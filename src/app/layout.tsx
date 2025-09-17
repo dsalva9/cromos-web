@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import SiteHeader from '@/components/site-header';
+import SupabaseProvider from '@/components/providers/SupabaseProvider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -15,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'CambiaCromos - Trade Sports Cards',
-  description: 'Intercambia cromos deportivos con coleccionistas de todo el mundo. La plataforma líder para el trading de cartas deportivas.',
+  description:
+    'Intercambia cromos deportivos con coleccionistas de todo el mundo. La plataforma líder para el trading de cartas deportivas.',
 };
 
 export default function RootLayout({
@@ -28,21 +30,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-background text-foreground antialiased`}
       >
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-1 rounded z-50"
-        >
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main" className="container mx-auto px-4 py-6">
-          {children}
-        </main>
-        <footer className="border-t">
-          <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Cromos
-          </div>
-        </footer>
+        <SupabaseProvider>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-1 rounded z-50"
+          >
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main" className="container mx-auto px-4 py-6">
+            {children}
+          </main>
+          <footer className="border-t">
+            <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Cromos
+            </div>
+          </footer>
+        </SupabaseProvider>
       </body>
     </html>
   );
