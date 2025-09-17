@@ -34,7 +34,7 @@ export default function SignupPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -47,7 +47,8 @@ export default function SignupPage() {
         <div className="text-center">
           <h1 className="text-2xl font-semibold">Sign up</h1>
           <p className="mt-2 text-muted-foreground">
-            Create your account and join the community of sports card collectors.
+            Create your account and join the community of sports card
+            collectors.
           </p>
         </div>
 
@@ -61,7 +62,7 @@ export default function SignupPage() {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
@@ -75,7 +76,7 @@ export default function SignupPage() {
               type="password"
               placeholder="Create a password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -89,16 +90,12 @@ export default function SignupPage() {
               type="password"
               placeholder="Confirm your password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={e => setConfirmPassword(e.target.value)}
               required
             />
           </div>
 
-          {error && (
-            <div className="text-sm text-destructive">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-sm text-destructive">{error}</div>}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Creating account...' : 'Sign up'}

@@ -86,19 +86,19 @@ export default function CollectionPage() {
         .from('stickers')
         .select(
           `
-          id,
-          code,
-          player_name,
-          team,
-          position,
-          nationality,
-          rating,
-          rarity,
-          image_url,
-          collections!left (
-            count
-          )
-        `
+        id,
+        code,
+        player_name,
+        team,
+        position,
+        nationality,
+        rating,
+        rarity,
+        image_url,
+        collections!left (
+          count
+        )
+      `
         )
         .eq('collections.user_id', user.id)
         .order('id');
@@ -120,9 +120,11 @@ export default function CollectionPage() {
       }));
 
       setStickers(formattedStickers);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching stickers:', err);
-      setError(err.message);
+      const errorMessage =
+        err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -161,9 +163,13 @@ export default function CollectionPage() {
 
         if (error) throw error;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An error occurred';
+      setError(message);
       console.error('Error updating sticker count:', err);
-      setError(err.message);
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to update sticker count';
+      setError(errorMessage);
 
       // Revert optimistic update on error
       setStickers(prev =>
@@ -184,6 +190,7 @@ export default function CollectionPage() {
     if (!userLoading && user) {
       fetchStickersAndCollection();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, userLoading]);
 
   // Loading state

@@ -32,7 +32,7 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -59,7 +59,7 @@ export default function LoginPage() {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
@@ -73,16 +73,12 @@ export default function LoginPage() {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
 
-          {error && (
-            <div className="text-sm text-destructive">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-sm text-destructive">{error}</div>}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
@@ -90,13 +86,16 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center">
-          <Link href="/forgot-password" className="text-sm text-muted-foreground hover:text-primary">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
             Forgot your password?
           </Link>
         </div>
 
         <div className="text-center text-sm">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/signup" className="text-primary hover:underline">
             Sign up
           </Link>

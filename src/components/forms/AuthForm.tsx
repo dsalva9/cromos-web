@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -33,8 +32,8 @@ function FormField({
       <label
         htmlFor={id}
         className={cn(
-          "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-          error && "text-destructive"
+          'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+          error && 'text-destructive'
         )}
       >
         {label}
@@ -45,18 +44,16 @@ function FormField({
         type={type}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         disabled={disabled}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={cn(error && "border-destructive focus-visible:ring-destructive")}
+        className={cn(
+          error && 'border-destructive focus-visible:ring-destructive'
+        )}
       />
       {error && (
-        <p
-          id={`${id}-error`}
-          className="text-sm text-destructive"
-          role="alert"
-        >
+        <p id={`${id}-error`} className="text-sm text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -69,7 +66,13 @@ interface LoadingButtonProps {
   loadingText: string;
   children: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
   disabled?: boolean;
@@ -117,20 +120,28 @@ function ErrorAlert({ error, className }: ErrorAlertProps) {
   if (!error) return null;
 
   return (
-    <div className={cn(
-      "rounded-md border border-destructive/50 bg-destructive/10 p-3",
-      className
-    )}>
+    <div
+      className={cn(
+        'rounded-md border border-destructive/50 bg-destructive/10 p-3',
+        className
+      )}
+    >
       <div className="flex">
         <div className="flex-shrink-0">
-          <svg className="h-5 w-5 text-destructive" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+          <svg
+            className="h-5 w-5 text-destructive"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+              clipRule="evenodd"
+            />
           </svg>
         </div>
         <div className="ml-3">
-          <p className="text-sm text-destructive font-medium">
-            {error}
-          </p>
+          <p className="text-sm text-destructive font-medium">{error}</p>
         </div>
       </div>
     </div>
@@ -146,14 +157,24 @@ function SuccessAlert({ message, className }: SuccessAlertProps) {
   if (!message) return null;
 
   return (
-    <div className={cn(
-      "rounded-md border border-green-500/50 bg-green-50 p-3 dark:bg-green-950/50",
-      className
-    )}>
+    <div
+      className={cn(
+        'rounded-md border border-green-500/50 bg-green-50 p-3 dark:bg-green-950/50',
+        className
+      )}
+    >
       <div className="flex">
         <div className="flex-shrink-0">
-          <svg className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.23 10.661a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" />
+          <svg
+            className="h-5 w-5 text-green-500"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.23 10.661a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.14-.094l3.75-5.25z"
+              clipRule="evenodd"
+            />
           </svg>
         </div>
         <div className="ml-3">
@@ -173,16 +194,19 @@ interface FormContainerProps {
   className?: string;
 }
 
-function FormContainer({ title, description, children, className }: FormContainerProps) {
+function FormContainer({
+  title,
+  description,
+  children,
+  className,
+}: FormContainerProps) {
   return (
-    <main className={cn("container mx-auto max-w-md p-4", className)}>
+    <main className={cn('container mx-auto max-w-md p-4', className)}>
       <div className="space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           {description && (
-            <p className="mt-2 text-muted-foreground">
-              {description}
-            </p>
+            <p className="mt-2 text-muted-foreground">{description}</p>
           )}
         </div>
         {children}
@@ -191,10 +215,4 @@ function FormContainer({ title, description, children, className }: FormContaine
   );
 }
 
-export {
-  FormField,
-  LoadingButton,
-  ErrorAlert,
-  SuccessAlert,
-  FormContainer,
-};
+export { FormField, LoadingButton, ErrorAlert, SuccessAlert, FormContainer };

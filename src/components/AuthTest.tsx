@@ -18,7 +18,7 @@ export default function AuthTest() {
 
     try {
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -28,15 +28,17 @@ export default function AuthTest() {
         if (error) throw error;
         setMessage('Check your email for the confirmation link!');
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
         setMessage('Signed in successfully!');
       }
-    } catch (error: any) {
-      setMessage(`Error: ${error.message}`);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'An error occurred';
+      setMessage(`Error: ${message}`);
     }
   };
 
