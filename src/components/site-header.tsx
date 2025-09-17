@@ -27,7 +27,7 @@ export default function SiteHeader() {
   ];
 
   return (
-    <header className="border-b bg-[var(--surface)]">
+    <header className="sticky top-0 z-50 border-b bg-[var(--surface)]">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -46,7 +46,7 @@ export default function SiteHeader() {
             className="hidden md:block"
           >
             <ul className="flex items-center space-x-8">
-              {navigationLinks.map((link) => (
+              {navigationLinks.map(link => (
                 <li key={link.href}>
                   <NavLink
                     href={link.href}
@@ -87,7 +87,7 @@ export default function SiteHeader() {
           )}
         >
           <ul className="py-4 space-y-2">
-            {navigationLinks.map((link) => (
+            {navigationLinks.map(link => (
               <li key={link.href}>
                 <NavLink
                   href={link.href}
