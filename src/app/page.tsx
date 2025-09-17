@@ -20,7 +20,12 @@ export default function Home() {
           <Button asChild size="lg" className="w-full sm:w-auto">
             <Link href="/mi-coleccion">Mi colección</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto"
+          >
             <Link href="/mi-coleccion">Explorar cromos</Link>
           </Button>
         </div>

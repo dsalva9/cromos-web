@@ -1,0 +1,156 @@
+/* CambiaCromos Theme System */
+
+/* Light theme (default) */
+:root {
+  /* Brand Colors*/
+  --brand: #2563eb;
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-800: #1e40af;
+  --brand-900: #1e3a8a;
+
+  /* Surface Colors */
+  --surface: #ffffff;
+  --surface-50: #f8fafc;
+  --surface-100: #f1f5f9;
+  --surface-200: #e2e8f0;
+  --surface-300: #cbd5e1;
+  --surface-contrast: #0f172a;
+  --surface-muted: #64748b;
+
+  /* Semantic Colors */
+  --muted: #6b7280;
+  --muted-light: #9ca3af;
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  /* Border & Interaction */
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
+  --focus-ring: #93c5fd;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark theme override */
+[data-theme='dark'] {
+  /* Brand Colors (adjusted for dark mode) */
+  --brand: #3b82f6;
+  --brand-50: #1e3a8a;
+  --brand-100: #1e40af;
+  --brand-200: #1d4ed8;
+  --brand-300: #2563eb;
+  --brand-400: #3b82f6;
+  --brand-500: #60a5fa;
+  --brand-600: #93c5fd;
+  --brand-700: #bfdbfe;
+  --brand-800: #dbeafe;
+  --brand-900: #eff6ff;
+
+  /* Surface Colors */
+  --surface: #0f172a;
+  --surface-50: #020617;
+  --surface-100: #0f172a;
+  --surface-200: #1e293b;
+  --surface-300: #334155;
+  --surface-contrast: #f8fafc;
+  --surface-muted: #94a3b8;
+
+  /* Semantic Colors */
+  --muted: #9ca3af;
+  --muted-light: #6b7280;
+  --accent: #fbbf24;
+  --accent-light: #f59e0b;
+
+  /* Status Colors (dark mode adjusted) */
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --info: #60a5fa;
+
+  /* Border & Interaction */
+  --border: #374151;
+  --border-hover: #4b5563;
+  --focus-ring: #60a5fa;
+
+  /* Shadow (darker) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
+/* Utility classes for quick theming */
+.bg-brand {
+  background-color: var(--brand);
+}
+.bg-surface {
+  background-color: var(--surface);
+}
+.bg-surface-50 {
+  background-color: var(--surface-50);
+}
+.text-brand {
+  color: var(--brand);
+}
+.text-surface-contrast {
+  color: var(--surface-contrast);
+}
+.text-muted {
+  color: var(--muted);
+}
+.border-theme {
+  border-color: var(--border);
+}
+
+/* Card styling with theme variables */
+.card-theme {
+  background-color: var(--surface);
+  color: var(--surface-contrast);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-theme:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow);
+}
+
+/* Button styling with theme variables */
+.btn-brand {
+  background-color: var(--brand);
+  color: var(--surface);
+  border: 1px solid var(--brand);
+}
+
+.btn-brand:hover {
+  background-color: var(--brand-700);
+  border-color: var(--brand-700);
+}
+
+.btn-surface {
+  background-color: var(--surface);
+  color: var(--surface-contrast);
+  border: 1px solid var(--border);
+}
+
+.btn-surface:hover {
+  background-color: var(--surface-50);
+  border-color: var(--border-hover);
+}
