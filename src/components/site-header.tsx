@@ -36,7 +36,7 @@ export default function SiteHeader() {
             className="text-xl font-bold text-[var(--brand)] hover:text-[var(--brand-600)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-2 rounded-sm"
             onClick={closeMenu}
           >
-            Cromos
+            CambiaCromos
           </Link>
 
           {/* Desktop Navigation */}
