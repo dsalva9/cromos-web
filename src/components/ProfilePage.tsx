@@ -64,11 +64,10 @@ function ProfileContent() {
         .from('profiles')
         .select('id, nickname, avatar_url, created_at')
         .eq('id', user.id)
-        .maybeSingle(); // Use maybeSingle() instead of single()
+        .maybeSingle();
 
       if (profileError) {
         console.error('Profile error:', profileError);
-        // Don't throw error, just create default profile
       }
 
       setProfile(
@@ -105,7 +104,7 @@ function ProfileContent() {
 
       // Get stats for each user collection
       const collectionsWithStats = await Promise.all(
-        (userCollectionsData || []).map(async uc => {
+        (userCollectionsData || []).map(async (uc: any) => {
           if (!uc.collections) return null;
 
           // Get collection stats
@@ -138,7 +137,7 @@ function ProfileContent() {
 
       // Fetch available collections user hasn't joined
       const userCollectionIds = (userCollectionsData || [])
-        .map(uc => uc.collections?.id)
+        .map((uc: any) => uc.collections?.id)
         .filter(Boolean);
 
       const { data: availableData, error: availableError } = await supabase
@@ -162,10 +161,7 @@ function ProfileContent() {
     if (!user) return;
 
     try {
-      console.log('Attempting to update nickname for user:', user.id);
-      console.log('New nickname:', nickname.trim() || null);
-
-      const { data, error } = await supabase.from('profiles').upsert(
+      const { error } = await supabase.from('profiles').upsert(
         {
           id: user.id,
           nickname: nickname.trim() || null,
@@ -175,9 +171,6 @@ function ProfileContent() {
         }
       );
 
-      console.log('Supabase response data:', data);
-      console.log('Supabase response error:', error);
-
       if (error) throw error;
 
       setProfile(prev =>
@@ -185,10 +178,8 @@ function ProfileContent() {
       );
       setEditingNickname(false);
     } catch (err: unknown) {
-      console.error('Full error object:', err);
-      setError(
-        `Error updating nickname: ${err instanceof Error ? err.message : 'Unknown error'}`
-      );
+      console.error('Error updating nickname:', err);
+      setError('Error updating nickname');
     }
   };
 
@@ -301,13 +292,13 @@ function ProfileContent() {
                         className="flex-1"
                         onKeyDown={e => {
                           if (e.key === 'Enter') {
-                            setNickname();
+                            updateNickname();
                           }
                           if (e.key === 'Escape') {
-                            setNickname(false);
+                            setEditingNickname(false);
                           }
                         }}
-                        autofocus
+                        autoFocus
                       />
                       <Button size="sm" onClick={updateNickname}>
                         Guardar
@@ -315,14 +306,7 @@ function ProfileContent() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            updateNickname();
-                          }
-                          if (e.key === 'Escape') {
-                            updateNickname(false);
-                          }
-                        }}
+                        onClick={() => setEditingNickname(false)}
                       >
                         Cancelar
                       </Button>
