@@ -4,14 +4,23 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import AuthGuard from '@/components/AuthGuard';
+
+interface Collection {
+  id: number;
+  name: string;
+  competition: string;
+  year: string;
+  description: string;
+}
 
 interface Sticker {
   id: number;
+  collection_id: number;
   code: string;
   player_name: string;
-  team: string;
+  team_name: string;
   position: string;
   nationality: string;
   rating: number;
@@ -46,23 +55,13 @@ function getRarityGradient(rarity: Sticker['rarity']) {
   }
 }
 
-function getRarityColor(rarity: Sticker['rarity']) {
-  switch (rarity) {
-    case 'legendary':
-      return 'bg-gradient-to-r from-yellow-400 to-orange-500';
-    case 'epic':
-      return 'bg-gradient-to-r from-purple-400 to-pink-500';
-    case 'rare':
-      return 'bg-gradient-to-r from-blue-400 to-cyan-500';
-    case 'common':
-      return 'bg-gradient-to-r from-gray-400 to-gray-500';
-  }
-}
-
 function CollectionContent() {
   const { supabase } = useSupabase();
   const { user, loading: userLoading } = useUser();
 
+  const [activeCollection, setActiveCollection] = useState<Collection | null>(
+    null
+  );
   const [stickers, setStickers] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +91,63 @@ function CollectionContent() {
     };
   }, [stickers]);
 
-  // Fetch all stickers with user's collection data
+  // Get or create user's active collection
+  const setupUserActiveCollection = async () => {
+    if (!user) return null;
+
+    try {
+      // First, check if user has an active collection
+      const { data: userCollection, error: userCollectionError } =
+        await supabase
+          .from('user_collections')
+          .select(
+            `
+          collection_id,
+          collections (
+            id,
+            name,
+            competition,
+            year,
+            description
+          )
+        `
+          )
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .single();
+
+      if (userCollection && userCollection.collections) {
+        return userCollection.collections as Collection;
+      }
+
+      // If no active collection, get the first available collection and make it active
+      const { data: firstCollection, error: firstCollectionError } =
+        await supabase
+          .from('collections')
+          .select('*')
+          .eq('is_active', true)
+          .limit(1)
+          .single();
+
+      if (firstCollectionError || !firstCollection) {
+        throw new Error('No collections available');
+      }
+
+      // Add user to this collection and make it active
+      await supabase.from('user_collections').insert({
+        user_id: user.id,
+        collection_id: firstCollection.id,
+        is_active: true,
+      });
+
+      return firstCollection as Collection;
+    } catch (err: unknown) {
+      console.error('Error setting up user collection:', err);
+      throw err;
+    }
+  };
+
+  // Fetch stickers for the active collection with user's data
   const fetchStickersAndCollection = async () => {
     if (!user) return;
 
@@ -100,42 +155,58 @@ function CollectionContent() {
       setLoading(true);
       setError(null);
 
+      // Get user's active collection
+      const collection = await setupUserActiveCollection();
+      if (!collection) {
+        setError('No collection found');
+        return;
+      }
+
+      setActiveCollection(collection);
+
+      // Fetch all stickers for this collection with user's ownership data
       const { data: stickersData, error: stickersError } = await supabase
         .from('stickers')
         .select(
           `
-        id,
-        code,
-        player_name,
-        team,
-        position,
-        nationality,
-        rating,
-        rarity,
-        image_url,
-        collections!left (
-          count,
-          wanted
+          id,
+          collection_id,
+          code,
+          player_name,
+          position,
+          nationality,
+          rating,
+          rarity,
+          image_url,
+          collection_teams (
+            team_name
+          ),
+          user_stickers!left (
+            count,
+            wanted
+          )
+        `
         )
-      `
-        )
-        .eq('collections.user_id', user.id)
+        .eq('collection_id', collection.id)
+        .eq('user_stickers.user_id', user.id)
         .order('id');
 
       if (stickersError) throw stickersError;
 
+      // Transform the data
       const formattedStickers: CollectionItem[] = stickersData.map(sticker => ({
         id: sticker.id,
+        collection_id: sticker.collection_id,
         code: sticker.code,
         player_name: sticker.player_name,
-        team: sticker.team,
-        position: sticker.position,
-        nationality: sticker.nationality,
-        rating: sticker.rating,
+        team_name: sticker.collection_teams?.team_name || 'Unknown Team',
+        position: sticker.position || '',
+        nationality: sticker.nationality || '',
+        rating: sticker.rating || 0,
         rarity: sticker.rarity as Sticker['rarity'],
         image_url: sticker.image_url,
-        count: sticker.collections?.[0]?.count || 0,
-        wanted: sticker.collections?.[0]?.wanted || false,
+        count: sticker.user_stickers?.[0]?.count || 0,
+        wanted: sticker.user_stickers?.[0]?.wanted || false,
       }));
 
       setStickers(formattedStickers);
@@ -158,6 +229,7 @@ function CollectionContent() {
 
     const newCount = currentSticker.count === 0 ? 1 : currentSticker.count + 1;
 
+    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
@@ -167,7 +239,7 @@ function CollectionContent() {
     );
 
     try {
-      const { error } = await supabase.from('collections').upsert({
+      const { error } = await supabase.from('user_stickers').upsert({
         user_id: user.id,
         sticker_id: stickerId,
         count: newCount,
@@ -177,7 +249,7 @@ function CollectionContent() {
       if (error) throw error;
     } catch (err: unknown) {
       console.error('Error updating sticker ownership:', err);
-      fetchStickersAndCollection();
+      fetchStickersAndCollection(); // Revert on error
     }
   };
 
@@ -190,6 +262,7 @@ function CollectionContent() {
 
     const newWantedStatus = !currentSticker.wanted;
 
+    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
@@ -200,7 +273,8 @@ function CollectionContent() {
 
     try {
       if (newWantedStatus) {
-        const { error } = await supabase.from('collections').upsert({
+        // Add to wanted list
+        const { error } = await supabase.from('user_stickers').upsert({
           user_id: user.id,
           sticker_id: stickerId,
           count: 0,
@@ -208,8 +282,9 @@ function CollectionContent() {
         });
         if (error) throw error;
       } else {
+        // Remove from wanted list
         const { error } = await supabase
-          .from('collections')
+          .from('user_stickers')
           .delete()
           .eq('user_id', user.id)
           .eq('sticker_id', stickerId)
@@ -218,7 +293,7 @@ function CollectionContent() {
       }
     } catch (err: unknown) {
       console.error('Error updating wanted status:', err);
-      fetchStickersAndCollection();
+      fetchStickersAndCollection(); // Revert on error
     }
   };
 
@@ -277,52 +352,50 @@ function CollectionContent() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with Collection Info */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-            Liga 2024
+            {activeCollection?.name || 'Mi Colección'}
           </h1>
+          {activeCollection?.description && (
+            <p className="text-white/80 mt-2">{activeCollection.description}</p>
+          )}
         </div>
 
         {/* Stickers Grid */}
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {stickers.map(sticker => (
-            <Card
+            <ModernCard
               key={sticker.id}
-              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden bg-white/95 backdrop-blur-sm"
+              className="bg-white hover:scale-105 transition-transform duration-200"
             >
-              <CardContent className="p-3">
+              <ModernCardContent className="p-3">
                 {/* Player Image Area */}
-                <div className="aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  {/* Rarity Background */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${getRarityGradient(sticker.rarity)} opacity-20`}
-                  ></div>
-
+                <div
+                  className={`aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br ${getRarityGradient(sticker.rarity)} p-4 flex items-center justify-center`}
+                >
                   {/* Player Avatar */}
                   <div className="relative z-10">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-2xl text-white shadow-lg">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl shadow-lg border border-white/30">
                       👤
                     </div>
                   </div>
 
                   {/* Status Indicators */}
                   {sticker.wanted && sticker.count === 0 && (
-                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                      ¡LO QUIERO!
+                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                      QUIERO
                     </div>
                   )}
 
                   {sticker.count > 1 && (
-                    <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                    <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
                       +{sticker.count - 1}
                     </div>
                   )}
 
                   {/* Rating Badge */}
-                  <div
-                    className={`absolute top-2 right-2 ${getRarityColor(sticker.rarity)} text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg`}
-                  >
+                  <div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
                     {sticker.rating}
                   </div>
                 </div>
@@ -333,7 +406,7 @@ function CollectionContent() {
                     {sticker.player_name}
                   </h3>
                   <p className="text-xs text-gray-600 text-center font-semibold">
-                    {sticker.team}
+                    {sticker.team_name}
                   </p>
                   <p className="text-xs text-gray-500 text-center">
                     {sticker.code}
@@ -344,10 +417,10 @@ function CollectionContent() {
                 <div className="space-y-2">
                   <Button
                     size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-300 ${
+                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
                       sticker.count > 0
-                        ? 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-green-400 text-green-600 hover:bg-green-50'
+                        ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
+                        : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
                     }`}
                     onClick={() => updateStickerOwnership(sticker.id)}
                   >
@@ -356,10 +429,10 @@ function CollectionContent() {
 
                   <Button
                     size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-300 ${
+                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
                       sticker.wanted && sticker.count === 0
-                        ? 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg'
-                        : 'bg-white border-2 border-blue-400 text-blue-600 hover:bg-blue-50'
+                        ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
+                        : 'bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50 shadow-sm'
                     }`}
                     onClick={() => toggleWantedStatus(sticker.id)}
                     disabled={sticker.count > 0}
@@ -367,8 +440,8 @@ function CollectionContent() {
                     {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </ModernCardContent>
+            </ModernCard>
           ))}
         </div>
 
