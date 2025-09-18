@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import AuthGuard from '@/components/AuthGuard';
@@ -40,6 +39,11 @@ interface UserProgress {
   duplicates_count: number;
   wanted_count: number;
   completion_percentage: number;
+}
+
+interface UserCollectionData {
+  collection_id: number;
+  collections: Collection | Collection[] | null;
 }
 
 function getRarityGradient(rarity: Sticker['rarity']) {
@@ -92,16 +96,15 @@ function CollectionContent() {
   }, [stickers]);
 
   // Get or create user's active collection
-  const setupUserActiveCollection = async () => {
+  const setupUserActiveCollection = useCallback(async () => {
     if (!user) return null;
 
     try {
       // First, check if user has an active collection
-      const { data: userCollection, error: userCollectionError } =
-        await supabase
-          .from('user_collections')
-          .select(
-            `
+      const { data: userCollection } = await supabase
+        .from('user_collections')
+        .select(
+          `
           collection_id,
           collections (
             id,
@@ -111,13 +114,21 @@ function CollectionContent() {
             description
           )
         `
-          )
-          .eq('user_id', user.id)
-          .eq('is_active', true)
-          .single();
+        )
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single();
 
       if (userCollection && userCollection.collections) {
-        return userCollection.collections as Collection;
+        const typedUserCollection = userCollection as UserCollectionData;
+
+        // Handle both array and single object responses from Supabase
+        const collections = typedUserCollection.collections;
+        if (Array.isArray(collections) && collections.length > 0) {
+          return collections[0];
+        } else if (collections && !Array.isArray(collections)) {
+          return collections;
+        }
       }
 
       // If no active collection, get the first available collection and make it active
@@ -145,10 +156,10 @@ function CollectionContent() {
       console.error('Error setting up user collection:', err);
       throw err;
     }
-  };
+  }, [user, supabase]);
 
   // Fetch stickers for the active collection with user's data
-  const fetchStickersAndCollection = async () => {
+  const fetchStickersAndCollection = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -194,20 +205,34 @@ function CollectionContent() {
       if (stickersError) throw stickersError;
 
       // Transform the data
-      const formattedStickers: CollectionItem[] = stickersData.map(sticker => ({
-        id: sticker.id,
-        collection_id: sticker.collection_id,
-        code: sticker.code,
-        player_name: sticker.player_name,
-        team_name: sticker.collection_teams?.team_name || 'Unknown Team',
-        position: sticker.position || '',
-        nationality: sticker.nationality || '',
-        rating: sticker.rating || 0,
-        rarity: sticker.rarity as Sticker['rarity'],
-        image_url: sticker.image_url,
-        count: sticker.user_stickers?.[0]?.count || 0,
-        wanted: sticker.user_stickers?.[0]?.wanted || false,
-      }));
+      const formattedStickers: CollectionItem[] = stickersData.map(sticker => {
+        // Handle team_name extraction from collection_teams
+        let teamName = 'Unknown Team';
+        if (sticker.collection_teams) {
+          if (Array.isArray(sticker.collection_teams)) {
+            teamName = sticker.collection_teams[0]?.team_name || 'Unknown Team';
+          } else {
+            teamName =
+              (sticker.collection_teams as { team_name: string })?.team_name ||
+              'Unknown Team';
+          }
+        }
+
+        return {
+          id: sticker.id,
+          collection_id: sticker.collection_id,
+          code: sticker.code,
+          player_name: sticker.player_name,
+          team_name: teamName,
+          position: sticker.position || '',
+          nationality: sticker.nationality || '',
+          rating: sticker.rating || 0,
+          rarity: sticker.rarity as Sticker['rarity'],
+          image_url: sticker.image_url,
+          count: sticker.user_stickers?.[0]?.count || 0,
+          wanted: sticker.user_stickers?.[0]?.wanted || false,
+        };
+      });
 
       setStickers(formattedStickers);
     } catch (err: unknown) {
@@ -218,7 +243,7 @@ function CollectionContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase, setupUserActiveCollection]);
 
   // Update sticker ownership
   const updateStickerOwnership = async (stickerId: number) => {
@@ -301,7 +326,7 @@ function CollectionContent() {
     if (!userLoading && user) {
       fetchStickersAndCollection();
     }
-  }, [user, userLoading]);
+  }, [user, userLoading, fetchStickersAndCollection]);
 
   if (userLoading || loading) {
     return (

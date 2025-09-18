@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +37,12 @@ interface Profile {
   created_at: string;
 }
 
+interface UserCollectionRawData {
+  is_active: boolean;
+  joined_at: string;
+  collections: Collection[] | Collection | null;
+}
+
 function ProfileContent() {
   const { supabase } = useSupabase();
   const { user, loading: userLoading } = useUser();
@@ -52,7 +58,7 @@ function ProfileContent() {
   const [nickname, setNickname] = useState('');
 
   // Fetch user profile and collections
-  const fetchProfileData = async () => {
+  const fetchProfileData = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -102,17 +108,26 @@ function ProfileContent() {
 
       if (userCollectionsError) throw userCollectionsError;
 
-      // Get stats for each user collection
+      // Process each user collection and get stats
       const collectionsWithStats = await Promise.all(
-        (userCollectionsData || []).map(async (uc: any) => {
+        (userCollectionsData || []).map(async (uc: UserCollectionRawData) => {
           if (!uc.collections) return null;
+
+          // Extract the collection object (handle both array and single object)
+          let collection: Collection;
+          if (Array.isArray(uc.collections)) {
+            if (uc.collections.length === 0) return null;
+            collection = uc.collections[0];
+          } else {
+            collection = uc.collections;
+          }
 
           // Get collection stats
           const { data: statsData } = await supabase.rpc(
             'get_user_collection_stats',
             {
               p_user_id: user.id,
-              p_collection_id: uc.collections.id,
+              p_collection_id: collection.id,
             }
           );
 
@@ -125,7 +140,7 @@ function ProfileContent() {
           };
 
           return {
-            ...uc.collections,
+            ...collection,
             is_user_active: uc.is_active,
             joined_at: uc.joined_at,
             stats,
@@ -133,11 +148,21 @@ function ProfileContent() {
         })
       );
 
-      setUserCollections(collectionsWithStats.filter(Boolean));
+      setUserCollections(
+        collectionsWithStats.filter(Boolean) as UserCollection[]
+      );
 
       // Fetch available collections user hasn't joined
       const userCollectionIds = (userCollectionsData || [])
-        .map((uc: any) => uc.collections?.id)
+        .map((uc: UserCollectionRawData) => {
+          if (!uc.collections) return null;
+
+          if (Array.isArray(uc.collections)) {
+            return uc.collections.length > 0 ? uc.collections[0].id : null;
+          } else {
+            return uc.collections.id;
+          }
+        })
         .filter(Boolean);
 
       const { data: availableData, error: availableError } = await supabase
@@ -154,7 +179,7 @@ function ProfileContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, supabase]);
 
   // Update profile nickname
   const updateNickname = async () => {
@@ -235,7 +260,7 @@ function ProfileContent() {
     if (!userLoading && user) {
       fetchProfileData();
     }
-  }, [user, userLoading]);
+  }, [user, userLoading, fetchProfileData]);
 
   if (userLoading || loading) {
     return (
