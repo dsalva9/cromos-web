@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -120,4 +131,12 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Override any default card borders */
+.card-no-border {
+  border: none !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }

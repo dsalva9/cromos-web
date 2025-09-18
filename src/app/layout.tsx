@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="light">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-background text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-transparent text-foreground antialiased`}
       >
         <SupabaseProvider>
           <a
@@ -38,7 +38,7 @@ export default function RootLayout({
             Skip to content
           </a>
           <SiteHeader />
-          <main id="main" className="container mx-auto px-4 py-6">
+          <main id="main" className="min-h-screen">
             {children}
           </main>
           <footer className="border-t">

@@ -43,13 +43,14 @@ export default function SiteHeader() {
   const navigationLinks = user ? authenticatedLinks : unauthenticatedLinks;
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-700/50 shadow-xl">
+      {' '}
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link
             href="/"
-            className="text-xl font-bold text-primary hover:text-primary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm"
+            className="text-2xl font-black text-white hover:text-yellow-300 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 rounded-lg"
             onClick={closeMenu}
           >
             CambiaCromos
@@ -59,14 +60,14 @@ export default function SiteHeader() {
           <nav
             role="navigation"
             aria-label="Main navigation"
-            className="hidden md:flex md:items-center md:space-x-6"
+            className="hidden md:flex md:items-center md:space-x-1"
           >
-            <ul className="flex items-center space-x-6">
+            <ul className="flex items-center space-x-1">
               {navigationLinks.map(link => (
                 <li key={link.href}>
                   <NavLink
                     href={link.href}
-                    className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm"
+                    className="px-4 py-2 rounded-xl font-semibold text-white/90 hover:text-white hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-1"
                   >
                     {link.label}
                   </NavLink>
@@ -76,13 +77,13 @@ export default function SiteHeader() {
 
             {/* Auth Actions */}
             {!loading && (
-              <div className="flex items-center space-x-2 ml-4 pl-4 border-l">
+              <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-white/20">
                 {user ? (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleSignOut}
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 text-white/90 hover:text-white hover:bg-red-500/20 rounded-xl px-4 py-2 font-semibold transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4" />
                     <span>Salir</span>
@@ -95,7 +96,7 @@ export default function SiteHeader() {
           {/* Mobile Menu Toggle */}
           <button
             type="button"
-            className="md:hidden p-2 text-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-sm transition-colors"
+            className="md:hidden p-2 text-white/90 hover:text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-1 rounded-xl transition-all duration-200"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-menu"
             aria-label="Toggle navigation menu"
@@ -115,7 +116,7 @@ export default function SiteHeader() {
           role="navigation"
           aria-label="Mobile navigation"
           className={cn(
-            'md:hidden border-t bg-background',
+            'md:hidden border-t border-white/20 bg-white/10 backdrop-blur-md',
             isMenuOpen ? 'block' : 'hidden'
           )}
         >
@@ -124,7 +125,7 @@ export default function SiteHeader() {
               <li key={link.href}>
                 <NavLink
                   href={link.href}
-                  className="block px-4 py-2 hover:bg-muted rounded-md mx-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="block px-4 py-3 mx-2 rounded-xl font-semibold text-white/90 hover:text-white hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-1"
                   onClick={closeMenu}
                 >
                   {link.label}
@@ -134,12 +135,12 @@ export default function SiteHeader() {
 
             {/* Mobile Auth Actions */}
             {!loading && user && (
-              <li className="px-2 pt-2 border-t mt-4">
+              <li className="px-2 pt-2 border-t border-white/20 mt-4">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleSignOut}
-                  className="w-full justify-start flex items-center space-x-2"
+                  className="w-full justify-start flex items-center space-x-2 text-white/90 hover:text-white hover:bg-red-500/20 rounded-xl px-4 py-3 font-semibold"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Salir</span>

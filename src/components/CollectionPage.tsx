@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import AuthGuard from '@/components/AuthGuard';
 
 interface Sticker {
@@ -19,8 +20,8 @@ interface Sticker {
 }
 
 interface CollectionItem extends Sticker {
-  count: number; // How many of this sticker the user owns
-  wanted: boolean; // Whether the user wants this sticker
+  count: number;
+  wanted: boolean;
 }
 
 interface UserProgress {
@@ -32,16 +33,29 @@ interface UserProgress {
   completion_percentage: number;
 }
 
+function getRarityGradient(rarity: Sticker['rarity']) {
+  switch (rarity) {
+    case 'legendary':
+      return 'from-yellow-400 to-orange-500';
+    case 'epic':
+      return 'from-purple-400 to-pink-500';
+    case 'rare':
+      return 'from-blue-400 to-cyan-500';
+    case 'common':
+      return 'from-gray-400 to-gray-500';
+  }
+}
+
 function getRarityColor(rarity: Sticker['rarity']) {
   switch (rarity) {
     case 'legendary':
-      return 'bg-yellow-500';
+      return 'bg-gradient-to-r from-yellow-400 to-orange-500';
     case 'epic':
-      return 'bg-purple-500';
+      return 'bg-gradient-to-r from-purple-400 to-pink-500';
     case 'rare':
-      return 'bg-blue-500';
+      return 'bg-gradient-to-r from-blue-400 to-cyan-500';
     case 'common':
-      return 'bg-gray-500';
+      return 'bg-gradient-to-r from-gray-400 to-gray-500';
   }
 }
 
@@ -86,7 +100,6 @@ function CollectionContent() {
       setLoading(true);
       setError(null);
 
-      // Fetch all stickers with user's collection count and wanted status
       const { data: stickersData, error: stickersError } = await supabase
         .from('stickers')
         .select(
@@ -111,7 +124,6 @@ function CollectionContent() {
 
       if (stickersError) throw stickersError;
 
-      // Transform the data to include count and wanted status
       const formattedStickers: CollectionItem[] = stickersData.map(sticker => ({
         id: sticker.id,
         code: sticker.code,
@@ -137,7 +149,7 @@ function CollectionContent() {
     }
   };
 
-  // Update sticker ownership (count)
+  // Update sticker ownership
   const updateStickerOwnership = async (stickerId: number) => {
     if (!user) return;
 
@@ -146,11 +158,10 @@ function CollectionContent() {
 
     const newCount = currentSticker.count === 0 ? 1 : currentSticker.count + 1;
 
-    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
-          ? { ...sticker, count: newCount, wanted: false } // Remove from wanted when owned
+          ? { ...sticker, count: newCount, wanted: false }
           : sticker
       )
     );
@@ -160,17 +171,12 @@ function CollectionContent() {
         user_id: user.id,
         sticker_id: stickerId,
         count: newCount,
-        wanted: false, // Can't want what you own
+        wanted: false,
       });
 
       if (error) throw error;
     } catch (err: unknown) {
       console.error('Error updating sticker ownership:', err);
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update sticker';
-      setError(errorMessage);
-
-      // Revert optimistic update
       fetchStickersAndCollection();
     }
   };
@@ -180,14 +186,10 @@ function CollectionContent() {
     if (!user) return;
 
     const currentSticker = stickers.find(s => s.id === stickerId);
-    if (!currentSticker) return;
-
-    // Can't want stickers you already own
-    if (currentSticker.count > 0) return;
+    if (!currentSticker || currentSticker.count > 0) return;
 
     const newWantedStatus = !currentSticker.wanted;
 
-    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
@@ -198,7 +200,6 @@ function CollectionContent() {
 
     try {
       if (newWantedStatus) {
-        // Add to wanted list
         const { error } = await supabase.from('collections').upsert({
           user_id: user.id,
           sticker_id: stickerId,
@@ -207,7 +208,6 @@ function CollectionContent() {
         });
         if (error) throw error;
       } else {
-        // Remove from wanted list (delete the record if count is 0)
         const { error } = await supabase
           .from('collections')
           .delete()
@@ -218,42 +218,34 @@ function CollectionContent() {
       }
     } catch (err: unknown) {
       console.error('Error updating wanted status:', err);
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update wanted status';
-      setError(errorMessage);
-
-      // Revert optimistic update
       fetchStickersAndCollection();
     }
   };
 
-  // Load data when user is available
   useEffect(() => {
     if (!userLoading && user) {
       fetchStickersAndCollection();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, userLoading]);
 
-  // Loading state
   if (userLoading || loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <p>Cargando tu colección...</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+        <div className="text-white text-xl">Cargando tu colección...</div>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-destructive">Error</h1>
-          <p className="text-muted-foreground">{error}</p>
-          <Button onClick={fetchStickersAndCollection}>
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+        <div className="text-center space-y-4 text-white">
+          <h1 className="text-2xl font-bold">Error</h1>
+          <p>{error}</p>
+          <Button
+            onClick={fetchStickersAndCollection}
+            className="bg-white text-teal-600 hover:bg-gray-100"
+          >
             Intentar de nuevo
           </Button>
         </div>
@@ -262,154 +254,127 @@ function CollectionContent() {
   }
 
   return (
-    <div className="pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
       {/* Sticky Progress Header */}
-      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <div className="sticky top-16 z-40 bg-gradient-to-r from-teal-500/95 to-cyan-600/95 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Badge
-              variant="outline"
-              className="bg-green-50 text-green-700 border-green-200"
-            >
-              Tengo: {progress.owned_unique_stickers}/{progress.total_stickers}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="bg-blue-50 text-blue-700 border-blue-200"
-            >
-              Total: {progress.total_owned_count}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="bg-purple-50 text-purple-700 border-purple-200"
-            >
-              Repetidos: {progress.duplicates_count}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="bg-orange-50 text-orange-700 border-orange-200"
-            >
-              Quiero: {progress.wanted_count}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="bg-indigo-50 text-indigo-700 border-indigo-200"
-            >
-              Progreso: {progress.completion_percentage}%
-            </Badge>
+          <div className="flex flex-wrap justify-center gap-3 text-sm">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
+              <span className="text-green-300">TENGO</span>{' '}
+              {progress.owned_unique_stickers}
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
+              <span className="text-orange-300">ME FALTA</span>{' '}
+              {progress.wanted_count}
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
+              {progress.completion_percentage}%{' '}
+              <span className="text-yellow-300">★</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Mi Colección</h1>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+            Liga 2024
+          </h1>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* Stickers Grid */}
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {stickers.map(sticker => (
-            <div
+            <Card
               key={sticker.id}
-              className="rounded-lg border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 overflow-hidden bg-white/95 backdrop-blur-sm"
             >
-              {/* Player Image Placeholder */}
-              <div className="mb-4 aspect-[3/4] rounded-md bg-muted flex items-center justify-center relative overflow-hidden">
-                <span className="text-sm text-muted-foreground">Foto</span>
-                {/* Rarity indicator corner */}
-                <div
-                  className={`absolute top-2 right-2 w-3 h-3 rounded-full ${getRarityColor(sticker.rarity)}`}
-                ></div>
+              <CardContent className="p-3">
+                {/* Player Image Area */}
+                <div className="aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  {/* Rarity Background */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${getRarityGradient(sticker.rarity)} opacity-20`}
+                  ></div>
 
-                {/* Status indicators */}
-                {sticker.wanted && sticker.count === 0 && (
-                  <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                    Quiero
+                  {/* Player Avatar */}
+                  <div className="relative z-10">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-2xl text-white shadow-lg">
+                      👤
+                    </div>
                   </div>
-                )}
-                {sticker.count > 1 && (
-                  <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                    +{sticker.count - 1} extra
-                  </div>
-                )}
-              </div>
 
-              {/* Player Info */}
-              <div className="space-y-2">
-                <div className="flex items-start justify-between">
-                  <h3 className="font-semibold text-sm leading-tight">
-                    {sticker.player_name}
-                  </h3>
-                  <Badge
-                    className={`${getRarityColor(sticker.rarity)} text-white text-xs`}
+                  {/* Status Indicators */}
+                  {sticker.wanted && sticker.count === 0 && (
+                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                      ¡LO QUIERO!
+                    </div>
+                  )}
+
+                  {sticker.count > 1 && (
+                    <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                      +{sticker.count - 1}
+                    </div>
+                  )}
+
+                  {/* Rating Badge */}
+                  <div
+                    className={`absolute top-2 right-2 ${getRarityColor(sticker.rarity)} text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg`}
                   >
                     {sticker.rating}
-                  </Badge>
+                  </div>
                 </div>
 
-                <p className="text-sm font-medium text-primary">
-                  {sticker.team}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {sticker.position}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {sticker.nationality}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Código: {sticker.code}
-                </p>
-
-                {/* Status Display */}
-                {sticker.count > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    Tienes: {sticker.count}
-                  </Badge>
-                )}
+                {/* Player Info */}
+                <div className="space-y-1 mb-3">
+                  <h3 className="font-bold text-sm text-gray-800 leading-tight text-center">
+                    {sticker.player_name}
+                  </h3>
+                  <p className="text-xs text-gray-600 text-center font-semibold">
+                    {sticker.team}
+                  </p>
+                  <p className="text-xs text-gray-500 text-center">
+                    {sticker.code}
+                  </p>
+                </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 pt-2">
+                <div className="space-y-2">
                   <Button
                     size="sm"
-                    variant={sticker.count > 0 ? 'default' : 'outline'}
-                    className={`flex-1 text-xs transition-all duration-200 ${
+                    className={`w-full text-xs font-bold rounded-xl transition-all duration-300 ${
                       sticker.count > 0
-                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'hover:bg-green-50 hover:text-green-700 hover:border-green-200'
+                        ? 'bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white shadow-lg'
+                        : 'bg-white border-2 border-green-400 text-green-600 hover:bg-green-50'
                     }`}
                     onClick={() => updateStickerOwnership(sticker.id)}
                   >
-                    {sticker.count === 0 ? 'Tengo' : 'Tengo Repe'}
+                    {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
                   </Button>
 
                   <Button
                     size="sm"
-                    variant={
+                    className={`w-full text-xs font-bold rounded-xl transition-all duration-300 ${
                       sticker.wanted && sticker.count === 0
-                        ? 'default'
-                        : 'outline'
-                    }
-                    className={`flex-1 text-xs transition-all duration-200 ${
-                      sticker.wanted && sticker.count === 0
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200'
+                        ? 'bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg'
+                        : 'bg-white border-2 border-blue-400 text-blue-600 hover:bg-blue-50'
                     }`}
                     onClick={() => toggleWantedStatus(sticker.id)}
-                    disabled={sticker.count > 0} // Can't want what you own
+                    disabled={sticker.count > 0}
                   >
-                    {sticker.wanted && sticker.count === 0
-                      ? 'Ya no lo quiero'
-                      : 'Quiero'}
+                    {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
                   </Button>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
         {stickers.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No hay cromos disponibles.</p>
+            <div className="text-white text-xl">No hay cromos disponibles</div>
           </div>
         )}
       </div>
