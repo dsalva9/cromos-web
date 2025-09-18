@@ -398,7 +398,7 @@ function CollectionContent() {
                     disabled={sticker.count > 0} // Can't want what you own
                   >
                     {sticker.wanted && sticker.count === 0
-                      ? 'Lo Quiero'
+                      ? 'Ya no lo quiero'
                       : 'Quiero'}
                   </Button>
                 </div>
