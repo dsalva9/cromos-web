@@ -9,10 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial project setup with Next.js 15
-- TypeScript configuration
-- Tailwind CSS v4 with shadcn/ui components
-- Basic project structure and documentation
+- Trading system development (in progress)
+- User directory and public profiles (planned)
+- Advanced search and filtering (planned)
 
 ### Changed
 
@@ -25,6 +24,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - N/A
+
+## [0.2.0] - 2024-12-XX
+
+### Added
+
+- Complete user authentication system with Supabase
+- User profile management with collection statistics
+- Collection joining and switching functionality
+- Comprehensive sticker inventory system ("TENGO"/"QUIERO" functionality)
+- Collection progress tracking with completion percentages
+- Modern gradient UI with responsive design
+- Protected routes with AuthGuard component
+- Multi-collection support with user preferences
+- Real-time sticker ownership updates
+- Duplicate tracking and want list management
+- Site navigation with user-specific menu items
+
+### Infrastructure
+
+- Supabase RLS policies implementation
+- Database functions for collection statistics
+- Optimistic UI updates for better UX
+- Error handling and loading states
 
 ## [0.1.0] - 2024-XX-XX
 
