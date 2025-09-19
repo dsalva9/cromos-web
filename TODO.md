@@ -4,18 +4,18 @@
 
 ### High Priority
 
-- [ ] Set up Supabase project and database
-- [ ] Create basic database schema for sports cards
+- [x] Set up Supabase project and database
+- [x] Create basic database schema for sticker collections
 - [ ] Implement user authentication flow
 - [ ] Create basic user profile management
 - [ ] Set up protected routes structure
 
 ### Medium Priority
 
-- [ ] Design and implement card collection interface
-- [ ] Create basic card display components
-- [ ] Set up file upload for card images
-- [ ] Implement basic search functionality
+- [ ] Design and implement collection browser (World Cup, Premier League, etc.)
+- [ ] Create sticker display components with rarity indicators
+- [ ] Implement user sticker inventory management
+- [ ] Build collection progress tracking interface
 
 ### Low Priority
 
@@ -28,17 +28,19 @@
 
 ### Trading System
 
-- [ ] Design trading proposal system
-- [ ] Implement trade request flow
+- [ ] Design sticker exchange proposal system
+- [ ] Implement trade request flow (I have X, you want X)
 - [ ] Create trade history tracking
 - [ ] Add trade status management
+- [ ] Build "Find traders" feature (who has what I need)
 
-### Card Management
+### Sticker Management
 
-- [ ] Advanced card filtering and sorting
-- [ ] Card condition tracking
-- [ ] Wishlist functionality
-- [ ] Collection statistics dashboard
+- [ ] Advanced sticker filtering (by team, player, rarity, etc.)
+- [ ] Duplicate sticker tracking (count > 1)
+- [ ] Wishlist functionality (wanted = true)
+- [ ] Collection completion statistics dashboard
+- [ ] Missing stickers overview
 
 ### User Experience
 
