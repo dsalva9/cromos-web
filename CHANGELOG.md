@@ -25,6 +25,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
+## [0.6.0] - 2024-12-XX
+
+### Added
+
+- **Complete Profile Collection Management Refactor**
+  - Two-section layout: "Mis Colecciones" vs "Colecciones Disponibles"
+  - Add collections to user profile with one-click action
+  - Remove collections from profile with confirmation modal and cascade delete
+  - Set active collection with exclusive activation logic
+  - Auto-activation for first collection added
+  - Comprehensive loading states for all collection actions
+  - Empty states for both owned and available collection sections
+
+- **Enhanced User Experience**
+  - Confirmation modal component with destructive action styling
+  - Detailed collection statistics display (completion %, duplicates, wanted items)
+  - Visual badges for collection status (Active, Nueva, Inactiva)
+  - Granular action loading states (per-button loading indicators)
+  - Improved error handling and user feedback
+
+- **Data Integrity & Safety**
+  - Cascade delete functionality when removing collections
+  - Unique constraints preventing duplicate collection joins
+  - Safe destructive actions with clear warning messages
+  - Proper cleanup of user_stickers when removing collections
+
+### Changed
+
+- **ProfilePage Complete Rewrite**: Separated owned vs available collections with distinct UI sections
+- **Collection Management Logic**: Enhanced with proper cascade delete and exclusive active states
+- **User Interface**: Improved visual hierarchy and action organization
+
+### Infrastructure
+
+- New ConfirmModal component for safe destructive actions
+- Enhanced database schema documentation for cascade behavior
+- Improved TypeScript interfaces for collection management
+- Updated RLS policies for collection operations
+
 ## [0.2.0] - 2024-12-XX
 
 ### Added
@@ -92,6 +131,6 @@ When making changes to the project:
 4. **Commit message format:**
    ```bash
    git add CHANGELOG.md
-   git commit -m "docs: update changelog for v0.2.0"
+   git commit -m "docs: update changelog for v0.6.0"
    git push origin main
    ```

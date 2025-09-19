@@ -14,6 +14,7 @@
 - [x] Implement user sticker inventory management (TENGO/QUIERO)
 - [x] Build collection progress tracking interface
 - [x] User collection switching and joining functionality
+- [x] **Perfil: split owned vs available collections + add/remove/activate actions**
 
 ### Medium Priority - NEXT UP
 
@@ -98,6 +99,22 @@
 - [ ] Set up staging environment
 - [ ] Database backup strategies
 
+## 🛠️ Follow-ups for Perfil Collection Management
+
+### Near-term improvements
+
+- [ ] "Soft archive" instead of hard delete (keeps stats/history but hides from UI)
+- [ ] Bulk actions (add/remove multiple collections)
+- [ ] Sorting & filters on Perfil (by completion %, recency)
+- [ ] Link from Mi Colección to Perfil's switcher (or add dropdown in Mi Colección)
+
+### Medium-term enhancements
+
+- [ ] Role-based tools for "power users" to curate descriptions and seasons
+- [ ] Collection recommendations based on user activity
+- [ ] Import/export collection data
+- [ ] Achievement system for collection milestones
+
 ## 🐛 Known Issues
 
 - [ ] None currently identified
@@ -133,6 +150,6 @@
 ```bash
 # After completing a task
 git add TODO.md CHANGELOG.md
-git commit -m "docs: mark authentication flow as completed"
+git commit -m "docs: mark collection management as completed"
 git push origin main
 ```
