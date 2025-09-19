@@ -11,11 +11,8 @@ User profile information extending Supabase auth.users
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  username TEXT UNIQUE,
-  full_name TEXT,
+  nickname TEXT,
   avatar_url TEXT,
-  bio TEXT,
-  location TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -23,188 +20,146 @@ CREATE TABLE profiles (
 
 **Indexes:**
 
-- `profiles_username_idx` on `username`
-- `profiles_created_at_idx` on `created_at`
+- `profiles_pkey` PRIMARY KEY on `id`
 
 **RLS Policies:**
 
-- Users can view all profiles
-- Users can update only their own profile
+- `Enable read access for users based on user_id` - Users can view their own profile
+- `Enable insert for users based on user_id` - Users can create their own profile
+- `Enable update for users based on user_id` - Users can update their own profile
+- `Enable delete for users based on user_id` - Users can delete their own profile
+- `Update own profile` - Authenticated users can update their own profile
+- `Enable insert for authenticated users only` - Only authenticated users can create profiles
 
 ### `collections`
 
-User's card collections
+Sticker collections/albums (e.g., World Cup 2022, Premier League 2024)
 
 ```sql
 CREATE TABLE collections (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  id INTEGER PRIMARY KEY DEFAULT nextval('collections_id_seq'),
   name TEXT NOT NULL,
+  competition TEXT NOT NULL,
+  year TEXT NOT NULL,
   description TEXT,
-  is_public BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-**Indexes:**
-
-- `collections_user_id_idx` on `user_id`
-- `collections_name_idx` on `name`
-
-### `cards`
-
-Individual sports cards
-
-```sql
-CREATE TABLE cards (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  sport TEXT NOT NULL,
-  year INTEGER,
-  brand TEXT,
-  card_number TEXT,
-  player_name TEXT,
-  team TEXT,
-  position TEXT,
-  condition TEXT CHECK (condition IN ('mint', 'near_mint', 'excellent', 'very_good', 'good', 'fair', 'poor')),
   image_url TEXT,
-  description TEXT,
-  is_for_trade BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
 
 **Indexes:**
 
-- `cards_collection_id_idx` on `collection_id`
-- `cards_sport_idx` on `sport`
-- `cards_player_name_idx` on `player_name`
-- `cards_is_for_trade_idx` on `is_for_trade`
+- `collections_pkey` PRIMARY KEY on `id`
 
-### `trades`
+**RLS Policies:**
 
-Trading proposals and history
+- `Anyone can view collections` - Public read access to all collections
+
+### `collection_teams`
+
+Teams within each collection
 
 ```sql
-CREATE TABLE trades (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  proposer_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  status TEXT CHECK (status IN ('pending', 'accepted', 'rejected', 'completed', 'cancelled')) DEFAULT 'pending',
-  message TEXT,
+CREATE TABLE collection_teams (
+  id INTEGER PRIMARY KEY DEFAULT nextval('collection_teams_id_seq'),
+  collection_id INTEGER REFERENCES collections(id),
+  team_name TEXT NOT NULL,
+  team_code TEXT,
+  logo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Indexes:**
+
+- `collection_teams_pkey` PRIMARY KEY on `id`
+
+**RLS Policies:**
+
+- `Anyone can view teams` - Public read access to all teams
+
+### `stickers`
+
+Individual stickers within collections
+
+```sql
+CREATE TABLE stickers (
+  id INTEGER PRIMARY KEY DEFAULT nextval('stickers_id_seq'),
+  collection_id INTEGER REFERENCES collections(id),
+  team_id INTEGER REFERENCES collection_teams(id),
+  code TEXT NOT NULL,
+  player_name TEXT NOT NULL,
+  position TEXT,
+  nationality TEXT,
+  rating INTEGER,
+  rarity TEXT,
+  image_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+
+  UNIQUE(collection_id, code)
+);
+```
+
+**Indexes:**
+
+- `stickers_pkey` PRIMARY KEY on `id`
+- `stickers_collection_id_code_key` UNIQUE on `(collection_id, code)`
+- `idx_stickers_collection_id` INDEX on `collection_id`
+
+**RLS Policies:**
+
+- `Anyone can view stickers` - Public read access to all stickers
+
+### `user_collections`
+
+User participation in collections (which albums they're collecting)
+
+```sql
+CREATE TABLE user_collections (
+  user_id UUID REFERENCES profiles(id),
+  collection_id INTEGER REFERENCES collections(id),
+  is_active BOOLEAN,
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+
+  PRIMARY KEY (user_id, collection_id)
+);
+```
+
+**Indexes:**
+
+- `user_collections_pkey` PRIMARY KEY on `(user_id, collection_id)`
+- `idx_user_collections_active` INDEX on `(user_id, is_active)`
+
+**RLS Policies:**
+
+- `Users can manage their own collections` - Users have full access to their collection participations
+
+### `user_stickers`
+
+User's sticker inventory (owned stickers and wanted list)
+
+```sql
+CREATE TABLE user_stickers (
+  user_id UUID REFERENCES profiles(id),
+  sticker_id INTEGER REFERENCES stickers(id),
+  count INTEGER NOT NULL,
+  wanted BOOLEAN,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ
+
+  PRIMARY KEY (user_id, sticker_id)
 );
 ```
 
 **Indexes:**
 
-- `trades_proposer_id_idx` on `proposer_id`
-- `trades_recipient_id_idx` on `recipient_id`
-- `trades_status_idx` on `status`
+- `user_stickers_pkey` PRIMARY KEY on `(user_id, sticker_id)`
+- `idx_user_stickers_user_id` INDEX on `user_id`
 
-### `trade_items`
+**RLS Policies:**
 
-Cards included in trade proposals
-
-```sql
-CREATE TABLE trade_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  trade_id UUID REFERENCES trades(id) ON DELETE CASCADE,
-  card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
-  offered_by UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-**Indexes:**
-
-- `trade_items_trade_id_idx` on `trade_id`
-- `trade_items_card_id_idx` on `card_id`
-
-### `wishlists`
-
-User's wanted cards
-
-```sql
-CREATE TABLE wishlists (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  sport TEXT NOT NULL,
-  player_name TEXT,
-  year INTEGER,
-  brand TEXT,
-  card_number TEXT,
-  notes TEXT,
-  priority INTEGER DEFAULT 1 CHECK (priority >= 1 AND priority <= 5),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-**Indexes:**
-
-- `wishlists_user_id_idx` on `user_id`
-- `wishlists_sport_idx` on `sport`
-- `wishlists_player_name_idx` on `player_name`
-
-## Row Level Security (RLS) Policies
-
-### `profiles`
-
-```sql
--- Enable RLS
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
--- Users can view all profiles
-CREATE POLICY "Profiles are viewable by everyone" ON profiles FOR SELECT USING (true);
-
--- Users can update their own profile
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-
--- Users can insert their own profile
-CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-```
-
-### `collections`
-
-```sql
-ALTER TABLE collections ENABLE ROW LEVEL SECURITY;
-
--- Users can view public collections and their own private ones
-CREATE POLICY "Collections visibility" ON collections FOR SELECT
-USING (is_public = true OR auth.uid() = user_id);
-
--- Users can manage their own collections
-CREATE POLICY "Users can manage own collections" ON collections FOR ALL
-USING (auth.uid() = user_id);
-```
-
-### `cards`
-
-```sql
-ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
-
--- Cards are viewable based on collection visibility
-CREATE POLICY "Cards visibility" ON cards FOR SELECT
-USING (
-  collection_id IN (
-    SELECT id FROM collections
-    WHERE is_public = true OR user_id = auth.uid()
-  )
-);
-
--- Users can manage cards in their own collections
-CREATE POLICY "Users can manage own cards" ON cards FOR ALL
-USING (
-  collection_id IN (
-    SELECT id FROM collections WHERE user_id = auth.uid()
-  )
-);
-```
+- `Users can manage their own stickers` - Users have full access to their sticker inventory
 
 ## Functions & Triggers
 
@@ -219,21 +174,35 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Apply to all tables with updated_at column
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_collections_updated_at BEFORE UPDATE ON collections FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_cards_updated_at BEFORE UPDATE ON cards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_trades_updated_at BEFORE UPDATE ON trades FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+-- Apply to tables with updated_at column
+CREATE TRIGGER update_profiles_updated_at
+    BEFORE UPDATE ON profiles
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_user_stickers_updated_at
+    BEFORE UPDATE ON user_stickers
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
 ## Storage Buckets
 
-### `card-images`
+### `sticker-images`
 
-- Public bucket for card images
+- Public bucket for sticker images
+- File size limit: 2MB
+- Allowed file types: image/jpeg, image/png, image/webp
+
+### `collection-images`
+
+- Public bucket for collection/album cover images
 - File size limit: 5MB
 - Allowed file types: image/jpeg, image/png, image/webp
-- RLS: Users can upload to their own folders
+
+### `team-logos`
+
+- Public bucket for team logos
+- File size limit: 1MB
+- Allowed file types: image/jpeg, image/png, image/webp, image/svg+xml
 
 ### `avatars`
 
@@ -242,19 +211,61 @@ CREATE TRIGGER update_trades_updated_at BEFORE UPDATE ON trades FOR EACH ROW EXE
 - Allowed file types: image/jpeg, image/png, image/webp
 - RLS: Users can upload/update their own avatar
 
-## Migration Strategy
+## Data Flow & Relationships
 
-1. **Initial Setup** - Create core tables (profiles, collections, cards)
-2. **Trading System** - Add trades and trade_items tables
-3. **Wishlist Feature** - Add wishlists table
-4. **Future Enhancements** - Add indexes and optimizations as needed
+### Collection Structure
 
-## Backup & Maintenance
+1. **Collections** (World Cup 2022, Premier League 2024, etc.)
+2. **Teams** within each collection
+3. **Stickers** for each player/team within the collection
+4. **Users** join collections they want to collect
+5. **User Stickers** track what each user owns/wants
 
-- **Daily automated backups** via Supabase
-- **Weekly schema exports** for version control
-- **Monthly performance review** of queries and indexes
-- **Quarterly data cleanup** of expired trades and inactive accounts
+### Key Relationships
+
+- Collections → Teams (1:many)
+- Teams → Stickers (1:many)
+- Collections → Stickers (1:many)
+- Users → Collections (many:many via user_collections)
+- Users → Stickers (many:many via user_stickers with count/wanted flags)
+
+## Query Patterns
+
+### Get user's collection progress
+
+```sql
+SELECT
+  c.name as collection_name,
+  COUNT(s.id) as total_stickers,
+  COUNT(us.sticker_id) as owned_stickers,
+  (COUNT(us.sticker_id) * 100.0 / COUNT(s.id)) as completion_percentage
+FROM collections c
+JOIN user_collections uc ON c.id = uc.collection_id
+JOIN stickers s ON c.id = s.collection_id
+LEFT JOIN user_stickers us ON s.id = us.sticker_id AND us.user_id = uc.user_id AND us.count > 0
+WHERE uc.user_id = $1 AND uc.is_active = true
+GROUP BY c.id, c.name;
+```
+
+### Find users who have stickers I want
+
+```sql
+SELECT DISTINCT p.nickname, p.id
+FROM profiles p
+JOIN user_stickers us_have ON p.id = us_have.user_id
+JOIN user_stickers us_want ON us_have.sticker_id = us_want.sticker_id
+WHERE us_want.user_id = $1
+  AND us_want.wanted = true
+  AND us_have.count > 0
+  AND us_have.user_id != $1;
+```
+
+## Migration History
+
+1. **v1.0** - Initial setup: profiles, collections, collection_teams, stickers
+2. **v1.1** - Added user_collections for user participation tracking
+3. **v1.2** - Added user_stickers for inventory and wishlist management
+4. **Current** - Established RLS policies and indexes for performance
 
 ---
 
@@ -270,13 +281,16 @@ When updating the schema:
 
 ```bash
 # Create new migration
-supabase migration new add_new_table
+supabase migration new add_feature_name
 
-# Apply migration
+# Apply migration locally
+supabase db reset
+
+# Push to remote
 supabase db push
 
 # Update documentation
 git add docs/database-schema.md
-git commit -m "docs: update schema for new feature"
+git commit -m "docs: update schema for [feature]"
 git push origin main
 ```
