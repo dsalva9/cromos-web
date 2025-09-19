@@ -6,8 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
-import { User, Trophy, Star, Calendar, Users } from 'lucide-react';
+import {
+  User,
+  Trophy,
+  Star,
+  Calendar,
+  Users,
+  Plus,
+  Trash2,
+  Target,
+  Copy,
+  Heart,
+} from 'lucide-react';
 
 interface Collection {
   id: number;
@@ -48,7 +60,9 @@ function ProfileContent() {
   const { user, loading: userLoading } = useUser();
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [userCollections, setUserCollections] = useState<UserCollection[]>([]);
+  const [ownedCollections, setOwnedCollections] = useState<UserCollection[]>(
+    []
+  );
   const [availableCollections, setAvailableCollections] = useState<
     Collection[]
   >([]);
@@ -56,6 +70,22 @@ function ProfileContent() {
   const [error, setError] = useState<string | null>(null);
   const [editingNickname, setEditingNickname] = useState(false);
   const [nickname, setNickname] = useState('');
+
+  // Modal states
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    collectionId: number | null;
+    collectionName: string;
+  }>({
+    open: false,
+    collectionId: null,
+    collectionName: '',
+  });
+
+  // Action loading states
+  const [actionLoading, setActionLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   // Fetch user profile and collections
   const fetchProfileData = useCallback(async () => {
@@ -86,41 +116,38 @@ function ProfileContent() {
       );
       setNickname(profileData?.nickname || '');
 
-      // Fetch user's collections with stats
+      // Fetch user's owned collections with stats
       const { data: userCollectionsData, error: userCollectionsError } =
         await supabase
           .from('user_collections')
           .select(
             `
-          is_active,
-          joined_at,
-          collections (
-            id,
-            name,
-            competition,
-            year,
-            description,
-            is_active
-          )
-        `
+            is_active,
+            joined_at,
+            collections (
+              id,
+              name,
+              competition,
+              year,
+              description,
+              is_active
+            )
+          `
           )
           .eq('user_id', user.id);
 
       if (userCollectionsError) throw userCollectionsError;
 
-      // Process each user collection and get stats
-      const collectionsWithStats = await Promise.all(
+      // Process owned collections and get stats
+      const ownedWithStats = await Promise.all(
         (userCollectionsData || []).map(async (uc: UserCollectionRawData) => {
           if (!uc.collections) return null;
 
-          // Extract the collection object (handle both array and single object)
-          let collection: Collection;
-          if (Array.isArray(uc.collections)) {
-            if (uc.collections.length === 0) return null;
-            collection = uc.collections[0];
-          } else {
-            collection = uc.collections;
-          }
+          const collection = Array.isArray(uc.collections)
+            ? uc.collections[0]
+            : uc.collections;
+
+          if (!collection) return null;
 
           // Get collection stats
           const { data: statsData } = await supabase.rpc(
@@ -148,28 +175,26 @@ function ProfileContent() {
         })
       );
 
-      setUserCollections(
-        collectionsWithStats.filter(Boolean) as UserCollection[]
-      );
+      setOwnedCollections(ownedWithStats.filter(Boolean) as UserCollection[]);
 
-      // Fetch available collections user hasn't joined
-      const userCollectionIds = (userCollectionsData || [])
-        .map((uc: UserCollectionRawData) => {
-          if (!uc.collections) return null;
+      // Fetch available collections (not owned by user)
+      const ownedIds = ownedWithStats.filter(Boolean).map(c => c!.id);
 
-          if (Array.isArray(uc.collections)) {
-            return uc.collections.length > 0 ? uc.collections[0].id : null;
-          } else {
-            return uc.collections.id;
-          }
-        })
-        .filter(Boolean);
-
-      const { data: availableData, error: availableError } = await supabase
+      let availableQuery = supabase
         .from('collections')
         .select('*')
-        .eq('is_active', true)
-        .not('id', 'in', `(${userCollectionIds.join(',') || '0'})`);
+        .eq('is_active', true);
+
+      if (ownedIds.length > 0) {
+        availableQuery = availableQuery.not(
+          'id',
+          'in',
+          `(${ownedIds.join(',')})`
+        );
+      }
+
+      const { data: availableData, error: availableError } =
+        await availableQuery;
 
       if (availableError) throw availableError;
       setAvailableCollections(availableData || []);
@@ -208,11 +233,93 @@ function ProfileContent() {
     }
   };
 
-  // Switch active collection
-  const switchActiveCollection = async (collectionId: number) => {
+  // Add collection to user's owned collections
+  const addCollection = async (collectionId: number) => {
     if (!user) return;
 
+    const actionKey = `add-${collectionId}`;
     try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      // Determine if this should be the active collection
+      const isFirstCollection = ownedCollections.length === 0;
+
+      const { error } = await supabase.from('user_collections').insert({
+        user_id: user.id,
+        collection_id: collectionId,
+        is_active: isFirstCollection,
+      });
+
+      if (error) throw error;
+
+      // Refresh data
+      await fetchProfileData();
+    } catch (err: unknown) {
+      console.error('Error adding collection:', err);
+      setError('Error al añadir colección');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+    }
+  };
+
+  // Remove collection and all user data for it
+  const removeCollection = async (collectionId: number) => {
+    if (!user) return;
+
+    const actionKey = `remove-${collectionId}`;
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      // First, get all sticker IDs for this collection
+      const { data: stickerIds, error: stickerIdsError } = await supabase
+        .from('stickers')
+        .select('id')
+        .eq('collection_id', collectionId);
+
+      if (stickerIdsError) throw stickerIdsError;
+
+      // Remove user_stickers for this collection if any stickers exist
+      if (stickerIds && stickerIds.length > 0) {
+        const { error: stickersError } = await supabase
+          .from('user_stickers')
+          .delete()
+          .eq('user_id', user.id)
+          .in(
+            'sticker_id',
+            stickerIds.map(s => s.id)
+          );
+
+        if (stickersError) throw stickersError;
+      }
+
+      // Then remove the user_collection
+      const { error: collectionError } = await supabase
+        .from('user_collections')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('collection_id', collectionId);
+
+      if (collectionError) throw collectionError;
+
+      // Close modal and refresh data
+      setConfirmModal({ open: false, collectionId: null, collectionName: '' });
+      await fetchProfileData();
+    } catch (err: unknown) {
+      console.error('Error removing collection:', err);
+      setError('Error al eliminar colección');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+    }
+  };
+
+  // Set active collection
+  const setActiveCollection = async (collectionId: number) => {
+    if (!user) return;
+
+    const actionKey = `activate-${collectionId}`;
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
       // Set all collections inactive
       await supabase
         .from('user_collections')
@@ -231,28 +338,10 @@ function ProfileContent() {
       // Refresh data
       await fetchProfileData();
     } catch (err: unknown) {
-      console.error('Error switching collection:', err);
-      setError('Error switching collection');
-    }
-  };
-
-  // Join a new collection
-  const joinCollection = async (collectionId: number) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase.from('user_collections').insert({
-        user_id: user.id,
-        collection_id: collectionId,
-        is_active: false,
-      });
-
-      if (error) throw error;
-
-      await fetchProfileData();
-    } catch (err: unknown) {
-      console.error('Error joining collection:', err);
-      setError('Error joining collection');
+      console.error('Error setting active collection:', err);
+      setError('Error al activar colección');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
@@ -287,7 +376,7 @@ function ProfileContent() {
     );
   }
 
-  const activeCollection = userCollections.find(uc => uc.is_user_active);
+  const activeCollection = ownedCollections.find(c => c.is_user_active);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
@@ -366,8 +455,8 @@ function ProfileContent() {
                 <div className="flex items-center text-gray-600">
                   <Users className="w-4 h-4 mr-2" />
                   <span className="text-sm">
-                    {userCollections.length} colección
-                    {userCollections.length !== 1 ? 'es' : ''}
+                    {ownedCollections.length} colección
+                    {ownedCollections.length !== 1 ? 'es' : ''}
                   </span>
                 </div>
               </div>
@@ -393,7 +482,10 @@ function ProfileContent() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {activeCollection.stats.completion_percentage}%
+                        {Math.round(
+                          activeCollection.stats.completion_percentage
+                        )}
+                        %
                       </div>
                       <div className="text-xs text-gray-500">Completado</div>
                     </div>
@@ -422,31 +514,31 @@ function ProfileContent() {
           )}
         </div>
 
-        {/* My Collections */}
+        {/* MIS COLECCIONES SECTION */}
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-bold text-white">Mis Colecciones</h3>
             <Badge className="bg-white/20 text-white px-3 py-1">
-              {userCollections.length} de{' '}
-              {userCollections.length + availableCollections.length} disponibles
+              {ownedCollections.length} propias
             </Badge>
           </div>
 
-          {userCollections.length === 0 ? (
+          {ownedCollections.length === 0 ? (
             <ModernCard className="bg-white">
-              <ModernCardContent className="p-6 text-center">
-                <Trophy className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <h4 className="font-semibold text-gray-700 mb-2">
-                  No tienes colecciones
+              <ModernCardContent className="p-8 text-center">
+                <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h4 className="text-xl font-semibold text-gray-700 mb-2">
+                  Aún no has añadido ninguna colección
                 </h4>
                 <p className="text-gray-500 text-sm mb-4">
-                  Únete a una colección para empezar a intercambiar cromos
+                  Explora las colecciones disponibles y añade una para empezar a
+                  intercambiar cromos
                 </p>
               </ModernCardContent>
             </ModernCard>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {userCollections.map(collection => (
+              {ownedCollections.map(collection => (
                 <ModernCard key={collection.id} className="bg-white">
                   <ModernCardContent className="p-4">
                     <div className="flex justify-between items-start mb-3">
@@ -471,47 +563,69 @@ function ProfileContent() {
                       {collection.competition} {collection.year}
                     </p>
 
+                    {/* Stats Grid */}
                     {collection.stats && (
-                      <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-4">
-                        <div className="text-center">
-                          <div className="font-bold text-green-600">
-                            {collection.stats.completion_percentage}%
-                          </div>
-                          <div>Completo</div>
+                      <div className="mb-4 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-500 flex items-center">
+                            <Target className="w-3 h-3 mr-1" />
+                            Progreso
+                          </span>
+                          <span className="text-xs font-bold text-green-600">
+                            {collection.stats.owned_stickers} /{' '}
+                            {collection.stats.total_stickers}(
+                            {Math.round(collection.stats.completion_percentage)}
+                            %)
+                          </span>
                         </div>
-                        <div className="text-center">
-                          <div className="font-bold text-blue-600">
-                            {collection.stats.owned_stickers}
-                          </div>
-                          <div>Cromos</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-purple-600">
-                            {collection.stats.duplicates}
-                          </div>
-                          <div>Repetidos</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-bold text-orange-600">
-                            {collection.stats.wanted}
-                          </div>
-                          <div>Busco</div>
+                        <div className="flex justify-between">
+                          <span className="text-xs text-gray-500 flex items-center">
+                            <Copy className="w-3 h-3 mr-1" />
+                            Repetidos: {collection.stats.duplicates}
+                          </span>
+                          <span className="text-xs text-gray-500 flex items-center">
+                            <Heart className="w-3 h-3 mr-1" />
+                            Busco: {collection.stats.wanted}
+                          </span>
                         </div>
                       </div>
                     )}
 
-                    {!collection.is_user_active && (
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
+                      {!collection.is_user_active && (
+                        <Button
+                          size="sm"
+                          onClick={() => setActiveCollection(collection.id)}
+                          disabled={actionLoading[`activate-${collection.id}`]}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                        >
+                          {actionLoading[`activate-${collection.id}`]
+                            ? 'Activando...'
+                            : 'Hacer Activa'}
+                        </Button>
+                      )}
+
                       <Button
                         size="sm"
-                        onClick={() => switchActiveCollection(collection.id)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                        variant="outline"
+                        onClick={() =>
+                          setConfirmModal({
+                            open: true,
+                            collectionId: collection.id,
+                            collectionName: collection.name,
+                          })
+                        }
+                        disabled={Object.values(actionLoading).some(Boolean)}
+                        className="w-full border-red-300 text-red-600 hover:bg-red-50"
                       >
-                        Hacer Activa
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Eliminar de mis colecciones
                       </Button>
-                    )}
+                    </div>
 
                     {collection.is_user_active && (
-                      <div className="text-center">
+                      <div className="text-center mt-2">
                         <span className="text-xs text-green-600 font-medium">
                           ✓ Esta es tu colección activa
                         </span>
@@ -524,18 +638,31 @@ function ProfileContent() {
           )}
         </div>
 
-        {/* Available Collections */}
-        {availableCollections.length > 0 && (
-          <div className="mt-8">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-bold text-white">
-                Nuevas Colecciones
-              </h3>
-              <Badge className="bg-yellow-500 text-white px-3 py-1">
-                {availableCollections.length} disponible
-                {availableCollections.length !== 1 ? 's' : ''}
-              </Badge>
-            </div>
+        {/* COLECCIONES DISPONIBLES SECTION */}
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-bold text-white">
+              Colecciones Disponibles
+            </h3>
+            <Badge className="bg-yellow-500 text-white px-3 py-1">
+              {availableCollections.length} disponible
+              {availableCollections.length !== 1 ? 's' : ''}
+            </Badge>
+          </div>
+
+          {availableCollections.length === 0 ? (
+            <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
+              <ModernCardContent className="p-8 text-center">
+                <Star className="w-16 h-16 text-white/70 mx-auto mb-4" />
+                <h4 className="text-xl font-semibold text-white mb-2">
+                  ¡Ya has añadido todas las colecciones disponibles!
+                </h4>
+                <p className="text-white/80 text-sm">
+                  No hay más colecciones para añadir en este momento
+                </p>
+              </ModernCardContent>
+            </ModernCard>
+          ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {availableCollections.map(collection => (
                 <ModernCard
@@ -552,47 +679,66 @@ function ProfileContent() {
                       </Badge>
                     </div>
 
-                    <p className="text-xs text-gray-600 mb-4">
+                    <p className="text-xs text-gray-600 mb-2">
                       {collection.competition} {collection.year}
                     </p>
 
                     {collection.description && (
-                      <p className="text-xs text-gray-500 mb-4">
+                      <p className="text-xs text-gray-500 mb-4 line-clamp-2">
                         {collection.description}
                       </p>
                     )}
 
                     <Button
                       size="sm"
-                      onClick={() => joinCollection(collection.id)}
+                      onClick={() => addCollection(collection.id)}
+                      disabled={actionLoading[`add-${collection.id}`]}
                       className="w-full bg-green-500 hover:bg-green-600 text-white"
                     >
-                      + Unirse a Colección
+                      <Plus className="w-3 h-3 mr-1" />
+                      {actionLoading[`add-${collection.id}`]
+                        ? 'Añadiendo...'
+                        : 'Añadir a mis colecciones'}
                     </Button>
                   </ModernCardContent>
                 </ModernCard>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* No Available Collections */}
-        {availableCollections.length === 0 && userCollections.length > 0 && (
-          <div className="mt-8">
-            <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
-              <ModernCardContent className="p-6 text-center">
-                <Star className="w-12 h-12 text-white/70 mx-auto mb-3" />
-                <h4 className="font-semibold text-white mb-2">
-                  ¡Todas las colecciones desbloqueadas!
-                </h4>
-                <p className="text-white/80 text-sm">
-                  Ya formas parte de todas las colecciones disponibles
-                </p>
-              </ModernCardContent>
-            </ModernCard>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        open={confirmModal.open}
+        onOpenChange={open =>
+          setConfirmModal({ open, collectionId: null, collectionName: '' })
+        }
+        title="Eliminar colección de tu perfil"
+        description={
+          <div className="space-y-2">
+            <p>
+              ¿Estás seguro de que quieres eliminar &ldquo;
+              {confirmModal.collectionName}&rdquo; de tu perfil?
+            </p>
+            <p className="text-sm text-red-600">
+              <strong>
+                Se eliminarán también todos tus datos de esta colección
+              </strong>
+              (tengo/quiero/duplicados). Esta acción no se puede deshacer.
+            </p>
+          </div>
+        }
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={() => {
+          if (confirmModal.collectionId) {
+            removeCollection(confirmModal.collectionId);
+          }
+        }}
+        loading={actionLoading[`remove-${confirmModal.collectionId}`]}
+        variant="destructive"
+      />
     </div>
   );
 }
