@@ -7,9 +7,9 @@ This document outlines the API endpoints and routes for the Cromos Web applicati
 ### Public Routes (No authentication required)
 
 - `GET /` - Landing page
-- `GET /login` - Login page
+- `GET /login` - Login page (`src/app/(auth)/login/page.tsx`)
 - `POST /login` - Handle login form
-- `GET /signup` - Registration page
+- `GET /signup` - Registration page (`src/app/(auth)/signup/page.tsx`)
 - `POST /signup` - Handle registration form
 - `GET /auth/callback` - Supabase auth callback handler
 
@@ -17,10 +17,10 @@ This document outlines the API endpoints and routes for the Cromos Web applicati
 
 ### Main Application Routes
 
-- `GET /mi-coleccion` - User's active collection view
+- `GET /mi-coleccion` - User's active collection view (`src/app/mi-coleccion/page.tsx`)
 - `GET /trades` - Trading interface (not implemented yet)
 - `GET /messages` - User messages (not implemented yet)
-- `GET /profile` - User profile management
+- `GET /profile` - User profile management (`src/app/profile/page.tsx`)
 
 ## Database Functions (Supabase RPC)
 
