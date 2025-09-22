@@ -8,9 +8,8 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { useProfileData } from '@/hooks/profile/useProfileData';
-import { useCollectionActions } from '@/hooks/profile/useCollectionActions';
 import {
   User,
   Trophy,
@@ -30,6 +29,7 @@ import {
 
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
+  const { supabase } = useSupabase(); // Use the hook at component level
   const router = useRouter();
 
   // Profile data with optimistic updates
@@ -40,12 +40,9 @@ function ProfileContent() {
     availableCollections,
     loading,
     error,
-    // We'll use a simpler approach without the cache functions
     refresh,
   } = useProfileData();
 
-  // For now, let's create a simpler collection actions hook call
-  // We'll handle the optimistic updates differently to avoid type conflicts
   const [actionLoading, setActionLoading] = useState<{
     [key: string]: boolean;
   }>({});
@@ -77,10 +74,6 @@ function ProfileContent() {
     const actionKey = 'nick-user';
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
-
-      const { supabase } = await import(
-        '@/components/providers/SupabaseProvider'
-      ).then(m => ({ supabase: m.useSupabase().supabase }));
 
       const { error } = await supabase.from('profiles').upsert(
         {
@@ -135,10 +128,6 @@ function ProfileContent() {
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
 
-      const { supabase } = await import(
-        '@/components/providers/SupabaseProvider'
-      ).then(m => ({ supabase: m.useSupabase().supabase }));
-
       // Get sticker IDs for this collection
       const { data: stickerIds, error: stickerIdsError } = await supabase
         .from('stickers')
@@ -179,17 +168,13 @@ function ProfileContent() {
     }
   };
 
-  // Handle setting active collection
+  // Handle setting active collection - Fixed hook usage
   const handleSetActiveCollection = async (collectionId: number) => {
     if (!user) return;
 
     const actionKey = `activate-${collectionId}`;
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
-
-      const { supabase } = await import(
-        '@/components/providers/SupabaseProvider'
-      ).then(m => ({ supabase: m.useSupabase().supabase }));
 
       // Set all collections inactive
       await supabase
@@ -221,10 +206,6 @@ function ProfileContent() {
     const actionKey = `add-${collectionId}`;
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
-
-      const { supabase } = await import(
-        '@/components/providers/SupabaseProvider'
-      ).then(m => ({ supabase: m.useSupabase().supabase }));
 
       const isFirstCollection = ownedCollections.length === 0;
 
