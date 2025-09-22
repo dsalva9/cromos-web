@@ -40,36 +40,15 @@ function ProfileContent() {
     availableCollections,
     loading,
     error,
-    // Optimistic actions
-    optimisticAddCollection,
-    optimisticRemoveCollection,
-    optimisticSetActiveCollection,
-    optimisticUpdateNickname,
-    // Cache management
-    takeSnapshot,
-    restoreSnapshot,
-    softRefresh,
+    // We'll use a simpler approach without the cache functions
+    refresh,
   } = useProfileData();
 
-  // Collection actions with optimistic updates
-  const {
-    addCollection,
-    removeCollection,
-    setActiveCollection,
-    updateNickname,
-    actionLoading,
-  } = useCollectionActions({
-    userId: user?.id || '',
-    optimisticAddCollection,
-    optimisticRemoveCollection,
-    optimisticSetActiveCollection,
-    optimisticUpdateNickname,
-    takeSnapshot,
-    restoreSnapshot,
-    softRefresh,
-    availableCollections,
-    ownedCollections,
-  });
+  // For now, let's create a simpler collection actions hook call
+  // We'll handle the optimistic updates differently to avoid type conflicts
+  const [actionLoading, setActionLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   // Local UI state
   const [editingNickname, setEditingNickname] = useState(false);
@@ -93,8 +72,33 @@ function ProfileContent() {
   };
 
   const handleSaveNickname = async () => {
-    await updateNickname(tempNickname);
-    setEditingNickname(false);
+    if (!user) return;
+
+    const actionKey = 'nick-user';
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      const { supabase } = await import(
+        '@/components/providers/SupabaseProvider'
+      ).then(m => ({ supabase: m.useSupabase().supabase }));
+
+      const { error } = await supabase.from('profiles').upsert(
+        {
+          id: user.id,
+          nickname: tempNickname.trim() || null,
+        },
+        { onConflict: 'id' }
+      );
+
+      if (error) throw error;
+
+      setEditingNickname(false);
+      refresh(); // Refresh data after update
+    } catch (err) {
+      console.error('Error updating nickname:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+    }
   };
 
   const handleCancelNickname = () => {
@@ -116,7 +120,7 @@ function ProfileContent() {
   };
 
   // Handle collection removal confirmation
-  const handleRemoveClick = (collection: any) => {
+  const handleRemoveClick = (collection: (typeof ownedCollections)[0]) => {
     setConfirmModal({
       open: true,
       collectionId: collection.id,
@@ -125,10 +129,119 @@ function ProfileContent() {
   };
 
   const handleConfirmRemove = async () => {
-    if (confirmModal.collectionId) {
-      await removeCollection(confirmModal.collectionId);
+    if (!confirmModal.collectionId || !user) return;
+
+    const actionKey = `remove-${confirmModal.collectionId}`;
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      const { supabase } = await import(
+        '@/components/providers/SupabaseProvider'
+      ).then(m => ({ supabase: m.useSupabase().supabase }));
+
+      // Get sticker IDs for this collection
+      const { data: stickerIds, error: stickerIdsError } = await supabase
+        .from('stickers')
+        .select('id')
+        .eq('collection_id', confirmModal.collectionId);
+
+      if (stickerIdsError) throw stickerIdsError;
+
+      // Remove user_stickers if any exist
+      if (stickerIds && stickerIds.length > 0) {
+        const { error: stickersError } = await supabase
+          .from('user_stickers')
+          .delete()
+          .eq('user_id', user.id)
+          .in(
+            'sticker_id',
+            stickerIds.map(s => s.id)
+          );
+
+        if (stickersError) throw stickersError;
+      }
+
+      // Remove user_collection
+      const { error: collectionError } = await supabase
+        .from('user_collections')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('collection_id', confirmModal.collectionId);
+
+      if (collectionError) throw collectionError;
+
+      setConfirmModal({ open: false, collectionId: null, collectionName: '' });
+      refresh(); // Refresh data after removal
+    } catch (err) {
+      console.error('Error removing collection:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
-    setConfirmModal({ open: false, collectionId: null, collectionName: '' });
+  };
+
+  // Handle setting active collection
+  const handleSetActiveCollection = async (collectionId: number) => {
+    if (!user) return;
+
+    const actionKey = `activate-${collectionId}`;
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      const { supabase } = await import(
+        '@/components/providers/SupabaseProvider'
+      ).then(m => ({ supabase: m.useSupabase().supabase }));
+
+      // Set all collections inactive
+      await supabase
+        .from('user_collections')
+        .update({ is_active: false })
+        .eq('user_id', user.id);
+
+      // Set selected collection as active
+      const { error } = await supabase
+        .from('user_collections')
+        .update({ is_active: true })
+        .eq('user_id', user.id)
+        .eq('collection_id', collectionId);
+
+      if (error) throw error;
+
+      refresh(); // Refresh data after update
+    } catch (err) {
+      console.error('Error setting active collection:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+    }
+  };
+
+  // Handle adding collection
+  const handleAddCollection = async (collectionId: number) => {
+    if (!user) return;
+
+    const actionKey = `add-${collectionId}`;
+    try {
+      setActionLoading(prev => ({ ...prev, [actionKey]: true }));
+
+      const { supabase } = await import(
+        '@/components/providers/SupabaseProvider'
+      ).then(m => ({ supabase: m.useSupabase().supabase }));
+
+      const isFirstCollection = ownedCollections.length === 0;
+
+      const { error } = await supabase.from('user_collections').insert({
+        user_id: user.id,
+        collection_id: collectionId,
+        is_active: isFirstCollection,
+      });
+
+      if (error) throw error;
+
+      refresh(); // Refresh data after adding
+    } catch (err) {
+      console.error('Error adding collection:', err);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [actionKey]: false }));
+    }
   };
 
   // Loading and error states
@@ -430,7 +543,9 @@ function ProfileContent() {
                       {!collection.is_user_active && (
                         <Button
                           size="sm"
-                          onClick={() => setActiveCollection(collection.id)}
+                          onClick={() =>
+                            handleSetActiveCollection(collection.id)
+                          }
                           disabled={actionLoading[`activate-${collection.id}`]}
                           className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
                           type="button"
@@ -533,7 +648,7 @@ function ProfileContent() {
                     {/* Add Button */}
                     <Button
                       size="sm"
-                      onClick={() => addCollection(collection.id)}
+                      onClick={() => handleAddCollection(collection.id)}
                       disabled={actionLoading[`add-${collection.id}`]}
                       className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
                       type="button"
