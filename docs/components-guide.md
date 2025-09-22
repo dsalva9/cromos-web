@@ -56,7 +56,7 @@ Protects routes that require authentication.
 
 ### CollectionPage
 
-**File**: `src/components/CollectionPage.tsx`
+**File**: `src/app/mi-coleccion/page.tsx`
 
 Main sticker collection interface.
 
@@ -80,7 +80,7 @@ const progress = useMemo(() => calculateProgress(stickers), [stickers]);
 
 ### ProfilePage
 
-**File**: `src/components/ProfilePage.tsx`
+**File**: `src/app/profile/page.tsx`
 
 User profile and collection management.
 
