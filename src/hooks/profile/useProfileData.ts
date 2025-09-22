@@ -58,16 +58,37 @@ export function useProfileData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Cache for optimistic updates
-  const [cacheSnapshot, setCacheSnapshot] = useState<CacheSnapshot | null>(
-    null
-  );
+  // Cache for optimistic updates (removed unused state)
 
   // Active collection ID for quick access
   const activeCollectionId = useMemo(() => {
     const activeCollection = ownedCollections.find(c => c.is_user_active);
     return activeCollection?.id || null;
   }, [ownedCollections]);
+
+  // Helper: Get fallback collection ID if no active collection
+  const getFallbackCollectionId = useCallback(() => {
+    if (activeCollectionId) return activeCollectionId;
+
+    // Return first owned collection if available
+    return ownedCollections.length > 0 ? ownedCollections[0].id : null;
+  }, [activeCollectionId, ownedCollections]);
+
+  // Helper: Check if user owns a specific collection
+  const ownsCollection = useCallback(
+    (collectionId: number) => {
+      return ownedCollections.some(c => c.id === collectionId);
+    },
+    [ownedCollections]
+  );
+
+  // Helper: Get collection by ID from owned collections
+  const getOwnedCollection = useCallback(
+    (collectionId: number) => {
+      return ownedCollections.find(c => c.id === collectionId) || null;
+    },
+    [ownedCollections]
+  );
 
   // Take snapshot for rollback
   const takeSnapshot = useCallback((): CacheSnapshot => {
@@ -390,6 +411,11 @@ export function useProfileData() {
     ownedCollections,
     availableCollections,
     activeCollectionId,
+
+    // Helper methods
+    getFallbackCollectionId,
+    ownsCollection,
+    getOwnedCollection,
 
     // States
     loading,

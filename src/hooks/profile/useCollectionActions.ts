@@ -11,8 +11,24 @@ interface Collection {
   is_active: boolean;
 }
 
+interface UserCollection {
+  id: number;
+  name: string;
+  competition: string;
+  year: string;
+  is_user_active: boolean;
+  joined_at: string;
+  stats?: {
+    total_stickers: number;
+    owned_stickers: number;
+    completion_percentage: number;
+    duplicates: number;
+    wanted: number;
+  };
+}
+
 interface CacheSnapshot {
-  ownedCollections: any[];
+  ownedCollections: UserCollection[];
   availableCollections: Collection[];
   nickname: string;
   activeCollectionId: number | null;
@@ -36,7 +52,7 @@ interface UseCollectionActionsProps {
 
   // Current data for logic decisions
   availableCollections: Collection[];
-  ownedCollections: any[];
+  ownedCollections: UserCollection[];
 }
 
 export function useCollectionActions({
