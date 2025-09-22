@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,21 +27,70 @@ import {
   Eye,
 } from 'lucide-react';
 
+// Simple toast function
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll('[data-toast]');
+  existingToasts.forEach(toast => toast.remove());
+
+  // Create toast
+  const toast = document.createElement('div');
+  toast.setAttribute('data-toast', 'true');
+  toast.className = `fixed top-20 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white font-medium ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // Auto-remove
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }, 3000);
+};
+
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
-  const { supabase } = useSupabase(); // Use the hook at component level
+  const { supabase } = useSupabase();
   const router = useRouter();
 
-  // Profile data with optimistic updates
+  // Profile data
   const {
     profile,
     nickname,
-    ownedCollections,
-    availableCollections,
+    ownedCollections: originalOwnedCollections,
+    availableCollections: originalAvailableCollections,
     loading,
     error,
     refresh,
   } = useProfileData();
+
+  // Local state for optimistic updates
+  const [optimisticOwnedCollections, setOptimisticOwnedCollections] = useState(
+    originalOwnedCollections
+  );
+  const [optimisticAvailableCollections, setOptimisticAvailableCollections] =
+    useState(originalAvailableCollections);
+  const [optimisticNickname, setOptimisticNickname] = useState(nickname);
+
+  // Use optimistic data when available, fallback to original
+  const ownedCollections =
+    optimisticOwnedCollections.length >= 0
+      ? optimisticOwnedCollections
+      : originalOwnedCollections;
+  const availableCollections =
+    optimisticAvailableCollections.length >= 0
+      ? optimisticAvailableCollections
+      : originalAvailableCollections;
+  const displayNickname = optimisticNickname || nickname;
+
+  // Sync optimistic state when original data changes
+  useEffect(() => {
+    setOptimisticOwnedCollections(originalOwnedCollections);
+    setOptimisticAvailableCollections(originalAvailableCollections);
+    setOptimisticNickname(nickname);
+  }, [originalOwnedCollections, originalAvailableCollections, nickname]);
 
   const [actionLoading, setActionLoading] = useState<{
     [key: string]: boolean;
@@ -64,7 +113,7 @@ function ProfileContent() {
 
   // Handle nickname editing
   const handleEditNickname = () => {
-    setTempNickname(nickname);
+    setTempNickname(displayNickname);
     setEditingNickname(true);
   };
 
@@ -72,23 +121,38 @@ function ProfileContent() {
     if (!user) return;
 
     const actionKey = 'nick-user';
+    const newNickname = tempNickname.trim();
+
+    // Take snapshot for rollback
+    const previousNickname = optimisticNickname;
+
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
 
+      // Optimistic update
+      setOptimisticNickname(newNickname);
+      setEditingNickname(false);
+      showToast('Nombre actualizado');
+
+      // Server call
       const { error } = await supabase.from('profiles').upsert(
         {
           id: user.id,
-          nickname: tempNickname.trim() || null,
+          nickname: newNickname || null,
         },
         { onConflict: 'id' }
       );
 
       if (error) throw error;
 
-      setEditingNickname(false);
-      refresh(); // Refresh data after update
+      // No need to refresh - optimistic update is already correct
     } catch (err) {
       console.error('Error updating nickname:', err);
+
+      // Rollback optimistic update
+      setOptimisticNickname(previousNickname);
+      setEditingNickname(true);
+      showToast('Error al actualizar nombre', 'error');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -125,10 +189,38 @@ function ProfileContent() {
     if (!confirmModal.collectionId || !user) return;
 
     const actionKey = `remove-${confirmModal.collectionId}`;
+    const collectionToRemove = ownedCollections.find(
+      c => c.id === confirmModal.collectionId
+    );
+    if (!collectionToRemove) return;
+
+    // Take snapshot for rollback
+    const previousOwned = [...optimisticOwnedCollections];
+    const previousAvailable = [...optimisticAvailableCollections];
+
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
 
-      // Get sticker IDs for this collection
+      // Optimistic update
+      setOptimisticOwnedCollections(prev =>
+        prev.filter(c => c.id !== confirmModal.collectionId)
+      );
+
+      // Add back to available
+      const backToAvailable = {
+        id: collectionToRemove.id,
+        name: collectionToRemove.name,
+        competition: collectionToRemove.competition,
+        year: collectionToRemove.year,
+        description: collectionToRemove.description || null,
+        is_active: true,
+      };
+      setOptimisticAvailableCollections(prev => [...prev, backToAvailable]);
+
+      setConfirmModal({ open: false, collectionId: null, collectionName: '' });
+      showToast(`"${collectionToRemove.name}" eliminada de tu perfil`);
+
+      // Server calls
       const { data: stickerIds, error: stickerIdsError } = await supabase
         .from('stickers')
         .select('id')
@@ -136,7 +228,6 @@ function ProfileContent() {
 
       if (stickerIdsError) throw stickerIdsError;
 
-      // Remove user_stickers if any exist
       if (stickerIds && stickerIds.length > 0) {
         const { error: stickersError } = await supabase
           .from('user_stickers')
@@ -150,7 +241,6 @@ function ProfileContent() {
         if (stickersError) throw stickersError;
       }
 
-      // Remove user_collection
       const { error: collectionError } = await supabase
         .from('user_collections')
         .delete()
@@ -159,30 +249,50 @@ function ProfileContent() {
 
       if (collectionError) throw collectionError;
 
-      setConfirmModal({ open: false, collectionId: null, collectionName: '' });
-      refresh(); // Refresh data after removal
+      // Soft refresh to sync
+      refresh();
     } catch (err) {
       console.error('Error removing collection:', err);
+
+      // Rollback optimistic updates
+      setOptimisticOwnedCollections(previousOwned);
+      setOptimisticAvailableCollections(previousAvailable);
+      showToast('Error al eliminar colección', 'error');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
-  // Handle setting active collection - Fixed hook usage
+  // Handle setting active collection with optimistic updates
   const handleSetActiveCollection = async (collectionId: number) => {
     if (!user) return;
 
     const actionKey = `activate-${collectionId}`;
+    const collection = ownedCollections.find(c => c.id === collectionId);
+    if (!collection || collection.is_user_active) return;
+
+    // Take snapshot for rollback
+    const previousOwned = [...optimisticOwnedCollections];
+
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
 
-      // Set all collections inactive
+      // Optimistic update - set all inactive, then set target as active
+      setOptimisticOwnedCollections(prev =>
+        prev.map(c => ({
+          ...c,
+          is_user_active: c.id === collectionId,
+        }))
+      );
+
+      showToast(`"${collection.name}" es ahora tu colección activa`);
+
+      // Server calls
       await supabase
         .from('user_collections')
         .update({ is_active: false })
         .eq('user_id', user.id);
 
-      // Set selected collection as active
       const { error } = await supabase
         .from('user_collections')
         .update({ is_active: true })
@@ -191,24 +301,61 @@ function ProfileContent() {
 
       if (error) throw error;
 
-      refresh(); // Refresh data after update
+      // No need to refresh - optimistic update already shows correct state
     } catch (err) {
       console.error('Error setting active collection:', err);
+
+      // Rollback optimistic update
+      setOptimisticOwnedCollections(previousOwned);
+      showToast('Error al activar colección', 'error');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
   };
 
-  // Handle adding collection
+  // Handle adding collection with optimistic updates
   const handleAddCollection = async (collectionId: number) => {
     if (!user) return;
 
     const actionKey = `add-${collectionId}`;
+    const collection = availableCollections.find(c => c.id === collectionId);
+    if (!collection) return;
+
+    // Take snapshot for rollback
+    const previousOwned = [...optimisticOwnedCollections];
+    const previousAvailable = [...optimisticAvailableCollections];
+    const isFirstCollection = ownedCollections.length === 0;
+
     try {
       setActionLoading(prev => ({ ...prev, [actionKey]: true }));
 
-      const isFirstCollection = ownedCollections.length === 0;
+      // Optimistic update - remove from available, add to owned
+      setOptimisticAvailableCollections(prev =>
+        prev.filter(c => c.id !== collectionId)
+      );
 
+      const newUserCollection = {
+        ...collection,
+        is_user_active: isFirstCollection,
+        joined_at: new Date().toISOString(),
+        stats: {
+          total_stickers: 0,
+          owned_stickers: 0,
+          completion_percentage: 0,
+          duplicates: 0,
+          wanted: 0,
+        },
+      };
+
+      if (isFirstCollection) {
+        setOptimisticOwnedCollections([newUserCollection]);
+      } else {
+        setOptimisticOwnedCollections(prev => [...prev, newUserCollection]);
+      }
+
+      showToast(`"${collection.name}" añadida a tus colecciones`);
+
+      // Server call
       const { error } = await supabase.from('user_collections').insert({
         user_id: user.id,
         collection_id: collectionId,
@@ -217,9 +364,15 @@ function ProfileContent() {
 
       if (error) throw error;
 
-      refresh(); // Refresh data after adding
+      // Only refresh to sync stats for new collections - the UI state is already correct
+      setTimeout(() => refresh(), 1000);
     } catch (err) {
       console.error('Error adding collection:', err);
+
+      // Rollback optimistic updates
+      setOptimisticOwnedCollections(previousOwned);
+      setOptimisticAvailableCollections(previousAvailable);
+      showToast('Error al añadir colección', 'error');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -340,7 +493,7 @@ function ProfileContent() {
                     <div>
                       <div className="flex items-center space-x-3 mb-2">
                         <h2 className="text-3xl font-bold">
-                          {nickname || 'Sin nombre'}
+                          {displayNickname || 'Sin nombre'}
                         </h2>
                         <Button
                           size="sm"
