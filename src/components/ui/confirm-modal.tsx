@@ -1,6 +1,4 @@
-'use client';
-
-import { ReactNode } from 'react';
+import * as React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,15 +8,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
 
 interface ConfirmModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
-  description: string | ReactNode;
+  description: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
+  onCancel?: () => void;
   loading?: boolean;
   variant?: 'default' | 'destructive';
 }
@@ -31,35 +31,50 @@ export function ConfirmModal({
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   onConfirm,
+  onCancel,
   loading = false,
   variant = 'default',
 }: ConfirmModalProps) {
-  const handleConfirm = () => {
-    onConfirm();
-  };
-
   const handleCancel = () => {
-    if (!loading) {
+    if (onCancel) {
+      onCancel();
+    } else {
       onOpenChange(false);
     }
+  };
+
+  const handleConfirm = () => {
+    onConfirm();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {description}
-          </DialogDescription>
+          <div className="flex items-center space-x-3">
+            {variant === 'destructive' && (
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+            )}
+            <div className="flex-1">
+              <DialogTitle className="text-lg font-semibold">
+                {title}
+              </DialogTitle>
+            </div>
+          </div>
         </DialogHeader>
 
-        <DialogFooter className="flex gap-2 sm:gap-0">
+        <DialogDescription className="text-sm text-gray-600 mt-4">
+          {description}
+        </DialogDescription>
+
+        <DialogFooter className="mt-6 space-x-2">
           <Button
             variant="outline"
             onClick={handleCancel}
             disabled={loading}
-            className="sm:mr-2"
+            type="button"
           >
             {cancelText}
           </Button>
@@ -67,6 +82,7 @@ export function ConfirmModal({
             variant={variant === 'destructive' ? 'destructive' : 'default'}
             onClick={handleConfirm}
             disabled={loading}
+            type="button"
           >
             {loading ? 'Procesando...' : confirmText}
           </Button>

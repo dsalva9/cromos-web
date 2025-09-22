@@ -25,6 +25,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
+## [0.8.0] - 2024-12-XX
+
+### Added
+
+- **Seamless Perfil Actions with Optimistic Updates**
+  - All profile actions now update UI instantly without page reloads
+  - Per-action loading states for individual buttons and controls
+  - Optimistic cache management with automatic rollback on errors
+  - Custom toast notification system for success/error feedback
+  - Hook-based architecture for profile data and collection actions
+
+- **Enhanced Profile User Experience**
+  - Inline nickname editing with immediate visual feedback
+  - Collection add/remove/activate actions work seamlessly
+  - Visual loading indicators per action (no full-page spinners)
+  - Error handling with toast notifications and state recovery
+  - Keyboard shortcuts for nickname editing (Enter to save, Escape to cancel)
+
+- **Robust State Management**
+  - Snapshot-based optimistic updates with rollback capability
+  - Soft refresh functionality for cache reconciliation
+  - Client-side cache with server sync validation
+  - Prevention of concurrent conflicting actions
+
+### Changed
+
+- **Profile Page Architecture**: Complete refactor to hook-based optimistic updates
+- **Data Flow**: Eliminated all router.refresh() calls and page reloads
+- **User Feedback**: Replaced full-page loading with granular action feedback
+- **Error Handling**: Enhanced error states with automatic recovery
+
+### Technical Infrastructure
+
+- New hooks: `useProfileData` and `useCollectionActions` for optimistic state management
+- Custom toast utility system for user notifications
+- Enhanced confirm modal component with loading states
+- Improved TypeScript interfaces for profile and collection data
+
+## [0.7.0] - 2024-12-XX
+
+### Added
+
+- **Modern Card-Based Profile Design**
+  - Gradient header profile card with large avatar and status indicators
+  - Inline nickname editing with stylish pencil icon button
+  - Smooth hover animations for all collection cards
+  - Visual progress bars with animated completion percentages
+  - Color-coded gradient header strips (green for active, gray for inactive collections)
+
+- **Enhanced Visual Design System**
+  - Pill-style action buttons with proper color coding (blue activate, red delete, green add)
+  - Colorful statistics display boxes with meaningful lucide-react icons
+  - Consistent card elevation and shadow system across all components
+  - Improved spacing and typography hierarchy for better readability
+
+- **UI/UX Improvements**
+  - Smooth scale-up hover effects on collection cards
+  - Animated progress indicators with gradient fills
+  - Better visual feedback for all user actions
+  - Enhanced empty states with larger icons and better messaging
+  - Consistent badge styling with shadow effects
+
+### Changed
+
+- **Profile Page Complete Visual Overhaul**: Transformed from basic layout to modern card-based design matching Mi Colección page aesthetics
+- **Collection Card Layout**: Redesigned with gradient headers, better stats display, and modern action buttons
+- **Button Design System**: Unified pill-style buttons with consistent colors and hover effects
+- **Visual Hierarchy**: Improved spacing, typography, and color usage throughout profile interface
+
+### Infrastructure
+
+- Enhanced ModernCard component usage for consistent design language
+- Improved loading states with better visual feedback
+- Better responsive design patterns for card-based layouts
+
 ## [0.6.0] - 2024-12-XX
 
 ### Added
@@ -131,6 +206,6 @@ When making changes to the project:
 4. **Commit message format:**
    ```bash
    git add CHANGELOG.md
-   git commit -m "docs: update changelog for v0.6.0"
+   git commit -m "docs: update changelog for v0.8.0"
    git push origin main
    ```

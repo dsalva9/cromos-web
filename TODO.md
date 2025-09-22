@@ -16,6 +16,7 @@
 - [x] User collection switching and joining functionality
 - [x] **Perfil: split owned vs available collections + add/remove/activate actions**
 - [x] **Modern card-based profile design with gradients, hover effects, and visual polish**
+- [x] **Seamless Perfil actions with optimistic updates (no page reloads)**
 
 ### Medium Priority - NEXT UP
 
@@ -123,10 +124,22 @@
 - [x] Modern action buttons with proper states
 - [x] Enhanced empty states with better messaging
 
+### Seamless Optimistic Actions - ✅ DONE
+
+- [x] Eliminated all page reloads from profile actions
+- [x] Optimistic updates with automatic rollback on errors
+- [x] Per-action loading states (granular feedback)
+- [x] Custom toast notification system
+- [x] Hook-based architecture for state management
+- [x] Smart caching with server reconciliation
+- [x] Error handling with user-friendly feedback
+- [x] Keyboard shortcuts and accessibility improvements
+
 ## 🛠️ Follow-ups for Enhanced Profile Management
 
 ### Near-term improvements
 
+- [ ] Add real-time sync with Supabase Realtime for multi-tab consistency
 - [ ] "Soft archive" instead of hard delete (keeps stats/history but hides from UI)
 - [ ] Bulk actions (add/remove multiple collections)
 - [ ] Sorting & filters on Perfil (by completion %, recency)
@@ -138,6 +151,14 @@
 - [ ] Collection recommendations based on user activity
 - [ ] Import/export collection data
 - [ ] Achievement system for collection milestones
+- [ ] Advanced undo/redo system for complex operations
+
+### Technical improvements
+
+- [ ] Refactor to React Query (if desired) for larger-scale caching
+- [ ] Add unit tests for optimistic flows + error rollback
+- [ ] Implement service worker for offline optimistic updates
+- [ ] Add telemetry for action success/failure rates
 
 ## 🛡️ Known Issues
 
@@ -175,6 +196,6 @@
 ```bash
 # After completing a task
 git add TODO.md CHANGELOG.md docs/current-features.md
-git commit -m "docs: mark modern profile design as completed"
+git commit -m "docs: mark seamless profile actions as completed"
 git push origin main
 ```
