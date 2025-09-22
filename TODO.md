@@ -15,6 +15,7 @@
 - [x] Build collection progress tracking interface
 - [x] User collection switching and joining functionality
 - [x] **Perfil: split owned vs available collections + add/remove/activate actions**
+- [x] **Modern card-based profile design with gradients, hover effects, and visual polish**
 
 ### Medium Priority - NEXT UP
 
@@ -99,7 +100,30 @@
 - [ ] Set up staging environment
 - [ ] Database backup strategies
 
-## 🛠️ Follow-ups for Perfil Collection Management
+## 🛠️ UI/UX Enhancements - COMPLETED ✅
+
+### Modern Design System - ✅ DONE
+
+- [x] Consistent card-based design language across all pages
+- [x] Gradient headers and accent colors for visual hierarchy
+- [x] Smooth hover animations and transitions
+- [x] Pill-style buttons with proper color coding
+- [x] Progress bars with animated fills
+- [x] Meaningful icons from lucide-react
+- [x] Enhanced loading states and user feedback
+- [x] Professional shadow and elevation system
+
+### Profile Page Modernization - ✅ DONE
+
+- [x] Gradient profile header with large avatar
+- [x] Inline editing with styled icon buttons
+- [x] Card-based collection display with hover effects
+- [x] Animated progress indicators
+- [x] Color-coded status indicators (active/inactive collections)
+- [x] Modern action buttons with proper states
+- [x] Enhanced empty states with better messaging
+
+## 🛠️ Follow-ups for Enhanced Profile Management
 
 ### Near-term improvements
 
@@ -115,7 +139,7 @@
 - [ ] Import/export collection data
 - [ ] Achievement system for collection milestones
 
-## 🐛 Known Issues
+## 🛡️ Known Issues
 
 - [ ] None currently identified
 
@@ -144,12 +168,13 @@
 2. **Add new items** as they come up in development
 3. **Update priorities** based on user feedback and business needs
 4. **Review weekly** to adjust sprint planning
+5. **Update docs/current-features.md** when features are completed
 
 ## Git Workflow for TODO Updates
 
 ```bash
 # After completing a task
-git add TODO.md CHANGELOG.md
-git commit -m "docs: mark collection management as completed"
+git add TODO.md CHANGELOG.md docs/current-features.md
+git commit -m "docs: mark modern profile design as completed"
 git push origin main
 ```
