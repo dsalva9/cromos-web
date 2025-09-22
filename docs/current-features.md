@@ -19,7 +19,7 @@
 - **Protected Routes**: AuthGuard component protects authenticated pages
 - **User State**: Global user context via SupabaseProvider
 
-**Files**: `SupabaseProvider.tsx`, `AuthGuard.tsx`, `(auth)/login/page.tsx`, `(auth)/signup/page.tsx`
+**Files**: `src/components/providers/SupabaseProvider.tsx`, `src/components/AuthGuard.tsx`, `src/app/(auth)/login/page.tsx`, `src/app/(auth)/signup/page.tsx`
 
 ### 2. Enhanced Profile Management ✨ **RECENTLY UPDATED**
 
@@ -45,7 +45,7 @@
 - **Auto-Activation**: First collection added automatically becomes active
 - **Empty State**: Celebrates when user has joined all available collections
 
-**Files**: `ProfilePage.tsx`, `confirm-modal.tsx`
+**Files**: `src/app/profile/page.tsx`, `src/components/ui/confirm-modal.tsx`
 
 ### 3. Collection System
 
@@ -65,7 +65,7 @@
 - **Progress Calculation**: Real-time completion percentage, owned count, duplicates
 - **Optimistic Updates**: UI updates immediately, syncs with database
 
-**Files**: `CollectionPage.tsx`
+**Files**: `src/app/mi-coleccion/page.tsx`
 
 ### 5. Modern UI/UX ✨ **RECENTLY ENHANCED**
 
@@ -78,7 +78,7 @@
 - **Loading States**: Proper feedback during async operations with button-level loading
 - **Icon Integration**: Meaningful lucide-react icons for better UX
 
-**Files**: `globals.css`, `modern-card.tsx`, `confirm-modal.tsx`, all component files
+**Files**: `src/app/globals.css`, `src/components/ui/modern-card.tsx`, `src/components/ui/confirm-modal.tsx`, all component files
 
 ### 6. Navigation System
 
@@ -87,7 +87,7 @@
 - **Mobile Menu**: Collapsible hamburger menu
 - **User Actions**: Logout functionality, profile access
 
-**Files**: `site-header.tsx`, `nav-link.tsx`
+**Files**: `src/components/site-header.tsx`, `src/components/nav-link.tsx`
 
 ## 🔧 Technical Implementation
 
@@ -155,9 +155,9 @@ User Authentication (Supabase Auth)
 Profile Creation (profiles table)
     ↓
 Collection Management (user_collections table)
-    ├─ Add Collection (with auto-activation if first)
-    ├─ Remove Collection (with cascade delete)
-    └─ Set Active Collection (exclusive)
+    ├── Add Collection (with auto-activation if first)
+    ├── Remove Collection (with cascade delete)
+    └── Set Active Collection (exclusive)
     ↓
 Sticker Tracking (user_stickers table)
 ```
@@ -168,8 +168,8 @@ Sticker Tracking (user_stickers table)
 Available Collections
     ↓ (Add Action with smooth animations)
 Owned Collections
-    ├─ Set Active (exclusive with visual feedback)
-    └─ Remove (with confirmation + cascade delete)
+    ├── Set Active (exclusive with visual feedback)
+    └── Remove (with confirmation + cascade delete)
     ↓ (Remove Action)
 Available Collections
 ```
