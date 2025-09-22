@@ -6,7 +6,8 @@
 
 - Manage their sticker collections (like Panini World Cup albums)
 - Track which stickers they own vs. want
-- Join multiple collections and switch between them
+- Join multiple collections and switch between them seamlessly
+- Navigate collections with active-first routing and deep-linking
 - Add/remove collections from their profile with seamless optimistic updates
 - (Future) Trade stickers with other users
 
@@ -21,205 +22,136 @@
 
 **Files**: `src/components/providers/SupabaseProvider.tsx`, `src/components/AuthGuard.tsx`, `src/app/(auth)/login/page.tsx`, `src/app/(auth)/signup/page.tsx`
 
-### 2. Seamless Profile Management ✨ **NEWLY ENHANCED**
+### 2. Active-first Collection Navigation System ✨
+
+- **Smart Navbar Routing**: "Mi Colección" link redirects to user's active collection automatically
+- **Canonical Collection URLs**: Deep-linkable `/mi-coleccion/[id]` routes for every collection
+- **Fallback Logic**: Auto-activates first owned collection if no active collection set
+- **Empty State Handling**: Elegant empty state with CTA for users without collections
+- **Toast Notifications**: User-friendly messages for navigation edge cases
+
+#### Dynamic Collection Navigation
+
+- **Collections Dropdown**: Easy switching between owned collections with visual indicators
+- **Active Status Display**: Clear visual indicators for active vs inactive collections
+- **Inline Activation**: "Hacer activa" button directly in collection headers
+- **Optimistic Switching**: Immediate visual feedback when changing active collection
+- **Keyboard Accessibility**: Full keyboard navigation support for dropdown
+
+#### Deep-linking Integration
+
+- **Profile → Collection**: Direct navigation from profile cards to collection pages
+- **Bookmarkable URLs**: Each collection has a permanent, shareable URL
+- **Client-side Navigation**: No page reloads when switching between collections
+- **State Preservation**: Navigation maintains user context and loading states
+
+**Files**: `src/app/mi-coleccion/page.tsx` (redirect), `src/app/mi-coleccion/[id]/page.tsx`, `src/components/collection/CollectionsDropdown.tsx`, `src/components/profile/OwnedCollectionCard.tsx`, `src/components/collection/EmptyCollectionState.tsx`
+
+### 3. Enhanced Profile Management ✅ **FULLY REFACTORED**
 
 - **Optimistic Updates**: All profile actions update UI instantly without page reloads
 - **Modern Card Design**: Beautiful gradient header with large avatar and status indicators
 - **Inline Editing**: Real-time nickname editing with keyboard shortcuts and loading states
 - **Per-Action Loading**: Individual button loading states instead of full-page spinners
-- **Toast Notifications**: Success/error feedback with custom toast system
+- **Toast Notifications**: Success/error feedback with simple toast system
 - **Error Recovery**: Automatic rollback of optimistic updates on server errors
 
-#### Seamless Collection Management
+#### Seamless Collection Management ✅ **COMPLETED**
 
 - **Add Collections**: Instant UI updates when joining new collections with auto-activation
 - **Remove Collections**: Safe deletion with confirmation modal and cascade cleanup
 - **Activate Collections**: Immediate active state switching with visual feedback
-- **Smart Caching**: Snapshot-based optimistic updates with server reconciliation
+- **Deep-link Navigation**: Collection cards now navigate directly to collection pages via clickable cards and "Ver Colección" buttons
+- **Smart Caching**: Optimistic state management with server reconciliation
 - **Conflict Prevention**: Action loading states prevent concurrent operations
-- **Keyboard UX**: Enter to save, Escape to cancel for nickname editing
 
-#### Visual Polish & UX
+**Files**: `src/app/profile/page.tsx`, `src/hooks/profile/useProfileData.ts`, `src/hooks/profile/useCollectionActions.ts`
 
-- **Card-Based Layout**: Each collection displayed with modern hover animations
-- **Progress Visualization**: Animated progress bars showing completion percentage
-- **Color-Coded States**: Green (active), blue (actions), yellow (new), red (delete)
-- **Stats Display**: Colorful statistics boxes with meaningful icons
-- **Empty States**: Helpful messaging and celebration when appropriate
+### 4. Sticker Collection Management
 
-**Files**: `src/app/profile/page.tsx`, `hooks/profile/useProfileData.ts`, `hooks/profile/useCollectionActions.ts`, `src/components/ui/confirm-modal.tsx`, `src/lib/toast.ts`
+- **Collection Display**: Grid-based sticker layout with rarity gradients
+- **Ownership Tracking**: "TENGO" button to mark owned stickers
+- **Want List**: "QUIERO" button for desired stickers
+- **Progress Tracking**: Real-time completion percentages
+- **Optimistic Updates**: Immediate UI feedback for all sticker actions
+- **Duplicate Management**: Track multiple copies of the same sticker
 
-### 3. Collection System
+**Files**: `src/app/mi-coleccion/[id]/page.tsx`
 
-- **Multi-Collection Support**: Database supports multiple albums (World Cup, Liga, etc.)
-- **Collection Metadata**: Name, competition, year, description
-- **Team Organization**: Collections contain teams, teams contain stickers
-- **User Participation**: Users join collections to start collecting
-- **Data Integrity**: Proper cascade delete when removing collections
+### 5. Database Architecture
 
-**Database Tables**: `collections`, `collection_teams`, `user_collections`
+- **Supabase Integration**: Full database with Row Level Security
+- **Collection Statistics**: Real-time progress calculation via database functions
+- **User Management**: Profile system with nickname and avatar support
+- **Multi-Collection Support**: Users can join multiple collections
+- **Active Collection System**: One active collection per user with exclusive activation
 
-### 4. Sticker Inventory Management
+**Files**: `src/lib/supabase/client.ts`, `src/types/index.ts`, Database schema documentation
 
-- **Ownership Tracking**: "TENGO" button to mark stickers as owned
-- **Quantity Support**: Track multiple copies (duplicates shown as "+2", "+3", etc.)
-- **Want List**: "QUIERO" button for stickers user wants to find
-- **Progress Calculation**: Real-time completion percentage, owned count, duplicates
-- **Optimistic Updates**: UI updates immediately, syncs with database
+### 6. Modern UI/UX Design System
 
-**Files**: `src/app/mi-coleccion/page.tsx`
+- **Gradient Theme**: Teal/cyan/blue gradient backgrounds throughout
+- **Modern Cards**: Hover effects, shadows, and smooth transitions
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
+- **Loading States**: Comprehensive loading indicators and skeleton states
+- **Error Handling**: User-friendly error messages and recovery options
+- **Spanish Language**: Complete Spanish localization
 
-### 5. Modern UI/UX ✨ **CONTINUOUSLY ENHANCED**
+## 🚧 Currently in Development
 
-- **Seamless Interactions**: No page reloads, instant visual feedback
-- **Consistent Card Design**: Unified card-based layout across Profile and Collection pages
-- **Gradient Design System**: Teal/cyan/blue gradient theme with accent colors throughout
-- **Spanish Interface**: All text in Spanish for target market
-- **Mobile-First**: Responsive grid layout for stickers and collections
-- **Visual Feedback**: Color-coded states and meaningful loading indicators
-- **Smooth Animations**: Hover effects, progress bar animations, and transitions
-- **Granular Loading**: Action-specific loading states with proper error handling
-- **Toast System**: Custom notification system for user feedback
+### Active-first Navigation Enhancements
 
-**Files**: `src/app/globals.css`, `src/components/ui/modern-card.tsx`, `src/components/ui/confirm-modal.tsx`, `src/lib/toast.ts`, all component files
+- Collection switching dropdown in main navigation
+- Breadcrumb navigation for deep-linked collections
+- Back navigation improvements
 
-### 6. Navigation System
+## 📋 Next Planned Features
 
-- **Dynamic Navigation**: Different menus for authenticated vs. guest users
-- **Active States**: Shows current page in navigation
-- **Mobile Menu**: Collapsible hamburger menu
-- **User Actions**: Logout functionality, profile access
+### Trading System (Phase 2)
 
-**Files**: `src/components/site-header.tsx`, `src/components/nav-link.tsx`
+- **Find Traders Feature**: Show users who have stickers I want and want stickers I have
+- **Trade Proposals**: Send/receive trade requests with multiple stickers
+- **Trade Chat**: Basic messaging for trade negotiations
+- **Trade History**: Track completed and pending trades
 
-## 🔧 Technical Implementation
+### Enhanced User Experience
 
-### Hook-Based Architecture ✨ **NEW**
+- **Public User Profiles**: View other users' collections and stats
+- **User Directory**: Browse and search for other collectors
+- **Notification System**: Trade requests, messages, new collections
+- **Collection Completion Celebrations**: Achievement system
 
-- **useProfileData**: Optimistic cache management with snapshot/rollback capability
-- **useCollectionActions**: Per-action loading states and server sync
-- **Cache Strategy**: Smart optimistic updates with automatic error recovery
-- **State Management**: Local cache with server reconciliation
+## 🔧 Technical Architecture
 
-### Database Architecture
+### State Management
 
-- **PostgreSQL** via Supabase with Row Level Security
-- **Cascade Delete Logic**: Proper cleanup when removing collections
-- **Unique Constraints**: Prevent duplicate collection joins
-- **Data Integrity**: Foreign key constraints and proper indexing
+- **Optimistic Updates**: All user actions provide immediate feedback
+- **Cache Management**: Snapshot-based rollback system for error recovery
+- **Server Reconciliation**: Background sync with Supabase
+- **Loading States**: Granular per-action loading indicators
 
-### Frontend Architecture
+### Component Architecture
 
-- **Next.js 15** with App Router
-- **TypeScript** for type safety
-- **Tailwind CSS v4** with shadcn/ui components
-- **Optimistic Updates** for better UX
-- **Hook-Based State**: Custom hooks for profile and collection management
-- **Toast System**: Custom notification utility
-- **Error Boundaries**: Graceful error handling with recovery
+- **Hook-based Data**: Custom hooks for profile data and collection actions
+- **Modern Components**: shadcn/ui component library with custom extensions
+- **Accessibility**: ARIA labels, keyboard navigation, focus management
+- **Error Boundaries**: Comprehensive error handling throughout
 
-### Key Design Patterns
+### Performance
 
-- **Provider Pattern**: Supabase context for auth/db access
-- **Hook Pattern**: Custom hooks for complex state management
-- **Optimistic Updates**: Immediate UI feedback with server sync
-- **Snapshot Pattern**: Cache snapshots for error rollback
-- **Confirmation Patterns**: Safe destructive actions with modals
-- **Action Loading States**: Granular loading feedback
-- **Modern Card System**: Consistent card-based UI components
+- **Optimistic UI**: Zero perceived latency for user actions
+- **Efficient Queries**: Selective data fetching and caching
+- **Client-side Navigation**: No page reloads for collection switching
+- **Progressive Enhancement**: Works without JavaScript for core functionality
 
-## 📊 Current User Flow
+## 📊 Implementation Status
 
-1. **Landing Page**: Unauthenticated users see signup/login options
-2. **Registration**: New users create account
-3. **Dashboard**: Authenticated users see main menu (Collection, Trades, Messages, Profile)
-4. **Profile Page**:
-   - **Modern Profile Card**: Gradient header with avatar, real-time nickname editing
-   - **Seamless Collection Management**: Instant add/remove/activate with visual feedback
-   - **Optimistic Updates**: All actions work immediately with server sync
-   - **Error Handling**: Automatic rollback and user notification on failures
-5. **Collection Page**: View all stickers, mark as owned/wanted, see progress
-
-## 🎨 UI Components Implemented
-
-### shadcn/ui Components
-
-- `Button` - Primary UI actions with loading states and variants
-- `Card` - Content containers (enhanced with ModernCard)
-- `Input` - Form fields with focus states
-- `Badge` - Status indicators (Active, Nueva, etc.) with color variants
-- `Dialog` - Modal windows for confirmations
-- `Avatar` - User avatars
-- `Progress` - Progress bars with smooth animations
-
-### Custom Components
-
-- `ModernCard` - Gradient card design with hover effects
-- `ConfirmModal` - Reusable confirmation dialog with loading states and destructive styling
-- `AuthGuard` - Route protection
-- `NavLink` - Active navigation links
-- `Toast System` - Custom notification utility with auto-dismiss and click-to-close
-
-### Custom Hooks ✨ **NEW**
-
-- `useProfileData` - Profile and collection data with optimistic cache
-- `useCollectionActions` - Collection management actions with loading states
-- Integration with existing `useSupabase` and `useUser` hooks
-
-## 💾 Data Models
-
-### Enhanced User Data Flow
-
-```
-User Authentication (Supabase Auth)
-    ↓
-Profile Creation (profiles table)
-    ↓
-Optimistic Collection Management
-    ├── Cache Snapshot (for rollback)
-    ├── Immediate UI Update
-    ├── Server Action (async)
-    ├── Success: Soft Refresh Cache
-    └── Error: Rollback + Toast Notification
-    ↓
-Sticker Tracking (user_stickers table)
-```
-
-### Seamless Collection Management Actions
-
-```
-Available Collections
-    ↓ (Add Action - optimistic)
-    ├── Immediate: Move to Owned Collections
-    ├── Server: Insert user_collection
-    ├── Success: Soft refresh stats
-    └── Error: Rollback + error toast
-
-Owned Collections
-    ├── Set Active (optimistic with immediate visual feedback)
-    ├── Remove (with confirmation + optimistic update)
-    └── All actions work without page reloads
-```
-
-## 🚧 Known Limitations
-
-1. **No Sticker Images**: Currently using placeholder avatars
-2. **No Search/Filter**: Users must scroll through all stickers
-3. **No Trading System**: Core feature not yet implemented
-4. **Limited Bulk Actions**: No multi-select for collection management
-5. **No Collection Creation**: Users can only join existing collections
-
-## 🎯 Ready for Next Phase
-
-The seamless optimistic update foundation is now complete:
-
-- **Zero Page Reloads**: All profile actions work instantly with visual feedback
-- **Robust Error Handling**: Automatic rollback and user notification on failures
-- **Professional UX**: Per-action loading states and smooth transitions
-- **Scalable Architecture**: Hook-based patterns ready for complex features
-- **User-Friendly Interfaces**: Intuitive design with proper feedback systems
-- **Data Integrity**: Safe operations with confirmation modals and cascade deletes
-- **Performance Optimized**: Smart caching with server reconciliation
-- **Mobile Ready**: Touch-friendly interactions with proper loading states
-
-The current implementation provides a polished, professional user experience that feels modern and responsive. Users can manage their collections seamlessly without any jarring page reloads or unexpected navigation, making it ready for the next phase of trading system development.
+| Feature               | Status      | Notes                                 |
+| --------------------- | ----------- | ------------------------------------- |
+| Authentication        | ✅ Complete | Supabase Auth with session management |
+| Profile Management    | ✅ Complete | Optimistic updates, modern UI         |
+| Collection Navigation | ✅ Complete | Deep-linking, dropdown switcher       |
+| Sticker Management    | ✅ Complete | TENGO/QUIERO with progress tracking   |
+| Database Schema       | ✅ Complete | RLS policies, statistics functions    |
+| Trading System        | 🚧 Planned  | Phase 2 development                   |
+| User Directory        | 📅 Future   | Phase 3 community features            |

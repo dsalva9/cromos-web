@@ -25,45 +25,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
-## [0.8.0] - 2024-12-XX
+## [1.0.0] - 2025-01-XX
 
 ### Added
 
-- **Seamless Perfil Actions with Optimistic Updates**
-  - All profile actions now update UI instantly without page reloads
-  - Per-action loading states for individual buttons and controls
-  - Optimistic cache management with automatic rollback on errors
-  - Custom toast notification system for success/error feedback
-  - Hook-based architecture for profile data and collection actions
+- **Complete Profile Management Refactor with Advanced Optimistic Updates**
+  - Eliminated all page reloads from profile actions for seamless UX
+  - Optimistic state management with automatic rollback on server errors
+  - Per-action loading states for granular user feedback
+  - Simple toast notification system for success/error messages
+  - Hook-based architecture with `useProfileData` and `useCollectionActions`
+- **Enhanced Collection Navigation Experience**
+  - Clickable collection cards for direct navigation to collection pages
+  - "Ver Colección" buttons for explicit navigation actions
+  - Deep-linking support with canonical `/mi-coleccion/[id]` URLs
+  - Improved visual design with enhanced hover effects and transitions
+  - Better mobile responsiveness for collection cards
 
-- **Enhanced Profile User Experience**
-  - Inline nickname editing with immediate visual feedback
-  - Collection add/remove/activate actions work seamlessly
-  - Visual loading indicators per action (no full-page spinners)
-  - Error handling with toast notifications and state recovery
-  - Keyboard shortcuts for nickname editing (Enter to save, Escape to cancel)
-
-- **Robust State Management**
-  - Snapshot-based optimistic updates with rollback capability
-  - Soft refresh functionality for cache reconciliation
-  - Client-side cache with server sync validation
-  - Prevention of concurrent conflicting actions
+- **Advanced State Management Architecture**
+  - Snapshot-based cache system for optimistic updates
+  - Smart error recovery with automatic state rollback
+  - Conflict prevention through action loading states
+  - Client-side validation before server operations
 
 ### Changed
 
-- **Profile Page Architecture**: Complete refactor to hook-based optimistic updates
-- **Data Flow**: Eliminated all router.refresh() calls and page reloads
-- **User Feedback**: Replaced full-page loading with granular action feedback
-- **Error Handling**: Enhanced error states with automatic recovery
+- **Profile Page Architecture**: Complete refactor from traditional form-based updates to modern optimistic state management
+- **Collection Management Flow**: Enhanced from basic CRUD to sophisticated optimistic updates with error recovery
+- **User Feedback System**: Migrated from alerts and page reloads to elegant toast notifications
+- **Navigation Patterns**: Improved from static links to dynamic, context-aware navigation
 
 ### Technical Infrastructure
 
-- New hooks: `useProfileData` and `useCollectionActions` for optimistic state management
-- Custom toast utility system for user notifications
-- Enhanced confirm modal component with loading states
-- Improved TypeScript interfaces for profile and collection data
+- New custom hooks: `useProfileData` for optimistic state management
+- Enhanced TypeScript interfaces for better type safety
+- Improved component organization with better separation of concerns
+- Better error handling patterns throughout the application
 
-## [0.7.0] - 2024-12-XX
+### Fixed
+
+- Eliminated page refresh issues when managing collections
+- Fixed inconsistent loading states across profile actions
+- Resolved navigation issues with collection switching
+- Improved error handling for network failures
+
+## [0.9.0] - 2024-12-XX
+
+### Added
+
+- **Active-first Collection Navigation**
+  - Navbar "Mi Colección" link now redirects to user's active collection by default
+  - New dynamic routing: `/mi-coleccion/[id]` for canonical collection URLs
+  - Collection pages show Active/Inactive status with inline "Hacer activa" button
+  - Collections dropdown switcher to easily navigate between owned collections
+  - Empty state for users with no collections, with CTA to follow collections
+
+- **Enhanced Collection User Experience**
+  - Deep-linking from Profile cards directly to collection pages
+  - Visual active collection indicators in dropdown (✓ checkmark and "Activa" badge)
+  - Optimistic active collection switching with immediate visual feedback
+  - Fallback logic when no active collection exists (auto-activates first owned)
+  - Smart redirect handling with user-friendly toast messages
+
+- **Improved Navigation Architecture**
+  - Canonical collection URLs for better bookmarking and sharing
+  - Client-side navigation between collections with no page reloads
+  - Keyboard accessible dropdown with proper ARIA labels
+  - Consistent loading states and error handling across navigation
+
+### Changed
+
+- **Routing Structure**: Migrated from `/mi-coleccion` to `/mi-coleccion/[id]` pattern
+- **Profile Collection Cards**: Now include "Ver Colección" button for direct navigation
+- **Collection Header**: Enhanced with status indicators and collection switcher dropdown
+
+### Technical Infrastructure
+
+- New CollectionsDropdown component with accessibility features
+- Enhanced OwnedCollectionCard component with deep-link navigation
+- Empty state handling for users without collections
+- Improved error boundaries and fallback strategies
+
+## [0.8.0] - 2024-12-XX
 
 ### Added
 
@@ -100,7 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved loading states with better visual feedback
 - Better responsive design patterns for card-based layouts
 
-## [0.6.0] - 2024-12-XX
+## [0.7.0] - 2024-12-XX
 
 ### Added
 
@@ -206,6 +249,6 @@ When making changes to the project:
 4. **Commit message format:**
    ```bash
    git add CHANGELOG.md
-   git commit -m "docs: update changelog for v0.8.0"
+   git commit -m "docs: update changelog for v1.0.0"
    git push origin main
    ```

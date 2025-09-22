@@ -1,6 +1,6 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint (Phase 1: Foundation)
+## 🚀 Current Sprint Status (Phase 1: Foundation)
 
 ### High Priority ✅ COMPLETED
 
@@ -17,169 +17,164 @@
 - [x] **Perfil: split owned vs available collections + add/remove/activate actions**
 - [x] **Modern card-based profile design with gradients, hover effects, and visual polish**
 - [x] **Seamless Perfil actions with optimistic updates (no page reloads)**
-
-### Medium Priority - NEXT UP
-
-- [ ] Add search and filtering for stickers (by team, player, rarity)
-- [ ] Implement sticker image upload/management
-- [ ] Create better mobile responsiveness
-- [ ] Add loading states and error handling improvements
-
-### Low Priority
-
-- [ ] Add dark mode toggle
-- [ ] Set up error boundary components
-- [ ] Create loading states and skeletons
-- [ ] Add basic animations and transitions
+- [x] **Active-first navigation system with collection dropdown switching**
+- [x] **Deep-linking for collections with canonical URLs (/mi-coleccion/[id])**
+- [x] **Collection cards with "Ver Colección" navigation and click-to-view**
 
 ## 🎯 Phase 2: Core Features - READY TO START
 
-### Trading System (High Impact)
+### Trading System (High Impact) 🚧 NEXT UP
 
 - [ ] **Find Traders Feature**: Show users who have stickers I want and want stickers I have
-- [ ] **Trade Proposals**: Send/receive trade requests with multiple stickers
-- [ ] **Trade Chat**: Basic messaging for trade negotiations
-- [ ] **Trade History**: Track completed and pending trades
+  - [ ] Create trading match algorithm
+  - [ ] Build "Find Trades" page with match results
+  - [ ] Add filters (collection, rarity, teams)
+  - [ ] Show mutual benefit opportunities
 
-### Enhanced User Experience
+- [ ] **Trade Proposals**: Send/receive trade requests with multiple stickers
+  - [ ] Create trade proposal database schema
+  - [ ] Build trade proposal form with multiple sticker selection
+  - [ ] Add trade proposal notifications
+  - [ ] Implement trade acceptance/rejection flow
+
+- [ ] **Trade Chat**: Basic messaging for trade negotiations
+  - [ ] Create messages database schema
+  - [ ] Build real-time messaging interface
+  - [ ] Add message notifications
+  - [ ] Include trade context in conversations
+
+- [ ] **Trade History**: Track completed and pending trades
+  - [ ] Create trade history database schema
+  - [ ] Build trade history interface
+  - [ ] Add trade status tracking
+  - [ ] Implement trade completion flow
+
+### Enhanced User Experience 📋 MEDIUM PRIORITY
 
 - [ ] **Public User Profiles**: View other users' collections and stats
+  - [ ] Create public profile routes
+  - [ ] Build public collection viewing interface
+  - [ ] Add user search functionality
+  - [ ] Implement privacy controls
+
 - [ ] **User Directory**: Browse and search for other collectors
+  - [ ] Create user directory page
+  - [ ] Add search and filtering options
+  - [ ] Show user activity and stats
+  - [ ] Add "follow" or "bookmark" users feature
+
 - [ ] **Notification System**: Trade requests, messages, new collections
+  - [ ] Create notifications database schema
+  - [ ] Build notification center interface
+  - [ ] Add real-time notifications with Supabase Realtime
+  - [ ] Implement email notification preferences
+
 - [ ] **Collection Completion Celebrations**: Achievement system
+  - [ ] Design achievement system
+  - [ ] Create celebration animations
+  - [ ] Add progress milestones
+  - [ ] Build achievement showcase
 
-### User Experience
+### Current Feature Enhancements 🔧 LOW PRIORITY
 
-- [ ] User profile customization
-- [ ] Notification system
-- [ ] Mobile-responsive design optimization
-- [ ] Performance optimization
+- [ ] **Collection Management Improvements**
+  - [ ] Add search and filtering for stickers (by team, player, rarity)
+  - [ ] Implement sticker image upload/management system
+  - [ ] Add bulk sticker operations (mark multiple as TENGO/QUIERO)
+  - [ ] Create collection export/import functionality
 
-## 🔮 Phase 3: Advanced Features
+- [ ] **Navigation & UX Polish**
+  - [ ] Add breadcrumb navigation for deep-linked collections
+  - [ ] Improve back navigation flow
+  - [ ] Add keyboard shortcuts for common actions
+  - [ ] Create onboarding tour for new users
+
+- [ ] **Mobile & Responsive**
+  - [ ] Optimize mobile collection grid layout
+  - [ ] Improve mobile navigation patterns
+  - [ ] Add mobile-specific gestures and interactions
+  - [ ] Test and improve tablet experience
+
+## 📮 Phase 3: Advanced Features
 
 ### Community Features
 
-- [ ] User ratings and reviews
+- [ ] User ratings and reviews for trades
 - [ ] Community forums/discussions
 - [ ] Featured collections showcase
 - [ ] Trading groups/communities
+- [ ] Collection sharing and social features
 
 ### Analytics & Insights
 
 - [ ] Collection value tracking
-- [ ] Market trend analysis
+- [ ] Market trend analysis for popular cards
 - [ ] Trade success metrics
-- [ ] Popular cards insights
+- [ ] Personal collection insights and recommendations
 
 ### Integration & API
 
-- [ ] External card database integration
-- [ ] Price tracking APIs
-- [ ] Social media sharing
-- [ ] Export/import collections
+- [ ] External card database integration (Panini API if available)
+- [ ] Price tracking APIs integration
+- [ ] Social media sharing features
+- [ ] Advanced export/import with other platforms
 
-## 📋 Technical Debt & Improvements
+## 🔧 Technical Debt & Improvements
 
-### Code Quality
+### Code Quality & Testing
 
 - [ ] Add comprehensive test suite (Jest + React Testing Library)
 - [ ] Set up Storybook for component documentation
-- [ ] Implement proper error handling patterns
+- [ ] Implement proper error handling patterns throughout
 - [ ] Add TypeScript strict mode gradually
+- [ ] Create component documentation
 
-### Performance
+### Performance & Optimization
 
-- [ ] Implement image optimization
-- [ ] Add caching strategies
-- [ ] Optimize bundle size
-- [ ] Set up monitoring and analytics
+- [ ] Implement image optimization and lazy loading
+- [ ] Add caching strategies (React Query migration?)
+- [ ] Optimize bundle size and code splitting
+- [ ] Set up monitoring and analytics (Vercel Analytics)
+- [ ] Implement service worker for offline capabilities
 
-### DevOps
+### DevOps & Infrastructure
 
-- [ ] Set up CI/CD pipeline
-- [ ] Add automated testing
+- [ ] Set up CI/CD pipeline (GitHub Actions)
+- [ ] Add automated testing in CI
 - [ ] Set up staging environment
-- [ ] Database backup strategies
+- [ ] Database backup and migration strategies
+- [ ] Add error tracking (Sentry)
 
-## 🛠️ UI/UX Enhancements - COMPLETED ✅
+## ✅ Recently Completed (Move to CHANGELOG)
 
-### Modern Design System - ✅ DONE
+### Profile Management System Enhancement
 
-- [x] Consistent card-based design language across all pages
-- [x] Gradient headers and accent colors for visual hierarchy
-- [x] Smooth hover animations and transitions
-- [x] Pill-style buttons with proper color coding
-- [x] Progress bars with animated fills
-- [x] Meaningful icons from lucide-react
-- [x] Enhanced loading states and user feedback
-- [x] Professional shadow and elevation system
+- [x] **Complete Profile Refactor with Optimistic Updates**
+  - [x] Eliminated all page reloads from profile actions
+  - [x] Optimistic updates with automatic rollback on errors
+  - [x] Per-action loading states for granular feedback
+  - [x] Simple toast notification system for user feedback
+  - [x] Hook-based architecture (`useProfileData`, `useCollectionActions`)
 
-### Profile Page Modernization - ✅ DONE
+- [x] **Enhanced Collection Navigation**
+  - [x] Collection cards now clickable for direct navigation
+  - [x] "Ver Colección" button for explicit navigation
+  - [x] Deep-linking support with `/mi-coleccion/[id]` routes
+  - [x] Improved visual design with better hover effects
 
-- [x] Gradient profile header with large avatar
-- [x] Inline editing with styled icon buttons
-- [x] Card-based collection display with hover effects
-- [x] Animated progress indicators
-- [x] Color-coded status indicators (active/inactive collections)
-- [x] Modern action buttons with proper states
-- [x] Enhanced empty states with better messaging
+## 🛡️ Known Issues & Tech Debt
 
-### Seamless Optimistic Actions - ✅ DONE
+### Minor Issues
 
-- [x] Eliminated all page reloads from profile actions
-- [x] Optimistic updates with automatic rollback on errors
-- [x] Per-action loading states (granular feedback)
-- [x] Custom toast notification system
-- [x] Hook-based architecture for state management
-- [x] Smart caching with server reconciliation
-- [x] Error handling with user-friendly feedback
-- [x] Keyboard shortcuts and accessibility improvements
+- [ ] Toast notifications could use better styling and positioning
+- [ ] Need better error messages for network failures
+- [ ] Consider adding confirmation for destructive actions beyond collection removal
 
-## 🛠️ Follow-ups for Enhanced Profile Management
+### Optimization Opportunities
 
-### Near-term improvements
-
-- [ ] Add real-time sync with Supabase Realtime for multi-tab consistency
-- [ ] "Soft archive" instead of hard delete (keeps stats/history but hides from UI)
-- [ ] Bulk actions (add/remove multiple collections)
-- [ ] Sorting & filters on Perfil (by completion %, recency)
-- [ ] Link from Mi Colección to Perfil's switcher (or add dropdown in Mi Colección)
-
-### Medium-term enhancements
-
-- [ ] Role-based tools for "power users" to curate descriptions and seasons
-- [ ] Collection recommendations based on user activity
-- [ ] Import/export collection data
-- [ ] Achievement system for collection milestones
-- [ ] Advanced undo/redo system for complex operations
-
-### Technical improvements
-
-- [ ] Refactor to React Query (if desired) for larger-scale caching
-- [ ] Add unit tests for optimistic flows + error rollback
-- [ ] Implement service worker for offline optimistic updates
-- [ ] Add telemetry for action success/failure rates
-
-## 🛡️ Known Issues
-
-- [ ] None currently identified
-
-## 💡 Ideas & Considerations
-
-### Future Enhancements
-
-- [ ] Mobile app development
-- [ ] AI-powered card recognition
-- [ ] Blockchain/NFT integration
-- [ ] Multi-language support
-- [ ] Advanced recommendation engine
-
-### Business Features
-
-- [ ] Premium subscription model
-- [ ] Marketplace integration
-- [ ] Professional seller accounts
-- [ ] Event management system
+- [ ] Profile data could use React Query for better caching
+- [ ] Collection dropdown could be optimized for large numbers of collections
+- [ ] Consider virtualizing sticker grids for very large collections
 
 ---
 
@@ -191,11 +186,19 @@
 4. **Review weekly** to adjust sprint planning
 5. **Update docs/current-features.md** when features are completed
 
-## Git Workflow for TODO Updates
+## Next Development Session Priorities
 
-```bash
-# After completing a task
-git add TODO.md CHANGELOG.md docs/current-features.md
-git commit -m "docs: mark seamless profile actions as completed"
-git push origin main
-```
+1. **Start Trading System Design**
+   - Design database schema for trade proposals
+   - Create wireframes for trading interface
+   - Plan user matching algorithm
+
+2. **Minor UX Improvements**
+   - Enhance toast notification system
+   - Add better loading states for collection switching
+   - Improve error messaging consistency
+
+3. **Documentation Updates**
+   - Update API endpoints documentation for new profile hooks
+   - Document optimistic update patterns
+   - Create component usage examples
