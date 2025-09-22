@@ -1,420 +1,154 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Badge } from '@/components/ui/badge';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
-import CollectionsDropdown from '@/components/collection/CollectionsDropdown';
-import { Star, AlertCircle } from 'lucide-react';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { useProfileData } from '@/hooks/profile/useProfileData';
+import { useCollectionActions } from '@/hooks/profile/useCollectionActions';
+import {
+  User,
+  Trophy,
+  Star,
+  Calendar,
+  Users,
+  Plus,
+  Trash2,
+  Target,
+  Copy,
+  Heart,
+  Edit3,
+  CheckCircle,
+  XCircle,
+  Eye,
+} from 'lucide-react';
 
-interface Collection {
-  id: number;
-  name: string;
-  competition: string;
-  year: string;
-  description: string;
-}
-
-interface Sticker {
-  id: number;
-  collection_id: number;
-  code: string;
-  player_name: string;
-  team_name: string;
-  position: string;
-  nationality: string;
-  rating: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  image_url: string | null;
-}
-
-interface CollectionItem extends Sticker {
-  count: number;
-  wanted: boolean;
-}
-
-interface UserProgress {
-  total_stickers: number;
-  owned_unique_stickers: number;
-  total_owned_count: number;
-  duplicates_count: number;
-  wanted_count: number;
-  completion_percentage: number;
-}
-
-interface UserCollectionData {
-  collection_id: number;
-  is_active: boolean;
-  collections: Collection | Collection[] | null;
-}
-
-function getRarityGradient(rarity: Sticker['rarity']) {
-  switch (rarity) {
-    case 'legendary':
-      return 'from-yellow-400 to-orange-500';
-    case 'epic':
-      return 'from-purple-400 to-pink-500';
-    case 'rare':
-      return 'from-blue-400 to-cyan-500';
-    case 'common':
-      return 'from-gray-400 to-gray-500';
-  }
-}
-
-function CollectionContent() {
-  const { supabase } = useSupabase();
+function ProfileContent() {
   const { user, loading: userLoading } = useUser();
-  const params = useParams();
   const router = useRouter();
 
-  const collectionId = params?.id ? parseInt(params.id as string) : null;
+  // Profile data with optimistic updates
+  const {
+    profile,
+    nickname,
+    ownedCollections,
+    availableCollections,
+    loading,
+    error,
+    // Optimistic actions
+    optimisticAddCollection,
+    optimisticRemoveCollection,
+    optimisticSetActiveCollection,
+    optimisticUpdateNickname,
+    // Cache management
+    takeSnapshot,
+    restoreSnapshot,
+    softRefresh,
+  } = useProfileData();
 
-  const [currentCollection, setCurrentCollection] = useState<Collection | null>(
-    null
-  );
-  const [ownedCollections, setOwnedCollections] = useState<Collection[]>([]);
-  const [activeCollectionId, setActiveCollectionId] = useState<number | null>(
-    null
-  );
-  const [stickers, setStickers] = useState<CollectionItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activating, setActivating] = useState(false);
+  // Collection actions with optimistic updates
+  const {
+    addCollection,
+    removeCollection,
+    setActiveCollection,
+    updateNickname,
+    actionLoading,
+  } = useCollectionActions({
+    userId: user?.id || '',
+    optimisticAddCollection,
+    optimisticRemoveCollection,
+    optimisticSetActiveCollection,
+    optimisticUpdateNickname,
+    takeSnapshot,
+    restoreSnapshot,
+    softRefresh,
+    availableCollections,
+    ownedCollections,
+  });
 
-  // Calculate progress from current stickers state
-  const progress = useMemo((): UserProgress => {
-    const totalStickers = stickers.length;
-    const ownedUniqueStickers = stickers.filter(s => s.count > 0).length;
-    const totalOwnedCount = stickers.reduce((sum, s) => sum + s.count, 0);
-    const duplicatesCount = stickers.reduce(
-      (sum, s) => sum + Math.max(0, s.count - 1),
-      0
-    );
-    const wantedCount = stickers.filter(s => s.wanted && s.count === 0).length;
-    const completionPercentage =
-      totalStickers > 0
-        ? Math.round((ownedUniqueStickers / totalStickers) * 100)
-        : 0;
+  // Local UI state
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [tempNickname, setTempNickname] = useState('');
 
-    return {
-      total_stickers: totalStickers,
-      owned_unique_stickers: ownedUniqueStickers,
-      total_owned_count: totalOwnedCount,
-      duplicates_count: duplicatesCount,
-      wanted_count: wantedCount,
-      completion_percentage: completionPercentage,
-    };
-  }, [stickers]);
+  // Confirmation modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    open: boolean;
+    collectionId: number | null;
+    collectionName: string;
+  }>({
+    open: false,
+    collectionId: null,
+    collectionName: '',
+  });
 
-  // Fetch user's owned collections and determine active collection
-  const fetchUserCollections = useCallback(async () => {
-    if (!user) return;
+  // Handle nickname editing
+  const handleEditNickname = () => {
+    setTempNickname(nickname);
+    setEditingNickname(true);
+  };
 
-    try {
-      const { data: userCollectionsData, error: userCollectionsError } =
-        await supabase
-          .from('user_collections')
-          .select(
-            `
-            collection_id,
-            is_active,
-            collections (
-              id,
-              name,
-              competition,
-              year,
-              description
-            )
-          `
-          )
-          .eq('user_id', user.id);
+  const handleSaveNickname = async () => {
+    await updateNickname(tempNickname);
+    setEditingNickname(false);
+  };
 
-      if (userCollectionsError) throw userCollectionsError;
+  const handleCancelNickname = () => {
+    setTempNickname('');
+    setEditingNickname(false);
+  };
 
-      const collections: Collection[] = [];
-      let activeId: number | null = null;
-
-      userCollectionsData?.forEach((uc: UserCollectionData) => {
-        if (uc.is_active) {
-          activeId = uc.collection_id;
-        }
-
-        if (uc.collections) {
-          const collection = Array.isArray(uc.collections)
-            ? uc.collections[0]
-            : uc.collections;
-
-          if (collection) {
-            collections.push(collection);
-          }
-        }
-      });
-
-      setOwnedCollections(collections);
-      setActiveCollectionId(activeId);
-
-      return { collections, activeId };
-    } catch (err: unknown) {
-      console.error('Error fetching user collections:', err);
-      throw err;
-    }
-  }, [user, supabase]);
-
-  // Fetch stickers for a specific collection
-  const fetchCollectionStickers = useCallback(
-    async (targetCollectionId: number) => {
-      if (!user) return;
-
-      try {
-        // First check if user owns this collection
-        const { data: userCollection, error: userCollectionError } =
-          await supabase
-            .from('user_collections')
-            .select('collection_id')
-            .eq('user_id', user.id)
-            .eq('collection_id', targetCollectionId)
-            .single();
-
-        if (userCollectionError || !userCollection) {
-          throw new Error('No tienes acceso a esta colección');
-        }
-
-        // Get collection details
-        const { data: collectionData, error: collectionError } = await supabase
-          .from('collections')
-          .select('*')
-          .eq('id', targetCollectionId)
-          .single();
-
-        if (collectionError) throw collectionError;
-        setCurrentCollection(collectionData);
-
-        // Fetch all stickers for this collection with user's ownership data
-        const { data: stickersData, error: stickersError } = await supabase
-          .from('stickers')
-          .select(
-            `
-          id,
-          collection_id,
-          code,
-          player_name,
-          position,
-          nationality,
-          rating,
-          rarity,
-          image_url,
-          collection_teams (
-            team_name
-          ),
-          user_stickers!left (
-            count,
-            wanted
-          )
-        `
-          )
-          .eq('collection_id', targetCollectionId)
-          .eq('user_stickers.user_id', user.id)
-          .order('id');
-
-        if (stickersError) throw stickersError;
-
-        // Transform the data
-        const formattedStickers: CollectionItem[] = stickersData.map(
-          sticker => {
-            // Handle team_name extraction from collection_teams
-            let teamName = 'Unknown Team';
-            if (sticker.collection_teams) {
-              if (Array.isArray(sticker.collection_teams)) {
-                teamName =
-                  sticker.collection_teams[0]?.team_name || 'Unknown Team';
-              } else {
-                teamName =
-                  (sticker.collection_teams as { team_name: string })
-                    ?.team_name || 'Unknown Team';
-              }
-            }
-
-            return {
-              id: sticker.id,
-              collection_id: sticker.collection_id,
-              code: sticker.code,
-              player_name: sticker.player_name,
-              team_name: teamName,
-              position: sticker.position || '',
-              nationality: sticker.nationality || '',
-              rating: sticker.rating || 0,
-              rarity: sticker.rarity as Sticker['rarity'],
-              image_url: sticker.image_url,
-              count: sticker.user_stickers?.[0]?.count || 0,
-              wanted: sticker.user_stickers?.[0]?.wanted || false,
-            };
-          }
-        );
-
-        setStickers(formattedStickers);
-      } catch (err: unknown) {
-        console.error('Error fetching collection stickers:', err);
-        const errorMessage =
-          err instanceof Error ? err.message : 'Error cargando colección';
-        setError(errorMessage);
-      }
-    },
-    [user, supabase]
-  );
-
-  // Set active collection
-  const setActiveCollection = async (targetCollectionId: number) => {
-    if (!user) return;
-
-    try {
-      setActivating(true);
-
-      // Optimistic update
-      setActiveCollectionId(targetCollectionId);
-
-      // Set all collections inactive
-      await supabase
-        .from('user_collections')
-        .update({ is_active: false })
-        .eq('user_id', user.id);
-
-      // Set selected collection as active
-      const { error } = await supabase
-        .from('user_collections')
-        .update({ is_active: true })
-        .eq('user_id', user.id)
-        .eq('collection_id', targetCollectionId);
-
-      if (error) throw error;
-    } catch (err: unknown) {
-      console.error('Error setting active collection:', err);
-      // Revert optimistic update
-      fetchUserCollections();
-    } finally {
-      setActivating(false);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSaveNickname();
+    } else if (e.key === 'Escape') {
+      handleCancelNickname();
     }
   };
 
-  // Update sticker ownership
-  const updateStickerOwnership = async (stickerId: number) => {
-    if (!user) return;
-
-    const currentSticker = stickers.find(s => s.id === stickerId);
-    if (!currentSticker) return;
-
-    const newCount = currentSticker.count === 0 ? 1 : currentSticker.count + 1;
-
-    // Optimistic update
-    setStickers(prev =>
-      prev.map(sticker =>
-        sticker.id === stickerId
-          ? { ...sticker, count: newCount, wanted: false }
-          : sticker
-      )
-    );
-
-    try {
-      const { error } = await supabase.from('user_stickers').upsert({
-        user_id: user.id,
-        sticker_id: stickerId,
-        count: newCount,
-        wanted: false,
-      });
-
-      if (error) throw error;
-    } catch (err: unknown) {
-      console.error('Error updating sticker ownership:', err);
-      // Revert optimistic update
-      if (collectionId) {
-        fetchCollectionStickers(collectionId);
-      }
-    }
+  // Handle collection navigation
+  const handleViewCollection = (collectionId: number) => {
+    router.push(`/mi-coleccion/${collectionId}`);
   };
 
-  // Toggle wanted status
-  const toggleWantedStatus = async (stickerId: number) => {
-    if (!user) return;
-
-    const currentSticker = stickers.find(s => s.id === stickerId);
-    if (!currentSticker || currentSticker.count > 0) return;
-
-    const newWantedStatus = !currentSticker.wanted;
-
-    // Optimistic update
-    setStickers(prev =>
-      prev.map(sticker =>
-        sticker.id === stickerId
-          ? { ...sticker, wanted: newWantedStatus }
-          : sticker
-      )
-    );
-
-    try {
-      if (newWantedStatus) {
-        // Add to wanted list
-        const { error } = await supabase.from('user_stickers').upsert({
-          user_id: user.id,
-          sticker_id: stickerId,
-          count: 0,
-          wanted: true,
-        });
-        if (error) throw error;
-      } else {
-        // Remove from wanted list
-        const { error } = await supabase
-          .from('user_stickers')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('sticker_id', stickerId)
-          .eq('count', 0);
-        if (error) throw error;
-      }
-    } catch (err: unknown) {
-      console.error('Error updating wanted status:', err);
-      // Revert optimistic update
-      if (collectionId) {
-        fetchCollectionStickers(collectionId);
-      }
-    }
+  // Handle collection removal confirmation
+  const handleRemoveClick = (collection: any) => {
+    setConfirmModal({
+      open: true,
+      collectionId: collection.id,
+      collectionName: collection.name,
+    });
   };
 
-  // Main data fetching effect
-  useEffect(() => {
-    if (!userLoading && user && collectionId) {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-
-          await fetchUserCollections();
-          await fetchCollectionStickers(collectionId);
-        } catch (err: unknown) {
-          console.error('Error loading collection:', err);
-          setError(
-            err instanceof Error ? err.message : 'Error loading collection'
-          );
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchData();
+  const handleConfirmRemove = async () => {
+    if (confirmModal.collectionId) {
+      await removeCollection(confirmModal.collectionId);
     }
-  }, [
-    user,
-    userLoading,
-    collectionId,
-    fetchUserCollections,
-    fetchCollectionStickers,
-  ]);
+    setConfirmModal({ open: false, collectionId: null, collectionName: '' });
+  };
 
-  if (userLoading || loading) {
+  // Loading and error states
+  if (userLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
-        <div className="text-white text-xl">Cargando colección...</div>
+        <div className="text-white text-xl">Cargando usuario...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+        <div className="text-white text-xl">Cargando perfil...</div>
       </div>
     );
   }
@@ -423,189 +157,439 @@ function CollectionContent() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
         <div className="text-center space-y-4 text-white">
-          <AlertCircle className="w-16 h-16 mx-auto text-white/70" />
           <h1 className="text-2xl font-bold">Error</h1>
           <p>{error}</p>
           <Button
-            onClick={() => router.push('/profile')}
+            onClick={() => window.location.reload()}
             className="bg-white text-teal-600 hover:bg-gray-100"
           >
-            Ir al Perfil
+            Reintentar
           </Button>
         </div>
       </div>
     );
   }
 
-  const isActiveCollection = activeCollectionId === collectionId;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
-      {/* Sticky Progress Header */}
-      <div className="sticky top-16 z-40 bg-gradient-to-r from-teal-500/95 to-cyan-600/95 backdrop-blur-sm border-b border-white/20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap justify-center gap-3 text-sm mb-3">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-green-300">TENGO</span>{' '}
-              {progress.owned_unique_stickers}
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-orange-300">ME FALTA</span>{' '}
-              {progress.wanted_count}
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              {progress.completion_percentage}%{' '}
-              <span className="text-yellow-300">★</span>
-            </div>
-          </div>
-
-          {/* Status and Switcher Row */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              {isActiveCollection ? (
-                <Badge className="bg-green-500 text-white shadow-lg">
-                  <Star className="w-3 h-3 mr-1" />
-                  Activa
-                </Badge>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <span className="text-white/80 text-sm">
-                    No es tu colección activa
-                  </span>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      collectionId && setActiveCollection(collectionId)
-                    }
-                    disabled={activating}
-                    className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                  >
-                    {activating ? 'Activando...' : 'Hacer activa'}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            <CollectionsDropdown
-              collections={ownedCollections}
-              currentId={collectionId || 0}
-              activeId={activeCollectionId}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Header with Collection Info */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-            {currentCollection?.name || 'Colección'}
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
+            Mi Perfil
           </h1>
-          {currentCollection?.description && (
-            <p className="text-white/80 mt-2">
-              {currentCollection.description}
-            </p>
+          <p className="text-white/80">Gestiona tu información y colecciones</p>
+        </div>
+
+        {/* Profile Card */}
+        <div className="mb-12">
+          <ModernCard className="bg-white overflow-hidden hover:shadow-2xl transition-all duration-300">
+            {/* Gradient Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+              <div className="flex items-center space-x-6">
+                {/* Avatar */}
+                <div className="relative">
+                  <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl border-4 border-white/30">
+                    <User className="w-12 h-12 text-white" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center shadow-lg">
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+
+                {/* Profile Info */}
+                <div className="flex-1 text-white">
+                  {editingNickname ? (
+                    <div className="space-y-3">
+                      <div className="flex space-x-2">
+                        <Input
+                          value={tempNickname}
+                          onChange={e => setTempNickname(e.target.value)}
+                          placeholder="Tu nombre de usuario"
+                          className="bg-white/90 border-0 text-gray-800 flex-1"
+                          onKeyDown={handleKeyDown}
+                          autoFocus
+                          disabled={actionLoading['nick-user']}
+                        />
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={handleSaveNickname}
+                          className="bg-green-500 hover:bg-green-600"
+                          disabled={actionLoading['nick-user']}
+                          type="button"
+                        >
+                          {actionLoading['nick-user'] ? (
+                            'Guardando...'
+                          ) : (
+                            <>
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Guardar
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelNickname}
+                          className="bg-white/90 text-gray-800 border-0 hover:bg-white"
+                          disabled={actionLoading['nick-user']}
+                          type="button"
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h2 className="text-3xl font-bold">
+                          {nickname || 'Sin nombre'}
+                        </h2>
+                        <Button
+                          size="sm"
+                          onClick={handleEditNickname}
+                          className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white p-2"
+                          type="button"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <p className="text-white/90 mb-3">{user?.email}</p>
+                      <div className="flex items-center space-x-6 text-sm">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-4 h-4" />
+                          <span>
+                            Desde{' '}
+                            {new Date(
+                              profile?.created_at || ''
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Users className="w-4 h-4" />
+                          <span>
+                            {ownedCollections?.length || 0} colección
+                            {(ownedCollections?.length || 0) !== 1 ? 'es' : ''}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </ModernCard>
+        </div>
+
+        {/* MIS COLECCIONES SECTION */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+              Mis Colecciones
+            </h3>
+            <Badge className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-lg">
+              {ownedCollections?.length || 0} propias
+            </Badge>
+          </div>
+
+          {!ownedCollections || ownedCollections.length === 0 ? (
+            <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
+              <ModernCardContent className="p-12 text-center">
+                <Trophy className="w-20 h-20 text-white/50 mx-auto mb-6" />
+                <h4 className="text-2xl font-semibold text-white mb-4">
+                  Aún no has añadido ninguna colección
+                </h4>
+                <p className="text-white/80 text-lg mb-6">
+                  Explora las colecciones disponibles y añade una para empezar a
+                  intercambiar cromos
+                </p>
+              </ModernCardContent>
+            </ModernCard>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {ownedCollections.map(collection => (
+                <ModernCard
+                  key={collection.id}
+                  className="bg-white hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+                  onClick={() => handleViewCollection(collection.id)}
+                >
+                  {/* Gradient Header Strip */}
+                  <div
+                    className={`h-3 ${
+                      collection.is_user_active
+                        ? 'bg-gradient-to-r from-green-400 to-green-500'
+                        : 'bg-gradient-to-r from-gray-400 to-gray-500'
+                    }`}
+                  />
+
+                  <ModernCardContent className="p-5">
+                    {/* Collection Header */}
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-800 text-lg leading-tight mb-1">
+                          {collection.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 font-medium">
+                          {collection.competition} {collection.year}
+                        </p>
+                      </div>
+                      {collection.is_user_active ? (
+                        <Badge className="bg-green-500 text-white shadow-lg">
+                          <Star className="w-3 h-3 mr-1" />
+                          Activa
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-gray-500 border-gray-300"
+                        >
+                          Inactiva
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Stats Section */}
+                    {collection.stats && (
+                      <div className="mb-6 space-y-4">
+                        {/* Progress Bar */}
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                              Progreso
+                            </span>
+                            <span className="text-sm font-bold text-green-600">
+                              {Math.round(
+                                collection.stats.completion_percentage
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-gradient-to-r from-green-400 to-green-500 h-2 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${collection.stats.completion_percentage}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="text-center bg-blue-50 rounded-xl p-3">
+                            <div className="text-2xl font-bold text-blue-600 mb-1">
+                              {collection.stats.owned_stickers}
+                            </div>
+                            <div className="text-xs text-gray-600 flex items-center justify-center">
+                              <Target className="w-3 h-3 mr-1" />
+                              Cromos
+                            </div>
+                          </div>
+                          <div className="text-center bg-purple-50 rounded-xl p-3">
+                            <div className="text-2xl font-bold text-purple-600 mb-1">
+                              {collection.stats.duplicates}
+                            </div>
+                            <div className="text-xs text-gray-600 flex items-center justify-center">
+                              <Copy className="w-3 h-3 mr-1" />
+                              Repetidos
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-center bg-orange-50 rounded-xl p-3">
+                          <div className="text-xl font-bold text-orange-600 mb-1">
+                            {collection.stats.wanted}
+                          </div>
+                          <div className="text-xs text-gray-600 flex items-center justify-center">
+                            <Heart className="w-3 h-3 mr-1" />
+                            Me faltan
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons - Stop propagation to prevent card click */}
+                    <div
+                      className="space-y-3"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {/* View Collection Button */}
+                      <Button
+                        size="sm"
+                        onClick={() => handleViewCollection(collection.id)}
+                        className="w-full bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
+                        type="button"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Ver Colección
+                      </Button>
+
+                      {!collection.is_user_active && (
+                        <Button
+                          size="sm"
+                          onClick={() => setActiveCollection(collection.id)}
+                          disabled={actionLoading[`activate-${collection.id}`]}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
+                          type="button"
+                        >
+                          {actionLoading[`activate-${collection.id}`] ? (
+                            'Activando...'
+                          ) : (
+                            <>
+                              <Star className="w-4 h-4 mr-2" />
+                              Hacer Activa
+                            </>
+                          )}
+                        </Button>
+                      )}
+
+                      <Button
+                        size="sm"
+                        onClick={() => handleRemoveClick(collection)}
+                        disabled={Object.values(actionLoading).some(Boolean)}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
+                        type="button"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                      </Button>
+                    </div>
+
+                    {collection.is_user_active && (
+                      <div className="text-center mt-4 p-3 bg-green-50 rounded-xl">
+                        <span className="text-sm text-green-700 font-medium flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Esta es tu colección activa
+                        </span>
+                      </div>
+                    )}
+                  </ModernCardContent>
+                </ModernCard>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Stickers Grid */}
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {stickers.map(sticker => (
-            <ModernCard
-              key={sticker.id}
-              className="bg-white hover:scale-105 transition-transform duration-200"
-            >
-              <ModernCardContent className="p-3">
-                {/* Player Image Area */}
-                <div
-                  className={`aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br ${getRarityGradient(sticker.rarity)} p-4 flex items-center justify-center`}
-                >
-                  {/* Player Avatar */}
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl shadow-lg border border-white/30">
-                      👤
-                    </div>
-                  </div>
+        {/* COLECCIONES DISPONIBLES SECTION */}
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+              Colecciones Disponibles
+            </h3>
+            <Badge className="bg-yellow-500 text-white px-4 py-2 text-lg shadow-lg">
+              {availableCollections?.length || 0} disponible
+              {(availableCollections?.length || 0) !== 1 ? 's' : ''}
+            </Badge>
+          </div>
 
-                  {/* Status Indicators */}
-                  {sticker.wanted && sticker.count === 0 && (
-                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                      QUIERO
-                    </div>
-                  )}
-
-                  {sticker.count > 1 && (
-                    <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                      +{sticker.count - 1}
-                    </div>
-                  )}
-
-                  {/* Rating Badge */}
-                  <div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                    {sticker.rating}
-                  </div>
-                </div>
-
-                {/* Player Info */}
-                <div className="space-y-1 mb-3">
-                  <h3 className="font-bold text-sm text-gray-800 leading-tight text-center">
-                    {sticker.player_name}
-                  </h3>
-                  <p className="text-xs text-gray-600 text-center font-semibold">
-                    {sticker.team_name}
-                  </p>
-                  <p className="text-xs text-gray-500 text-center">
-                    {sticker.code}
-                  </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-2">
-                  <Button
-                    size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
-                      sticker.count > 0
-                        ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
-                        : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
-                    }`}
-                    onClick={() => updateStickerOwnership(sticker.id)}
-                  >
-                    {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
-                      sticker.wanted && sticker.count === 0
-                        ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
-                        : 'bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50 shadow-sm'
-                    }`}
-                    onClick={() => toggleWantedStatus(sticker.id)}
-                    disabled={sticker.count > 0}
-                  >
-                    {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
-                  </Button>
-                </div>
+          {!availableCollections || availableCollections.length === 0 ? (
+            <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
+              <ModernCardContent className="p-12 text-center">
+                <Star className="w-20 h-20 text-white/50 mx-auto mb-6" />
+                <h4 className="text-2xl font-semibold text-white mb-4">
+                  ¡Ya has añadido todas las colecciones disponibles!
+                </h4>
+                <p className="text-white/80 text-lg">
+                  No hay más colecciones para añadir en este momento
+                </p>
               </ModernCardContent>
             </ModernCard>
-          ))}
-        </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {availableCollections.map(collection => (
+                <ModernCard
+                  key={collection.id}
+                  className="bg-white hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-dashed border-yellow-200"
+                >
+                  {/* Gradient Header Strip */}
+                  <div className="h-3 bg-gradient-to-r from-yellow-400 to-yellow-500" />
 
-        {stickers.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-white text-xl">No hay cromos disponibles</div>
-          </div>
-        )}
+                  <ModernCardContent className="p-5">
+                    {/* Collection Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-800 text-lg leading-tight mb-1">
+                          {collection.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 font-medium">
+                          {collection.competition} {collection.year}
+                        </p>
+                      </div>
+                      <Badge className="bg-yellow-100 text-yellow-800 shadow-lg">
+                        <Plus className="w-3 h-3 mr-1" />
+                        Nueva
+                      </Badge>
+                    </div>
+
+                    {collection.description && (
+                      <p className="text-sm text-gray-500 mb-6 line-clamp-3">
+                        {collection.description}
+                      </p>
+                    )}
+
+                    {/* Add Button */}
+                    <Button
+                      size="sm"
+                      onClick={() => addCollection(collection.id)}
+                      disabled={actionLoading[`add-${collection.id}`]}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
+                      type="button"
+                    >
+                      {actionLoading[`add-${collection.id}`] ? (
+                        'Añadiendo...'
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Añadir a mis colecciones
+                        </>
+                      )}
+                    </Button>
+                  </ModernCardContent>
+                </ModernCard>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        open={confirmModal.open}
+        onOpenChange={open =>
+          setConfirmModal({ open, collectionId: null, collectionName: '' })
+        }
+        title="Eliminar colección de tu perfil"
+        description={
+          <div className="space-y-2">
+            <p>
+              ¿Estás seguro de que quieres eliminar &ldquo;
+              {confirmModal.collectionName}&rdquo; de tu perfil?
+            </p>
+            <p className="text-sm text-red-600">
+              <strong>
+                Se eliminarán también todos tus datos de esta colección
+              </strong>
+              (tengo/quiero/duplicados). Esta acción no se puede deshacer.
+            </p>
+          </div>
+        }
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmRemove}
+        loading={actionLoading[`remove-${confirmModal.collectionId}`]}
+        variant="destructive"
+      />
     </div>
   );
 }
 
-export default function CollectionPage() {
+export default function ProfilePage() {
   return (
     <AuthGuard>
-      <CollectionContent />
+      <ProfileContent />
     </AuthGuard>
   );
 }
