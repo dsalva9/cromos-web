@@ -73,34 +73,43 @@ Navigation dropdown for switching between user's owned collections.
   collections={ownedCollections}
   currentId={currentCollectionId}
   activeId={activeCollectionId}
-  onSelect={(id) => router.push(`/mi-coleccion/${id}`)}
+  onSelect={(id) => router.push(`/mi-coleccion/${id}`)} // Optional
 />
 ```
 
 **Key Features:**
 
-- Keyboard accessibility with ARIA labels
-- Visual indicators for active collection
-- Auto-hides when user has ≤1 collection
-- Backdrop click to close
-- Responsive design
+- **Smart visibility**: Auto-hides when user has ≤1 collection
+- **Keyboard accessibility**: Enter/Space key navigation with proper ARIA roles
+- **Visual state indicators**:
+  - "Activa" badge for active collection
+  - "Actual" badge for currently viewed collection
+  - Blue highlight for current selection
+- **Flexible navigation**: Optional `onSelect` prop, defaults to direct routing
+- **Responsive design**: Fixed-width dropdown (320px) with scroll for many collections
+- **Backdrop interaction**: Click outside to close
 
 ### EmptyCollectionState
 
 **File**: `src/components/collection/EmptyCollectionState.tsx`
 
-Empty state component for users without collections.
+Full-screen empty state component for users without collections.
 
 ```typescript
-<EmptyCollectionState /> // Self-contained, no props needed
+<EmptyCollectionState /> // Self-contained with no props
 ```
 
 **Features:**
 
-- CTA button redirects to profile
-- Contextual messaging
-- Gradient background matching app theme
-- Responsive design with proper spacing
+- **Full-screen layout**: Takes entire viewport with centered content
+- **Contextual messaging**:
+  - Welcome message "¡Bienvenido a CambiaCromos!"
+  - Clear explanation of next steps
+  - Friendly onboarding tone in Spanish
+- **Direct CTA**: "Seguir una Colección" button routes to `/profile`
+- **Visual hierarchy**: Trophy icon, headings, and descriptive text
+- **Theme consistency**: Uses app's gradient background and modern card styling
+- **Responsive spacing**: Proper padding and max-width constraints
 
 ## Page Components
 
