@@ -124,9 +124,9 @@ CREATE OR REPLACE FUNCTION find_mutual_traders(
 ) RETURNS TABLE (
   match_user_id UUID,
   nickname TEXT,
-  overlap_from_them_to_me INTEGER,
-  overlap_from_me_to_them INTEGER,
-  total_mutual_overlap INTEGER
+  overlap_from_them_to_me BIGINT,
+  overlap_from_me_to_them BIGINT,
+  total_mutual_overlap BIGINT
 ) AS $$
 BEGIN
   RETURN QUERY

@@ -53,6 +53,8 @@ get_user_collection_stats(p_user_id: UUID, p_collection_id: INTEGER)
 [];
 ```
 
+**DB note:** The three overlap fields are stored as `BIGINT` in Postgres; PostgREST returns them as numbers in JS.
+
 **Usage:**
 
 ```typescript
