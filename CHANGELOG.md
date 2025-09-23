@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Trading system development (in progress)
+- Trading system development (planned for Phase 2)
 - User directory and public profiles (planned)
 - Advanced search and filtering (planned)
 
@@ -24,6 +24,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - N/A
+
+## [1.1.0] - 2025-01-XX (Latest)
+
+### Added
+
+- **Active Collection Warning System**: Orange alert banner when user has collections but no active one selected
+- **Enhanced User Feedback**: Improved toast messaging specifically for active collection removal scenarios
+
+### Changed
+
+- **Streamlined Profile Navigation**: Removed redundant "Ver Colección" button - entire collection card is now clickable
+- **Perfected Optimistic Updates**: Eliminated all remaining page reloads from collection add/remove operations
+- **Cleaner UI Layout**: Simplified action button arrangement with better visual hierarchy
+
+### Fixed
+
+- **True Zero-Reload Experience**: Collection management actions now use pure optimistic updates without any background refreshes
+- **Active Collection State Management**: Better handling and user communication when removing the active collection
+- **Visual Consistency**: Improved spacing and button layouts in collection cards
+
+### Technical
+
+- Enhanced optimistic state management to prevent unnecessary data refreshes
+- Improved error handling patterns for collection state management
+- Better user guidance through contextual warnings and messaging
 
 ## [1.0.0] - 2025-01-XX
 
@@ -228,6 +253,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## Phase 1 Complete! 🎉
+
+**Version 1.1.0 marks the completion of Phase 1 (Foundation).**
+
+The profile management system is now fully polished with:
+
+- ✅ Zero page reloads for all user actions
+- ✅ Perfect optimistic updates with error recovery
+- ✅ Streamlined navigation (click-to-navigate cards)
+- ✅ Smart active collection warnings and guidance
+- ✅ Modern, accessible, and responsive design
+
+**Next: Phase 2 Trading System Development begins!**
+
+---
+
 ## How to Update This File
 
 When making changes to the project:
@@ -249,6 +290,6 @@ When making changes to the project:
 4. **Commit message format:**
    ```bash
    git add CHANGELOG.md
-   git commit -m "docs: update changelog for v1.0.0"
+   git commit -m "docs: update changelog for v1.1.0"
    git push origin main
    ```
