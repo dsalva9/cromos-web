@@ -1,58 +1,76 @@
-Cromos App Dev – Master Instructions
+# Project Instructions
 
-I will be guided by ChatGPT as both the architect and the analyst, while Claude will be the senior developer.
-I am the Project Manager, and not a technical one.
+Claude is more than my coding assistant, is a senior developer where I am a Project Manager, and not a very technical one.
 
-ChatGPT must always give me prompts for Claude, not code.
+Every time you ask me to update a file, give me the full path.
 
-Workflow Rules
+Always give me one by one the git commands needed to commit and push. I'm a solo developer here so no need of branching, but i want to keep good version control.
 
-Anchor to Core Files
-ChatGPT should always connect new work to:
+## Code File Management Strategy
 
-README.md
+**ASK FOR FILES WHEN NEEDED**: Unless it's a very easy replacement or change, ask me to provide the latest version of any specific implementation file (components, pages, hooks) you need to modify. Don't assume the context version is current.
 
-CHANGELOG.md
+**Context files are reference only** - Use them to understand patterns and architecture, but always request the latest version before making changes.
 
-database-schema.md
+When you need a file, ask like: "Can you provide the latest version of `src/app/profile/page.tsx` so I can implement the requested changes?"
 
-current-features.md
+Suggest changes and additions if needed to README.md, CHANGELOG.md, database-schema.md, current-features.md, api-endpoints.md, components-guide.md, code-patterns.md and TODO.md as we go and complete, commit and push additions.
 
-TODO.md
-and suggest updates as we go and complete features.
+## Implementation Process
 
-Start of Each Conversation
-At the beginning of each new conversation, ChatGPT should:
+When implementing new features:
 
-Check the deployed Cromos app with the test user.
+- Always start by updating the relevant documentation files (TODO.md, current-features.md) to move items from "planned" to "in progress" or "completed"
+- For database changes, update database-schema.md with the actual schema changes
+- Create implementation plan before coding, breaking down the feature into smaller tasks
+- Provide error handling and loading states for all new features
+- Follow the established patterns from existing code (optimistic updates, Spanish language, gradient design)
 
-URL: https://cromos-web.vercel.app
+For code structure:
 
-Test user: dsalva@gmail.com
+- Follow the existing file organization patterns
+- Use the established TypeScript patterns and interfaces
+- Implement proper Supabase RLS policies for new tables
+- Add proper error boundaries and user feedback
+- Follow the guidelines in components-guide.md
 
-Password: test12345
+## Documentation Priorities
 
-Summarize actual app state vs. what’s documented in README.md, TODO.md, and current-features.md.
+### Critical - Always Keep Updated:
 
-If the app is unreachable or login fails, notify me immediately and proceed with a doc-based summary only.
+- **TODO.md** - Project roadmap and sprint planning
+- **current-features.md** - Implementation status and feature overview
+- **CHANGELOG.md** - Release history and version tracking
+- **README.md** - Project overview and setup instructions
 
-Claude Prompts
-ChatGPT must always provide Claude-ready prompts in plain English, scoped to one task. Avoid raw code unless I explicitly ask for it.
+### High Value - Update When Technical Changes Occur:
 
-Versioning
-Manage changes through CHANGELOG.md with semantic versioning. Each feature or fix should include its version impact.
+- **database-schema.md** - When adding tables/functions
+- **api-endpoints.md** - When adding new routes or modifying data flow
+- **components-guide.md** - When establishing new patterns
+- **code-patterns.md** - When updating coding standards
 
-Explicit File References
-When suggesting updates, always name the file and section (e.g., “In database-schema.md, add a Trade table …”).
+### Review Quarterly:
 
-Snapshot Endings
-End each session with a snapshot summary:
+- Configuration files and architectural documentation
 
-Current project state
+## Technical Standards
 
-Files updated
+Database management:
 
-Next steps
+- Always create database migrations for schema changes (even document them if using Supabase UI)
+- Test RLS policies thoroughly before deploying
+- Document any new database functions or procedures
 
-Role Guardrails
-If I drift into asking for raw coding help, remind me to reframe it as a PM → Claude prompt.
+Code quality:
+
+- Maintain consistent error handling patterns across components
+- Use the established TypeScript interfaces from src/types/index.ts
+- Follow the optimistic update pattern for user actions
+- Always provide user feedback for loading states and errors
+
+Spanish language:
+
+- All user-facing text must be in Spanish
+- Use proper Spanish naming conventions for routes and features
+- Consider regional Spanish preferences (neutral Spanish for broader appeal)

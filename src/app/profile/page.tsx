@@ -24,7 +24,7 @@ import {
   Edit3,
   CheckCircle,
   XCircle,
-  Eye,
+  AlertTriangle,
 } from 'lucide-react';
 
 // Simple toast function
@@ -63,7 +63,6 @@ function ProfileContent() {
     availableCollections: originalAvailableCollections,
     loading,
     error,
-    refresh,
   } = useProfileData();
 
   // Local state for optimistic updates
@@ -84,6 +83,9 @@ function ProfileContent() {
       ? optimisticAvailableCollections
       : originalAvailableCollections;
   const displayNickname = optimisticNickname || nickname;
+
+  // Check if there's an active collection
+  const hasActiveCollection = ownedCollections.some(c => c.is_user_active);
 
   // Sync optimistic state when original data changes
   useEffect(() => {
@@ -144,8 +146,6 @@ function ProfileContent() {
       );
 
       if (error) throw error;
-
-      // No need to refresh - optimistic update is already correct
     } catch (err) {
       console.error('Error updating nickname:', err);
 
@@ -194,6 +194,9 @@ function ProfileContent() {
     );
     if (!collectionToRemove) return;
 
+    // Check if removing active collection
+    const removingActiveCollection = collectionToRemove.is_user_active;
+
     // Take snapshot for rollback
     const previousOwned = [...optimisticOwnedCollections];
     const previousAvailable = [...optimisticAvailableCollections];
@@ -215,10 +218,20 @@ function ProfileContent() {
         description: collectionToRemove.description || null,
         is_active: true,
       };
-      setOptimisticAvailableCollections(prev => [...prev, backToAvailable]);
+      setOptimisticAvailableCollections(prev =>
+        [...prev, backToAvailable].sort((a, b) => a.name.localeCompare(b.name))
+      );
 
       setConfirmModal({ open: false, collectionId: null, collectionName: '' });
-      showToast(`"${collectionToRemove.name}" eliminada de tu perfil`);
+
+      // Show different message if removing active collection
+      if (removingActiveCollection) {
+        showToast(
+          `"${collectionToRemove.name}" eliminada. No tienes colección activa.`
+        );
+      } else {
+        showToast(`"${collectionToRemove.name}" eliminada de tu perfil`);
+      }
 
       // Server calls
       const { data: stickerIds, error: stickerIdsError } = await supabase
@@ -249,8 +262,7 @@ function ProfileContent() {
 
       if (collectionError) throw collectionError;
 
-      // Soft refresh to sync
-      refresh();
+      // Don't refresh - optimistic update is sufficient
     } catch (err) {
       console.error('Error removing collection:', err);
 
@@ -300,8 +312,6 @@ function ProfileContent() {
         .eq('collection_id', collectionId);
 
       if (error) throw error;
-
-      // No need to refresh - optimistic update already shows correct state
     } catch (err) {
       console.error('Error setting active collection:', err);
 
@@ -364,8 +374,7 @@ function ProfileContent() {
 
       if (error) throw error;
 
-      // Only refresh to sync stats for new collections - the UI state is already correct
-      setTimeout(() => refresh(), 1000);
+      // Don't refresh - optimistic update is sufficient for UI
     } catch (err) {
       console.error('Error adding collection:', err);
 
@@ -531,6 +540,31 @@ function ProfileContent() {
           </ModernCard>
         </div>
 
+        {/* No Active Collection Warning */}
+        {ownedCollections.length > 0 && !hasActiveCollection && (
+          <div className="mb-8">
+            <ModernCard className="bg-orange-50 border-2 border-orange-200 overflow-hidden">
+              <ModernCardContent className="p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-orange-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-orange-800 font-semibold mb-1">
+                      No tienes una colección activa
+                    </h4>
+                    <p className="text-orange-700 text-sm">
+                      Selecciona una de tus colecciones como activa para poder
+                      acceder a &quot;Mi Colección&quot; desde el menú
+                      principal.
+                    </p>
+                  </div>
+                </div>
+              </ModernCardContent>
+            </ModernCard>
+          </div>
+        )}
+
         {/* MIS COLECCIONES SECTION */}
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
@@ -663,17 +697,6 @@ function ProfileContent() {
                       className="space-y-3"
                       onClick={e => e.stopPropagation()}
                     >
-                      {/* View Collection Button */}
-                      <Button
-                        size="sm"
-                        onClick={() => handleViewCollection(collection.id)}
-                        className="w-full bg-teal-500 hover:bg-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
-                        type="button"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Ver Colección
-                      </Button>
-
                       {!collection.is_user_active && (
                         <Button
                           size="sm"
