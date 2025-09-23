@@ -18,9 +18,19 @@ This document outlines the API endpoints and routes for the Cromos Web applicati
 ### Main Application Routes
 
 - `GET /mi-coleccion` - User's active collection view (`src/app/mi-coleccion/page.tsx`)
-- `GET /trades` - Trading interface (not implemented yet)
-- `GET /messages` - User messages (not implemented yet)
+- `GET /mi-coleccion/[id]` - Specific collection view (`src/app/mi-coleccion/[id]/page.tsx`)
 - `GET /profile` - User profile management (`src/app/profile/page.tsx`)
+
+### Trading System Routes
+
+- `GET /trades/find` - Find mutual traders interface (`src/app/trades/find/page.tsx`)
+- `GET /trades/find/[userId]` - Detailed view of trading match (`src/app/trades/find/[userId]/page.tsx`)
+
+**Future Trading Routes (Phase 2+):**
+
+- `GET /trades/proposals` - Trade proposals management (not implemented)
+- `GET /trades/history` - Trade history (not implemented)
+- `GET /messages` - User messages (not implemented)
 
 ## Database Functions (Supabase RPC)
 
@@ -50,6 +60,107 @@ const { data } = await supabase.rpc('get_user_collection_stats', {
   p_user_id: user.id,
   p_collection_id: collectionId,
 });
+```
+
+### Trading System RPCs
+
+#### Find Mutual Traders
+
+```sql
+find_mutual_traders(
+  p_user_id: UUID,
+  p_collection_id: INTEGER,
+  p_rarity: TEXT,
+  p_team: TEXT,
+  p_query: TEXT,
+  p_min_overlap: INTEGER,
+  p_limit: INTEGER,
+  p_offset: INTEGER
+)
+```
+
+**Parameters:**
+
+- `p_user_id`: Current user's UUID (required)
+- `p_collection_id`: Collection to search within (required)
+- `p_rarity`: Filter by sticker rarity ('common', 'rare', 'epic', 'legendary') (optional)
+- `p_team`: Filter by team name (partial match, case-insensitive) (optional)
+- `p_query`: Filter by player name (partial match, case-insensitive) (optional)
+- `p_min_overlap`: Minimum number of mutual matches required (default: 1)
+- `p_limit`: Results per page (default: 20, max: 100)
+- `p_offset`: Pagination offset (default: 0)
+
+**Returns:**
+
+```typescript
+{
+  match_user_id: string;
+  nickname: string | null;
+  overlap_from_them_to_me: number; // Stickers they can offer me
+  overlap_from_me_to_them: number; // Stickers I can offer them
+  total_mutual_overlap: number; // Sum of both overlaps
+}
+[];
+```
+
+**Usage:**
+
+```typescript
+const { data: matches, error } = await supabase.rpc('find_mutual_traders', {
+  p_user_id: user.id,
+  p_collection_id: 1,
+  p_rarity: 'rare',
+  p_team: 'Barcelona',
+  p_query: 'Messi',
+  p_min_overlap: 2,
+  p_limit: 20,
+  p_offset: 0,
+});
+```
+
+#### Get Mutual Trade Detail
+
+```sql
+get_mutual_trade_detail(
+  p_user_id: UUID,
+  p_other_user_id: UUID,
+  p_collection_id: INTEGER
+)
+```
+
+**Parameters:**
+
+- `p_user_id`: Current user's UUID (required)
+- `p_other_user_id`: Target user to trade with (required)
+- `p_collection_id`: Collection context (required)
+
+**Returns:**
+
+```typescript
+{
+  direction: 'they_offer' | 'i_offer';
+  sticker_id: number;
+  sticker_code: string;
+  player_name: string;
+  team_name: string;
+  rarity: string;
+  count: number;
+}
+[];
+```
+
+**Usage:**
+
+```typescript
+const { data: details, error } = await supabase.rpc('get_mutual_trade_detail', {
+  p_user_id: user.id,
+  p_other_user_id: 'target-user-uuid',
+  p_collection_id: 1,
+});
+
+// Separate the results
+const theyOffer = details?.filter(d => d.direction === 'they_offer') || [];
+const iOffer = details?.filter(d => d.direction === 'i_offer') || [];
 ```
 
 ## Supabase Client Operations
@@ -146,6 +257,29 @@ await supabase.from('profiles').upsert({
 });
 ```
 
+#### Trading Operations
+
+```typescript
+// Find mutual traders with filters
+const { data: traders } = await supabase.rpc('find_mutual_traders', {
+  p_user_id: user.id,
+  p_collection_id: activeCollectionId,
+  p_rarity: selectedRarity,
+  p_team: teamFilter,
+  p_query: searchQuery,
+  p_min_overlap: minOverlap,
+  p_limit: pageSize,
+  p_offset: pageIndex * pageSize,
+});
+
+// Get trading details for specific user
+const { data: tradeDetails } = await supabase.rpc('get_mutual_trade_detail', {
+  p_user_id: user.id,
+  p_other_user_id: targetUserId,
+  p_collection_id: collectionId,
+});
+```
+
 ## Error Handling Patterns
 
 ### Standard Error Response
@@ -169,7 +303,56 @@ try {
 }
 ```
 
-## Real-time Subscriptions (Not Currently Used)
+### Trading-Specific Error Handling
+
+```typescript
+// Trading RPC error handling
+try {
+  const { data, error } = await supabase.rpc('find_mutual_traders', params);
+
+  if (error) {
+    console.error('Trading search failed:', error);
+    throw new Error('Error al buscar intercambios disponibles');
+  }
+
+  return data || [];
+} catch (err: unknown) {
+  const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+  showToast(errorMessage, 'error');
+  return [];
+}
+```
+
+## Route Parameters and Query Strings
+
+### Trading Routes
+
+#### `/trades/find`
+
+Query parameters (all optional):
+
+- `collection`: Collection ID to search within
+- `rarity`: Filter by rarity ('common', 'rare', 'epic', 'legendary')
+- `team`: Filter by team name
+- `query`: Search by player name
+- `min_overlap`: Minimum mutual matches (default: 1)
+- `page`: Page number for pagination (default: 0)
+
+Example: `/trades/find?collection=1&rarity=rare&team=Barcelona&min_overlap=2&page=1`
+
+#### `/trades/find/[userId]`
+
+URL parameters:
+
+- `userId`: UUID of the user to view trade details for
+
+Query parameters:
+
+- `collectionId`: Collection context (required)
+
+Example: `/trades/find/123e4567-e89b-12d3-a456-426614174000?collectionId=1`
+
+## Real-time Subscriptions (Future Implementation)
 
 For future implementation:
 
@@ -188,6 +371,7 @@ const subscription = supabase
     payload => {
       // Handle real-time updates
       console.log('Sticker updated:', payload);
+      // Refresh trading matches if needed
     }
   )
   .subscribe();
@@ -216,11 +400,19 @@ All database operations are protected by RLS policies:
 - **user_collections**: Users can only manage their own collections
 - **user_stickers**: Users can only manage their own stickers
 - **collections, stickers, collection_teams**: Public read access
+- **Trading RPCs**: SECURITY DEFINER functions with controlled data exposure
 
 ## Rate Limiting
 
-Currently relying on Supabase's built-in rate limiting. For future scaling, consider:
+Currently relying on Supabase's built-in rate limiting. For trading features specifically:
 
-- Implement client-side debouncing for rapid updates
+- **Search requests**: Debounced on client-side (500ms default)
+- **Pagination**: Client-side page size limits (max 100 results per request)
+- **Detail requests**: Cached for 5 minutes per user pair to reduce server load
+
+For future scaling, consider:
+
+- Implement client-side debouncing for rapid filter changes
 - Add request queuing for bulk operations
-- Cache frequently accessed data in localStorage
+- Cache frequently accessed trading data in localStorage
+- Implement progressive loading for large result sets

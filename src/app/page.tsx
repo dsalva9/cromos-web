@@ -93,7 +93,7 @@ export default function Home() {
           </Link>
 
           {/* Find Trades Card */}
-          <Link href="/trades">
+          <Link href="/trades/find">
             <ModernCard className="bg-gradient-to-r from-teal-400 to-teal-500 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden">
               <ModernCardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-white/20 rounded-2xl mx-auto mb-4 flex items-center justify-center">
