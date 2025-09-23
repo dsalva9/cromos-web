@@ -30,7 +30,7 @@ export default function SiteHeader() {
   const authenticatedLinks = [
     { href: '/', label: 'Home' },
     { href: '/mi-coleccion', label: 'Mi Colección' },
-    { href: '/trades', label: 'Intercambios' },
+    { href: '/trades/find', label: 'Intercambios' },
     { href: '/profile', label: 'Perfil' },
   ];
 

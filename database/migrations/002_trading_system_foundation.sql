@@ -25,25 +25,24 @@ ON profiles (nickname) WHERE nickname IS NOT NULL;
 
 -- STEP 2: CREATE TRADING RPC FUNCTIONS
 -- These are SECURITY DEFINER functions for controlled data access
-
 -- =====================================================
--- FIND MUTUAL TRADERS FUNCTION
+-- FIND MUTUAL TRADERS (Option B: BIGINT return types)
 -- =====================================================
 CREATE OR REPLACE FUNCTION find_mutual_traders(
-  p_user_id UUID,
+  p_user_id       UUID,
   p_collection_id INTEGER,
-  p_rarity TEXT DEFAULT NULL,
-  p_team TEXT DEFAULT NULL,
-  p_query TEXT DEFAULT NULL,
-  p_min_overlap INTEGER DEFAULT 1,
-  p_limit INTEGER DEFAULT 20,
-  p_offset INTEGER DEFAULT 0
+  p_rarity        TEXT DEFAULT NULL,
+  p_team          TEXT DEFAULT NULL,
+  p_query         TEXT DEFAULT NULL,
+  p_min_overlap   INTEGER DEFAULT 1,
+  p_limit         INTEGER DEFAULT 20,
+  p_offset        INTEGER DEFAULT 0
 ) RETURNS TABLE (
-  match_user_id UUID,
-  nickname TEXT,
-  overlap_from_them_to_me INTEGER,
-  overlap_from_me_to_them INTEGER,
-  total_mutual_overlap INTEGER
+  match_user_id              UUID,
+  nickname                   TEXT,
+  overlap_from_them_to_me    BIGINT,
+  overlap_from_me_to_them    BIGINT,
+  total_mutual_overlap       BIGINT
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -56,11 +55,11 @@ BEGIN
     LEFT JOIN collection_teams ct ON ct.id = s.team_id
     WHERE us.user_id = p_user_id
       AND s.collection_id = p_collection_id
-      AND us.wanted = true
+      AND us.wanted = TRUE
       AND us.count = 0
       AND (p_rarity IS NULL OR s.rarity = p_rarity)
-      AND (p_team IS NULL OR ct.team_name ILIKE '%' || p_team || '%')
-      AND (p_query IS NULL OR s.player_name ILIKE '%' || p_query || '%')
+      AND (p_team   IS NULL OR ct.team_name ILIKE '%' || p_team || '%')
+      AND (p_query  IS NULL OR s.player_name ILIKE '%' || p_query || '%')
   ),
   -- Stickers I have (count > 0)
   my_have AS (
@@ -72,59 +71,57 @@ BEGIN
       AND s.collection_id = p_collection_id
       AND us.count > 0
       AND (p_rarity IS NULL OR s.rarity = p_rarity)
-      AND (p_team IS NULL OR ct.team_name ILIKE '%' || p_team || '%')
-      AND (p_query IS NULL OR s.player_name ILIKE '%' || p_query || '%')
+      AND (p_team   IS NULL OR ct.team_name ILIKE '%' || p_team || '%')
+      AND (p_query  IS NULL OR s.player_name ILIKE '%' || p_query || '%')
   ),
-  -- Find overlaps
+  -- Candidate users that BOTH have what I want AND want what I have
+  other_users AS (
+    -- Users who have stickers I want
+    SELECT DISTINCT us.user_id
+    FROM user_stickers us
+    JOIN my_wants mw ON mw.id = us.sticker_id
+    WHERE us.user_id <> p_user_id
+      AND us.count > 0
+
+    INTERSECT
+
+    -- Users who want stickers I have
+    SELECT DISTINCT us.user_id
+    FROM user_stickers us
+    JOIN my_have mh ON mh.id = us.sticker_id
+    WHERE us.user_id <> p_user_id
+      AND us.wanted = TRUE
+      AND us.count = 0
+  ),
+  -- Count what they can offer me and what I can offer them
   mutual_matches AS (
-    SELECT 
-      other_users.user_id as match_user_id,
-      COUNT(DISTINCT they_have.sticker_id) as they_offer_count,
-      COUNT(DISTINCT they_want.sticker_id) as they_want_count
-    FROM (
-      -- Users who have stickers I want
-      SELECT DISTINCT us.user_id
-      FROM user_stickers us
-      JOIN my_wants mw ON mw.id = us.sticker_id
-      WHERE us.user_id != p_user_id 
-        AND us.count > 0
-      
-      INTERSECT
-      
-      -- Users who want stickers I have  
-      SELECT DISTINCT us.user_id
-      FROM user_stickers us
-      JOIN my_have mh ON mh.id = us.sticker_id
-      WHERE us.user_id != p_user_id
-        AND us.wanted = true
-        AND us.count = 0
-    ) other_users
-    -- Calculate what they can offer me
-    LEFT JOIN user_stickers they_have ON (
-      they_have.user_id = other_users.user_id 
-      AND they_have.count > 0
-      AND they_have.sticker_id IN (SELECT id FROM my_wants)
-    )
-    -- Calculate what they want from me
-    LEFT JOIN user_stickers they_want ON (
-      they_want.user_id = other_users.user_id
-      AND they_want.wanted = true
-      AND they_want.count = 0
-      AND they_want.sticker_id IN (SELECT id FROM my_have)
-    )
-    GROUP BY other_users.user_id
-    HAVING COUNT(DISTINCT they_have.sticker_id) >= p_min_overlap
-       AND COUNT(DISTINCT they_want.sticker_id) >= p_min_overlap
+    SELECT
+      ou.user_id AS match_user_id,
+      COUNT(DISTINCT th.sticker_id) AS they_offer_count, -- BIGINT
+      COUNT(DISTINCT tw.sticker_id) AS they_want_count   -- BIGINT
+    FROM other_users ou
+    LEFT JOIN user_stickers th
+      ON th.user_id = ou.user_id
+     AND th.count > 0
+     AND th.sticker_id IN (SELECT id FROM my_wants)
+    LEFT JOIN user_stickers tw
+      ON tw.user_id = ou.user_id
+     AND tw.wanted = TRUE
+     AND tw.count = 0
+     AND tw.sticker_id IN (SELECT id FROM my_have)
+    GROUP BY ou.user_id
+    HAVING COUNT(DISTINCT th.sticker_id) >= p_min_overlap
+       AND COUNT(DISTINCT tw.sticker_id) >= p_min_overlap
   )
-  SELECT 
+  SELECT
     mm.match_user_id,
-    COALESCE(p.nickname, 'Usuario') as nickname,
-    mm.they_offer_count as overlap_from_them_to_me,
-    mm.they_want_count as overlap_from_me_to_them,
-    (mm.they_offer_count + mm.they_want_count) as total_mutual_overlap
+    COALESCE(p.nickname, 'Usuario') AS nickname,
+    mm.they_offer_count            AS overlap_from_them_to_me,  -- BIGINT
+    mm.they_want_count             AS overlap_from_me_to_them,  -- BIGINT
+    (mm.they_offer_count + mm.they_want_count) AS total_mutual_overlap
   FROM mutual_matches mm
   LEFT JOIN profiles p ON p.id = mm.match_user_id
-  ORDER BY total_mutual_overlap DESC, mm.match_user_id ASC -- Deterministic sorting
+  ORDER BY total_mutual_overlap DESC, mm.match_user_id ASC
   LIMIT p_limit
   OFFSET p_offset;
 END;
