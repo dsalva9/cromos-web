@@ -220,3 +220,52 @@ export interface StickerWithOwnership extends Sticker {
 }
 
 export type StickerRarity = 'common' | 'rare' | 'epic' | 'legendary';
+
+// Trade Proposal types
+
+export enum TradeProposalStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+}
+
+export enum TradeProposalItemDirection {
+  OFFER = 'offer',
+  REQUEST = 'request',
+}
+
+export interface TradeProposal {
+  id: number;
+  collection_id: number;
+  from_user_id: string;
+  from_user_nickname: string;
+  to_user_id: string;
+  to_user_nickname: string;
+  status: TradeProposalStatus;
+  message: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TradeProposalListItem extends TradeProposal {
+  offer_item_count: number;
+  request_item_count: number;
+}
+
+export interface TradeProposalItem {
+  id: number;
+  sticker_id: number;
+  direction: TradeProposalItemDirection;
+  quantity: number;
+  sticker_code: string;
+  player_name: string;
+  team_name: string;
+  rarity: string;
+}
+
+export interface TradeProposalDetail {
+  proposal: TradeProposal;
+  items: TradeProposalItem[];
+}
