@@ -7,11 +7,15 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { StickerSelector } from '@/components/trades/StickerSelector';
-import { ProposalSummary } from '@/components/trades/ProposalSummary';
+import { StickerSelector } from '../../../components/trades/StickerSelector';
+import { ProposalSummary } from '../../../components/trades/ProposalSummary';
 import { useCreateProposal } from '@/hooks/trades/useCreateProposal';
 import { useMatchDetail } from '@/hooks/trades/useMatchDetail'; // Corrected hook name
-import { StickerWithOwnership, TradeProposalItem } from '@/types';
+import {
+  StickerWithOwnership,
+  TradeProposalItem,
+  TradeProposalItemDirection,
+} from '@/types';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
 
@@ -24,12 +28,12 @@ function ComposePage() {
   const collectionId = searchParams.get('collection_id');
 
   const {
-    iOffer: myStickers,
-    theyOffer: theirStickers,
+    iOffer: rawMyStickers,
+    theyOffer: rawTheirStickers,
     loading: detailsLoading,
     error: detailsError,
     fetchDetail: fetchMatchDetails,
-  } = useMatchDetail(); // Corrected hook usage
+  } = useMatchDetail();
 
   const {
     loading: createLoading,
@@ -50,6 +54,48 @@ function ComposePage() {
       });
     }
   }, [user, toUserId, collectionId, fetchMatchDetails]);
+
+  const myStickers: StickerWithOwnership[] = useMemo(
+    () =>
+      (rawMyStickers || []).map(s => ({
+        id: s.sticker_id,
+        collection_id: Number(collectionId),
+        team_id: null, // Not provided by the RPC
+        code: s.sticker_code,
+        player_name: s.player_name,
+        position: null, // Not provided by the RPC
+        nationality: null, // Not provided by the RPC
+        rating: null, // Not provided by the RPC
+        rarity: s.rarity,
+        image_url: null, // Not provided by the RPC
+        created_at: null, // Not provided by the RPC
+        count: s.count,
+        wanted: false,
+        team_name: s.team_name,
+      })),
+    [rawMyStickers, collectionId]
+  );
+
+  const theirStickers: StickerWithOwnership[] = useMemo(
+    () =>
+      (rawTheirStickers || []).map(s => ({
+        id: s.sticker_id,
+        collection_id: Number(collectionId),
+        team_id: null, // Not provided by the RPC
+        code: s.sticker_code,
+        player_name: s.player_name,
+        position: null, // Not provided by the RPC
+        nationality: null, // Not provided by the RPC
+        rating: null, // Not provided by the RPC
+        rarity: s.rarity,
+        image_url: null, // Not provided by the RPC
+        created_at: null, // Not provided by the RPC
+        count: s.count,
+        wanted: true,
+        team_name: s.team_name,
+      })),
+    [rawTheirStickers, collectionId]
+  );
 
   const handleItemChange = (
     item: StickerWithOwnership,
@@ -72,7 +118,7 @@ function ComposePage() {
         {
           ...item, // Spread all properties from the sticker
           sticker_id: item.id,
-          direction: list,
+          direction: list as TradeProposalItemDirection,
           quantity,
         },
       ];
