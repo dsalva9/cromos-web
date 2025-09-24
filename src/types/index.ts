@@ -255,12 +255,25 @@ export interface TradeProposalListItem extends TradeProposal {
 }
 
 export interface TradeProposalItem extends StickerWithOwnership {
+  // This is used for the composer
   sticker_id: number;
   direction: TradeProposalItemDirection;
   quantity: number;
 }
 
+export interface TradeProposalDetailItem {
+  // This is for the detail view RPC
+  id: number;
+  sticker_id: number;
+  direction: TradeProposalItemDirection;
+  quantity: number;
+  sticker_code: string;
+  player_name: string;
+  team_name: string;
+  rarity: string;
+}
+
 export interface TradeProposalDetail {
   proposal: TradeProposal;
-  items: TradeProposalItem[];
+  items: TradeProposalDetailItem[];
 }
