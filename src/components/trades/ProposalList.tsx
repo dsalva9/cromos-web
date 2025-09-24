@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useProposals } from '@/hooks/trades/useProposals';
 import { ProposalCard } from './ProposalCard';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Inbox } from 'lucide-react';
+import { ProposalDetailModal } from './ProposalDetailModal';
+import { TradeProposalListItem } from '@/types';
 
 interface ProposalListProps {
   box: 'inbox' | 'outbox';
@@ -13,6 +15,33 @@ interface ProposalListProps {
 export function ProposalList({ box }: ProposalListProps) {
   const { proposals, loading, error, fetchProposals, clearProposals } =
     useProposals();
+  const [optimisticProposals, setOptimisticProposals] = useState<
+    TradeProposalListItem[]
+  >([]);
+  const [selectedProposalId, setSelectedProposalId] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    setOptimisticProposals(proposals);
+  }, [proposals]);
+
+  const handleStatusChange = useCallback(
+    (proposalId: number, newStatus: string) => {
+      setOptimisticProposals(prev =>
+        prev.map(p =>
+          p.id === proposalId ? { ...p, status: newStatus as any } : p
+        )
+      );
+    },
+    []
+  );
+
+  const handleCardClick = (proposalId: number) => {
+    setSelectedProposalId(proposalId);
+  };
+
+  const handleCloseModal = () => setSelectedProposalId(null);
 
   useEffect(() => {
     // Fetch on mount and when box changes
@@ -43,7 +72,7 @@ export function ProposalList({ box }: ProposalListProps) {
     return <p className="text-red-400">{error}</p>;
   }
 
-  if (proposals.length === 0) {
+  if (optimisticProposals.length === 0) {
     return (
       <ModernCard className="bg-white/5 border-dashed border-white/20">
         <ModernCardContent className="p-8 text-center text-gray-400">
@@ -55,10 +84,23 @@ export function ProposalList({ box }: ProposalListProps) {
   }
 
   return (
-    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {proposals.map(proposal => (
-        <ProposalCard key={proposal.id} proposal={proposal} box={box} />
-      ))}
-    </div>
+    <>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {optimisticProposals.map(proposal => (
+          <ProposalCard
+            key={proposal.id}
+            proposal={proposal}
+            box={box}
+            onClick={() => handleCardClick(proposal.id)}
+          />
+        ))}
+      </div>
+      <ProposalDetailModal
+        proposalId={selectedProposalId}
+        isOpen={!!selectedProposalId}
+        onClose={handleCloseModal}
+        onStatusChange={handleStatusChange}
+      />
+    </>
   );
 }

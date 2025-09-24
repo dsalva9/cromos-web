@@ -7,6 +7,7 @@ import { useUser } from '../providers/SupabaseProvider';
 interface ProposalCardProps {
   proposal: TradeProposalListItem;
   box: 'inbox' | 'outbox';
+  onClick: () => void;
 }
 
 const getStatusBadgeVariant = (status: string) => {
@@ -23,7 +24,7 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-export function ProposalCard({ proposal, box }: ProposalCardProps) {
+export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
   const { user } = useUser();
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
@@ -31,7 +32,10 @@ export function ProposalCard({ proposal, box }: ProposalCardProps) {
     : proposal.to_user_nickname;
 
   return (
-    <ModernCard className="bg-white/10 hover:bg-white/20 transition-colors duration-200 cursor-pointer">
+    <ModernCard
+      onClick={onClick}
+      className="bg-white/10 hover:bg-white/20 transition-colors duration-200 cursor-pointer"
+    >
       <ModernCardContent className="p-4">
         <div className="flex justify-between items-start">
           <p className="font-semibold text-lg text-white">
