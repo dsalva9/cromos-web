@@ -70,14 +70,10 @@ function ComposePage() {
       return [
         ...prev,
         {
-          id: 0, // Placeholder
-          sticker_id: item.id, // This is the sticker's ID
+          ...item, // Spread all properties from the sticker
+          sticker_id: item.id,
+          direction: list,
           quantity,
-          direction: list === 'offer' ? 'offer' : 'request',
-          player_name: item.player_name,
-          sticker_code: item.code,
-          team_name: item.team_name || 'N/A',
-          rarity: item.rarity,
         },
       ];
     });
@@ -90,11 +86,11 @@ function ComposePage() {
       collectionId: Number(collectionId),
       toUserId,
       message,
-      offerItems: offerItems.map(({ sticker_id, quantity }) => ({
+      p_offer_items: offerItems.map(({ sticker_id, quantity }) => ({
         sticker_id,
         quantity,
       })),
-      requestItems: requestItems.map(({ sticker_id, quantity }) => ({
+      p_request_items: requestItems.map(({ sticker_id, quantity }) => ({
         sticker_id,
         quantity,
       })),
