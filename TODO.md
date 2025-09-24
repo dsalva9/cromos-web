@@ -26,18 +26,6 @@
 
 ### Trading System (High Impact) 🚧 NEXT UP
 
-- [ ] **Find Traders Feature**: Show users who have stickers I want and want stickers I have
-  - [ ] Create trading match algorithm
-  - [ ] Build "Find Trades" page with match results
-  - [ ] Add filters (collection, rarity, teams)
-  - [ ] Show mutual benefit opportunities
-
-- [ ] **Trade Proposals**: Send/receive trade requests with multiple stickers
-  - [ ] Create trade proposal database schema
-  - [ ] Build trade proposal form with multiple sticker selection
-  - [ ] Add trade proposal notifications
-  - [ ] Implement trade acceptance/rejection flow
-
 - [ ] **Trade Chat**: Basic messaging for trade negotiations
   - [ ] Create messages database schema
   - [ ] Build real-time messaging interface
@@ -147,6 +135,20 @@
 - [ ] Add error tracking (Sentry)
 
 ## ✅ Recently Completed (Move to CHANGELOG)
+
+### Trading System - Find & Propose ✅ **JUST COMPLETED**
+
+- [x] **Find Traders Feature**: Show users who have stickers I want and want stickers I have
+  - [x] Create trading match algorithm (`find_mutual_traders` RPC)
+  - [x] Build "Find Trades" page with match results
+  - [x] Add filters (collection, rarity, teams, etc.)
+  - [x] Show mutual benefit opportunities
+
+- [x] **Trade Proposals (MVP)**: Send/receive trade requests with multiple stickers
+  - [x] Create trade proposal database schema (`trade_proposals`, `trade_proposal_items`)
+  - [x] Build trade proposal form with multiple sticker selection
+  - [x] Implement trade acceptance/rejection flow (`respond_to_trade_proposal` RPC)
+  - [ ] _(Next Phase)_ Add trade proposal notifications
 
 ### Profile Management System Complete Polish ✅ **JUST COMPLETED**
 
