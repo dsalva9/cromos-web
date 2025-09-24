@@ -254,15 +254,15 @@ export interface TradeProposalListItem extends TradeProposal {
   request_item_count: number;
 }
 
-export interface TradeProposalItem {
+export interface TradeProposalItem extends Sticker {
   id: number;
   sticker_id: number;
   direction: TradeProposalItemDirection;
   quantity: number;
-  sticker_code: string;
+  sticker_code?: string;
   player_name: string;
-  team_name: string;
-  rarity: string;
+  team_name?: string;
+  rarity: string | null;
 }
 
 export interface TradeProposalDetail {

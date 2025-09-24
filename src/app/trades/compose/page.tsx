@@ -1,8 +1,8 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useEffect, useState, useMemo } from 'react';
+import { useUser } from '@/components/providers/SupabaseProvider';
 import { useSearchParams, useRouter } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { StickerSelector } from '@/components/trades/StickerSelector';
 import { ProposalSummary } from '@/components/trades/ProposalSummary';
 import { useCreateProposal } from '@/hooks/trades/useCreateProposal';
-import { useTradeDetail } from '@/hooks/trades/useTradeDetail';
+import { useMatchDetail } from '@/hooks/trades/useMatchDetail'; // Corrected hook name
 import { StickerWithOwnership, TradeProposalItem } from '@/types';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
@@ -24,11 +24,12 @@ function ComposePage() {
   const collectionId = searchParams.get('collection_id');
 
   const {
-    details,
+    iOffer: myStickers,
+    theyOffer: theirStickers,
     loading: detailsLoading,
     error: detailsError,
-    fetchDetails,
-  } = useTradeDetail();
+    fetchDetail: fetchMatchDetails,
+  } = useMatchDetail(); // Corrected hook usage
 
   const {
     loading: createLoading,
@@ -42,22 +43,13 @@ function ComposePage() {
 
   useEffect(() => {
     if (user && toUserId && collectionId) {
-      fetchDetails({
+      fetchMatchDetails({
         userId: user.id,
         otherUserId: toUserId,
         collectionId: Number(collectionId),
       });
     }
-  }, [user, toUserId, collectionId, fetchDetails]);
-
-  const myStickers = useMemo(
-    () => details.filter(s => s.direction === 'i_offer'),
-    [details]
-  );
-  const theirStickers = useMemo(
-    () => details.filter(s => s.direction === 'they_offer'),
-    [details]
-  );
+  }, [user, toUserId, collectionId, fetchMatchDetails]);
 
   const handleItemChange = (
     item: StickerWithOwnership,
@@ -79,9 +71,9 @@ function ComposePage() {
         ...prev,
         {
           id: 0, // Placeholder
-          sticker_id: item.id,
+          sticker_id: item.id, // This is the sticker's ID
           quantity,
-          direction: list,
+          direction: list === 'offer' ? 'offer' : 'request',
           player_name: item.player_name,
           sticker_code: item.code,
           team_name: item.team_name || 'N/A',
@@ -147,7 +139,7 @@ function ComposePage() {
                 title="Tus Cromos para Ofrecer"
                 stickers={myStickers}
                 selectedItems={offerItems}
-                onItemChange={(item, qty) =>
+                onItemChange={(item: StickerWithOwnership, qty: number) =>
                   handleItemChange(item, qty, 'offer')
                 }
               />
@@ -155,7 +147,7 @@ function ComposePage() {
                 title="Sus Cromos para Pedir"
                 stickers={theirStickers}
                 selectedItems={requestItems}
-                onItemChange={(item, qty) =>
+                onItemChange={(item: StickerWithOwnership, qty: number) =>
                   handleItemChange(item, qty, 'request')
                 }
               />

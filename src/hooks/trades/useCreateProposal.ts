@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
-import { useRouter } from 'next/navigation';
 
 interface ProposalItem {
   sticker_id: number;
@@ -11,8 +10,8 @@ interface CreateProposalParams {
   collectionId: number;
   toUserId: string;
   message: string;
-  offerItems: ProposalItem[];
-  requestItems: ProposalItem[];
+  p_offer_items: ProposalItem[];
+  p_request_items: ProposalItem[];
 }
 
 interface UseCreateProposalReturn {
@@ -34,7 +33,13 @@ export const useCreateProposal = (): UseCreateProposalReturn => {
       try {
         const { data: proposalId, error: rpcError } = await supabase.rpc(
           'create_trade_proposal',
-          { ...params }
+          {
+            p_collection_id: params.collectionId, // RPC expects p_collection_id
+            p_to_user: params.toUserId, // RPC expects p_to_user
+            p_message: params.message, // RPC expects p_message
+            p_offer_items: params.p_offer_items,
+            p_request_items: params.p_request_items,
+          }
         );
 
         if (rpcError) throw new Error(rpcError.message);
