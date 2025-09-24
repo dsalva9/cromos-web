@@ -7,20 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.2.0] - YYYY-MM-DD
+## [1.2.0] - 2025-01-XX
 
 ### Added
 
-- **Find Traders Feature**: Implemented the read-only part of the trading system, allowing users to find mutual trading partners based on their sticker inventories. Includes advanced filtering and a detailed match view.
 - **Trade Proposals MVP**: Implemented the core trading system. Users can now create, send, receive, and respond to trade proposals. This includes new database tables (`trade_proposals`, `trade_proposal_items`), four new RPC functions to manage trades, and a new UI section at `/trades/proposals` with a proposal composer and detail modal.
+- **Find Traders Feature**: This was part of the lead-up to proposals, allowing users to find mutual trading partners based on their sticker inventories. Includes advanced filtering and a detailed match view.
 
 ### Fixed
 
 - Resolved multiple data consistency issues related to user profiles and foreign key constraints during trade creation.
-
-### Removed
-
-- N/A
 
 ## [1.1.0] - 2025-01-XX
 
