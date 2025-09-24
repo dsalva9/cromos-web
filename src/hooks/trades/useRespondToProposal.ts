@@ -41,8 +41,12 @@ export const useRespondToProposal = (): UseRespondToProposalReturn => {
         if (rpcError) throw new Error(rpcError.message);
 
         return data; // Returns the new status
-      } catch (err: any) {
-        setError(err.message || 'Error al responder a la propuesta.');
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Error al responder a la propuesta.'
+        );
         return null;
       } finally {
         setLoading(false);

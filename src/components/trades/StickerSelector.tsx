@@ -1,13 +1,13 @@
 'use client';
 
-import { StickerWithOwnership, TradeProposalItem } from '@/types';
+import { StickerWithOwnership, TradeProposalDetailItem } from '@/types';
 import { ModernCard, ModernCardContent } from '../ui/modern-card';
 import { Input } from '../ui/input';
 
 interface StickerSelectorProps {
   title: string;
   stickers: StickerWithOwnership[];
-  selectedItems: TradeProposalItem[];
+  selectedItems: Partial<TradeProposalDetailItem>[];
   onItemChange: (item: StickerWithOwnership, quantity: number) => void;
 }
 

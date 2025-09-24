@@ -1,8 +1,7 @@
 import { TradeProposalListItem } from '@/types';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, ArrowLeft, ArrowDown, ArrowUp } from 'lucide-react';
-import { useUser } from '../providers/SupabaseProvider';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 
 interface ProposalCardProps {
   proposal: TradeProposalListItem;
@@ -25,7 +24,6 @@ const getStatusBadgeVariant = (status: string) => {
 };
 
 export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
-  const { user } = useUser();
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
     ? proposal.from_user_nickname

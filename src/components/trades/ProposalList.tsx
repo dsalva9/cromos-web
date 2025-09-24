@@ -6,7 +6,7 @@ import { ProposalCard } from './ProposalCard';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Inbox } from 'lucide-react';
 import { ProposalDetailModal } from './ProposalDetailModal';
-import { TradeProposalListItem } from '@/types';
+import type { TradeProposalListItem, TradeProposalStatus } from '@/types';
 
 interface ProposalListProps {
   box: 'inbox' | 'outbox';
@@ -30,7 +30,9 @@ export function ProposalList({ box }: ProposalListProps) {
     (proposalId: number, newStatus: string) => {
       setOptimisticProposals(prev =>
         prev.map(p =>
-          p.id === proposalId ? { ...p, status: newStatus as any } : p
+          p.id === proposalId
+            ? { ...p, status: newStatus as TradeProposalStatus }
+            : p
         )
       );
     },

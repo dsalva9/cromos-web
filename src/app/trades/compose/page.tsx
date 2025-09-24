@@ -13,7 +13,7 @@ import { useCreateProposal } from '@/hooks/trades/useCreateProposal';
 import { useMatchDetail } from '@/hooks/trades/useMatchDetail'; // Corrected hook name
 import {
   StickerWithOwnership,
-  TradeProposalItem,
+  TradeProposalDetailItem,
   TradeProposalItemDirection,
 } from '@/types';
 import { Textarea } from '@/components/ui/textarea';
@@ -44,8 +44,10 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
     createProposal,
   } = useCreateProposal();
 
-  const [offerItems, setOfferItems] = useState<TradeProposalItem[]>([]);
-  const [requestItems, setRequestItems] = useState<TradeProposalItem[]>([]);
+  const [offerItems, setOfferItems] = useState<TradeProposalDetailItem[]>([]);
+  const [requestItems, setRequestItems] = useState<TradeProposalDetailItem[]>(
+    []
+  );
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -118,6 +120,10 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
         ...prev,
         {
           ...item,
+          team_name: item.team_name || '', // Ensure team_name is always a string
+          rarity: item.rarity || 'common', // Ensure rarity is always a string
+          sticker_code: item.code, // Map `code` to `sticker_code`
+          id: 0, // Placeholder for new item
           sticker_id: item.id,
           direction: list as TradeProposalItemDirection,
           quantity,

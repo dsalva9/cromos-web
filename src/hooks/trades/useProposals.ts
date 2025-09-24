@@ -50,8 +50,10 @@ export const useProposals = (): UseProposalsReturn => {
           offset === 0 ? data || [] : [...prev, ...(data || [])]
         );
         setHasMore((data || []).length === limit);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Ocurrió un error desconocido.'
+        );
       } finally {
         setLoading(false);
       }

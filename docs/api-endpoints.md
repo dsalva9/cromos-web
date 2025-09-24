@@ -25,12 +25,8 @@ This document outlines the API endpoints and routes for the Cromos Web applicati
 
 - `GET /trades/find` - Find mutual traders interface (`src/app/trades/find/page.tsx`)
 - `GET /trades/find/[userId]` - Detailed view of trading match (`src/app/trades/find/[userId]/page.tsx`)
-
-**Future Trading Routes (Phase 2+):**
-
-- `GET /trades/proposals` - Trade proposals management (not implemented)
-- `GET /trades/history` - Trade history (not implemented)
-- `GET /messages` - User messages (not implemented)
+- `GET /trades/proposals` - View and manage trade proposals (`src/app/trades/proposals/page.tsx`)
+- `GET /trades/compose` - Create a new trade proposal (`src/app/trades/compose/page.tsx`)
 
 ## Database Functions (Supabase RPC)
 

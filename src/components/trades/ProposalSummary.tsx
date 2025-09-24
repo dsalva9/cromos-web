@@ -1,10 +1,10 @@
-import { TradeProposalItem } from '@/types';
+import { TradeProposalDetailItem } from '@/types';
 import { Badge } from '../ui/badge';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface ProposalSummaryProps {
   title: string;
-  items: TradeProposalItem[];
+  items: Partial<TradeProposalDetailItem>[];
   colorClass: string;
 }
 
