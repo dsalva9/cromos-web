@@ -205,8 +205,8 @@ BEGIN
     mm.they_offer_count as overlap_from_them_to_me,
     mm.they_want_count as overlap_from_me_to_them,
     (mm.they_offer_count + mm.they_want_count) as total_mutual_overlap
-  FROM mutual_matches mm
-  LEFT JOIN profiles p ON p.id = mm.match_user_id
+  FROM mutual_matches AS mm
+  INNER JOIN profiles p ON p.id = mm.match_user_id -- Changed to INNER JOIN to ensure user exists
   ORDER BY total_mutual_overlap DESC, mm.match_user_id ASC -- Deterministic sorting
   LIMIT p_limit
   OFFSET p_offset;
@@ -405,3 +405,127 @@ When implementing these changes:
 5. **Verify data integrity** after migrations
 6. **Deploy trading indexes** before functions to ensure optimal performance
 7. **Test trading functions** with sample data before enabling UI
+
+# Database Schema Documentation
+
+This document outlines the database schema for the Cromos Web application, managed in Supabase.
+
+## Table of Contents
+
+- [Core Tables](#core-tables)
+- [User-Specific Tables](#user-specific-tables)
+- [Trade System Tables](#trade-system-tables)
+- [Database Functions (RPC)](#database-functions-rpc)
+
+---
+
+## Core Tables
+
+### `collections`
+
+Stores information about each sticker collection (e.g., "World Cup 2026").
+
+| Column        | Type      | Description                            |
+| ------------- | --------- | -------------------------------------- |
+| `id`          | `integer` | **Primary Key**. Unique collection ID. |
+| `name`        | `text`    | Name of the collection.                |
+| `description` | `text`    | Description of the collection.         |
+| `year`        | `integer` | Release year of the collection.        |
+
+### `stickers`
+
+Stores every individual sticker available within a collection.
+
+| Column          | Type      | Description                                           |
+| --------------- | --------- | ----------------------------------------------------- |
+| `id`            | `integer` | **Primary Key**. Unique sticker ID.                   |
+| `collection_id` | `integer` | **Foreign Key** to `collections.id`.                  |
+| `code`          | `text`    | The official code of the sticker (e.g., "FWD 12").    |
+| `player_name`   | `text`    | Name of the player on the sticker.                    |
+| `rarity`        | `text`    | Rarity level ('common', 'rare', 'epic', 'legendary'). |
+
+---
+
+## User-Specific Tables
+
+### `profiles`
+
+Stores public user profile data, extending Supabase's `auth.users`.
+
+| Column       | Type   | Description                                          |
+| ------------ | ------ | ---------------------------------------------------- |
+| `id`         | `uuid` | **Primary Key**. **Foreign Key** to `auth.users.id`. |
+| `nickname`   | `text` | User's display name.                                 |
+| `avatar_url` | `text` | URL for the user's avatar image.                     |
+
+### `user_collections`
+
+A join table linking users to the collections they follow.
+
+| Column          | Type      | Description                                        |
+| --------------- | --------- | -------------------------------------------------- |
+| `user_id`       | `uuid`    | **Foreign Key** to `profiles.id`.                  |
+| `collection_id` | `integer` | **Foreign Key** to `collections.id`.               |
+| `is_active`     | `boolean` | Indicates if this is the user's active collection. |
+
+### `user_stickers`
+
+Tracks each user's inventory for every sticker.
+
+| Column       | Type      | Description                                 |
+| ------------ | --------- | ------------------------------------------- |
+| `user_id`    | `uuid`    | **Foreign Key** to `profiles.id`.           |
+| `sticker_id` | `integer` | **Foreign Key** to `stickers.id`.           |
+| `count`      | `integer` | How many copies the user owns (duplicates). |
+| `wanted`     | `boolean` | If the user wants this sticker.             |
+
+---
+
+## Trade System Tables
+
+### `trade_proposals`
+
+Stores the header information for each trade proposal. RLS policies ensure users can only access proposals where they are the sender or receiver. Direct DML is disabled; all interactions must use RPC functions.
+
+| Column          | Type                       | Description                                             |
+| --------------- | -------------------------- | ------------------------------------------------------- |
+| `id`            | `bigint`                   | **Primary Key**. Unique proposal ID.                    |
+| `collection_id` | `integer`                  | **Foreign Key** to `collections.id`.                    |
+| `from_user_id`  | `uuid`                     | **Foreign Key** to `profiles.id` (sender).              |
+| `to_user_id`    | `uuid`                     | **Foreign Key** to `profiles.id` (receiver).            |
+| `status`        | `trade_status` (enum)      | `'pending'`, `'accepted'`, `'rejected'`, `'cancelled'`. |
+| `message`       | `text`                     | Optional message from the sender.                       |
+| `created_at`    | `timestamp with time zone` | Timestamp of creation.                                  |
+| `updated_at`    | `timestamp with time zone` | Timestamp of last status update.                        |
+
+### `trade_proposal_items`
+
+Stores the individual sticker line items for each proposal. RLS policies restrict access based on the parent proposal's ownership.
+
+| Column        | Type                     | Description                                                                 |
+| ------------- | ------------------------ | --------------------------------------------------------------------------- |
+| `id`          | `bigint`                 | **Primary Key**. Unique item ID.                                            |
+| `proposal_id` | `bigint`                 | **Foreign Key** to `trade_proposals.id`.                                    |
+| `sticker_id`  | `integer`                | **Foreign Key** to `stickers.id`.                                           |
+| `direction`   | `trade_direction` (enum) | `'offer'` (from sender to receiver), `'request'` (from receiver to sender). |
+| `quantity`    | `integer`                | Number of stickers for this line item.                                      |
+
+---
+
+## Database Functions (RPC)
+
+### Statistics
+
+- `get_user_collection_stats(p_user_id, p_collection_id)`: Calculates a user's progress in a specific collection.
+
+### Trading - Match Finding
+
+- `find_mutual_traders(...)`: Finds potential trading partners based on mutual sticker needs and wants.
+- `get_mutual_trade_detail(p_user_id, p_other_user_id, p_collection_id)`: Gets the specific stickers that can be traded between two users.
+
+### Trading - Proposal Management
+
+- `create_trade_proposal(p_collection_id, p_to_user, p_message, p_offer_items, p_request_items)`: Creates a new trade proposal with its items.
+- `list_trade_proposals(p_user_id, p_box, p_limit, p_offset)`: Lists proposals for a user's inbox or outbox.
+- `get_trade_proposal_detail(p_proposal_id)`: Fetches the full details of a single proposal, including all items and user info.
+- `respond_to_trade_proposal(p_proposal_id, p_action)`: Allows a user to accept, reject, or cancel a proposal.

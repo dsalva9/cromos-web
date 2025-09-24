@@ -118,18 +118,6 @@
 
 #### Advanced Search & Filtering
 
-- **Multi-dimensional Filters**: Collection, rarity, team, player search, minimum overlap threshold
-- **Debounced Inputs**: 500ms debounce prevents excessive API calls during typing
-- **Active-first Selection**: Automatically preselects user's active collection
-- **Real-time Results**: Zero-reload filtering with immediate visual feedback
-
-#### Trading Discovery Interface
-
-- **Mutual Match Cards**: Clear visualization of bidirectional trading opportunities
-- **Detailed View**: Side-by-side sticker lists showing exactly what can be traded
-- **Pagination**: Efficient page-based navigation through large result sets
-- **Context Navigation**: Preserves collection and filter state across page navigation
-
 **New Routes:**
 
 - `/trades/find` - Main search interface with filtering
@@ -138,30 +126,20 @@
 **New Files**:
 
 - Pages: `src/app/trades/find/page.tsx`, `src/app/trades/find/[userId]/page.tsx`
-- Components: `src/components/trades/FindTradersFilters.tsx`, `src/components/trades/MatchCard.tsx`, `src/components/trades/MatchDetail.tsx`
-- Hooks: `src/hooks/trades/useFindTraders.ts`, `src/hooks/trades/useMatchDetail.ts`
 
-## 🚧 Currently in Development
+## 🚧 In Progress
 
-**Trading System - Find Traders (Read-Only Phase)** ✅ **JUST COMPLETED**
+**Trading System - Interactive Trading (MVP)** ✅ **JUST COMPLETED**
 
 The first slice of Phase 2 is now complete:
 
-- RPC-based trading match system implemented
-- /trades/find UI with advanced filtering completed
-- Mutual match detail views functional
-- Database functions deployed and optimized
+- **Interactive trading is live**: Users can now create, send, receive, and respond to trade proposals.
 
 **Status**: Ready for user testing and feedback collection.
 
 ## 📋 Next Planned Features (Phase 2 Continuation)
 
 ### Trading System - Interactive Features
-
-- **Trade Proposals**: Send/receive trade requests with multiple stickers
-- **Trade Negotiation**: Basic messaging system for proposal discussion
-- **Trade History**: Track completed and pending trades with status management
-- **Notification System**: Real-time alerts for trade requests and updates
 
 ### Enhanced User Experience
 
@@ -212,7 +190,8 @@ The first slice of Phase 2 is now complete:
 | Collection Navigation | ✅ Complete     | Deep-linking, dropdown switcher, click-to-nav |
 | Sticker Management    | ✅ Complete     | TENGO/QUIERO with progress tracking           |
 | Database Schema       | ✅ Complete     | RLS policies, statistics functions            |
-| **Find Traders**      | ✅ **Complete** | **RPC-based matching with advanced filters**  |
+| **Find Traders**      | ✅ **Complete** | RPC-based matching with advanced filters      |
+| **Trade Proposals**   | ✅ **Complete** | **Interactive proposal system (MVP)**         |
 | Trade Proposals       | 🚧 Next Phase   | Phase 2 continuation - interactive trading    |
 | Trade Chat/History    | 📅 Future       | Phase 2 continuation - full workflow          |
 | User Directory        | 📅 Future       | Phase 3 community features                    |
@@ -238,16 +217,11 @@ The first slice of Phase 2 is now complete:
 **Find Traders Interface**:
 
 - Advanced search with multi-dimensional filtering (rarity, team, player, overlap)
-- Debounced inputs with zero-reload interactions
-- Active-first collection selection with fallback logic
-- Paginated results with loading states and empty state handling
-
-**Match Discovery & Detail Views**:
-
-- Visual mutual benefit display with bidirectional trading indicators
-- Detailed side-by-side sticker lists for specific user pairs
-- Context-aware navigation preserving filter and collection state
-- Spanish-first UX with comprehensive error handling
+- **Interactive Trading MVP**:
+  - Proposal composer for selecting offer/request items.
+  - Inbox/Outbox dashboard for managing proposals.
+  - Modal-based detail view with accept/reject/cancel actions.
+  - Secure, RPC-driven workflow for all trade actions.
 
 **Ready for**: User testing, feedback collection, and Phase 2 continuation (proposals, chat, history)
 
