@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useCallback } from 'react';
-import { useUser } from '@/components/providers/SupabaseProvider';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { MatchDetail } from '@/components/trades/MatchDetail';
@@ -11,14 +11,17 @@ import { ArrowLeft, PlusCircle } from 'lucide-react';
 
 function TradeDetailPageContent() {
   const router = useRouter();
+  const params = useParams();
+  const { supabase } = useSupabase();
   const searchParams = useSearchParams();
   const { user } = useUser();
   const { iOffer, theyOffer, loading, error, fetchDetail } = useMatchDetail();
+  const [targetUserNickname, setTargetUserNickname] =
+    useState<string>('Usuario');
 
-  const otherUserId =
-    typeof window !== 'undefined'
-      ? window.location.pathname.split('/').pop()
-      : '';
+  const otherUserId = Array.isArray(params.userId)
+    ? params.userId[0]
+    : params.userId;
   const collectionId = searchParams.get('collectionId');
 
   const handleGoBack = () => {
@@ -27,6 +30,7 @@ function TradeDetailPageContent() {
 
   const handleCreateProposal = useCallback(() => {
     if (!otherUserId || !collectionId) return;
+    console.log('[Find Page] Creating proposal for to_user_id:', otherUserId); // DEBUG LOG
     router.push(
       `/trades/compose?to_user_id=${otherUserId}&collection_id=${collectionId}`
     );
@@ -39,11 +43,22 @@ function TradeDetailPageContent() {
         otherUserId,
         collectionId: Number(collectionId),
       });
-    }
-  }, [user, otherUserId, collectionId, fetchDetail]);
 
-  const targetUserNickname =
-    theyOffer[0]?.user_nickname || iOffer[0]?.user_nickname || 'Usuario';
+      const fetchNickname = async () => {
+        const { data: profile, error: _profileError } = await supabase
+          .from('profiles')
+          .select('nickname')
+          .eq('id', otherUserId)
+          .maybeSingle();
+
+        if (profile?.nickname) {
+          setTargetUserNickname(profile.nickname);
+        }
+      };
+
+      fetchNickname();
+    }
+  }, [user, otherUserId, collectionId, fetchDetail, supabase]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
@@ -65,7 +80,7 @@ function TradeDetailPageContent() {
             >
               <ArrowLeft className="mr-2 h-4 w-4" /> Volver
             </Button>
-            {otherUserId && (
+            {otherUserId && user && otherUserId !== user.id && (
               <Button
                 onClick={handleCreateProposal}
                 className="bg-teal-500 hover:bg-teal-600"

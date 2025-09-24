@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, FC } from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -18,14 +18,17 @@ import {
 } from '@/types';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
-function ComposePage() {
+interface ComposePageProps {
+  toUserId: string;
+  collectionId: string;
+}
+
+const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const { toast } = useToast();
   const { user } = useUser();
-
-  const toUserId = searchParams.get('to_user_id');
-  const collectionId = searchParams.get('collection_id');
 
   const {
     iOffer: rawMyStickers,
@@ -60,41 +63,39 @@ function ComposePage() {
       (rawMyStickers || []).map(s => ({
         id: s.sticker_id,
         collection_id: Number(collectionId),
-        team_id: null, // Not provided by the RPC
+        team_id: null,
         code: s.sticker_code,
         player_name: s.player_name,
-        position: null, // Not provided by the RPC
-        nationality: null, // Not provided by the RPC
-        rating: null, // Not provided by the RPC
+        position: null,
+        nationality: null,
+        rating: null,
         rarity: s.rarity,
-        image_url: null, // Not provided by the RPC
-        created_at: null, // Not provided by the RPC
+        image_url: null,
+        created_at: null,
         count: s.count,
         wanted: false,
         team_name: s.team_name,
       })),
-    [rawMyStickers, collectionId]
+    [rawMyStickers, collectionId] // collectionId is needed here
   );
 
   const theirStickers: StickerWithOwnership[] = useMemo(
     () =>
       (rawTheirStickers || []).map(s => ({
+        ...s, // Spreading here is fine as it's a subset
         id: s.sticker_id,
         collection_id: Number(collectionId),
-        team_id: null, // Not provided by the RPC
+        team_id: null,
         code: s.sticker_code,
-        player_name: s.player_name,
-        position: null, // Not provided by the RPC
-        nationality: null, // Not provided by the RPC
-        rating: null, // Not provided by the RPC
-        rarity: s.rarity,
-        image_url: null, // Not provided by the RPC
-        created_at: null, // Not provided by the RPC
+        position: null,
+        nationality: null,
+        rating: null,
+        image_url: null,
+        created_at: null,
         count: s.count,
         wanted: true,
-        team_name: s.team_name,
       })),
-    [rawTheirStickers, collectionId]
+    [rawTheirStickers, collectionId] // collectionId is needed here
   );
 
   const handleItemChange = (
@@ -116,7 +117,7 @@ function ComposePage() {
       return [
         ...prev,
         {
-          ...item, // Spread all properties from the sticker
+          ...item,
           sticker_id: item.id,
           direction: list as TradeProposalItemDirection,
           quantity,
@@ -128,6 +129,7 @@ function ComposePage() {
   const handleSubmit = async () => {
     if (!user || !toUserId || !collectionId) return;
 
+    console.log('[Compose Page] Submitting proposal with toUserId:', toUserId); // DEBUG LOG
     const proposalId = await createProposal({
       collectionId: Number(collectionId),
       toUserId,
@@ -143,6 +145,10 @@ function ComposePage() {
     });
 
     if (proposalId) {
+      toast({
+        title: 'Éxito',
+        description: 'Tu propuesta de intercambio ha sido enviada.',
+      });
       router.push('/trades/proposals');
     }
   };
@@ -247,13 +253,34 @@ function ComposePage() {
       </div>
     </div>
   );
+};
+
+function ComposeProposalPageWrapper() {
+  const searchParams = useSearchParams();
+  const toUserId = searchParams.get('to_user_id');
+  const collectionId = searchParams.get('collection_id');
+
+  if (!toUserId || !collectionId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-400">Error</h1>
+          <p className="text-white/80">
+            Faltan parámetros para crear la propuesta.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <ComposePage toUserId={toUserId} collectionId={collectionId} />;
 }
 
-export default function ComposeProposalPage() {
+export default function SuspendedComposeProposalPage() {
   return (
     <AuthGuard>
       <Suspense fallback={<div>Cargando...</div>}>
-        <ComposePage />
+        <ComposeProposalPageWrapper />
       </Suspense>
     </AuthGuard>
   );
