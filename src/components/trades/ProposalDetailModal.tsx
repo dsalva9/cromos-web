@@ -12,9 +12,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { useProposalDetail } from '@/hooks/trades/useProposalDetail';
 import { useRespondToProposal } from '@/hooks/trades/useRespondToProposal';
-import { TradeProposalDetail, TradeProposalItem } from '@/types';
+import { TradeProposalDetailItem } from '@/types';
 import { useUser } from '../providers/SupabaseProvider';
-import { Badge } from './ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowUp, Check, X, Ban } from 'lucide-react';
 
 interface ProposalDetailModalProps {
@@ -31,7 +31,7 @@ function ItemList({
   colorClass,
 }: {
   title: string;
-  items: TradeProposalItem[];
+  items: TradeProposalDetailItem[];
   icon: React.ReactNode;
   colorClass: string;
 }) {
@@ -105,9 +105,14 @@ export function ProposalDetailModal({
   const isReceiver = detail?.proposal.to_user_id === user?.id;
   const isPending = detail?.proposal.status === 'pending';
 
-  const offeredItems = detail?.items.filter(i => i.direction === 'offer') || [];
+  const offeredItems =
+    detail?.items.filter(
+      (i: TradeProposalDetailItem) => i.direction === 'offer'
+    ) || [];
   const requestedItems =
-    detail?.items.filter(i => i.direction === 'request') || [];
+    detail?.items.filter(
+      (i: TradeProposalDetailItem) => i.direction === 'request'
+    ) || [];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
