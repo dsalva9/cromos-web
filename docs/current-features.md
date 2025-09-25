@@ -56,7 +56,7 @@
 - **Modern Card Design**: Beautiful gradient header with large avatar and status indicators
 - **Inline Editing**: Real-time nickname editing with keyboard shortcuts and loading states
 - **Per-Action Loading**: Individual button loading states instead of full-page spinners
-- **Toast Notifications**: Success/error feedback with simple toast system
+- **Sonner Toast Notifications**: Rich success/error feedback with stacked toasts
 - **Error Recovery**: Automatic rollback of optimistic updates on server errors
 
 #### Seamless Collection Management ✅ **PERFECTED**
@@ -73,7 +73,7 @@
 - **Streamlined Navigation**: Removed redundant "Ver Colección" button - entire card is clickable
 - **No Reload Guarantee**: Fixed optimistic updates to eliminate all page refreshes
 - **Active Collection Warnings**: Prominent orange warning when user has no active collection selected
-- **Enhanced Feedback**: Improved toast messages, especially when removing active collections
+- **Enhanced Feedback**: Sonner defaults tuned for active-collection messaging
 - **Clean Interface**: Simplified action button layout with better visual hierarchy
 
 **Files**: `src/app/profile/page.tsx`, `src/hooks/profile/useProfileData.ts`, `src/hooks/profile/useCollectionActions.ts`
@@ -308,7 +308,7 @@
 - **Modal-based detail views** with accept/reject/cancel actions
 - **Secure, RPC-driven workflow** for all trade actions
 - **Complete TypeScript integration** with comprehensive interfaces
-- **Seamless user experience** with optimistic updates and toast feedback
+- **Seamless user experience** with optimistic updates and Sonner toast feedback
 
 **Ready for**: User testing, feedback collection, and Phase 2 continuation (chat, history, advanced features)
 

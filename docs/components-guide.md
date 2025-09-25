@@ -376,7 +376,7 @@ Preview component showing proposal contents before sending.
 - **Item Counts**: Clear summary of offer/request totals
 - **Validation Feedback**: Prevents submission of invalid proposals
 - **Loading States**: Handles async proposal creation
-- **Success Feedback**: Integration with toast notification system
+- **Success Feedback**: Sonner-based toast notifications
 
 **Validation Rules:**
 
@@ -501,7 +501,7 @@ await createProposal({
 - **RPC Integration**: Calls `create_trade_proposal` Supabase function
 - **Validation Logic**: Client-side validation before server submission
 - **Error Handling**: Comprehensive error messaging for all failure scenarios
-- **Success Feedback**: Integration with toast notification system
+- **Success Feedback**: Sonner-based toast notifications
 - **Loading States**: Granular loading during proposal creation
 
 ### useRespondToProposal ✅ **NEW - PROPOSAL RESPONSES**
@@ -526,7 +526,7 @@ await respondToProposal({
 - **Optimistic Updates**: Immediate UI feedback before server confirmation
 - **RPC Integration**: Calls `respond_to_trade_proposal` Supabase function
 - **Error Recovery**: Rollback mechanism for failed responses
-- **Toast Integration**: Contextual success/error messaging
+- **Sonner Toast Integration**: Contextual success/error messaging
 
 ### useProposalDetail ✅ **NEW - DETAILED PROPOSAL VIEW**
 
@@ -626,7 +626,7 @@ User profile and collection management with **true zero-reload optimistic update
 - **True optimistic collection management** (add/remove/activate) with zero page reloads
 - **Click-to-navigate cards** - entire collection cards are clickable for seamless navigation
 - **Active collection warning system** - orange alert when no active collection selected
-- **Enhanced toast notifications** with context-aware messaging
+- **Sonner toast notifications** with context-aware messaging
 - **Per-action loading states** for granular user feedback
 - **Confirmation modals** for destructive actions with cascade delete warnings
 
@@ -923,37 +923,28 @@ function getRarityGradient(rarity: Sticker['rarity']) {
 }
 ```
 
-### Enhanced Toast Notification System ✅ **EXTENDED FOR TRADING**
+### Toast Notifications with Sonner ?o. **EXTENDED FOR TRADING**
 
-Simple inline toast implementation for user feedback with trading-specific messaging:
+Our shared wrapper around [Sonner](https://sonner.emilkowal.ski) keeps the familiar `toast` API while enabling richer interactions:
 
 ```typescript
-const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-  // Remove existing toasts
-  const existingToasts = document.querySelectorAll('[data-toast]');
-  existingToasts.forEach(toast => toast.remove());
+import { toast } from '@/lib/toast';
 
-  // Create and show toast
-  const toast = document.createElement('div');
-  toast.setAttribute('data-toast', 'true');
-  toast.className = `fixed top-20 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white font-medium ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  }`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
+// Quick success & error feedback
+toast.success('Propuesta enviada correctamente');
+toast.error('Error al enviar propuesta');
 
-  // Auto-remove after 3 seconds
-  setTimeout(() => toast.remove(), 3000);
-};
+// Optionally provide extra context
+toast.success('Propuesta aceptada', {
+  description: 'El intercambio aparecera ahora en tu historial.',
+});
 
-// Enhanced usage examples for trading
-showToast('Propuesta enviada correctamente'); // Proposal creation
-showToast('Propuesta aceptada'); // Proposal acceptance
-showToast('Propuesta rechazada'); // Proposal rejection
-showToast('Propuesta cancelada'); // Proposal cancellation
-showToast('Error al enviar propuesta', 'error'); // Creation failure
-showToast('Error al responder propuesta', 'error'); // Response failure
+toast.error('Error al responder propuesta', {
+  description: 'Intentalo de nuevo en unos segundos.',
+});
 ```
+
+Sonner maneja el apilado, el enfoque y las animaciones automaticamente, asi que no hace falta manipular el DOM manualmente.
 
 ## State Management Patterns
 

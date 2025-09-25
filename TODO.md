@@ -40,7 +40,7 @@
   - [x] Implement proposal response system (accept/reject/cancel)
   - [x] Add RLS policies for secure access control
   - [x] Build ProposalDetailModal for viewing and responding to proposals
-  - [x] Create toast notification system for user feedback
+  - [x] Integrate Sonner-based toast notifications for user feedback
 
 ## 🔋 Phase 2 Continuation - READY TO START
 
@@ -183,7 +183,7 @@
   - [x] Eliminated all page reloads from profile actions
   - [x] Optimistic updates with automatic rollback on errors
   - [x] Per-action loading states for granular feedback
-  - [x] Simple toast notification system for user feedback
+  - [x] Sonner-based toast notification system for user feedback
   - [x] Hook-based architecture (`useProfileData`, `useCollectionActions`)
 
 - [x] **Enhanced Collection Navigation**
