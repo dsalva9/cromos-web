@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import SiteHeader from '@/components/site-header';
 import { Toaster } from 'sonner';
-import 'sonner/dist/sonner.css';
+import 'sonner/dist/styles.css';
 import SupabaseProvider from '@/components/providers/SupabaseProvider';
 
 const geistSans = Geist({
