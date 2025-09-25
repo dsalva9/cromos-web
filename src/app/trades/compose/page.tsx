@@ -18,7 +18,7 @@ import {
 } from '@/types';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from '@/lib/toast';
 
 interface ComposePageProps {
   toUserId: string;
@@ -27,7 +27,6 @@ interface ComposePageProps {
 
 const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
   const router = useRouter();
-  const { toast } = useToast();
   const { user } = useUser();
 
   const {
@@ -151,8 +150,7 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
     });
 
     if (proposalId) {
-      toast({
-        title: 'Éxito',
+      toast.success('Éxito', {
         description: 'Tu propuesta de intercambio ha sido enviada.',
       });
       router.push('/trades/proposals');

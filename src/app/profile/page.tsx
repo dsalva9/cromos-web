@@ -10,6 +10,7 @@ import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { useProfileData } from '@/hooks/profile/useProfileData';
+import { toast } from '@/lib/toast';
 import {
   User,
   Trophy,
@@ -26,29 +27,6 @@ import {
   XCircle,
   AlertTriangle,
 } from 'lucide-react';
-
-// Simple toast function
-const showToast = (message: string, type: 'success' | 'error' = 'success') => {
-  // Remove existing toasts
-  const existingToasts = document.querySelectorAll('[data-toast]');
-  existingToasts.forEach(toast => toast.remove());
-
-  // Create toast
-  const toast = document.createElement('div');
-  toast.setAttribute('data-toast', 'true');
-  toast.className = `fixed top-20 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white font-medium ${
-    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-  }`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  // Auto-remove
-  setTimeout(() => {
-    if (toast.parentNode) {
-      toast.parentNode.removeChild(toast);
-    }
-  }, 3000);
-};
 
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
@@ -134,7 +112,7 @@ function ProfileContent() {
       // Optimistic update
       setOptimisticNickname(newNickname);
       setEditingNickname(false);
-      showToast('Nombre actualizado');
+      toast.success('Nombre actualizado');
 
       // Server call
       const { error } = await supabase.from('profiles').upsert(
@@ -152,7 +130,7 @@ function ProfileContent() {
       // Rollback optimistic update
       setOptimisticNickname(previousNickname);
       setEditingNickname(true);
-      showToast('Error al actualizar nombre', 'error');
+      toast.error('Error al actualizar nombre');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -226,11 +204,11 @@ function ProfileContent() {
 
       // Show different message if removing active collection
       if (removingActiveCollection) {
-        showToast(
+        toast.success(
           `"${collectionToRemove.name}" eliminada. No tienes colección activa.`
         );
       } else {
-        showToast(`"${collectionToRemove.name}" eliminada de tu perfil`);
+        toast.success(`"${collectionToRemove.name}" eliminada de tu perfil`);
       }
 
       // Server calls
@@ -269,7 +247,7 @@ function ProfileContent() {
       // Rollback optimistic updates
       setOptimisticOwnedCollections(previousOwned);
       setOptimisticAvailableCollections(previousAvailable);
-      showToast('Error al eliminar colección', 'error');
+      toast.error('Error al eliminar colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -297,7 +275,7 @@ function ProfileContent() {
         }))
       );
 
-      showToast(`"${collection.name}" es ahora tu colección activa`);
+      toast.success(`"${collection.name}" es ahora tu colección activa`);
 
       // Server calls
       await supabase
@@ -317,7 +295,7 @@ function ProfileContent() {
 
       // Rollback optimistic update
       setOptimisticOwnedCollections(previousOwned);
-      showToast('Error al activar colección', 'error');
+      toast.error('Error al activar colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -363,7 +341,7 @@ function ProfileContent() {
         setOptimisticOwnedCollections(prev => [...prev, newUserCollection]);
       }
 
-      showToast(`"${collection.name}" añadida a tus colecciones`);
+      toast.success(`"${collection.name}" añadida a tus colecciones`);
 
       // Server call
       const { error } = await supabase.from('user_collections').insert({
@@ -381,7 +359,7 @@ function ProfileContent() {
       // Rollback optimistic updates
       setOptimisticOwnedCollections(previousOwned);
       setOptimisticAvailableCollections(previousAvailable);
-      showToast('Error al añadir colección', 'error');
+      toast.error('Error al añadir colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }

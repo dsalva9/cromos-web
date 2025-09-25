@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import SiteHeader from '@/components/site-header';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from 'sonner';
+import 'sonner/dist/sonner.css';
 import SupabaseProvider from '@/components/providers/SupabaseProvider';
 
 const geistSans = Geist({
@@ -47,9 +48,10 @@ export default function RootLayout({
               © {new Date().getFullYear()} Cromos
             </div>
           </footer>
-          <Toaster />
+          <Toaster position="top-right" richColors expand />
         </SupabaseProvider>
       </body>
     </html>
   );
 }
+

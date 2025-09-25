@@ -8,6 +8,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { AlertTriangle, Users, TrendingUp } from 'lucide-react';
 import { FindTradersFilters } from '@/components/trades/FindTradersFilters';
 import { MatchCard } from '@/components/trades/MatchCard';
+import { toast } from '@/lib/toast';
 import { useFindTraders } from '@/hooks/trades/useFindTraders';
 
 interface Collection {
@@ -153,13 +154,7 @@ function FindTradersContent() {
   // Show toast for errors
   useEffect(() => {
     if (matchesError) {
-      const toast = document.createElement('div');
-      toast.setAttribute('data-toast', 'true');
-      toast.className =
-        'fixed top-20 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-white font-medium bg-red-500';
-      toast.textContent = matchesError;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+      toast.error(matchesError);
     }
   }, [matchesError]);
 
