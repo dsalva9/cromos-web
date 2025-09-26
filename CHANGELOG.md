@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Replaced the custom toast helper and shadcn components with Sonner-based notifications for stacked, animated feedback.
+- Mi Coleccion: botones `Tengo`/`Repe (n)` con control de decremento, nueva pill "Repes" en la cabecera y ajustes de layout para la insignia "Activa".
 
 
 ## [1.2.0] - 2025-01-XX
@@ -290,3 +291,4 @@ When making changes to the project:
    git commit -m "docs: update changelog for v1.1.0"
    git push origin main
    ```
+

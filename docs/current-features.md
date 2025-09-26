@@ -81,11 +81,13 @@
 ### 4. Sticker Collection Management
 
 - **Collection Display**: Grid-based sticker layout with rarity gradients
-- **Ownership Tracking**: "TENGO" button to mark owned stickers
+- **Ownership Tracking**: Boton principal `Tengo` cambia a `Repe (n)` cuando hay duplicados y mantiene actualizaciones optimistas.
 - **Want List**: "QUIERO" button for desired stickers
 - **Progress Tracking**: Real-time completion percentages
 - **Optimistic Updates**: Immediate UI feedback for all sticker actions
-- **Duplicate Management**: Track multiple copies of the same sticker
+- **Duplicate Management**: Track multiple copies of the same sticker con etiquetas y contadores sincronizados
+- **Header pills**: La barra superior de Mi Coleccion muestra Tengo, Me faltan, Repes y Progreso usando `get_user_collection_stats` para valores en vivo.
+- **Decrement Control**: Cada StickerCard incluye un boton ghost `-` (aria-label/title: "Quitar uno") para restar repes con rollback y toast de error.
 
 **Files**: `src/app/mi-coleccion/[id]/page.tsx`
 
@@ -442,3 +444,5 @@ Smart performance patterns throughout:
 **Phase 2 Trading System Status**: ✅ **COMPLETE AND READY FOR USER TESTING**
 
 **Next Major Milestone**: Phase 2 continuation with Trade Chat system integrated with existing proposal workflow.
+
+

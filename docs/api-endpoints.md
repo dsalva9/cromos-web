@@ -65,6 +65,8 @@ const { data } = await supabase.rpc('get_user_collection_stats', {
 });
 ```
 
+**UI note**: `CollectionPage` pinta `duplicates` como la pill "Repes" en la barra superior junto a Tengo, Me faltan y %.
+
 ### Trading System RPCs
 
 #### Find Mutual Traders
@@ -438,11 +440,11 @@ const {
 const { data } = await supabase
   .from('user_collections')
   .select(
-    `
+```
     is_active,
     joined_at,
     collections (*)
-  `
+```
   )
   .eq('user_id', userId);
 
@@ -468,11 +470,11 @@ await supabase
 const { data } = await supabase
   .from('stickers')
   .select(
-    `
+```
     *,
     collection_teams (team_name),
     user_stickers!left (count, wanted)
-  `
+```
   )
   .eq('collection_id', collectionId)
   .eq('user_stickers.user_id', userId);
@@ -975,3 +977,6 @@ The trading system now provides a comprehensive API surface for:
 - Secure, RLS-protected operations throughout
 
 **Ready for**: User testing, performance monitoring, and Phase 2 continuation with real-time chat integration.
+
+
+

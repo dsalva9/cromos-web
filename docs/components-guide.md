@@ -80,15 +80,29 @@ Navigation dropdown for switching between user's owned collections.
 
 **Key Features:**
 
-- **Smart visibility**: Auto-hides when user has ≤1 collection
+- **Smart visibility**: Auto-hides cuando el usuario tiene 1 coleccion o menos
 - **Keyboard accessibility**: Enter/Space key navigation with proper ARIA roles
-- **Visual state indicators**:
-  - "Activa" badge for active collection
-  - "Actual" badge for currently viewed collection
+- **Visual state indicators en el listado**:
+  - "Activa" badge dentro del panel para marcar la coleccion activa
+  - "Actual" badge para indicar la coleccion actualmente abierta
   - Blue highlight for current selection
+- **Trigger layout**: El boton principal deja la insignia "Activa" al contenedor padre para alinear badge y dropdown.
 - **Flexible navigation**: Optional `onSelect` prop, defaults to direct routing
 - **Responsive design**: Fixed-width dropdown (320px) with scroll for many collections
 - **Backdrop interaction**: Click outside to close
+
+### StickerCard (inline)
+
+**File**: `src/app/mi-coleccion/[id]/page.tsx`
+
+Renderiza los controles principales de cada cromo dentro de `CollectionPage`.
+
+**Detalles clave:**
+
+- Boton principal `Tengo` permanece blanco en `count = 0`, se vuelve verde en `count = 1` y muta a `Repe (n)` cuando `count >= 2`.
+- Boton ghost `-` (aria-label/title: "Quitar uno") aparece con `count > 0` para restar inventario sin caer por debajo de cero.
+- Ambos botones usan actualizaciones optimistas con snapshots y `toast.error` para revertir en caso de fallo de Supabase.
+- La insignia `+n` mantiene visible la cantidad de repes disponibles en la tarjeta.
 
 ### EmptyCollectionState
 
@@ -579,11 +593,12 @@ Main sticker collection interface with optimistic updates.
 
 **Key Features:**
 
-- Sticker grid with rarity-based gradients
-- TENGO/QUIERO button interactions
-- Real-time progress calculation with useMemo
-- Sticky progress header
-- Optimistic UI updates with error rollback
+- Sticker grid with rarity-based gradients y cintillos de rareza
+- Botones `Tengo`/`Repe (n)` con actualizaciones optimistas y rollback
+- Boton ghost `-` para decrementar repes con toasts de error y focus visible
+- Sticky progress header con pills Tengo / Me faltan / Repes / % alimentadas por `get_user_collection_stats`
+- CollectionsDropdown alineado con la insignia externa "Activa" y fallback a calculos locales cuando la RPC no responde
+- Capa de fallback local con `useMemo` para mantener estadisticas cuando la RPC no esta disponible
 
 **State Management Pattern:**
 
@@ -1250,3 +1265,6 @@ When creating new components:
 - Extensive documentation and patterns for future development
 
 **Phase 2 Component Architecture Status**: ✅ **COMPLETE AND PRODUCTION-READY**
+
+
+
