@@ -75,8 +75,6 @@ Guardrails
 
 ChatGPT never outputs raw code.
 
-Codex/Gemini never modifies project docs — only code.
-
 PM validates final state against deployed app (https://cromos-web.vercel.app) using test account.
 
 Future Agents (Planned)
