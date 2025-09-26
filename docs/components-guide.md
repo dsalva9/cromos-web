@@ -1,6 +1,6 @@
 # Components Architecture Guide
 
-This document outlines the component structure and patterns used in the Cromos Web application.
+This document outlines the component structure and patterns used in the CambioCromos application.
 
 ## Component Organization
 
@@ -118,7 +118,7 @@ Full-screen empty state component for users without collections.
 
 - **Full-screen layout**: Takes entire viewport with centered content
 - **Contextual messaging**:
-  - Welcome message "¡Bienvenido a CambiaCromos!"
+  - Welcome message "¡Bienvenido a CambioCromos!"
   - Clear explanation of next steps
   - Friendly onboarding tone in Spanish
 - **Direct CTA**: "Seguir una Colección" button routes to `/profile`
@@ -189,7 +189,7 @@ Trading match summary card with mutual benefit visualization.
 
 - **Mutual Benefit Display**: Clear visualization of bidirectional trading opportunities
 - **User Identity**: Avatar placeholder with nickname fallback
-- **Action-Oriented Design**: "Ver detalles" CTA with hover effects
+- **Full-Card Link**: Entire card is a focusable link with hover/focus states instead of a secondary button
 - **Color-Coded Stats**:
   - Green for "Te pueden ofrecer" (incoming offers)
   - Blue for "Puedes ofrecer" (outgoing offers)
@@ -346,6 +346,7 @@ Multi-select interface for building proposals with offer/request sections.
 
 - **Dual-Section Layout**: Separate "Ofrecer" and "Pedir" sections
 - **Multi-Select Functionality**: Toggle stickers in/out of proposal
+- **QuantityStepper Integration**: Uses shared +/- control with duplicate-aware clamping and disabled state at max=0
 - **Visual Feedback**: Selected items highlighted with checkmarks
 - **Sticker Details**: Full sticker information with rarity colors
 - **Smart Filtering**: Only shows relevant stickers for each section
@@ -364,6 +365,31 @@ const availableRequests = otherUserStickers.filter(
   s => s.count > 0 && userWantsList.includes(s.id)
 );
 ```
+
+### QuantityStepper
+
+**File**: `src/components/ui/QuantityStepper.tsx`
+
+Reusable counter control for adjusting proposal quantities.
+
+**Props & Behavior:**
+
+- `value: number` current quantity (component clamps it within bounds)
+- `onChange(next: number)` returns sanitized integers within the configured range
+- `min?: number` defaults to `0`; `max?: number` disables incrementing when duplicates are exhausted
+- `size?: 'sm' | 'md'` exposes compact and default sizing variants
+
+**Accessibility & UX:**
+
+- Ghost icon buttons with `aria-label`/`title` ("Disminuir", "Añadir uno")
+- Disabled states at bounds; prevents negative values or exceeding owned duplicates
+- Centered value uses `aria-live="polite"` to announce updates for screen readers
+- Keyboard focus ring handled on the outer container to match optimistic UI patterns
+
+**Usage:**
+
+- Embedded in `StickerSelector` for both offer/request lists
+- Keeps proposal summaries and submission payloads aligned with duplicate limits
 
 ### ProposalSummary
 

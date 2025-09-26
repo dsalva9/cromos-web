@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { StickerWithOwnership, TradeProposalDetailItem } from '@/types';
 import { ModernCard, ModernCardContent } from '../ui/modern-card';
-import { Input } from '../ui/input';
+import { QuantityStepper } from '../ui/QuantityStepper';
 
 interface StickerSelectorProps {
   title: string;
@@ -29,6 +29,12 @@ export function StickerSelector({
               const selected = selectedItems.find(
                 i => i.sticker_id === sticker.id
               );
+              const availableDuplicates = Math.max(0, sticker.count ?? 0);
+              const selectedQuantity = Math.min(
+                Math.max(selected?.quantity ?? 0, 0),
+                availableDuplicates
+              );
+
               return (
                 <div
                   key={sticker.id}
@@ -37,28 +43,16 @@ export function StickerSelector({
                   <div>
                     <p className="font-semibold">{sticker.player_name}</p>
                     <p className="text-xs text-white/70">
-                      {sticker.code} - Tienes {sticker.count}
+                      {sticker.code} - Tienes {availableDuplicates}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <label
-                      htmlFor={`sticker-${sticker.id}`}
-                      className="text-sm"
-                    >
-                      Cant:
-                    </label>
-                    <Input
-                      id={`sticker-${sticker.id}`}
-                      type="number"
-                      min="0"
-                      max={sticker.count}
-                      value={selected?.quantity || 0}
-                      onChange={e =>
-                        onItemChange(sticker, parseInt(e.target.value, 10) || 0)
-                      }
-                      className="w-16 bg-black/30 border-white/20 text-center"
-                    />
-                  </div>
+                  <QuantityStepper
+                    value={selectedQuantity}
+                    onChange={qty => onItemChange(sticker, qty)}
+                    min={0}
+                    max={availableDuplicates}
+                    size="sm"
+                  />
                 </div>
               );
             })}

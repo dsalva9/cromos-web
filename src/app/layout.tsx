@@ -5,6 +5,7 @@ import SiteHeader from '@/components/site-header';
 import { Toaster } from 'sonner';
 import 'sonner/dist/styles.css';
 import SupabaseProvider from '@/components/providers/SupabaseProvider';
+import { siteConfig } from '@/config/site';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -17,9 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CambiaCromos - Trade Sports Cards',
-  description:
-    'Intercambia cromos deportivos con coleccionistas de todo el mundo. La plataforma líder para el trading de cartas deportivas.',
+  metadataBase: new URL(siteConfig.url),
+  title: `${siteConfig.name} - Intercambia cromos deportivos`,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({
@@ -45,7 +46,7 @@ export default function RootLayout({
           </main>
           <footer className="border-t">
             <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Cromos
+              © {new Date().getFullYear()} {siteConfig.name}
             </div>
           </footer>
           <Toaster position="top-right" richColors expand />

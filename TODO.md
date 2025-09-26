@@ -96,6 +96,11 @@
 
 ### Current Feature Enhancements 🔧 LOW PRIORITY
 
+- [ ] **Trading UI QA**
+  - [ ] Add tests for QuantityStepper clamping, disabled states, and aria-live announcements
+  - [ ] Verify MatchCard link focus states with keyboard and screen readers
+  - [ ] Capture analytics for the "Buzón Intercambios" CTA usage
+
 - [ ] **Collection Management Improvements**
   - [ ] Add search and filtering for stickers (by team, player, rarity)
   - [ ] Implement sticker image upload/management system

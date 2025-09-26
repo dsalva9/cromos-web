@@ -1,13 +1,19 @@
 # Changelog
 
-All notable changes to the Cromos Web project will be documented in this file.
+All notable changes to the CambioCromos project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Trades**: Replaced manual proposal quantity inputs with the shared QuantityStepper (+/-) control; clamps to owned duplicates, disables at zero, and keeps the summary/payload synchronized.
+- **Navigation**: Added "Buzón Intercambios" CTA on /trades/find and an alias route at /trades/inbox for direct inbox access.
+
 ### Changed
+- **Trades**: Match cards are fully clickable links with accessible focus states; removed the redundant "Ver detalles" button.
+- **Branding**: Updated site naming to "CambioCromos" across layout metadata, header, landing hero, and footer.
 - Replaced the custom toast helper and shadcn components with Sonner-based notifications for stacked, animated feedback.
 - Mi Coleccion: botones `Tengo`/`Repe (n)` con control de decremento, nueva pill "Repes" en la cabecera y ajustes de layout para la insignia "Activa".
 

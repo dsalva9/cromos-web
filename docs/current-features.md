@@ -2,7 +2,7 @@
 
 ## 🎯 Core Application Overview
 
-**CambiaCromos** is a Spanish-language sticker collection and trading platform where users can:
+**CambioCromos** is a Spanish-language sticker collection and trading platform where users can:
 
 - Manage their sticker collections (like Panini World Cup albums)
 - Track which stickers they own vs. want
@@ -127,11 +127,12 @@
 
 - `/trades/find` - Main search interface with filtering
 - `/trades/find/[userId]?collectionId=...` - Detailed match view
+- Header CTA links directly to `/trades/inbox` ("Buzón Intercambios") for fast inbox access
 
 **Components:**
 
 - `FindTradersFilters` - Advanced filtering with debounced inputs
-- `MatchCard` - Trading match summary with mutual benefit visualization
+- `MatchCard` - Trading match summary with mutual benefit visualization; full-card link opens match detail (no extra button)
 - `MatchDetail` - Detailed side-by-side sticker lists
 
 **Hooks:**
@@ -146,6 +147,7 @@
 #### Complete Interactive Trading Workflow
 
 - **Proposal Composer**: Multi-sticker selection interface for creating complex trade offers
+- **Quantity Steppers**: Sticker quantities use accessible +/- controls with duplicate-aware clamping and live summary sync
 - **Inbox/Outbox Dashboard**: Manage received and sent proposals with clear status indicators
 - **Proposal Detail Modal**: Rich modal interface for viewing and responding to proposals
 - **Response System**: Accept, reject, or cancel proposals with immediate feedback

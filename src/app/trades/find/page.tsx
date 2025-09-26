@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import Link from 'next/link';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
@@ -198,13 +199,22 @@ function FindTradersContent() {
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
       {/* Header */}
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
-            Buscar intercambios
-          </h1>
-          <p className="text-white/80">
-            Encuentra usuarios que tengan cromos que necesitas
-          </p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="text-center sm:text-left">
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
+              Buscar intercambios
+            </h1>
+            <p className="text-white/80">
+              Encuentra usuarios que tengan cromos que necesitas
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="ghost"
+            className="self-center sm:self-start bg-white/10 text-white hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+          >
+            <Link href="/trades/inbox">Buzón Intercambios</Link>
+          </Button>
         </div>
 
         {/* Active collection warning */}

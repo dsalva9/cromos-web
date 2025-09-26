@@ -1,5 +1,8 @@
 'use client';
 
+
+import { siteConfig } from '@/config/site';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, LogOut } from 'lucide-react';
@@ -31,6 +34,7 @@ export default function SiteHeader() {
     { href: '/', label: 'Home' },
     { href: '/mi-coleccion', label: 'Mi Colección' },
     { href: '/trades/find', label: 'Intercambios' },
+    { href: '/trades/inbox', label: 'Buzón Intercambios' },
     { href: '/profile', label: 'Perfil' },
   ];
 
@@ -53,7 +57,7 @@ export default function SiteHeader() {
             className="text-2xl font-black text-white hover:text-yellow-300 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 rounded-lg"
             onClick={closeMenu}
           >
-            CambiaCromos
+            {siteConfig.name}
           </Link>
 
           {/* Desktop Navigation */}
@@ -153,3 +157,5 @@ export default function SiteHeader() {
     </header>
   );
 }
+
+

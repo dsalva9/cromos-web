@@ -104,49 +104,68 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
     quantity: number,
     list: 'offer' | 'request'
   ) => {
+    const safeMax = Math.max(0, item.count ?? 0);
+    const normalizedQuantity = Number.isFinite(quantity) ? Math.floor(quantity) : 0;
+    const clampedQuantity = Math.min(Math.max(normalizedQuantity, 0), safeMax);
     const setList = list === 'offer' ? setOfferItems : setRequestItems;
+
     setList(prev => {
       const existing = prev.find(i => i.sticker_id === item.id);
-      if (quantity === 0) {
-        return prev.filter(i => i.sticker_id !== item.id);
+
+      if (clampedQuantity === 0) {
+        return existing ? prev.filter(i => i.sticker_id !== item.id) : prev;
       }
+
       if (existing) {
+        if (existing.quantity === clampedQuantity) {
+          return prev;
+        }
         return prev.map(i =>
-          i.sticker_id === item.id ? { ...i, quantity } : i
+          i.sticker_id === item.id ? { ...i, quantity: clampedQuantity } : i
         );
       }
+
       return [
         ...prev,
         {
           ...item,
           team_name: item.team_name || '', // Ensure team_name is always a string
           rarity: item.rarity || 'common', // Ensure rarity is always a string
-          sticker_code: item.code, // Map `code` to `sticker_code`
+          sticker_code: item.code, // Map code to sticker_code
           id: 0, // Placeholder for new item
           sticker_id: item.id,
           direction: list as TradeProposalItemDirection,
-          quantity,
+          quantity: clampedQuantity,
         },
       ];
     });
   };
 
+
   const handleSubmit = async () => {
     if (!user || !toUserId || !collectionId) return;
 
     console.log('[Compose Page] Submitting proposal with toUserId:', toUserId); // DEBUG LOG
+    const offerPayload = offerItems
+      .map(({ sticker_id, quantity }) => ({
+        sticker_id,
+        quantity: Math.max(0, Math.floor(quantity)),
+      }))
+      .filter(item => item.quantity > 0);
+
+    const requestPayload = requestItems
+      .map(({ sticker_id, quantity }) => ({
+        sticker_id,
+        quantity: Math.max(0, Math.floor(quantity)),
+      }))
+      .filter(item => item.quantity > 0);
+
     const proposalId = await createProposal({
       collectionId: Number(collectionId),
       toUserId,
       message,
-      p_offer_items: offerItems.map(({ sticker_id, quantity }) => ({
-        sticker_id,
-        quantity,
-      })),
-      p_request_items: requestItems.map(({ sticker_id, quantity }) => ({
-        sticker_id,
-        quantity,
-      })),
+      p_offer_items: offerPayload,
+      p_request_items: requestPayload,
     });
 
     if (proposalId) {

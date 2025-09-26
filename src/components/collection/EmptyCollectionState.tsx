@@ -1,5 +1,8 @@
 'use client';
 
+
+import { siteConfig } from '@/config/site';
+
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -19,7 +22,7 @@ export default function EmptyCollectionState() {
           <ModernCardContent className="p-12 text-center">
             <Trophy className="w-20 h-20 text-teal-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              ¡Bienvenido a CambiaCromos!
+              ¡Bienvenido a {siteConfig.name}!
             </h1>
             <h2 className="text-xl font-semibold text-gray-700 mb-4">
               Aún no sigues ninguna colección
@@ -50,3 +53,5 @@ export default function EmptyCollectionState() {
     </div>
   );
 }
+
+

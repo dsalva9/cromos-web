@@ -1,5 +1,7 @@
 'use client';
 
+import { siteConfig } from '@/config/site';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,7 +49,7 @@ export default function LoginPage() {
           ⚽
         </div>
         <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
-          CambiaCromos
+          {siteConfig.name}
         </h1>
       </div>
 
@@ -158,3 +160,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

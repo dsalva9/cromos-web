@@ -45,7 +45,7 @@ function TradeDetailPageContent() {
       });
 
       const fetchNickname = async () => {
-        const { data: profile, error: _profileError } = await supabase
+        const { data: profile } = await supabase
           .from('profiles')
           .select('nickname')
           .eq('id', otherUserId)

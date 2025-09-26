@@ -1,5 +1,8 @@
 'use client';
 
+
+import { siteConfig } from '@/config/site';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/components/providers/SupabaseProvider';
@@ -31,7 +34,7 @@ export default function Home() {
 
           {/* App Title */}
           <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
-            CambiaCromos
+            {siteConfig.name}
           </h1>
 
           {/* Subtitle */}
@@ -138,3 +141,5 @@ export default function Home() {
     </div>
   );
 }
+
+
