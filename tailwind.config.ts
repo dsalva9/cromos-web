@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
   content: [
@@ -52,11 +53,11 @@ const config: Config = {
       fontFamily: {
         sans: [
           'var(--font-geist-sans)',
-          ...require('tailwindcss/defaultTheme').fontFamily.sans,
+          ...defaultTheme.fontFamily.sans,
         ],
         mono: [
           'var(--font-geist-mono)',
-          ...require('tailwindcss/defaultTheme').fontFamily.mono,
+          ...defaultTheme.fontFamily.mono,
         ],
       },
       // Custom additions for sports cards theme

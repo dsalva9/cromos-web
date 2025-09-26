@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import AuthGuard from '@/components/AuthGuard';
 import CollectionsDropdown from '@/components/collection/CollectionsDropdown';
-import { Star, AlertCircle } from 'lucide-react';
+import { toast } from '@/lib/toast';
+import { Star, AlertCircle, Minus } from 'lucide-react';
 
 interface Collection {
   id: number;
@@ -51,6 +52,14 @@ interface UserCollectionData {
   collections: Collection | Collection[] | null;
 }
 
+interface CollectionStats {
+  total_stickers: number;
+  owned_stickers: number;
+  completion_percentage: number;
+  duplicates: number;
+  wanted?: number;
+}
+
 function getRarityGradient(rarity: Sticker['rarity']) {
   switch (rarity) {
     case 'legendary':
@@ -80,6 +89,7 @@ function CollectionContent() {
     null
   );
   const [stickers, setStickers] = useState<CollectionItem[]>([]);
+  const [collectionStats, setCollectionStats] = useState<CollectionStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activating, setActivating] = useState(false);
@@ -191,6 +201,7 @@ function CollectionContent() {
 
         if (collectionError) throw collectionError;
         setCurrentCollection(collectionData);
+        setCollectionStats(null);
 
         // Fetch all stickers for this collection with user's ownership data
         const { data: stickersData, error: stickersError } = await supabase
@@ -255,6 +266,21 @@ function CollectionContent() {
         );
 
         setStickers(formattedStickers);
+
+        const { data: statsData, error: statsError } = await supabase.rpc(
+          'get_user_collection_stats',
+          {
+            p_user_id: user.id,
+            p_collection_id: targetCollectionId,
+          }
+        );
+
+        if (statsError) {
+          console.error('Error fetching collection stats:', statsError);
+          setCollectionStats(null);
+        } else {
+          setCollectionStats(statsData?.[0] ?? null);
+        }
       } catch (err: unknown) {
         console.error('Error fetching collection stickers:', err);
         const errorMessage =
@@ -305,9 +331,10 @@ function CollectionContent() {
     const currentSticker = stickers.find(s => s.id === stickerId);
     if (!currentSticker) return;
 
-    const newCount = currentSticker.count === 0 ? 1 : currentSticker.count + 1;
+    const previousStickers = stickers;
+    const previousStats = collectionStats;
+    const newCount = currentSticker.count + 1;
 
-    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
@@ -315,6 +342,26 @@ function CollectionContent() {
           : sticker
       )
     );
+
+    setCollectionStats(prev => {
+      if (!prev) return prev;
+
+      const ownershipGain = currentSticker.count === 0 ? 1 : 0;
+      const duplicatesGain = currentSticker.count >= 1 ? 1 : 0;
+      const updatedOwned = prev.owned_stickers + ownershipGain;
+      const updatedDuplicates = prev.duplicates + duplicatesGain;
+      const updatedCompletion =
+        prev.total_stickers > 0
+          ? Math.round((updatedOwned / prev.total_stickers) * 100)
+          : prev.completion_percentage;
+
+      return {
+        ...prev,
+        owned_stickers: updatedOwned,
+        duplicates: updatedDuplicates,
+        completion_percentage: updatedCompletion,
+      };
+    });
 
     try {
       const { error } = await supabase.from('user_stickers').upsert({
@@ -327,10 +374,65 @@ function CollectionContent() {
       if (error) throw error;
     } catch (err: unknown) {
       console.error('Error updating sticker ownership:', err);
-      // Revert optimistic update
-      if (collectionId) {
-        fetchCollectionStickers(collectionId);
-      }
+      setStickers(previousStickers);
+      setCollectionStats(previousStats);
+      toast.error('No pudimos actualizar tus cromos. Intenta de nuevo.');
+    }
+  };
+
+  const decrementStickerOwnership = async (stickerId: number) => {
+    if (!user) return;
+
+    const currentSticker = stickers.find(s => s.id === stickerId);
+    if (!currentSticker || currentSticker.count === 0) return;
+
+    const previousStickers = stickers;
+    const previousStats = collectionStats;
+    const newCount = Math.max(currentSticker.count - 1, 0);
+    const nextWanted = newCount === 0 ? currentSticker.wanted : false;
+
+    setStickers(prev =>
+      prev.map(sticker =>
+        sticker.id === stickerId
+          ? { ...sticker, count: newCount, wanted: nextWanted }
+          : sticker
+      )
+    );
+
+    setCollectionStats(prev => {
+      if (!prev) return prev;
+
+      const ownershipLoss = currentSticker.count === 1 ? 1 : 0;
+      const duplicatesLoss = currentSticker.count > 1 ? 1 : 0;
+      const updatedOwned = Math.max(prev.owned_stickers - ownershipLoss, 0);
+      const updatedDuplicates = Math.max(prev.duplicates - duplicatesLoss, 0);
+      const updatedCompletion =
+        prev.total_stickers > 0
+          ? Math.round((updatedOwned / prev.total_stickers) * 100)
+          : prev.completion_percentage;
+
+      return {
+        ...prev,
+        owned_stickers: updatedOwned,
+        duplicates: updatedDuplicates,
+        completion_percentage: updatedCompletion,
+      };
+    });
+
+    try {
+      const { error } = await supabase.from('user_stickers').upsert({
+        user_id: user.id,
+        sticker_id: stickerId,
+        count: newCount,
+        wanted: nextWanted,
+      });
+
+      if (error) throw error;
+    } catch (err: unknown) {
+      console.error('Error decrementing sticker ownership:', err);
+      setStickers(previousStickers);
+      setCollectionStats(previousStats);
+      toast.error('No pudimos actualizar tus cromos. Intenta de nuevo.');
     }
   };
 
@@ -342,8 +444,9 @@ function CollectionContent() {
     if (!currentSticker || currentSticker.count > 0) return;
 
     const newWantedStatus = !currentSticker.wanted;
+    const previousStickers = stickers;
+    const previousStats = collectionStats;
 
-    // Optimistic update
     setStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
@@ -352,9 +455,22 @@ function CollectionContent() {
       )
     );
 
+    setCollectionStats(prev => {
+      if (!prev || typeof prev.wanted === 'undefined') return prev;
+
+      const updatedWanted = Math.max(
+        prev.wanted + (newWantedStatus ? 1 : -1),
+        0
+      );
+
+      return {
+        ...prev,
+        wanted: updatedWanted,
+      };
+    });
+
     try {
       if (newWantedStatus) {
-        // Add to wanted list
         const { error } = await supabase.from('user_stickers').upsert({
           user_id: user.id,
           sticker_id: stickerId,
@@ -363,7 +479,6 @@ function CollectionContent() {
         });
         if (error) throw error;
       } else {
-        // Remove from wanted list
         const { error } = await supabase
           .from('user_stickers')
           .delete()
@@ -374,10 +489,9 @@ function CollectionContent() {
       }
     } catch (err: unknown) {
       console.error('Error updating wanted status:', err);
-      // Revert optimistic update
-      if (collectionId) {
-        fetchCollectionStickers(collectionId);
-      }
+      setStickers(previousStickers);
+      setCollectionStats(previousStats);
+      toast.error('No pudimos actualizar tu lista de deseos. Intenta de nuevo.');
     }
   };
 
@@ -439,6 +553,15 @@ function CollectionContent() {
 
   const isActiveCollection = activeCollectionId === collectionId;
 
+  const ownedDisplay =
+    collectionStats?.owned_stickers ?? progress.owned_unique_stickers;
+  const totalStickers = collectionStats?.total_stickers ?? progress.total_stickers;
+  const missingCount = Math.max(totalStickers - ownedDisplay, 0);
+  const duplicatesDisplay =
+    collectionStats?.duplicates ?? progress.duplicates_count;
+  const completionDisplay =
+    collectionStats?.completion_percentage ?? progress.completion_percentage;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
       {/* Sticky Progress Header */}
@@ -446,51 +569,60 @@ function CollectionContent() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-wrap justify-center gap-3 text-sm mb-3">
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-green-300">TENGO</span>{' '}
-              {progress.owned_unique_stickers}
+              <span className="text-green-200">Tengo</span>{' '}
+              {ownedDisplay}
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-orange-300">ME FALTA</span>{' '}
-              {progress.wanted_count}
+              <span className="text-orange-200">Me faltan</span>{' '}
+              {missingCount}
             </div>
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              {progress.completion_percentage}%{' '}
-              <span className="text-yellow-300">★</span>
+              <span className="text-purple-200">Repes</span>{' '}
+              {duplicatesDisplay}
+            </div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
+              <span className="text-yellow-200">Progreso</span>{' '}
+              {completionDisplay}%
             </div>
           </div>
-
+
           {/* Status and Switcher Row */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              {isActiveCollection ? (
-                <Badge className="bg-green-500 text-white shadow-lg">
-                  <Star className="w-3 h-3 mr-1" />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {isActiveCollection ? (
+              <div className="flex items-center gap-2 text-white/80 text-sm">
+                <Star className="h-4 w-4 text-white/70" aria-hidden="true" />
+                <span>Colección activa</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-white/80 text-sm">
+                  No es tu colección activa
+                </span>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    collectionId && setActiveCollection(collectionId)
+                  }
+                  disabled={activating}
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1"
+                >
+                  {activating ? 'Activando...' : 'Hacer activa'}
+                </Button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <CollectionsDropdown
+                collections={ownedCollections}
+                currentId={collectionId || 0}
+                activeId={activeCollectionId}
+              />
+              {isActiveCollection && (
+                <Badge className="bg-green-500 text-white shadow-lg px-2.5 py-1 text-xs">
                   Activa
                 </Badge>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <span className="text-white/80 text-sm">
-                    No es tu colección activa
-                  </span>
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      collectionId && setActiveCollection(collectionId)
-                    }
-                    disabled={activating}
-                    className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                  >
-                    {activating ? 'Activando...' : 'Hacer activa'}
-                  </Button>
-                </div>
               )}
             </div>
-
-            <CollectionsDropdown
-              collections={ownedCollections}
-              currentId={collectionId || 0}
-              activeId={activeCollectionId}
-            />
           </div>
         </div>
       </div>
@@ -562,17 +694,35 @@ function CollectionContent() {
 
                 {/* Action Buttons */}
                 <div className="space-y-2">
-                  <Button
-                    size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
-                      sticker.count > 0
-                        ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
-                        : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
-                    }`}
-                    onClick={() => updateStickerOwnership(sticker.id)}
-                  >
-                    {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      className={`flex-1 text-xs font-bold rounded-xl transition-all duration-200 ${
+                        sticker.count > 0
+                          ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
+                          : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
+                      }`}
+                      onClick={() => updateStickerOwnership(sticker.id)}
+                    >
+                      {sticker.count === 0
+                        ? 'Tengo'
+                        : sticker.count === 1
+                        ? 'Tengo'
+                        : `Repe (${sticker.count - 1})`}
+                    </Button>
+                    {sticker.count > 0 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-lg border border-green-200 bg-white/80 text-green-600 hover:bg-green-50"
+                        onClick={() => decrementStickerOwnership(sticker.id)}
+                        aria-label="Quitar uno"
+                        title="Quitar uno"
+                      >
+                        <Minus className="h-4 w-4" aria-hidden="true" />
+                      </Button>
+                    )}
+                  </div>
 
                   <Button
                     size="sm"
@@ -584,7 +734,7 @@ function CollectionContent() {
                     onClick={() => toggleWantedStatus(sticker.id)}
                     disabled={sticker.count > 0}
                   >
-                    {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
+                    {sticker.wanted && sticker.count === 0 ? 'Ya no' : 'Quiero'}
                   </Button>
                 </div>
               </ModernCardContent>

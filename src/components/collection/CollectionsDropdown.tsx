@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Check, Star } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -66,12 +66,6 @@ export default function CollectionsDropdown({
               ? `${currentCollection.competition} ${currentCollection.year}`
               : 'Seleccionar colección'}
           </span>
-          {activeId === currentId && (
-            <Badge className="bg-green-500 text-white text-xs px-2 py-0.5">
-              <Star className="w-3 h-3 mr-1" />
-              Activa
-            </Badge>
-          )}
         </div>
         <ChevronDown
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
