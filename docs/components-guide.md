@@ -42,6 +42,46 @@ const supabase = useSupabaseClient();
 
 ## Guard Components
 
+### Sticker Images & Placeholders
+
+Sticker images are managed through Supabase Storage and rendered using `next/image` for optimal performance and accessibility.
+
+#### Database & URL Resolution
+
+- **DB Schema**: The `stickers` table contains `thumb_path_webp_100` (for 100px thumbnails) and `image_path_webp_300` (for 300px detail images).
+- **Client-side Resolution**: The client is responsible for resolving these paths into public URLs using `supabase.storage.from('sticker-images').getPublicUrl(path)`.
+
+#### Usage Strategy
+
+- **Grids (e.g., `CollectionPage`)**: Always use the `thumb_path_webp_100` to minimize initial load times.
+- **Detail Views (e.g., Modals, Detail Pages)**: Use the `image_path_webp_300` for a higher-quality view.
+
+#### Fallback Chain & Layout Shift
+
+A graceful fallback chain prevents missing images and layout shifts:
+
+1.  **`thumb_public_url`**: The primary source for grid images.
+2.  **`image_public_url`**: If the thumbnail is missing, fall back to the full-size image.
+3.  **`image_url`**: If storage paths are missing, fall back to the original external URL.
+4.  **Initials Placeholder**: If all image sources fail, a non-image placeholder with the player's initial is rendered inside the card's aspect-ratio container, preventing any layout shift.
+
+#### Performance: `sizes` and `priority`
+
+- **`sizes`**: The `sizes` prop should be used on all grid-based images to help the browser select the most efficient image from the `srcset`. A good default for our responsive grid is `"(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"`.
+- **`priority`**: The `priority` prop should be applied to images that are "above the fold" on initial page load (e.g., the first 6-12 images in `CollectionPage`) to signal the browser to preload them.
+
+#### Accessibility: ALT Text Policy
+
+A consistent and deterministic ALT text policy is enforced:
+
+- **Player/Sticker Card**: `alt="{playerName} - {teamName}"` (e.g., `alt="Lionel Messi - Inter Miami CF"`)
+- **Team Badge/Crest Slot**: `alt="Escudo del {teamName}"`
+- **Manager Slot**: `alt="Entrenador de {teamName}"`
+- **Special Themed Sticker**: `alt="{specialPageTitle} - {stickerName}"`
+- **Empty Special Slot**: `alt="{specialPageTitle} - pendiente"`
+
+This ensures screen readers provide useful, predictable context for all images.
+
 ### AuthGuard
 
 **File**: `src/components/AuthGuard.tsx`
@@ -1291,6 +1331,3 @@ When creating new components:
 - Extensive documentation and patterns for future development
 
 **Phase 2 Component Architecture Status**: ✅ **COMPLETE AND PRODUCTION-READY**
-
-
-
