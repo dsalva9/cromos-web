@@ -2,6 +2,17 @@
 
 ## 🚀 Current Sprint Status (Phase 2: Trading System)
 
+### MVP Refresh v1.3.0-alpha - IN PROGRESS
+
+- [ ] Album pages & sticker metadata groundwork
+  - [x] Database migration drafted (tables, indexes, RPCs, RLS)
+  - [ ] Seed `collection_pages` and `page_slots` per active collection
+  - [ ] Wire new RPCs into app services and surface completion UI
+- [ ] Trade chat + history UI integration
+  - [x] Persist chat/history tables & permissions via migration
+  - [ ] Build Supabase listeners + UI flows for chat/history timelines
+  - [ ] Expose `complete_trade` / `cancel_trade` actions in proposals UI
+
 ### High Priority ✅ COMPLETED
 
 - [x] Set up Supabase project and database

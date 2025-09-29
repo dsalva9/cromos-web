@@ -18,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mi Coleccion: botones `Tengo`/`Repe (n)` con control de decremento, nueva pill "Repes" en la cabecera y ajustes de layout para la insignia "Activa".
 
 
+## [1.3.0-alpha] - 2025-XX-XX
+
+### Added
+- Album page scaffolding: `collection_pages`, `page_slots`, and unique `stickers.sticker_number` with WebP asset columns.
+- Collector recognition + trade audit tables: `user_badges`, `trade_chats`, `trades_history`.
+- RPC toolkit: `bulk_add_stickers_by_numbers`, `get_completion_report`, `search_stickers`, `complete_trade`, `cancel_trade` (granted to `authenticated`).
+
+### Security
+- New RLS policies ensuring album structure is read-only to clients, badges remain owner-visible, and chat/history stay scoped to trade participants.
+
+### Deployment Notes
+- Run `database/migrations/20240927090000_album_pages_trade_chat.sql` and backfill `stickers.sticker_number` before tightening constraints.
 ## [1.2.0] - 2025-01-XX
 
 ### Added

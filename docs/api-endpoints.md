@@ -67,7 +67,135 @@ const { data } = await supabase.rpc('get_user_collection_stats', {
 
 **UI note**: `CollectionPage` pinta `duplicates` como la pill "Repes" en la barra superior junto a Tengo, Me faltan y %.
 
+### Inventory Utilities (v1.3.0-alpha)
+
+#### `bulk_add_stickers_by_numbers`
+
+```sql
+bulk_add_stickers_by_numbers(
+  p_user_id UUID,
+  p_collection_id INTEGER,
+  p_numbers INTEGER[]
+) RETURNS JSON
+```
+
+**Purpose**: Server-side helper to add packs of stickers without per-item RPC round-trips.
+
+**Parameters**:
+- `p_user_id`: Must match the authenticated user (enforced inside the function)
+- `p_collection_id`: Collection whose inventory is being updated
+- `p_numbers`: Array of sticker numbers pulled from `stickers.sticker_number`
+
+**Returns**:
+
+```typescript
+{
+  added: number;        // total new stickers that became owned
+  duplicates: number[]; // numbers the user already owned before this call
+  invalid: number[];    // numbers not found in the target collection
+}
+```
+
+**Usage**:
+
+```typescript
+await supabase.rpc('bulk_add_stickers_by_numbers', {
+  p_user_id: user.id,
+  p_collection_id: activeCollectionId,
+  p_numbers: packNumbers,
+});
+```
+
+#### `get_completion_report`
+
+```sql
+get_completion_report(
+  p_user_id UUID,
+  p_collection_id INTEGER
+) RETURNS JSON
+```
+
+Generates a per-page completion overview leveraging the new `collection_pages` + `page_slots` tables.
+
+**Response shape**:
+
+```typescript
+{
+  collection_id: number;
+  pages: Array<{
+    page_id: number;
+    title: string;
+    kind: 'team' | 'special';
+    order_index: number;
+    missing: number[]; // sticker numbers with zero inventory
+    repes: number[];   // sticker numbers with count > 1
+  }>;
+}
+```
+
+#### `search_stickers`
+
+```sql
+search_stickers(
+  p_collection_id INTEGER,
+  p_query TEXT,
+  p_filters JSONB
+) RETURNS SETOF {
+  sticker_id INTEGER,
+  sticker_number INTEGER,
+  code TEXT,
+  player_name TEXT,
+  rarity TEXT,
+  team_id INTEGER,
+  team_name TEXT,
+  page_id BIGINT,
+  page_title TEXT,
+  page_kind TEXT,
+  slot_index INTEGER,
+  owned_count INTEGER,
+  is_missing BOOLEAN,
+  is_duplicate BOOLEAN
+}
+```
+
+- Uses `auth.uid()` internally; only authenticated users can call it.
+- Supported `filters` keys: `owned`, `missing`, `repes` (booleans) and `kind` (`'team' | 'special'`).
+- `query` matches against sticker code, player name, or sticker number.
+
+Example filter payload:
+
+```typescript
+await supabase.rpc('search_stickers', {
+  p_collection_id: activeCollectionId,
+  p_query: searchTerm,
+  p_filters: {
+    owned: true,
+    repes: true,
+    kind: 'team',
+  },
+});
+```
 ### Trading System RPCs
+
+#### Complete Trade
+
+```sql
+complete_trade(p_trade_id BIGINT) RETURNS VOID
+```
+
+- Verifies that `auth.uid()` matches either `from_user` or `to_user` on the proposal.
+- Upserts the `trades_history` row with status `completed` and clears any previous `cancelled_at` stamp.
+- Updates `trade_proposals.status` to `accepted` (skipped if already `cancelled`).
+
+#### Cancel Trade
+
+```sql
+cancel_trade(p_trade_id BIGINT) RETURNS VOID
+```
+
+- Requires caller participation.
+- Sets `trade_proposals.status` to `cancelled`, stamps `cancelled_at`, and clears `completed_at` in `trades_history`.
+- Pair with chat UI to let users withdraw offers without exposing write access to tables directly.
 
 #### Find Mutual Traders
 
