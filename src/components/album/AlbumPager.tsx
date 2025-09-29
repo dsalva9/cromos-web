@@ -18,7 +18,7 @@ export default function AlbumPager({ pages, collectionId, currentPageId }: Album
 
   const renderPageLink = (page: CollectionPage) => {
     const isActive = page.id === currentPageId;
-    const teamCrest = page.collection_teams?.crest_url;
+    const teamLogo = page.collection_teams?.logo_url;
 
     return (
       <Link
@@ -33,8 +33,8 @@ export default function AlbumPager({ pages, collectionId, currentPageId }: Album
         )}
         aria-current={isActive ? 'page' : undefined}
       >
-        {page.kind === 'team' && teamCrest ? (
-          <Image src={teamCrest} alt={`Escudo de ${page.title}`} width={24} height={24} className="h-6 w-6" />
+        {page.kind === 'team' && teamLogo ? (
+          <Image src={teamLogo} alt={`Escudo de ${page.title}`} width={24} height={24} className="h-6 w-6" />
         ) : (
           <Shield className="h-6 w-6" />
         )}

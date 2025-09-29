@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('Collection Page Image Handling', () => {
   const collectionUrl = '/mi-coleccion/1'; // Assuming a valid collection page

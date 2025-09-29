@@ -14,7 +14,7 @@ export interface CollectionPage {
   title: string;
   order_index: number;
   icon_url?: string; // For special pages
-  collection_teams?: { crest_url: string | null } | null; // For team pages
+  collection_teams?: { logo_url: string | null } | null; // For team pages
 }
 
 export interface PageSlot {
@@ -52,7 +52,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         .from('collection_pages')
         .select(`
           id, collection_id, kind, team_id, title, order_index,
-          collection_teams ( crest_url )
+          collection_teams ( logo_url )
         `)
         .eq('collection_id', collectionId)
         .order('order_index', { ascending: true });
@@ -76,7 +76,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         .from('collection_pages')
         .select(`
           *,
-          collection_teams ( crest_url )
+          collection_teams ( logo_url )
         `)
         .eq('id', targetPageId)
         .single();

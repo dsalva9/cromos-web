@@ -9,15 +9,15 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({ page }: PageHeaderProps) {
-  const crestUrl = page.kind === 'team' ? page.collection_teams?.crest_url : null;
+  const logoUrl = page.kind === 'team' ? page.collection_teams?.logo_url : null;
   const progress = page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
 
   return (
     <div className="bg-white/10 backdrop-blur-sm border-b border-t border-white/20 py-4 px-4 sticky top-[72px] z-20">
       <div className="container mx-auto flex items-center gap-4">
-        {crestUrl && (
+        {logoUrl && (
           <div className="relative h-12 w-12 flex-shrink-0">
-            <Image src={crestUrl} alt={`Crest of ${page.title}`} fill className="object-contain" />
+            <Image src={logoUrl} alt={`Crest of ${page.title}`} fill className="object-contain" />
           </div>
         )}
         <div className="flex-grow">

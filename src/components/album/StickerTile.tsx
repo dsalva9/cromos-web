@@ -2,8 +2,7 @@
 
 import Image from 'next/image';
 import { PageSlot } from '@/hooks/album';
-import { cn } from '@/lib/utils';
-import { Shield, User, Shirt, Star } from 'lucide-react';
+import { Shield, User, Shirt } from 'lucide-react';
 
 interface StickerTileProps {
   slot: PageSlot;
