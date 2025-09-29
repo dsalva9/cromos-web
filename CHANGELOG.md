@@ -8,30 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - **Trades**: Replaced manual proposal quantity inputs with the shared QuantityStepper (+/-) control; clamps to owned duplicates, disables at zero, and keeps the summary/payload synchronized.
 - **Navigation**: Added "Buzón Intercambios" CTA on /trades/find and an alias route at /trades/inbox for direct inbox access.
 
 ### Changed
+
+- **Images**: Sticker grids now use 100px thumbnails (`thumb_path_webp_100`) with `sizes` and `priority` props for performance; detail views will use 300px images. Implemented a consistent ALT text policy for accessibility.
 - **Trades**: Match cards are fully clickable links with accessible focus states; removed the redundant "Ver detalles" button.
 - **Branding**: Updated site naming to "CambioCromos" across layout metadata, header, landing hero, and footer.
 - Replaced the custom toast helper and shadcn components with Sonner-based notifications for stacked, animated feedback.
 - Mi Coleccion: botones `Tengo`/`Repe (n)` con control de decremento, nueva pill "Repes" en la cabecera y ajustes de layout para la insignia "Activa".
 
-
-## [1.3.0-alpha] - 2025-XX-XX
-
-### Added
-- Album page scaffolding: `collection_pages`, `page_slots`, and unique `stickers.sticker_number` with WebP asset columns.
-- Storage pipeline: Supabase buckets (`sticker-images`, `avatars`), storage policies, and a resume-safe backfill CLI for sticker assets.
-- Frontend: Mi coleccion y detalle consumen `image_path_webp_300`/`thumb_path_webp_100` cuando existen, con fallback a `image_url`.
-- Collector recognition + trade audit tables: `user_badges`, `trade_chats`, `trades_history`.
-- RPC toolkit: `bulk_add_stickers_by_numbers`, `get_completion_report`, `search_stickers`, `complete_trade`, `cancel_trade` (granted to `authenticated`).
-
-### Security
-- New RLS policies ensuring album structure is read-only to clients, badges remain owner-visible, and chat/history stay scoped to trade participants.
-
-### Deployment Notes
-- Run `database/migrations/20240927090000_album_pages_trade_chat.sql` and backfill `stickers.sticker_number` before tightening constraints.
 ## [1.2.0] - 2025-01-XX
 
 ### Added
@@ -311,4 +299,3 @@ When making changes to the project:
    git commit -m "docs: update changelog for v1.1.0"
    git push origin main
    ```
-

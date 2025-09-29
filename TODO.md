@@ -114,7 +114,7 @@
 
 - [ ] **Collection Management Improvements**
   - [ ] Add search and filtering for stickers (by team, player, rarity)
-  - [x] Implement sticker image upload/management system
+  - [x] Implement sticker image upload/management system ✅
     - [x] Supabase storage buckets and backfill tooling configured
     - [x] Mi coleccion muestra assets de Supabase Storage
     - [ ] Hook sticker uploader into admin UI (future milestone)
@@ -169,7 +169,7 @@
 
 ### Performance & Optimization
 
-- [ ] Implement image optimization and lazy loading
+- [x] Implement image optimization (`sizes`, `priority`) and lazy loading ✅
 - [ ] Add caching strategies (React Query migration?)
 - [ ] Optimize bundle size and code splitting
 - [ ] Set up monitoring and analytics (Vercel Analytics)
