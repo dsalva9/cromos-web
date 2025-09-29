@@ -9,7 +9,7 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({ page }: PageHeaderProps) {
-  const logoUrl = page.kind === 'team' ? page.collection_teams?.logo_url : null;
+  const logoUrl = page.kind === 'team' ? page.collection_teams?.[0]?.logo_url : null;
   const progress = page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
 
   return (

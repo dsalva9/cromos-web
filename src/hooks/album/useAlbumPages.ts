@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
-import { Sticker } from '@/types'; // Assuming a central types file
+import { Sticker } from '@/types';
 
 // Types based on database-schema.md
 export interface CollectionPage {
@@ -13,18 +13,22 @@ export interface CollectionPage {
   team_id: number | null;
   title: string;
   order_index: number;
-  icon_url?: string; // For special pages
-  collection_teams?: { logo_url: string | null } | null; // For team pages
+  icon_url?: string;
+  collection_teams?: { logo_url: string | null }[] | null;
+}
+
+// This represents the final shape of a sticker after processing
+export interface ProcessedSticker extends Sticker {
+    user_stickers: { count: number; wanted: boolean }[] | null; 
+    image_public_url: string | null;
+    thumb_public_url: string | null;
+    collection_teams: { team_name: string } | null;
 }
 
 export interface PageSlot {
   slot_index: number;
   sticker_id: number | null;
-  stickers: (Sticker & { 
-    user_stickers: { count: number; wanted: boolean }[] | null; 
-    image_public_url: string | null;
-    thumb_public_url: string | null;
-  }) | null;
+  stickers: ProcessedSticker | null; // The final shape is a single object or null
 }
 
 export interface AlbumPageData extends CollectionPage {
@@ -88,7 +92,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         .select(`
           slot_index,
           sticker_id,
-          stickers (*, user_stickers!left(count, wanted))
+          stickers (*, user_stickers!left(count, wanted), collection_teams(team_name))
         `)
         .eq('page_id', targetPageId)
         .eq('stickers.user_stickers.user_id', user.id)
@@ -102,14 +106,20 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         return data?.publicUrl ?? null;
       };
 
-      const processedSlots = slotsData.map(slot => ({
-        ...slot,
-        stickers: slot.stickers ? {
-          ...slot.stickers,
-          image_public_url: resolvePublicUrl(slot.stickers.image_path_webp_300),
-          thumb_public_url: resolvePublicUrl(slot.stickers.thumb_path_webp_100),
-        } : null,
-      }));
+      const processedSlots: PageSlot[] = slotsData.map(slot => {
+        const stickerData = Array.isArray(slot.stickers) ? slot.stickers[0] : slot.stickers;
+
+        const processedSticker: ProcessedSticker | null = stickerData ? {
+            ...stickerData,
+            image_public_url: resolvePublicUrl(stickerData.image_path_webp_300),
+            thumb_public_url: resolvePublicUrl(stickerData.thumb_path_webp_100),
+        } : null;
+
+        return {
+            ...slot,
+            stickers: processedSticker,
+        };
+      });
 
       const ownedCount = processedSlots.filter(s => s.stickers && s.stickers.user_stickers && s.stickers.user_stickers.length > 0 && s.stickers.user_stickers[0].count > 0).length;
 
@@ -144,7 +154,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         }
       }
       
-      if (!targetPageId) {
+      if (!targetPageId && pages[0]) {
         targetPageId = pages[0].id;
         router.replace(`${pathname}?page=${targetPageId}`);
       }

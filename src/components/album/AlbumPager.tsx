@@ -18,7 +18,7 @@ export default function AlbumPager({ pages, collectionId, currentPageId }: Album
 
   const renderPageLink = (page: CollectionPage) => {
     const isActive = page.id === currentPageId;
-    const teamLogo = page.collection_teams?.logo_url;
+    const teamLogo = page.collection_teams?.[0]?.logo_url;
 
     return (
       <Link
