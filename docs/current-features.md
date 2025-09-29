@@ -8,6 +8,7 @@
 - Track which stickers they own vs. want
 - Join multiple collections and switch between them seamlessly
 - Navigate collections with active-first routing and deep-linking
+- See live album progress pills (Tengo/Me falta/Repes/% progreso) with sticky header on Mi Coleccion
 - Add/remove collections from their profile with seamless optimistic updates
 - **Find mutual trading opportunities with other collectors** ✅ **COMPLETED - PHASE 2**
 - **Create and manage trade proposals with multi-sticker selection** ✅ **NEW - MVP COMPLETE**
@@ -36,6 +37,7 @@
 #### Dynamic Collection Navigation
 
 - **Collections Dropdown**: Easy switching between owned collections with visual indicators
+- **Album Summary Header**: Sticky stats bar on /mi-coleccion/[id] combining Tengo/Me falta/Repes/% with inline collection selector and optimistic updates
 - **Active Status Display**: Clear visual indicators for active vs inactive collections
 - **Inline Activation**: "Hacer activa" button directly in collection headers
 - **Optimistic Switching**: Immediate visual feedback when changing active collection

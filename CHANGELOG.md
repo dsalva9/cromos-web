@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Album Summary Header**: Sticky overview on /mi-coleccion/[id] with Tengo/Me falta/Repes/% stats, plus collection switcher fed by get_user_collection_stats.
+
+### Changed
+- **Sticker Tiles**: Restored the decrement control and optimistic inventory math so users can adjust duplicates directly from the album view.
+- **Album Hook**: Unified collection switching, summary stats, and sticker ownership toggles under useAlbumPages, exposing pending states for smoother UI feedback.
+
 ## [1.3.0-alpha] - 2025-09-29
 
 ### Added

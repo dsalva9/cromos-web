@@ -4,10 +4,10 @@
 
 ### MVP Refresh v1.3.0-alpha - IN PROGRESS
 
-- [ ] Album pages UI (teams + specials) with image-backed tiles - In Progress (MVP)
+- [x] Album pages UI (teams + specials) with image-backed tiles - MVP ready for review
   - [x] Database migration drafted (tables, indexes, RPCs, RLS)
   - [ ] Seed `collection_pages` and `page_slots` per active collection
-  - [ ] Wire new RPCs into app services and surface completion UI
+  - [x] Wire new RPCs into app services and surface completion UI (album summary header, collection switcher, +/- controls)
 - [ ] Trade chat + history UI integration
   - [x] Persist chat/history tables & permissions via migration
   - [ ] Build Supabase listeners + UI flows for chat/history timelines

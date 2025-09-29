@@ -20,6 +20,7 @@
 
 - **Modern Gradient UI**: Teal/cyan/blue theme with responsive design
 - **Spanish Interface**: Complete Spanish language support
+- ****Sticky Album Overview**: Progress pills (Tengo/Me falta/Repes/%) with inline collection switcher and +/- ownership controls and quick +/- ownership controls
 - **Optimistic Updates**: Immediate UI feedback with background sync
 - **Loading States**: Comprehensive loading indicators for all actions
 - **Mobile-First**: Responsive design optimized for all screen sizes
