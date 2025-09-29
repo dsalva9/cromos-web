@@ -114,7 +114,9 @@
 
 - [ ] **Collection Management Improvements**
   - [ ] Add search and filtering for stickers (by team, player, rarity)
-  - [ ] Implement sticker image upload/management system
+  - [x] Implement sticker image upload/management system
+    - [x] Supabase storage buckets and backfill tooling configured
+    - [ ] Hook sticker uploader into admin UI (future milestone)
   - [ ] Add bulk sticker operations (mark multiple as TENGO/QUIERO)
   - [ ] Create collection export/import functionality
 

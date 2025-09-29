@@ -20,6 +20,42 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_stickers_collection_number_unique
 - New media columns store pre-processed WebP assets (full 300px + thumb 100px).
 - Keep the column nullable until backfill jobs populate existing rows.
 
+### Supabase Storage Buckets
+
+```sql
+select storage.create_bucket('sticker-images', public => true, file_size_limit => 5 * 1024 * 1024, allowed_mime_types => array['image/webp', 'image/png', 'image/jpeg']);
+select storage.create_bucket('avatars', public => true, file_size_limit => 2 * 1024 * 1024, allowed_mime_types => array['image/webp', 'image/png', 'image/jpeg']);
+-- Use storage.update_bucket(...) if the bucket already exists.
+```
+
+- Buckets expose public read access; uploads require authenticated sessions.
+- `sticker-images` stores processed sticker art at `sticker-images/{collection_id}/{sticker_number}-{sticker_id}.webp` and thumb variants under `thumbs/`.
+- `avatars` is reserved for profile images and shares the same MIME+size guardrails.
+
+**Policies (run in SQL Editor)**
+
+```sql
+create policy "Public read sticker media"
+  on storage.objects for select
+  using (bucket_id in ('sticker-images', 'avatars'));
+
+create policy "Authenticated write sticker media"
+  on storage.objects for insert
+  with check (bucket_id in ('sticker-images', 'avatars') and auth.role() = 'authenticated');
+
+create policy "Authenticated update sticker media"
+  on storage.objects for update
+  using (bucket_id in ('sticker-images', 'avatars') and auth.role() = 'authenticated')
+  with check (bucket_id in ('sticker-images', 'avatars') and auth.role() = 'authenticated');
+
+create policy "Authenticated delete sticker media"
+  on storage.objects for delete
+  using (bucket_id in ('sticker-images', 'avatars') and auth.role() = 'authenticated');
+```
+
+Run these via Supabase SQL Editor or `supabase db remote commit` to apply once per project.
+
+
 ### New Tables
 
 #### `collection_pages`

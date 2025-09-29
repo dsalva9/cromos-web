@@ -95,6 +95,9 @@ export interface Database {
           rating: number | null;
           rarity: string | null;
           image_url: string | null;
+          sticker_number: number | null;
+          image_path_webp_300: string | null;
+          thumb_path_webp_100: string | null;
           created_at: string | null;
         };
         Insert: {
@@ -108,6 +111,9 @@ export interface Database {
           rating?: number | null;
           rarity?: string | null;
           image_url?: string | null;
+          sticker_number?: number | null;
+          image_path_webp_300?: string | null;
+          thumb_path_webp_100?: string | null;
           created_at?: string | null;
         };
         Update: {
@@ -121,6 +127,9 @@ export interface Database {
           rating?: number | null;
           rarity?: string | null;
           image_url?: string | null;
+          sticker_number?: number | null;
+          image_path_webp_300?: string | null;
+          thumb_path_webp_100?: string | null;
           created_at?: string | null;
         };
       };
