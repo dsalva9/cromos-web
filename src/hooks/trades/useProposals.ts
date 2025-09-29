@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { TradeProposalListItem } from '@/types';
 
@@ -33,7 +33,12 @@ export const useProposals = (): UseProposalsReturn => {
       limit: number;
       offset: number;
     }) => {
-      if (!user) return;
+      if (!user) {
+        setProposals([]);
+        setHasMore(false);
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       setError(null);
@@ -61,7 +66,11 @@ export const useProposals = (): UseProposalsReturn => {
     [supabase, user]
   );
 
-  const clearProposals = useCallback(() => setProposals([]), []);
+  const clearProposals = useCallback(() => {
+    setProposals([]);
+    setHasMore(false);
+    setError(null);
+  }, []);
 
   return { proposals, loading, error, hasMore, fetchProposals, clearProposals };
 };
