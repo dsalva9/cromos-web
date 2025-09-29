@@ -166,6 +166,87 @@ Full-screen empty state component for users without collections.
 - **Theme consistency**: Uses app's gradient background and modern card styling
 - **Responsive spacing**: Proper padding and max-width constraints
 
+## Album Components (v1.3.0-alpha)
+
+### useAlbumPages
+
+**File**: `src/hooks/album/useAlbumPages.ts`
+
+Orchestrates all data fetching for the album view.
+
+**Key Features:**
+- Fetches all `collection_pages` for a given collection.
+- Fetches the content (`page_slots` and `stickers`) for a specific page.
+- Handles default page logic: if no `page` is in the URL query, it loads the first page.
+- Manages loading and error states for the album view.
+- Returns `pages`, `currentPage`, `loading`, and `error`.
+
+### AlbumPager
+
+**File**: `src/components/album/AlbumPager.tsx`
+
+Renders the primary navigation for album pages.
+
+**Props:**
+- `pages: CollectionPage[]`
+- `collectionId: number`
+- `currentPageId: number`
+
+**Features:**
+- Separates pages into "Teams" and "Specials" groups.
+- Uses `next/link` for client-side navigation that updates the `?page` query param.
+- Highlights the active page.
+- Team tabs display the team crest and name.
+- Special pages are grouped under a "Specials" heading.
+- Horizontally scrollable to accommodate many pages.
+- Fully keyboard navigable with focus rings for a11y.
+
+### PageHeader
+
+**File**: `src/components/album/PageHeader.tsx`
+
+Displays the title and progress for the current album page.
+
+**Props:**
+- `page: AlbumPageData`
+
+**Features:**
+- Shows the page title and team crest (for team pages).
+- Displays page completion progress: "Tengo X / N".
+- Includes a `Progress` bar component to visually represent completion.
+
+### AlbumPageGrid
+
+**File**: `src/components/album/AlbumPageGrid.tsx`
+
+Renders the grid of stickers for a given page.
+
+**Props:**
+- `page: AlbumPageData`
+
+**Features:**
+- Renders exactly 20 slots for `team` pages to ensure layout consistency.
+- Renders a variable number of slots for `special` pages based on data.
+- Maps over slots and renders a `StickerTile` for each.
+- Marks above-the-fold images as `priority` for `next/image`.
+
+### StickerTile
+
+**File**: `src/components/album/StickerTile.tsx`
+
+Renders an individual sticker slot in the album.
+
+**Props:**
+- `slot: PageSlot`
+- `pageKind: 'team' | 'special'`
+- `isPriority: boolean`
+
+**Features:**
+- **Owned State**: If the user owns the sticker, it renders the `thumb_path_webp_100` image and "Tengo" / "Repe(n)" badges.
+- **Missing State**: If the sticker is not owned or not yet defined, it renders a placeholder with an appropriate icon (Shield for badge, User for manager, Shirt for player).
+- **A11y**: Implements the ALT text policy correctly based on the sticker type (player, badge, manager, special).
+- **Performance**: Uses `next/image` with `sizes` and `priority` props.
+
 ## Trading Components ✅ **ESTABLISHED & EXTENDED - PHASE 2**
 
 ### FindTradersFilters
@@ -795,7 +876,7 @@ Proposal creation interface with multi-sticker selection and preview.
 
 ```typescript
 // Main composer workflow
-<div className="composer-container">
+<div class="composer-container">
   <UserContextHeader targetUser={targetUser} collection={collection} />
 
   <StickerSelector

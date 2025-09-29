@@ -89,6 +89,14 @@
 - **Header pills**: La barra superior de Mi Coleccion muestra Tengo, Me faltan, Repes y Progreso usando `get_user_collection_stats` para valores en vivo.
 - **Decrement Control**: Cada StickerCard incluye un boton ghost `-` (aria-label/title: "Quitar uno") para restar repes con rollback y toast de error.
 
+#### Album Style Navigation (v1.3.0-alpha)
+
+- **Album-style pages (teams + specials) with image-backed tiles.**
+- Paginated view for collections accessible via `/mi-coleccion/[id]?page=[pageId]`.
+- `AlbumPager` component allows for quick navigation between team and special pages.
+- `AlbumPageGrid` renders a consistent 20-slot grid for team pages and a variable grid for special pages.
+- `StickerTile` component shows sticker images for owned items and styled placeholders for missing ones, respecting all a11y and image optimization policies.
+
 **Files**: `src/app/mi-coleccion/[id]/page.tsx`
 
 ### 5. Database Architecture

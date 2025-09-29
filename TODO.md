@@ -4,7 +4,7 @@
 
 ### MVP Refresh v1.3.0-alpha - IN PROGRESS
 
-- [ ] Album pages & sticker metadata groundwork
+- [ ] Album pages UI (teams + specials) with image-backed tiles - In Progress (MVP)
   - [x] Database migration drafted (tables, indexes, RPCs, RLS)
   - [ ] Seed `collection_pages` and `page_slots` per active collection
   - [ ] Wire new RPCs into app services and surface completion UI

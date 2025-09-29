@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0-alpha] - 2025-09-29
+
+### Added
+
+- **Album Pages UI**: Foundational UI for album-style navigation.
+  - Paginated view for collections with deep-linking (`/mi-coleccion/[id]?page=[pageId]`)
+  - `AlbumPager` component for page-to-page navigation, separating Teams and Specials.
+  - `AlbumPageGrid` which renders 20 slots for Team pages and a variable number for Special pages.
+  - `StickerTile` component to display individual stickers, showing owned status or a placeholder.
+  - `useAlbumPages` hook to orchestrate data fetching for pages and their content.
+
 ### Added
 
 - **Trades**: Replaced manual proposal quantity inputs with the shared QuantityStepper (+/-) control; clamps to owned duplicates, disables at zero, and keeps the summary/payload synchronized.
