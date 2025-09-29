@@ -44,8 +44,6 @@ type StickerRowWithRelations = Sticker & {
   user_stickers: StickerUserRelation[] | null;
 };
 
-
-
 interface UserProgress {
   total_stickers: number;
   owned_unique_stickers: number;
@@ -220,7 +218,9 @@ function CollectionContent() {
 
       const resolvePublicUrl = (path: string | null) => {
         if (!path) return null;
-        const { data } = supabase.storage.from('sticker-images').getPublicUrl(path);
+        const { data } = supabase.storage
+          .from('sticker-images')
+          .getPublicUrl(path);
         return data?.publicUrl ?? null;
       };
 
@@ -240,8 +240,12 @@ function CollectionContent() {
           }
         }
 
-        const imagePath = (sticker.image_path_webp_300 ?? null) as string | null;
-        const thumbPath = (sticker.thumb_path_webp_100 ?? null) as string | null;
+        const imagePath = (sticker.image_path_webp_300 ?? null) as
+          | string
+          | null;
+        const thumbPath = (sticker.thumb_path_webp_100 ?? null) as
+          | string
+          | null;
         const publicFull = resolvePublicUrl(imagePath);
         const publicThumb = resolvePublicUrl(thumbPath);
 
@@ -420,10 +424,14 @@ function CollectionContent() {
 
         {/* Stickers Grid */}
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {stickers.map(sticker => {
-            const displayImage = sticker.thumb_public_url ?? sticker.image_public_url;
-            const fallbackInitial = sticker.player_name?.charAt(0)?.toUpperCase() || '?';
-            const showRating = Number.isFinite(sticker.rating) && sticker.rating > 0;
+          {stickers.map((sticker, index) => {
+            const displayImage =
+              sticker.thumb_public_url ?? sticker.image_public_url;
+            const fallbackInitial =
+              sticker.player_name?.charAt(0)?.toUpperCase() || '?';
+            const showRating =
+              Number.isFinite(sticker.rating) && sticker.rating > 0;
+            const isPriority = index < 6; // Prioritize loading for the first row of images
 
             return (
               <ModernCard
@@ -439,13 +447,16 @@ function CollectionContent() {
                       <>
                         <Image
                           src={displayImage}
-                          alt={`Sticker de ${sticker.player_name}`}
+                          alt={`${sticker.player_name} - ${sticker.team_name}`}
                           fill
                           className="object-cover"
-                          loading="lazy"
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                          priority={isPriority}
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                         />
-                        <div className="absolute inset-0 bg-black/15" aria-hidden="true" />
+                        <div
+                          className="absolute inset-0 bg-black/15"
+                          aria-hidden="true"
+                        />
                       </>
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -483,9 +494,7 @@ function CollectionContent() {
                     <p className="text-xs text-gray-600 font-semibold">
                       {sticker.team_name}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {sticker.code}
-                    </p>
+                    <p className="text-xs text-gray-500">{sticker.code}</p>
                   </div>
 
                   {/* Action Buttons */}
@@ -499,7 +508,9 @@ function CollectionContent() {
                       }`}
                       onClick={() => updateStickerOwnership(sticker.id)}
                     >
-                      {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
+                      {sticker.count === 0
+                        ? 'TENGO'
+                        : `TENGO (${sticker.count})`}
                     </Button>
 
                     <Button
@@ -512,7 +523,9 @@ function CollectionContent() {
                       onClick={() => toggleWantedStatus(sticker.id)}
                       disabled={sticker.count > 0}
                     >
-                      {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
+                      {sticker.wanted && sticker.count === 0
+                        ? 'YA NO'
+                        : 'QUIERO'}
                     </Button>
                   </div>
                 </ModernCardContent>
