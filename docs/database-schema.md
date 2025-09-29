@@ -31,6 +31,7 @@ select storage.create_bucket('avatars', public => true, file_size_limit => 2 * 1
 - Buckets expose public read access; uploads require authenticated sessions.
 - `sticker-images` stores processed sticker art at `sticker-images/{collection_id}/{sticker_number}-{sticker_id}.webp` and thumb variants under `thumbs/`.
 - `avatars` is reserved for profile images and shares the same MIME+size guardrails.
+- UI views consumen estas rutas en Mi coleccion y detalle, conservando fallback en `image_url`.
 
 **Policies (run in SQL Editor)**
 

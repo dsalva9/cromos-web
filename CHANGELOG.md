@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Album page scaffolding: `collection_pages`, `page_slots`, and unique `stickers.sticker_number` with WebP asset columns.
 - Storage pipeline: Supabase buckets (`sticker-images`, `avatars`), storage policies, and a resume-safe backfill CLI for sticker assets.
+- Frontend: Mi coleccion y detalle consumen `image_path_webp_300`/`thumb_path_webp_100` cuando existen, con fallback a `image_url`.
 - Collector recognition + trade audit tables: `user_badges`, `trade_chats`, `trades_history`.
 - RPC toolkit: `bulk_add_stickers_by_numbers`, `get_completion_report`, `search_stickers`, `complete_trade`, `cancel_trade` (granted to `authenticated`).
 

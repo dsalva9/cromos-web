@@ -39,3 +39,4 @@
 - The script uploads full + thumb WebP files to `sticker-images/{collection_id}/...` and updates `stickers.image_path_webp_300` / `stickers.thumb_path_webp_100`.
 - `--force` can re-upload existing assets if a retry is needed; otherwise processed stickers are skipped for safe resumes.
 - Rollback: delete objects from Supabase Storage and run `UPDATE stickers SET image_path_webp_300 = NULL, thumb_path_webp_100 = NULL WHERE collection_id = ?` before re-running the script.
+- Mi coleccion y vistas detalle ahora leen `image_path_webp_300`/`thumb_path_webp_100` cuando estan disponibles.

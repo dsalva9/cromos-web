@@ -21,6 +21,8 @@ type StickerMatch = {
   teamLabel?: string | null;
 };
 
+type StickerUpdate = Database['public']['Tables']['stickers']['Update'];
+
 type Supabase = SupabaseClient<Database>;
 
 interface ProcessCounters {
@@ -464,10 +466,14 @@ async function updateStickerPaths({
   targetPath: string;
   isThumb: boolean;
 }) {
-  const updatePayload = isThumb
+  const updatePayload: StickerUpdate = isThumb
     ? { thumb_path_webp_100: targetPath }
     : { image_path_webp_300: targetPath };
-  const { error } = await supabase.from('stickers').update(updatePayload).eq('id', stickerId);
+  const { error } = await supabase
+    .from('stickers')
+    // @ts-expect-error: Supabase update typing does not accept narrow payloads
+    .update(updatePayload)
+    .eq('id', stickerId);
   if (error) {
     throw new Error(error.message);
   }

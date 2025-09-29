@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
@@ -25,12 +26,25 @@ interface Sticker {
   rating: number;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   image_url: string | null;
+  image_path_webp_300: string | null;
+  thumb_path_webp_100: string | null;
 }
 
 interface CollectionItem extends Sticker {
   count: number;
   wanted: boolean;
+  image_public_url: string | null;
+  thumb_public_url: string | null;
 }
+
+type StickerTeamRelation = { team_name: string };
+type StickerUserRelation = { count: number | null; wanted: boolean | null };
+type StickerRowWithRelations = Sticker & {
+  collection_teams: StickerTeamRelation | StickerTeamRelation[] | null;
+  user_stickers: StickerUserRelation[] | null;
+};
+
+
 
 interface UserProgress {
   total_stickers: number;
@@ -204,8 +218,16 @@ function CollectionContent() {
 
       if (stickersError) throw stickersError;
 
+      const resolvePublicUrl = (path: string | null) => {
+        if (!path) return null;
+        const { data } = supabase.storage.from('sticker-images').getPublicUrl(path);
+        return data?.publicUrl ?? null;
+      };
+
       // Transform the data
-      const formattedStickers: CollectionItem[] = stickersData.map(sticker => {
+      const rows = (stickersData ?? []) as StickerRowWithRelations[];
+
+      const formattedStickers: CollectionItem[] = rows.map(sticker => {
         // Handle team_name extraction from collection_teams
         let teamName = 'Unknown Team';
         if (sticker.collection_teams) {
@@ -218,6 +240,11 @@ function CollectionContent() {
           }
         }
 
+        const imagePath = (sticker.image_path_webp_300 ?? null) as string | null;
+        const thumbPath = (sticker.thumb_path_webp_100 ?? null) as string | null;
+        const publicFull = resolvePublicUrl(imagePath);
+        const publicThumb = resolvePublicUrl(thumbPath);
+
         return {
           id: sticker.id,
           collection_id: sticker.collection_id,
@@ -229,6 +256,10 @@ function CollectionContent() {
           rating: sticker.rating || 0,
           rarity: sticker.rarity as Sticker['rarity'],
           image_url: sticker.image_url,
+          image_path_webp_300: imagePath,
+          thumb_path_webp_100: thumbPath,
+          image_public_url: publicFull ?? sticker.image_url,
+          thumb_public_url: publicThumb ?? publicFull ?? sticker.image_url,
           count: sticker.user_stickers?.[0]?.count || 0,
           wanted: sticker.user_stickers?.[0]?.wanted || false,
         };
@@ -389,87 +420,106 @@ function CollectionContent() {
 
         {/* Stickers Grid */}
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {stickers.map(sticker => (
-            <ModernCard
-              key={sticker.id}
-              className="bg-white hover:scale-105 transition-transform duration-200"
-            >
-              <ModernCardContent className="p-3">
-                {/* Player Image Area */}
-                <div
-                  className={`aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br ${getRarityGradient(sticker.rarity)} p-4 flex items-center justify-center`}
-                >
-                  {/* Player Avatar */}
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-2xl shadow-lg border border-white/30">
-                      👤
-                    </div>
+          {stickers.map(sticker => {
+            const displayImage = sticker.thumb_public_url ?? sticker.image_public_url;
+            const fallbackInitial = sticker.player_name?.charAt(0)?.toUpperCase() || '?';
+            const showRating = Number.isFinite(sticker.rating) && sticker.rating > 0;
+
+            return (
+              <ModernCard
+                key={sticker.id}
+                className="bg-white hover:scale-105 transition-transform duration-200"
+              >
+                <ModernCardContent className="p-3">
+                  {/* Player Image Area */}
+                  <div
+                    className={`aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br ${getRarityGradient(sticker.rarity)}`}
+                  >
+                    {displayImage ? (
+                      <>
+                        <Image
+                          src={displayImage}
+                          alt={`Sticker de ${sticker.player_name}`}
+                          fill
+                          className="object-cover"
+                          loading="lazy"
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
+                        />
+                        <div className="absolute inset-0 bg-black/15" aria-hidden="true" />
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-4xl font-bold text-white/80">
+                          {fallbackInitial}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Status Indicators */}
+                    {sticker.wanted && sticker.count === 0 && (
+                      <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                        QUIERO
+                      </div>
+                    )}
+
+                    {sticker.count > 1 && (
+                      <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                        +{sticker.count - 1}
+                      </div>
+                    )}
+
+                    {showRating && (
+                      <div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                        {sticker.rating}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Status Indicators */}
-                  {sticker.wanted && sticker.count === 0 && (
-                    <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                      QUIERO
-                    </div>
-                  )}
-
-                  {sticker.count > 1 && (
-                    <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                      +{sticker.count - 1}
-                    </div>
-                  )}
-
-                  {/* Rating Badge */}
-                  <div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                    {sticker.rating}
+                  {/* Player Info */}
+                  <div className="space-y-1 mb-3 text-center">
+                    <h3 className="font-bold text-sm text-gray-800 leading-tight">
+                      {sticker.player_name}
+                    </h3>
+                    <p className="text-xs text-gray-600 font-semibold">
+                      {sticker.team_name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {sticker.code}
+                    </p>
                   </div>
-                </div>
 
-                {/* Player Info */}
-                <div className="space-y-1 mb-3">
-                  <h3 className="font-bold text-sm text-gray-800 leading-tight text-center">
-                    {sticker.player_name}
-                  </h3>
-                  <p className="text-xs text-gray-600 text-center font-semibold">
-                    {sticker.team_name}
-                  </p>
-                  <p className="text-xs text-gray-500 text-center">
-                    {sticker.code}
-                  </p>
-                </div>
+                  {/* Action Buttons */}
+                  <div className="space-y-2">
+                    <Button
+                      size="sm"
+                      className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
+                        sticker.count > 0
+                          ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
+                          : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
+                      }`}
+                      onClick={() => updateStickerOwnership(sticker.id)}
+                    >
+                      {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
+                    </Button>
 
-                {/* Action Buttons */}
-                <div className="space-y-2">
-                  <Button
-                    size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
-                      sticker.count > 0
-                        ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
-                        : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
-                    }`}
-                    onClick={() => updateStickerOwnership(sticker.id)}
-                  >
-                    {sticker.count === 0 ? 'TENGO' : `TENGO (${sticker.count})`}
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
-                      sticker.wanted && sticker.count === 0
-                        ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
-                        : 'bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50 shadow-sm'
-                    }`}
-                    onClick={() => toggleWantedStatus(sticker.id)}
-                    disabled={sticker.count > 0}
-                  >
-                    {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
-                  </Button>
-                </div>
-              </ModernCardContent>
-            </ModernCard>
-          ))}
+                    <Button
+                      size="sm"
+                      className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
+                        sticker.wanted && sticker.count === 0
+                          ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
+                          : 'bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50 shadow-sm'
+                      }`}
+                      onClick={() => toggleWantedStatus(sticker.id)}
+                      disabled={sticker.count > 0}
+                    >
+                      {sticker.wanted && sticker.count === 0 ? 'YA NO' : 'QUIERO'}
+                    </Button>
+                  </div>
+                </ModernCardContent>
+              </ModernCard>
+            );
+          })}
         </div>
-
         {stickers.length === 0 && (
           <div className="text-center py-12">
             <div className="text-white text-xl">No hay cromos disponibles</div>
