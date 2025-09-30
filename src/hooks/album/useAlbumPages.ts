@@ -68,7 +68,10 @@ const createEmptySummary = (): AlbumSummary => ({
   completionPercentage: 0,
 });
 
-export function useAlbumPages(collectionId: number | null, pageId: string | null) {
+export function useAlbumPages(
+  collectionId: number | null,
+  pageId: string | null
+) {
   const { supabase } = useSupabase();
   const { user } = useUser();
   const router = useRouter();
@@ -79,7 +82,9 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<AlbumSummary | null>(null);
-  const [collectionOptions, setCollectionOptions] = useState<UserCollectionOption[]>([]);
+  const [collectionOptions, setCollectionOptions] = useState<
+    UserCollectionOption[]
+  >([]);
   const [activeCollectionInfo, setActiveCollectionInfo] =
     useState<UserCollectionOption | null>(null);
   const [switchingCollection, setSwitchingCollection] = useState(false);
@@ -153,7 +158,10 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
   }, [collectionId, supabase, user]);
 
   const fetchCollectionStats = useCallback(
-    async (targetCollectionId: number, options?: { keepExisting?: boolean }) => {
+    async (
+      targetCollectionId: number,
+      options?: { keepExisting?: boolean }
+    ) => {
       if (!user) return;
 
       if (!options?.keepExisting) {
@@ -161,10 +169,13 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
       }
 
       try {
-        const { data, error } = await supabase.rpc('get_user_collection_stats', {
-          p_user_id: user.id,
-          p_collection_id: targetCollectionId,
-        });
+        const { data, error } = await supabase.rpc(
+          'get_user_collection_stats',
+          {
+            p_user_id: user.id,
+            p_collection_id: targetCollectionId,
+          }
+        );
 
         if (error) throw error;
 
@@ -237,7 +248,9 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
       console.error('Error fetching album pages:', err);
       setPages([]);
       setCurrentPage(null);
-      setError(err instanceof Error ? err.message : 'Failed to load album pages.');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load album pages.'
+      );
       setLoading(false);
       return [] as CollectionPage[];
     }
@@ -351,9 +364,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
           const processedSticker: ProcessedSticker = {
             ...rawSticker,
             user_stickers:
-              normalizedUserStickers.length > 0
-                ? normalizedUserStickers
-                : null,
+              normalizedUserStickers.length > 0 ? normalizedUserStickers : null,
             image_public_url: fullImage,
             thumb_public_url: thumbImage,
           };
@@ -366,7 +377,11 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
 
         const ownedCount = processedSlots.filter(slot => {
           const sticker = slot.stickers;
-          if (!sticker || !sticker.user_stickers || sticker.user_stickers.length === 0) {
+          if (
+            !sticker ||
+            !sticker.user_stickers ||
+            sticker.user_stickers.length === 0
+          ) {
             return false;
           }
           return sticker.user_stickers[0].count > 0;
@@ -375,8 +390,7 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         const finalPageData: AlbumPageData = {
           ...(pageData as AlbumPageData),
           page_slots: processedSlots,
-          total_slots:
-            pageData.kind === 'team' ? 20 : processedSlots.length,
+          total_slots: processedSlots.length, // Use actual slot count for all pages
           owned_slots: ownedCount,
         };
 
@@ -384,7 +398,9 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
       } catch (err) {
         console.error('Error fetching page content:', err);
         setCurrentPage(null);
-        setError(err instanceof Error ? err.message : 'Failed to load page content.');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load page content.'
+        );
       } finally {
         if (!options?.silent) {
           setLoading(false);
@@ -536,7 +552,14 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         setPendingStickerIds(prev => prev.filter(id => id !== stickerId));
       }
     },
-    [collectionId, currentPage, fetchCollectionStats, fetchPageContent, supabase, user]
+    [
+      collectionId,
+      currentPage,
+      fetchCollectionStats,
+      fetchPageContent,
+      supabase,
+      user,
+    ]
   );
 
   const reduceStickerOwned = useCallback(
@@ -647,7 +670,14 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         setPendingStickerIds(prev => prev.filter(id => id !== stickerId));
       }
     },
-    [collectionId, currentPage, fetchCollectionStats, fetchPageContent, supabase, user]
+    [
+      collectionId,
+      currentPage,
+      fetchCollectionStats,
+      fetchPageContent,
+      supabase,
+      user,
+    ]
   );
   const toggleStickerWanted = useCallback(
     async (stickerId: number) => {
@@ -738,7 +768,14 @@ export function useAlbumPages(collectionId: number | null, pageId: string | null
         setPendingStickerIds(prev => prev.filter(id => id !== stickerId));
       }
     },
-    [collectionId, currentPage, fetchCollectionStats, fetchPageContent, supabase, user]
+    [
+      collectionId,
+      currentPage,
+      fetchCollectionStats,
+      fetchPageContent,
+      supabase,
+      user,
+    ]
   );
 
   useEffect(() => {
