@@ -132,26 +132,153 @@ search_stickers(
 
 ---
 
-### Trading - Discovery
+### Trading - Discovery (v1.1.0)
 
-... (find_mutual_traders, get_mutual_trade_detail documentation remains the same)
+#### `find_mutual_traders`
+
+Finds users with mutual trading opportunities based on a variety of filters.
+
+**Function Signature:**
+
+```sql
+FUNCTION find_mutual_traders(
+  p_user_id UUID,
+  p_collection_id INTEGER,
+  p_rarity TEXT DEFAULT NULL,
+  p_team TEXT DEFAULT NULL,
+  p_query TEXT DEFAULT NULL,
+  p_min_overlap INTEGER DEFAULT 1,
+  p_limit INTEGER DEFAULT 20,
+  p_offset INTEGER DEFAULT 0
+) RETURNS TABLE (
+  match_user_id UUID,
+  nickname TEXT,
+  overlap_from_them_to_me BIGINT,
+  overlap_from_me_to_them BIGINT,
+  total_mutual_overlap BIGINT
+)
+```
+
+**Security**: SECURITY DEFINER
+**Use Case**: Powers the `/trades/find` page, enabling users to discover potential trading partners.
 
 ---
 
-### Trading - Proposals
+#### `get_mutual_trade_detail`
 
-... (create_trade_proposal, respond_to_trade_proposal, list_trade_proposals documentation remains the same)
+Gets the detailed sticker-by-sticker breakdown of a mutual trade opportunity between two users.
+
+**Function Signature:**
+
+```sql
+FUNCTION get_mutual_trade_detail(
+  p_user_id UUID,
+  p_other_user_id UUID,
+  p_collection_id INTEGER
+) RETURNS TABLE (
+  direction TEXT,
+  sticker_id INTEGER,
+  sticker_code TEXT,
+  player_name TEXT,
+  team_name TEXT,
+  rarity TEXT,
+  count INTEGER
+)
+```
+
+**Security**: SECURITY DEFINER
+**Use Case**: Powers the `/trades/find/[userId]` detail page, showing what each user can offer the other.
+
+---
+
+### Trading - Proposals (v1.2.0)
+
+#### `create_trade_proposal`
+
+Creates a new trade proposal with offered and requested items.
+
+**Function Signature:**
+
+```sql
+FUNCTION create_trade_proposal(
+  p_collection_id INTEGER,
+  p_to_user UUID,
+  p_message TEXT,
+  p_offer_items JSONB,
+  p_request_items JSONB
+) RETURNS JSON
+```
+
+**Returns:**
+
+```json
+{
+  "proposal_id": 123
+}
+```
+
+**Security**: SECURITY DEFINER
+**Use Case**: Powers the proposal composer at `/trades/compose`.
+
+---
+
+#### `respond_to_trade_proposal`
+
+Allows a user to accept, reject, or cancel a trade proposal.
+
+**Function Signature:**
+
+```sql
+FUNCTION respond_to_trade_proposal(
+  p_proposal_id INTEGER,
+  p_action TEXT
+) RETURNS JSON
+```
+
+**Parameters:**
+
+- `p_action`: `'accept'`, `'reject'`, or `'cancel'`
+
+**Security**: SECURITY DEFINER
+**Use Case**: Used in the proposal detail modal to handle user responses.
+
+---
+
+#### `list_trade_proposals`
+
+Lists a user's trade proposals, separated into an inbox and an outbox.
+
+**Function Signature:**
+
+```sql
+FUNCTION list_trade_proposals(
+  p_user_id UUID,
+  p_box TEXT,
+  p_limit INTEGER DEFAULT 20,
+  p_offset INTEGER DEFAULT 0
+) RETURNS TABLE (...)
+```
+
+**Parameters:**
+
+- `p_box`: `'inbox'` or `'outbox'`
+
+**Security**: SECURITY DEFINER
+**Use Case**: Powers the `/trades/proposals` dashboard.
 
 ---
 
 #### `get_trade_proposal_detail`
 
-... (documentation remains the same)
+Retrieves the complete details of a single trade proposal, including all items and user information.
 
-console.log(`Offering: ${proposal.offer_items.length} stickers`);
-console.log(`Requesting: ${proposal.request_items.length} stickers`);
+**Function Signature:**
 
-````
+```sql
+FUNCTION get_trade_proposal_detail(
+  p_proposal_id INTEGER
+) RETURNS JSON
+```
 
 **Security**: SECURITY DEFINER
 **Access Control**: Only proposal participants can view details
@@ -166,11 +293,12 @@ console.log(`Requesting: ${proposal.request_items.length} stickers`);
 Mark a trade as completed and record in history.
 
 **Function Signature:**
+
 ```sql
 complete_trade(
   p_trade_id BIGINT
-) RETURNS VOID
-````
+) RETURNS VOID;
+```
 
 **Parameters:**
 
@@ -223,7 +351,7 @@ Cancel a trade and record cancellation in history.
 ```sql
 cancel_trade(
   p_trade_id BIGINT
-) RETURNS VOID
+) RETURNS VOID;
 ```
 
 **Parameters:**
