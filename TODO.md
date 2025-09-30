@@ -1,124 +1,160 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint Status (Phase 2: Trading System)
+## 🚀 Current Sprint Status
 
-### MVP Refresh v1.3.0-alpha - IN PROGRESS
+### v1.3.0 UI Integration - IN PROGRESS
 
-- [x] Album pages UI (teams + specials) with image-backed tiles - MVP ready for review
-  - [x] Database migration drafted (tables, indexes, RPCs, RLS)
-  - [ ] Seed `collection_pages` and `page_slots` per active collection
-  - [x] Wire new RPCs into app services and surface completion UI (album summary header, collection switcher, +/- controls)
-- [ ] Trade chat + history UI integration
-  - [x] Persist chat/history tables & permissions via migration
-  - [ ] Build Supabase listeners + UI flows for chat/history timelines
-  - [ ] Expose `complete_trade` / `cancel_trade` actions in proposals UI
+**Backend Complete ✅ | Frontend Integration Needed 🚧**
 
-### High Priority ✅ COMPLETED
+- [x] **Database Schema v1.3.0** - All tables, indexes, and RLS policies deployed
+  - [x] `collection_pages` table with team/special page definitions
+  - [x] `page_slots` table with sticker-to-slot mapping
+  - [x] `trade_chats` table for trade messaging
+  - [x] `trades_history` table for completion tracking
+  - [x] `user_badges` table for achievements
+  - [x] Enhanced `stickers` table with image paths and numbers
+- [x] **RPC Functions v1.3.0** - All database functions operational
+  - [x] `bulk_add_stickers_by_numbers` - Batch sticker addition
+  - [x] `get_completion_report` - Per-page completion analysis
+  - [x] `search_stickers` - Advanced sticker search with filters
+  - [x] `complete_trade` - Mark trades as completed
+  - [x] `cancel_trade` - Cancel trades with history
 
-- [x] Set up Supabase project and database
-- [x] Create basic database schema for sticker collections
-- [x] Implement user authentication flow
-- [x] Create basic user profile management
-- [x] Set up protected routes structure
-- [x] Build collection browser and management
-- [x] Create sticker display components with rarity indicators
-- [x] Implement user sticker inventory management (TENGO/QUIERO)
-- [x] Build collection progress tracking interface
-- [x] User collection switching and joining functionality
-- [x] **Perfil: split owned vs available collections + add/remove/activate actions**
-- [x] **Modern card-based profile design with gradients, hover effects, and visual polish**
-- [x] **Seamless Perfil actions with optimistic updates (no page reloads)**
-- [x] **Active-first navigation system with collection dropdown switching**
-- [x] **Deep-linking for collections with canonical URLs (/mi-coleccion/[id])**
-- [x] **Collection cards with click-to-navigate and streamlined UX**
-- [x] **Profile UX polish: removed redundant buttons, true optimistic updates, active collection warnings**
+- [ ] **Album Pages UI Integration** 🔥 HIGH PRIORITY
+  - [ ] Wire up `useAlbumPages` hook to production RPCs
+  - [ ] Complete `AlbumPager` component integration
+  - [ ] Implement `AlbumPageGrid` with 20-slot team pages
+  - [ ] Build `StickerTile` component with image support
+  - [ ] Integrate album summary header with live stats
+  - [ ] Test page navigation and slot rendering
 
-## 🎯 Phase 2: Core Features - MAJOR MILESTONE COMPLETE ✅
+- [ ] **Trade Chat UI** 🔥 HIGH PRIORITY
+  - [ ] Build chat interface components
+  - [ ] Integrate Supabase Realtime listeners
+  - [ ] Add chat to proposal detail modal
+  - [ ] Implement message notifications
+  - [ ] Test real-time message delivery
 
-### Trading System (High Impact) ✅ COMPLETED
+- [ ] **Trade History Dashboard**
+  - [ ] Create history viewing interface
+  - [ ] Integrate `complete_trade` / `cancel_trade` actions
+  - [ ] Display completed trade statistics
+  - [ ] Add trade rating system (future)
 
-- [x] **Find Traders Feature**: Show users who have stickers I want and want stickers I have
-  - [x] Create trading match algorithm with RPC functions
-  - [x] Build "Find Trades" page with match results
-  - [x] Add filters (collection, rarity, teams, player name)
-  - [x] Show mutual benefit opportunities with clear visualizations
+### Data Migration Tasks 🗄️
 
-- [x] **Trade Proposals MVP**: Send/receive trade requests with multiple stickers
-  - [x] Create trade proposal database schema (trade_proposals, trade_proposal_items)
-  - [x] Build secure RPC functions for all trade operations
-  - [x] Create trade proposal composer with sticker selection
-  - [x] Add inbox/outbox dashboard for proposal management
-  - [x] Implement proposal response system (accept/reject/cancel)
-  - [x] Add RLS policies for secure access control
-  - [x] Build ProposalDetailModal for viewing and responding to proposals
-  - [x] Integrate Sonner-based toast notifications for user feedback
+- [ ] **Sticker Number Backfill**
+  - [ ] Generate sequential numbers for all existing stickers
+  - [ ] Update `stickers.sticker_number` column
+  - [ ] Verify uniqueness within collections
 
-## 🔋 Phase 2 Continuation - READY TO START
+- [ ] **Collection Pages Seeding**
+  - [ ] Create `collection_pages` for all active collections
+  - [ ] Generate team pages (20 slots: badge, manager, 18 players)
+  - [ ] Generate special pages (variable slots)
+  - [ ] Set proper `order_index` for navigation
 
-### Trading System - Enhanced Features 🚧 NEXT UP
+- [ ] **Page Slots Population**
+  - [ ] Map stickers to page slots
+  - [ ] Validate slot assignments
+  - [ ] Test page completion calculations
 
-- [ ] **Trade Chat**: Basic messaging for trade negotiations
-  - [ ] Create messages database schema with trade context
-  - [ ] Build real-time messaging interface using Supabase Realtime
-  - [ ] Add message notifications and read status
-  - [ ] Include trade proposal context in conversations
-  - [ ] Integrate chat access from proposal detail modal
+- [ ] **Sticker Image Upload**
+  - [ ] Process existing images to WebP format
+  - [ ] Generate 300px full-size versions
+  - [ ] Generate 100px thumbnails
+  - [ ] Upload to Supabase Storage `sticker-images` bucket
+  - [ ] Update `image_path_webp_300` and `thumb_path_webp_100`
 
-- [ ] **Trade History**: Track completed and pending trades
-  - [ ] Create trade history database schema
-  - [ ] Build trade history interface with status tracking
-  - [ ] Add trade completion workflow
-  - [ ] Implement trade rating/feedback system
-  - [ ] Create statistics dashboard for completed trades
+## ✅ Phase 2: Core Features - BACKEND COMPLETE
 
-- [ ] **Enhanced Proposal System**: Advanced negotiation features
-  - [ ] Add counter-proposal functionality
-  - [ ] Implement proposal editing/modification
-  - [ ] Add proposal expiration dates
-  - [ ] Create bulk proposal operations
-  - [ ] Add proposal templates for common trades
+### Trading System (Backend ✅ | Frontend Partial ⚠️)
 
-### Enhanced User Experience 📋 MEDIUM PRIORITY
+**Trade Discovery & Proposals - COMPLETE ✅**
 
-- [ ] **Public User Profiles**: View other users' collections and stats
+- [x] Find Traders Feature with RPC-based matching
+- [x] Trade Proposals MVP (create, respond, inbox/outbox)
+- [x] Proposal detail modal and response system
+- [x] Advanced filtering and search
+
+**Trade Chat - BACKEND READY 🚧**
+
+- [x] Database schema (`trade_chats` table)
+- [x] RLS policies for secure messaging
+- [x] Indexes for chronological loading
+- [ ] Frontend chat interface ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Supabase Realtime integration ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Message notifications ⬅️ **NEEDS IMPLEMENTATION**
+
+**Trade History - BACKEND READY 🚧**
+
+- [x] Database schema (`trades_history` table)
+- [x] `complete_trade` RPC function
+- [x] `cancel_trade` RPC function
+- [x] History tracking with metadata
+- [ ] Frontend history dashboard ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Statistics and analytics UI ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Trade rating system (future)
+
+### Enhanced Sticker Management - BACKEND COMPLETE ✅
+
+**Album Pages System - BACKEND READY 🚧**
+
+- [x] `collection_pages` table (team rosters, special sections)
+- [x] `page_slots` table (sticker positioning)
+- [x] `get_completion_report` RPC function
+- [x] `search_stickers` RPC function
+- [x] Performance indexes for navigation
+- [ ] Frontend album navigation UI ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Page grid rendering ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Sticker tile components ⬅️ **NEEDS IMPLEMENTATION**
+
+**Enhanced Sticker Images - BACKEND READY 🚧**
+
+- [x] `sticker_number` column for sequential ordering
+- [x] `image_path_webp_300` for full-size WebP images
+- [x] `thumb_path_webp_100` for thumbnails
+- [x] Supabase Storage buckets configured
+- [x] `bulk_add_stickers_by_numbers` RPC function
+- [ ] Image upload and processing pipeline ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Frontend image display with WebP ⬅️ **NEEDS IMPLEMENTATION**
+- [ ] Backfill existing stickers ⬅️ **NEEDS DATA MIGRATION**
+
+## 📋 Phase 2 Continuation - READY TO START
+
+### Enhanced User Experience 🔄 MEDIUM PRIORITY
+
+- [ ] **Public User Profiles**
   - [ ] Create public profile routes
   - [ ] Build public collection viewing interface
   - [ ] Add user search functionality
   - [ ] Implement privacy controls
 
-- [ ] **User Directory**: Browse and search for other collectors
+- [ ] **User Directory**
   - [ ] Create user directory page
   - [ ] Add search and filtering options
   - [ ] Show user activity and stats
   - [ ] Add "follow" or "bookmark" users feature
 
-- [ ] **Notification System**: Trade requests, messages, new collections
+- [ ] **Notification System**
   - [ ] Create notifications database schema
   - [ ] Build notification center interface
   - [ ] Add real-time notifications with Supabase Realtime
   - [ ] Implement email notification preferences
   - [ ] Integrate with trade proposal workflow
 
-- [ ] **Collection Completion Celebrations**: Achievement system
-  - [ ] Design achievement system
+- [ ] **Collection Completion Celebrations**
+  - [ ] Design achievement system (uses existing `user_badges` table)
   - [ ] Create celebration animations
   - [ ] Add progress milestones
   - [ ] Build achievement showcase
 
 ### Current Feature Enhancements 🔧 LOW PRIORITY
 
-- [ ] **Trading UI QA**
-  - [ ] Add tests for QuantityStepper clamping, disabled states, and aria-live announcements
-  - [ ] Verify MatchCard link focus states with keyboard and screen readers
-  - [ ] Capture analytics for the "Buzón Intercambios" CTA usage
-
 - [ ] **Collection Management Improvements**
-  - [ ] Add search and filtering for stickers (by team, player, rarity)
-  - [x] Implement sticker image upload/management system ✅
-    - [x] Supabase storage buckets and backfill tooling configured
-    - [x] Mi coleccion muestra assets de Supabase Storage
-    - [ ] Hook sticker uploader into admin UI (future milestone)
-  - [ ] Add bulk sticker operations (mark multiple as TENGO/QUIERO)
+  - [ ] Add search and filtering for stickers (use `search_stickers` RPC)
+  - [x] Implement sticker image upload/management system ✅ Backend ready
+  - [ ] Add bulk sticker operations (use `bulk_add_stickers_by_numbers`)
   - [ ] Create collection export/import functionality
 
 - [ ] **Navigation & UX Polish**
@@ -183,38 +219,11 @@
 - [ ] Database backup and migration strategies
 - [ ] Add error tracking (Sentry)
 
-## ✅ Recently Completed (Move to CHANGELOG)
-
-### Trade Proposals MVP ✅ **JUST COMPLETED - v1.2.0**
-
-- [x] **Complete Interactive Trading System**: Full proposal lifecycle from creation to completion
-- [x] **Secure Database Architecture**: RLS-protected tables with SECURITY DEFINER RPC functions
-- [x] **Multi-Sticker Proposals**: Compose complex trades with multiple offer/request items
-- [x] **Inbox/Outbox Dashboard**: Manage received and sent proposals with clear status indicators
-- [x] **Proposal Response System**: Accept, reject, or cancel proposals with immediate feedback
-- [x] **Rich User Interface**: Modal-based detail views with comprehensive sticker information
-- [x] **Composer Integration**: Seamless flow from find traders to proposal creation
-- [x] **Enhanced Type Safety**: Complete TypeScript interfaces for all trading operations
-
-### Profile Management System Enhancement ✅ **PREVIOUSLY COMPLETED**
-
-- [x] **Complete Profile Refactor with Optimistic Updates**
-  - [x] Eliminated all page reloads from profile actions
-  - [x] Optimistic updates with automatic rollback on errors
-  - [x] Per-action loading states for granular feedback
-  - [x] Sonner-based toast notification system for user feedback
-  - [x] Hook-based architecture (`useProfileData`, `useCollectionActions`)
-
-- [x] **Enhanced Collection Navigation**
-  - [x] Collection cards now clickable for direct navigation
-  - [x] Deep-linking support with `/mi-coleccion/[id]` routes
-  - [x] Improved visual design with better hover effects
-
 ## 🛡️ Known Issues & Tech Debt
 
 ### Minor Issues
 
-- [ ] Consider adding confirmation for other destructive actions beyond collection removal
+- [ ] Consider adding confirmation for other destructive actions
 - [ ] Toast notifications could use better positioning on mobile
 - [ ] Proposal composer could benefit from auto-save functionality
 
@@ -223,7 +232,86 @@
 - [ ] Profile data could use React Query for better caching
 - [ ] Collection dropdown could be optimized for large numbers of collections
 - [ ] Consider virtualizing sticker grids for very large collections
-- [ ] Trade proposal queries could benefit from additional indexes for large user bases
+- [ ] Trade proposal queries could benefit from additional indexes
+
+---
+
+## 🎯 Next Development Session Priorities
+
+### 1. Complete Documentation Alignment ✅ DONE
+
+- [x] Update database-schema.md to v1.3.0
+- [x] Update CHANGELOG.md with v1.3.0 status
+- [x] Create DATABASE_AUDIT_SUMMARY.md
+- [ ] Update TODO.md (this file) ⬅️ **IN PROGRESS**
+- [ ] Update current-features.md
+- [ ] Update api-endpoints.md
+
+### 2. Choose Next Feature Focus 🎯 DECISION NEEDED
+
+**Option A: Album Pages UI** (Recommended - Quick Win)
+
+- **Effort**: 3-5 days
+- **Impact**: HIGH - Completes core collection experience
+- **Backend**: ✅ 100% Ready
+- **Dependencies**: Need to seed collection pages data first
+
+**Option B: Trade Chat System** (High User Value)
+
+- **Effort**: 5-7 days
+- **Impact**: HIGH - Completes trading workflow
+- **Backend**: ✅ 100% Ready
+- **Dependencies**: Requires Supabase Realtime setup
+
+**Option C: Trade History Dashboard** (Completeness)
+
+- **Effort**: 3-4 days
+- **Impact**: MEDIUM - Adds closure and analytics
+- **Backend**: ✅ 100% Ready
+- **Dependencies**: None
+
+### 3. Data Migration Sprint 🗄️ REQUIRED BEFORE UI
+
+**Before implementing Album Pages UI:**
+
+1. Backfill `sticker_number` for all stickers
+2. Generate and seed `collection_pages`
+3. Create `page_slots` for all pages
+4. Test v1.3.0 RPCs with real data
+5. Upload sample sticker images to Storage
+
+**Estimated Effort**: 2-3 days
+
+---
+
+## 🏆 Major Milestones Achieved
+
+### Phase 1 Complete! 🎉 (v1.0.0)
+
+- Zero-reload profile management
+- Seamless collection navigation
+- Modern responsive design
+- Complete sticker inventory system
+
+### Phase 2 Backend Complete! 🚀 (v1.3.0)
+
+- **Complete Trading Infrastructure**
+  - Discovery, proposals, chat tables, history
+  - All RPC functions operational
+  - Security and performance optimized
+
+- **Album Pages System**
+  - Page and slot structure defined
+  - Completion tracking ready
+  - Search and bulk operations ready
+
+- **Enhanced Sticker Management**
+  - WebP image optimization ready
+  - Sequential numbering system
+  - Storage buckets configured
+
+**Current Status**: Backend at v1.3.0 ✅ | Frontend at v1.2.0 ⚠️  
+**Next Milestone**: Complete v1.3.0 UI integration
 
 ---
 
@@ -233,40 +321,10 @@
 2. **Add new items** as they come up in development
 3. **Update priorities** based on user feedback and business needs
 4. **Review weekly** to adjust sprint planning
-5. **Update docs/current-features.md** when features are completed
+5. **Update current-features.md** when features are completed
 
-## Next Development Session Priorities
+---
 
-1. **Start Trade Chat System Design** 🎯 **NEXT MAJOR MILESTONE**
-   - Design database schema for messages with trade proposal context
-   - Create wireframes for chat interface integrated with proposal workflow
-   - Plan real-time messaging using Supabase Realtime
-
-2. **Polish Current Trading System**
-   - Gather user feedback on proposal system
-   - Optimize RPC function performance for larger datasets
-   - Consider mobile UX improvements for trading interfaces
-
-3. **Documentation Maintenance**
-   - Update current-features.md with completed trade proposals system
-   - Document trading component patterns in components-guide.md
-   - Plan Phase 3 features based on user adoption metrics
-
-## 🏆 Major Milestones Achieved
-
-### Phase 1 Complete! 🎉
-
-- Zero-reload profile management
-- Seamless collection navigation
-- Modern responsive design
-- Complete sticker inventory system
-
-### Phase 2 First Major Feature Complete! 🚀
-
-- **Interactive Trading System with Proposals MVP**
-- RPC-based secure trading architecture
-- Advanced search and filtering for trading partners
-- Complete proposal lifecycle management
-- Professional-grade user interface and experience
-
-**Ready for**: User testing, feedback collection, and Phase 2 continuation with chat and history features
+**Last Updated**: 2025-01-XX (Post Database Audit)  
+**Current Focus**: v1.3.0 UI Integration + Data Migration  
+**Recommendation**: Complete Album Pages UI after data migration sprint
