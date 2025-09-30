@@ -390,7 +390,7 @@ export function useAlbumPages(
         const finalPageData: AlbumPageData = {
           ...(pageData as AlbumPageData),
           page_slots: processedSlots,
-          total_slots: processedSlots.length, // Use actual slot count for all pages
+          total_slots: pageData.kind === 'team' ? 20 : processedSlots.length,
           owned_slots: ownedCount,
         };
 

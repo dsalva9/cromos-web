@@ -20,8 +20,20 @@ export default function AlbumPageGrid({
   onToggleWanted,
   pendingStickerIds = [],
 }: AlbumPageGridProps) {
-  // Use actual slots from the page - no padding for team pages
-  const slots: PageSlot[] = page.page_slots;
+  let slots: PageSlot[] = page.page_slots;
+
+  if (page.kind === 'team') {
+    slots = Array.from({ length: 20 }, (_, index) => {
+      const existingSlot = page.page_slots.find(
+        slot => slot.slot_index === index
+      );
+      return (existingSlot || {
+        slot_index: index,
+        sticker_id: null,
+        stickers: null,
+      }) as PageSlot;
+    });
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
