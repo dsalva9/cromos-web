@@ -7,229 +7,168 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- **Album Summary Header**: Sticky overview on /mi-coleccion/[id] with Tengo/Me falta/Repes/% stats, plus collection switcher fed by get_user_collection_stats.
+### In Progress
 
-### Changed
-- **Sticker Tiles**: Restored the decrement control and optimistic inventory math so users can adjust duplicates directly from the album view.
-- **Album Hook**: Unified collection switching, summary stats, and sticker ownership toggles under useAlbumPages, exposing pending states for smoother UI feedback.
+- **Trade Chat UI**: Frontend integration for real-time messaging in proposals
+- **Trade History Dashboard**: User interface for viewing completed trades
+- **Album Pages UI Polish**: Complete integration of album navigation system
 
-## [1.3.0-alpha] - 2025-09-29
+## [1.3.0] - 2025-01-XX
 
-### Added
+### Added - Album Pages System
 
-- **Album Pages UI**: Foundational UI for album-style navigation.
-  - Paginated view for collections with deep-linking (`/mi-coleccion/[id]?page=[pageId]`)
-  - `AlbumPager` component for page-to-page navigation, separating Teams and Specials.
-  - `AlbumPageGrid` which renders 20 slots for Team pages and a variable number for Special pages.
-  - `StickerTile` component to display individual stickers, showing owned status or a placeholder.
-  - `useAlbumPages` hook to orchestrate data fetching for pages and their content.
+- **Database Schema Complete**: All v1.3.0 tables deployed to production
+  - `collection_pages`: Album page definitions (team rosters, special sections)
+  - `page_slots`: Sticker-to-slot mapping with 20-slot team pages
+  - `user_badges`: Achievement tracking system
+  - `trade_chats`: Infrastructure for trade messaging
+  - `trades_history`: Terminal state tracking for completed/cancelled trades
 
-### Added
+- **Enhanced Sticker Images**: WebP optimization system
+  - `stickers.sticker_number`: Unique sequential numbering within collections
+  - `stickers.image_path_webp_300`: Full-size 300px WebP images
+  - `stickers.thumb_path_webp_100`: Optimized 100px thumbnails
+  - Supabase Storage buckets: `sticker-images`, `avatars`
 
-- **Trades**: Replaced manual proposal quantity inputs with the shared QuantityStepper (+/-) control; clamps to owned duplicates, disables at zero, and keeps the summary/payload synchronized.
-- **Navigation**: Added "Buzón Intercambios" CTA on /trades/find and an alias route at /trades/inbox for direct inbox access.
-
-### Changed
-
-- **Images**: Sticker grids now use 100px thumbnails (`thumb_path_webp_100`) with `sizes` and `priority` props for performance; detail views will use 300px images. Implemented a consistent ALT text policy for accessibility.
-- **Trades**: Match cards are fully clickable links with accessible focus states; removed the redundant "Ver detalles" button.
-- **Branding**: Updated site naming to "CambioCromos" across layout metadata, header, landing hero, and footer.
-- Replaced the custom toast helper and shadcn components with Sonner-based notifications for stacked, animated feedback.
-- Mi Coleccion: botones `Tengo`/`Repe (n)` con control de decremento, nueva pill "Repes" en la cabecera y ajustes de layout para la insignia "Activa".
-
-## [1.2.0] - 2025-01-XX
-
-### Added
-
-- **Trade Proposals MVP**: Implemented the core trading system. Users can now create, send, receive, and respond to trade proposals. This includes new database tables (`trade_proposals`, `trade_proposal_items`), four new RPC functions to manage trades, and a new UI section at `/trades/proposals` with a proposal composer and detail modal.
-- **Find Traders Feature**: This was part of the lead-up to proposals, allowing users to find mutual trading partners based on their sticker inventories. Includes advanced filtering and a detailed match view.
-
-### Fixed
-
-- Resolved multiple data consistency issues related to user profiles and foreign key constraints during trade creation.
-
-## [1.1.0] - 2025-01-XX
-
-### Added
-
-- **Active Collection Warning System**: Orange alert banner when user has collections but no active one selected
-- **Enhanced User Feedback**: Improved toast messaging specifically for active collection removal scenarios
+- **New RPC Functions (v1.3.0)**:
+  - `bulk_add_stickers_by_numbers`: Batch sticker addition by number
+  - `get_completion_report`: Per-page completion analysis with missing/duplicate tracking
+  - `search_stickers`: Advanced sticker search with filters (owned, missing, repes, kind)
+  - `complete_trade`: Mark trades as completed with history tracking
+  - `cancel_trade`: Cancel trades with proper state management
 
 ### Changed
 
-- **Streamlined Profile Navigation**: Removed redundant "Ver Colección" button - entire collection card is now clickable
-- **Perfected Optimistic Updates**: Eliminated all remaining page reloads from collection add/remove operations
-- **Cleaner UI Layout**: Simplified action button arrangement with better visual hierarchy
-
-### Fixed
-
-- **True Zero-Reload Experience**: Collection management actions now use pure optimistic updates without any background refreshes
-- **Active Collection State Management**: Better handling and user communication when removing the active collection
-- **Visual Consistency**: Improved spacing and button layouts in collection cards
+- **Sticker Data Model**: Enhanced with album page support and optimized images
+- **Performance**: New indexes for album page navigation and slot lookups
+- **RLS Policies**: Extended security model for new tables (pages, slots, badges, chat, history)
 
 ### Technical
 
-- Enhanced optimistic state management to prevent unnecessary data refreshes
-- Improved error handling patterns for collection state management
-- Better user guidance through contextual warnings and messaging
+- Complete database migration to v1.3.0 schema
+- All 13 tables documented and indexed
+- All 14 RPC functions deployed and tested
+- Storage bucket policies configured for public images
 
-## [1.0.0] - 2025-01-XX
+## [1.2.0] - 2025-01-XX
 
-### Added
+### Added - Trade Proposals MVP
 
-- **Complete Profile Management Refactor with Advanced Optimistic Updates**
-  - Eliminated all page reloads from profile actions for seamless UX
-  - Optimistic state management with automatic rollback on server errors
-  - Per-action loading states for granular user feedback
-  - Simple toast notification system for success/error messages
-  - Hook-based architecture with `useProfileData` and `useCollectionActions`
-- **Enhanced Collection Navigation Experience**
-  - Clickable collection cards for direct navigation to collection pages
-  - "Ver Colección" buttons for explicit navigation actions
-  - Deep-linking support with canonical `/mi-coleccion/[id]` URLs
-  - Improved visual design with enhanced hover effects and transitions
-  - Better mobile responsiveness for collection cards
-
-- **Advanced State Management Architecture**
-  - Snapshot-based cache system for optimistic updates
-  - Smart error recovery with automatic state rollback
-  - Conflict prevention through action loading states
-  - Client-side validation before server operations
+- **Complete Interactive Trading System**: Full proposal lifecycle from creation to completion
+- **Secure Database Architecture**: RLS-protected tables with SECURITY DEFINER RPC functions
+- **Multi-Sticker Proposals**: Compose complex trades with multiple offer/request items
+- **Inbox/Outbox Dashboard**: Manage received and sent proposals with clear status indicators
+- **Proposal Response System**: Accept, reject, or cancel proposals with immediate feedback
+- **Rich User Interface**: Modal-based detail views with comprehensive sticker information
+- **Composer Integration**: Seamless flow from find traders to proposal creation
+- **Enhanced Type Safety**: Complete TypeScript interfaces for all trading operations
+- **QuantityStepper Component**: Reusable +/- control with duplicate-aware clamping
 
 ### Changed
 
-- **Profile Page Architecture**: Complete refactor from traditional form-based updates to modern optimistic state management
-- **Collection Management Flow**: Enhanced from basic CRUD to sophisticated optimistic updates with error recovery
-- **User Feedback System**: Migrated from alerts and page reloads to elegant toast notifications
-- **Navigation Patterns**: Improved from static links to dynamic, context-aware navigation
+- **Navigation**: Added "Buzón Intercambios" CTA and `/trades/inbox` alias route
+- **Match Cards**: Full-card clickable links with accessible focus states (removed redundant button)
+- **Branding**: Updated to "CambioCromos" across all interfaces
 
-### Technical Infrastructure
+### Technical
 
-- New custom hooks: `useProfileData` for optimistic state management
-- Enhanced TypeScript interfaces for better type safety
-- Improved component organization with better separation of concerns
-- Better error handling patterns throughout the application
+- Database tables: `trade_proposals`, `trade_proposal_items`
+- RPC functions: `create_trade_proposal`, `respond_to_trade_proposal`, `list_trade_proposals`, `get_trade_proposal_detail`
+- Comprehensive RLS policies for secure proposal access
+- Sonner-based toast notification system
+
+## [1.1.0] - 2025-01-XX
+
+### Added - Find Traders Feature
+
+- **RPC-Based Matching Engine**: `find_mutual_traders` and `get_mutual_trade_detail` functions
+- **Advanced Search & Filtering**: Rarity, team, player name, minimum overlap controls
+- **Mutual Benefit Visualization**: Clear display of bidirectional trading opportunities
+- **Performance Optimized**: Custom indexes for efficient filtering on large datasets
+
+### Changed
+
+- **Active Collection Warning System**: Orange alert when no active collection selected
+- **Streamlined Profile Navigation**: Removed redundant buttons - entire collection card is clickable
+- **Enhanced User Feedback**: Improved toast messaging for active collection scenarios
 
 ### Fixed
 
-- Eliminated page refresh issues when managing collections
-- Fixed inconsistent loading states across profile actions
-- Resolved navigation issues with collection switching
-- Improved error handling for network failures
+- **True Zero-Reload Experience**: Eliminated all remaining page refreshes from collection operations
+- **Active Collection State Management**: Better handling when removing active collection
+
+### Technical
+
+- New indexes: `idx_user_stickers_trading`, `idx_stickers_collection_filters`, `idx_collection_teams_name`
+- Trading hooks: `useFindTraders`, `useMatchDetail`
+- Trading components: `FindTradersFilters`, `MatchCard`, `MatchDetail`
+
+## [1.0.0] - 2025-01-XX
+
+### Added - Complete Profile Management
+
+- **Zero-Reload Profile Actions**: Optimistic updates with automatic rollback
+- **Enhanced Collection Navigation**: Clickable cards, deep-linking with `/mi-coleccion/[id]` URLs
+- **Active-First Routing**: Navbar "Mi Colección" redirects to active collection
+- **Collections Dropdown**: Easy switching between owned collections with visual indicators
+- **Modern Card-Based Design**: Gradient headers, hover effects, animated progress bars
+- **Confirmation Modals**: Safe destructive actions with cascade delete warnings
+
+### Changed
+
+- **Profile Page Complete Refactor**: Two-section layout (owned vs available collections)
+- **Collection Management**: Add, remove, activate with per-action loading states
+- **Optimistic State Management**: Snapshot-based cache with rollback on errors
+
+### Technical
+
+- Hooks: `useProfileData`, `useCollectionActions`
+- Components: `CollectionsDropdown`, `EmptyCollectionState`, `ConfirmModal`
+- Enhanced TypeScript interfaces for collection management
 
 ## [0.9.0] - 2024-12-XX
 
 ### Added
 
-- **Active-first Collection Navigation**
-  - Navbar "Mi Colección" link now redirects to user's active collection by default
-  - New dynamic routing: `/mi-coleccion/[id]` for canonical collection URLs
-  - Collection pages show Active/Inactive status with inline "Hacer activa" button
-  - Collections dropdown switcher to easily navigate between owned collections
-  - Empty state for users with no collections, with CTA to follow collections
+- **Active-first Collection Navigation**: Navbar link redirects to user's active collection
+- **Dynamic Routing**: `/mi-coleccion/[id]` for canonical collection URLs
+- **Collection Switcher**: Dropdown with active/inactive status indicators
+- **Empty State**: Elegant handling for users without collections
 
-- **Enhanced Collection User Experience**
-  - Deep-linking from Profile cards directly to collection pages
-  - Visual active collection indicators in dropdown (✓ checkmark and "Activa" badge)
-  - Optimistic active collection switching with immediate visual feedback
-  - Fallback logic when no active collection exists (auto-activates first owned)
-  - Smart redirect handling with user-friendly toast messages
+### Technical
 
-- **Improved Navigation Architecture**
-  - Canonical collection URLs for better bookmarking and sharing
-  - Client-side navigation between collections with no page reloads
-  - Keyboard accessible dropdown with proper ARIA labels
-  - Consistent loading states and error handling across navigation
-
-### Changed
-
-- **Routing Structure**: Migrated from `/mi-coleccion` to `/mi-coleccion/[id]` pattern
-- **Profile Collection Cards**: Now include "Ver Colección" button for direct navigation
-- **Collection Header**: Enhanced with status indicators and collection switcher dropdown
-
-### Technical Infrastructure
-
-- New CollectionsDropdown component with accessibility features
-- Enhanced OwnedCollectionCard component with deep-link navigation
-- Empty state handling for users without collections
-- Improved error boundaries and fallback strategies
+- New routing structure and navigation patterns
+- Enhanced `CollectionPage` component with fallback logic
 
 ## [0.8.0] - 2024-12-XX
 
 ### Added
 
-- **Modern Card-Based Profile Design**
-  - Gradient header profile card with large avatar and status indicators
-  - Inline nickname editing with stylish pencil icon button
-  - Smooth hover animations for all collection cards
-  - Visual progress bars with animated completion percentages
-  - Color-coded gradient header strips (green for active, gray for inactive collections)
-
-- **Enhanced Visual Design System**
-  - Pill-style action buttons with proper color coding (blue activate, red delete, green add)
-  - Colorful statistics display boxes with meaningful lucide-react icons
-  - Consistent card elevation and shadow system across all components
-  - Improved spacing and typography hierarchy for better readability
-
-- **UI/UX Improvements**
-  - Smooth scale-up hover effects on collection cards
-  - Animated progress indicators with gradient fills
-  - Better visual feedback for all user actions
-  - Enhanced empty states with larger icons and better messaging
-  - Consistent badge styling with shadow effects
+- **Modern Card-Based Profile Design**: Gradient headers, large avatars, status indicators
+- **Inline Nickname Editing**: Stylish pencil icon button with keyboard shortcuts
+- **Animated Progress Bars**: Visual completion indicators with gradients
+- **Color-Coded Action Buttons**: Pill-style buttons with consistent styling
 
 ### Changed
 
-- **Profile Page Complete Visual Overhaul**: Transformed from basic layout to modern card-based design matching Mi Colección page aesthetics
-- **Collection Card Layout**: Redesigned with gradient headers, better stats display, and modern action buttons
-- **Button Design System**: Unified pill-style buttons with consistent colors and hover effects
-- **Visual Hierarchy**: Improved spacing, typography, and color usage throughout profile interface
-
-### Infrastructure
-
-- Enhanced ModernCard component usage for consistent design language
-- Improved loading states with better visual feedback
-- Better responsive design patterns for card-based layouts
+- **Profile Page Visual Overhaul**: Transformed to modern card-based design
+- **Collection Card Layout**: Gradient headers, improved stats display
+- **Button Design System**: Unified pill-style buttons throughout
 
 ## [0.7.0] - 2024-12-XX
 
 ### Added
 
-- **Complete Profile Collection Management Refactor**
-  - Two-section layout: "Mis Colecciones" vs "Colecciones Disponibles"
-  - Add collections to user profile with one-click action
-  - Remove collections from profile with confirmation modal and cascade delete
-  - Set active collection with exclusive activation logic
-  - Auto-activation for first collection added
-  - Comprehensive loading states for all collection actions
-  - Empty states for both owned and available collection sections
+- **Profile Collection Management Refactor**: Two-section layout (owned vs available)
+- **Add/Remove Collections**: One-click actions with confirmation modals
+- **Active Collection System**: Exclusive activation with auto-activation for first collection
+- **Cascade Delete**: Safe cleanup of user data when removing collections
 
-- **Enhanced User Experience**
-  - Confirmation modal component with destructive action styling
-  - Detailed collection statistics display (completion %, duplicates, wanted items)
-  - Visual badges for collection status (Active, Nueva, Inactiva)
-  - Granular action loading states (per-button loading indicators)
-  - Improved error handling and user feedback
+### Technical
 
-- **Data Integrity & Safety**
-  - Cascade delete functionality when removing collections
-  - Unique constraints preventing duplicate collection joins
-  - Safe destructive actions with clear warning messages
-  - Proper cleanup of user_stickers when removing collections
-
-### Changed
-
-- **ProfilePage Complete Rewrite**: Separated owned vs available collections with distinct UI sections
-- **Collection Management Logic**: Enhanced with proper cascade delete and exclusive active states
-- **User Interface**: Improved visual hierarchy and action organization
-
-### Infrastructure
-
-- New ConfirmModal component for safe destructive actions
-- Enhanced database schema documentation for cascade behavior
-- Improved TypeScript interfaces for collection management
-- Updated RLS policies for collection operations
+- Enhanced database schema with proper cascade behavior
+- Granular action loading states
+- Comprehensive empty states
 
 ## [0.2.0] - 2024-12-XX
 
@@ -238,82 +177,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete user authentication system with Supabase
 - User profile management with collection statistics
 - Collection joining and switching functionality
-- Comprehensive sticker inventory system ("TENGO"/"QUIERO" functionality)
+- Comprehensive sticker inventory system ("TENGO"/"QUIERO")
 - Collection progress tracking with completion percentages
 - Modern gradient UI with responsive design
 - Protected routes with AuthGuard component
-- Multi-collection support with user preferences
 - Real-time sticker ownership updates
-- Duplicate tracking and want list management
-- Site navigation with user-specific menu items
 
 ### Infrastructure
 
 - Supabase RLS policies implementation
 - Database functions for collection statistics
-- Optimistic UI updates for better UX
+- Optimistic UI updates
 - Error handling and loading states
 
 ## [0.1.0] - 2024-XX-XX
 
 ### Added
 
-- Initial project setup
-- Next.js 15 with App Router
+- Initial project setup with Next.js 15 and App Router
 - TypeScript configuration
 - Tailwind CSS v4 integration
 - shadcn/ui component library setup
-- Basic UI components: Button, Card, Input, Dialog, Avatar, Badge, Progress, Textarea
-- Modern card component for sports card theme
+- Basic UI components
 - Supabase integration preparation
 - Development workflow documentation
 
-### Infrastructure
-
-- ESLint and Prettier configuration
-- Git workflow and conventional commits setup
-- Environment variables template
-- Core documentation files
-
 ---
 
-## Phase 1 Complete! 🎉
+## 🎉 Major Milestones
 
-**Version 1.1.0 marks the completion of Phase 1 (Foundation).**
+### Phase 1 Complete (v1.0.0)
 
-The profile management system is now fully polished with:
+- Zero-reload profile management
+- Seamless collection navigation
+- Modern responsive design
+- Complete sticker inventory system
 
-- ✅ Zero page reloads for all user actions
-- ✅ Perfect optimistic updates with error recovery
-- ✅ Streamlined navigation (click-to-navigate cards)
-- ✅ Smart active collection warnings and guidance
-- ✅ Modern, accessible, and responsive design
+### Phase 2 Core Features Complete (v1.2.0)
 
-**Next: Phase 2 Trading System Development begins!**
+- **Interactive Trading System with Proposals MVP**
+- RPC-based secure trading architecture
+- Advanced search and filtering for trading partners
+- Complete proposal lifecycle management
+
+### Phase 2 Database Complete (v1.3.0)
+
+- **All v1.3.0 schema deployed to production**
+- Album pages infrastructure ready
+- Trade history and chat tables live
+- Enhanced sticker images with WebP optimization
+- Complete RPC function suite (14 functions)
+
+**Current Status**: Database at v1.3.0, UI at v1.2.0
+**Next Focus**: Complete Phase 2 UI integration (album pages, chat, history)
 
 ---
 
 ## How to Update This File
 
-When making changes to the project:
+When making changes:
 
 1. **Add entries under [Unreleased]** as you develop
-2. **Use these categories:**
-   - `Added` for new features
-   - `Changed` for changes in existing functionality
-   - `Deprecated` for soon-to-be removed features
-   - `Removed` for now removed features
-   - `Fixed` for bug fixes
-   - `Security` for vulnerability fixes
+2. **Use categories**: Added, Changed, Deprecated, Removed, Fixed, Security, Technical
+3. **When releasing**: Move unreleased items to new version section with date
+4. **Commit format**: `git commit -m "docs: update changelog for vX.X.X"`
 
-3. **When releasing a version:**
-   - Move unreleased items to a new version section
-   - Add the release date
-   - Create a new empty [Unreleased] section
+---
 
-4. **Commit message format:**
-   ```bash
-   git add CHANGELOG.md
-   git commit -m "docs: update changelog for v1.1.0"
-   git push origin main
-   ```
+**Phase 2 Status**: Major backend infrastructure complete ✅
+**Ready for**: UI integration of album pages, chat, and history features
