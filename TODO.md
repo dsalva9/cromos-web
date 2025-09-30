@@ -1,10 +1,10 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint Status
+## 🚀 Current Sprint: Data Migration & v1.3.0 Go-Live
 
-### v1.3.0 UI Integration - IN PROGRESS
+### v1.3.0 Feature Status
 
-**Backend Complete ✅ | Frontend Integration Needed 🚧**
+**Backend Complete ✅ | Frontend Code Complete ✅ | Data Migration Needed 🚧**
 
 - [x] **Database Schema v1.3.0** - All tables, indexes, and RLS policies deployed
   - [x] `collection_pages` table with team/special page definitions
@@ -20,7 +20,7 @@
   - [x] `complete_trade` - Mark trades as completed
   - [x] `cancel_trade` - Cancel trades with history
 
-- [x] **Album Pages UI Integration** 🔥 HIGH PRIORITY
+- [x] **Album Pages UI - Code Complete**
   - [x] Implement `useAlbumPages` hook with production RPCs
   - [x] Implement `AlbumPager` component for page navigation
   - [x] Implement `AlbumPageGrid` with 20-slot team pages
@@ -28,44 +28,30 @@
   - [x] Implement album summary header with live stats from `get_completion_report`
   - [x] Full UI integration complete
 
-- [ ] **Trade Chat UI** 🔥 HIGH PRIORITY
-  - [ ] Build chat interface components
-  - [ ] Integrate Supabase Realtime listeners
-  - [ ] Add chat to proposal detail modal
-  - [ ] Implement message notifications
-  - [ ] Test real-time message delivery
-
-- [ ] **Trade History Dashboard**
-  - [ ] Create history viewing interface
-  - [ ] Integrate `complete_trade` / `cancel_trade` actions
-  - [ ] Display completed trade statistics
-  - [ ] Add trade rating system (future)
-
-### Data Migration Tasks 🗄️
+### Data Migration Sprint - IN PROGRESS 🔥
 
 - [ ] **Sticker Number Backfill**
   - [ ] Generate sequential numbers for all existing stickers
   - [ ] Update `stickers.sticker_number` column
   - [ ] Verify uniqueness within collections
 
-- [ ] **Collection Pages Seeding**
+- [ ] **Collection Pages & Slots Seeding**
   - [ ] Create `collection_pages` for all active collections
   - [ ] Generate team pages (20 slots: badge, manager, 18 players)
   - [ ] Generate special pages (variable slots)
   - [ ] Set proper `order_index` for navigation
-
-- [ ] **Page Slots Population**
   - [ ] Map stickers to page slots
   - [ ] Validate slot assignments
   - [ ] Test page completion calculations
+
 - [ ] **Sticker Image Backfill**
   - [x] Implement `npm run backfill:stickers` CLI script for automated processing and upload
-  - [ ] **Run script** for all collections to populate Supabase Storage
+  - [ ] **Run script** for all collections to populate Supabase Storage and update `stickers` table
   - [ ] Verify `image_path_webp_300` and `thumb_path_webp_100` are correctly updated
 
-## ✅ Phase 2: Core Features - BACKEND COMPLETE
+## ✅ Phase 2: Core Features - COMPLETE
 
-### Trading System (Backend ✅ | Frontend Partial ⚠️)
+### Trading System (Backend ✅ | Frontend Proposals ✅ | Chat/History 🚧)
 
 **Trade Discovery & Proposals - COMPLETE ✅**
 
@@ -73,6 +59,15 @@
 - [x] Trade Proposals MVP (create, respond, inbox/outbox)
 - [x] Proposal detail modal and response system
 - [x] Advanced filtering and search
+
+**Album Pages System - COMPLETE ✅**
+
+- [x] `collection_pages` & `page_slots` tables
+- [x] `get_completion_report` & `search_stickers` RPC functions
+- [x] Performance indexes for navigation
+- [x] Frontend album navigation UI (code complete)
+- [x] Page grid rendering (code complete)
+- [x] Sticker tile components (code complete)
 
 **Trade Chat - BACKEND READY 🚧**
 
@@ -93,20 +88,7 @@
 - [ ] Statistics and analytics UI ⬅️ **NEEDS IMPLEMENTATION**
 - [ ] Trade rating system (future)
 
-### Enhanced Sticker Management - BACKEND COMPLETE ✅
-
-**Album Pages System - BACKEND READY 🚧**
-
-- [x] `collection_pages` table (team rosters, special sections)
-- [x] `page_slots` table (sticker positioning)
-- [x] `get_completion_report` RPC function
-- [x] `search_stickers` RPC function
-- [x] Performance indexes for navigation
-- [ ] Frontend album navigation UI ⬅️ **NEEDS IMPLEMENTATION**
-- [ ] Page grid rendering ⬅️ **NEEDS IMPLEMENTATION**
-- [ ] Sticker tile components ⬅️ **NEEDS IMPLEMENTATION**
-
-**Enhanced Sticker Images - BACKEND READY 🚧**
+**Enhanced Sticker Images - COMPLETE ✅**
 
 - [x] `sticker_number` column for sequential ordering
 - [x] `image_path_webp_300` for full-size WebP images
@@ -115,11 +97,24 @@
 - [x] `bulk_add_stickers_by_numbers` RPC function
 - [x] Image upload and processing pipeline (via CLI script)
 - [x] Frontend image display with WebP and graceful fallback
-- [ ] Backfill existing stickers ⬅️ **NEEDS SCRIPT EXECUTION**
+- [ ] Backfill existing stickers ⬅️ **DATA MIGRATION SPRINT**
 
-## 📋 Phase 2 Continuation - READY TO START
+## 📋 Phase 2.1: Next Sprint - READY TO START
 
-### Enhanced User Experience 🔄 MEDIUM PRIORITY
+- [ ] **Trade Chat UI** 🔥 HIGH PRIORITY
+  - [ ] Build chat interface components
+  - [ ] Integrate Supabase Realtime listeners
+  - [ ] Add chat to proposal detail modal
+  - [ ] Implement message notifications
+  - [ ] Test real-time message delivery
+
+- [ ] **Trade History Dashboard**
+  - [ ] Create history viewing interface
+  - [ ] Integrate `complete_trade` / `cancel_trade` actions
+  - [ ] Display completed trade statistics
+  - [ ] Add trade rating system (future)
+
+### Enhanced User Experience 🔄 MEDIUM PRIORITY (Post Chat/History)
 
 - [ ] **Public User Profiles**
   - [ ] Create public profile routes
@@ -233,54 +228,6 @@
 
 ---
 
-## 🎯 Next Development Session Priorities
-
-### 1. Complete Documentation Alignment ✅ DONE
-
-- [x] Update database-schema.md to v1.3.0
-- [x] Update CHANGELOG.md with v1.3.0 status
-- [x] Create DATABASE_AUDIT_SUMMARY.md
-- [ ] Update TODO.md (this file) ⬅️ **IN PROGRESS**
-- [ ] Update current-features.md
-- [ ] Update api-endpoints.md
-
-### 2. Choose Next Feature Focus 🎯 DECISION NEEDED
-
-**Option A: Album Pages UI** (Recommended - Quick Win)
-
-- **Effort**: 3-5 days
-- **Impact**: HIGH - Completes core collection experience
-- **Backend**: ✅ 100% Ready
-- **Dependencies**: Need to seed collection pages data first
-
-**Option B: Trade Chat System** (High User Value)
-
-- **Effort**: 5-7 days
-- **Impact**: HIGH - Completes trading workflow
-- **Backend**: ✅ 100% Ready
-- **Dependencies**: Requires Supabase Realtime setup
-
-**Option C: Trade History Dashboard** (Completeness)
-
-- **Effort**: 3-4 days
-- **Impact**: MEDIUM - Adds closure and analytics
-- **Backend**: ✅ 100% Ready
-- **Dependencies**: None
-
-### 3. Data Migration Sprint 🗄️ REQUIRED BEFORE UI
-
-**Before implementing Album Pages UI:**
-
-1. Backfill `sticker_number` for all stickers
-2. Generate and seed `collection_pages`
-3. Create `page_slots` for all pages
-4. Test v1.3.0 RPCs with real data
-5. Upload sample sticker images to Storage
-
-**Estimated Effort**: 2-3 days
-
----
-
 ## 🏆 Major Milestones Achieved
 
 ### Phase 1 Complete! 🎉 (v1.0.0)
@@ -290,7 +237,7 @@
 - Modern responsive design
 - Complete sticker inventory system
 
-### Phase 2 Backend Complete! 🚀 (v1.3.0)
+### Phase 2 Complete! 🚀 (v1.3.0)
 
 - **Complete Trading Infrastructure**
   - Discovery, proposals, chat tables, history
@@ -307,14 +254,14 @@
   - Sequential numbering system
   - Storage buckets configured
 
-**Current Status**: Backend at v1.3.0 ✅ | Frontend at v1.2.0 ⚠️  
-**Next Milestone**: Complete v1.3.0 UI integration
+**Current Status**: Backend at v1.3.0 ✅ | Frontend code at v1.3.0 ✅  
+**Next Milestone**: Complete v1.3.0 Data Migration to go live.
 
 ---
 
 ## How to Use This File
 
-1. **Move completed items** to CHANGELOG.md with proper versioning
+1. **Check off completed items** and update CHANGELOG.md with proper versioning
 2. **Add new items** as they come up in development
 3. **Update priorities** based on user feedback and business needs
 4. **Review weekly** to adjust sprint planning
@@ -322,6 +269,6 @@
 
 ---
 
-**Last Updated**: 2025-01-XX (Post Database Audit)  
-**Current Focus**: v1.3.0 UI Integration + Data Migration  
-**Recommendation**: Complete Album Pages UI after data migration sprint
+**Last Updated**: 2025-01-XX (Post Documentation Sync)  
+**Current Focus**: v1.3.0 Data Migration Sprint  
+**Next Focus**: Trade Chat UI and History Dashboard
