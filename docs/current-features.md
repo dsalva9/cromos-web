@@ -182,10 +182,11 @@
 
 **What's Needed:**
 
-- Data migration: Seed `collection_pages` and `page_slots`
-- Complete UI integration of album components
-- Image upload pipeline for sticker artwork
-- Test page navigation and completion tracking
+- **Data Migration**: Seed `collection_pages`, `page_slots`, and run the image backfill script.
+- **UI Integration**: Complete the integration of the drafted album components.
+- **Image Backfill**: An `npm run backfill:stickers` script has been implemented for automated image processing and uploading. This is the primary method for populating sticker images.
+- **Image Fallback**: The UI has implemented a graceful, multi-step fallback chain for sticker images to prevent layout shifts and ensure a robust visual experience.
+- **Testing**: Test page navigation, completion tracking, and image loading.
 
 **Files**: Schema in `database-schema.md`, UI drafts in `src/components/album/*` (if exists)
 

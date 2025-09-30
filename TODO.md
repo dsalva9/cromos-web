@@ -21,12 +21,12 @@
   - [x] `cancel_trade` - Cancel trades with history
 
 - [ ] **Album Pages UI Integration** 🔥 HIGH PRIORITY
-  - [ ] Wire up `useAlbumPages` hook to production RPCs
-  - [ ] Complete `AlbumPager` component integration
-  - [ ] Implement `AlbumPageGrid` with 20-slot team pages
-  - [ ] Build `StickerTile` component with image support
-  - [ ] Integrate album summary header with live stats
-  - [ ] Test page navigation and slot rendering
+  - [x] Draft `useAlbumPages` hook, `AlbumPager`, `AlbumPageGrid`, and `StickerTile` components
+  - [ ] **Integrate** `useAlbumPages` hook with production RPCs
+  - [ ] **Integrate** `AlbumPager` component for page navigation
+  - [ ] **Integrate** `AlbumPageGrid` with 20-slot team pages
+  - [ ] **Integrate** `StickerTile` component with image support and fallback logic
+  - [ ] **Integrate** album summary header with live stats from `get_completion_report`
 
 - [ ] **Trade Chat UI** 🔥 HIGH PRIORITY
   - [ ] Build chat interface components
@@ -58,13 +58,10 @@
   - [ ] Map stickers to page slots
   - [ ] Validate slot assignments
   - [ ] Test page completion calculations
-
-- [ ] **Sticker Image Upload**
-  - [ ] Process existing images to WebP format
-  - [ ] Generate 300px full-size versions
-  - [ ] Generate 100px thumbnails
-  - [ ] Upload to Supabase Storage `sticker-images` bucket
-  - [ ] Update `image_path_webp_300` and `thumb_path_webp_100`
+- [ ] **Sticker Image Backfill**
+  - [x] Implement `npm run backfill:stickers` CLI script for automated processing and upload
+  - [ ] **Run script** for all collections to populate Supabase Storage
+  - [ ] Verify `image_path_webp_300` and `thumb_path_webp_100` are correctly updated
 
 ## ✅ Phase 2: Core Features - BACKEND COMPLETE
 
@@ -116,9 +113,9 @@
 - [x] `thumb_path_webp_100` for thumbnails
 - [x] Supabase Storage buckets configured
 - [x] `bulk_add_stickers_by_numbers` RPC function
-- [ ] Image upload and processing pipeline ⬅️ **NEEDS IMPLEMENTATION**
-- [ ] Frontend image display with WebP ⬅️ **NEEDS IMPLEMENTATION**
-- [ ] Backfill existing stickers ⬅️ **NEEDS DATA MIGRATION**
+- [x] Image upload and processing pipeline (via CLI script) ⬅️ **IMPLEMENTED**
+- [x] Frontend image display with WebP and graceful fallback ⬅️ **IMPLEMENTED**
+- [ ] Backfill existing stickers ⬅️ **NEEDS SCRIPT EXECUTION**
 
 ## 📋 Phase 2 Continuation - READY TO START
 

@@ -29,25 +29,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `stickers.thumb_path_webp_100`: Optimized 100px thumbnails
   - Supabase Storage buckets: `sticker-images`, `avatars`
 
-- **Album Pages UI - Complete Implementation**:
-  - `AlbumPager`: Navigation component with team/special page grouping
-  - `PageHeader`: Page title display with completion progress bars
-  - `AlbumPageGrid`: Responsive grid with 20-slot team pages and variable special pages
-  - `StickerTile`: Individual sticker component with ownership controls
-  - `useAlbumPages`: Comprehensive hook managing all album state and operations
-  - Collection switching with active collection management
-  - Optimistic updates with automatic rollback on errors
-  - Smart image loading with priority for above-the-fold content
-
 - **Image Management System**:
-  - **CLI Backfill Script**: `npm run backfill:stickers` for automated image processing
-    - Intelligent player/team slug matching algorithm
-    - Support for WebP, PNG, and JPEG formats
-    - Separate full-size (300px) and thumbnail (100px) processing
-    - Dry-run mode for safe testing (`--dry-run`)
-    - Force re-upload capability (`--force`)
-    - Comprehensive error handling and summary reporting
-    - Environment variable configuration or CLI arguments
+  - **Automated Backfill Script**: Added `npm run backfill:stickers` CLI script for processing local images into WebP format (300px and 100px) and uploading them to Supabase Storage.
+  - **UI Image Integration**: Implemented image rendering in components with a graceful fallback chain to prevent layout shifts and ensure a robust user experience.
+
+- **Album Pages UI - Drafted**:
+  - Drafted core components for album navigation:
+    - `useAlbumPages` (Hook)
+    - `AlbumPager`
+    - `PageHeader`
+    - `AlbumPageGrid`
+    - `StickerTile`
+  - UI integration is now the primary task for this feature.
+
+- **Image Display & Performance**:
   - **Graceful Image Fallback Chain**: Prevents layout shifts
     1. `thumb_public_url` (100px WebP thumbnail)
     2. `image_public_url` (300px WebP full-size)
@@ -58,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `sizes` prop for responsive image selection
     - Consistent ALT text policy for accessibility
 
-- **New RPC Functions (v1.3.0)**:
+- **New RPC Functions**:
   - `bulk_add_stickers_by_numbers`: Batch sticker addition by number
   - `get_completion_report`: Per-page completion analysis with missing/duplicate tracking
   - `search_stickers`: Advanced sticker search with filters (owned, missing, repes, kind)
@@ -260,11 +255,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Trade history and chat infrastructure ready
 
 **Current Status**: Database at v1.3.0 ✅ | Frontend at v1.3.0 ✅ (Album Pages)
-**Next Focus**: Trade chat UI and history dashboard integration
+**Next Focus**: Album Pages UI Integration, then Trade Chat UI.
 
 ---
 
-## How to Update This File
+## How to Update This File\_
 
 When making changes:
 
