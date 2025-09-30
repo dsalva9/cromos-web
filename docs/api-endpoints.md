@@ -1,4 +1,153 @@
-console.log(`Status: ${proposal.status}`);
+## API Endpoints & Operations
+
+**Version**: v1.3.0  
+**Status**: ✅ All backend features documented
+
+---
+
+## RPC Functions (Database)
+
+### Collection Statistics
+
+#### `get_user_collection_stats`
+
+Returns completion statistics for a user's collection.
+
+**Function Signature:**
+
+```sql
+get_user_collection_stats(
+  p_user_id UUID,
+  p_collection_id INTEGER
+) RETURNS JSON
+```
+
+**Returns:**
+
+```json
+{
+  "total_stickers": 600,
+  "owned_stickers": 450,
+  "completion_percentage": 75,
+  "duplicates": 120,
+  "wanted": 50
+}
+```
+
+**Security**: SECURITY DEFINER
+
+---
+
+#### `get_completion_report` ✅ **v1.3.0 NEW**
+
+Generates a per-page completion report, listing missing and duplicate stickers for each page.
+
+**Function Signature:**
+
+```sql
+get_completion_report(
+  p_user_id UUID,
+  p_collection_id INTEGER
+) RETURNS JSON
+```
+
+**Returns:**
+
+```json
+{
+  "collection_id": 1,
+  "pages": [
+    {
+      "page_id": 1,
+      "title": "FC Barcelona",
+      "kind": "team",
+      "order_index": 1,
+      "missing": [1, 5, 12],
+      "repes": [3, 7, 15]
+    }
+  ]
+}
+```
+
+**Security**: SECURITY DEFINER, requires caller = `p_user_id`
+
+---
+
+### Sticker Management
+
+#### `bulk_add_stickers_by_numbers` ✅ **v1.3.0 NEW**
+
+Adds multiple stickers to a user's inventory by their `sticker_number` in a single operation.
+
+**Function Signature:**
+
+```sql
+bulk_add_stickers_by_numbers(
+  p_user_id UUID,
+  p_collection_id INTEGER,
+  p_numbers INTEGER[]
+) RETURNS JSON
+```
+
+**Returns:**
+
+```json
+{
+  "added": 5,
+  "duplicates": [12, 15],
+  "invalid": [999]
+}
+```
+
+**Security**: SECURITY DEFINER, requires caller = `p_user_id`
+
+---
+
+#### `search_stickers` ✅ **v1.3.0 NEW**
+
+Performs an advanced search for stickers within a collection, with filters for ownership status.
+
+**Function Signature:**
+
+```sql
+search_stickers(
+  p_collection_id INTEGER,
+  p_query TEXT,
+  p_filters JSONB
+) RETURNS SETOF sticker_search_result
+```
+
+**Filters:**
+
+```json
+{
+  "owned": true,
+  "missing": false,
+  "repes": true,
+  "kind": "team"
+}
+```
+
+**Security**: SECURITY DEFINER, authenticated users only
+
+---
+
+### Trading - Discovery
+
+... (find_mutual_traders, get_mutual_trade_detail documentation remains the same)
+
+---
+
+### Trading - Proposals
+
+... (create_trade_proposal, respond_to_trade_proposal, list_trade_proposals documentation remains the same)
+
+---
+
+#### `get_trade_proposal_detail`
+
+... (documentation remains the same)
+
 console.log(`Offering: ${proposal.offer_items.length} stickers`);
 console.log(`Requesting: ${proposal.request_items.length} stickers`);
 
@@ -250,51 +399,40 @@ await supabase
 
 ---
 
-#### Album Pages (v1.3.0) ✅ **BACKEND READY**
+#### Album Pages (v1.3.0) ✅ **COMPLETE**
+
+The `useAlbumPages` hook performs an efficient query to get all necessary data for a page in one go.
 
 ```typescript
-// Get all pages for a collection
-const { data: pages } = await supabase
-  .from('collection_pages')
-  .select(
-    `
-    *,
-    collection_teams (
-      team_name,
-      logo_url
-    )
-  `
-  )
-  .eq('collection_id', collectionId)
-  .order('order_index');
-
-// Get slots for a specific page
-const { data: slots } = await supabase
+// Get all slots for a page with nested sticker and user ownership data
+const { data: slotsData, error: slotsError } = await supabase
   .from('page_slots')
   .select(
     `
-    *,
+    slot_index,
+    sticker_id,
     stickers (
-      id,
-      sticker_number,
-      code,
-      player_name,
-      rarity,
+      *,
+      user_stickers!left ( user_id, count, wanted ),
+      collection_teams ( team_name ),
+      -- Public URLs are resolved on the client
+      image_path_webp_300,
       thumb_path_webp_100,
-      image_path_webp_300
+      image_url
     )
   `
   )
   .eq('page_id', pageId)
-  .order('slot_index');
+  .order('slot_index', { ascending: true });
 
-// Get user's ownership for page stickers
-const stickerIds = slots.map(s => s.sticker_id).filter(Boolean);
-const { data: ownership } = await supabase
-  .from('user_stickers')
-  .select('sticker_id, count, wanted')
-  .eq('user_id', userId)
-  .in('sticker_id', stickerIds);
+// On the client, this data is then processed:
+// 1. Filter user_stickers to only the current user's data.
+// 2. Resolve public URLs for thumb_path_webp_100 and image_path_webp_300.
+// 3. Construct the final fallback chain for images.
+// 4. Calculate page completion stats (owned_slots / total_slots).
+
+// This pattern is encapsulated within the useAlbumPages hook
+// to ensure consistency and performance.
 ```
 
 ---

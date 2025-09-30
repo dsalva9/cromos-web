@@ -166,20 +166,24 @@ Full-screen empty state component for users without collections.
 - **Theme consistency**: Uses app's gradient background and modern card styling
 - **Responsive spacing**: Proper padding and max-width constraints
 
-## Album Components (v1.3.0-alpha)
+## Album Components (v1.3.0)
 
 ### useAlbumPages
 
 **File**: `src/hooks/album/useAlbumPages.ts`
 
-Orchestrates all data fetching for the album view.
+Orchestrates all data fetching and state management for the album view.
 
 **Key Features:**
+
 - Fetches all `collection_pages` for a given collection.
 - Fetches the content (`page_slots` and `stickers`) for a specific page.
+- Fetches the user's ownership data (`user_stickers`) for the current page's stickers.
+- Merges page slot data with user ownership to provide a complete view.
 - Handles default page logic: if no `page` is in the URL query, it loads the first page.
 - Manages loading and error states for the album view.
-- Returns `pages`, `currentPage`, `loading`, and `error`.
+- Provides action handlers (`markStickerOwned`, `reduceStickerOwned`) for optimistic updates.
+- Returns `pages`, `currentPage`, `loading`, `error`, and the action handlers.
 
 ### AlbumPager
 
@@ -188,11 +192,13 @@ Orchestrates all data fetching for the album view.
 Renders the primary navigation for album pages.
 
 **Props:**
+
 - `pages: CollectionPage[]`
 - `collectionId: number`
 - `currentPageId: number`
 
 **Features:**
+
 - Separates pages into "Teams" and "Specials" groups.
 - Uses `next/link` for client-side navigation that updates the `?page` query param.
 - Highlights the active page.
@@ -208,9 +214,11 @@ Renders the primary navigation for album pages.
 Displays the title and progress for the current album page.
 
 **Props:**
+
 - `page: AlbumPageData`
 
 **Features:**
+
 - Shows the page title and team crest (for team pages).
 - Displays page completion progress: "Tengo X / N".
 - Includes a `Progress` bar component to visually represent completion.
@@ -222,9 +230,11 @@ Displays the title and progress for the current album page.
 Renders the grid of stickers for a given page.
 
 **Props:**
+
 - `page: AlbumPageData`
 
 **Features:**
+
 - Renders exactly 20 slots for `team` pages to ensure layout consistency.
 - Renders a variable number of slots for `special` pages based on data.
 - Maps over slots and renders a `StickerTile` for each.
@@ -237,13 +247,16 @@ Renders the grid of stickers for a given page.
 Renders an individual sticker slot in the album.
 
 **Props:**
+
 - `slot: PageSlot`
 - `pageKind: 'team' | 'special'`
 - `isPriority: boolean`
 
 **Features:**
-- **Owned State**: If the user owns the sticker, it renders the `thumb_path_webp_100` image and "Tengo" / "Repe(n)" badges.
+
+- **Owned State**: If the user owns the sticker, it renders the `thumb_path_webp_100` image.
 - **Missing State**: If the sticker is not owned or not yet defined, it renders a placeholder with an appropriate icon (Shield for badge, User for manager, Shirt for player).
+- **Interactive Controls**: Includes the `Tengo` and `-` buttons that trigger optimistic updates on the user's inventory directly from the album page.
 - **A11y**: Implements the ALT text policy correctly based on the sticker type (player, badge, manager, special).
 - **Performance**: Uses `next/image` with `sizes` and `priority` props.
 
