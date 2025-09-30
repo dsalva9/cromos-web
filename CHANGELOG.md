@@ -7,10 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### In Progress
-
-- **Trade Chat UI**: Frontend integration for real-time messaging in proposals
-- **Trade History Dashboard**: User interface for viewing completed trades
+### Added
 
 ## [1.3.0] - 2025-01-XX
 
