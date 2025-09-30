@@ -13,6 +13,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added - Complete Album Pages System
 
+**Database Infrastructure (Deployed):**
+
+- `collection_pages` table - Album page definitions for team rosters and special sections
+- `page_slots` table - Sticker-to-slot mapping with 20-slot team pages
+- Complete migration for Collection 24 (Panini La Liga 2025-26)
+  - 20 team pages × 20 slots (badge + coach + 18 players)
+  - 7 special pages (SuperKids, Extra Gold, Fichajes, Mister Cero, etc.)
+  - 1 alternates page for backup/substitute players (67 stickers)
+  - All 577 stickers mapped to appropriate pages
+
+**UI Components (Complete):**
+
+- `AlbumPager` - Page navigation with team/special grouping and team crests
+- `PageHeader` - Page title with completion progress bars
+- `AlbumPageGrid` - Responsive grid with 20-slot team pages and variable special pages
+- `StickerTile` - Individual sticker display with ownership controls and image fallback
+- `AlbumSummaryHeader` - Collection switcher with live stats pills
+- `useAlbumPages` - Comprehensive hook managing all album state and data fetching
+
+**Features:**
+
+- Navigate album pages like a real sticker album
+- Team pages display 20 fixed slots (badge at position 0, coach at position 1, players 2-19)
+- Special pages display variable slots based on content
+- Optimistic updates for TENGO/QUIERO/REPE controls
+- Page-level completion tracking
+- Deep-linking with `?page=` query parameter
+- Collection switching from album view
+- Graceful image fallback chain prevents layout shifts
+
+### Changed
+
+- Sticker data model enhanced with sequential numbering for album ordering
+- Album view replaces grid-based collection page as primary navigation
+- Collection stats now reflect album-based completion
+
+### Technical
+
+- Sticker number backfill: All stickers assigned sequential numbers within collections
+- Page generation scripts for automated album structure creation
+- Slot mapping logic handles team pages (20 fixed) vs special pages (variable)
+- Code-based sticker assignment parsing team prefixes and slot numbers
+
 - **Database Schema Complete**: All v1.3.0 tables deployed to production
   - `collection_pages`: Album page definitions (team rosters, special sections)
   - `page_slots`: Sticker-to-slot mapping with 20-slot team pages
