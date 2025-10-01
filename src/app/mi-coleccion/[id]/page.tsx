@@ -71,20 +71,15 @@ function AlbumView() {
       <AlbumSummaryHeader
         collectionName={activeCollection?.name}
         summary={summary}
-        collections={collections}
-        activeCollectionId={activeCollection?.id ?? null}
-        onCollectionChange={switchCollection}
-        switching={switchingCollection}
       />
-      <div className="relative">
-        <AlbumPager
-          pages={pages}
-          collectionId={collectionId}
-          currentPageId={currentPage.id}
-        />
-        <PageHeader page={currentPage} />
-      </div>
-      <div className="relative z-0 container mx-auto px-4 py-8">
+      <AlbumPager
+        pages={pages}
+        collectionId={collectionId}
+        currentPageId={currentPage.id}
+      />
+      <PageHeader page={currentPage} />
+
+      <div className="container mx-auto px-4 py-8">
         <AlbumPageGrid
           page={currentPage}
           onMarkOwned={markStickerOwned}

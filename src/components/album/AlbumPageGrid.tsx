@@ -36,7 +36,7 @@ export default function AlbumPageGrid({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 pt-6 pb-8">
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
         {slots.map((slot, index) => {
           const isPending = slot.sticker_id

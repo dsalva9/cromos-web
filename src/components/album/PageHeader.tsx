@@ -15,7 +15,7 @@ export default function PageHeader({ page }: PageHeaderProps) {
     page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
 
   return (
-    <div className="sticky top-[224px] lg:top-[172px] z-10 bg-gray-900/90 backdrop-blur-sm border-b-2 border-gray-700 py-2 mb-8">
+    <div className="sticky top-[244px] z-10 bg-[#1F2937]/90 backdrop-blur-sm border-b-2 border-gray-700 py-2">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-center gap-4">
           <Progress

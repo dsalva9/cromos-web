@@ -1,42 +1,26 @@
 'use client';
 
-import { ChangeEvent } from 'react';
-import { AlbumSummary, UserCollectionOption } from '@/hooks/album';
+import { AlbumSummary } from '@/hooks/album';
 
 interface AlbumSummaryHeaderProps {
   collectionName?: string;
   summary: AlbumSummary | null;
-  collections: UserCollectionOption[];
-  activeCollectionId?: number | null;
-  onCollectionChange: (collectionId: number) => void;
-  switching?: boolean;
 }
 
 export default function AlbumSummaryHeader({
   collectionName,
   summary,
-  collections,
-  activeCollectionId,
-  onCollectionChange,
-  switching = false,
 }: AlbumSummaryHeaderProps) {
   const owned = summary?.ownedUnique ?? null;
   const wanted = summary?.wanted ?? null;
   const duplicates = summary?.duplicates ?? null;
   const completion = summary?.completionPercentage ?? null;
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = Number(event.target.value);
-    if (!Number.isNaN(value)) {
-      onCollectionChange(value);
-    }
-  };
-
   return (
-    <div className="sticky top-16 z-40 bg-gray-800 border-b border-gray-700">
-      <div className="container mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 text-white">
+    <div className="sticky top-16 z-30 bg-[#1F2937] py-4 border-b border-gray-700">
+      <div className="container mx-auto px-4 flex flex-col gap-4 text-white">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
             Mi coleccion
           </p>
           <h1 className="text-2xl font-extrabold uppercase drop-shadow-lg">
@@ -44,7 +28,7 @@ export default function AlbumSummaryHeader({
           </h1>
         </div>
 
-        <div className="flex flex-wrap justify-start lg:justify-end gap-x-6 gap-y-2 text-sm border-t border-gray-700 lg:border-none pt-4 lg:pt-0">
+        <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 text-sm">
           <div className="font-bold">
             <span className="text-gray-300">TENGO</span>{' '}
             <span className="text-[#FFC000]">

@@ -43,6 +43,23 @@ export default function AlbumPager({
     }
   }, [checkForScroll, pages]);
 
+  // Effect to scroll the active page link into view
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const activeLink = container.querySelector<HTMLAnchorElement>(
+        '[aria-current="page"]'
+      );
+      if (activeLink) {
+        activeLink.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
+    }
+  }, [currentPageId, pages]);
+
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollContainerRef.current;
     if (el) {
@@ -91,7 +108,7 @@ export default function AlbumPager({
   };
 
   return (
-    <div className="sticky top-[148px] lg:top-[100px] z-20 bg-gray-900 border-y-2 border-gray-700">
+    <div className="sticky top-[168px] z-20 bg-[#1F2937] border-y-2 border-gray-700">
       {canScrollLeft && (
         <Button
           variant="outline"
@@ -105,7 +122,7 @@ export default function AlbumPager({
       <div
         ref={scrollContainerRef}
         onScroll={checkForScroll}
-        className="flex items-center gap-2 overflow-x-auto p-4 scrollbar-hide container mx-auto"
+        className="flex items-center gap-2 overflow-x-auto p-4 container mx-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {teamPages.length > 0 && (
           <div className="flex items-center gap-2">
