@@ -433,7 +433,7 @@ function CollectionContent() {
         </div>
 
         {/* Stickers Grid */}
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {stickers.map((sticker, index) => {
             const displayImage =
               sticker.thumb_public_url ?? sticker.image_public_url;
@@ -498,35 +498,38 @@ function CollectionContent() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="space-y-2">
-                    <Button
-                      size="sm"
-                      className={`w-full text-xs rounded-md transition-all duration-200 ${
-                        sticker.count > 0
-                          ? 'bg-[#FFC000] text-gray-900 font-bold border border-black'
-                          : 'bg-gray-700 text-white font-bold border border-black'
-                      }`}
-                      onClick={() => updateStickerOwnership(sticker.id)}
-                    >
-                      {sticker.count === 0
-                        ? 'TENGO'
-                        : `REPE (+${sticker.count - 1})`}
-                    </Button>
-
-                    <Button
-                      size="sm"
-                      className={`w-full text-xs rounded-md transition-all duration-200 ${
-                        sticker.wanted && sticker.count === 0
-                          ? 'bg-[#E84D4D] text-white font-bold border border-black'
-                          : 'bg-[#FFC000] text-gray-900 font-bold border border-black'
-                      }`}
-                      onClick={() => toggleWantedStatus(sticker.id)}
-                      disabled={sticker.count > 0}
-                    >
-                      {sticker.wanted && sticker.count === 0
-                        ? 'YA NO'
-                        : 'QUIERO'}
-                    </Button>
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex space-x-1">
+                      <Button
+                        size="sm"
+                        className={`w-full flex-1 text-xs rounded-md transition-all duration-200 ${
+                          sticker.count > 0
+                            ? 'bg-[#FFC000] text-gray-900 font-bold border border-black'
+                            : 'bg-gray-700 text-white font-bold border border-black'
+                        }`}
+                        onClick={() => updateStickerOwnership(sticker.id)}
+                      >
+                        {sticker.count === 0
+                          ? 'TENGO'
+                          : `REPE (+${sticker.count - 1})`}
+                      </Button>
+                    </div>
+                    <div className="flex space-x-1">
+                      <Button
+                        size="sm"
+                        className={`w-full flex-1 text-xs rounded-md transition-all duration-200 ${
+                          sticker.wanted && sticker.count === 0
+                            ? 'bg-[#E84D4D] text-white font-bold border border-black'
+                            : 'bg-[#FFC000] text-gray-900 font-bold border border-black'
+                        }`}
+                        onClick={() => toggleWantedStatus(sticker.id)}
+                        disabled={sticker.count > 0}
+                      >
+                        {sticker.wanted && sticker.count === 0
+                          ? 'YA NO'
+                          : 'LO QUIERO'}
+                      </Button>
+                    </div>
                   </div>
                 </ModernCardContent>
               </ModernCard>

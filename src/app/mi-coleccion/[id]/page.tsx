@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import AlbumPager from '@/components/album/AlbumPager';
@@ -15,6 +15,12 @@ function AlbumView() {
 
   const collectionId = params.id ? parseInt(params.id as string, 10) : null;
   const pageId = searchParams.get('page');
+
+  const [summaryHeaderHeight, setSummaryHeaderHeight] = useState(0);
+  const [pagerHeight, setPagerHeight] = useState(0);
+
+  // h-16 in site-header.tsx corresponds to 4rem = 64px
+  const SITE_HEADER_HEIGHT = 64;
 
   const {
     pages,
@@ -71,13 +77,23 @@ function AlbumView() {
       <AlbumSummaryHeader
         collectionName={activeCollection?.name}
         summary={summary}
+        onHeightChange={setSummaryHeaderHeight}
       />
       <AlbumPager
         pages={pages}
         collectionId={collectionId}
         currentPageId={currentPage.id}
+        onHeightChange={setPagerHeight}
+        stickyStyle={{
+          top: `${SITE_HEADER_HEIGHT + summaryHeaderHeight}px`,
+        }}
       />
-      <PageHeader page={currentPage} />
+      <PageHeader
+        page={currentPage}
+        stickyStyle={{
+          top: `${SITE_HEADER_HEIGHT + summaryHeaderHeight + pagerHeight}px`,
+        }}
+      />
 
       <div className="container mx-auto px-4 py-8">
         <AlbumPageGrid

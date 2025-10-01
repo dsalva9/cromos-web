@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, CSSProperties } from 'react';
 import Link from 'next/link';
 import { CollectionPage } from '@/hooks/album';
 import { Shield, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -12,12 +12,16 @@ interface AlbumPagerProps {
   pages: CollectionPage[];
   collectionId: number;
   currentPageId: number;
+  stickyStyle?: CSSProperties;
+  onHeightChange?: (height: number) => void;
 }
 
 export default function AlbumPager({
   pages,
   collectionId,
   currentPageId,
+  stickyStyle,
+  onHeightChange,
 }: AlbumPagerProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -39,9 +43,20 @@ export default function AlbumPager({
     if (el) {
       checkForScroll();
       window.addEventListener('resize', checkForScroll);
-      return () => window.removeEventListener('resize', checkForScroll);
+
+      const observer = new ResizeObserver(entries => {
+        if (onHeightChange) {
+          onHeightChange(entries[0].target.getBoundingClientRect().height);
+        }
+      });
+      observer.observe(el);
+
+      return () => {
+        window.removeEventListener('resize', checkForScroll);
+        observer.disconnect();
+      };
     }
-  }, [checkForScroll, pages]);
+  }, [checkForScroll, pages, onHeightChange]);
 
   // Effect to scroll the active page link into view
   useEffect(() => {
@@ -108,7 +123,10 @@ export default function AlbumPager({
   };
 
   return (
-    <div className="sticky top-[168px] z-20 bg-[#1F2937] border-y-2 border-gray-700">
+    <div
+      className="sticky z-30 bg-gray-900 border-y border-gray-700"
+      style={stickyStyle}
+    >
       {canScrollLeft && (
         <Button
           variant="outline"

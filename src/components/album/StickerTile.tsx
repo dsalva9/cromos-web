@@ -171,10 +171,10 @@ export default function StickerTile({
 
       {sticker && (
         <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-[1fr_auto] gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
-              className={`w-full text-xs rounded-md transition-all duration-200 ${
+              className={`flex-1 text-xs rounded-md transition-all duration-200 ${
                 ownedCount > 0
                   ? 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
                   : 'bg-gray-700 text-white font-bold border border-black hover:bg-gray-600'
@@ -182,34 +182,36 @@ export default function StickerTile({
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >
-              {ownedCount === 0 ? 'TENGO' : `REPE (+${ownedCount - 1})`}
+              {ownedCount === 0 ? 'TENGO' : `REPE (+${repeCount})`}
             </Button>
 
-            {ownedCount > 0 && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-10 h-9 text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
-                onClick={handleDecrease}
-                disabled={disabledDecrease}
-              >
-                -
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {ownedCount > 0 ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
+                  onClick={handleDecrease}
+                  disabled={disabledDecrease}
+                >
+                  -
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className={`w-full text-xs rounded-md transition-all duration-200 ${
+                    isWanted
+                      ? 'bg-[#E84D4D] text-white font-bold border border-black hover:bg-red-600'
+                      : 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
+                  }`}
+                  onClick={handleToggleWanted}
+                  disabled={disabledWanted}
+                >
+                  {isWanted ? 'YA NO' : 'LO QUIERO'}
+                </Button>
+              )}
+            </div>
           </div>
-
-          <Button
-            size="sm"
-            className={`w-full text-xs rounded-md transition-all duration-200 ${
-              isWanted
-                ? 'bg-[#E84D4D] text-white font-bold border border-black hover:bg-red-600'
-                : 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
-            }`}
-            onClick={handleToggleWanted}
-            disabled={disabledWanted}
-          >
-            {isWanted ? 'YA NO' : 'LO QUIERO'}
-          </Button>
         </div>
       )}
     </div>

@@ -205,7 +205,7 @@ The main sticky header in the album view, updated to the new dark theme.
 
 **Styling:**
 
-- **Container**: `sticky top-16 z-30 bg-[#1F2937] py-4 border-b border-gray-700`.
+- **Container**: `sticky top-16 z-40 bg-gray-800 py-4 border-b border-gray-700`.
 - **Title**: `text-3xl font-extrabold uppercase`.
 - **Stats Bar**: No longer uses pills. It's now a series of `font-bold` text elements where numbers are highlighted in the primary accent color (`text-[#FFC000]`).
 - **Collection Switcher**: The `<select>` element is styled to match the dark theme: `bg-gray-900 text-white border-2 border-black rounded-full`.
@@ -218,7 +218,7 @@ The sticky, horizontal navigation for album pages (teams and special sections).
 
 **Styling:**
 
-- **Container**: `sticky top-[168px] z-20 bg-[#1F2937] border-y-2 border-gray-700`. It is positioned below the `AlbumSummaryHeader`.
+- **Container**: `sticky top-32 z-30 bg-gray-900 border-y border-gray-700`. It is positioned below the `AlbumSummaryHeader`.
 - **Active Tab**: Uses the primary accent color for a high-contrast look: `bg-[#FFC000] text-gray-900 font-extrabold`.
 - **Inactive Tab**: Dark and subtle: `bg-gray-800 text-gray-300 border border-gray-700`.
 
@@ -230,7 +230,7 @@ Displays the title and progress for the current album page (e.g., "ATHLETIC CLUB
 
 **Styling:**
 
-- **Container**: `sticky top-[244px] z-10 bg-[#1F2937]/90 backdrop-blur-sm border-b-2 border-gray-700 py-2`.
+- **Container**: No background color; sits on the main page background. A `mb-8` provides spacing.
 - **Title**: `text-2xl font-extrabold uppercase text-white`.
 - **Progress Bar**: Uses a dark track for the progress component: `bg-gray-600`.
 
@@ -288,9 +288,12 @@ Renders an individual sticker slot in the album.
   - `REPE`: `bg-[#E84D4D] text-white border-2 border-black ... font-extrabold`.
 - **Player Info Overlay**: A dark gradient at the bottom displays the player name: `bg-gradient-to-t from-black/80 to-transparent`.
 - **Action Buttons**:
-  - **TENGO/REPE**: `bg-[#FFC000]` (owned) or `bg-gray-700` (not owned), with `font-bold border border-black hover:bg-yellow-400` or `hover:bg-gray-600`.
-  - **LO QUIERO/YA NO**: `bg-[#FFC000]` (to add) or `bg-[#E84D4D]` (to remove), with similar border and hover styles.
-  - **"-" Button**: `bg-gray-700`, appears only when `ownedCount > 0`.
+  - **Layout**: Buttons are in a `flex flex-col space-y-1` container. Each row is a `flex space-x-1`.
+  - **Single Button Row**: A button like `TENGO` uses `w-full`.
+  - **Double Button Row**: Two buttons like `LO QUIERO` and `YA NO` each use `w-1/2`.
+  - **TENGO/REPE**: `bg-[#FFC000]` (owned) or `bg-gray-700` (not owned), with `font-bold border border-black`.
+  - **LO QUIERO/YA NO**: `bg-[#FFC000]` (to add) or `bg-[#E84D4D]` (to remove), with similar styles.
+  - **"-" Button**: `bg-gray-700`, appears only when `ownedCount > 0`, typically paired with the `TENGO/REPE` button.
 - **Placeholder**: For empty slots, a dashed border container is used: `bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-lg`.
 
 ## Profile & Collection Cards
