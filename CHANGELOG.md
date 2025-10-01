@@ -12,17 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mobile UI Optimization (Album View)**: Reworked the `StickerTile` component for a cleaner mobile experience.
   - The entire sticker is now tappable to add it.
   - Action buttons below the sticker are hidden on mobile.
-  - A dynamic badge (`REPE`, `QUIERO`, or a checkmark) on the sticker now acts as a dropdown menu for secondary actions (Quitar uno, Lo quiero).
+  - A dynamic badge (`+n`, `QUIERO`, or a checkmark) on the sticker now acts as a dropdown menu for secondary actions (Quitar uno, Lo quiero).
   - Unowned stickers are now grayscale to improve visual distinction.
 
 ### Changed
 
-- **Desktop UI Refinement (Album View)**: Simplified the desktop `StickerTile` to only show a `REPE` badge when duplicates are present, removing the checkmark for a cleaner look.
+- **Desktop UI Refinement (Album View)**:
+  - Added a green checkmark badge for owned stickers.
+  - Simplified the duplicate badge to `+n` (e.g., `+1`) and styled it green for consistency with the owned checkmark.
 - **Album Layout**: Moved the team page progress bar (`PageHeader`) to be a sticky footer to optimize vertical space, especially on mobile.
 - **UI Text**: Updated labels in collection summary headers for clarity. "Me Falta" is now "Faltan", and the progress percentage is now labeled "Total".
 
 ### Fixed
 
+- **Desktop `REPE` Button Logic**: Corrected an off-by-one error where the `REPE (+n)` button text did not accurately reflect the state after the next click.
 - **Mobile Sticker Actions**: Fixed a bug where tapping an action in the mobile dropdown menu would also trigger the sticker's main "add" action.
 - **Robust Sticky Headers**: Fixed persistent positioning issues with the three sticky headers in the album view (`AlbumSummaryHeader`, `AlbumPager`, `PageHeader`). Implemented a dynamic height calculation using `ResizeObserver` to ensure headers stack correctly and remain sticky on all screen sizes, even when content wrapping changes their height.
 
