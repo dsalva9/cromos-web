@@ -33,59 +33,44 @@ export default function AlbumSummaryHeader({
   };
 
   return (
-    <div className="sticky top-0 z-40 bg-gradient-to-r from-teal-600/95 to-cyan-600/95 backdrop-blur-sm border-b border-white/20">
-      <div className="container mx-auto px-4 py-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between text-white">
+    <div className="sticky top-16 z-40 bg-gray-800 border-b border-gray-700">
+      <div className="container mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 text-white">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/70">Mi coleccion</p>
-          <h1 className="text-3xl font-bold drop-shadow-lg">
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
+            Mi coleccion
+          </p>
+          <h1 className="text-2xl font-extrabold uppercase drop-shadow-lg">
             {collectionName ?? 'Coleccion sin nombre'}
           </h1>
         </div>
 
-        {collections.length > 0 && (
-          <div className="flex flex-col gap-2 md:items-end">
-            <label className="text-xs uppercase tracking-widest text-white/70">
-              Cambiar coleccion
-            </label>
-            <select
-              value={(activeCollectionId ?? (collections[0]?.id ?? ''))}
-              onChange={handleChange}
-              disabled={switching}
-              className="bg-white/90 text-gray-900 text-sm font-semibold px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-cyan-300"
-            >
-              {collections.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
-
-      <div className="border-t border-white/10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap justify-center gap-3 text-sm font-semibold">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white">
-              <span className="text-green-200">Tengo</span>{' '}
+        <div className="flex flex-wrap justify-start lg:justify-end gap-x-6 gap-y-2 text-sm border-t border-gray-700 lg:border-none pt-4 lg:pt-0">
+          <div className="font-bold">
+            <span className="text-gray-300">TENGO</span>{' '}
+            <span className="text-[#FFC000]">
               {owned !== null ? owned : '--'}
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white">
-              <span className="text-orange-200">Me falta</span>{' '}
+            </span>
+          </div>
+          <div className="font-bold">
+            <span className="text-gray-300">ME FALTA</span>{' '}
+            <span className="text-[#FFC000]">
               {wanted !== null ? wanted : '--'}
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white">
-              <span className="text-purple-200">Repes</span>{' '}
+            </span>
+          </div>
+          <div className="font-bold">
+            <span className="text-gray-300">REPES</span>{' '}
+            <span className="text-[#FFC000]">
               {duplicates !== null ? duplicates : '--'}
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white">
-              {completion !== null ? `${completion}%` : '--%'}{' '}
-              <span className="text-yellow-200">*</span>
-            </div>
+            </span>
+          </div>
+          <div className="font-bold">
+            <span className="text-gray-300">COMPLETADO</span>{' '}
+            <span className="text-[#FFC000]">
+              {completion !== null ? `${completion}%` : '--%'}
+            </span>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

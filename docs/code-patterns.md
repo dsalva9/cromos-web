@@ -87,7 +87,7 @@ function PageContent() {
 
   if (userLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-white text-xl">Cargando...</div>
       </div>
     );
@@ -95,7 +95,7 @@ function PageContent() {
 
   // Component JSX
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
+    <div className="min-h-screen bg-[#1F2937]">
       {/* Content */}
     </div>
   );

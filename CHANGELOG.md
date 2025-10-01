@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.4.0] - 2025-01-XX
+
+### Added
+
+- **Retro-Comic UI/UX Design System**: Implemented a bold, high-contrast, retro-comic sticker aesthetic across the entire application.
+
+### Changed
+
+- **Complete UI Overhaul**: Replaced the previous gradient-based theme with a dark mode-first design (`bg-[#1F2937]`).
+- **Component Redesign**: Updated all major components (`ModernCard`, `StickerTile`, headers, buttons, badges) with a chunky, high-contrast style featuring thick black borders and specific accent colors (`#FFC000` gold, `#E84D4D` red).
+- **Updated Pages**: Applied the new theme consistently across the Profile Page, Collection Grid, and the full Album View.
+- **Typography**: Standardized major titles to be bold, condensed, and `uppercase` for a stronger visual identity.
+
+### Technical
+
+- Refactored multiple page and component styles to use the new centralized theme principles.
+
 ## [1.3.0] - 2025-01-XX
 
 ### Added - Complete Album Pages System
@@ -271,6 +288,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## 🎉 Major Milestones
+
+### Phase 2.5 Complete (v1.4.0)
+
+- **Complete UI/UX Redesign**
+- Modern, high-contrast "Retro-Comic" theme implemented
+- Consistent styling across all user-facing pages
 
 ### Phase 1 Complete (v1.0.0)
 

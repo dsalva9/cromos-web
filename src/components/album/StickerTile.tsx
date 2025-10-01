@@ -26,7 +26,10 @@ function getTeamName(sticker: PageSlot['stickers']): string {
   if (Array.isArray(sticker.collection_teams)) {
     return sticker.collection_teams[0]?.team_name || 'Equipo Desconocido';
   }
-  if (typeof sticker.collection_teams === 'object' && sticker.collection_teams !== null) {
+  if (
+    typeof sticker.collection_teams === 'object' &&
+    sticker.collection_teams !== null
+  ) {
     return (sticker.collection_teams as { team_name: string }).team_name;
   }
   return 'Equipo Desconocido';
@@ -71,7 +74,8 @@ export default function StickerTile({
   const isWanted = Boolean(ownership?.wanted && ownedCount === 0);
 
   const altText = getAltText(sticker, pageKind, slot.slot_index);
-  const slotRole = pageKind === 'team' ? getTeamSlotRole(slot.slot_index) : 'special';
+  const slotRole =
+    pageKind === 'team' ? getTeamSlotRole(slot.slot_index) : 'special';
   const teamName = getTeamName(sticker);
 
   const disabledIncrease = !stickerId || isPending;
@@ -99,16 +103,18 @@ export default function StickerTile({
     if (slotRole === 'manager') Icon = User;
 
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800/30 border-2 border-dashed border-white/20 rounded-xl p-2 text-center">
-        <Icon className="w-8 h-8 text-white/30 mb-2" />
-        <span className="text-xs font-semibold text-white/40">#{slot.slot_index + 1}</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-lg p-2 text-center">
+        <Icon className="w-8 h-8 text-gray-600 mb-2" />
+        <span className="text-xs font-semibold text-gray-500">
+          #{slot.slot_index + 1}
+        </span>
       </div>
     );
   };
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="aspect-[3/4] w-full relative rounded-xl overflow-hidden shadow-lg bg-gray-700/20">
+      <div className="aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl">
         {sticker && sticker.thumb_public_url ? (
           <>
             <Image
@@ -119,7 +125,6 @@ export default function StickerTile({
               priority={isPriority}
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
             />
-            <div className="absolute inset-0 bg-black/10" />
           </>
         ) : sticker && sticker.image_public_url ? (
           <>
@@ -131,28 +136,29 @@ export default function StickerTile({
               priority={isPriority}
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
             />
-            <div className="absolute inset-0 bg-black/10" />
           </>
         ) : (
           renderPlaceholder()
         )}
 
         {isWanted && (
-          <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+          <div className="absolute top-2 right-2 bg-[#FFC000] text-gray-900 border-2 border-black px-2 py-0.5 font-extrabold">
             QUIERO
           </div>
         )}
 
         {repeCount > 0 && (
-          <div className="absolute top-2 right-2 bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-lg">
-            REPE (+{repeCount})
+          <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
+            REPE
           </div>
         )}
 
         {sticker && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white">
-            <p className="font-bold text-sm truncate">{sticker.player_name}</p>
-            <p className="text-xs opacity-80 truncate">{teamName}</p>
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+            <p className="font-bold text-base uppercase truncate">
+              {sticker.player_name}
+            </p>
+            <p className="text-xs opacity-90 truncate">{teamName}</p>
           </div>
         )}
 
@@ -165,42 +171,44 @@ export default function StickerTile({
 
       {sticker && (
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-[1fr_auto] gap-2">
             <Button
               size="sm"
-              className={`flex-1 text-xs font-bold rounded-xl transition-all duration-200 ${
+              className={`w-full text-xs rounded-md transition-all duration-200 ${
                 ownedCount > 0
-                  ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
-                  : 'bg-white/90 text-green-600 border border-green-500 hover:bg-green-50 shadow-sm'
+                  ? 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
+                  : 'bg-gray-700 text-white font-bold border border-black hover:bg-gray-600'
               }`}
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >
-              {ownedCount === 0 ? 'TENGO' : `TENGO (${ownedCount})`}
+              {ownedCount === 0 ? 'TENGO' : `REPE (+${ownedCount - 1})`}
             </Button>
 
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-10 h-9 text-lg font-bold border-green-400 text-green-600 hover:bg-green-50"
-              onClick={handleDecrease}
-              disabled={disabledDecrease}
-            >
-              -
-            </Button>
+            {ownedCount > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-10 h-9 text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
+                onClick={handleDecrease}
+                disabled={disabledDecrease}
+              >
+                -
+              </Button>
+            )}
           </div>
 
           <Button
             size="sm"
-            className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
+            className={`w-full text-xs rounded-md transition-all duration-200 ${
               isWanted
-                ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
-                : 'bg-white/90 text-blue-600 border border-blue-500 hover:bg-blue-50 shadow-sm'
+                ? 'bg-[#E84D4D] text-white font-bold border border-black hover:bg-red-600'
+                : 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
             }`}
             onClick={handleToggleWanted}
             disabled={disabledWanted}
           >
-            {isWanted ? 'YA NO' : 'QUIERO'}
+            {isWanted ? 'YA NO' : 'LO QUIERO'}
           </Button>
         </div>
       )}

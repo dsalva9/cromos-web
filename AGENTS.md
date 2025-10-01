@@ -23,21 +23,19 @@ Maintains alignment between repo state and living docs.
 
 Prepares structured prompts for the Senior Developer.
 
-Never writes raw code — instead, provides developer-ready instructions.
+Does not write implementation code — instead, provides developer-ready instructions based on visual analysis and high-level goals.
 
 Ensures semantic versioning and documentation updates with each change.
 
 Senior Developer (IDE-Embedded Agentic AI: Codex or Gemini Code Assistant)
 
-This role is fulfilled by an agentic AI embedded in the IDE (currently testing both Codex and Gemini).
+This role is fulfilled by the agentic AI embedded in the IDE.
 
-Only one is used at a time — they are interchangeable in this role.
-
-Implements the actual code in VS environment, based on ChatGPT prompts.
+Implements the actual code in the VS Code environment, based on prompts from the Architect.
 
 Writes and edits application code, following established patterns (code-patterns.md, components-guide.md).
 
-Returns modified files as artifacts.
+Returns modified files as diffs or complete code blocks.
 
 Ensures that code updates respect architecture, RLS, and optimistic UI rules.
 

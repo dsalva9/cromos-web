@@ -1,6 +1,6 @@
 # Project Instructions
 
-Claude is more than my coding assistant, is a senior developer where I am a Project Manager, and not a very technical one.
+You, Gemini Code Assist or Codex, are more than my coding assistant; you are a senior developer where I am a Project Manager, and not a very technical one.
 
 Every time you ask me to update a file, give me the full path.
 
@@ -24,7 +24,7 @@ When implementing new features:
 - For database changes, update database-schema.md with the actual schema changes
 - Create implementation plan before coding, breaking down the feature into smaller tasks
 - Provide error handling and loading states for all new features
-- Follow the established patterns from existing code (optimistic updates, Spanish language, gradient design)
+- Follow the established patterns from existing code (optimistic updates, Spanish language, Retro-Comic theme)
 
 For code structure:
 

@@ -365,7 +365,7 @@ function CollectionContent() {
 
   if (userLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-white text-xl">Cargando tu colección...</div>
       </div>
     );
@@ -373,13 +373,13 @@ function CollectionContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center space-y-4 text-white">
           <h1 className="text-2xl font-bold">Error</h1>
           <p>{error}</p>
           <Button
             onClick={fetchStickersAndCollection}
-            className="bg-white text-teal-600 hover:bg-gray-100"
+            className="bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400"
           >
             Intentar de nuevo
           </Button>
@@ -389,22 +389,32 @@ function CollectionContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
+    <div className="min-h-screen bg-[#1F2937]">
       {/* Sticky Progress Header */}
-      <div className="sticky top-16 z-40 bg-gradient-to-r from-teal-500/95 to-cyan-600/95 backdrop-blur-sm border-b border-white/20">
+      <div className="sticky top-16 z-40 bg-gray-800 border-b border-gray-700">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap justify-center gap-3 text-sm">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-green-300">TENGO</span>{' '}
-              {progress.owned_unique_stickers}
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <div className="font-bold">
+              <span className="text-gray-300">TENGO</span>{' '}
+              <span className="text-[#FFC000]">
+                {progress.owned_unique_stickers}
+              </span>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              <span className="text-orange-300">ME FALTA</span>{' '}
-              {progress.wanted_count}
+            <div className="font-bold">
+              <span className="text-gray-300">ME FALTA</span>{' '}
+              <span className="text-[#FFC000]">{progress.wanted_count}</span>
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-white font-semibold">
-              {progress.completion_percentage}%{' '}
-              <span className="text-yellow-300">★</span>
+            <div className="font-bold">
+              <span className="text-gray-300">REPES</span>{' '}
+              <span className="text-[#FFC000]">
+                {progress.duplicates_count}
+              </span>
+            </div>
+            <div className="font-bold">
+              <span className="text-gray-300">COMPLETADO</span>{' '}
+              <span className="text-[#FFC000]">
+                {progress.completion_percentage}%
+              </span>
             </div>
           </div>
         </div>
@@ -414,7 +424,7 @@ function CollectionContent() {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Collection Info */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+          <h1 className="text-4xl font-extrabold uppercase text-white drop-shadow-lg">
             {activeCollection?.name || 'Mi Colección'}
           </h1>
           {activeCollection?.description && (
@@ -436,13 +446,11 @@ function CollectionContent() {
             return (
               <ModernCard
                 key={sticker.id}
-                className="bg-white hover:scale-105 transition-transform duration-200"
+                className="bg-gray-800 border-2 border-black rounded-lg shadow-xl transition-transform hover:scale-[1.02]"
               >
                 <ModernCardContent className="p-3">
                   {/* Player Image Area */}
-                  <div
-                    className={`aspect-[3/4] rounded-xl mb-3 relative overflow-hidden bg-gradient-to-br ${getRarityGradient(sticker.rarity)}`}
-                  >
+                  <div className={`aspect-[3/4] mb-3 relative overflow-hidden`}>
                     {displayImage ? (
                       <>
                         <Image
@@ -452,10 +460,6 @@ function CollectionContent() {
                           className="object-cover"
                           priority={isPriority}
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                        />
-                        <div
-                          className="absolute inset-0 bg-black/15"
-                          aria-hidden="true"
                         />
                       </>
                     ) : (
@@ -468,57 +472,53 @@ function CollectionContent() {
 
                     {/* Status Indicators */}
                     {sticker.wanted && sticker.count === 0 && (
-                      <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                      <div className="absolute top-2 right-2 bg-[#FFC000] text-gray-900 border-2 border-black px-2 py-0.5 font-extrabold">
                         QUIERO
                       </div>
                     )}
 
                     {sticker.count > 1 && (
-                      <div className="absolute bottom-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">
-                        +{sticker.count - 1}
+                      <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
+                        REPE
                       </div>
                     )}
 
                     {showRating && (
-                      <div className="absolute top-2 right-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
+                      <div className="absolute bottom-2 left-2 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-full font-bold shadow-lg">
                         {sticker.rating}
                       </div>
                     )}
                   </div>
 
                   {/* Player Info */}
-                  <div className="space-y-1 mb-3 text-center">
-                    <h3 className="font-bold text-sm text-gray-800 leading-tight">
+                  <div className="mb-3 text-center">
+                    <h3 className="text-xl font-bold uppercase text-white mt-2">
                       {sticker.player_name}
                     </h3>
-                    <p className="text-xs text-gray-600 font-semibold">
-                      {sticker.team_name}
-                    </p>
-                    <p className="text-xs text-gray-500">{sticker.code}</p>
                   </div>
 
                   {/* Action Buttons */}
                   <div className="space-y-2">
                     <Button
                       size="sm"
-                      className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
+                      className={`w-full text-xs rounded-md transition-all duration-200 ${
                         sticker.count > 0
-                          ? 'bg-green-500 hover:bg-green-600 text-white shadow-md'
-                          : 'bg-white border-2 border-green-500 text-green-600 hover:bg-green-50 shadow-sm'
+                          ? 'bg-[#FFC000] text-gray-900 font-bold border border-black'
+                          : 'bg-gray-700 text-white font-bold border border-black'
                       }`}
                       onClick={() => updateStickerOwnership(sticker.id)}
                     >
                       {sticker.count === 0
                         ? 'TENGO'
-                        : `TENGO (${sticker.count})`}
+                        : `REPE (+${sticker.count - 1})`}
                     </Button>
 
                     <Button
                       size="sm"
-                      className={`w-full text-xs font-bold rounded-xl transition-all duration-200 ${
+                      className={`w-full text-xs rounded-md transition-all duration-200 ${
                         sticker.wanted && sticker.count === 0
-                          ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-md'
-                          : 'bg-white border-2 border-blue-500 text-blue-600 hover:bg-blue-50 shadow-sm'
+                          ? 'bg-[#E84D4D] text-white font-bold border border-black'
+                          : 'bg-[#FFC000] text-gray-900 font-bold border border-black'
                       }`}
                       onClick={() => toggleWantedStatus(sticker.id)}
                       disabled={sticker.count > 0}

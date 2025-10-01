@@ -1,9 +1,11 @@
 'use client';
 
+import { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CollectionPage } from '@/hooks/album';
-import { Shield, Sparkles } from 'lucide-react';
+import { Shield, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface AlbumPagerProps {
@@ -12,7 +14,46 @@ interface AlbumPagerProps {
   currentPageId: number;
 }
 
-export default function AlbumPager({ pages, collectionId, currentPageId }: AlbumPagerProps) {
+export default function AlbumPager({
+  pages,
+  collectionId,
+  currentPageId,
+}: AlbumPagerProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkForScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const hasOverflow = el.scrollWidth > el.clientWidth;
+      setCanScrollLeft(el.scrollLeft > 0);
+      setCanScrollRight(
+        hasOverflow && el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      checkForScroll();
+      window.addEventListener('resize', checkForScroll);
+      return () => window.removeEventListener('resize', checkForScroll);
+    }
+  }, [checkForScroll, pages]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      const scrollAmount = el.clientWidth * 0.8;
+      el.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   const teamPages = pages.filter(p => p.kind === 'team');
   const specialPages = pages.filter(p => p.kind === 'special');
 
@@ -25,16 +66,22 @@ export default function AlbumPager({ pages, collectionId, currentPageId }: Album
         key={page.id}
         href={`/mi-coleccion/${collectionId}?page=${page.id}`}
         className={cn(
-          'flex items-center gap-3 px-4 py-2 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white',
-          'whitespace-nowrap text-sm font-semibold',
+          'flex items-center gap-3 px-4 py-2 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-yellow-400',
+          'whitespace-nowrap text-sm',
           isActive
-            ? 'bg-white text-gray-900 shadow-md'
-            : 'bg-white/10 text-white hover:bg-white/20'
+            ? 'bg-[#FFC000] text-gray-900 font-extrabold'
+            : 'bg-gray-800 text-gray-300 border border-gray-700 hover:bg-gray-700'
         )}
         aria-current={isActive ? 'page' : undefined}
       >
         {page.kind === 'team' && teamLogo ? (
-          <Image src={teamLogo} alt={`Escudo de ${page.title}`} width={24} height={24} className="h-6 w-6" />
+          <Image
+            src={teamLogo}
+            alt={`Escudo de ${page.title}`}
+            width={24}
+            height={24}
+            className="h-6 w-6"
+          />
         ) : (
           <Shield className="h-6 w-6" />
         )}
@@ -44,27 +91,51 @@ export default function AlbumPager({ pages, collectionId, currentPageId }: Album
   };
 
   return (
-    <div className="sticky top-0 z-30 bg-gray-800/50 backdrop-blur-sm">
-        <div className="flex items-center gap-2 overflow-x-auto p-4 scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-700">
-            {teamPages.length > 0 && (
-                <div className="flex items-center gap-2">
-                    {teamPages.map(renderPageLink)}
-                </div>
-            )}
+    <div className="sticky top-[148px] lg:top-[100px] z-20 bg-gray-900 border-y-2 border-gray-700">
+      {canScrollLeft && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-full bg-gray-800/80 hover:bg-gray-700 border-black text-white"
+          onClick={() => scroll('left')}
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      )}
+      <div
+        ref={scrollContainerRef}
+        onScroll={checkForScroll}
+        className="flex items-center gap-2 overflow-x-auto p-4 scrollbar-hide container mx-auto"
+      >
+        {teamPages.length > 0 && (
+          <div className="flex items-center gap-2">
+            {teamPages.map(renderPageLink)}
+          </div>
+        )}
 
-            {specialPages.length > 0 && (
-                <>
-                    <div className="h-8 w-px bg-white/20 mx-2" />
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 text-white/80 font-semibold text-sm ml-2">
-                            <Sparkles className="h-5 w-5" />
-                            <span>Especiales</span>
-                        </div>
-                        {specialPages.map(renderPageLink)}
-                    </div>
-                </>
-            )}
-        </div>
+        {specialPages.length > 0 && (
+          <>
+            <div className="h-8 w-px bg-gray-700 mx-2" />
+            <div className="flex items-center gap-2">
+              <div className="flex flex-shrink-0 items-center gap-2 text-gray-400 font-semibold text-sm ml-2">
+                <Sparkles className="h-5 w-5" />
+                <span>Especiales</span>
+              </div>
+              {specialPages.map(renderPageLink)}
+            </div>
+          </>
+        )}
+      </div>
+      {canScrollRight && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-full bg-gray-800/80 hover:bg-gray-700 border-black text-white"
+          onClick={() => scroll('right')}
+        >
+          <ChevronRight className="h-6 w-6" />
+        </Button>
+      )}
     </div>
   );
 }

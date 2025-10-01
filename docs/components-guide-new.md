@@ -1021,8 +1021,23 @@ All standard shadcn/ui components are available with trading-specific enhancemen
 #### ModernCard
 
 **File**: `src/components/ui/modern-card.tsx`
+**File**: `src/components/ui/modern-card.tsx`
 
 Enhanced card component for the sports card theme with trading support.
+
+```typescript
+<ModernCard className="bg-gradient-to-r from-teal-400 to-cyan-500">
+  <ModernCardContent className="p-6">
+    Content with hover effects and smooth transitions
+  </ModernCardContent>
+</ModernCard>
+```
+
+**Enhanced Features:**
+
+- **Proposal card variants** with status-based styling
+- **Interactive hover states** for clickable proposal cards
+- **Loading placeholders** for async content
 
 #### ConfirmModal
 
@@ -1082,9 +1097,31 @@ Comprehensive form component library for authentication flows with trading conte
 
 ## Styling Patterns
 
-### Retro-Comic Theme
+### Gradient Design System
 
-Refer to `docs/theme-guide.md` for the complete color palette, core principles, and component examples for the v1.4.0 "Retro-Comic" theme.
+```css
+/* Primary application gradients */
+.bg-gradient-primary: from-teal-400 via-cyan-500 to-blue-600
+.bg-gradient-success: from-green-400 to-green-500
+.bg-gradient-warning: from-orange-400 to-orange-500
+.bg-gradient-profile: from-blue-500 to-purple-600
+
+/* Card header strips */
+.bg-gradient-active: from-green-400 to-green-500
+.bg-gradient-inactive: from-gray-400 to-gray-500
+.bg-gradient-available: from-yellow-400 to-yellow-500
+
+/* Trading-specific gradients */
+.bg-gradient-trade-offer: from-green-500 to-green-600
+.bg-gradient-trade-request: from-blue-500 to-blue-600
+.bg-gradient-mutual-benefit: from-teal-500 to-cyan-500
+
+/* NEW - Proposal status gradients */
+.bg-gradient-pending: from-yellow-400 to-yellow-500
+.bg-gradient-accepted: from-green-400 to-green-500
+.bg-gradient-rejected: from-red-400 to-red-500
+.bg-gradient-cancelled: from-gray-400 to-gray-500
+```
 
 ### Rarity-Based Gradients
 
@@ -1392,9 +1429,6 @@ When creating new components:
 5. ✅ **Responsive design** with mobile-first approach
 6. ✅ **Accessibility** features (ARIA, keyboard navigation)
 7. ✅ **Consistent styling** following gradient design system
-
-- **Consistent styling** following the Retro-Comic theme (`docs/theme-guide.md`)
-
 8. ✅ **Zero-reload optimistic updates** where applicable
 9. ✅ **Context-aware user feedback** with appropriate toast messaging
 10. ✅ **Snapshot-based error recovery** for complex state management

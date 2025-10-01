@@ -9,25 +9,23 @@ interface PageHeaderProps {
 }
 
 export default function PageHeader({ page }: PageHeaderProps) {
-  const logoUrl = page.kind === 'team' ? page.collection_teams?.[0]?.logo_url : null;
-  const progress = page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
+  const logoUrl =
+    page.kind === 'team' ? page.collection_teams?.[0]?.logo_url : null;
+  const progress =
+    page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm border-b border-t border-white/20 py-4 px-4 sticky top-[72px] z-20">
-      <div className="container mx-auto flex items-center gap-4">
-        {logoUrl && (
-          <div className="relative h-12 w-12 flex-shrink-0">
-            <Image src={logoUrl} alt={`Crest of ${page.title}`} fill className="object-contain" />
-          </div>
-        )}
-        <div className="flex-grow">
-          <h1 className="text-2xl font-bold text-white drop-shadow-lg">{page.title}</h1>
-          <div className="flex items-center gap-3 mt-1">
-            <Progress value={progress} className="h-2 w-full max-w-xs bg-black/20" />
-            <span className="text-sm font-semibold text-white/80">
-              Tengo {page.owned_slots} / {page.total_slots}
-            </span>
-          </div>
+    <div className="sticky top-[224px] lg:top-[172px] z-10 bg-gray-900/90 backdrop-blur-sm border-b-2 border-gray-700 py-2 mb-8">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-center gap-4">
+          <Progress
+            value={progress}
+            className="h-2 w-full max-w-xs bg-gray-700"
+            indicatorClassName="bg-gradient-to-r from-yellow-400 to-orange-500"
+          />
+          <span className="text-sm font-bold text-gray-300 flex-shrink-0">
+            Tengo {page.owned_slots} / {page.total_slots}
+          </span>
         </div>
       </div>
     </div>

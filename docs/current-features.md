@@ -102,13 +102,14 @@
 
 **Files**: Complete schema in `docs/database-schema.md`
 
-### 6. Modern UI/UX Design System ✅
+### 6. Retro-Comic UI/UX Design System ✅
 
-- **Gradient Theme**: Teal/cyan/blue gradients throughout
-- **Modern Cards**: Hover effects, shadows, smooth transitions
+- **Retro-Comic Theme**: Bold, high-contrast aesthetic applied across the application, replacing the previous gradient-based theme.
+- **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) is now the standard for all pages.
+- **High-Contrast Elements**: Chunky components with thick black borders (`border-2 border-black`) and blocky rounding (`rounded-lg`).
+- **Accent Colors**: Primary gold (`#FFC000`) for positive actions and active states, and red (`#E84D4D`) for negative actions or duplicate indicators.
+- **Bold Typography**: Major titles are `uppercase` and `font-extrabold`.
 - **Responsive Design**: Mobile-first with breakpoint optimization
-- **Loading States**: Comprehensive indicators and skeletons
-- **Error Handling**: User-friendly messages and recovery
 - **Spanish Language**: Complete localization
 
 ### 7. Trading System - Find Traders ✅ **COMPLETE**

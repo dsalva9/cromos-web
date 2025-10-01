@@ -25,9 +25,10 @@
 
 ### User Experience
 
-- **Modern Gradient UI**: Teal/cyan/blue theme with responsive design
+- **Retro-Comic UI Design**: A bold, high-contrast, dark theme inspired by retro comic books and stickers.
+- **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) across the entire application.
+- **High-Contrast Components**: Chunky cards and buttons with thick black borders and bold accent colors (Gold `#FFC000` and Red `#E84D4D`).
 - **Spanish Interface**: Complete Spanish language support
-- **Sticky Album Overview**: Progress pills (Tengo/Me falta/Repes/%) with inline collection switcher and quick +/- ownership controls.
 - **Optimistic Updates**: Immediate UI feedback with background sync
 - **Loading States**: Comprehensive loading indicators for all actions
 - **Mobile-First**: Responsive design optimized for all screen sizes

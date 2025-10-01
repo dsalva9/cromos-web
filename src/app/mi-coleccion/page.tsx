@@ -104,15 +104,11 @@ function CollectionRedirectContent() {
   // Show loading while redirecting or checking
   if (userLoading || checking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center space-y-4 text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
           <div className="text-xl">
             {userLoading ? 'Cargando usuario...' : 'Buscando tu colección...'}
-          </div>
-          <div className="text-sm opacity-80">
-            Debug: userLoading={userLoading.toString()}, checking=
-            {checking.toString()}
           </div>
         </div>
       </div>
@@ -121,7 +117,7 @@ function CollectionRedirectContent() {
 
   // This shouldn't render, but just in case
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
       <div className="text-center space-y-4 text-white">
         <h1 className="text-2xl font-bold">Redirigiendo...</h1>
       </div>

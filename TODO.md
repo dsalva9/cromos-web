@@ -28,6 +28,10 @@
   - [x] Implement album summary header with live stats from `get_completion_report`
   - [x] Full UI integration complete
 
+- [x] **UI/UX Redesign - Complete**
+  - [x] Implemented new "Retro-Comic" dark theme across all pages.
+  - [x] Updated all major components (`ModernCard`, `StickerTile`, headers, buttons) to new style.
+
 ### Data Migration Sprint - IN PROGRESS 🔥
 
 - [ ] **Sticker Number Backfill**
