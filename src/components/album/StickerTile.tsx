@@ -159,8 +159,12 @@ export default function StickerTile({
         {/* Desktop-only Badges */}
         <div className="hidden sm:block">
           {repeCount > 0 ? (
-            <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
-              REPE (+{repeCount})
+            <div className="absolute top-2 right-2 bg-green-500 text-white border-2 border-black px-2 py-0.5 font-semibold">
+              +{repeCount}
+            </div>
+          ) : ownedCount > 0 ? (
+            <div className="absolute top-2 right-2 bg-green-500 text-white border-2 border-black p-1">
+              <Check className="h-4 w-4" />
             </div>
           ) : isWanted ? (
             <div className="absolute top-2 right-2 bg-[#FFC000] text-gray-900 border-2 border-black px-2 py-0.5 font-extrabold">
@@ -178,15 +182,15 @@ export default function StickerTile({
                 onClick={e => e.stopPropagation()} // Prevent parent button click
               >
                 {repeCount > 0 ? (
-                  <div className="border-2 border-black px-2 py-0.5 font-extrabold cursor-pointer bg-[#E84D4D] text-white">
-                    REPE (+{repeCount})
+                  <div className="border-2 border-black px-2 py-0.5 font-semibold cursor-pointer bg-green-500 text-white">
+                    +{repeCount}
                   </div>
                 ) : isWanted ? (
                   <div className="border-2 border-black px-2 py-0.5 font-extrabold cursor-pointer bg-[#FFC000] text-gray-900">
                     QUIERO
                   </div>
                 ) : ownedCount > 0 ? (
-                  <div className="bg-green-500 text-white border-2 border-black p-1 font-extrabold cursor-pointer">
+                  <div className="bg-green-500 text-white border-2 border-black p-1 cursor-pointer">
                     <Check className="h-4 w-4" />
                   </div>
                 ) : (
@@ -246,7 +250,7 @@ export default function StickerTile({
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >
-              {ownedCount === 0 ? 'TENGO' : `REPE (+${repeCount})`}
+              {ownedCount > 0 ? `REPE (+${ownedCount})` : 'TENGO'}
             </Button>
 
             <div className="hidden sm:flex gap-2">
