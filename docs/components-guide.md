@@ -800,7 +800,7 @@ Main sticker collection interface with optimistic updates.
 - Sticker grid with rarity-based gradients y cintillos de rareza
 - Botones `Tengo`/`Repe (n)` con actualizaciones optimistas y rollback
 - Boton ghost `-` para decrementar repes con toasts de error y focus visible
-- Sticky progress header con pills Tengo / Me faltan / Repes / % alimentadas por `get_user_collection_stats`
+- Sticky progress header con pills Tengo / Faltan / Repes / Total alimentadas por `get_user_collection_stats`
 - CollectionsDropdown alineado con la insignia externa "Activa" y fallback a calculos locales cuando la RPC no responde
 - Capa de fallback local con `useMemo` para mantener estadisticas cuando la RPC no esta disponible
 

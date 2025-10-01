@@ -401,7 +401,7 @@ function CollectionContent() {
               </span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">ME FALTA</span>{' '}
+              <span className="text-gray-300">FALTAN</span>{' '}
               <span className="text-[#FFC000]">{progress.wanted_count}</span>
             </div>
             <div className="font-bold">
@@ -411,7 +411,7 @@ function CollectionContent() {
               </span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">COMPLETADO</span>{' '}
+              <span className="text-gray-300">TOTAL</span>{' '}
               <span className="text-[#FFC000]">
                 {progress.completion_percentage}%
               </span>

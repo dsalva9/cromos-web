@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+- **UI Text**: Updated labels in collection summary headers for clarity. "Me Falta" is now "Faltan", and the progress percentage is now labeled "Total".
+
 ### Fixed
 
 - **Robust Sticky Headers**: Fixed persistent positioning issues with the three sticky headers in the album view (`AlbumSummaryHeader`, `AlbumPager`, `PageHeader`). Implemented a dynamic height calculation using `ResizeObserver` to ensure headers stack correctly and remain sticky on all screen sizes, even when content wrapping changes their height.

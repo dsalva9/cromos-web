@@ -51,7 +51,7 @@ export default function AlbumSummaryHeader({
             </span>
           </div>
           <div className="font-bold">
-            <span className="text-gray-300">ME FALTA</span>{' '}
+            <span className="text-gray-300">FALTAN</span>{' '}
             <span className="text-[#FFC000]">
               {wanted !== null ? wanted : '--'}
             </span>
@@ -63,7 +63,7 @@ export default function AlbumSummaryHeader({
             </span>
           </div>
           <div className="font-bold">
-            <span className="text-gray-300">COMPLETADO</span>{' '}
+            <span className="text-gray-300">TOTAL</span>{' '}
             <span className="text-[#FFC000]">
               {completion !== null ? `${completion}%` : '--%'}
             </span>
