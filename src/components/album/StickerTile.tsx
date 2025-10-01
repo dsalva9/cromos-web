@@ -1,9 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { Shield, User, Shirt } from 'lucide-react';
+import { Shield, User, Shirt, MoreHorizontal, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { PageSlot } from '@/hooks/album';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface StickerTileProps {
   slot: PageSlot;
@@ -114,7 +121,15 @@ export default function StickerTile({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl">
+      <button
+        onClick={handleIncrease}
+        disabled={disabledIncrease}
+        className={cn(
+          'aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:cursor-not-allowed transition-all',
+          ownedCount === 0 && 'grayscale hover:grayscale-0'
+        )}
+        aria-label={`Añadir ${sticker?.player_name ?? 'cromo'}`}
+      >
         {sticker && sticker.thumb_public_url ? (
           <>
             <Image
@@ -122,7 +137,7 @@ export default function StickerTile({
               alt={altText}
               fill
               className="object-cover"
-              priority={isPriority}
+              priority={isPriority} // This prop is now on the button's child
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
             />
           </>
@@ -133,7 +148,7 @@ export default function StickerTile({
               alt={altText}
               fill
               className="object-cover"
-              priority={isPriority}
+              priority={isPriority} // This prop is now on the button's child
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
             />
           </>
@@ -141,17 +156,66 @@ export default function StickerTile({
           renderPlaceholder()
         )}
 
-        {isWanted && (
-          <div className="absolute top-2 right-2 bg-[#FFC000] text-gray-900 border-2 border-black px-2 py-0.5 font-extrabold">
-            QUIERO
-          </div>
-        )}
+        {/* Desktop-only Badges */}
+        <div className="hidden sm:block">
+          {repeCount > 0 ? (
+            <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
+              REPE (+{repeCount})
+            </div>
+          ) : isWanted ? (
+            <div className="absolute top-2 right-2 bg-[#FFC000] text-gray-900 border-2 border-black px-2 py-0.5 font-extrabold">
+              QUIERO
+            </div>
+          ) : null}
+        </div>
 
-        {repeCount > 0 && (
-          <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
-            REPE
-          </div>
-        )}
+        {/* Mobile Dropdown Trigger via Badges */}
+        <div className="sm:hidden absolute top-2 right-2 z-10">
+          <DropdownMenu>
+            {(isWanted || ownedCount > 0) && (
+              <DropdownMenuTrigger
+                asChild
+                onClick={e => e.stopPropagation()} // Prevent parent button click
+              >
+                {repeCount > 0 ? (
+                  <div className="border-2 border-black px-2 py-0.5 font-extrabold cursor-pointer bg-[#E84D4D] text-white">
+                    REPE (+{repeCount})
+                  </div>
+                ) : isWanted ? (
+                  <div className="border-2 border-black px-2 py-0.5 font-extrabold cursor-pointer bg-[#FFC000] text-gray-900">
+                    QUIERO
+                  </div>
+                ) : ownedCount > 0 ? (
+                  <div className="bg-green-500 text-white border-2 border-black p-1 font-extrabold cursor-pointer">
+                    <Check className="h-4 w-4" />
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </DropdownMenuTrigger>
+            )}
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={e => {
+                  e.stopPropagation();
+                  handleDecrease();
+                }}
+                disabled={disabledDecrease}
+              >
+                Quitar uno
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={e => {
+                  e.stopPropagation();
+                  handleToggleWanted();
+                }}
+                disabled={disabledWanted}
+              >
+                {isWanted ? 'Ya no lo quiero' : 'Lo quiero'}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         {sticker && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
@@ -167,14 +231,14 @@ export default function StickerTile({
             <div className="h-6 w-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
-      </div>
+      </button>
 
       {sticker && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 sm:grid">
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
-              className={`flex-1 text-xs rounded-md transition-all duration-200 ${
+              className={`hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 ${
                 ownedCount > 0
                   ? 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
                   : 'bg-gray-700 text-white font-bold border border-black hover:bg-gray-600'
@@ -185,7 +249,7 @@ export default function StickerTile({
               {ownedCount === 0 ? 'TENGO' : `REPE (+${repeCount})`}
             </Button>
 
-            <div className="flex gap-2">
+            <div className="hidden sm:flex gap-2">
               {ownedCount > 0 ? (
                 <Button
                   size="sm"
@@ -193,13 +257,14 @@ export default function StickerTile({
                   className="w-full text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
                   onClick={handleDecrease}
                   disabled={disabledDecrease}
+                  aria-label="Quitar uno"
                 >
                   -
                 </Button>
               ) : (
                 <Button
                   size="sm"
-                  className={`w-full text-xs rounded-md transition-all duration-200 ${
+                  className={`w-full text-xs rounded-md transition-all duration-200  ${
                     isWanted
                       ? 'bg-[#E84D4D] text-white font-bold border border-black hover:bg-red-600'
                       : 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
