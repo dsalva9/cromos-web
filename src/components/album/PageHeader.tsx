@@ -6,18 +6,14 @@ import { Progress } from '@/components/ui/progress';
 
 interface PageHeaderProps {
   page: AlbumPageData;
-  stickyStyle?: CSSProperties;
 }
 
-export default function PageHeader({ page, stickyStyle }: PageHeaderProps) {
+export default function PageHeader({ page }: PageHeaderProps) {
   const progress =
     page.total_slots > 0 ? (page.owned_slots / page.total_slots) * 100 : 0;
 
   return (
-    <div
-      className="sticky z-20 bg-gray-900/80 backdrop-blur-sm py-3 border-b border-gray-700 mb-8"
-      style={stickyStyle}
-    >
+    <div className="sticky bottom-0 z-20 bg-gray-900/80 backdrop-blur-sm py-3 border-t border-gray-700">
       <div className="container mx-auto flex items-center justify-between gap-4 px-4">
         <div className="hidden sm:flex items-center gap-4 flex-1 min-w-0">
           <h2 className="text-xl md:text-2xl font-extrabold uppercase text-white truncate">

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Album Layout**: Moved the team page progress bar (`PageHeader`) to be a sticky footer to optimize vertical space, especially on mobile.
 - **UI Text**: Updated labels in collection summary headers for clarity. "Me Falta" is now "Faltan", and the progress percentage is now labeled "Total".
 
 ### Fixed
