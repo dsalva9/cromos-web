@@ -4,7 +4,7 @@
 
 - **User Authentication**: Secure signup/login with Supabase Auth
 - **Multi-Collection Support**: Join and manage multiple sticker albums
-- **Sticker Inventory Management**: Track owned ("TENGO") and wanted ("QUIERO") stickers
+- **Sticker Inventory Management**: Track owned ("TENGO") stickers and automatically surface missing ones (legacy "QUIERO" badges stay until the UI migration).
 - **Progress Tracking**: Real-time completion percentages and statistics
 - **Zero-Reload Profile**: Add, remove, and activate collections with instant UI feedback and no page reloads.
 

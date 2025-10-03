@@ -286,6 +286,7 @@ Renders an individual sticker slot in the album.
 - **Badges (`QUIERO`, `REPE`)**: High-contrast blocks positioned at the top-right.
   - `QUIERO`: `bg-[#FFC000] text-gray-900 border-2 border-black ... font-extrabold`.
   - `REPE`: `bg-[#E84D4D] text-white border-2 border-black ... font-extrabold`.
+> Legacy note: The "QUIERO" badge still reads from `user_stickers.wanted`; Phase 2 will swap it to the implicit missing state (`count = 0`).
 - **Player Info Overlay**: A dark gradient at the bottom displays the player name: `bg-gradient-to-t from-black/80 to-transparent`.
 - **Action Buttons**:
   - **Layout**: Buttons are in a `flex flex-col space-y-1` container. Each row is a `flex space-x-1`.

@@ -199,11 +199,16 @@ CREATE TABLE user_stickers (
 **Indexes:**
 
 - Primary key on `(user_id, sticker_id)`
-- `idx_user_stickers_trading` on `(sticker_id, user_id, wanted, count)` for trading queries
+- `idx_user_stickers_trading` on `(sticker_id, user_id, wanted, count)` for legacy compatibility
+- `idx_user_stickers_trading_v2` on `(sticker_id, user_id, count)` for duplicate-driven trading queries
 
 **RLS Policies:**
 
 - Users can only access their own sticker inventory
+
+**Notes:**
+
+- The `wanted` column remains for backward compatibility. Supabase RPCs now infer trade intent from inventory counts (missing = `count = 0`, duplicates = `count > 1`), so application code should avoid mutating this flag.
 
 ---
 
@@ -447,7 +452,7 @@ CREATE TABLE user_badges (
 
 #### `get_user_collection_stats`
 
-Returns completion statistics for a user's collection.
+Returns completion statistics for a user's collection. Legacy clients can continue reading the `wanted` key, which now mirrors the new `missing` metric computed from ownership counts.
 
 ```sql
 FUNCTION get_user_collection_stats(
@@ -464,7 +469,8 @@ FUNCTION get_user_collection_stats(
   "owned_stickers": 450,
   "completion_percentage": 75,
   "duplicates": 120,
-  "wanted": 50
+  "missing": 150,
+  "wanted": 150
 }
 ```
 
@@ -564,7 +570,7 @@ FUNCTION search_stickers(
 
 #### `find_mutual_traders`
 
-Find users with mutual trading opportunities.
+Find users with mutual trading opportunities. Sticker intent is now inferred from inventory counts: a sticker is missing when the seeker has `count = 0`, and a tradeable duplicate when the owner has `count > 1`.
 
 ```sql
 FUNCTION find_mutual_traders(
@@ -591,7 +597,7 @@ FUNCTION find_mutual_traders(
 
 #### `get_mutual_trade_detail`
 
-Get detailed sticker lists for a trading pair.
+Get detailed sticker lists for a trading pair. Rows are emitted with `direction = 'they_offer'` when the other user has duplicates (`count > 1`) and you have none, and `direction = 'i_offer'` for the inverse.
 
 ```sql
 FUNCTION get_mutual_trade_detail(
@@ -789,7 +795,8 @@ Stores user profile avatars.
 
 Key indexes for monitoring:
 
-- `idx_user_stickers_trading` (high traffic)
+- `idx_user_stickers_trading_v2` (Phase 1 high traffic)
+- `idx_user_stickers_trading` (kept during transition)
 - `idx_stickers_collection_filters` (trading queries)
 - `idx_trade_proposals_to_user` (inbox queries)
 - `idx_collection_pages_order` (album navigation)
