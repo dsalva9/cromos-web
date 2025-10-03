@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Trading RPCs**: Phase 1 migration to implicit missing/duplicate logic (`count = 0` vs `count > 1`), new `idx_user_stickers_trading_v2` index, and `get_user_collection_stats` now exposes a `missing` field while mirroring it under the legacy `wanted` key.
+- **Album & Collection UI**: Removed QUIERO toggles/badges, derive Faltan from owned counts, and limit mobile dropdowns to duplicate management.
 - **Desktop UI Refinement (Album View)**:
   - Added a green checkmark badge for owned stickers.
   - Simplified the duplicate badge to `+n` (e.g., `+1`) and styled it green for consistency with the owned checkmark.
@@ -356,3 +357,4 @@ When making changes:
 
 **Phase 2 Status**: Album Pages complete ✅ | Trade Chat & History pending 🚧  
 **Ready for**: Phase 2 completion (chat UI, history dashboard)
+

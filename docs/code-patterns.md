@@ -137,7 +137,7 @@ export default function PageName() {
 ### Action Buttons
 
 ```typescript
-// Primary action (TENGO/QUIERO style)
+// Primary action (TENGO style)
 <Button
   className={`w-full font-bold rounded-xl transition-all duration-200 ${
     isActive
@@ -227,3 +227,4 @@ const { data } = await supabase
 - Users can only access their own data
 - Public read access for reference data (collections, stickers)
 - Descriptive policy names that explain the access pattern
+

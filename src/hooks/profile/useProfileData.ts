@@ -18,7 +18,7 @@ interface UserCollection extends Collection {
     owned_stickers: number;
     completion_percentage: number;
     duplicates: number;
-    wanted: number;
+    missing: number;
   };
 }
 
@@ -124,7 +124,7 @@ export function useProfileData() {
           owned_stickers: 0,
           completion_percentage: 0,
           duplicates: 0,
-          wanted: 0,
+          missing: 0,
         },
       };
 
@@ -263,7 +263,7 @@ export function useProfileData() {
             owned_stickers: 0,
             completion_percentage: 0,
             duplicates: 0,
-            wanted: 0,
+            missing: 0,
           };
 
           return {
@@ -358,7 +358,7 @@ export function useProfileData() {
               owned_stickers: 0,
               completion_percentage: 0,
               duplicates: 0,
-              wanted: 0,
+              missing: 0,
             };
 
             return {
@@ -441,3 +441,8 @@ export function useProfileData() {
     setError,
   };
 }
+
+
+
+
+

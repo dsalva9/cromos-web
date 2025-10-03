@@ -17,7 +17,7 @@ export default function AlbumSummaryHeader({
   const ref = useRef<HTMLDivElement>(null);
 
   const owned = summary?.ownedUnique ?? null;
-  const wanted = summary?.wanted ?? null;
+  const missing = summary?.missing ?? null;
   const duplicates = summary?.duplicates ?? null;
   const completion = summary?.completionPercentage ?? null;
 
@@ -53,7 +53,7 @@ export default function AlbumSummaryHeader({
           <div className="font-bold">
             <span className="text-gray-300">FALTAN</span>{' '}
             <span className="text-[#FFC000]">
-              {wanted !== null ? wanted : '--'}
+              {missing !== null ? missing : '--'}
             </span>
           </div>
           <div className="font-bold">

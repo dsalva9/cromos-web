@@ -109,13 +109,13 @@
 
 ## 📋 Phase 2.1: Next Sprint - READY TO START
 
-- [ ] **Implicit Missing UI Migration** (Phase 2)
-  - [ ] Replace `user_stickers.wanted` reads in `src/hooks/album/useAlbumPages.ts` with count-derived missing/duplicate logic.
-  - [ ] Update album components (`StickerTile`, `AlbumSummaryHeader`, `AlbumPageGrid`) to show missing badges using `count = 0`.
-  - [ ] Refactor collection grid toggles in `src/components/CollectionPage.tsx` to drop manual wanted upserts.
-  - [ ] Update profile stats (`src/hooks/profile/useProfileData.ts`, `ProfilePage`, `components/profile/OwnedCollectionCard.tsx`) to consume the new `missing` field.
-  - [ ] Retire `userWantsList` usage across trading docs and `src/app/trades/compose/page.tsx` in favor of missing-based selectors.
-  - [ ] QA trading flows to ensure compose/detail UI matches Phase 1 RPC semantics (duplicates > 1 vs missing).
+- [x] **Implicit Missing UI Migration** (Phase 2)
+  - [x] Replace `user_stickers.wanted` reads in `src/hooks/album/useAlbumPages.ts` with count-derived missing/duplicate logic.
+  - [x] Update album components (`StickerTile`, `AlbumSummaryHeader`, `AlbumPageGrid`) to show missing badges using `count = 0`.
+  - [x] Refactor collection grid toggles in `src/components/CollectionPage.tsx` to drop manual wanted upserts.
+  - [x] Update profile stats (`src/hooks/profile/useProfileData.ts`, `ProfilePage`, `components/profile/OwnedCollectionCard.tsx`) to consume the new `missing` field.
+  - [x] Retire `userWantsList` usage across trading docs and `src/app/trades/compose/page.tsx` in favor of missing-based selectors.
+  - [x] QA trading flows to ensure compose/detail UI matches Phase 1 RPC semantics (duplicates > 1 vs missing).
 - [ ] **Trade Chat UI** 🔥 HIGH PRIORITY
   - [ ] Build chat interface components
   - [ ] Integrate Supabase Realtime listeners
@@ -287,3 +287,5 @@
 **Last Updated**: 2025-01-XX (Post Documentation Sync)  
 **Current Focus**: v1.3.0 Data Migration Sprint  
 **Next Focus**: Trade Chat UI and History Dashboard
+
+

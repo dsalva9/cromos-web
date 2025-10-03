@@ -55,7 +55,6 @@
 
 - **Collection Display**: Grid-based layout with rarity gradients
 - **Ownership Tracking**: TENGO/REPE(n) buttons with optimistic updates
-- **Want List**: QUIERO button for desired stickers
 - **Progress Tracking**: Real-time completion percentages
 - **Duplicate Management**: Track multiple copies with decrement controls
 - **Header Pills**: Sticky stats bar (Tengo/Me faltan/Repes/%) using `get_user_collection_stats`
@@ -399,7 +398,7 @@ All user interactions maintain the zero-reload promise across:
 
 - Profile management (add/remove/activate collections)
 - Collection navigation (switching between collections)
-- Sticker management (TENGO/QUIERO operations)
+- Sticker management (TENGO operations with automatic "missing" tracking)
 - Trading search (filtering, pagination, detail navigation)
 - Proposal management (create, send, respond, view details)
 
@@ -670,3 +669,6 @@ Smart performance patterns throughout:
 **Current Version**: Backend v1.3.0 | Frontend v1.3.0 (Code Complete)
 **Status**: Code Complete ✅ | Data Migration Needed 🚧  
 **Next Focus**: Data Migration Sprint
+
+
+

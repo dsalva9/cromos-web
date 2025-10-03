@@ -1,6 +1,5 @@
 'use client';
 
-import { CSSProperties } from 'react';
 import { AlbumPageData } from '@/hooks/album';
 import { Progress } from '@/components/ui/progress';
 
@@ -30,3 +29,6 @@ export default function PageHeader({ page }: PageHeaderProps) {
     </div>
   );
 }
+
+
+
