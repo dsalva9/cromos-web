@@ -1,4 +1,4 @@
-export interface Collection {
+﻿export interface Collection {
   id: number;
   name: string;
   competition: string;
@@ -31,4 +31,5 @@ export interface UserCollectionRawData {
   joined_at: string;
   collections: Collection[] | Collection | null;
 }
+
 

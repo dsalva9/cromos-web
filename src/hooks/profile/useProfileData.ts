@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+﻿import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 
 interface Collection {
@@ -441,6 +441,7 @@ export function useProfileData() {
     setError,
   };
 }
+
 
 
 

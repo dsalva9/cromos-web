@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
@@ -259,7 +259,7 @@ function ProfileContent() {
       await fetchProfileData();
     } catch (err: unknown) {
       console.error('Error adding collection:', err);
-      setError('Error al añadir colección');
+      setError('Error al aÃ±adir colecciÃ³n');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -309,7 +309,7 @@ function ProfileContent() {
       await fetchProfileData();
     } catch (err: unknown) {
       console.error('Error removing collection:', err);
-      setError('Error al eliminar colección');
+      setError('Error al eliminar colecciÃ³n');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -342,7 +342,7 @@ function ProfileContent() {
       await fetchProfileData();
     } catch (err: unknown) {
       console.error('Error setting active collection:', err);
-      setError('Error al activar colección');
+      setError('Error al activar colecciÃ³n');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -387,7 +387,7 @@ function ProfileContent() {
           <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
             Mi Perfil
           </h1>
-          <p className="text-white/80">Gestiona tu información y colecciones</p>
+          <p className="text-white/80">Gestiona tu informaciÃ³n y colecciones</p>
         </div>
 
         {/* Profile Card */}
@@ -475,7 +475,7 @@ function ProfileContent() {
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4" />
                           <span>
-                            {ownedCollections.length} colección
+                            {ownedCollections.length} colecciÃ³n
                             {ownedCollections.length !== 1 ? 'es' : ''}
                           </span>
                         </div>
@@ -504,10 +504,10 @@ function ProfileContent() {
               <ModernCardContent className="p-12 text-center">
                 <Trophy className="w-20 h-20 text-white/50 mx-auto mb-6" />
                 <h4 className="text-2xl font-semibold text-white mb-4">
-                  Aún no has añadido ninguna colección
+                  AÃºn no has aÃ±adido ninguna colecciÃ³n
                 </h4>
                 <p className="text-white/80 text-lg mb-6">
-                  Explora las colecciones disponibles y añade una para empezar a
+                  Explora las colecciones disponibles y aÃ±ade una para empezar a
                   intercambiar cromos
                 </p>
               </ModernCardContent>
@@ -655,7 +655,7 @@ function ProfileContent() {
                       <div className="text-center mt-4 p-3 bg-green-50 rounded-xl">
                         <span className="text-sm text-green-700 font-medium flex items-center justify-center">
                           <CheckCircle className="w-4 h-4 mr-2" />
-                          Esta es tu colección activa
+                          Esta es tu colecciÃ³n activa
                         </span>
                       </div>
                     )}
@@ -683,10 +683,10 @@ function ProfileContent() {
               <ModernCardContent className="p-12 text-center">
                 <Star className="w-20 h-20 text-white/50 mx-auto mb-6" />
                 <h4 className="text-2xl font-semibold text-white mb-4">
-                  ¡Ya has añadido todas las colecciones disponibles!
+                  Â¡Ya has aÃ±adido todas las colecciones disponibles!
                 </h4>
                 <p className="text-white/80 text-lg">
-                  No hay más colecciones para añadir en este momento
+                  No hay mÃ¡s colecciones para aÃ±adir en este momento
                 </p>
               </ModernCardContent>
             </ModernCard>
@@ -731,11 +731,11 @@ function ProfileContent() {
                       className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200"
                     >
                       {actionLoading[`add-${collection.id}`] ? (
-                        'Añadiendo...'
+                        'AÃ±adiendo...'
                       ) : (
                         <>
                           <Plus className="w-4 h-4 mr-2" />
-                          Añadir a mis colecciones
+                          AÃ±adir a mis colecciones
                         </>
                       )}
                     </Button>
@@ -753,18 +753,18 @@ function ProfileContent() {
         onOpenChange={open =>
           setConfirmModal({ open, collectionId: null, collectionName: '' })
         }
-        title="Eliminar colección de tu perfil"
+        title="Eliminar colecciÃ³n de tu perfil"
         description={
           <div className="space-y-2">
             <p>
-              ¿Estás seguro de que quieres eliminar &ldquo;
+              Â¿EstÃ¡s seguro de que quieres eliminar &ldquo;
               {confirmModal.collectionName}&rdquo; de tu perfil?
             </p>
             <p className="text-sm text-red-600">
               <strong>
-                Se eliminarán también todos tus datos de esta colección
+                Se eliminarÃ¡n tambiÃ©n todos tus datos de esta colecciÃ³n
               </strong>
-              (tengo/quiero/duplicados). Esta acción no se puede deshacer.
+              (tengo/quiero/duplicados). Esta acciÃ³n no se puede deshacer.
             </p>
           </div>
         }
@@ -789,5 +789,6 @@ export default function ProfilePage() {
     </AuthGuard>
   );
 }
+
 
 

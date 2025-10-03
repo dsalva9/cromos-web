@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -155,7 +155,7 @@ function CollectionContent() {
       if (!collection) {
         collection = await setupUserActiveCollection();
         if (!collection) {
-          setError('No se encontr� una colecci�n activa.');
+          setError('No se encontrï¿½ una colecciï¿½n activa.');
           setLoading(false);
           return;
         }
@@ -325,7 +325,7 @@ function CollectionContent() {
   if (userLoading || loading) {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl">Cargando tu colecci�n...</div>
+        <div className="text-white text-xl">Cargando tu colecciï¿½n...</div>
       </div>
     );
   }
@@ -385,7 +385,7 @@ function CollectionContent() {
         {/* Header with Collection Info */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold uppercase text-white drop-shadow-lg">
-            {activeCollection?.name || 'Mi Colecci�n'}
+            {activeCollection?.name || 'Mi Colecciï¿½n'}
           </h1>
           {activeCollection?.description && (
             <p className="text-white/80 mt-2">{activeCollection.description}</p>
@@ -501,4 +501,5 @@ export default function CollectionPage() {
     </AuthGuard>
   );
 }
+
 

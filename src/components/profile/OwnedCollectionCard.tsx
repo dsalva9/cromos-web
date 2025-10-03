@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -158,7 +158,7 @@ export function OwnedCollectionCard({
           <div className="text-center mt-5 p-4 bg-green-50 rounded-xl ring-1 ring-green-100">
             <span className="text-sm text-green-700 font-medium flex items-center justify-center">
               <CheckCircle className="w-4 h-4 mr-2" />
-              Esta es tu colección activa
+              Esta es tu colecciÃ³n activa
             </span>
           </div>
         )}
@@ -166,5 +166,6 @@ export function OwnedCollectionCard({
     </ModernCard>
   );
 }
+
 
 

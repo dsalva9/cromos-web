@@ -1,4 +1,4 @@
-// Database types
+﻿// Database types
 export interface Database {
   public: {
     Tables: {
@@ -287,4 +287,5 @@ export interface TradeProposalDetail {
   proposal: TradeProposal;
   items: TradeProposalDetailItem[];
 }
+
 

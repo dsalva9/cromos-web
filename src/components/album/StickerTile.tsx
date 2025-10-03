@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import { Shield, User, Shirt, Check } from 'lucide-react';
@@ -119,7 +119,7 @@ export default function StickerTile({
           'aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:cursor-not-allowed transition-all',
           ownedCount === 0 && 'grayscale hover:grayscale-0'
         )}
-        aria-label={`A�adir ${sticker?.player_name ?? 'cromo'}`}
+        aria-label={`Añadir ${sticker?.player_name ?? 'cromo'}`}
       >
         {sticker && sticker.thumb_public_url ? (
           <Image
@@ -241,3 +241,5 @@ export default function StickerTile({
     </div>
   );
 }
+
+

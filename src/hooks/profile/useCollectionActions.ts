@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
 
@@ -82,7 +82,7 @@ export function useCollectionActions({
       // Find collection to add
       const collection = availableCollections.find(c => c.id === collectionId);
       if (!collection) {
-        toast.error('Colección no encontrada');
+        toast.error('ColecciÃ³n no encontrada');
         return;
       }
 
@@ -96,7 +96,7 @@ export function useCollectionActions({
         optimisticAddCollection(collection);
 
         // Show immediate feedback
-        toast.success(`"${collection.name}" añadida a tus colecciones`);
+        toast.success(`"${collection.name}" aÃ±adida a tus colecciones`);
 
         // Server call
         const isFirstCollection = ownedCollections.length === 0;
@@ -118,7 +118,7 @@ export function useCollectionActions({
 
         // Show error
         const errorMessage =
-          err instanceof Error ? err.message : 'Error al añadir colección';
+          err instanceof Error ? err.message : 'Error al aÃ±adir colecciÃ³n';
         toast.error(errorMessage);
       } finally {
         setActionLoading(prev => ({ ...prev, [actionKey]: false }));
@@ -144,7 +144,7 @@ export function useCollectionActions({
       // Find collection to remove
       const collection = ownedCollections.find(c => c.id === collectionId);
       if (!collection) {
-        toast.error('Colección no encontrada');
+        toast.error('ColecciÃ³n no encontrada');
         return;
       }
 
@@ -202,7 +202,7 @@ export function useCollectionActions({
 
         // Show error
         const errorMessage =
-          err instanceof Error ? err.message : 'Error al eliminar colección';
+          err instanceof Error ? err.message : 'Error al eliminar colecciÃ³n';
         toast.error(errorMessage);
       } finally {
         setActionLoading(prev => ({ ...prev, [actionKey]: false }));
@@ -227,7 +227,7 @@ export function useCollectionActions({
       // Find collection to activate
       const collection = ownedCollections.find(c => c.id === collectionId);
       if (!collection) {
-        toast.error('Colección no encontrada');
+        toast.error('ColecciÃ³n no encontrada');
         return;
       }
 
@@ -246,7 +246,7 @@ export function useCollectionActions({
         optimisticSetActiveCollection(collectionId);
 
         // Show immediate feedback
-        toast.success(`"${collection.name}" es ahora tu colección activa`);
+        toast.success(`"${collection.name}" es ahora tu colecciÃ³n activa`);
 
         // Server calls
         // Set all collections inactive first
@@ -274,7 +274,7 @@ export function useCollectionActions({
 
         // Show error
         const errorMessage =
-          err instanceof Error ? err.message : 'Error al activar colección';
+          err instanceof Error ? err.message : 'Error al activar colecciÃ³n';
         toast.error(errorMessage);
       } finally {
         setActionLoading(prev => ({ ...prev, [actionKey]: false }));
@@ -346,6 +346,7 @@ export function useCollectionActions({
     actionLoading,
   };
 }
+
 
 
 
