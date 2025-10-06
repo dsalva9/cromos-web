@@ -264,7 +264,6 @@ function CollectionContent() {
         user_id: user.id,
         sticker_id: stickerId,
         count: newCount,
-        wanted: false,
       });
 
       if (error) throw error;
@@ -297,7 +296,6 @@ function CollectionContent() {
           user_id: user.id,
           sticker_id: stickerId,
           count: newCount,
-          wanted: false,
         });
 
         if (error) throw error;

@@ -1,8 +1,8 @@
 # Database Schema Documentation
 
-## Current State: v1.3.0 (All features deployed)
+## Current State: v1.4.0 (Phase 4 schema cleanup)
 
-Last updated: 2025-01-XX
+Last updated: 2025-10-06
 Source: Direct export from Supabase production database
 
 ## Overview
@@ -177,9 +177,7 @@ CREATE TABLE user_collections (
 
 - Users can only access their own collection memberships
 
-**Notes:**
 
-- The `wanted` column remains for backward compatibility. Supabase RPCs now infer trade intent from inventory counts (missing = `count = 0`, duplicates = `count > 1`), so application code should avoid mutating this flag.
 
 ---
 
@@ -192,7 +190,6 @@ CREATE TABLE user_stickers (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   sticker_id INTEGER REFERENCES stickers(id) ON DELETE CASCADE,
   count INTEGER NOT NULL DEFAULT 0,
-  wanted BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 
@@ -203,7 +200,6 @@ CREATE TABLE user_stickers (
 **Indexes:**
 
 - Primary key on `(user_id, sticker_id)`
-- `idx_user_stickers_trading` on `(sticker_id, user_id, wanted, count)` for legacy compatibility
 - `idx_user_stickers_trading_v2` on `(sticker_id, user_id, count)` for duplicate-driven trading queries
 
 **RLS Policies:**
@@ -212,7 +208,8 @@ CREATE TABLE user_stickers (
 
 **Notes:**
 
-- The `wanted` column remains for backward compatibility. Supabase RPCs now infer trade intent from inventory counts (missing = `count = 0`, duplicates = `count > 1`), so application code should avoid mutating this flag.
+- Trade intent is derived from `count` values (missing = 0, duplicates > 1).
+- Legacy `wanted` flag removed in v1.4.0.
 
 ---
 
@@ -456,7 +453,7 @@ CREATE TABLE user_badges (
 
 #### `get_user_collection_stats`
 
-Returns completion statistics for a user's collection. Legacy clients can continue reading the `wanted` key, which now mirrors the new `missing` metric computed from ownership counts.
+Returns completion statistics for a user's collection. Missing counts are inferred from ownership records (count = 0).
 
 ```sql
 FUNCTION get_user_collection_stats(
@@ -474,7 +471,6 @@ FUNCTION get_user_collection_stats(
   "completion_percentage": 75,
   "duplicates": 120,
   "missing": 150,
-  "wanted": 150
 }
 ```
 

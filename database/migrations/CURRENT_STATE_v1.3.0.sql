@@ -77,7 +77,6 @@ CREATE TABLE IF NOT EXISTS user_stickers (
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   sticker_id INTEGER REFERENCES stickers(id) ON DELETE CASCADE,
   count INTEGER NOT NULL DEFAULT 0,
-  wanted BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (user_id, sticker_id)
@@ -188,9 +187,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_stickers_collection_number_unique
   WHERE sticker_number IS NOT NULL;
 
 -- User Stickers
-CREATE INDEX IF NOT EXISTS idx_user_stickers_trading 
-  ON user_stickers(sticker_id, user_id, wanted, count);
-
 -- Collection Pages
 CREATE INDEX IF NOT EXISTS idx_collection_pages_order 
   ON collection_pages(collection_id, order_index);

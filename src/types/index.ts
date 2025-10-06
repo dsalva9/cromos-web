@@ -158,7 +158,6 @@ export interface Database {
           user_id: string;
           sticker_id: number;
           count: number;
-          wanted: boolean | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -166,7 +165,6 @@ export interface Database {
           user_id: string;
           sticker_id: number;
           count: number;
-          wanted?: boolean | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -174,7 +172,6 @@ export interface Database {
           user_id?: string;
           sticker_id?: number;
           count?: number;
-          wanted?: boolean | null;
           created_at?: string | null;
           updated_at?: string | null;
         };
@@ -195,7 +192,6 @@ export interface Database {
           completion_percentage: number;
           duplicates: number;
           missing: number;
-          wanted: number;
         }[];
       };
     };
@@ -219,13 +215,12 @@ export interface CollectionWithStats extends Collection {
     owned_stickers: number;
     completion_percentage: number;
     duplicates: number;
-    wanted: number;
+    missing: number;
   };
 }
 
 export interface StickerWithOwnership extends Sticker {
   count: number;
-  wanted: boolean;
   team_name?: string;
 }
 

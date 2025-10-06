@@ -1,6 +1,6 @@
 ## API Endpoints & Operations
 
-**Version**: v1.3.0  
+**Version**: v1.4.0  
 **Status**: ✅ All backend features documented
 
 ---
@@ -11,7 +11,7 @@
 
 #### `get_user_collection_stats`
 
-Returns completion statistics for a collection. The new `missing` metric infers wants from inventory counts; the legacy `wanted` key mirrors this value until the Phase 2 UI cleanup.
+Returns completion statistics for a collection. The `missing` metric replaces the legacy flag and is inferred from ownership counts (count = 0).
 
 **Function Signature:**
 
@@ -31,7 +31,6 @@ get_user_collection_stats(
   "completion_percentage": 75,
   "duplicates": 120,
   "missing": 150,
-  "wanted": 150
 }
 ```
 
@@ -476,7 +475,7 @@ const { data } = await supabase
     `
     *,
     collection_teams (team_name),
-    user_stickers!left (count, wanted)
+    user_stickers!left (count)
   `
   )
   .eq('collection_id', collectionId)
@@ -487,15 +486,6 @@ await supabase.from('user_stickers').upsert({
   user_id: userId,
   sticker_id: stickerId,
   count: newCount,
-  wanted: false,
-});
-
-// Legacy wanted toggle (Phase 1 compatibility only - prefer relying on implicit missing via count = 0)
-await supabase.from('user_stickers').upsert({
-  user_id: userId,
-  sticker_id: stickerId,
-  count: 0,
-  wanted: true,
 });
 ```
 
@@ -542,7 +532,7 @@ const { data: slotsData, error: slotsError } = await supabase
     sticker_id,
     stickers (
       *,
-      user_stickers!left ( user_id, count, wanted ),
+      user_stickers!left ( user_id, count ),
       collection_teams ( team_name ),
       -- Public URLs are resolved on the client
       image_path_webp_300,
