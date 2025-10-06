@@ -1,5 +1,4 @@
-'use client';
-
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 
@@ -157,6 +156,3 @@ export default function SiteHeader() {
     </header>
   );
 }
-
-
-
