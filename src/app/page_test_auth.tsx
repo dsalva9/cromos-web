@@ -1,4 +1,4 @@
-import AuthTest from '@/components/AuthTest';
+﻿import AuthTest from '@/components/AuthTest';
 
 export default function Home() {
   return (
@@ -7,3 +7,4 @@ export default function Home() {
     </div>
   );
 }
+

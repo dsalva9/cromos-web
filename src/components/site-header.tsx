@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -32,15 +32,15 @@ export default function SiteHeader() {
   // Different navigation based on auth state
   const authenticatedLinks = [
     { href: '/', label: 'Home' },
-    { href: '/mi-coleccion', label: 'Mi Colección' },
+    { href: '/mi-coleccion', label: 'Mi ColecciÃ³n' },
     { href: '/trades/find', label: 'Intercambios' },
-    { href: '/trades/inbox', label: 'Buzón Intercambios' },
+    { href: '/trades/inbox', label: 'BuzÃ³n Intercambios' },
     { href: '/profile', label: 'Perfil' },
   ];
 
   const unauthenticatedLinks = [
     { href: '/', label: 'Home' },
-    { href: '/login', label: 'Iniciar Sesión' },
+    { href: '/login', label: 'Iniciar SesiÃ³n' },
     { href: '/signup', label: 'Registrarse' },
   ];
 
@@ -157,5 +157,6 @@ export default function SiteHeader() {
     </header>
   );
 }
+
 
 

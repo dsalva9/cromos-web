@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense, FC } from 'react';
 import { useEffect, useState, useMemo } from 'react';
@@ -175,7 +175,7 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
     });
 
     if (proposalId) {
-      toast.success('Éxito', {
+      toast.success('Ã‰xito', {
         description: 'Tu propuesta de intercambio ha sido enviada.',
       });
       router.push('/trades/proposals');
@@ -258,7 +258,7 @@ const ComposePage: FC<ComposePageProps> = ({ toUserId, collectionId }) => {
                       id="message"
                       value={message}
                       onChange={e => setMessage(e.target.value)}
-                      placeholder="Añade un mensaje a tu propuesta..."
+                      placeholder="AÃ±ade un mensaje a tu propuesta..."
                       className="bg-black/20 border-white/20 text-white"
                     />
                   </div>
@@ -295,7 +295,7 @@ function ComposeProposalPageWrapper() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-400">Error</h1>
           <p className="text-white/80">
-            Faltan parámetros para crear la propuesta.
+            Faltan parÃ¡metros para crear la propuesta.
           </p>
         </div>
       </div>
@@ -314,3 +314,4 @@ export default function SuspendedComposeProposalPage() {
     </AuthGuard>
   );
 }
+

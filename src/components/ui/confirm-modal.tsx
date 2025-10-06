@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -91,3 +91,4 @@ export function ConfirmModal({
     </Dialog>
   );
 }
+

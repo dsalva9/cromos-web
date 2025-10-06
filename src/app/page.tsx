@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -28,7 +28,7 @@ export default function Home() {
           {/* Hero Character */}
           <div className="mb-8">
             <div className="w-32 h-32 bg-green-400 rounded-3xl mx-auto flex items-center justify-center text-6xl shadow-lg transform rotate-3">
-              ⚽
+              âš½
             </div>
           </div>
 
@@ -49,7 +49,7 @@ export default function Home() {
               size="lg"
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 rounded-2xl shadow-lg border-0 text-lg"
             >
-              <Link href="/login">Iniciar Sesión</Link>
+              <Link href="/login">Iniciar SesiÃ³n</Link>
             </Button>
 
             <Button
@@ -73,9 +73,9 @@ export default function Home() {
         {/* Welcome Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">
-            ¡Hola!
+            Â¡Hola!
           </h1>
-          <p className="text-white/90 text-lg">¿Qué quieres hacer hoy?</p>
+          <p className="text-white/90 text-lg">Â¿QuÃ© quieres hacer hoy?</p>
         </div>
 
         {/* Action Cards Grid */}
@@ -88,7 +88,7 @@ export default function Home() {
                   <Trophy className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-2xl font-bold text-white mb-2">
-                  Mi Colección
+                  Mi ColecciÃ³n
                 </h2>
                 <p className="text-white/90 text-sm">Gestiona tus cromos</p>
               </ModernCardContent>
@@ -133,7 +133,7 @@ export default function Home() {
           <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
             <Star className="w-5 h-5 text-yellow-300 fill-current" />
             <span className="text-white font-medium">
-              ¡Empieza tu colección!
+              Â¡Empieza tu colecciÃ³n!
             </span>
           </div>
         </div>
@@ -141,5 +141,6 @@ export default function Home() {
     </div>
   );
 }
+
 
 

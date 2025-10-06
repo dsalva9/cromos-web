@@ -1,4 +1,4 @@
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+﻿import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -37,11 +37,11 @@ function getRarityLabel(rarity: string) {
     case 'legendary':
       return 'Legendaria';
     case 'epic':
-      return 'Épica';
+      return 'Ã‰pica';
     case 'rare':
       return 'Rara';
     case 'common':
-      return 'Común';
+      return 'ComÃºn';
     default:
       return rarity || 'Desconocida';
   }
@@ -141,7 +141,7 @@ export function MatchDetail({
       {/* What I can offer them */}
       <StickerList
         stickers={iOffer}
-        title={`Tú puedes ofrecer a ${targetUserNickname}`}
+        title={`TÃº puedes ofrecer a ${targetUserNickname}`}
         emptyMessage="No tienes cromos que este usuario necesite."
         icon={<ArrowUp className="w-5 h-5 text-white" />}
         headerColor="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -149,3 +149,4 @@ export function MatchDetail({
     </div>
   );
 }
+

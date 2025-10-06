@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 
 interface ProposalItem {
@@ -65,3 +65,4 @@ export const useCreateProposal = (): UseCreateProposalReturn => {
 
   return { loading, error, createProposal };
 };
+

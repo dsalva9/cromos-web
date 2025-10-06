@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -22,7 +22,7 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError('Las contraseÃ±as no coinciden');
       return;
     }
 
@@ -57,10 +57,10 @@ export default function SignupPage() {
         {/* Logo/Header */}
         <div className="mb-8 text-center">
           <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
-            📧
+            ðŸ“§
           </div>
           <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
-            ¡Revisa tu email!
+            Â¡Revisa tu email!
           </h1>
         </div>
 
@@ -76,13 +76,13 @@ export default function SignupPage() {
           <div className="p-8 text-center">
             <div className="mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-2xl">✅</span>
+                <span className="text-2xl">âœ…</span>
               </div>
               <h2 className="text-xl font-bold text-gray-800 mb-2">
                 Cuenta creada
               </h2>
               <p className="text-gray-600">
-                Te hemos enviado un enlace de confirmación a{' '}
+                Te hemos enviado un enlace de confirmaciÃ³n a{' '}
                 <strong>{email}</strong>
               </p>
             </div>
@@ -95,7 +95,7 @@ export default function SignupPage() {
 
               <Link href="/login">
                 <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl">
-                  Ir a iniciar sesión
+                  Ir a iniciar sesiÃ³n
                 </Button>
               </Link>
             </div>
@@ -108,7 +108,7 @@ export default function SignupPage() {
             href="/"
             className="text-white/80 hover:text-white text-sm font-medium hover:underline"
           >
-            ← Volver al inicio
+            â† Volver al inicio
           </Link>
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function SignupPage() {
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
-          ⚽
+          âš½
         </div>
         <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
           {siteConfig.name}
@@ -143,7 +143,7 @@ export default function SignupPage() {
               Crear Cuenta
             </h2>
             <p className="text-gray-300">
-              Únete a la comunidad de coleccionistas
+              Ãšnete a la comunidad de coleccionistas
             </p>
           </div>
 
@@ -171,12 +171,12 @@ export default function SignupPage() {
                 htmlFor="password"
                 className="text-sm font-semibold text-gray-200"
               >
-                Contraseña
+                ContraseÃ±a
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -189,12 +189,12 @@ export default function SignupPage() {
                 htmlFor="confirmPassword"
                 className="text-sm font-semibold text-gray-200"
               >
-                Confirmar Contraseña
+                Confirmar ContraseÃ±a
               </label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
@@ -220,12 +220,12 @@ export default function SignupPage() {
           <div className="mt-8 text-center">
             <div className="border-t border-gray-600 pt-6">
               <p className="text-sm text-gray-300">
-                ¿Ya tienes cuenta?{' '}
+                Â¿Ya tienes cuenta?{' '}
                 <Link
                   href="/login"
                   className="text-blue-400 hover:text-blue-300 font-bold hover:underline"
                 >
-                  Iniciar sesión
+                  Iniciar sesiÃ³n
                 </Link>
               </p>
             </div>
@@ -239,11 +239,12 @@ export default function SignupPage() {
           href="/"
           className="text-white/80 hover:text-white text-sm font-medium hover:underline"
         >
-          ← Volver al inicio
+          â† Volver al inicio
         </Link>
       </div>
     </div>
   );
 }
+
 
 

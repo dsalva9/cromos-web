@@ -1,4 +1,4 @@
-import { toast as sonnerToast, type ExternalToast } from 'sonner';
+﻿import { toast as sonnerToast, type ExternalToast } from 'sonner';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -27,3 +27,4 @@ Object.assign(compatToast, sonnerToast);
 
 export { compatToast as toast };
 export type { ToastOptions, ToastType };
+

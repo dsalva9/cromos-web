@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -29,9 +29,9 @@ interface FindTradersFiltersProps {
 
 const RARITY_OPTIONS = [
   { value: '', label: 'Todas las rarezas' },
-  { value: 'common', label: 'Común' },
+  { value: 'common', label: 'ComÃºn' },
   { value: 'rare', label: 'Rara' },
-  { value: 'epic', label: 'Épica' },
+  { value: 'epic', label: 'Ã‰pica' },
   { value: 'legendary', label: 'Legendaria' },
 ];
 
@@ -92,7 +92,7 @@ export function FindTradersFilters({
       {/* Collection Selector */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Colección
+          ColecciÃ³n
         </label>
         <div className="relative">
           <button
@@ -106,7 +106,7 @@ export function FindTradersFilters({
             <span className="truncate">
               {selectedCollection
                 ? `${selectedCollection.name} (${selectedCollection.year})`
-                : 'Selecciona una colección'}
+                : 'Selecciona una colecciÃ³n'}
             </span>
             <ChevronDown className="w-4 h-4 text-gray-500" />
             {selectedCollection?.is_user_active && (
@@ -262,7 +262,7 @@ export function FindTradersFilters({
           {/* Min Overlap Filter */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Coincidencias mínimas
+              Coincidencias mÃ­nimas
             </label>
             <div className="flex flex-wrap gap-2">
               {MIN_OVERLAP_OPTIONS.map(value => (
@@ -285,7 +285,7 @@ export function FindTradersFilters({
               ))}
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Número mínimo de cromos que pueden intercambiarse mutuamente
+              NÃºmero mÃ­nimo de cromos que pueden intercambiarse mutuamente
             </p>
           </div>
         </div>
@@ -344,3 +344,4 @@ export function FindTradersFilters({
     </div>
   );
 }
+

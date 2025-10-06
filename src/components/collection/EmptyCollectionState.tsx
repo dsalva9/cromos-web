@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -22,14 +22,14 @@ export default function EmptyCollectionState() {
           <ModernCardContent className="p-12 text-center">
             <Trophy className="w-20 h-20 text-teal-500 mx-auto mb-6" />
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              ¡Bienvenido a {siteConfig.name}!
+              Â¡Bienvenido a {siteConfig.name}!
             </h1>
             <h2 className="text-xl font-semibold text-gray-700 mb-4">
-              Aún no sigues ninguna colección
+              AÃºn no sigues ninguna colecciÃ³n
             </h2>
             <p className="text-gray-600 text-lg mb-8 leading-relaxed">
               Para empezar a intercambiar cromos, primero necesitas seguir una
-              colección. Explora las colecciones disponibles y elige la que más
+              colecciÃ³n. Explora las colecciones disponibles y elige la que mÃ¡s
               te guste.
             </p>
 
@@ -40,7 +40,7 @@ export default function EmptyCollectionState() {
                 className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 <Plus className="w-5 h-5 mr-2" />
-                Seguir una Colección
+                Seguir una ColecciÃ³n
               </Button>
 
               <p className="text-sm text-gray-500">
@@ -53,5 +53,6 @@ export default function EmptyCollectionState() {
     </div>
   );
 }
+
 
 

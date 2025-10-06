@@ -1,4 +1,4 @@
-import { TradeProposalDetailItem } from '@/types';
+﻿import { TradeProposalDetailItem } from '@/types';
 import { Badge } from '../ui/badge';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -43,3 +43,4 @@ export function ProposalSummary({
     </div>
   );
 }
+

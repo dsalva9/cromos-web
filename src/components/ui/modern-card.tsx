@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { cn } from '@/lib/utils';
 
 const ModernCard = React.forwardRef<
@@ -25,3 +25,4 @@ const ModernCardContent = React.forwardRef<
 ModernCardContent.displayName = 'ModernCardContent';
 
 export { ModernCard, ModernCardContent };
+

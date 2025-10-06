@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 
 interface TradeSticker {
@@ -112,3 +112,4 @@ export function useMatchDetail() {
     clearDetail,
   };
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 
@@ -83,3 +83,4 @@ export function ProfileLoadingSkeleton() {
     </div>
   );
 }
+

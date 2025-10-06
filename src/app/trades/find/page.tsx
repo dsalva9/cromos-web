@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
@@ -178,7 +178,7 @@ function FindTradersContent() {
               Sin colecciones
             </h2>
             <p className="text-gray-600 mb-6">
-              Necesitas seguir al menos una colección para buscar intercambios.
+              Necesitas seguir al menos una colecciÃ³n para buscar intercambios.
             </p>
             <Button
               onClick={() => (window.location.href = '/profile')}
@@ -213,7 +213,7 @@ function FindTradersContent() {
             variant="ghost"
             className="self-center sm:self-start bg-white/10 text-white hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
           >
-            <Link href="/trades/inbox">Buzón Intercambios</Link>
+            <Link href="/trades/inbox">BuzÃ³n Intercambios</Link>
           </Button>
         </div>
 
@@ -225,11 +225,11 @@ function FindTradersContent() {
                 <AlertTriangle className="w-6 h-6 text-orange-500" />
                 <div>
                   <h4 className="text-orange-800 font-semibold">
-                    Recomendación
+                    RecomendaciÃ³n
                   </h4>
                   <p className="text-orange-700 text-sm">
-                    Considera activar una colección desde tu perfil para
-                    facilitar la navegación.
+                    Considera activar una colecciÃ³n desde tu perfil para
+                    facilitar la navegaciÃ³n.
                   </p>
                 </div>
               </div>
@@ -266,7 +266,7 @@ function FindTradersContent() {
                   </div>
                   {totalCount > 0 && (
                     <span className="text-sm text-gray-500">
-                      Página {currentPage + 1}
+                      PÃ¡gina {currentPage + 1}
                     </span>
                   )}
                 </div>
@@ -315,7 +315,7 @@ function FindTradersContent() {
                   Sin intercambios disponibles
                 </h3>
                 <p className="text-gray-500 text-sm">
-                  Prueba ajustando los filtros o eligiendo otra colección.
+                  Prueba ajustando los filtros o eligiendo otra colecciÃ³n.
                 </p>
               </ModernCardContent>
             </ModernCard>
@@ -335,7 +335,7 @@ function FindTradersContent() {
             </Button>
             <div className="flex items-center px-4 py-2 bg-white/90 rounded-lg">
               <span className="text-gray-700 font-medium">
-                Página {currentPage + 1}
+                PÃ¡gina {currentPage + 1}
               </span>
             </div>
             <Button
@@ -360,3 +360,4 @@ export default function FindTradersPage() {
     </AuthGuard>
   );
 }
+

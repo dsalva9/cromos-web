@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { TradeProposalDetail } from '@/types';
 
@@ -45,3 +45,4 @@ export const useProposalDetail = (): UseProposalDetailReturn => {
 
   return { detail, loading, error, fetchDetail, clearDetail };
 };
+

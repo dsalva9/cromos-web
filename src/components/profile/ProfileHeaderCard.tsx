@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -122,7 +122,7 @@ export function ProfileHeaderCard({
                     <div className="flex items-center space-x-2">
                       <Users className="w-5 h-5" />
                       <span>
-                        {ownedCollectionsCount} colección
+                        {ownedCollectionsCount} colecciÃ³n
                         {ownedCollectionsCount !== 1 ? 'es' : ''}
                       </span>
                     </div>
@@ -136,3 +136,4 @@ export function ProfileHeaderCard({
     </ModernCard>
   );
 }
+

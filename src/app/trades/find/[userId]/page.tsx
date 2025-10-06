@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
@@ -69,7 +69,7 @@ function TradeDetailPageContent() {
               Detalle del Intercambio
             </h1>
             <p className="text-white/80">
-              Viendo cromos en común con {targetUserNickname}
+              Viendo cromos en comÃºn con {targetUserNickname}
             </p>
           </div>
           <div className="flex items-center space-x-2">
@@ -116,3 +116,4 @@ export default function TradeDetail() {
     </AuthGuard>
   );
 }
+

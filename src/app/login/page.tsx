@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
-          ⚽
+          âš½
         </div>
         <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
           {siteConfig.name}
@@ -66,9 +66,9 @@ export default function LoginPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-100 mb-2">
-              Iniciar Sesión
+              Iniciar SesiÃ³n
             </h2>
-            <p className="text-gray-300">Accede a tu colección de cromos</p>
+            <p className="text-gray-300">Accede a tu colecciÃ³n de cromos</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -96,13 +96,13 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="text-sm font-semibold text-gray-200"
               >
-                Contraseña
+                ContraseÃ±a
               </label>
 
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -121,7 +121,7 @@ export default function LoginPage() {
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl"
               disabled={loading}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? 'Iniciando sesiÃ³n...' : 'Iniciar SesiÃ³n'}
             </Button>
           </form>
 
@@ -130,12 +130,12 @@ export default function LoginPage() {
               href="/forgot-password"
               className="text-sm text-blue-400 hover:text-blue-300 font-medium hover:underline"
             >
-              ¿Olvidaste tu contraseña?
+              Â¿Olvidaste tu contraseÃ±a?
             </Link>
 
             <div className="border-t border-gray-200 pt-4">
               <p className="text-sm text-gray-600">
-                ¿No tienes cuenta?{' '}
+                Â¿No tienes cuenta?{' '}
                 <Link
                   href="/signup"
                   className="text-blue-600 hover:text-blue-700 font-bold hover:underline"
@@ -154,10 +154,11 @@ export default function LoginPage() {
           href="/"
           className="text-white/80 hover:text-white text-sm font-medium hover:underline"
         >
-          ← Volver al inicio
+          â† Volver al inicio
         </Link>
       </div>
     </div>
   );
 }
+
 

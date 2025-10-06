@@ -1,4 +1,4 @@
-// src/app/debug/page.tsx
+﻿// src/app/debug/page.tsx
 'use client';
 
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
@@ -22,3 +22,4 @@ export default function DebugSession() {
     </main>
   );
 }
+

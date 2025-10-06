@@ -1,4 +1,4 @@
-export interface FootballerCard {
+﻿export interface FootballerCard {
   id: string;
   name: string;
   team: string;
@@ -32,7 +32,7 @@ export const mockFootballers: FootballerCard[] = [
   },
   {
     id: '3',
-    name: 'Luka Modrić',
+    name: 'Luka ModriÄ‡',
     team: 'Real Madrid',
     position: 'Centrocampista',
     nationality: 'Croacia',
@@ -45,7 +45,7 @@ export const mockFootballers: FootballerCard[] = [
     name: 'Pedri',
     team: 'FC Barcelona',
     position: 'Centrocampista',
-    nationality: 'España',
+    nationality: 'EspaÃ±a',
     rating: 85,
     imageUrl: '/placeholder-player.jpg',
     rarity: 'rare'
@@ -53,7 +53,7 @@ export const mockFootballers: FootballerCard[] = [
   {
     id: '5',
     name: 'Jan Oblak',
-    team: 'Atlético Madrid',
+    team: 'AtlÃ©tico Madrid',
     position: 'Portero',
     nationality: 'Eslovenia',
     rating: 89,
@@ -75,7 +75,7 @@ export const mockFootballers: FootballerCard[] = [
     name: 'Gavi',
     team: 'FC Barcelona',
     position: 'Centrocampista',
-    nationality: 'España',
+    nationality: 'EspaÃ±a',
     rating: 82,
     imageUrl: '/placeholder-player.jpg',
     rarity: 'rare'
@@ -85,7 +85,7 @@ export const mockFootballers: FootballerCard[] = [
     name: 'Sergio Canales',
     team: 'Real Betis',
     position: 'Centrocampista',
-    nationality: 'España',
+    nationality: 'EspaÃ±a',
     rating: 83,
     imageUrl: '/placeholder-player.jpg',
     rarity: 'common'
@@ -95,7 +95,7 @@ export const mockFootballers: FootballerCard[] = [
     name: 'Iago Aspas',
     team: 'RC Celta',
     position: 'Delantero',
-    nationality: 'España',
+    nationality: 'EspaÃ±a',
     rating: 84,
     imageUrl: '/placeholder-player.jpg',
     rarity: 'common'
@@ -105,7 +105,7 @@ export const mockFootballers: FootballerCard[] = [
     name: 'Mikel Oyarzabal',
     team: 'Real Sociedad',
     position: 'Delantero',
-    nationality: 'España',
+    nationality: 'EspaÃ±a',
     rating: 83,
     imageUrl: '/placeholder-player.jpg',
     rarity: 'common'

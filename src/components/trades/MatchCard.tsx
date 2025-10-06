@@ -88,3 +88,4 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
     </Link>
   );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,11 +58,11 @@ export function AvailableCollectionCard({
           className="w-full bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 ring-0 focus-visible:ring-2 focus-visible:ring-green-400 opacity-90 hover:opacity-100"
         >
           {isAdding ? (
-            'Añadiendo...'
+            'AÃ±adiendo...'
           ) : (
             <>
               <Plus className="w-4 h-4 mr-2" />
-              Añadir a mis colecciones
+              AÃ±adir a mis colecciones
             </>
           )}
         </Button>
@@ -70,3 +70,4 @@ export function AvailableCollectionCard({
     </ModernCard>
   );
 }
+
