@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StickerGrid } from '@/components/trades/StickerGrid';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { TradeProposalItem } from '@/types';
-import type { UserStickerWithDetails } from '@/hooks/trades/useProposalComposerData';
+import type { UserStickerWithDetails } from '@/types';
 
 interface StickerSelectorProps {
   myStickers: UserStickerWithDetails[];

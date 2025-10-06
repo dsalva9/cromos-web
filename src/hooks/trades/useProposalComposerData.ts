@@ -1,22 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import type { Collection, Profile, UserSticker } from '@/types';
+import type {
+  Collection,
+  Profile,
+  UserStickerWithDetails,
+} from '@/types';
 
 interface UseProposalComposerDataParams {
   fromUserId?: string | null;
   toUserId?: string | null;
   collectionId?: number | null;
 }
-
-// This new type accurately represents the data fetched from Supabase,
-// which includes the nested 'stickers' object.
-export type UserStickerWithDetails = UserSticker & {
-  stickers: {
-    code: string;
-    player_name: string;
-    thumb_path_webp_100: string | null;
-  } | null;
-};
 
 interface ProposalComposerData {
   fromUser: Profile;

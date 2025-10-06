@@ -224,6 +224,17 @@ export interface StickerWithOwnership extends Sticker {
   team_name?: string;
 }
 
+export interface StickerDetailsLite {
+  code: string;
+  player_name: string;
+  thumb_path_webp_100: string | null;
+}
+
+export interface UserStickerWithDetails extends UserSticker {
+  stickers: StickerDetailsLite | null;
+  duplicates?: number;
+}
+
 export type StickerRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 // Trade Proposal types
@@ -259,9 +270,8 @@ export interface TradeProposalListItem extends TradeProposal {
   request_item_count: number;
 }
 
-export interface TradeProposalItem extends StickerWithOwnership {
-  // This is used for the composer
-  sticker_id: number;
+export interface TradeProposalItem extends UserStickerWithDetails {
+  // Used for the proposal composer selections
   direction: TradeProposalItemDirection;
   quantity: number;
 }

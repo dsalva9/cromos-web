@@ -8,7 +8,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { QuantityStepper } from '@/components/ui/QuantityStepper';
 import Image from 'next/image';
 import { TradeProposalItemDirection, type TradeProposalItem } from '@/types';
-import type { UserStickerWithDetails } from '@/hooks/trades/useProposalComposerData';
+import type { UserStickerWithDetails } from '@/types';
 
 interface StickerGridProps {
   stickers: (UserStickerWithDetails & { duplicates: number })[];
