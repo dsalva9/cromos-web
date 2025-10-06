@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -83,7 +83,7 @@ export function StickerSelector({
           selectedItems={selectedOfferItems}
           onItemsChange={onOfferItemsChange}
           mode="offer"
-          emptyMessage="No tienes cromos repetidos para ofrecer en esta colección."
+          emptyMessage="No tienes cromos repetidos para ofrecer en esta colecci�n."
         />
       </TabsContent>
 

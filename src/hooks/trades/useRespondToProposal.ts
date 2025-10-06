@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 
 type ProposalAction = 'accept' | 'reject' | 'cancel';

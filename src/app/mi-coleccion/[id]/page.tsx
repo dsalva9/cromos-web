@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Suspense, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -102,7 +102,7 @@ function AlbumView() {
               </h3>
               <div className="flex flex-col gap-2 items-center">
                 <label className="text-xs uppercase tracking-widest text-white/70">
-                  Cambiar de colecciÃ³n
+                  Cambiar de colección
                 </label>
                 <select
                   value={activeCollection?.id ?? ''}

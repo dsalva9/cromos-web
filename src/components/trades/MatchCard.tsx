@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { User, ArrowRightLeft, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
 

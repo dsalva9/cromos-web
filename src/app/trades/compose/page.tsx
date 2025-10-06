@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -71,8 +71,8 @@ function ProposalComposer() {
     });
 
     if (success) {
-      toast.success('¡Propuesta enviada con éxito!', {
-        description: 'Serás redirigido a tu panel de propuestas.',
+      toast.success('�Propuesta enviada con �xito!', {
+        description: 'Ser�s redirigido a tu panel de propuestas.',
       });
       router.push('/trades/proposals');
     }

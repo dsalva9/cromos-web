@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import SiteHeader from '@/components/site-header';
@@ -46,7 +46,7 @@ export default function RootLayout({
           </main>
           <footer className="border-t">
             <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-              Â© {new Date().getFullYear()} {siteConfig.name}
+              © {new Date().getFullYear()} {siteConfig.name}
             </div>
           </footer>
           <Toaster position="top-right" richColors expand />

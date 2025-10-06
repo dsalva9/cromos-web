@@ -156,7 +156,7 @@ export default function PageName() {
 
 - Loading: "Cargando..."
 - Error: "Error", "Error desconocido"
-- Success: "Éxito", "Guardado correctamente"
+- Success: "�xito", "Guardado correctamente"
 - Empty state: "No hay elementos disponibles"
 
 ### Action Buttons
@@ -172,7 +172,7 @@ export default function PageName() {
 
 - Home: "Inicio"
 - Profile: "Perfil"
-- Collection: "Mi Colección"
+- Collection: "Mi Colecci�n"
 - Trades: "Intercambios"
 - Messages: "Mensajes"
 

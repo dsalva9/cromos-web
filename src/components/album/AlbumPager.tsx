@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useRef, useState, useEffect, useCallback, CSSProperties } from 'react';
 import Link from 'next/link';

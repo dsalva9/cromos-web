@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ export default function AuthGuard({
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <p>Verificando autenticaciÃ³n...</p>
+          <p>Verificando autenticación...</p>
         </div>
       </div>
     );

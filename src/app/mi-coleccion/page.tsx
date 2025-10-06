@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -108,7 +108,7 @@ function CollectionRedirectContent() {
         <div className="text-center space-y-4 text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
           <div className="text-xl">
-            {userLoading ? 'Cargando usuario...' : 'Buscando tu colecciÃ³n...'}
+            {userLoading ? 'Cargando usuario...' : 'Buscando tu colección...'}
           </div>
         </div>
       </div>

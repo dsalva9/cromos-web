@@ -1,4 +1,4 @@
-﻿import { TradeProposalListItem } from '@/types';
+import { TradeProposalListItem } from '@/types';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';

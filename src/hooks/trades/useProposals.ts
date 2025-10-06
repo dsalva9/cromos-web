@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { TradeProposalListItem } from '@/types';
 
@@ -57,7 +57,7 @@ export const useProposals = (): UseProposalsReturn => {
         setHasMore((data || []).length === limit);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : 'OcurriÃ³ un error desconocido.'
+          err instanceof Error ? err.message : 'Ocurrió un error desconocido.'
         );
       } finally {
         setLoading(false);

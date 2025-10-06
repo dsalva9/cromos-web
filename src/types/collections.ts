@@ -1,4 +1,4 @@
-﻿export interface Collection {
+export interface Collection {
   id: number;
   name: string;
   competition: string;

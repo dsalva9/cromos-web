@@ -1,4 +1,4 @@
-﻿﻿# Database Schema Documentation
+# Database Schema Documentation
 
 ## Current State: v1.3.0 (All features deployed)
 
@@ -755,10 +755,10 @@ Stores sticker artwork.
 
 ```
 sticker-images/
-â”œâ”€â”€ {collection_id}/
-â”‚   â”œâ”€â”€ {sticker_number}-{sticker_id}.webp (300px)
-â”‚   â””â”€â”€ thumbs/
-â”‚       â””â”€â”€ {sticker_number}-{sticker_id}.webp (100px)
+├── {collection_id}/
+│   ├── {sticker_number}-{sticker_id}.webp (300px)
+│   └── thumbs/
+│       └── {sticker_number}-{sticker_id}.webp (100px)
 ```
 
 **Configuration:**
@@ -787,13 +787,13 @@ Stores user profile avatars.
 
 ### Deployment Checklist
 
-1. âœ… All core tables created
-2. âœ… All indexes applied
-3. âœ… All RLS policies active
-4. âœ… All RPC functions deployed
-5. âœ… Storage buckets configured
-6. âš ï¸ Backfill `stickers.sticker_number` before enforcing NOT NULL
-7. âš ï¸ Populate `collection_pages` and `page_slots` for active collections
+1. ✅ All core tables created
+2. ✅ All indexes applied
+3. ✅ All RLS policies active
+4. ✅ All RPC functions deployed
+5. ✅ Storage buckets configured
+6. ⚠️ Backfill `stickers.sticker_number` before enforcing NOT NULL
+7. ⚠️ Populate `collection_pages` and `page_slots` for active collections
 
 ### Performance Monitoring
 
@@ -816,5 +816,5 @@ Key indexes for monitoring:
 
 ---
 
-**Status:** âœ… All v1.3.0 features deployed and documented
+**Status:** ✅ All v1.3.0 features deployed and documented
 **Next:** Begin Phase 2 continuation (chat UI, history dashboard)

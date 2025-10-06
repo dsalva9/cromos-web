@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -35,10 +35,10 @@ export function OwnedCollectionsGrid({
           <ModernCardContent className="p-16 text-center">
             <Trophy className="w-24 h-24 text-white/60 mx-auto mb-8" />
             <h4 className="text-3xl font-semibold text-white/90 mb-6">
-              AÃºn no has aÃ±adido ninguna colecciÃ³n
+              Aún no has añadido ninguna colección
             </h4>
             <p className="text-white/80 text-lg leading-relaxed">
-              Explora las colecciones disponibles y aÃ±ade una para empezar a
+              Explora las colecciones disponibles y añade una para empezar a
               intercambiar cromos
             </p>
           </ModernCardContent>

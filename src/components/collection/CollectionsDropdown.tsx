@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -64,7 +64,7 @@ export default function CollectionsDropdown({
           <span className="truncate">
             {currentCollection
               ? `${currentCollection.competition} ${currentCollection.year}`
-              : 'Seleccionar colecciÃ³n'}
+              : 'Seleccionar colección'}
           </span>
         </div>
         <ChevronDown

@@ -1,4 +1,4 @@
-﻿// Database types
+// Database types
 export interface Database {
   public: {
     Tables: {

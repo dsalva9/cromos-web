@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -29,9 +29,9 @@ interface FindTradersFiltersProps {
 
 const RARITY_OPTIONS = [
   { value: '', label: 'Todas las rarezas' },
-  { value: 'common', label: 'ComÃºn' },
+  { value: 'common', label: 'Común' },
   { value: 'rare', label: 'Rara' },
-  { value: 'epic', label: 'Ã‰pica' },
+  { value: 'epic', label: 'Épica' },
   { value: 'legendary', label: 'Legendaria' },
 ];
 
@@ -92,7 +92,7 @@ export function FindTradersFilters({
       {/* Collection Selector */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-2">
-          ColecciÃ³n
+          Colección
         </label>
         <div className="relative">
           <button
@@ -106,7 +106,7 @@ export function FindTradersFilters({
             <span className="truncate">
               {selectedCollection
                 ? `${selectedCollection.name} (${selectedCollection.year})`
-                : 'Selecciona una colecciÃ³n'}
+                : 'Selecciona una colección'}
             </span>
             <ChevronDown className="w-4 h-4 text-gray-500" />
             {selectedCollection?.is_user_active && (
@@ -262,7 +262,7 @@ export function FindTradersFilters({
           {/* Min Overlap Filter */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Coincidencias mÃ­nimas
+              Coincidencias mínimas
             </label>
             <div className="flex flex-wrap gap-2">
               {MIN_OVERLAP_OPTIONS.map(value => (
@@ -285,7 +285,7 @@ export function FindTradersFilters({
               ))}
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              NÃºmero mÃ­nimo de cromos que pueden intercambiarse mutuamente
+              Número mínimo de cromos que pueden intercambiarse mutuamente
             </p>
           </div>
         </div>

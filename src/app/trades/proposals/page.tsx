@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';

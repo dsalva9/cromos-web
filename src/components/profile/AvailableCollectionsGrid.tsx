@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -33,10 +33,10 @@ export function AvailableCollectionsGrid({
           <ModernCardContent className="p-16 text-center">
             <Star className="w-24 h-24 text-white/60 mx-auto mb-8" />
             <h4 className="text-3xl font-semibold text-white/90 mb-6">
-              Â¡Ya has aÃ±adido todas las colecciones disponibles!
+              ¡Ya has añadido todas las colecciones disponibles!
             </h4>
             <p className="text-white/80 text-lg leading-relaxed">
-              No hay mÃ¡s colecciones para aÃ±adir en este momento
+              No hay más colecciones para añadir en este momento
             </p>
           </ModernCardContent>
         </ModernCard>

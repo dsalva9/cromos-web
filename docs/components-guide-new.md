@@ -1,4 +1,4 @@
-﻿# Components Architecture Guide
+# Components Architecture Guide
 
 This document outlines the component structure and patterns used in the CambioCromos application.
 
@@ -35,12 +35,12 @@ This document outlines the component structure and patterns used in the CambioCr
 
 ```
 src/components/
-â”œâ”€â”€ ui/                    # shadcn/ui base components + custom extensions
-â”œâ”€â”€ providers/             # Context providers
-â”œâ”€â”€ collection/           # Collection-specific components
-â”œâ”€â”€ trades/              # Trading-specific components
-â”œâ”€â”€ profile/             # Profile-specific components (if any)
-â””â”€â”€ [shared-components]   # Reusable application components
+├── ui/                    # shadcn/ui base components + custom extensions
+├── providers/             # Context providers
+├── collection/           # Collection-specific components
+├── trades/              # Trading-specific components
+├── profile/             # Profile-specific components (if any)
+└── [shared-components]   # Reusable application components
 ```
 
 ## Provider Components
@@ -126,7 +126,7 @@ Protects routes that require authentication.
 **Features:**
 
 - Redirects unauthenticated users
-- Shows Spanish loading states ("Verificando autenticaciÃ³n...")
+- Shows Spanish loading states ("Verificando autenticación...")
 - Customizable redirect destination
 - Graceful handling of auth state changes
 
@@ -187,10 +187,10 @@ Full-screen empty state component for users without collections.
 
 - **Full-screen layout**: Takes entire viewport with centered content
 - **Contextual messaging**:
-  - Welcome message "Â¡Bienvenido a CambioCromos!"
+  - Welcome message "¡Bienvenido a CambioCromos!"
   - Clear explanation of next steps
   - Friendly onboarding tone in Spanish
-- **Direct CTA**: "Seguir una ColecciÃ³n" button routes to `/profile`
+- **Direct CTA**: "Seguir una Colección" button routes to `/profile`
 - **Visual hierarchy**: Trophy icon, headings, and descriptive text
 - **Theme consistency**: Uses app's gradient background and modern card styling
 - **Responsive spacing**: Proper padding and max-width constraints
@@ -329,7 +329,7 @@ Advanced filter interface for trading search with debounced inputs.
 - **Filter Categories**:
   - Collection dropdown with active/inactive status
   - Player name search with search icon
-  - Rarity dropdown (ComÃºn, Rara, Ã‰pica, Legendaria)
+  - Rarity dropdown (Común, Rara, Épica, Legendaria)
   - Team name text input
   - Minimum overlap button selector (1-10+ coincidences)
 
@@ -399,7 +399,7 @@ Detailed side-by-side sticker lists for trading pairs.
 - **Empty States**: Contextual messages when no stickers available in either direction
 - **Accessibility**: Semantic HTML with proper headings and screen reader support
 
-### Trading Proposal Components âœ… **NEW - MVP COMPLETE**
+### Trading Proposal Components ✅ **NEW - MVP COMPLETE**
 
 ### ProposalList & ProposalCard
 
@@ -412,7 +412,7 @@ Display proposal summaries with status indicators and action buttons.
   proposals={proposals}
   loading={loading}
   onProposalSelect={handleProposalSelect}
-  emptyMessage="No tienes propuestas en esta secciÃ³n"
+  emptyMessage="No tienes propuestas en esta sección"
 />
 
 <ProposalCard
@@ -558,7 +558,7 @@ Reusable counter control for adjusting proposal quantities.
 
 **Accessibility & UX:**
 
-- Ghost icon buttons with `aria-label`/`title` ("Disminuir", "AÃ±adir uno")
+- Ghost icon buttons with `aria-label`/`title` ("Disminuir", "Añadir uno")
 - Disabled states at bounds; prevents negative values or exceeding owned duplicates
 - Centered value uses `aria-live="polite"` to announce updates for screen readers
 - Keyboard focus ring handled on the outer container to match optimistic UI patterns
@@ -604,7 +604,7 @@ const isValidProposal =
   message.trim().length <= 500;
 ```
 
-## Trading Hooks âœ… **COMPREHENSIVE TRADING STATE MANAGEMENT**
+## Trading Hooks ✅ **COMPREHENSIVE TRADING STATE MANAGEMENT**
 
 ### useFindTraders
 
@@ -667,7 +667,7 @@ await fetchDetail({
 - **Error Handling**: State reset on errors with user-friendly messages
 - **Cache Management**: `clearDetail` for component unmounting
 
-### useProposals âœ… **NEW - PROPOSAL MANAGEMENT**
+### useProposals ✅ **NEW - PROPOSAL MANAGEMENT**
 
 **File**: `src/hooks/trades/useProposals.ts`
 
@@ -694,7 +694,7 @@ await fetchProposals({
 - **Error Recovery**: Comprehensive error handling with user feedback
 - **Optimistic Updates**: Immediate UI updates for proposal responses
 
-### useCreateProposal âœ… **NEW - PROPOSAL CREATION**
+### useCreateProposal ✅ **NEW - PROPOSAL CREATION**
 
 **File**: `src/hooks/trades/useCreateProposal.ts`
 
@@ -721,7 +721,7 @@ await createProposal({
 - **Success Feedback**: Sonner-based toast notifications
 - **Loading States**: Granular loading during proposal creation
 
-### useRespondToProposal âœ… **NEW - PROPOSAL RESPONSES**
+### useRespondToProposal ✅ **NEW - PROPOSAL RESPONSES**
 
 **File**: `src/hooks/trades/useRespondToProposal.ts`
 
@@ -745,7 +745,7 @@ await respondToProposal({
 - **Error Recovery**: Rollback mechanism for failed responses
 - **Sonner Toast Integration**: Contextual success/error messaging
 
-### useProposalDetail âœ… **NEW - DETAILED PROPOSAL VIEW**
+### useProposalDetail ✅ **NEW - DETAILED PROPOSAL VIEW**
 
 **File**: `src/hooks/trades/useProposalDetail.ts`
 
@@ -832,7 +832,7 @@ const updateStickerOwnership = async (stickerId: number) => {
 };
 ```
 
-### ProfilePage âœ… **COMPLETED & PERFECTED**
+### ProfilePage ✅ **COMPLETED & PERFECTED**
 
 **File**: `src/app/profile/page.tsx`
 
@@ -848,7 +848,7 @@ User profile and collection management with **true zero-reload optimistic update
 - **Per-action loading states** for granular user feedback
 - **Confirmation modals** for destructive actions with cascade delete warnings
 
-### FindTradersPage âœ… **COMPLETED - PHASE 2**
+### FindTradersPage ✅ **COMPLETED - PHASE 2**
 
 **File**: `src/app/trades/find/page.tsx`
 
@@ -864,7 +864,7 @@ Main trading search interface with filtering and pagination.
 - **Toast notifications** for search errors
 - **Responsive grid layout** for match cards (1-3 columns based on screen size)
 
-### FindTraderDetailPage âœ… **COMPLETED - PHASE 2**
+### FindTraderDetailPage ✅ **COMPLETED - PHASE 2**
 
 **File**: `src/app/trades/find/[userId]/page.tsx`
 
@@ -879,7 +879,7 @@ Detailed view for specific trading matches with back navigation and proposal cre
 - **Proposal creation CTA** with seamless navigation to composer
 - **Error boundaries** with user-friendly error states
 
-### ProposalsDashboardPage âœ… **NEW - MVP COMPLETE**
+### ProposalsDashboardPage ✅ **NEW - MVP COMPLETE**
 
 **File**: `src/app/trades/proposals/page.tsx`
 
@@ -913,7 +913,7 @@ const handleProposalSelect = (proposalId: number) => {
 };
 ```
 
-### ProposalComposerPage âœ… **NEW - MVP COMPLETE**
+### ProposalComposerPage ✅ **NEW - MVP COMPLETE**
 
 **File**: `src/app/trades/compose/page.tsx`
 
@@ -922,7 +922,7 @@ Proposal creation interface with multi-sticker selection and preview.
 **Key Features:**
 
 - **URL Parameter Integration**: Accepts `userId` and `collectionId` from find traders flow
-- **Multi-Step Workflow**: Sticker selection â†’ summary/preview â†’ submission
+- **Multi-Step Workflow**: Sticker selection → summary/preview → submission
 - **Validation Logic**: Prevents invalid proposals with clear error messages
 - **Context Preservation**: Maintains target user and collection context throughout
 - **Back Navigation**: Returns to find traders detail with context preserved
@@ -977,7 +977,7 @@ Main application navigation with responsive design and trading integration.
 
 ```typescript
 const navigationItems = [
-  { href: '/mi-coleccion', label: 'Mi ColecciÃ³n' },
+  { href: '/mi-coleccion', label: 'Mi Colección' },
   { href: '/trades/find', label: 'Buscar Intercambios' }, // NEW
   { href: '/trades/proposals', label: 'Mis Propuestas' }, // NEW
   { href: '/profile', label: 'Perfil' },
@@ -1052,7 +1052,7 @@ Reusable confirmation modal for destructive actions with trading support.
   open={confirmState.open}
   onOpenChange={setConfirmState}
   title="Rechazar propuesta"
-  description={<span>Â¿EstÃ¡s seguro? <strong>Esta acciÃ³n no se puede deshacer</strong></span>}
+  description={<span>¿Estás seguro? <strong>Esta acción no se puede deshacer</strong></span>}
   confirmText="Rechazar"
   cancelText="Cancelar"
   onConfirm={handleReject}
@@ -1077,7 +1077,7 @@ Comprehensive form component library for authentication flows with trading conte
 
 ```typescript
 // Individual components with trading integration
-<FormContainer title="Iniciar SesiÃ³n" description="Accede a tu cuenta de intercambios">
+<FormContainer title="Iniciar Sesión" description="Accede a tu cuenta de intercambios">
   <FormField
     id="email"
     label="Email"
@@ -1088,8 +1088,8 @@ Comprehensive form component library for authentication flows with trading conte
     required
   />
 
-  <LoadingButton loading={isLoading} loadingText="Iniciando sesiÃ³n...">
-    Iniciar SesiÃ³n
+  <LoadingButton loading={isLoading} loadingText="Iniciando sesión...">
+    Iniciar Sesión
   </LoadingButton>
 
   <ErrorAlert error={errorMessage} />
@@ -1167,7 +1167,7 @@ Sonner maneja el apilado, el enfoque y las animaciones automaticamente, asi que 
 
 ## State Management Patterns
 
-### Perfected Optimistic Updates with Rollback âœ… **EXTENDED TO TRADING**
+### Perfected Optimistic Updates with Rollback ✅ **EXTENDED TO TRADING**
 
 All user actions follow this pattern for immediate feedback with **zero page reloads**:
 
@@ -1193,7 +1193,7 @@ const performTradingAction = async actionData => {
 };
 ```
 
-### Advanced Snapshot-Based Caching âœ… **ENHANCED FOR PROPOSALS**
+### Advanced Snapshot-Based Caching ✅ **ENHANCED FOR PROPOSALS**
 
 ```typescript
 // Cache management for complex proposal operations
@@ -1215,7 +1215,7 @@ const restoreProposalSnapshot = useCallback(snapshot => {
 }, []);
 ```
 
-### Debounced Input Pattern âœ… **ESTABLISHED - TRADING FILTERS**
+### Debounced Input Pattern ✅ **ESTABLISHED - TRADING FILTERS**
 
 For search inputs and filters to prevent excessive API calls:
 
@@ -1237,7 +1237,7 @@ const handleFilterUpdate = (key: string, value: string) => {
 };
 ```
 
-### Modal State Management âœ… **NEW - PROPOSAL MODALS**
+### Modal State Management ✅ **NEW - PROPOSAL MODALS**
 
 Comprehensive modal state management for proposal workflows:
 
@@ -1272,7 +1272,7 @@ const closeAllModals = () => {
 };
 ```
 
-### Loading States âœ… **ENHANCED FOR TRADING OPERATIONS**
+### Loading States ✅ **ENHANCED FOR TRADING OPERATIONS**
 
 Per-action loading for granular user feedback:
 
@@ -1301,7 +1301,7 @@ const handleTradingAction = async (actionId: string, actionType: string) => {
 
 ## Component Creation Guidelines
 
-### TypeScript Interface Standards âœ… **EXTENDED FOR TRADING**
+### TypeScript Interface Standards ✅ **EXTENDED FOR TRADING**
 
 ```typescript
 interface TradingComponentProps {
@@ -1322,7 +1322,7 @@ interface TradingComponentProps {
 }
 ```
 
-### Accessibility Requirements âœ… **EXTENDED FOR TRADING WORKFLOWS**
+### Accessibility Requirements ✅ **EXTENDED FOR TRADING WORKFLOWS**
 
 - **Spanish language**: All user-facing text in Spanish
 - **ARIA labels**: Proper labeling for screen readers, especially for complex trading interfaces
@@ -1340,7 +1340,7 @@ interface TradingComponentProps {
 
 ## Testing Considerations (Future Implementation)
 
-### Priority Testing Areas âœ… **EXTENDED FOR TRADING**
+### Priority Testing Areas ✅ **EXTENDED FOR TRADING**
 
 - **Optimistic updates**: Verify rollback behavior on server errors
 - **Auth flows**: Login/logout state transitions
@@ -1355,7 +1355,7 @@ interface TradingComponentProps {
 
 ## Performance Optimization
 
-### Current Optimizations âœ… **ENHANCED FOR TRADING**
+### Current Optimizations ✅ **ENHANCED FOR TRADING**
 
 - **Memoization**: `useMemo` for expensive calculations (progress stats, proposal filtering)
 - **Callback stability**: `useCallback` for event handlers
@@ -1388,7 +1388,7 @@ These should be removed from production builds.
 
 ---
 
-## Phase 2 Component Patterns âœ… **FULLY ESTABLISHED**
+## Phase 2 Component Patterns ✅ **FULLY ESTABLISHED**
 
 ### Comprehensive Trading Component Architecture
 
@@ -1405,7 +1405,7 @@ All Phase 2 trading components follow these established patterns:
 9. **Active Collection Priority**: Always preselect user's active collection when available
 10. **Comprehensive Error Handling**: User-friendly error states with recovery options
 
-### Trading-Specific Patterns âœ… **NEW ARCHITECTURAL PATTERNS**
+### Trading-Specific Patterns ✅ **NEW ARCHITECTURAL PATTERNS**
 
 11. **Proposal Lifecycle Management**: Complete workflow from creation to response with state tracking
 12. **Multi-Sticker Selection**: Complex selection interfaces supporting bulk operations
@@ -1424,51 +1424,51 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 
 When creating new components:
 
-1. âœ… **TypeScript interfaces** defined for all props
-2. âœ… **Spanish language** for all user-facing text
-3. âœ… **Error boundaries** and proper error handling
-4. âœ… **Loading states** for async operations
-5. âœ… **Responsive design** with mobile-first approach
-6. âœ… **Accessibility** features (ARIA, keyboard navigation)
-7. âœ… **Consistent styling** following gradient design system
-8. âœ… **Zero-reload optimistic updates** where applicable
-9. âœ… **Context-aware user feedback** with appropriate toast messaging
-10. âœ… **Snapshot-based error recovery** for complex state management
-11. âœ… **Debounced inputs** for search/filter functionality
-12. âœ… **RPC integration** following established Supabase patterns
-13. âœ… **Modal state management** for complex UI workflows (NEW)
-14. âœ… **Proposal lifecycle integration** for trading features (NEW)
-15. âœ… **Status-based conditional rendering** for dynamic interfaces (NEW)
+1. ✅ **TypeScript interfaces** defined for all props
+2. ✅ **Spanish language** for all user-facing text
+3. ✅ **Error boundaries** and proper error handling
+4. ✅ **Loading states** for async operations
+5. ✅ **Responsive design** with mobile-first approach
+6. ✅ **Accessibility** features (ARIA, keyboard navigation)
+7. ✅ **Consistent styling** following gradient design system
+8. ✅ **Zero-reload optimistic updates** where applicable
+9. ✅ **Context-aware user feedback** with appropriate toast messaging
+10. ✅ **Snapshot-based error recovery** for complex state management
+11. ✅ **Debounced inputs** for search/filter functionality
+12. ✅ **RPC integration** following established Supabase patterns
+13. ✅ **Modal state management** for complex UI workflows (NEW)
+14. ✅ **Proposal lifecycle integration** for trading features (NEW)
+15. ✅ **Status-based conditional rendering** for dynamic interfaces (NEW)
 
 ---
 
 ## Architecture Success Metrics
 
-### Component Reusability âœ… **ACHIEVED**
+### Component Reusability ✅ **ACHIEVED**
 
 - Trading components follow established patterns from profile system
 - Consistent state management across all features
 - Reusable UI patterns for similar workflows
 
-### Performance Optimization âœ… **ACHIEVED**
+### Performance Optimization ✅ **ACHIEVED**
 
 - Zero-reload interactions maintained across complex trading workflows
 - Efficient RPC-based data fetching
 - Optimized modal rendering and state management
 
-### User Experience Excellence âœ… **ACHIEVED**
+### User Experience Excellence ✅ **ACHIEVED**
 
 - Intuitive trading workflows with clear visual feedback
 - Comprehensive error handling and recovery
 - Mobile-optimized responsive design throughout
 
-### Developer Experience âœ… **ACHIEVED**
+### Developer Experience ✅ **ACHIEVED**
 
 - Comprehensive TypeScript coverage
 - Clear component boundaries and responsibilities
 - Extensive documentation and patterns for future development
 
-**Phase 2 Component Architecture Status**: âœ… **COMPLETE AND PRODUCTION-READY**
+**Phase 2 Component Architecture Status**: ✅ **COMPLETE AND PRODUCTION-READY**
 
 
 

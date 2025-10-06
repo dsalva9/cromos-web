@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -63,7 +63,7 @@ export function ProposalSummary({
 
         <div>
           <Textarea
-            placeholder="Añade un mensaje (opcional)..."
+            placeholder="A�ade un mensaje (opcional)..."
             value={message}
             onChange={e => onMessageChange(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}

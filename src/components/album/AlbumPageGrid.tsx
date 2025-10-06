@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { AlbumPageData, PageSlot } from '@/hooks/album';
 import StickerTile from './StickerTile';

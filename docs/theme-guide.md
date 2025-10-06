@@ -54,7 +54,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 <button
   class="bg-[#FFC000] text-gray-900 font-bold border border-black rounded-md hover:bg-yellow-400"
 >
-  Acción Principal
+  Acci�n Principal
 </button>
 ```
 
@@ -64,7 +64,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 <button
   class="bg-[#E84D4D] text-white font-bold border border-black rounded-md hover:bg-red-600"
 >
-  Acción Negativa
+  Acci�n Negativa
 </button>
 ```
 
@@ -75,7 +75,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
   href="#"
   class="bg-[#FFC000] text-gray-900 font-extrabold rounded-full px-4 py-2"
 >
-  Página Activa
+  P�gina Activa
 </a>
 ```
 
@@ -86,7 +86,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
   href="#"
   class="bg-gray-800 text-gray-300 border border-gray-700 rounded-full px-4 py-2"
 >
-  Página Inactiva
+  P�gina Inactiva
 </a>
 ```
 

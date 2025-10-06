@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -68,7 +68,7 @@ export default function UIDemoPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   Player Card
-                  <Badge className="bg-yellow-500">â­ 92</Badge>
+                  <Badge className="bg-yellow-500">⭐ 92</Badge>
                 </CardTitle>
                 <CardDescription>
                   Football player card example
@@ -100,15 +100,15 @@ export default function UIDemoPage() {
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span>Button</span>
-                  <Badge className="bg-green-500">âœ“ Working</Badge>
+                  <Badge className="bg-green-500">✓ Working</Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Badge</span>
-                  <Badge className="bg-green-500">âœ“ Working</Badge>
+                  <Badge className="bg-green-500">✓ Working</Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Card</span>
-                  <Badge className="bg-green-500">âœ“ Working</Badge>
+                  <Badge className="bg-green-500">✓ Working</Badge>
                 </div>
               </CardContent>
             </Card>

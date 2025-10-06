@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useSession } from '@supabase/auth-helpers-react';
 
 export default function SessionDebug() {

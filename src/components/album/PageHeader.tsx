@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { AlbumPageData } from '@/hooks/album';
 import { Progress } from '@/components/ui/progress';
