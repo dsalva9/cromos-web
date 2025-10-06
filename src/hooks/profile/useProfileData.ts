@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { normalizeCollectionStats } from '@/lib/collectionStats';
 
 interface Collection {
   id: number;
@@ -258,13 +259,14 @@ export function useProfileData() {
             }
           );
 
-          const stats = statsData?.[0] || {
-            total_stickers: 0,
-            owned_stickers: 0,
-            completion_percentage: 0,
-            duplicates: 0,
-            missing: 0,
-          };
+          const stats =
+            normalizeCollectionStats(statsData) ?? {
+              total_stickers: 0,
+              owned_stickers: 0,
+              completion_percentage: 0,
+              duplicates: 0,
+              missing: 0,
+            };
 
           return {
             ...collection,
@@ -353,13 +355,14 @@ export function useProfileData() {
               }
             );
 
-            const stats = statsData?.[0] || {
-              total_stickers: 0,
-              owned_stickers: 0,
-              completion_percentage: 0,
-              duplicates: 0,
-              missing: 0,
-            };
+            const stats =
+              normalizeCollectionStats(statsData) ?? {
+                total_stickers: 0,
+                owned_stickers: 0,
+                completion_percentage: 0,
+                duplicates: 0,
+                missing: 0,
+              };
 
             return {
               ...collection,

@@ -186,13 +186,21 @@ export interface Database {
           p_user_id: string;
           p_collection_id: number;
         };
-        Returns: {
-          total_stickers: number;
-          owned_stickers: number;
-          completion_percentage: number;
-          duplicates: number;
-          missing: number;
-        }[];
+        Returns:
+          | {
+              total_stickers: number;
+              owned_stickers: number;
+              completion_percentage: number;
+              duplicates: number;
+              missing: number;
+            }[]
+          | {
+              total_stickers: number;
+              owned_stickers: number;
+              completion_percentage: number;
+              duplicates: number;
+              missing: number;
+            };
       };
     };
     Enums: {
@@ -292,7 +300,4 @@ export interface TradeProposalDetail {
   proposal: TradeProposal;
   items: TradeProposalDetailItem[];
 }
-
-
-
 

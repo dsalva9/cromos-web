@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
+import { normalizeCollectionStats } from '@/lib/collectionStats';
 import { Input } from '@/components/ui/input';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
@@ -161,13 +162,14 @@ function ProfileContent() {
             }
           );
 
-          const stats = statsData?.[0] || {
-            total_stickers: 0,
-            owned_stickers: 0,
-            completion_percentage: 0,
-            duplicates: 0,
-            missing: 0,
-          };
+          const stats =
+            normalizeCollectionStats(statsData) ?? {
+              total_stickers: 0,
+              owned_stickers: 0,
+              completion_percentage: 0,
+              duplicates: 0,
+              missing: 0,
+            };
 
           return {
             ...collection,

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Sticker } from '@/types';
+import { normalizeCollectionStats } from '@/lib/collectionStats';
 
 export interface CollectionPage {
   id: number;
@@ -179,14 +180,14 @@ export function useAlbumPages(
 
         if (error) throw error;
 
-        const stats = Array.isArray(data) && data.length > 0 ? data[0] : null;
+        const stats = normalizeCollectionStats(data);
 
         if (stats) {
-          const total = stats.total_stickers ?? 0;
-          const owned = stats.owned_stickers ?? 0;
-          const duplicates = stats.duplicates ?? 0;
-          const missing = stats.missing ?? Math.max(total - owned, 0);
-          const completion = total > 0 ? Math.round((owned / total) * 100) : 0;
+          const total = stats.total_stickers;
+          const owned = stats.owned_stickers;
+          const duplicates = stats.duplicates;
+          const missing = stats.missing;
+          const completion = stats.completion_percentage;
 
           setSummary({
             totalStickers: total,
@@ -741,5 +742,4 @@ export function useAlbumPages(
     reduceStickerOwned,
   };
 }
-
 
