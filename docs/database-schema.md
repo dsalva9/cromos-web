@@ -201,6 +201,8 @@ CREATE TABLE user_stickers (
 
 - Primary key on `(user_id, sticker_id)`
 - `idx_user_stickers_trading_v2` on `(sticker_id, user_id, count)` for duplicate-driven trading queries
+- `idx_user_stickers_user_collection_sticker` on `(user_id, collection_id, sticker_id)` for fast user inventory lookups
+- `idx_user_stickers_user_collection_sticker_count` on `(user_id, collection_id, sticker_id, count)` for filtering by count
 
 **RLS Policies:**
 
@@ -245,6 +247,8 @@ CREATE TABLE collection_pages (
 
 - Primary key on `id`
 - `idx_collection_pages_order` on `(collection_id, order_index)`
+- `idx_collection_pages_page_collection` on `(page_id, collection_id)` for page validation _(v1.4.0)_
+- `idx_collection_pages_collection` on `(collection_id)` for collection lookups _(v1.4.0)_
 
 **RLS Policies:**
 
@@ -278,6 +282,8 @@ CREATE TABLE page_slots (
 
 - Primary key on `(page_id, slot_index)`
 - `idx_page_slots_page_slot` on `(page_id, slot_index)` (covering index)
+- `idx_page_slots_page_id` on `(page_id)` for page→stickers lookups
+- `idx_page_slots_page_sticker` on `(page_id, sticker_id)` composite for joins
 
 **RLS Policies:**
 
@@ -727,6 +733,192 @@ FUNCTION cancel_trade(
 
 ---
 
+### Sticker Completion
+
+#### `mark_team_page_complete` _(v1.4.0)_
+
+Marks all stickers on a team page as owned (count=1) for a user. Only adds stickers that are currently missing (no row or count=0). Idempotent - returns added_count=0 if page already complete.
+
+```sql
+FUNCTION mark_team_page_complete(
+  p_user_id UUID,
+  p_collection_id INT,
+  p_page_id INT
+) RETURNS JSONB
+```
+
+**Parameters:**
+
+- `p_user_id`: User UUID (must match authenticated user)
+- `p_collection_id`: Collection ID that owns the page
+- `p_page_id`: Page ID to mark complete (must be a team page)
+
+**Returns:**
+
+```json
+{
+  "added_count": 5,
+  "affected_sticker_ids": [1, 5, 12, 18, 20]
+}
+```
+
+**Preconditions:**
+
+- User must be authenticated (`auth.uid()`)
+- Caller must be acting on their own behalf (`p_user_id = auth.uid()`)
+- Page must belong to the specified collection
+- Page must be a team page (`kind = 'team'` or exactly 20 slots)
+
+**Side Effects:**
+
+- Inserts new rows into `user_stickers` with `count = 1` for missing stickers
+- Updates existing rows where `count = 0` to `count = 1`
+- Does NOT modify stickers with `count >= 1` (preserves singles and duplicates)
+- Idempotent: re-running on same page returns `added_count = 0`
+
+**Security:**
+
+- `SECURITY DEFINER`: Runs with elevated privileges
+- Auth guard: Validates `p_user_id = auth.uid()` at function start
+- RLS remains enabled on `user_stickers` table
+- Cross-user writes blocked by exception
+
+**Scope:**
+
+- **Team pages only**: Badge + manager + 18 players (20 slots)
+- **Special pages**: Not supported in Phase 1 (raises exception)
+
+**Error Cases:**
+
+- Cross-user write: `Unauthorized: Cannot modify stickers for another user`
+- Invalid page/collection: `Invalid page_id X for collection_id Y`
+- Non-team page: `Only team pages are supported` (SQLSTATE `check_violation`)
+- RLS violations: Standard Supabase RLS errors
+
+**Full Implementation:**
+
+```sql
+-- Drop existing function if it exists
+DROP FUNCTION IF EXISTS mark_team_page_complete(UUID, INT, INT);
+
+-- Create the function with team page validation
+CREATE OR REPLACE FUNCTION mark_team_page_complete(
+    p_user_id UUID,
+    p_collection_id INT,
+    p_page_id INT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO public
+AS $$
+DECLARE
+    v_added_count INT := 0;
+    v_affected_sticker_ids INT[] := ARRAY[]::INT[];
+    v_page_exists BOOLEAN;
+    v_page_kind TEXT;
+    v_slot_count INT;
+BEGIN
+    -- Security: Verify the caller is acting on their own behalf
+    IF p_user_id <> auth.uid() THEN
+        RAISE EXCEPTION 'Unauthorized: Cannot modify stickers for another user';
+    END IF;
+
+    -- Validate that the page belongs to the collection and get page kind
+    SELECT
+        EXISTS(
+            SELECT 1
+            FROM collection_pages
+            WHERE id = p_page_id
+              AND collection_id = p_collection_id
+        ),
+        (SELECT kind FROM collection_pages WHERE id = p_page_id)
+    INTO v_page_exists, v_page_kind;
+
+    IF NOT v_page_exists THEN
+        RAISE EXCEPTION 'Invalid page_id % for collection_id %', p_page_id, p_collection_id;
+    END IF;
+
+    -- Guard: Only allow team pages
+    -- First try to use collection_pages.kind if available
+    IF v_page_kind IS NOT NULL THEN
+        -- Column exists, use it directly
+        IF v_page_kind <> 'team' THEN
+            RAISE EXCEPTION 'Only team pages are supported'
+                USING ERRCODE = 'check_violation';
+        END IF;
+    ELSE
+        -- Fallback: check slot count (team pages have exactly 20 slots)
+        SELECT COUNT(*)
+        INTO v_slot_count
+        FROM page_slots
+        WHERE page_id = p_page_id;
+
+        IF v_slot_count <> 20 THEN
+            RAISE EXCEPTION 'Only team pages are supported'
+                USING ERRCODE = 'check_violation';
+        END IF;
+    END IF;
+
+    -- Insert missing stickers (count = 0 or no row) and collect affected IDs
+    WITH page_stickers AS (
+        -- Get all stickers on this page that belong to the collection
+        SELECT ps.sticker_id
+        FROM page_slots ps
+        INNER JOIN stickers s ON s.id = ps.sticker_id
+        WHERE ps.page_id = p_page_id
+          AND s.collection_id = p_collection_id
+    ),
+    missing_stickers AS (
+        -- Find stickers that are missing (no row or count = 0)
+        SELECT ps.sticker_id
+        FROM page_stickers ps
+        LEFT JOIN user_stickers us ON
+            us.user_id = p_user_id
+            AND us.sticker_id = ps.sticker_id
+        WHERE us.sticker_id IS NULL OR us.count = 0
+    ),
+    inserted AS (
+        -- Upsert: insert new rows or update count to 1 where it was 0
+        INSERT INTO user_stickers (user_id, sticker_id, count)
+        SELECT p_user_id, sticker_id, 1
+        FROM missing_stickers
+        ON CONFLICT (user_id, sticker_id)
+        DO UPDATE SET count = 1
+        WHERE user_stickers.count = 0
+        RETURNING sticker_id
+    )
+    SELECT
+        COUNT(*)::INT,
+        ARRAY_AGG(sticker_id ORDER BY sticker_id)
+    INTO v_added_count, v_affected_sticker_ids
+    FROM inserted;
+
+    -- Handle case where no stickers were added
+    IF v_affected_sticker_ids IS NULL THEN
+        v_affected_sticker_ids := ARRAY[]::INT[];
+    END IF;
+
+    RETURN jsonb_build_object(
+        'added_count', v_added_count,
+        'affected_sticker_ids', v_affected_sticker_ids
+    );
+END;
+$$;
+
+-- Revoke all permissions from public
+REVOKE ALL ON FUNCTION mark_team_page_complete(UUID, INT, INT) FROM PUBLIC;
+
+-- Grant execute to authenticated users
+GRANT EXECUTE ON FUNCTION mark_team_page_complete(UUID, INT, INT) TO authenticated;
+
+-- Add function comment
+COMMENT ON FUNCTION mark_team_page_complete(UUID, INT, INT) IS
+'Marks all stickers on a team page as owned (count=1) for a user. Only adds stickers that are currently missing (no row or count=0). Idempotent - returns added_count=0 if page already complete. Only supports team pages (kind=team or exactly 20 slots).';
+```
+
+---
+
 ## Triggers
 
 ### `handle_updated_at`
@@ -800,6 +992,70 @@ Key indexes for monitoring:
 - `idx_stickers_collection_filters` (trading queries)
 - `idx_trade_proposals_to_user` (inbox queries)
 - `idx_collection_pages_order` (album navigation)
+- `idx_page_slots_page_id` (page completion queries - v1.4.0)
+- `idx_user_stickers_user_collection_sticker_count` (page completion queries - v1.4.0)
+
+---
+
+## Performance Indexes (v1.4.0)
+
+The following indexes optimize the `mark_team_page_complete` function and related page-based operations:
+
+```sql
+-- Indexes for mark_team_page_complete performance
+-- These support fast lookups in the function's CTEs
+
+-- Index for page_slots: quick lookup of all stickers on a given page
+CREATE INDEX IF NOT EXISTS idx_page_slots_page_id
+ON page_slots(page_id);
+
+-- Composite index for page_slots: covers both columns used in joins
+CREATE INDEX IF NOT EXISTS idx_page_slots_page_sticker
+ON page_slots(page_id, sticker_id);
+
+-- Index for user_stickers: fast lookup by user + collection + sticker
+-- This supports the LEFT JOIN in missing_stickers CTE
+CREATE INDEX IF NOT EXISTS idx_user_stickers_user_collection_sticker
+ON user_stickers(user_id, collection_id, sticker_id);
+
+-- Additional index including count for filtering count = 0
+CREATE INDEX IF NOT EXISTS idx_user_stickers_user_collection_sticker_count
+ON user_stickers(user_id, collection_id, sticker_id, count);
+
+-- Index for collection_pages: validate page belongs to collection
+CREATE INDEX IF NOT EXISTS idx_collection_pages_page_collection
+ON collection_pages(page_id, collection_id);
+
+-- Alternative index if collection_pages has 'id' as primary key
+CREATE INDEX IF NOT EXISTS idx_collection_pages_collection
+ON collection_pages(collection_id);
+
+/*
+EXPECTED QUERY PLAN SHAPE:
+============================
+
+1. Page validation (collection_pages):
+   -> Index Scan using idx_collection_pages_page_collection
+   -> Should be instant lookup
+
+2. page_stickers CTE (page_slots):
+   -> Index Scan using idx_page_slots_page_id
+   -> Returns ~20 rows for team pages
+
+3. missing_stickers CTE (LEFT JOIN):
+   -> Nested Loop Left Join
+      -> Seq Scan on page_stickers (small CTE, ~20 rows)
+      -> Index Scan using idx_user_stickers_user_collection_sticker
+   -> Filter on (us.sticker_id IS NULL OR us.count = 0)
+
+4. INSERT with ON CONFLICT:
+   -> Uses unique constraint on (user_id, collection_id, sticker_id)
+   -> Supported by idx_user_stickers_user_collection_sticker
+
+Overall: Should be < 10ms for typical team page (20 stickers)
+Key: All joins use index scans, no table scans except tiny CTEs
+*/
+```
 
 ---
 

@@ -674,6 +674,135 @@ export function useAlbumPages(
     ]
   );
 
+  const markPageComplete = useCallback(
+    async (targetPageId: number) => {
+      if (!user || !collectionId || !currentPage) return;
+
+      // Only allow completing the current page
+      if (targetPageId !== currentPage.id) {
+        console.error('Can only complete the current page');
+        return;
+      }
+
+      // Guard: only team pages supported
+      if (currentPage.kind !== 'team') {
+        console.error('Only team pages can be marked complete');
+        return;
+      }
+
+      // Snapshot current state for rollback
+      const snapshotPage = { ...currentPage };
+      const snapshotSummary = summary ? { ...summary } : null;
+
+      // Optimistic update: set all missing stickers to count = 1
+      const missingSlots = currentPage.page_slots.filter(slot => {
+        if (!slot.stickers) return false;
+        const count = slot.stickers.user_stickers?.[0]?.count ?? 0;
+        return count === 0;
+      });
+
+      const missingStickerIds = missingSlots
+        .map(slot => slot.sticker_id)
+        .filter((id): id is number => id !== null);
+
+      if (missingStickerIds.length === 0) {
+        // Page already complete, no-op
+        return;
+      }
+
+      // Optimistically update page slots
+      setCurrentPage(prev => {
+        if (!prev) return prev;
+
+        const updatedSlots = prev.page_slots.map(slot => {
+          if (!slot.stickers) return slot;
+
+          const currentCount = slot.stickers.user_stickers?.[0]?.count ?? 0;
+          if (currentCount > 0) return slot; // Already owned
+
+          return {
+            ...slot,
+            stickers: {
+              ...slot.stickers,
+              user_stickers: [{ count: 1 }],
+            },
+          } as PageSlot;
+        });
+
+        const ownedSlots = updatedSlots.filter(slot => {
+          const info = slot.stickers?.user_stickers?.[0];
+          return info ? info.count > 0 : false;
+        }).length;
+
+        return {
+          ...prev,
+          page_slots: updatedSlots,
+          owned_slots: ownedSlots,
+        };
+      });
+
+      // Optimistically update summary (add missing count to owned, subtract from missing)
+      setSummary(prev => {
+        if (!prev) return prev;
+
+        const addedCount = missingStickerIds.length;
+        const ownedUnique = prev.ownedUnique + addedCount;
+        const missing = Math.max(prev.missing - addedCount, 0);
+        const completionPercentage =
+          prev.totalStickers > 0
+            ? Math.round((ownedUnique / prev.totalStickers) * 100)
+            : 0;
+
+        return {
+          ...prev,
+          ownedUnique,
+          missing,
+          completionPercentage,
+        };
+      });
+
+      // Call RPC
+      try {
+        const { data, error } = await supabase.rpc('mark_team_page_complete', {
+          p_user_id: user.id,
+          p_collection_id: collectionId,
+          p_page_id: targetPageId,
+        });
+
+        if (error) throw error;
+
+        // Reconcile with server response
+        const { added_count, affected_sticker_ids } = data as {
+          added_count: number;
+          affected_sticker_ids: number[];
+        };
+
+        console.log(
+          `Page complete: ${added_count} stickers added`,
+          affected_sticker_ids
+        );
+
+        // Refresh stats to ensure consistency
+        await fetchCollectionStats(collectionId, { keepExisting: true });
+      } catch (err) {
+        console.error('Error marking page complete:', err);
+
+        // Rollback optimistic updates
+        setCurrentPage(snapshotPage);
+        if (snapshotSummary) {
+          setSummary(snapshotSummary);
+        }
+
+        // Show error toast
+        if (typeof window !== 'undefined') {
+          const { toast } = await import('@/lib/toast');
+          toast.error('No se pudo completar el equipo.');
+        }
+      }
+    },
+    [collectionId, currentPage, fetchCollectionStats, supabase, summary, user]
+  );
+
   useEffect(() => {
     void fetchUserCollections();
   }, [fetchUserCollections]);
@@ -740,6 +869,7 @@ export function useAlbumPages(
     switchCollection,
     markStickerOwned,
     reduceStickerOwned,
+    markPageComplete,
   };
 }
 

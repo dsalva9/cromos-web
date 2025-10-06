@@ -1,6 +1,22 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: Data Migration & v1.3.0 Go-Live
+## 🚀 Current Sprint: v1.4.0 - Team Page Completion Feature
+
+### v1.4.0 Feature Status
+
+**Backend Complete ✅ | Frontend Complete ✅ | Documentation Complete ✅ | Tests Complete ✅**
+
+- [x] **Mark Team Page Complete Feature**
+  - [x] `mark_team_page_complete` RPC function with validation
+  - [x] Desktop: "Marcar equipo completo" button with confirmation dialog
+  - [x] Mobile: Long-press (600ms) + overflow menu (⋯) with ActionSheet
+  - [x] Optimistic UI updates in `useAlbumPages` hook
+  - [x] Success/error toast notifications
+  - [x] Idempotent behavior (preserves singles and duplicates)
+  - [x] Accessibility: keyboard navigation, ARIA labels
+  - [x] Performance indexes for fast queries
+  - [x] Comprehensive documentation in all guides
+  - [x] Playwright E2E tests (4 test cases)
 
 ### v1.3.0 Feature Status
 
@@ -13,12 +29,13 @@
   - [x] `trades_history` table for completion tracking
   - [x] `user_badges` table for achievements
   - [x] Enhanced `stickers` table with image paths and numbers
-- [x] **RPC Functions v1.3.0** - All database functions operational
+- [x] **RPC Functions v1.4.0** - All database functions operational (15 total)
   - [x] `bulk_add_stickers_by_numbers` - Batch sticker addition
   - [x] `get_completion_report` - Per-page completion analysis
   - [x] `search_stickers` - Advanced sticker search with filters
   - [x] `complete_trade` - Mark trades as completed
   - [x] `cancel_trade` - Cancel trades with history
+  - [x] `mark_team_page_complete` - Bulk mark team pages ✅ **v1.4.0**
 
 - [x] **Album Pages UI - Code Complete**
   - [x] Implement `useAlbumPages` hook with production RPCs
@@ -284,8 +301,8 @@
 
 ---
 
-**Last Updated**: 2025-01-XX (Post Documentation Sync)  
-**Current Focus**: v1.3.0 Data Migration Sprint  
-**Next Focus**: Trade Chat UI and History Dashboard
+**Last Updated**: 2025-10-06 (v1.4.0 - Team Page Completion Feature)
+**Current Focus**: v1.4.0 Feature Complete - Ready for deployment
+**Next Focus**: v1.3.0 Data Migration Sprint → Trade Chat UI and History Dashboard
 
 

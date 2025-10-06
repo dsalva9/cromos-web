@@ -9,6 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- TBD
+
+### Changed
+
+- TBD
+
+### Fixed
+
+- TBD
+
+## [1.4.0] - 2025-10-06
+
+### Added
+
+- **Mark Team Page Complete Feature**: Bulk-complete all missing stickers on team pages with one action
+  - New RPC function: `mark_team_page_complete(p_user_id, p_collection_id, p_page_id)`
+    - Validates team pages only (20 slots: badge + manager + 18 players)
+    - Only affects missing stickers (count=0), preserves singles and duplicates
+    - Returns `{added_count, affected_sticker_ids}` with idempotent behavior
+    - SECURITY DEFINER with auth.uid() validation
+  - **Desktop UI (≥ md breakpoint)**:
+    - "Marcar equipo completo" button in PageHeader
+    - Confirmation dialog before completing
+    - Green button styling for positive action
+  - **Mobile UI (< md breakpoint)**:
+    - Long-press on team title (600ms) opens ActionSheet
+    - Overflow menu button (⋯) for discoverability
+    - Bottom sheet with "Marcar todo el equipo como completado" action
+    - Visual feedback during long-press (opacity change)
+  - **Accessibility**:
+    - Keyboard navigation support (Enter/Space keys)
+    - Proper ARIA labels for screen readers
+    - Focus management in dialogs
+    - Disabled states when page is complete
+  - **Optimistic Updates**:
+    - Instant UI feedback before RPC completes
+    - Automatic rollback on error with toast notification
+    - Stats reconciliation after success
+  - **Performance Indexes**:
+    - `idx_page_slots_page_id` - Fast page→stickers lookup
+    - `idx_page_slots_page_sticker` - Composite index for joins
+    - `idx_user_stickers_user_collection_sticker` - User inventory lookups
+    - `idx_collection_pages_page_collection` - Page validation
+  - **Comprehensive Testing**:
+    - Playwright E2E test suite with 4 test cases
+    - Desktop button flow test
+    - Mobile long-press test
+    - Mobile overflow menu test
+    - Idempotency and persistence tests
+
 - **Mobile UI Optimization (Album View)**: Reworked the `StickerTile` component for a cleaner mobile experience.
   - The entire sticker is now tappable to add it.
   - Action buttons below the sticker are hidden on mobile.
@@ -25,29 +75,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Simplified the duplicate badge to `+n` (e.g., `+1`) and styled it green for consistency with the owned checkmark.
 - **Album Layout**: Moved the team page progress bar (`PageHeader`) to be a sticky footer to optimize vertical space, especially on mobile.
 - **UI Text**: Updated labels in collection summary headers for clarity. "Me Falta" is now "Faltan", and the progress percentage is now labeled "Total".
+- **PageHeader Component**: Enhanced with completion actions for both desktop and mobile
+  - Props: Added `onMarkPageComplete` callback
+  - State management: Long-press detection, ActionSheet control
+  - Responsive behavior: Different UX patterns for mobile vs desktop
 
 ### Fixed
 
 - **Desktop `REPE` Button Logic**: Corrected an off-by-one error where the `REPE (+n)` button text did not accurately reflect the state after the next click.
 - **Mobile Sticker Actions**: Fixed a bug where tapping an action in the mobile dropdown menu would also trigger the sticker's main "add" action.
 - **Robust Sticky Headers**: Fixed persistent positioning issues with the three sticky headers in the album view (`AlbumSummaryHeader`, `AlbumPager`, `PageHeader`). Implemented a dynamic height calculation using `ResizeObserver` to ensure headers stack correctly and remain sticky on all screen sizes, even when content wrapping changes their height.
+- **Toast Library**: Corrected imports from `react-hot-toast` to `@/lib/toast` (sonner wrapper) throughout codebase
+- **SQL Function**: Fixed `mark_team_page_complete` to properly join through `stickers` table since `user_stickers` doesn't have `collection_id` column
 
-## [1.4.0] - 2025-01-XX
+### Documentation
 
-### Added
-
-- **Retro-Comic UI/UX Design System**: Implemented a bold, high-contrast, retro-comic sticker aesthetic across the entire application.
-
-### Changed
-
-- **Complete UI Overhaul**: Replaced the previous gradient-based theme with a dark mode-first design (`bg-[#1F2937]`).
-- **Component Redesign**: Updated all major components (`ModernCard`, `StickerTile`, headers, buttons, badges) with a chunky, high-contrast style featuring thick black borders and specific accent colors (`#FFC000` gold, `#E84D4D` red).
-- **Updated Pages**: Applied the new theme consistently across the Profile Page, Collection Grid, and the full Album View.
-- **Typography**: Standardized major titles to be bold, condensed, and `uppercase` for a stronger visual identity.
+- **database-schema.md**: Added `mark_team_page_complete` RPC with full SQL implementation and corrected joins
+- **api-endpoints.md**: Documented error handling patterns and usage examples for team page completion
+- **components-guide.md**: Comprehensive PageHeader documentation with desktop/mobile behavior
+- **components-guide-new.md**: Updated with same PageHeader enhancements
+- **current-features.md**: Added v1.4.0 feature to Sticker Collection Management section
+- **TODO.md**: Created v1.4.0 sprint section with completed checklist
 
 ### Technical
 
-- Refactored multiple page and component styles to use the new centralized theme principles.
+- Extended `useAlbumPages` hook with `markPageComplete(pageId)` action
+  - Optimistic state snapshots for rollback
+  - Error handling with dynamic toast imports
+  - Stats reconciliation after RPC success
+- RPC function count: 14 → 15 functions
+- Build system: Resolved module resolution issues
 
 ## [1.3.0] - 2025-01-XX
 

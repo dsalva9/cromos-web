@@ -132,6 +132,127 @@ search_stickers(
 
 ---
 
+#### `mark_team_page_complete` ✅ **v1.4.0 NEW**
+
+Marks all stickers on a team page as owned (count=1) for a user. Only adds stickers that are currently missing (no row or count=0). Idempotent - returns added_count=0 if page already complete.
+
+**Function Signature:**
+
+```sql
+mark_team_page_complete(
+  p_user_id UUID,
+  p_collection_id INT,
+  p_page_id INT
+) RETURNS JSONB
+```
+
+**Parameters:**
+
+- `p_user_id`: User UUID (must match authenticated user)
+- `p_collection_id`: Collection ID that owns the page
+- `p_page_id`: Page ID to mark complete (must be a team page)
+
+**Returns:**
+
+```json
+{
+  "added_count": 5,
+  "affected_sticker_ids": [1, 5, 12, 18, 20]
+}
+```
+
+**Preconditions:**
+
+- User must be authenticated (`auth.uid()`)
+- Caller must be acting on their own behalf (`p_user_id = auth.uid()`)
+- Page must belong to the specified collection
+- Page must be a team page (`kind = 'team'` or exactly 20 slots)
+
+**Side Effects:**
+
+- Inserts new rows into `user_stickers` with `count = 1` for missing stickers
+- Updates existing rows where `count = 0` to `count = 1`
+- Does NOT modify stickers with `count >= 1` (preserves singles and duplicates)
+- Idempotent: re-running on same page returns `added_count = 0`
+
+**Security:**
+
+- `SECURITY DEFINER`: Runs with elevated privileges
+- Auth guard: Validates `p_user_id = auth.uid()` at function start
+- RLS remains enabled on `user_stickers` table
+- Cross-user writes blocked by exception
+
+**Scope:**
+
+- **Team pages only**: Badge + manager + 18 players (20 slots)
+- **Special pages**: Not supported in Phase 1 (raises exception)
+
+**Usage Example:**
+
+```typescript
+try {
+  const { data, error } = await supabase.rpc('mark_team_page_complete', {
+    p_user_id: user.id,
+    p_collection_id: 1,
+    p_page_id: 5,
+  });
+
+  if (error) throw error;
+
+  const { added_count, affected_sticker_ids } = data;
+
+  if (added_count > 0) {
+    toast.success(`¡Equipo completado! ${added_count} cromos añadidos`);
+  } else {
+    toast.info('Este equipo ya estaba completo');
+  }
+
+  // Refresh collection stats
+  refreshCompletionReport();
+} catch (err) {
+  console.error('Error completing team page:', err);
+  toast.error('Error al completar equipo');
+}
+```
+
+**Error Cases:**
+
+| Error Condition | Exception Message | SQLSTATE |
+|----------------|-------------------|----------|
+| Cross-user write | `Unauthorized: Cannot modify stickers for another user` | Default |
+| Invalid page/collection | `Invalid page_id X for collection_id Y` | Default |
+| Non-team page | `Only team pages are supported` | `check_violation` |
+| Page not found | `Invalid page_id X for collection_id Y` | Default |
+| RLS violation | Supabase RLS error | `42501` |
+
+**Example Response - Partial Completion:**
+
+```json
+{
+  "added_count": 3,
+  "affected_sticker_ids": [102, 105, 119]
+}
+```
+
+**Example Response - Already Complete:**
+
+```json
+{
+  "added_count": 0,
+  "affected_sticker_ids": []
+}
+```
+
+**Notes:**
+
+- Designed for "Mark team as complete" UI feature
+- Useful for users who acquire full team rosters physically
+- Complements single-sticker addition workflows
+- Does not validate physical sticker possession (trust-based)
+- Consider adding audit logging in future phases
+
+---
+
 ### Trading - Discovery (v1.1.0)
 
 #### `find_mutual_traders`
@@ -751,6 +872,47 @@ try {
     } else {
       throw new Error('Error al crear la propuesta');
     }
+  }
+
+  return data;
+} catch (err: unknown) {
+  const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+  toast.error(errorMessage);
+  throw err;
+}
+```
+
+**Mark Team Page Complete:**
+
+```typescript
+// Complete a team page with error handling
+try {
+  const { data, error } = await supabase.rpc('mark_team_page_complete', {
+    p_user_id: user.id,
+    p_collection_id: collectionId,
+    p_page_id: pageId,
+  });
+
+  if (error) {
+    console.error('Page completion failed:', error);
+
+    if (error.code === 'check_violation') {
+      throw new Error('Solo las páginas de equipos pueden completarse');
+    } else if (error.message.includes('Invalid page_id')) {
+      throw new Error('La página no pertenece a esta colección');
+    } else if (error.message.includes('Unauthorized')) {
+      throw new Error('No autorizado');
+    } else {
+      throw new Error('No se pudo completar el equipo');
+    }
+  }
+
+  const { added_count, affected_sticker_ids } = data;
+
+  if (added_count === 0) {
+    toast.info('Este equipo ya estaba completo');
+  } else {
+    toast.success(`Equipo completado ✔️ (${added_count} cromos añadidos)`);
   }
 
   return data;

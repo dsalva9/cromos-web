@@ -33,7 +33,8 @@ function AlbumView() {
     pendingStickerIds,
     switchCollection,
     markStickerOwned,
-    reduceStickerOwned
+    reduceStickerOwned,
+    markPageComplete,
   } = useAlbumPages(collectionId, pageId);
 
   if (!collectionId) {
@@ -122,7 +123,7 @@ function AlbumView() {
         </div>
       </div>
 
-      <PageHeader page={currentPage} />
+      <PageHeader page={currentPage} onMarkPageComplete={markPageComplete} />
     </div>
   );
 }

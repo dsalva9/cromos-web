@@ -226,13 +226,53 @@ The sticky, horizontal navigation for album pages (teams and special sections).
 
 **File**: `src/components/album/PageHeader.tsx`
 
-Displays the title and progress for the current album page (e.g., "ATHLETIC CLUB").
+Displays the title, progress, and completion actions for the current album page (e.g., "ATHLETIC CLUB").
+
+**Props:**
+
+- `page: AlbumPageData` - Current page data
+- `onMarkPageComplete?: (pageId: number) => Promise<void>` - Callback to mark all missing stickers as owned
+
+**Features:**
+
+**Desktop (≥ md):**
+- Displays page title and progress bar
+- Shows "Marcar equipo completo" button when:
+  - Page is a team page (`kind === 'team'`)
+  - Has missing stickers (`missing > 0`)
+  - `onMarkPageComplete` callback is provided
+- Button opens confirmation dialog before completing
+- Green button styling for positive action
+
+**Mobile (< md):**
+- Long-press on title area (600ms) opens ActionSheet
+- Overflow menu button (⋯) provides discoverable alternative
+- ActionSheet (bottom sheet) with:
+  - Team name and missing count
+  - "Marcar todo el equipo como completado" primary action
+  - "Cancelar" secondary action
+- Visual feedback during long-press (opacity change)
+
+**Accessibility:**
+- Long-press area supports keyboard navigation (Enter/Space)
+- Proper ARIA labels for screen readers
+- Focus management in dialogs
+- Disabled states when page is already complete
+
+**Behavior:**
+- Calls `onMarkPageComplete(pageId)` from hook
+- Optimistic UI updates for instant feedback
+- Success toast: "Equipo completado ✔️"
+- Error toast: "No se pudo completar el equipo."
+- Idempotent: re-running shows "Ya estaba completo"
 
 **Styling:**
 
-- **Container**: No background color; sits on the main page background. A `mb-8` provides spacing.
-- **Title**: `text-2xl font-extrabold uppercase text-white`.
-- **Progress Bar**: Uses a dark track for the progress component: `bg-gray-600`.
+- **Container**: Sticky bottom bar with backdrop blur (`sticky bottom-0 z-20 bg-gray-900/80 backdrop-blur-sm`)
+- **Title**: `text-xl md:text-2xl font-extrabold uppercase text-white`
+- **Progress Bar**: Dark track (`bg-gray-600`)
+- **Complete Button**: Green primary (`bg-green-600 hover:bg-green-700`)
+- **ActionSheet**: Rounded top corners, drag handle indicator
 
 ### useAlbumPages
 

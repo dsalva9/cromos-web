@@ -58,8 +58,14 @@
 - **Progress Tracking**: Real-time completion percentages
 - **Duplicate Management**: Track multiple copies with decrement controls
 - **Header Pills**: Sticky stats bar (Tengo/Me faltan/Repes/%) using `get_user_collection_stats`
+- **Team Page Completion** ✅ **v1.4.0**: Mark entire team pages as complete with one action
+  - Desktop: "Marcar equipo completo" button with confirmation dialog
+  - Mobile: Long-press (600ms) or overflow menu (⋯) opens ActionSheet
+  - Optimistic UI updates with instant feedback
+  - RPC: `mark_team_page_complete` - only affects missing stickers (count=0)
+  - Idempotent: preserves existing singles and duplicates
 
-**Files**: `src/app/mi-coleccion/[id]/page.tsx`
+**Files**: `src/app/mi-coleccion/[id]/page.tsx`, `src/components/album/PageHeader.tsx`, `src/hooks/album/useAlbumPages.ts`
 
 ### 5. Database Architecture ✅
 
@@ -90,10 +96,10 @@
 
 - `user_badges` - User achievement tracking
 
-**RPC Functions (14):** ✅ **ALL DEPLOYED**
+**RPC Functions (15):** ✅ **ALL DEPLOYED**
 
 - Collection stats: `get_user_collection_stats`, `get_completion_report`
-- Sticker management: `bulk_add_stickers_by_numbers`, `search_stickers`
+- Sticker management: `bulk_add_stickers_by_numbers`, `search_stickers`, `mark_team_page_complete` ✅ **v1.4.0**
 - Trading discovery: `find_mutual_traders`, `get_mutual_trade_detail`
 - Trading proposals: `create_trade_proposal`, `respond_to_trade_proposal`, `list_trade_proposals`, `get_trade_proposal_detail`
 - Trading history: `complete_trade`, `cancel_trade`
