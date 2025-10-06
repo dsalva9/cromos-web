@@ -12,13 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mobile UI Optimization (Album View)**: Reworked the `StickerTile` component for a cleaner mobile experience.
   - The entire sticker is now tappable to add it.
   - Action buttons below the sticker are hidden on mobile.
-  - A dynamic badge (`+n`, `QUIERO`, or a checkmark) on the sticker now acts as a dropdown menu for secondary actions (Quitar uno, Lo quiero).
+  - A dynamic badge (`+n` or a checkmark) on the sticker now opens duplicate-management actions (e.g., Quitar uno) without a separate want state.
   - Unowned stickers are now grayscale to improve visual distinction.
 
 ### Changed
 
 - **Trading RPCs**: Phase 4 cleanup removes `user_stickers.wanted`, drops the legacy `idx_user_stickers_trading` index, and updates `get_user_collection_stats` to return only the count-derived `missing` metric.
-- **Album & Collection UI**: Removed QUIERO toggles/badges, derive Faltan from owned counts, and limit mobile dropdowns to duplicate management.
+- Removed explicit want list; app now treats any missing sticker as "wanted" implicitly.
+- **Album & Collection UI**: Simplified controls to focus on owned/duplicate states, derive Faltan from owned counts, and limit mobile dropdowns to duplicate management.
 - **Desktop UI Refinement (Album View)**:
   - Added a green checkmark badge for owned stickers.
   - Simplified the duplicate badge to `+n` (e.g., `+1`) and styled it green for consistency with the owned checkmark.
@@ -76,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Navigate album pages like a real sticker album
 - Team pages display 20 fixed slots (badge at position 0, coach at position 1, players 2-19)
 - Special pages display variable slots based on content
-- Optimistic updates for TENGO/QUIERO/REPE controls
+- Optimistic updates for TENGO/REPE controls
 - Page-level completion tracking
 - Deep-linking with `?page=` query parameter
 - Collection switching from album view
@@ -282,7 +283,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete user authentication system with Supabase
 - User profile management with collection statistics
 - Collection joining and switching functionality
-- Comprehensive sticker inventory system ("TENGO"/"QUIERO")
+- Comprehensive sticker inventory system ("TENGO"/"REPES"/"FALTAN")
 - Collection progress tracking with completion percentages
 - Modern gradient UI with responsive design
 - Protected routes with AuthGuard component
@@ -357,4 +358,3 @@ When making changes:
 
 **Phase 2 Status**: Album Pages complete ✅ | Trade Chat & History pending 🚧  
 **Ready for**: Phase 2 completion (chat UI, history dashboard)
-

@@ -41,7 +41,7 @@ export function ConfirmRemoveCollectionModal({
               <strong>
                 Se eliminarán también todos tus datos de esta colección
               </strong>{' '}
-              (tengo/quiero/duplicados). Esta acción no se puede deshacer.
+              (tengo/duplicados/faltan). Esta acción no se puede deshacer.
             </p>
           </DialogDescription>
         </DialogHeader>
@@ -66,4 +66,3 @@ export function ConfirmRemoveCollectionModal({
     </Dialog>
   );
 }
-

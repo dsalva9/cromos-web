@@ -87,7 +87,7 @@ export default function UIDemoPage() {
                     Tengo
                   </Button>
                   <Button size="sm" variant="outline" className="flex-1">
-                    Quiero
+                    Quitar uno
                   </Button>
                 </div>
               </CardFooter>

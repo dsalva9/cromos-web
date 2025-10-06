@@ -27,7 +27,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 | Role                       | Hex       | Tailwind Class (BG) | Tailwind Class (Text) | Usage                                                                |
 | -------------------------- | --------- | ------------------- | --------------------- | -------------------------------------------------------------------- |
 | **Primary Accent (Gold)**  | `#FFC000` | `bg-[#FFC000]`      | `text-[#FFC000]`      | Primary actions (`TENGO`), active states, highlights |
-| **Secondary Accent (Red)** | `#E84D4D` | `bg-[#E84D4D]`      | `text-[#E84D4D]`      | Negative actions (`YA NO`, `Eliminar`), `REPE` badge                 |
+| **Secondary Accent (Red)** | `#E84D4D` | `bg-[#E84D4D]`      | `text-[#E84D4D]`      | Duplicate (`REPE`) indicators, removal actions (`Eliminar`), and rejection states |
 | **Page Background**        | `#1F2937` | `bg-[#1F2937]`      | -                     | Main background for all pages                                        |
 | **Card Background**        | -         | `bg-gray-800`       | -                     | Background for `ModernCard`, `StickerTile`, etc.                     |
 | **Sticky Nav Background**  | -         | `bg-gray-900`       | -                     | Background for sticky elements like `AlbumPager`                     |
@@ -58,7 +58,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 </button>
 ```
 
-### Destructive Action Button (`Eliminar`, `YA NO`)
+### Destructive Action Button (`Eliminar`, restar duplicados)
 
 ```html
 <button
@@ -89,5 +89,3 @@ This document provides a quick reference for the "Retro-Comic" design system use
   P�gina Inactiva
 </a>
 ```
-
-

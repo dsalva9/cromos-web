@@ -18,7 +18,7 @@ The application has been redesigned with a bold, high-contrast, retro-comic stic
 ### Theme Colors
 
 - **Primary Accent (Gold/Yellow)**: `#FFC000` (`bg-[#FFC000]`). Used for primary actions (`TENGO`, `Hacer Activa`), active states, and highlighted stats.
-- **Secondary Accent (Red)**: `#E84D4D` (`bg-[#E84D4D]`). Used for "duplicate" (`REPE`) status, negative actions (`YA NO`, `Eliminar`), and rejection states.
+- **Secondary Accent (Red)**: `#E84D4D` (`bg-[#E84D4D]`). Used for duplicate (`REPE`) indicators, removal actions (`Eliminar`), and rejection states.
 - **Dark Backgrounds**: `bg-gray-800` for cards and `bg-gray-900` for sticky navigation elements.
 
 ### Styled Page Examples
@@ -289,6 +289,7 @@ Renders an individual sticker slot in the album.
   - **Layout**: Buttons sit in a stacked `flex flex-col space-y-1` wrapper.
   - **Add (`TENGO` / `REPE`)**: Primary button toggles between `TENGO` and `REPE (+n)` with gold styling when owned.
   - **Remove (`-`)**: Outline button appears only when the user owns the sticker and decrements the count.
+  - **Missing (`FALTAN`) state**: Zero owned count automatically marks the sticker as missing; there is no separate want toggle or badge.
 - **Placeholder**: For empty slots, a dashed border container is used: `bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-lg`.
   - **Mode-aware Labeling**: `mode="offer"` muestra "Tus duplicados"; `mode="request"` resalta duplicados del otro coleccionista.
 
