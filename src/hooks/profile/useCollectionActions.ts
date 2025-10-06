@@ -23,7 +23,7 @@ interface UserCollection {
     owned_stickers: number;
     completion_percentage: number;
     duplicates: number;
-    wanted: number;
+    missing: number;
   };
 }
 
@@ -346,3 +346,6 @@ export function useCollectionActions({
     actionLoading,
   };
 }
+
+
+

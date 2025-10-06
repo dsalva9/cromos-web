@@ -41,7 +41,7 @@ interface UserCollection extends Collection {
     owned_stickers: number;
     completion_percentage: number;
     duplicates: number;
-    wanted: number;
+    missing: number;
   };
 }
 
@@ -166,7 +166,7 @@ function ProfileContent() {
             owned_stickers: 0,
             completion_percentage: 0,
             duplicates: 0,
-            wanted: 0,
+            missing: 0,
           };
 
           return {
@@ -604,7 +604,7 @@ function ProfileContent() {
 
                         <div className="text-center bg-orange-50 rounded-xl p-3">
                           <div className="text-xl font-bold text-orange-600 mb-1">
-                            {collection.stats.wanted}
+                            {collection.stats.missing}
                           </div>
                           <div className="text-xs text-gray-600 flex items-center justify-center">
                             <Heart className="w-3 h-3 mr-1" />
@@ -789,3 +789,5 @@ export default function ProfilePage() {
     </AuthGuard>
   );
 }
+
+

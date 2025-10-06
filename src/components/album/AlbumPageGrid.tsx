@@ -7,7 +7,6 @@ interface AlbumPageGridProps {
   page: AlbumPageData;
   onMarkOwned: (stickerId: number) => void;
   onReduceOwned: (stickerId: number) => void;
-  onToggleWanted: (stickerId: number) => void;
   pendingStickerIds?: number[];
 }
 
@@ -17,7 +16,6 @@ export default function AlbumPageGrid({
   page,
   onMarkOwned,
   onReduceOwned,
-  onToggleWanted,
   pendingStickerIds = [],
 }: AlbumPageGridProps) {
   let slots: PageSlot[] = page.page_slots;
@@ -51,7 +49,6 @@ export default function AlbumPageGrid({
               isPriority={index < GRID_COLS * 2} // Prioritize first two rows
               onMarkOwned={onMarkOwned}
               onReduceOwned={onReduceOwned}
-              onToggleWanted={onToggleWanted}
               isPending={isPending}
             />
           );

@@ -33,8 +33,7 @@ function AlbumView() {
     pendingStickerIds,
     switchCollection,
     markStickerOwned,
-    reduceStickerOwned,
-    toggleStickerWanted,
+    reduceStickerOwned
   } = useAlbumPages(collectionId, pageId);
 
   if (!collectionId) {
@@ -93,7 +92,6 @@ function AlbumView() {
             page={currentPage}
             onMarkOwned={markStickerOwned}
             onReduceOwned={reduceStickerOwned}
-            onToggleWanted={toggleStickerWanted}
             pendingStickerIds={pendingStickerIds}
           />
 

@@ -17,7 +17,7 @@ export interface CollectionPage {
 }
 
 export interface ProcessedSticker extends Sticker {
-  user_stickers: { count: number; wanted: boolean }[] | null;
+  user_stickers: { count: number }[] | null;
   image_public_url: string | null;
   thumb_public_url: string | null;
   collection_teams: { team_name: string } | null;
@@ -39,7 +39,7 @@ export interface AlbumSummary {
   totalStickers: number;
   ownedUnique: number;
   duplicates: number;
-  wanted: number;
+  missing: number;
   completionPercentage: number;
 }
 
@@ -64,7 +64,7 @@ const createEmptySummary = (): AlbumSummary => ({
   totalStickers: 0,
   ownedUnique: 0,
   duplicates: 0,
-  wanted: 0,
+  missing: 0,
   completionPercentage: 0,
 });
 
@@ -185,14 +185,14 @@ export function useAlbumPages(
           const total = stats.total_stickers ?? 0;
           const owned = stats.owned_stickers ?? 0;
           const duplicates = stats.duplicates ?? 0;
-          const wanted = stats.wanted ?? 0;
+          const missing = stats.missing ?? Math.max(total - owned, 0);
           const completion = total > 0 ? Math.round((owned / total) * 100) : 0;
 
           setSummary({
             totalStickers: total,
             ownedUnique: owned,
             duplicates,
-            wanted,
+            missing,
             completionPercentage: completion,
           });
         } else {
@@ -293,7 +293,7 @@ export function useAlbumPages(
             sticker_id,
             stickers (
               *,
-              user_stickers!left ( user_id, count, wanted ),
+              user_stickers!left ( user_id, count ),
               collection_teams ( team_name )
             )
           `
@@ -324,7 +324,7 @@ export function useAlbumPages(
           }
 
           const rawUserStickers = rawSticker.user_stickers;
-          let normalizedUserStickers: { count: number; wanted: boolean }[] = [];
+          let normalizedUserStickers: { count: number }[] = [];
 
           if (Array.isArray(rawUserStickers)) {
             const match = rawUserStickers.find(
@@ -334,7 +334,6 @@ export function useAlbumPages(
               normalizedUserStickers = [
                 {
                   count: match.count ?? 0,
-                  wanted: match.wanted ?? false,
                 },
               ];
             }
@@ -342,13 +341,11 @@ export function useAlbumPages(
             const record = rawUserStickers as {
               user_id?: string;
               count?: number;
-              wanted?: boolean;
             };
             if (!record.user_id || record.user_id === user.id) {
               normalizedUserStickers = [
                 {
                   count: record.count ?? 0,
-                  wanted: record.wanted ?? false,
                 },
               ];
             }
@@ -470,7 +467,6 @@ export function useAlbumPages(
       if (!slot || !slot.stickers) return;
 
       const currentCount = slot.stickers.user_stickers?.[0]?.count ?? 0;
-      const currentWanted = slot.stickers.user_stickers?.[0]?.wanted ?? false;
       const newCount = currentCount + 1;
 
       setPendingStickerIds(prev =>
@@ -491,7 +487,6 @@ export function useAlbumPages(
               user_stickers: [
                 {
                   count: newCount,
-                  wanted: false,
                 },
               ],
             },
@@ -515,10 +510,10 @@ export function useAlbumPages(
         const ownedDelta = currentCount === 0 ? 1 : 0;
         const duplicatesDelta =
           Math.max(newCount - 1, 0) - Math.max(currentCount - 1, 0);
-        const wantedDelta = currentWanted ? -1 : 0;
+        const missingDelta = currentCount === 0 ? -1 : 0;
         const ownedUnique = prev.ownedUnique + ownedDelta;
-        const wanted = Math.max(prev.wanted + wantedDelta, 0);
-        const duplicates = prev.duplicates + duplicatesDelta;
+        const duplicates = Math.max(prev.duplicates + duplicatesDelta, 0);
+        const missing = Math.max(prev.missing + missingDelta, 0);
         const completionPercentage =
           prev.totalStickers > 0
             ? Math.round((ownedUnique / prev.totalStickers) * 100)
@@ -528,7 +523,7 @@ export function useAlbumPages(
           ...prev,
           ownedUnique,
           duplicates,
-          wanted,
+          missing,
           completionPercentage,
         };
       });
@@ -589,21 +584,18 @@ export function useAlbumPages(
             return pageSlot;
           }
 
-          const updatedUserStickers =
-            newCount > 0
-              ? [
-                  {
-                    count: newCount,
-                    wanted: false,
-                  },
-                ]
-              : null;
-
           return {
             ...pageSlot,
             stickers: {
               ...pageSlot.stickers,
-              user_stickers: updatedUserStickers,
+              user_stickers:
+                newCount > 0
+                  ? [
+                      {
+                        count: newCount,
+                      },
+                    ]
+                  : null,
             },
           } as PageSlot;
         });
@@ -626,8 +618,10 @@ export function useAlbumPages(
         const oldDuplicates = Math.max(currentCount - 1, 0);
         const newDuplicates = Math.max(newCount - 1, 0);
         const duplicatesDelta = newDuplicates - oldDuplicates;
+        const missingDelta = newCount === 0 ? 1 : 0;
         const ownedUnique = Math.max(prev.ownedUnique + ownedDelta, 0);
         const duplicates = Math.max(prev.duplicates + duplicatesDelta, 0);
+        const missing = Math.max(prev.missing + missingDelta, 0);
         const completionPercentage =
           prev.totalStickers > 0
             ? Math.round((ownedUnique / prev.totalStickers) * 100)
@@ -637,6 +631,7 @@ export function useAlbumPages(
           ...prev,
           ownedUnique,
           duplicates,
+          missing,
           completionPercentage,
         };
       });
@@ -664,104 +659,6 @@ export function useAlbumPages(
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } catch (err) {
         console.error('Error reducing sticker ownership:', err);
-        await fetchPageContent(pageId, { silent: true });
-        await fetchCollectionStats(collectionId, { keepExisting: true });
-      } finally {
-        setPendingStickerIds(prev => prev.filter(id => id !== stickerId));
-      }
-    },
-    [
-      collectionId,
-      currentPage,
-      fetchCollectionStats,
-      fetchPageContent,
-      supabase,
-      user,
-    ]
-  );
-  const toggleStickerWanted = useCallback(
-    async (stickerId: number) => {
-      if (!user || !collectionId || !currentPage) return;
-
-      const pageId = currentPage.id;
-      const slot = currentPage.page_slots.find(
-        pageSlot => pageSlot.sticker_id === stickerId
-      );
-
-      if (!slot || !slot.stickers) return;
-
-      const currentCount = slot.stickers.user_stickers?.[0]?.count ?? 0;
-      if (currentCount > 0) return;
-
-      const currentWanted = slot.stickers.user_stickers?.[0]?.wanted ?? false;
-      const newWanted = !currentWanted;
-
-      setPendingStickerIds(prev =>
-        prev.includes(stickerId) ? prev : [...prev, stickerId]
-      );
-
-      setCurrentPage(prev => {
-        if (!prev) return prev;
-        const updatedSlots = prev.page_slots.map(pageSlot => {
-          if (pageSlot.sticker_id !== stickerId || !pageSlot.stickers) {
-            return pageSlot;
-          }
-
-          return {
-            ...pageSlot,
-            stickers: {
-              ...pageSlot.stickers,
-              user_stickers: newWanted
-                ? [
-                    {
-                      count: 0,
-                      wanted: true,
-                    },
-                  ]
-                : null,
-            },
-          } as PageSlot;
-        });
-
-        return {
-          ...prev,
-          page_slots: updatedSlots,
-        };
-      });
-
-      setSummary(prev => {
-        if (!prev) return prev;
-        const wanted = Math.max(prev.wanted + (newWanted ? 1 : -1), 0);
-        return {
-          ...prev,
-          wanted,
-        };
-      });
-
-      try {
-        if (newWanted) {
-          const { error } = await supabase.from('user_stickers').upsert({
-            user_id: user.id,
-            sticker_id: stickerId,
-            count: 0,
-            wanted: true,
-          });
-
-          if (error) throw error;
-        } else {
-          const { error } = await supabase
-            .from('user_stickers')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('sticker_id', stickerId)
-            .eq('count', 0);
-
-          if (error) throw error;
-        }
-
-        await fetchCollectionStats(collectionId, { keepExisting: true });
-      } catch (err) {
-        console.error('Error updating wanted status:', err);
         await fetchPageContent(pageId, { silent: true });
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } finally {
@@ -844,6 +741,5 @@ export function useAlbumPages(
     switchCollection,
     markStickerOwned,
     reduceStickerOwned,
-    toggleStickerWanted,
   };
 }

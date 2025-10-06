@@ -283,18 +283,14 @@ Renders an individual sticker slot in the album.
 **Styling:**
 
 - **Container**: `aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl`.
-- **Badges (`QUIERO`, `REPE`)**: High-contrast blocks positioned at the top-right.
-  - `QUIERO`: `bg-[#FFC000] text-gray-900 border-2 border-black ... font-extrabold`.
-  - `REPE`: `bg-[#E84D4D] text-white border-2 border-black ... font-extrabold`.
+- **Badges**: Duplicates render a red `REPE` chip; owned singles render a green checkmark badge.
 - **Player Info Overlay**: A dark gradient at the bottom displays the player name: `bg-gradient-to-t from-black/80 to-transparent`.
 - **Action Buttons**:
-  - **Layout**: Buttons are in a `flex flex-col space-y-1` container. Each row is a `flex space-x-1`.
-  - **Single Button Row**: A button like `TENGO` uses `w-full`.
-  - **Double Button Row**: Two buttons like `LO QUIERO` and `YA NO` each use `w-1/2`.
-  - **TENGO/REPE**: `bg-[#FFC000]` (owned) or `bg-gray-700` (not owned), with `font-bold border border-black`.
-  - **LO QUIERO/YA NO**: `bg-[#FFC000]` (to add) or `bg-[#E84D4D]` (to remove), with similar styles.
-  - **"-" Button**: `bg-gray-700`, appears only when `ownedCount > 0`, typically paired with the `TENGO/REPE` button.
+  - **Layout**: Buttons sit in a stacked `flex flex-col space-y-1` wrapper.
+  - **Add (`TENGO` / `REPE`)**: Primary button toggles between `TENGO` and `REPE (+n)` with gold styling when owned.
+  - **Remove (`-`)**: Outline button appears only when the user owns the sticker and decrements the count.
 - **Placeholder**: For empty slots, a dashed border container is used: `bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-lg`.
+
 
 ## Profile & Collection Cards
 
@@ -1436,3 +1432,9 @@ When creating new components:
 - Extensive documentation and patterns for future development
 
 **Phase 2 Component Architecture Status**: ✅ **COMPLETE AND PRODUCTION-READY**
+
+
+
+
+
+

@@ -26,7 +26,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 
 | Role                       | Hex       | Tailwind Class (BG) | Tailwind Class (Text) | Usage                                                                |
 | -------------------------- | --------- | ------------------- | --------------------- | -------------------------------------------------------------------- |
-| **Primary Accent (Gold)**  | `#FFC000` | `bg-[#FFC000]`      | `text-[#FFC000]`      | Primary actions (`TENGO`), active states, highlights, `QUIERO` badge |
+| **Primary Accent (Gold)**  | `#FFC000` | `bg-[#FFC000]`      | `text-[#FFC000]`      | Primary actions (`TENGO`), active states, highlights |
 | **Secondary Accent (Red)** | `#E84D4D` | `bg-[#E84D4D]`      | `text-[#E84D4D]`      | Negative actions (`YA NO`, `Eliminar`), `REPE` badge                 |
 | **Page Background**        | `#1F2937` | `bg-[#1F2937]`      | -                     | Main background for all pages                                        |
 | **Card Background**        | -         | `bg-gray-800`       | -                     | Background for `ModernCard`, `StickerTile`, etc.                     |
@@ -89,3 +89,5 @@ This document provides a quick reference for the "Retro-Comic" design system use
   Página Inactiva
 </a>
 ```
+
+

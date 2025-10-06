@@ -113,7 +113,7 @@ export function OwnedCollectionCard({
 
             <div className="text-center bg-amber-50 rounded-xl p-4 ring-1 ring-amber-100">
               <div className="text-xl font-bold text-amber-700 mb-1">
-                {collection.stats.wanted}
+                {collection.stats.missing}
               </div>
               <div className="text-xs text-amber-700 flex items-center justify-center font-medium">
                 <Heart className="w-3 h-3 mr-1" />
@@ -166,3 +166,5 @@ export function OwnedCollectionCard({
     </ModernCard>
   );
 }
+
+

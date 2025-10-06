@@ -4,7 +4,7 @@
 
 - **User Authentication**: Secure signup/login with Supabase Auth
 - **Multi-Collection Support**: Join and manage multiple sticker albums
-- **Sticker Inventory Management**: Track owned ("TENGO") and wanted ("QUIERO") stickers
+- **Sticker Inventory Management**: Track owned ("TENGO") stickers and automatically surface missing ones.
 - **Progress Tracking**: Real-time completion percentages and statistics
 - **Zero-Reload Profile**: Add, remove, and activate collections with instant UI feedback and no page reloads.
 
@@ -52,3 +52,4 @@
 - `--force` can re-upload existing assets if a retry is needed; otherwise processed stickers are skipped for safe resumes.
 - Rollback: delete objects from Supabase Storage and run `UPDATE stickers SET image_path_webp_300 = NULL, thumb_path_webp_100 = NULL WHERE collection_id = ?` before re-running the script.
 - The album view and sticker details now read from `image_path_webp_300`/`thumb_path_webp_100` when available.
+

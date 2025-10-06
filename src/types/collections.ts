@@ -15,7 +15,7 @@ export interface UserCollection extends Collection {
     owned_stickers: number;
     completion_percentage: number;
     duplicates: number;
-    wanted: number;
+    missing: number;
   };
 }
 
@@ -31,3 +31,4 @@ export interface UserCollectionRawData {
   joined_at: string;
   collections: Collection[] | Collection | null;
 }
+

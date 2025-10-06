@@ -11,7 +11,7 @@
 
 #### `get_user_collection_stats`
 
-Returns completion statistics for a user's collection.
+Returns completion statistics for a collection. The new `missing` metric infers wants from inventory counts; the legacy `wanted` key mirrors this value until the Phase 2 UI cleanup.
 
 **Function Signature:**
 
@@ -30,7 +30,8 @@ get_user_collection_stats(
   "owned_stickers": 450,
   "completion_percentage": 75,
   "duplicates": 120,
-  "wanted": 50
+  "missing": 150,
+  "wanted": 150
 }
 ```
 
@@ -489,7 +490,7 @@ await supabase.from('user_stickers').upsert({
   wanted: false,
 });
 
-// Toggle wanted status
+// Legacy wanted toggle (Phase 1 compatibility only - prefer relying on implicit missing via count = 0)
 await supabase.from('user_stickers').upsert({
   user_id: userId,
   sticker_id: stickerId,
@@ -1146,3 +1147,5 @@ When deploying v1.3.0 features:
 **Status**: ✅ All v1.3.0 backend features documented and operational  
 **Next**: Frontend UI integration for album pages, chat, and history  
 **Ready for**: Full Phase 2 feature completion
+
+

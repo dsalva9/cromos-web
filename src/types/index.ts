@@ -194,6 +194,7 @@ export interface Database {
           owned_stickers: number;
           completion_percentage: number;
           duplicates: number;
+          missing: number;
           wanted: number;
         }[];
       };
@@ -286,3 +287,4 @@ export interface TradeProposalDetail {
   proposal: TradeProposal;
   items: TradeProposalDetailItem[];
 }
+
