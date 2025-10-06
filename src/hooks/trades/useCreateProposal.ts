@@ -1,61 +1,59 @@
 ﻿import { useState, useCallback } from 'react';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
-
-interface ProposalItem {
-  sticker_id: number;
-  quantity: number;
-}
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import type { TradeProposalItem } from '@/types';
 
 interface CreateProposalParams {
   collectionId: number;
   toUserId: string;
+  offerItems: TradeProposalItem[];
+  requestItems: TradeProposalItem[];
   message: string;
-  p_offer_items: ProposalItem[];
-  p_request_items: ProposalItem[];
 }
 
-interface UseCreateProposalReturn {
-  loading: boolean;
-  error: string | null;
-  createProposal: (params: CreateProposalParams) => Promise<number | null>;
-}
-
-export const useCreateProposal = (): UseCreateProposalReturn => {
-  const { supabase } = useSupabase();
+/**
+ * Hook for creating a new trade proposal. It handles the RPC call
+ * to Supabase and manages loading and error states.
+ */
+export function useCreateProposal() {
+  const supabase = useSupabaseClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const createProposal = useCallback(
-    async (params: CreateProposalParams): Promise<number | null> => {
+    async ({
+      collectionId,
+      toUserId,
+      offerItems,
+      requestItems,
+      message,
+    }: CreateProposalParams): Promise<boolean> => {
       setLoading(true);
       setError(null);
 
-      const rpcParams = {
-        p_collection_id: params.collectionId,
-        p_to_user: params.toUserId,
-        p_message: params.message,
-        p_offer_items: params.p_offer_items,
-        p_request_items: params.p_request_items,
-      };
-
-      console.log(
-        '[useCreateProposal Hook] Calling RPC with params:',
-        rpcParams
-      ); // DEBUG LOG
-
       try {
-        const { data: proposalId, error: rpcError } = await supabase.rpc(
+        const { error: rpcError } = await supabase.rpc(
           'create_trade_proposal',
-          rpcParams
+          {
+            p_collection_id: collectionId,
+            p_to_user: toUserId,
+            p_offer_items: offerItems,
+            p_request_items: requestItems,
+            p_message: message,
+          }
         );
 
-        if (rpcError) throw new Error(rpcError.message);
-        return proposalId;
+        if (rpcError) {
+          throw new Error(rpcError.message);
+        }
+
+        return true;
       } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Error al crear la propuesta.';
-        setError(errorMessage);
-        return null;
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unexpected error occurred.');
+        }
+        return false;
       } finally {
         setLoading(false);
       }
@@ -63,6 +61,5 @@ export const useCreateProposal = (): UseCreateProposalReturn => {
     [supabase]
   );
 
-  return { loading, error, createProposal };
-};
-
+  return { createProposal, loading, error };
+}

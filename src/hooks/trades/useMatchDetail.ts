@@ -65,7 +65,7 @@ export function useMatchDetail() {
             player_name: item.player_name,
             team_name: item.team_name,
             rarity: item.rarity,
-            count: item.count,
+            count: Math.max(item.count - 1, 0),
           }));
 
         const iOfferList = results
@@ -76,7 +76,7 @@ export function useMatchDetail() {
             player_name: item.player_name,
             team_name: item.team_name,
             rarity: item.rarity,
-            count: item.count,
+            count: Math.max(item.count - 1, 0),
           }));
 
         setTheyOffer(theyOfferList);
@@ -112,4 +112,5 @@ export function useMatchDetail() {
     clearDetail,
   };
 }
+
 

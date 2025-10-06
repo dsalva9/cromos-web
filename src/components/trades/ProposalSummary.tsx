@@ -1,46 +1,89 @@
-﻿import { TradeProposalDetailItem } from '@/types';
-import { Badge } from '../ui/badge';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+﻿'use client';
+
+import { Button } from '@/components/ui/button';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+import type { TradeProposalItem } from '@/types';
 
 interface ProposalSummaryProps {
-  title: string;
-  items: Partial<TradeProposalDetailItem>[];
-  colorClass: string;
+  offerItems: TradeProposalItem[];
+  requestItems: TradeProposalItem[];
+  targetUserNickname: string;
+  message: string;
+  onMessageChange: (message: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+  disabled: boolean;
 }
 
+/**
+ * A summary card for the trade proposal being composed.
+ * It shows item counts, provides a message input, and a submission button.
+ */
 export function ProposalSummary({
-  title,
-  items,
-  colorClass,
+  offerItems,
+  requestItems,
+  targetUserNickname,
+  message,
+  onMessageChange,
+  onSubmit,
+  loading,
+  disabled,
 }: ProposalSummaryProps) {
-  const Icon = title === 'Ofreces' ? ArrowDown : ArrowUp;
+  const offerCount = offerItems.reduce((sum, item) => sum + item.quantity, 0);
+  const requestCount = requestItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+  const MAX_MESSAGE_LENGTH = 500;
 
   return (
-    <div>
-      <h3
-        className={`text-lg font-semibold mb-2 flex items-center ${colorClass}`}
-      >
-        <Icon className="h-5 w-5 mr-2" />
-        {title} ({items.length})
-      </h3>
-      <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-        {items.length === 0 ? (
-          <p className="text-sm text-white/60">Nada seleccionado.</p>
-        ) : (
-          items.map(item => (
-            <div
-              key={item.sticker_id}
-              className="flex justify-between items-center text-sm bg-black/20 p-2 rounded-md"
-            >
-              <span>
-                {item.player_name} ({item.sticker_code})
-              </span>
-              <Badge variant="secondary">x{item.quantity}</Badge>
-            </div>
-          ))
-        )}
+    <ModernCard className="bg-gray-800 border-2 border-black">
+      <div className="p-6 pb-0">
+        <h2 className="text-lg font-bold uppercase">Resumen de la Propuesta</h2>
       </div>
-    </div>
+      <ModernCardContent className="space-y-6 p-6">
+        <div className="space-y-4 text-sm">
+          <div className="flex justify-between items-center">
+            <p className="font-semibold text-white">Tu Oferta:</p>
+            <p className="font-bold text-[#FFC000]">
+              {offerCount} cromo{offerCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="font-semibold text-white">
+              Tu Pedido a {targetUserNickname}:
+            </p>
+            <p className="font-bold text-[#FFC000]">
+              {requestCount} cromo{requestCount !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <Textarea
+            placeholder="Añade un mensaje (opcional)..."
+            value={message}
+            onChange={e => onMessageChange(e.target.value)}
+            maxLength={MAX_MESSAGE_LENGTH}
+            className="bg-gray-900 border-black"
+          />
+          <p className="text-xs text-gray-400 mt-2 text-right">
+            {message.length} / {MAX_MESSAGE_LENGTH}
+          </p>
+        </div>
+
+        <Button
+          onClick={onSubmit}
+          disabled={disabled || loading}
+          size="lg"
+          className="w-full"
+        >
+          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {loading ? 'Enviando...' : 'Enviar Propuesta'}
+        </Button>
+      </ModernCardContent>
+    </ModernCard>
   );
 }
-

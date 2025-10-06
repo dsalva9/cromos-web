@@ -1,4 +1,4 @@
-# Database Schema Documentation
+﻿﻿# Database Schema Documentation
 
 ## Current State: v1.3.0 (All features deployed)
 
@@ -176,6 +176,10 @@ CREATE TABLE user_collections (
 **RLS Policies:**
 
 - Users can only access their own collection memberships
+
+**Notes:**
+
+- The `wanted` column remains for backward compatibility. Supabase RPCs now infer trade intent from inventory counts (missing = `count = 0`, duplicates = `count > 1`), so application code should avoid mutating this flag.
 
 ---
 
@@ -570,7 +574,7 @@ FUNCTION search_stickers(
 
 #### `find_mutual_traders`
 
-Find users with mutual trading opportunities. Sticker intent is now inferred from inventory counts: a sticker is missing when the seeker has `count = 0`, and a tradeable duplicate when the owner has `count > 1`.
+Find users with mutual trading opportunities. Sticker intent is inferred from inventory counts: a sticker is missing when the seeker has `count = 0`, and a tradeable duplicate is available when the owner has `count > 1`.
 
 ```sql
 FUNCTION find_mutual_traders(
@@ -597,7 +601,7 @@ FUNCTION find_mutual_traders(
 
 #### `get_mutual_trade_detail`
 
-Get detailed sticker lists for a trading pair. Rows are emitted with `direction = 'they_offer'` when the other user has duplicates (`count > 1`) and you have none, and `direction = 'i_offer'` for the inverse.
+Get detailed sticker lists for a trading pair. Rows are emitted with `direction = 'they_offer'` when the other user has duplicates (`count > 1`) and the current user has none (`count = 0`), and `direction = 'i_offer'` for the inverse.
 
 ```sql
 FUNCTION get_mutual_trade_detail(
@@ -751,10 +755,10 @@ Stores sticker artwork.
 
 ```
 sticker-images/
-├── {collection_id}/
-│   ├── {sticker_number}-{sticker_id}.webp (300px)
-│   └── thumbs/
-│       └── {sticker_number}-{sticker_id}.webp (100px)
+â”œâ”€â”€ {collection_id}/
+â”‚   â”œâ”€â”€ {sticker_number}-{sticker_id}.webp (300px)
+â”‚   â””â”€â”€ thumbs/
+â”‚       â””â”€â”€ {sticker_number}-{sticker_id}.webp (100px)
 ```
 
 **Configuration:**
@@ -783,13 +787,13 @@ Stores user profile avatars.
 
 ### Deployment Checklist
 
-1. ✅ All core tables created
-2. ✅ All indexes applied
-3. ✅ All RLS policies active
-4. ✅ All RPC functions deployed
-5. ✅ Storage buckets configured
-6. ⚠️ Backfill `stickers.sticker_number` before enforcing NOT NULL
-7. ⚠️ Populate `collection_pages` and `page_slots` for active collections
+1. âœ… All core tables created
+2. âœ… All indexes applied
+3. âœ… All RLS policies active
+4. âœ… All RPC functions deployed
+5. âœ… Storage buckets configured
+6. âš ï¸ Backfill `stickers.sticker_number` before enforcing NOT NULL
+7. âš ï¸ Populate `collection_pages` and `page_slots` for active collections
 
 ### Performance Monitoring
 
@@ -812,5 +816,5 @@ Key indexes for monitoring:
 
 ---
 
-**Status:** ✅ All v1.3.0 features deployed and documented
+**Status:** âœ… All v1.3.0 features deployed and documented
 **Next:** Begin Phase 2 continuation (chat UI, history dashboard)
