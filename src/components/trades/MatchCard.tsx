@@ -17,13 +17,13 @@ interface MatchCardProps {
 
 export function MatchCard({ match, collectionId }: MatchCardProps) {
   const displayName = match.nickname || 'Usuario';
-  const detailsHref = `/trades/find/${match.match_user_id}?collectionId=${collectionId}`;
+  const composeHref = `/trades/compose?userId=${match.match_user_id}&collectionId=${collectionId}`;
 
   return (
     <Link
-      href={detailsHref}
+      href={composeHref}
       className="block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]"
-      aria-label={`Ver detalles de intercambio con ${displayName}`}
+      aria-label={`Crear propuesta de intercambio con ${displayName}`}
     >
       <ModernCard className="bg-gray-800 border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
         <ModernCardContent className="p-6">
