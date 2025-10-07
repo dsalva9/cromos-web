@@ -1,6 +1,30 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: v1.4.1 - Theme Rollout & Consistency Pass
+## 🚀 Current Sprint: v1.4.3 - Trade Flow Optimization
+
+### v1.4.2 Feature Status
+
+**Trade Composer UX ✅ | Trade Matching Logic ✅ | Documentation Complete ✅**
+
+- [x] **Trade Composer UX Improvements**
+  - [x] Fixed tab button alignment across all trade screens
+  - [x] Team names display instead of sticker codes
+  - [x] Validation requires both offer AND request items
+  - [x] Fixed UTF-8 encoding for Spanish characters
+  - [x] Proposal messages now appear as first chat message
+- [x] **Trade Matching Logic Updates**
+  - [x] Updated `find_mutual_traders` to use count-based logic
+  - [x] Updated `get_mutual_trade_detail` with same logic
+  - [x] Fixed incorrect match counts in intercambios screen
+  - [x] Removed dependency on 'wanted' flag
+- [x] **Database Updates**
+  - [x] Migration: `20251007100000_fix_trade_matching_and_chat.sql`
+  - [x] Updated `create_trade_proposal` RPC
+  - [x] Fixed `find_mutual_traders` and `get_mutual_trade_detail` functions
+- [x] **Documentation**
+  - [x] Updated database-schema.md with correct RPC signatures
+  - [x] Updated current-features.md with v1.4.2 changes
+  - [x] Updated CHANGELOG.md with detailed fixes
 
 ### v1.4.1 Feature Status
 

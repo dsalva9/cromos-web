@@ -30,6 +30,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.2] - 2025-10-07
 
+### Fixed - Trade Composer UX & Matching Logic
+
+- **Tab Button Alignment**: Fixed positioning of OFRECER/PEDIR, RECIBIDAS/ENVIADAS, and RESUMEN/MENSAJES tabs
+  - Changed base `TabsList` component from `inline-flex` to `flex`
+  - Applied `max-w-[400px]` constraint for consistent sizing across screens
+- **Team Name Display**: Trade composer now shows team names instead of sticker codes
+  - Added `collection_teams` to sticker query in `useProposalComposerData`
+  - Updated `StickerDetailsLite` type to include team information
+  - Modified `StickerGrid` to display team name with code fallback
+- **Proposal Validation**: Now requires both offer AND request items (not just one)
+  - Changed validation logic from OR to AND in composer
+  - Prevents incomplete one-sided proposals
+- **UTF-8 Encoding**: Fixed Spanish character display (Tú, Colección)
+  - Resolved encoding issues in `ComposerHeader` and `compose/page`
+- **Trade Matching Logic**: Updated SQL functions to work without 'wanted' flag
+  - `find_mutual_traders`: Now uses count-based logic (missing=0, duplicates>1)
+  - `get_mutual_trade_detail`: Same count-based logic applied
+  - Fixed incorrect match counts in intercambios screen
+- **Proposal Message Flow**: Messages now appear as first chat message
+  - Updated `create_trade_proposal` to store message in `trade_chats` table
+  - Proposal `message` field always NULL (messages in chat only)
+  - Migration: `20251007100000_fix_trade_matching_and_chat.sql`
+
 ### Added - Trade Chat UI + Unread Message Badges
 
 - **Real-time Trade Chat System**:
