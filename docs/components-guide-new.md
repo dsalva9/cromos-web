@@ -905,20 +905,11 @@ Main trading search interface with filtering and pagination.
 - **Toast notifications** for search errors
 - **Responsive grid layout** for match cards (1-3 columns based on screen size)
 
-### FindTraderDetailPage ✅ **COMPLETED - PHASE 2**
+### FindTraderDetailPage ⚠️ **REMOVED in v1.4.3**
 
-**File**: `src/app/trades/find/[userId]/page.tsx`
+**This page has been removed** to streamline the user flow. Match cards now link directly to `/trades/compose`.
 
-Detailed view for specific trading matches with back navigation and proposal creation.
-
-**Key Features:**
-
-- **Parameter validation** for userId and collectionId query params
-- **Back navigation** with collection context preservation
-- **User profile integration** with nickname fallback
-- **Side-by-side sticker lists** using MatchDetail component
-- **Proposal creation CTA** with seamless navigation to composer
-- **Error boundaries** with user-friendly error states
+**Rationale**: The intermediate detail page was redundant. Users can now go from finding a match to creating a proposal in one click.
 
 ### ProposalsDashboardPage ✅ **NEW - MVP COMPLETE**
 

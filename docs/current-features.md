@@ -139,10 +139,11 @@
 
 #### Advanced Search & Filtering
 
-- **Routes**: `/trades/find`, `/trades/find/[userId]`
-- **Components**: `FindTradersFilters`, `MatchCard`, `MatchDetail`
-- **Hooks**: `useFindTraders`, `useMatchDetail`
+- **Routes**: `/trades/find` (direct navigation to composer from match cards)
+- **Components**: `FindTradersFilters`, `MatchCard`
+- **Hooks**: `useFindTraders`
 - **Features**: Debounced search, rarity/team/player filtering, pagination
+- **Flow**: Match cards link directly to `/trades/compose` (v1.4.3 - removed intermediate detail page)
 
 **Files**: `src/app/trades/find/*`, `src/components/trades/*`, `src/hooks/trades/*`
 

@@ -308,7 +308,7 @@ FUNCTION get_mutual_trade_detail(
 ```
 
 **Security**: SECURITY DEFINER
-**Use Case**: Powers the `/trades/find/[userId]` detail page, showing what each user can offer the other.
+**Use Case**: Previously powered the detail page (removed in v1.4.3). Now used internally for data preparation before navigating to composer.
 
 ---
 
@@ -999,17 +999,11 @@ Example: `/trades/find?collection=1&rarity=rare&team=Barcelona&min_overlap=2&pag
 
 ---
 
-#### `/trades/find/[userId]`
+#### `/trades/find/[userId]` ⚠️ **REMOVED in v1.4.3**
 
-URL parameters:
+**This route has been removed**. Match cards now link directly to `/trades/compose`.
 
-- `userId`: UUID of the user to view trade details for
-
-Query parameters:
-
-- `collectionId`: Collection context (required)
-
-Example: `/trades/find/123e4567-e89b-12d3-a456-426614174000?collectionId=1`
+**Migration**: Use `/trades/compose?userId=[userId]&collectionId=[collectionId]` instead.
 
 ---
 

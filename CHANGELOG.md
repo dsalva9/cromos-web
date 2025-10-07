@@ -19,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.4.3] - 2025-10-07
+
+### Changed - Streamlined Trade Flow
+
+- **Removed intermediate trade detail page**: Users now go directly from match card to proposal composer
+  - Deleted `/trades/find/[userId]` route entirely
+  - Updated `MatchCard` to link directly to `/trades/compose?userId=...&collectionId=...`
+  - Improved user flow: Find match → Create proposal (single click, no intermediate step)
+
 ## [1.4.2] - 2025-10-07
 
 ### Added - Trade Chat UI + Unread Message Badges
