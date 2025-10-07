@@ -6,7 +6,8 @@ import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { AlertTriangle, Users, TrendingUp } from 'lucide-react';
+import { AlertTriangle, Users, TrendingUp, ArrowLeft } from 'lucide-react';
+import { FindTradersFilters } from '@/components/trades/FindTradersFilters';
 import { MatchCard } from '@/components/trades/MatchCard';
 import { toast } from '@/lib/toast';
 import { useFindTraders } from '@/hooks/trades/useFindTraders';
@@ -23,7 +24,7 @@ interface UserCollection extends Collection {
   joined_at: string;
 }
 
-function FindTradersContent() {
+function AdvancedSearchContent() {
   const { supabase } = useSupabase();
   const { user, loading: userLoading } = useUser();
   const [ownedCollections, setOwnedCollections] = useState<UserCollection[]>(
@@ -34,7 +35,13 @@ function FindTradersContent() {
     number | null
   >(null);
 
-  // No filters - simplified view
+  // Filter states
+  const [filters, setFilters] = useState({
+    rarity: '',
+    team: '',
+    query: '',
+    minOverlap: 1,
+  });
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -113,18 +120,18 @@ function FindTradersContent() {
     }
   }, [user, supabase]);
 
-  // Search effect (active collection only, no filters)
+  // Search effect
   useEffect(() => {
     if (selectedCollectionId && user) {
       searchTrades({
         userId: user.id,
         collectionId: selectedCollectionId,
-        filters: { rarity: '', team: '', query: '', minOverlap: 1 },
+        filters,
         limit: pageSize,
         offset: currentPage * pageSize,
       });
     }
-  }, [user, selectedCollectionId, currentPage, searchTrades]);
+  }, [user, selectedCollectionId, filters, currentPage, searchTrades]);
 
   // Initial load
   useEffect(() => {
@@ -133,6 +140,17 @@ function FindTradersContent() {
     }
   }, [user, userLoading, fetchCollections]);
 
+  // Handle filter changes (reset pagination)
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setCurrentPage(0);
+  };
+
+  // Handle collection change (reset pagination)
+  const handleCollectionChange = (collectionId: number) => {
+    setSelectedCollectionId(collectionId);
+    setCurrentPage(0);
+  };
 
   // Show toast for errors
   useEffect(() => {
@@ -144,7 +162,7 @@ function FindTradersContent() {
   if (userLoading || collectionsLoading) {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl font-bold uppercase">Cargando intercambios...</div>
+        <div className="text-white text-xl font-bold uppercase">Cargando búsqueda avanzada...</div>
       </div>
     );
   }
@@ -181,21 +199,34 @@ function FindTradersContent() {
     <div className="min-h-screen bg-[#1F2937]">
       {/* Header */}
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-6 flex items-center gap-4">
+          <Button
+            asChild
+            variant="ghost"
+            className="bg-gray-800 text-white hover:bg-gray-700 border-2 border-black rounded-md font-bold uppercase text-sm focus-visible:ring-2 focus-visible:ring-[#FFC000]"
+          >
+            <Link href="/trades/find">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver a Intercambios
+            </Link>
+          </Button>
+        </div>
+
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="text-center sm:text-left">
             <h1 className="text-4xl font-black uppercase text-white mb-2">
-              Intercambios
+              Búsqueda avanzada
             </h1>
             <p className="text-gray-300 font-medium">
-              Usuarios con cromos que necesitas en tu colección activa
+              Los resultados usan tus filtros. En &apos;Intercambios&apos; verás atajos de tu colección activa.
             </p>
           </div>
           <Button
             asChild
-            variant="outline"
+            variant="ghost"
             className="self-center sm:self-start bg-gray-800 text-white hover:bg-gray-700 border-2 border-black rounded-md font-bold uppercase text-sm focus-visible:ring-2 focus-visible:ring-[#FFC000]"
           >
-            <Link href="/trades/search">Búsqueda avanzada</Link>
+            <Link href="/trades/proposals">Mis Propuestas</Link>
           </Button>
         </div>
 
@@ -219,6 +250,16 @@ function FindTradersContent() {
           </ModernCard>
         )}
 
+        {/* Filters */}
+        <div className="mb-6">
+          <FindTradersFilters
+            collections={ownedCollections}
+            selectedCollectionId={selectedCollectionId}
+            filters={filters}
+            onCollectionChange={handleCollectionChange}
+            onFiltersChange={handleFiltersChange}
+          />
+        </div>
 
         {/* Results Summary */}
         {selectedCollectionId && !matchesLoading && (
@@ -323,11 +364,10 @@ function FindTradersContent() {
   );
 }
 
-export default function FindTradersPage() {
+export default function AdvancedSearchPage() {
   return (
     <AuthGuard>
-      <FindTradersContent />
+      <AdvancedSearchContent />
     </AuthGuard>
   );
 }
-

@@ -10,9 +10,15 @@ interface CreateProposalParams {
   message: string;
 }
 
+interface CreateProposalResult {
+  success: boolean;
+  proposalId?: number;
+}
+
 /**
  * Hook for creating a new trade proposal. It handles the RPC call
  * to Supabase and manages loading and error states.
+ * Returns the newly created proposal ID on success.
  */
 export function useCreateProposal() {
   const supabase = useSupabaseClient();
@@ -26,12 +32,12 @@ export function useCreateProposal() {
       offerItems,
       requestItems,
       message,
-    }: CreateProposalParams): Promise<boolean> => {
+    }: CreateProposalParams): Promise<CreateProposalResult> => {
       setLoading(true);
       setError(null);
 
       try {
-        const { error: rpcError } = await supabase.rpc(
+        const { data, error: rpcError } = await supabase.rpc(
           'create_trade_proposal',
           {
             p_collection_id: collectionId,
@@ -46,14 +52,14 @@ export function useCreateProposal() {
           throw new Error(rpcError.message);
         }
 
-        return true;
+        return { success: true, proposalId: data };
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message);
         } else {
           setError('An unexpected error occurred.');
         }
-        return false;
+        return { success: false };
       } finally {
         setLoading(false);
       }

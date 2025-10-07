@@ -10,6 +10,7 @@ interface ProposalCardProps {
   box: 'inbox' | 'outbox';
   onClick: () => void;
   unreadCount?: number;
+  isHighlighted?: boolean;
 }
 
 const getStatusBadgeVariant = (status: string) => {
@@ -26,7 +27,7 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-export function ProposalCard({ proposal, box, onClick, unreadCount = 0 }: ProposalCardProps) {
+export function ProposalCard({ proposal, box, onClick, unreadCount = 0, isHighlighted = false }: ProposalCardProps) {
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
     ? proposal.from_user_nickname
@@ -47,7 +48,14 @@ export function ProposalCard({ proposal, box, onClick, unreadCount = 0 }: Propos
 
       <ModernCard
         onClick={onClick}
-        className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 cursor-pointer border-2 border-black shadow-xl"
+        className={`bg-gray-800 hover:bg-gray-700 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
+          isHighlighted
+            ? 'border-[#FFC000] animate-pulse-border'
+            : 'border-black'
+        }`}
+        style={isHighlighted ? {
+          animation: 'pulse-border 1.5s ease-in-out 3'
+        } : undefined}
       >
         <ModernCardContent className="p-4">
 

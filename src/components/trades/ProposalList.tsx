@@ -12,9 +12,10 @@ import type { TradeProposalListItem, TradeProposalStatus } from '@/types';
 interface ProposalListProps {
   box: 'inbox' | 'outbox';
   onUnreadCountChange?: (totalUnread: number) => void;
+  highlightProposalId?: number | null;
 }
 
-export function ProposalList({ box, onUnreadCountChange }: ProposalListProps) {
+export function ProposalList({ box, onUnreadCountChange, highlightProposalId }: ProposalListProps) {
   const { proposals, loading, error, fetchProposals, clearProposals } =
     useProposals();
   const [optimisticProposals, setOptimisticProposals] = useState<
@@ -121,6 +122,7 @@ export function ProposalList({ box, onUnreadCountChange }: ProposalListProps) {
             box={box}
             onClick={() => handleCardClick(proposal.id)}
             unreadCount={getCountForTrade(proposal.id)}
+            isHighlighted={highlightProposalId === proposal.id}
           />
         ))}
       </div>

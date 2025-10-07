@@ -2,6 +2,39 @@
 
 ## 🚀 Current Sprint: v1.4.3 - Trade Flow Optimization
 
+### v1.4.3 Feature Status
+
+**Trade UX Polishes ✅ | SegmentedTabs Component ✅ | Tests Pending 🚧**
+
+- [x] **Task A: Streamline "Intercambios" (Find) and move advanced controls**
+  - [x] Simplified `/trades/find` to show matches for active collection only
+  - [x] Removed collection dropdown, player search, and advanced filters from /trades/find
+  - [x] Added "Búsqueda avanzada" button routing to `/trades/search`
+  - [x] Created new `/trades/search` page with full filter experience
+  - [x] Added "Volver a Intercambios" link in /trades/search
+- [x] **Task B: Post-create redirect with one-time highlight**
+  - [x] Updated `useCreateProposal` to return proposalId
+  - [x] Modified composer to redirect to `/trades/proposals?tab=sent&highlight=<id>`
+  - [x] Added query param handling in proposals page for tab selection
+  - [x] Implemented one-time border pulse animation on newly created card
+  - [x] Created highlight-animation.css with pulse-border keyframes
+  - [x] Auto-clear highlight after 2 seconds
+- [x] **Task C: Create SegmentedTabs and unify paired tabs**
+  - [x] Created reusable `SegmentedTabs` component with equal-width grid layout
+  - [x] Applied to Recibidas|Enviadas in `/trades/proposals`
+  - [x] Applied to Resumen|Mensajes in `ProposalDetailModal`
+  - [x] Updated Ofrecer|Pedir tabs in `StickerSelector` for consistency
+  - [x] Full keyboard navigation (Arrow keys) and ARIA support
+  - [x] Gold active state, thick borders, flush seams
+- [ ] **Documentation & Tests**
+  - [x] Update components-guide.md with SegmentedTabs and new routes
+  - [x] Update current-features.md with v1.4.3 changes
+  - [x] Update TODO.md completion status
+  - [ ] Update CHANGELOG.md
+  - [ ] Playwright tests: trades-find-vs-search.spec.ts
+  - [ ] Playwright tests: proposal-highlight.spec.ts
+  - [ ] Playwright tests: segmented-tabs.spec.ts
+
 ### v1.4.2 Feature Status
 
 **Trade Composer UX ✅ | Trade Matching Logic ✅ | Documentation Complete ✅**

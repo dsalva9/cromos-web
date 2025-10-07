@@ -62,7 +62,7 @@ function ProposalComposer() {
   const handleCreateProposal = async () => {
     if (!data?.toUser || !data.collection || !user) return;
 
-    const success = await createProposal({
+    const result = await createProposal({
       collectionId: data.collection.id,
       toUserId: data.toUser.id,
       offerItems,
@@ -70,11 +70,11 @@ function ProposalComposer() {
       message,
     });
 
-    if (success) {
+    if (result.success && result.proposalId) {
       toast.success('¡Propuesta enviada con éxito!', {
         description: 'Serás redirigido a tu panel de propuestas.',
       });
-      router.push('/trades/proposals');
+      router.push(`/trades/proposals?tab=sent&highlight=${result.proposalId}`);
     }
   };
 

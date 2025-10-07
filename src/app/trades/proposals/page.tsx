@@ -1,20 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ProposalList } from '@/components/trades/ProposalList';
-import { PlusCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { PlusCircle, Inbox, Send } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const UNREAD_BADGE_CAP = 9;
 
 function TradeProposalsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read tab from query param (default to 'inbox')
+  const tabParam = searchParams.get('tab');
+  const initialTab = tabParam === 'sent' ? 'outbox' : 'inbox';
+
+  // Read highlight param for newly created proposal
+  const highlightParam = searchParams.get('highlight');
+  const [highlightProposalId, setHighlightProposalId] = useState<number | null>(
+    highlightParam ? parseInt(highlightParam) : null
+  );
+
+  const [activeTab, setActiveTab] = useState<'inbox' | 'outbox'>(initialTab);
   const [inboxUnread, setInboxUnread] = useState(0);
   const [outboxUnread, setOutboxUnread] = useState(0);
+
+  // Clear highlight after first render
+  useEffect(() => {
+    if (highlightProposalId) {
+      const timer = setTimeout(() => {
+        setHighlightProposalId(null);
+        // Remove highlight param from URL without reload
+        const url = new URL(window.location.href);
+        url.searchParams.delete('highlight');
+        window.history.replaceState({}, '', url.toString());
+      }, 3000); // Show highlight for 3 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightProposalId]);
 
   const handleNewProposal = () => {
     // Placeholder: In the future, this will likely open a composer modal
@@ -43,38 +72,55 @@ function TradeProposalsContent() {
           </Button>
         </div>
 
-        <Tabs defaultValue="inbox" className="w-full">
-          <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
-            <TabsTrigger
-              value="inbox"
-              className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:font-black data-[state=active]:uppercase data-[state=active]:border-2 data-[state=active]:border-black rounded-md font-bold text-white relative"
-            >
-              Recibidas
-              {inboxUnread > 0 && (
-                <Badge className="ml-2 bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-2 py-0.5 shadow-md">
-                  {inboxUnread > UNREAD_BADGE_CAP ? `${UNREAD_BADGE_CAP}+` : inboxUnread}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger
-              value="outbox"
-              className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:font-black data-[state=active]:uppercase data-[state=active]:border-2 data-[state=active]:border-black rounded-md font-bold text-white relative"
-            >
-              Enviadas
-              {outboxUnread > 0 && (
-                <Badge className="ml-2 bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-2 py-0.5 shadow-md">
-                  {outboxUnread > UNREAD_BADGE_CAP ? `${UNREAD_BADGE_CAP}+` : outboxUnread}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="inbox" className="mt-6">
-            <ProposalList box="inbox" onUnreadCountChange={setInboxUnread} />
-          </TabsContent>
-          <TabsContent value="outbox" className="mt-6">
-            <ProposalList box="outbox" onUnreadCountChange={setOutboxUnread} />
-          </TabsContent>
-        </Tabs>
+        <div className="w-full">
+          <div className="max-w-[400px]">
+            <SegmentedTabs
+              tabs={[
+                {
+                  value: 'inbox',
+                  label: 'Recibidas',
+                  icon: <Inbox className="h-4 w-4" />,
+                  badge:
+                    inboxUnread > 0 ? (
+                      <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5 shadow-md">
+                        {inboxUnread > UNREAD_BADGE_CAP
+                          ? `${UNREAD_BADGE_CAP}+`
+                          : inboxUnread}
+                      </Badge>
+                    ) : undefined,
+                },
+                {
+                  value: 'outbox',
+                  label: 'Enviadas',
+                  icon: <Send className="h-4 w-4" />,
+                  badge:
+                    outboxUnread > 0 ? (
+                      <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5 shadow-md">
+                        {outboxUnread > UNREAD_BADGE_CAP
+                          ? `${UNREAD_BADGE_CAP}+`
+                          : outboxUnread}
+                      </Badge>
+                    ) : undefined,
+                },
+              ]}
+              value={activeTab}
+              onValueChange={val => setActiveTab(val as 'inbox' | 'outbox')}
+              aria-label="Propuestas de intercambio"
+            />
+          </div>
+          <div className="mt-6">
+            {activeTab === 'inbox' && (
+              <ProposalList box="inbox" onUnreadCountChange={setInboxUnread} />
+            )}
+            {activeTab === 'outbox' && (
+              <ProposalList
+                box="outbox"
+                onUnreadCountChange={setOutboxUnread}
+                highlightProposalId={highlightProposalId}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -83,7 +129,13 @@ function TradeProposalsContent() {
 export default function TradeProposalsPage() {
   return (
     <AuthGuard>
-      <TradeProposalsContent />
+      <Suspense fallback={
+        <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+          <div className="text-white font-bold uppercase text-xl">Cargando propuestas...</div>
+        </div>
+      }>
+        <TradeProposalsContent />
+      </Suspense>
     </AuthGuard>
   );
 }

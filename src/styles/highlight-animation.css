@@ -1,0 +1,15 @@
+/* Highlight animation for newly created proposals */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #000000;
+    box-shadow: 0 0 0 0 rgba(255, 192, 0, 0);
+  }
+  50% {
+    border-color: #FFC000;
+    box-shadow: 0 0 0 4px rgba(255, 192, 0, 0.3);
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 1.5s ease-in-out 2;
+}

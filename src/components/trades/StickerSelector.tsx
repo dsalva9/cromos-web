@@ -67,17 +67,18 @@ export function StickerSelector({
   }
 
   return (
-    <Tabs defaultValue="offer" className="w-full">
-      <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black p-1">
-        <TabsTrigger
-          value="offer"
-          className="font-bold uppercase data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black rounded-md"
-        >
-          Ofrecer ({selectedOfferItems.length})
-        </TabsTrigger>
-        <TabsTrigger
-          value="request"
-          className="font-bold uppercase data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black rounded-md"
+    <div className="w-full">
+      <Tabs defaultValue="offer" className="w-full">
+        <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
+          <TabsTrigger
+            value="offer"
+            className="font-bold uppercase text-white data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:font-black rounded-md transition-all"
+          >
+            Ofrecer ({selectedOfferItems.length})
+          </TabsTrigger>
+          <TabsTrigger
+            value="request"
+            className="font-bold uppercase text-white data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:font-black rounded-md transition-all"
         >
           Pedir ({selectedRequestItems.length})
         </TabsTrigger>
@@ -103,5 +104,6 @@ export function StickerSelector({
         />
       </TabsContent>
     </Tabs>
+    </div>
   );
 }

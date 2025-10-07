@@ -19,22 +19,34 @@
 
 ---
 
-## 🆕 Recent Updates (v1.4.2)
+## 🆕 Recent Updates (v1.4.3)
 
-### Trade Composer UX Improvements
+### Trade Flow UX Polishes ✅
+- **Streamlined /trades/find**: Simplified interface shows matches for active collection only
+- **Advanced Search**: New `/trades/search` page with full filter controls (collection, player, rarity, team, minOverlap)
+- **Post-Create Flow**: After creating proposal, redirect to ENVIADAS tab with one-time highlight animation on the new card
+- **SegmentedTabs Component**: New reusable component for equal-width paired tabs (RECIBIDAS|ENVIADAS, RESUMEN|MENSAJES, OFRECER|PEDIR)
+  - Equal-width grid layout with flush seams
+  - Gold active state (#FFC000) with thick borders (border-2 border-black)
+  - Full keyboard navigation (Arrow keys) and ARIA compliance
+  - Icons and badge support built-in
+
+### v1.4.2 Updates
+
+#### Trade Composer UX Improvements
 - ✅ Fixed tab alignment across all trade screens (OFRECER/PEDIR, RECIBIDAS/ENVIADAS, RESUMEN/MENSAJES)
 - ✅ Team names now display instead of sticker codes in composer
 - ✅ Validation requires both offer AND request items for valid proposals
 - ✅ Fixed UTF-8 encoding for Spanish characters (Tú, Colección)
 - ✅ Proposal messages now appear as first chat message (not separate field)
 
-### Trade Matching Logic Updates
+#### Trade Matching Logic Updates
 - ✅ Updated `find_mutual_traders` to work without 'wanted' flag
 - ✅ Now uses count-based logic: missing (count=0), duplicates (count>1)
 - ✅ Fixed incorrect match counts in intercambios screen
 - ✅ Updated `get_mutual_trade_detail` with same logic
 
-### Database Changes
+#### Database Changes
 - Migration: `20251007100000_fix_trade_matching_and_chat.sql`
 - Updated `create_trade_proposal` to store message in `trade_chats`
 - Fixed `find_mutual_traders` and `get_mutual_trade_detail` functions

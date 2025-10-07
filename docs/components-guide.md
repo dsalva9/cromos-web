@@ -897,21 +897,36 @@ User profile and collection management with **true zero-reload optimistic update
 - **Per-action loading states** for granular user feedback
 - **Confirmation modals** for destructive actions with cascade delete warnings
 
-### FindTradersPage ✅ **COMPLETED - PHASE 2**
+### FindTradersPage (Simplified) ✅ **v1.4.3**
 
 **File**: `src/app/trades/find/page.tsx`
 
-Main trading search interface with filtering and pagination.
+Streamlined trading discovery showing matches for active collection only.
 
 **Key Features:**
 
-- **Active-first collection preselection** with fallback logic
-- **Zero-reload filtering** with debounced inputs and optimistic UI
-- **Pagination controls** with loading states and result counts
+- **Active collection only**: No filters, shows matches for user's active collection
+- **"Búsqueda avanzada" button**: Routes to `/trades/search` for advanced filtering
+- **Zero-reload interactions**: Instant pagination without page refresh
 - **Empty states** for no collections and no matches
 - **Active collection warnings** consistent with profile patterns
 - **Toast notifications** for search errors
 - **Responsive grid layout** for match cards (1-3 columns based on screen size)
+
+### AdvancedSearchPage ✅ **NEW - v1.4.3**
+
+**File**: `src/app/trades/search/page.tsx`
+
+Full-featured trading search interface with comprehensive filters.
+
+**Key Features:**
+
+- **Complete filter controls**: Collection dropdown, player search, rarity, team, minOverlap
+- **Debounced inputs**: 500ms debounce on text-based filters
+- **"Volver a Intercambios" link**: Easy return to simplified view
+- **Filter badges**: Visual summary of active filters with individual removal
+- **Pagination controls** with loading states and result counts
+- **Context tip**: Header explains relationship between simplified and advanced views
 
 ### FindTraderDetailPage ⚠️ **REMOVED in v1.4.3**
 
@@ -919,15 +934,17 @@ Main trading search interface with filtering and pagination.
 
 **Rationale**: The intermediate detail page was redundant. Users can now go from finding a match to creating a proposal in one click.
 
-### ProposalsDashboardPage ✅ **NEW - MVP COMPLETE**
+### ProposalsDashboardPage ✅ **v1.4.3 - ENHANCED**
 
 **File**: `src/app/trades/proposals/page.tsx`
 
-Comprehensive proposal management dashboard with inbox/outbox functionality.
+Comprehensive proposal management dashboard with inbox/outbox functionality and highlight support.
 
 **Key Features:**
 
-- **Tab-based Navigation**: Clean separation between "Recibidas" (inbox) and "Enviadas" (outbox)
+- **SegmentedTabs Navigation**: Equal-width RECIBIDAS|ENVIADAS tabs with icons and unread badges
+- **Query-driven Tab Selection**: `?tab=sent` param sets initial tab (for post-create redirect)
+- **One-time Highlight**: `?highlight=<proposalId>` param triggers 2-second pulse animation on newly created proposal
 - **Real-time Updates**: Fresh proposal lists with refresh capability
 - **Status Filtering**: Visual indicators for all proposal statuses
 - **Empty States**: Contextual messaging for empty inbox/outbox
@@ -938,19 +955,31 @@ Comprehensive proposal management dashboard with inbox/outbox functionality.
 **State Management Pattern:**
 
 ```typescript
+// Query param integration (v1.4.3)
+const tabParam = searchParams.get('tab');
+const initialTab = tabParam === 'sent' ? 'outbox' : 'inbox';
+const highlightParam = searchParams.get('highlight');
+const [highlightProposalId, setHighlightProposalId] = useState(
+  highlightParam ? parseInt(highlightParam) : null
+);
+
 // Tab switching with state preservation
-const [activeTab, setActiveTab] = useState<'inbox' | 'outbox'>('inbox');
+const [activeTab, setActiveTab] = useState<'inbox' | 'outbox'>(initialTab);
 const [selectedProposal, setSelectedProposal] = useState<number | null>(null);
 
-// Separate data management for each tab
-const inboxProposals = useProposals({ box: 'inbox' });
-const outboxProposals = useProposals({ box: 'outbox' });
-
-// Modal integration
-const handleProposalSelect = (proposalId: number) => {
-  setSelectedProposal(proposalId);
-  setModalOpen(true);
-};
+// Clear highlight after 2 seconds
+useEffect(() => {
+  if (highlightProposalId) {
+    const timer = setTimeout(() => {
+      setHighlightProposalId(null);
+      // Remove highlight param from URL without reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('highlight');
+      window.history.replaceState({}, '', url.toString());
+    }, 2000);
+    return () => clearTimeout(timer);
+  }
+}, [highlightProposalId]);
 ```
 
 ### ProposalComposerPage ✅ **NEW - MVP COMPLETE**
@@ -1059,6 +1088,49 @@ All standard shadcn/ui components are available with trading-specific enhancemen
 - `Card` - Standard card layouts (enhanced for proposals)
 
 ### Custom UI Extensions
+
+#### SegmentedTabs ✅ **NEW - v1.4.3**
+
+**File**: `src/components/ui/SegmentedTabs.tsx`
+
+Equal-width paired tab control following Retro-Comic theme.
+
+```typescript
+<SegmentedTabs
+  tabs={[
+    {
+      value: 'inbox',
+      label: 'Recibidas',
+      icon: <Inbox className="h-4 w-4" />,
+      badge: unreadCount > 0 ? <Badge>...</Badge> : undefined,
+    },
+    {
+      value: 'outbox',
+      label: 'Enviadas',
+      icon: <Send className="h-4 w-4" />,
+    },
+  ]}
+  value={activeTab}
+  onValueChange={setActiveTab}
+  aria-label="Propuestas de intercambio"
+/>
+```
+
+**Key Features:**
+
+- **Equal-width columns** using CSS grid (`grid-template-columns: repeat(N, 1fr)`)
+- **Retro-Comic styling**: Thick borders (border-2 border-black), gold active state (#FFC000)
+- **Flush seams**: Zero internal gap between tabs
+- **Rounded outer corners only**: Active tab gets border radius on first/last position
+- **Full keyboard navigation**: Arrow keys to switch tabs, focus ring on active element
+- **ARIA compliant**: `role="tablist"`, `aria-selected`, `aria-controls` attributes
+- **Icon & badge support**: Optional icon and badge props per tab
+
+**Usage locations:**
+
+- **Proposals Page**: RECIBIDAS | ENVIADAS tabs
+- **ProposalDetailModal**: RESUMEN | MENSAJES tabs
+- **StickerSelector**: OFRECER | PEDIR tabs (shadcn Tabs with aligned styling)
 
 #### ModernCard
 

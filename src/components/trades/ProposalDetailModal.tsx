@@ -9,16 +9,16 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { useProposalDetail } from '@/hooks/trades/useProposalDetail';
 import { useRespondToProposal } from '@/hooks/trades/useRespondToProposal';
 import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { TradeProposalDetailItem } from '@/types';
 import { useUser } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
-import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare } from 'lucide-react';
+import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText } from 'lucide-react';
 
 interface ProposalDetailModalProps {
   proposalId: number | null;
@@ -188,63 +188,68 @@ export function ProposalDetailModal({
         {error && <p className="text-[#E84D4D] font-bold">{error}</p>}
 
         {detail && (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
-              <TabsTrigger
-                value="resumen"
-                className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:font-black data-[state=active]:uppercase data-[state=active]:border-2 data-[state=active]:border-black rounded-md font-bold text-white"
-              >
-                Resumen
-              </TabsTrigger>
-              <TabsTrigger
-                value="mensajes"
-                className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:font-black data-[state=active]:uppercase data-[state=active]:border-2 data-[state=active]:border-black rounded-md font-bold text-white relative"
-              >
-                <MessageSquare className="inline h-4 w-4 mr-2" />
-                Mensajes
-                {unreadCount > 0 && (
-                  <Badge className="ml-2 bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-1.5 py-0.5">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
+          <>
+            <SegmentedTabs
+              tabs={[
+                {
+                  value: 'resumen',
+                  label: 'Resumen',
+                  icon: <FileText className="h-4 w-4" />,
+                },
+                {
+                  value: 'mensajes',
+                  label: 'Mensajes',
+                  icon: <MessageSquare className="h-4 w-4" />,
+                  badge:
+                    unreadCount > 0 ? (
+                      <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </Badge>
+                    ) : undefined,
+                },
+              ]}
+              value={activeTab}
+              onValueChange={setActiveTab}
+              aria-label="Detalle de propuesta"
+            />
 
-            <TabsContent value="resumen" className="mt-4">
-              <div className="grid gap-6">
-                <ItemList
-                  title="Lo que se ofrece"
-                  items={offeredItems}
-                  icon={<ArrowDown className="h-5 w-5 mr-2" />}
-                  colorClass="text-green-400"
-                />
-                <ItemList
-                  title="Lo que se pide"
-                  items={requestedItems}
-                  icon={<ArrowUp className="h-5 w-5 mr-2" />}
-                  colorClass="text-blue-400"
-                />
-                {detail.proposal.message && (
-                  <div>
-                    <h3 className="text-lg font-bold uppercase mb-2">
-                      Mensaje
-                    </h3>
-                    <p className="text-sm text-gray-300 bg-gray-800 p-3 rounded-md border-2 border-black">
-                      {detail.proposal.message}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </TabsContent>
+            <div className="mt-4">
+              {activeTab === 'resumen' && (
+                <div className="grid gap-6">
+                  <ItemList
+                    title="Lo que se ofrece"
+                    items={offeredItems}
+                    icon={<ArrowDown className="h-5 w-5 mr-2" />}
+                    colorClass="text-green-400"
+                  />
+                  <ItemList
+                    title="Lo que se pide"
+                    items={requestedItems}
+                    icon={<ArrowUp className="h-5 w-5 mr-2" />}
+                    colorClass="text-blue-400"
+                  />
+                  {detail.proposal.message && (
+                    <div>
+                      <h3 className="text-lg font-bold uppercase mb-2">
+                        Mensaje
+                      </h3>
+                      <p className="text-sm text-gray-300 bg-gray-800 p-3 rounded-md border-2 border-black">
+                        {detail.proposal.message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
-            <TabsContent value="mensajes" className="mt-4">
-              <TradeChatPanel
-                tradeId={proposalId}
-                counterpartyNickname={counterpartyNickname}
-                isProposalActive={isProposalActive}
-              />
-            </TabsContent>
-          </Tabs>
+              {activeTab === 'mensajes' && (
+                <TradeChatPanel
+                  tradeId={proposalId}
+                  counterpartyNickname={counterpartyNickname}
+                  isProposalActive={isProposalActive}
+                />
+              )}
+            </div>
+          </>
         )}
 
         <DialogFooter>
