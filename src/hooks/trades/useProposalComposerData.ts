@@ -67,10 +67,11 @@ export function useProposalComposerData({
       const stickersQuery = `
         sticker_id,
         count,
-        stickers (
+        stickers!inner (
           code,
           player_name,
-          thumb_path_webp_100
+          thumb_path_webp_100,
+          collection_id
         )
       `;
 
