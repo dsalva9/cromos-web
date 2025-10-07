@@ -42,15 +42,15 @@ export function StickerSelector({
     [myStickers]
   );
 
-  // Request section: Filters for stickers the other user has duplicates of (count > 1)
+  // Request section: Filters for stickers the other user has (count > 0)
   // AND the current user is missing (count = 0).
   const availableRequests = useMemo(() => {
     const myOwnedStickerIds = new Set(
       myStickers.filter(s => s.count > 0).map(s => s.sticker_id)
     );
     return otherUserStickers
-      .filter(s => s.count > 1 && !myOwnedStickerIds.has(s.sticker_id))
-      .map(s => ({ ...s, duplicates: s.count - 1 }));
+      .filter(s => s.count > 0 && !myOwnedStickerIds.has(s.sticker_id))
+      .map(s => ({ ...s, duplicates: s.count }));
   }, [myStickers, otherUserStickers]);
 
   if (loading) {
@@ -68,7 +68,7 @@ export function StickerSelector({
 
   return (
     <Tabs defaultValue="offer" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 md:w-[400px] bg-gray-800 border-2 border-black p-1">
+      <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black p-1">
         <TabsTrigger
           value="offer"
           className="font-bold uppercase data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black rounded-md"

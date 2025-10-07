@@ -236,6 +236,9 @@ export interface StickerDetailsLite {
   code: string;
   player_name: string;
   thumb_path_webp_100: string | null;
+  thumb_public_url?: string; // Computed field
+  image_public_url?: string; // Computed field (fallback)
+  collection_teams: { team_name: string } | null;
 }
 
 export interface UserStickerWithDetails extends UserSticker {

@@ -44,7 +44,7 @@ function TradeProposalsContent() {
         </div>
 
         <Tabs defaultValue="inbox" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
+          <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
             <TabsTrigger
               value="inbox"
               className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:font-black data-[state=active]:uppercase data-[state=active]:border-2 data-[state=active]:border-black rounded-md font-bold text-white relative"

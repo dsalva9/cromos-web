@@ -46,17 +46,18 @@ export function useProposalComposerData({
     setError(null);
 
     try {
+      // Fetch profiles using maybeSingle() to handle potential no-results gracefully
       const fromUserPromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', fromUserId)
-        .single();
+        .maybeSingle();
 
       const toUserPromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', toUserId)
-        .single();
+        .maybeSingle();
 
       const collectionPromise = supabase
         .from('collections')
@@ -64,14 +65,26 @@ export function useProposalComposerData({
         .eq('id', collectionId)
         .single();
 
+      // Get sticker IDs for this collection first
+      const { data: collectionStickers } = await supabase
+        .from('stickers')
+        .select('id')
+        .eq('collection_id', collectionId);
+
+      const stickerIds = collectionStickers?.map(s => s.id) || [];
+
+      if (stickerIds.length === 0) {
+        throw new Error('No stickers found for this collection');
+      }
+
       const stickersQuery = `
         sticker_id,
         count,
-        stickers!inner (
+        stickers (
           code,
           player_name,
           thumb_path_webp_100,
-          collection_id
+          collection_teams ( team_name )
         )
       `;
 
@@ -79,13 +92,13 @@ export function useProposalComposerData({
         .from('user_stickers')
         .select(stickersQuery)
         .eq('user_id', fromUserId)
-        .eq('stickers.collection_id', collectionId);
+        .in('sticker_id', stickerIds);
 
       const otherUserStickersPromise = supabase
         .from('user_stickers')
         .select(stickersQuery)
         .eq('user_id', toUserId)
-        .eq('stickers.collection_id', collectionId);
+        .in('sticker_id', stickerIds);
 
       const [
         fromUserRes,
@@ -101,8 +114,21 @@ export function useProposalComposerData({
         otherUserStickersPromise,
       ]);
 
+      if (fromUserRes.error)
+        throw new Error(`Error fetching your profile: ${fromUserRes.error.message}`);
       if (toUserRes.error)
         throw new Error(`Error fetching user: ${toUserRes.error.message}`);
+      if (!fromUserRes.data)
+        throw new Error('Your profile not found');
+
+      // If target user profile doesn't exist, create a default one
+      const toUserProfile: Profile = toUserRes.data || {
+        id: toUserId!,
+        nickname: 'Usuario',
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
       if (collectionRes.error)
         throw new Error(
           `Error fetching collection: ${collectionRes.error.message}`
@@ -116,15 +142,31 @@ export function useProposalComposerData({
           `Error fetching other user's stickers: ${otherUserStickersRes.error.message}`
         );
 
+      // Map stickers to add public URLs
+      const mapStickersWithUrls = (stickers: unknown[]) => {
+        return (stickers as UserStickerWithDetails[]).map(sticker => {
+          if (sticker.stickers?.thumb_path_webp_100) {
+            return {
+              ...sticker,
+              stickers: {
+                ...sticker.stickers,
+                thumb_public_url: supabase.storage
+                  .from('sticker-images')
+                  .getPublicUrl(sticker.stickers.thumb_path_webp_100).data
+                  .publicUrl,
+              },
+            };
+          }
+          return sticker;
+        });
+      };
+
       setData({
         fromUser: fromUserRes.data,
-        toUser: toUserRes.data,
+        toUser: toUserProfile,
         collection: collectionRes.data,
-        myStickers:
-          (myStickersRes.data as unknown as UserStickerWithDetails[]) ?? [],
-        otherUserStickers:
-          (otherUserStickersRes.data as unknown as UserStickerWithDetails[]) ??
-          [],
+        myStickers: mapStickersWithUrls(myStickersRes.data ?? []),
+        otherUserStickers: mapStickersWithUrls(otherUserStickersRes.data ?? []),
       });
     } catch (err: unknown) {
       setError(
@@ -133,7 +175,8 @@ export function useProposalComposerData({
     } finally {
       setLoading(false);
     }
-  }, [fromUserId, toUserId, collectionId, supabase, loading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromUserId, toUserId, collectionId, supabase]);
 
   useEffect(() => {
     fetchData();

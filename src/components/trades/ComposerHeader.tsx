@@ -43,13 +43,13 @@ export function ComposerHeader({
             <Avatar className="h-12 w-12 border-2 border-black">
               <AvatarImage
                 src={fromUserAvatar ?? undefined}
-                alt={fromUser?.nickname ?? 'T�'}
+                alt={fromUser?.nickname ?? 'Tú'}
               />
               <AvatarFallback>{getInitials(fromUser?.nickname)}</AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left">
               <p className="text-lg font-bold text-white">
-                {fromUser?.nickname ?? 'T�'}
+                {fromUser?.nickname ?? 'Tú'}
               </p>
               <p className="text-sm text-gray-400">Ofertante</p>
             </div>
@@ -76,7 +76,7 @@ export function ComposerHeader({
         </div>
         <div className="text-center mt-4 pt-4 border-t border-gray-700">
           <p className="text-sm text-gray-400 uppercase tracking-wider">
-            Colecci�n
+            Colección
           </p>
           <p className="text-lg font-semibold text-white">{collection.name}</p>
         </div>

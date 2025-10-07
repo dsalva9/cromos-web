@@ -71,14 +71,14 @@ function ProposalComposer() {
     });
 
     if (success) {
-      toast.success('�Propuesta enviada con �xito!', {
-        description: 'Ser�s redirigido a tu panel de propuestas.',
+      toast.success('¡Propuesta enviada con éxito!', {
+        description: 'Serás redirigido a tu panel de propuestas.',
       });
       router.push('/trades/proposals');
     }
   };
 
-  const isValidProposal = offerItems.length > 0 || requestItems.length > 0;
+  const isValidProposal = offerItems.length > 0 && requestItems.length > 0;
 
   return (
     <div className="min-h-screen bg-[#1F2937]">
