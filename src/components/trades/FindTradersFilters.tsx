@@ -88,10 +88,10 @@ export function FindTradersFilters({
     localFilters.minOverlap > 1;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 bg-gray-800 border-2 border-black rounded-md p-4 shadow-xl">
       {/* Collection Selector */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className="block text-sm font-bold uppercase text-white mb-2">
           Colección
         </label>
         <div className="relative">
@@ -99,7 +99,7 @@ export function FindTradersFilters({
             onClick={() =>
               setIsCollectionDropdownOpen(!isCollectionDropdownOpen)
             }
-            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full bg-gray-900 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors text-white font-medium"
             aria-haspopup="listbox"
             aria-expanded={isCollectionDropdownOpen}
           >
@@ -108,11 +108,11 @@ export function FindTradersFilters({
                 ? `${selectedCollection.name} (${selectedCollection.year})`
                 : 'Selecciona una colección'}
             </span>
-            <ChevronDown className="w-4 h-4 text-gray-500" />
+            <ChevronDown className="w-4 h-4 text-gray-400" />
             {selectedCollection?.is_user_active && (
               <Badge
                 variant="secondary"
-                className="ml-2 bg-green-100 text-green-700"
+                className="ml-2 bg-[#FFC000] text-gray-900 border border-black font-bold"
               >
                 Activa
               </Badge>
@@ -125,7 +125,7 @@ export function FindTradersFilters({
                 className="fixed inset-0 z-10"
                 onClick={() => setIsCollectionDropdownOpen(false)}
               />
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              <div className="absolute z-20 w-full mt-1 bg-gray-900 border-2 border-black rounded-md shadow-xl max-h-60 overflow-y-auto">
                 {collections.map(collection => (
                   <button
                     key={collection.id}
@@ -133,7 +133,7 @@ export function FindTradersFilters({
                       onCollectionChange(collection.id);
                       setIsCollectionDropdownOpen(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center justify-between focus:outline-none focus:bg-teal-50"
+                    className="w-full px-4 py-2 text-left hover:bg-gray-800 flex items-center justify-between focus:outline-none focus:bg-gray-700 text-white font-medium transition-colors border-b border-gray-700 last:border-b-0"
                   >
                     <span className="truncate">
                       {collection.name} ({collection.year})
@@ -141,7 +141,7 @@ export function FindTradersFilters({
                     {collection.is_user_active && (
                       <Badge
                         variant="secondary"
-                        className="ml-2 bg-green-100 text-green-700"
+                        className="ml-2 bg-[#FFC000] text-gray-900 border border-black font-bold text-xs"
                       >
                         Activa
                       </Badge>
@@ -156,7 +156,7 @@ export function FindTradersFilters({
 
       {/* Search Query */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className="block text-sm font-bold uppercase text-white mb-2">
           Buscar jugador
         </label>
         <div className="relative">
@@ -166,19 +166,19 @@ export function FindTradersFilters({
             placeholder="Nombre del jugador..."
             value={localFilters.query}
             onChange={e => handleFilterUpdate('query', e.target.value)}
-            className="pl-10 bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+            className="pl-10 bg-gray-900 border-2 border-black text-white placeholder:text-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
           />
         </div>
       </div>
 
       {/* Advanced Filters Toggle */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="text-gray-600 hover:text-gray-800"
+          className="text-white hover:text-gray-900 bg-gray-900 hover:bg-[#FFC000] border-2 border-black font-bold uppercase text-xs rounded-md"
         >
           <Filter className="w-4 h-4 mr-2" />
           Filtros avanzados
@@ -193,7 +193,7 @@ export function FindTradersFilters({
             variant="outline"
             size="sm"
             onClick={clearFilters}
-            className="text-red-600 hover:text-red-800 border-red-200 hover:border-red-300"
+            className="text-white hover:text-white bg-gray-900 hover:bg-[#E84D4D] border-2 border-black font-bold uppercase text-xs rounded-md"
           >
             <X className="w-4 h-4 mr-1" />
             Limpiar filtros
@@ -203,21 +203,21 @@ export function FindTradersFilters({
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="space-y-4 pt-4 border-t border-gray-200">
+        <div className="space-y-4 pt-4 border-t-2 border-gray-700">
           {/* Rarity Filter */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-bold uppercase text-white mb-2">
               Rareza
             </label>
             <div className="relative">
               <button
                 onClick={() => setIsRarityDropdownOpen(!isRarityDropdownOpen)}
-                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 text-left flex items-center justify-between hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full bg-gray-900 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors text-white font-medium"
                 aria-haspopup="listbox"
                 aria-expanded={isRarityDropdownOpen}
               >
                 <span>{selectedRarity?.label || 'Todas las rarezas'}</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
 
               {isRarityDropdownOpen && (
@@ -226,7 +226,7 @@ export function FindTradersFilters({
                     className="fixed inset-0 z-10"
                     onClick={() => setIsRarityDropdownOpen(false)}
                   />
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                  <div className="absolute z-20 w-full mt-1 bg-gray-900 border-2 border-black rounded-md shadow-xl">
                     {RARITY_OPTIONS.map(option => (
                       <button
                         key={option.value}
@@ -234,7 +234,7 @@ export function FindTradersFilters({
                           handleFilterUpdate('rarity', option.value);
                           setIsRarityDropdownOpen(false);
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:outline-none focus:bg-teal-50"
+                        className="w-full px-4 py-2 text-left hover:bg-gray-800 focus:outline-none focus:bg-gray-700 text-white font-medium transition-colors border-b border-gray-700 last:border-b-0"
                       >
                         {option.label}
                       </button>
@@ -247,7 +247,7 @@ export function FindTradersFilters({
 
           {/* Team Filter */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-bold uppercase text-white mb-2">
               Equipo
             </label>
             <Input
@@ -255,13 +255,13 @@ export function FindTradersFilters({
               placeholder="Nombre del equipo..."
               value={localFilters.team}
               onChange={e => handleFilterUpdate('team', e.target.value)}
-              className="bg-white border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+              className="bg-gray-900 border-2 border-black text-white placeholder:text-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
             />
           </div>
 
           {/* Min Overlap Filter */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-bold uppercase text-white mb-2">
               Coincidencias mínimas
             </label>
             <div className="flex flex-wrap gap-2">
@@ -276,15 +276,15 @@ export function FindTradersFilters({
                   onClick={() => handleFilterUpdate('minOverlap', value)}
                   className={
                     localFilters.minOverlap === value
-                      ? 'bg-teal-500 hover:bg-teal-600 text-white'
-                      : 'text-gray-600 hover:text-gray-800 border-gray-300 hover:border-gray-400'
+                      ? 'bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold rounded-md'
+                      : 'text-white hover:text-gray-900 bg-gray-900 hover:bg-gray-700 border-2 border-black font-bold rounded-md'
                   }
                 >
                   {value}+
                 </Button>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-2 font-medium">
               Número mínimo de cromos que pueden intercambiarse mutuamente
             </p>
           </div>
@@ -293,47 +293,51 @@ export function FindTradersFilters({
 
       {/* Active Filters Summary */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200">
+        <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-gray-700">
           {localFilters.rarity && (
-            <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Rareza:{' '}
               {RARITY_OPTIONS.find(r => r.value === localFilters.rarity)?.label}
               <button
                 onClick={() => handleFilterUpdate('rarity', '')}
-                className="ml-1 hover:text-teal-900"
+                className="ml-1 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-black rounded"
+                aria-label="Quitar filtro de rareza"
               >
                 <X className="w-3 h-3" />
               </button>
             </Badge>
           )}
           {localFilters.team && (
-            <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Equipo: {localFilters.team}
               <button
                 onClick={() => handleFilterUpdate('team', '')}
-                className="ml-1 hover:text-teal-900"
+                className="ml-1 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-black rounded"
+                aria-label="Quitar filtro de equipo"
               >
                 <X className="w-3 h-3" />
               </button>
             </Badge>
           )}
           {localFilters.query && (
-            <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Jugador: {localFilters.query}
               <button
                 onClick={() => handleFilterUpdate('query', '')}
-                className="ml-1 hover:text-teal-900"
+                className="ml-1 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-black rounded"
+                aria-label="Quitar filtro de jugador"
               >
                 <X className="w-3 h-3" />
               </button>
             </Badge>
           )}
           {localFilters.minOverlap > 1 && (
-            <Badge variant="secondary" className="bg-teal-100 text-teal-800">
+            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Min. {localFilters.minOverlap} coincidencias
               <button
                 onClick={() => handleFilterUpdate('minOverlap', 1)}
-                className="ml-1 hover:text-teal-900"
+                className="ml-1 hover:text-gray-700 focus:outline-none focus:ring-1 focus:ring-black rounded"
+                aria-label="Quitar filtro de coincidencias mínimas"
               >
                 <X className="w-3 h-3" />
               </button>

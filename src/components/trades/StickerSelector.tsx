@@ -56,10 +56,10 @@ export function StickerSelector({
   if (loading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-10 w-full max-w-sm" />
+        <Skeleton className="h-10 w-full max-w-sm bg-gray-800 border-2 border-black" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] w-full rounded-lg" />
+            <Skeleton key={i} className="aspect-[3/4] w-full rounded-md bg-gray-800 border-2 border-black" />
           ))}
         </div>
       </div>
@@ -68,11 +68,17 @@ export function StickerSelector({
 
   return (
     <Tabs defaultValue="offer" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-        <TabsTrigger value="offer">
+      <TabsList className="grid w-full grid-cols-2 md:w-[400px] bg-gray-800 border-2 border-black p-1">
+        <TabsTrigger
+          value="offer"
+          className="font-bold uppercase data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black rounded-md"
+        >
           Ofrecer ({selectedOfferItems.length})
         </TabsTrigger>
-        <TabsTrigger value="request">
+        <TabsTrigger
+          value="request"
+          className="font-bold uppercase data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black rounded-md"
+        >
           Pedir ({selectedRequestItems.length})
         </TabsTrigger>
       </TabsList>
@@ -83,7 +89,7 @@ export function StickerSelector({
           selectedItems={selectedOfferItems}
           onItemsChange={onOfferItemsChange}
           mode="offer"
-          emptyMessage="No tienes cromos repetidos para ofrecer en esta colecci�n."
+          emptyMessage="No tienes cromos repetidos para ofrecer en esta colección."
         />
       </TabsContent>
 

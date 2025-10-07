@@ -38,29 +38,29 @@ function ItemList({
   return (
     <div>
       <h3
-        className={`text-lg font-semibold mb-2 flex items-center ${colorClass}`}
+        className={`text-lg font-bold uppercase mb-2 flex items-center ${colorClass}`}
       >
         {icon}
         {title}
       </h3>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-500">Nada.</p>
+        <p className="text-sm text-gray-400 font-bold">Nada.</p>
       ) : (
         <ul className="space-y-2">
           {items.map(item => (
             <li
               key={item.id}
-              className="flex justify-between items-center bg-gray-100 p-2 rounded-md"
+              className="flex justify-between items-center bg-gray-800 p-3 rounded-md border-2 border-black"
             >
               <div>
-                <p className="font-semibold text-gray-800">
+                <p className="font-bold text-white">
                   {item.player_name}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-300">
                   {item.sticker_code} - {item.team_name}
                 </p>
               </div>
-              <Badge variant="secondary">x{item.quantity}</Badge>
+              <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold">x{item.quantity}</Badge>
             </li>
           ))}
         </ul>
@@ -116,19 +116,19 @@ export function ProposalDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[625px] bg-white text-black">
+      <DialogContent className="sm:max-w-[625px] bg-gray-900 text-white border-2 border-black shadow-xl">
         <DialogHeader>
-          <DialogTitle>Detalle de la Propuesta</DialogTitle>
+          <DialogTitle className="text-2xl font-bold uppercase">Detalle de la Propuesta</DialogTitle>
           {detail && (
-            <DialogDescription>
-              Propuesta de <strong>{detail.proposal.from_user_nickname}</strong>{' '}
-              para <strong>{detail.proposal.to_user_nickname}</strong>.
+            <DialogDescription className="text-gray-300">
+              Propuesta de <strong className="text-[#FFC000]">{detail.proposal.from_user_nickname}</strong>{' '}
+              para <strong className="text-[#FFC000]">{detail.proposal.to_user_nickname}</strong>.
             </DialogDescription>
           )}
         </DialogHeader>
 
-        {loading && <p>Cargando detalles...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {loading && <p className="font-bold">Cargando detalles...</p>}
+        {error && <p className="text-[#E84D4D] font-bold">{error}</p>}
 
         {detail && (
           <div className="grid gap-6 py-4">
@@ -136,18 +136,18 @@ export function ProposalDetailModal({
               title="Lo que se ofrece"
               items={offeredItems}
               icon={<ArrowDown className="h-5 w-5 mr-2" />}
-              colorClass="text-green-600"
+              colorClass="text-green-400"
             />
             <ItemList
               title="Lo que se pide"
               items={requestedItems}
               icon={<ArrowUp className="h-5 w-5 mr-2" />}
-              colorClass="text-blue-600"
+              colorClass="text-blue-400"
             />
             {detail.proposal.message && (
               <div>
-                <h3 className="text-lg font-semibold mb-2">Mensaje</h3>
-                <p className="text-sm text-gray-700 bg-gray-100 p-3 rounded-md">
+                <h3 className="text-lg font-bold uppercase mb-2">Mensaje</h3>
+                <p className="text-sm text-gray-300 bg-gray-800 p-3 rounded-md border-2 border-black">
                   {detail.proposal.message}
                 </p>
               </div>
@@ -157,19 +157,20 @@ export function ProposalDetailModal({
 
         <DialogFooter>
           {respondError && (
-            <p className="text-red-500 text-sm">{respondError}</p>
+            <p className="text-[#E84D4D] text-sm font-bold">{respondError}</p>
           )}
           {isPending && isReceiver && (
             <div className="flex space-x-2">
               <Button
                 variant="destructive"
+                className="bg-[#E84D4D] hover:bg-red-600 text-white border-2 border-black font-bold uppercase"
                 onClick={() => handleRespond('reject')}
                 disabled={respondLoading}
               >
                 <X className="mr-2 h-4 w-4" /> Rechazar
               </Button>
               <Button
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-white border-2 border-black font-bold uppercase"
                 onClick={() => handleRespond('accept')}
                 disabled={respondLoading}
               >
@@ -180,6 +181,7 @@ export function ProposalDetailModal({
           {isPending && isSender && (
             <Button
               variant="destructive"
+              className="bg-[#E84D4D] hover:bg-red-600 text-white border-2 border-black font-bold uppercase"
               onClick={() => handleRespond('cancel')}
               disabled={respondLoading}
             >

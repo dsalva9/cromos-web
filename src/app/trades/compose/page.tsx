@@ -81,15 +81,16 @@ function ProposalComposer() {
   const isValidProposal = offerItems.length > 0 || requestItems.length > 0;
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 px-4">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="mb-4 text-white"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Volver
-      </Button>
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto max-w-6xl py-8 px-4">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="mb-4 text-white bg-gray-800 hover:bg-gray-700 border-2 border-black rounded-md font-bold uppercase"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Volver
+        </Button>
 
       {data && (
         <ComposerHeader
@@ -99,31 +100,32 @@ function ProposalComposer() {
         />
       )}
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <StickerSelector
-            myStickers={data?.myStickers ?? []}
-            otherUserStickers={data?.otherUserStickers ?? []}
-            selectedOfferItems={offerItems}
-            selectedRequestItems={requestItems}
-            onOfferItemsChange={setOfferItems}
-            onRequestItemsChange={setRequestItems}
-            loading={dataLoading}
-          />
-        </div>
-
-        <div className="lg:col-span-1">
-          <div className="sticky top-24">
-            <ProposalSummary
-              offerItems={offerItems}
-              requestItems={requestItems}
-              targetUserNickname={data?.toUser.nickname ?? '...'}
-              message={message}
-              onMessageChange={setMessage}
-              onSubmit={handleCreateProposal}
-              loading={submissionLoading}
-              disabled={!isValidProposal || dataLoading}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <StickerSelector
+              myStickers={data?.myStickers ?? []}
+              otherUserStickers={data?.otherUserStickers ?? []}
+              selectedOfferItems={offerItems}
+              selectedRequestItems={requestItems}
+              onOfferItemsChange={setOfferItems}
+              onRequestItemsChange={setRequestItems}
+              loading={dataLoading}
             />
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <ProposalSummary
+                offerItems={offerItems}
+                requestItems={requestItems}
+                targetUserNickname={data?.toUser.nickname ?? '...'}
+                message={message}
+                onMessageChange={setMessage}
+                onSubmit={handleCreateProposal}
+                loading={submissionLoading}
+                disabled={!isValidProposal || dataLoading}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -133,7 +135,7 @@ function ProposalComposer() {
 
 export default function ProposalComposerPage() {
   return (
-    <Suspense fallback={<div>Cargando...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#1F2937] flex items-center justify-center"><div className="text-white font-bold uppercase text-xl">Cargando...</div></div>}>
       <ProposalComposer />
     </Suspense>
   );

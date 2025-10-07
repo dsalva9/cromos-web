@@ -4,9 +4,9 @@ This document outlines the component structure and patterns used in the CambioCr
 
 ---
 
-## UI Redesign: Retro-Comic Theme (v1.4.0)
+## UI Redesign: Retro-Comic Theme (v1.4.1) ✅ **COMPLETE**
 
-The application has been redesigned with a bold, high-contrast, retro-comic sticker aesthetic. This theme is applied across all major user-facing pages.
+The application has been fully redesigned with a bold, high-contrast, retro-comic sticker aesthetic. This theme is applied across **all** user-facing pages, navigation, and components.
 
 ### Core Theme Principles
 
@@ -21,11 +21,20 @@ The application has been redesigned with a bold, high-contrast, retro-comic stic
 - **Secondary Accent (Red)**: `#E84D4D` (`bg-[#E84D4D]`). Used for duplicate (`REPE`) indicators, removal actions (`Eliminar`), and rejection states.
 - **Dark Backgrounds**: `bg-gray-800` for cards and `bg-gray-900` for sticky navigation elements.
 
-### Styled Page Examples
+### Styled Page Examples (v1.4.1 - Complete Rollout)
 
-- **Profile Page (`/profile`)**: Manages user information and collections using the new card style.
-- **Collection Grid Page (`/mi-coleccion`)**: The default grid view for a collection, using `ModernCard` for stickers.
-- **Collection Album Page (`/mi-coleccion/[id]?page=X`)**: The detailed album view with `StickerTile` components.
+All pages now follow the Retro-Comic theme:
+
+- **Home Page (`/`)**: Hero section and features with themed cards and buttons
+- **Authentication Pages (`/login`, `/signup`)**: Dark theme with gold logo and card styling
+- **Navigation**: SiteHeader and SiteFooter with consistent dark theme and gold accents
+- **Profile Page (`/profile`)**: User management with themed cards and gold/red buttons
+- **Collection Pages (`/mi-coleccion`, `/mi-coleccion/[id]`)**: Album view with gold progress bars and tabs
+- **Trading Pages**:
+  - **Find Traders (`/trades/find`)**: Dark page with themed filters and match cards
+  - **Match Detail (`/trades/find/[userId]`)**: Themed sticker lists and proposal buttons
+  - **Proposals Dashboard (`/trades/proposals`)**: Tab interface with gold active states
+  - **Proposal Composer (`/trades/compose`)**: Multi-sticker selection with themed summary
 
 ---
 
@@ -1344,7 +1353,7 @@ interface TradingComponentProps {
 
 ## Testing Considerations (Future Implementation)
 
-### Priority Testing Areas ✅ **EXTENDED FOR TRADING**
+### Priority Testing Areas ✅ **EXTENDED FOR TRADING & THEME**
 
 - **Optimistic updates**: Verify rollback behavior on server errors
 - **Auth flows**: Login/logout state transitions
@@ -1356,6 +1365,14 @@ interface TradingComponentProps {
 - **Proposal workflows**: End-to-end testing for proposal creation, response, and management
 - **Modal interactions**: Focus management and keyboard navigation in modals
 - **State management**: Verify optimistic updates and rollback for proposal actions
+- **Theme Verification** ✅ **NEW (v1.4.1)**:
+  - Visual regression testing for Retro-Comic theme
+  - Verify thick borders (`border-2 border-black`) on components
+  - Verify gold accent (`#FFC000`) on active states and buttons
+  - Verify dark backgrounds (`bg-[#1F2937]`) on pages
+  - Check reduced rounding (`rounded-md`) throughout
+  - Accessibility: contrast ratios for gold buttons and text
+  - Keyboard navigation with new themed focus states
 
 ## Performance Optimization
 

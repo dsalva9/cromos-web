@@ -1,6 +1,52 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: v1.4.0 - Team Page Completion Feature
+## 🚀 Current Sprint: v1.4.1 - Theme Rollout & Consistency Pass
+
+### v1.4.1 Feature Status
+
+**Theme Rollout Complete ✅ | QA Complete ✅ | Documentation Complete ✅**
+
+- [x] **Complete Retro-Comic Theme Rollout**
+  - [x] Task 1: Home page theme pass (already complete)
+  - [x] Task 2: Navigation (header/footer)
+    - [x] SiteHeader: Dark theme, gold active states, Escape key handler
+    - [x] SiteFooter: Consistent link styling with thick borders
+    - [x] NavLink: Updated route handling for /trades/proposals
+  - [x] Task 3: Trades visual consistency
+    - [x] FindTradersFilters: Dark cards with gold accents
+    - [x] MatchCard: Full-card clickable with hover states
+    - [x] Page layouts: Solid dark backgrounds, themed headers
+    - [x] All trading components themed (via Task agent)
+  - [x] Task 4: Album view
+    - [x] AlbumSummaryHeader: Dark theme with font-black stats
+    - [x] AlbumPager: Gold active tabs with thick borders
+    - [x] PageHeader: Gold complete button, improved progress bar
+    - [x] All album components themed (via Task agent)
+  - [x] Task 5: Shared primitives
+    - [x] Skeleton: Already dark-themed
+    - [x] EmptyCollectionState: Updated with dark theme
+    - [x] Toast system: Verified shared wrapper usage
+    - [x] Image alt-text: Verified policy implementation
+  - [x] Additional updates (user-requested)
+    - [x] Profile page: Comprehensive theme update
+    - [x] Trades proposals page: Dark theme with gold tabs
+    - [x] Trades compose page: Dark background wrapper
+    - [x] Progress bar visibility: Changed to gold indicator
+    - [x] Authentication pages: Login and signup fully themed
+  - [x] Task 6: QA & E2E testing
+    - [x] Created theme-rollout.spec.ts with comprehensive tests
+    - [x] Visual verification helpers for borders/colors/backgrounds
+    - [x] Authentication pages testing
+    - [x] Navigation testing (header/footer/mobile menu)
+    - [x] Trading pages testing (find/proposals)
+    - [x] Album pages testing (pager/header/tiles)
+    - [x] Profile page testing
+    - [x] Accessibility testing (contrast/keyboard navigation)
+  - [x] Task 7: Documentation
+    - [x] Updated components-guide.md with theme completion
+    - [x] Updated current-features.md with v1.4.1 details
+    - [x] Updated TODO.md with sprint completion
+    - [x] Updated CHANGELOG.md with theme rollout entry
 
 ### v1.4.0 Feature Status
 
@@ -301,8 +347,8 @@
 
 ---
 
-**Last Updated**: 2025-10-06 (v1.4.0 - Team Page Completion Feature)
-**Current Focus**: v1.4.0 Feature Complete - Ready for deployment
+**Last Updated**: 2025-10-07 (v1.4.1 - Theme Rollout Complete)
+**Current Focus**: v1.4.1 Complete - Retro-Comic theme applied across entire application
 **Next Focus**: v1.3.0 Data Migration Sprint → Trade Chat UI and History Dashboard
 
 

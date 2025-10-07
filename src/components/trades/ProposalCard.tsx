@@ -12,14 +12,14 @@ interface ProposalCardProps {
 const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'accepted':
-      return 'bg-green-500 text-white';
+      return 'bg-green-500 text-white border-2 border-black font-bold uppercase';
     case 'rejected':
     case 'cancelled':
-      return 'bg-red-500 text-white';
+      return 'bg-[#E84D4D] text-white border-2 border-black font-bold uppercase';
     case 'pending':
-      return 'bg-yellow-500 text-black';
+      return 'bg-[#FFC000] text-gray-900 border-2 border-black font-bold uppercase';
     default:
-      return 'bg-gray-500 text-white';
+      return 'bg-gray-500 text-white border-2 border-black font-bold uppercase';
   }
 };
 
@@ -32,11 +32,11 @@ export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
   return (
     <ModernCard
       onClick={onClick}
-      className="bg-white/10 hover:bg-white/20 transition-colors duration-200 cursor-pointer"
+      className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 cursor-pointer border-2 border-black shadow-xl"
     >
       <ModernCardContent className="p-4">
         <div className="flex justify-between items-start">
-          <p className="font-semibold text-lg text-white">
+          <p className="font-bold text-lg text-white uppercase">
             {isInbox ? (
               <ArrowRight className="inline h-4 w-4 mr-2 text-green-400" />
             ) : (
@@ -56,19 +56,19 @@ export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
           })}
         </p>
         <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between bg-black/20 p-2 rounded-md">
-            <span className="text-green-400 flex items-center">
+          <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+            <span className="text-green-400 flex items-center font-bold">
               <ArrowDown className="h-4 w-4 mr-1" /> Ofreces
             </span>
-            <span className="font-bold">
+            <span className="font-bold text-white">
               {proposal.offer_item_count} cromos
             </span>
           </div>
-          <div className="flex items-center justify-between bg-black/20 p-2 rounded-md">
-            <span className="text-blue-400 flex items-center">
+          <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+            <span className="text-blue-400 flex items-center font-bold">
               <ArrowUp className="h-4 w-4 mr-1" /> Pides
             </span>
-            <span className="font-bold">
+            <span className="font-bold text-white">
               {proposal.request_item_count} cromos
             </span>
           </div>

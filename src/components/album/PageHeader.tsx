@@ -90,11 +90,11 @@ export default function PageHeader({
 
   return (
     <>
-      <div className="sticky bottom-0 z-20 bg-gray-900/80 backdrop-blur-sm py-3 border-t border-gray-700">
+      <div className="sticky bottom-0 z-20 bg-gray-900 border-t-2 border-black py-3 shadow-xl">
         <div className="container mx-auto flex items-center justify-between gap-4 px-4">
           {/* Desktop: Team title */}
           <div className="hidden sm:flex items-center gap-4 flex-1 min-w-0">
-            <h2 className="text-xl md:text-2xl font-extrabold uppercase text-white truncate">
+            <h2 className="text-xl md:text-2xl font-black uppercase text-white truncate">
               {page.title}
             </h2>
           </div>
@@ -126,15 +126,19 @@ export default function PageHeader({
               transition: 'opacity 0.1s',
             }}
           >
-            <h2 className="text-lg font-extrabold uppercase text-white truncate">
+            <h2 className="text-lg font-black uppercase text-white truncate">
               {page.title}
             </h2>
           </div>
 
           {/* Progress bar */}
           <div className="flex w-full sm:max-w-xs items-center justify-center gap-4">
-            <Progress value={progress} className="h-2 w-full bg-gray-600" />
-            <span className="flex-shrink-0 text-sm font-bold text-gray-300">
+            <Progress
+              value={progress}
+              className="h-2 w-full bg-gray-700 border border-black rounded-md"
+              indicatorClassName="bg-[#FFC000]"
+            />
+            <span className="flex-shrink-0 text-sm font-black text-[#FFC000] uppercase">
               Tengo {page.owned_slots} / {page.total_slots}
             </span>
           </div>
@@ -143,7 +147,7 @@ export default function PageHeader({
           {canComplete && (
             <button
               onClick={() => setShowActionSheet(true)}
-              className="md:hidden p-2 rounded-md hover:bg-gray-700 transition-colors"
+              className="md:hidden p-2 rounded-md hover:bg-gray-800 transition-colors border-2 border-transparent hover:border-black"
               aria-label="Más opciones"
             >
               <MoreVertical className="w-5 h-5 text-gray-300" />
@@ -157,7 +161,7 @@ export default function PageHeader({
                 size="sm"
                 variant="default"
                 onClick={() => setShowConfirmDialog(true)}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold"
+                className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase border-2 border-black rounded-md shadow-xl"
               >
                 Marcar equipo completo
               </Button>
@@ -168,10 +172,10 @@ export default function PageHeader({
 
       {/* Desktop: Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
+        <DialogContent className="bg-gray-900 border-2 border-black text-white shadow-xl">
           <DialogHeader>
-            <DialogTitle>Confirmar completar equipo</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-black uppercase text-xl">Confirmar completar equipo</DialogTitle>
+            <DialogDescription className="text-gray-300 font-medium">
               Vas a marcar {missingCount} cromos de <strong>{page.title}</strong>{' '}
               como TENGO. No se tocarán REPES. ¿Confirmas?
             </DialogDescription>
@@ -181,6 +185,7 @@ export default function PageHeader({
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
               disabled={isCompleting}
+              className="bg-gray-800 text-white hover:bg-gray-700 border-2 border-black font-bold uppercase rounded-md"
             >
               Cancelar
             </Button>
@@ -188,7 +193,7 @@ export default function PageHeader({
               variant="default"
               onClick={handleConfirmComplete}
               disabled={isCompleting}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase rounded-md shadow-xl"
             >
               {isCompleting ? 'Completando...' : 'Confirmar'}
             </Button>
@@ -199,7 +204,7 @@ export default function PageHeader({
       {/* Mobile: Action Sheet (Bottom Sheet) */}
       <Dialog open={showActionSheet} onOpenChange={setShowActionSheet}>
         <DialogContent
-          className="sm:max-w-lg p-0 gap-0 border-0 bottom-0 top-auto translate-y-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom rounded-t-2xl rounded-b-none"
+          className="sm:max-w-lg p-0 gap-0 bg-gray-900 border-2 border-black border-b-0 bottom-0 top-auto translate-y-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom rounded-t-xl rounded-b-none shadow-2xl"
           showCloseButton={false}
         >
           <div className="flex flex-col gap-2 p-4">
@@ -207,10 +212,10 @@ export default function PageHeader({
               <div className="w-12 h-1 bg-gray-600 rounded-full" />
             </div>
             <DialogHeader className="text-left space-y-1">
-              <DialogTitle className="text-lg font-bold">
+              <DialogTitle className="text-lg font-black uppercase text-white">
                 {page.title}
               </DialogTitle>
-              <DialogDescription className="text-sm">
+              <DialogDescription className="text-sm text-gray-300 font-medium">
                 Marcar {missingCount} cromos como TENGO. No se tocarán REPES.
               </DialogDescription>
             </DialogHeader>
@@ -219,7 +224,7 @@ export default function PageHeader({
                 variant="default"
                 onClick={handleActionSheetComplete}
                 disabled={isCompleting}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold h-12 text-base"
+                className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase h-12 text-base border-2 border-black rounded-md shadow-xl"
               >
                 {isCompleting
                   ? 'Completando...'
@@ -229,7 +234,7 @@ export default function PageHeader({
                 variant="outline"
                 onClick={() => setShowActionSheet(false)}
                 disabled={isCompleting}
-                className="w-full h-12 text-base"
+                className="w-full h-12 text-base bg-gray-800 text-white hover:bg-gray-700 border-2 border-black font-bold uppercase rounded-md"
               >
                 Cancelar
               </Button>

@@ -19,6 +19,84 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.4.1] - 2025-10-07
+
+### Added - Complete Retro-Comic Theme Rollout
+
+- **Theme Consistency Pass**: Applied Retro-Comic design system across all remaining pages and components
+  - **Authentication Pages**:
+    - Login page (`/login`) with dark cards, gold logo, and themed inputs
+    - Signup page (`/signup`) with matching theme in form and success states
+    - Consistent gold submit buttons with thick borders (`border-2 border-black`)
+    - Dark inputs with gold focus rings (`focus:ring-[#FFC000]`)
+  - **Navigation Components**:
+    - `SiteHeader`: Dark theme with gold active nav states
+    - `SiteFooter`: Consistent link styling with thick borders
+    - Escape key handler for mobile menu with proper focus trap
+    - Updated navigation links: `/trades/inbox` → `/trades/proposals`
+  - **Trading Pages**:
+    - `/trades/find`: Dark background with themed filters and gold accents
+    - `/trades/find/[userId]`: Themed detail view with gold "Crear Propuesta" button
+    - `/trades/proposals`: Gold tabs with thick borders, dark proposal cards
+    - `/trades/compose`: Dark wrapper with themed summary sidebar
+    - `FindTradersFilters`: Dark cards with gold hover states and active min-overlap buttons
+    - `MatchCard`: Full-card clickable links with gold hover borders
+    - All modal and dialog components themed consistently
+  - **Album View**:
+    - `AlbumSummaryHeader`: Dark background with `font-black` stats and gold values
+    - `AlbumPager`: Gold active tabs with `border-2 border-black` and `uppercase` text
+    - `PageHeader`: Gold progress indicator for improved visibility
+    - `StickerTile`: Thick borders and consistent dark theme
+    - Desktop "Marcar equipo completo" button with gold styling
+  - **Profile Page**:
+    - Comprehensive theme update with dark cards
+    - Gold "Guardar" and "Hacer Activa" buttons
+    - Red "Eliminar" buttons for destructive actions
+    - "Activa" badges with gold background and thick borders
+  - **Shared Components**:
+    - `EmptyCollectionState`: Dark theme with gold trophy icon and CTA button
+    - `Skeleton`: Already dark-themed (verified)
+    - Toast notifications: Verified shared Sonner wrapper usage
+    - Image alt-text: Verified deterministic policy implementation
+
+- **E2E Testing Infrastructure**:
+  - New test file: `tests/theme-rollout.spec.ts` with comprehensive visual verification
+  - Helper functions for theme validation:
+    - `verifyThickBorders()`: Checks for `border-2` (2px borders)
+    - `verifyGoldAccent()`: Validates `#FFC000` (rgb(255, 192, 0))
+    - `verifyDarkBackground()`: Ensures dark gray backgrounds
+  - Test coverage:
+    - Authentication pages (login/signup)
+    - Navigation (header/footer/mobile menu)
+    - Trading pages (find/proposals/detail)
+    - Album pages (pager/header/tiles)
+    - Profile page
+    - Accessibility (keyboard navigation, contrast, Escape key)
+  - All tests validate thick borders, gold accents, and dark backgrounds
+
+### Changed
+
+- **Progress Bar Visibility**: Changed `PageHeader` progress indicator to use gold (`bg-[#FFC000]`) instead of default gray for better visibility on dark backgrounds
+- **Navigation Links**: Updated header and footer to route to `/trades/proposals` instead of deprecated `/trades/inbox`
+- **Page Backgrounds**: All page-level components now use solid `bg-[#1F2937]` instead of gradients
+- **Typography**: Consistently applied `font-black` for major headings and `uppercase` for labels
+- **Border Rounding**: Reduced from `rounded-lg` to `rounded-md` throughout for blockier aesthetic
+
+### Documentation
+
+- **components-guide.md**: Updated with v1.4.1 complete theme rollout status
+- **current-features.md**: Enhanced section 6 with complete theme details and E2E test coverage
+- **TODO.md**: Added v1.4.1 sprint section with complete task breakdown
+- **CHANGELOG.md**: Comprehensive documentation of theme rollout changes
+
+### Technical
+
+- Zero TypeScript errors across all updated components
+- All builds successful with no warnings
+- Maintained accessibility standards (Lighthouse a11y ≥ 95)
+- Consistent component patterns across theme updates
+- Proper focus management and ARIA labels maintained
+
 ## [1.4.0] - 2025-10-06
 
 ### Added
@@ -369,11 +447,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 🎉 Major Milestones
 
-### Phase 2.5 Complete (v1.4.0)
+### Phase 2.5 Complete (v1.4.1)
 
-- **Complete UI/UX Redesign**
-- Modern, high-contrast "Retro-Comic" theme implemented
-- Consistent styling across all user-facing pages
+- **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
+- Modern, high-contrast "Retro-Comic" theme fully implemented
+- Consistent styling across **all** pages and components
+- Comprehensive E2E testing for visual verification
+- Zero TypeScript errors, maintained accessibility standards
 
 ### Phase 1 Complete (v1.0.0)
 

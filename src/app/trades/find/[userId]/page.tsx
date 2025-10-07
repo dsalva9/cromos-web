@@ -61,14 +61,14 @@ function TradeDetailPageContent() {
   }, [user, otherUserId, collectionId, fetchDetail, supabase]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
+    <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+            <h1 className="text-4xl font-black uppercase text-white">
               Detalle del Intercambio
             </h1>
-            <p className="text-white/80">
+            <p className="text-gray-300 font-medium">
               Viendo cromos en común con {targetUserNickname}
             </p>
           </div>
@@ -76,14 +76,14 @@ function TradeDetailPageContent() {
             <Button
               onClick={handleGoBack}
               variant="outline"
-              className="bg-transparent text-white hover:bg-white/10 hover:text-white"
+              className="bg-gray-800 text-white hover:bg-gray-700 border-2 border-black rounded-md font-bold uppercase text-sm"
             >
               <ArrowLeft className="mr-2 h-4 w-4" /> Volver
             </Button>
             {otherUserId && user && otherUserId !== user.id && (
               <Button
                 onClick={handleCreateProposal}
-                className="bg-teal-500 hover:bg-teal-600"
+                className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black rounded-md font-bold uppercase text-sm shadow-xl"
               >
                 <PlusCircle className="mr-2 h-4 w-4" /> Crear Propuesta
               </Button>
@@ -92,11 +92,11 @@ function TradeDetailPageContent() {
         </div>
 
         {loading && (
-          <p className="text-center text-white/80">
+          <p className="text-center text-white font-bold uppercase">
             Cargando detalles del intercambio...
           </p>
         )}
-        {error && <p className="text-center text-red-300">{error}</p>}
+        {error && <p className="text-center text-[#E84D4D] font-bold">{error}</p>}
         {!loading && !error && (
           <MatchDetail
             theyOffer={theyOffer}

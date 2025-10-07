@@ -161,8 +161,8 @@ function FindTradersContent() {
 
   if (userLoading || collectionsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
-        <div className="text-white text-xl">Cargando intercambios...</div>
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="text-white text-xl font-bold uppercase">Cargando intercambios...</div>
       </div>
     );
   }
@@ -170,19 +170,19 @@ function FindTradersContent() {
   // No collections state
   if (ownedCollections.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center p-4">
-        <ModernCard className="bg-white max-w-md w-full">
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center p-4">
+        <ModernCard className="bg-gray-800 border-2 border-black shadow-xl max-w-md w-full">
           <ModernCardContent className="p-8 text-center">
             <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            <h2 className="text-2xl font-bold uppercase text-white mb-2">
               Sin colecciones
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-300 mb-6">
               Necesitas seguir al menos una colección para buscar intercambios.
             </p>
             <Button
               onClick={() => (window.location.href = '/profile')}
-              className="bg-teal-500 hover:bg-teal-600 text-white"
+              className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase rounded-md"
             >
               Seguir colecciones
             </Button>
@@ -196,38 +196,38 @@ function FindTradersContent() {
   const showActiveWarning = !activeCollection && ownedCollections.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600">
+    <div className="min-h-screen bg-[#1F2937]">
       {/* Header */}
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="text-center sm:text-left">
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-2">
+            <h1 className="text-4xl font-black uppercase text-white mb-2">
               Buscar intercambios
             </h1>
-            <p className="text-white/80">
+            <p className="text-gray-300 font-medium">
               Encuentra usuarios que tengan cromos que necesitas
             </p>
           </div>
           <Button
             asChild
             variant="ghost"
-            className="self-center sm:self-start bg-white/10 text-white hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+            className="self-center sm:self-start bg-gray-800 text-white hover:bg-gray-700 border-2 border-black rounded-md font-bold uppercase text-sm focus-visible:ring-2 focus-visible:ring-[#FFC000]"
           >
-            <Link href="/trades/inbox">Buzón Intercambios</Link>
+            <Link href="/trades/proposals">Mis Propuestas</Link>
           </Button>
         </div>
 
         {/* Active collection warning */}
         {showActiveWarning && (
-          <ModernCard className="bg-orange-50 border-2 border-orange-200 mb-6">
+          <ModernCard className="bg-orange-900 border-2 border-orange-700 mb-6 shadow-xl">
             <ModernCardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <AlertTriangle className="w-6 h-6 text-orange-500" />
+                <AlertTriangle className="w-6 h-6 text-orange-400" />
                 <div>
-                  <h4 className="text-orange-800 font-semibold">
+                  <h4 className="text-orange-200 font-bold uppercase">
                     Recomendación
                   </h4>
-                  <p className="text-orange-700 text-sm">
+                  <p className="text-orange-300 text-sm font-medium">
                     Considera activar una colección desde tu perfil para
                     facilitar la navegación.
                   </p>
@@ -238,34 +238,32 @@ function FindTradersContent() {
         )}
 
         {/* Filters */}
-        <ModernCard className="bg-white/95 backdrop-blur-sm mb-6">
-          <ModernCardContent className="p-6">
-            <FindTradersFilters
-              collections={ownedCollections}
-              selectedCollectionId={selectedCollectionId}
-              filters={filters}
-              onCollectionChange={handleCollectionChange}
-              onFiltersChange={handleFiltersChange}
-            />
-          </ModernCardContent>
-        </ModernCard>
+        <div className="mb-6">
+          <FindTradersFilters
+            collections={ownedCollections}
+            selectedCollectionId={selectedCollectionId}
+            filters={filters}
+            onCollectionChange={handleCollectionChange}
+            onFiltersChange={handleFiltersChange}
+          />
+        </div>
 
         {/* Results Summary */}
         {selectedCollectionId && !matchesLoading && (
           <div className="mb-6">
-            <ModernCard className="bg-white/90 backdrop-blur-sm">
+            <ModernCard className="bg-gray-800 border-2 border-black shadow-xl">
               <ModernCardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <TrendingUp className="w-5 h-5 text-teal-600" />
-                    <span className="font-semibold text-gray-700">
+                    <TrendingUp className="w-5 h-5 text-[#FFC000]" />
+                    <span className="font-bold uppercase text-white">
                       {matches.length > 0
                         ? `${matches.length} intercambios encontrados`
                         : 'Sin intercambios disponibles'}
                     </span>
                   </div>
                   {totalCount > 0 && (
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-400 font-medium">
                       Página {currentPage + 1}
                     </span>
                   )}
@@ -279,12 +277,12 @@ function FindTradersContent() {
         {matchesLoading && (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <ModernCard key={i} className="bg-white animate-pulse">
+              <ModernCard key={i} className="bg-gray-800 border-2 border-black shadow-xl animate-pulse">
                 <ModernCardContent className="p-6">
                   <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    <div className="h-4 bg-gray-700 rounded-md w-3/4"></div>
+                    <div className="h-3 bg-gray-700 rounded-md w-1/2"></div>
+                    <div className="h-3 bg-gray-700 rounded-md w-2/3"></div>
                   </div>
                 </ModernCardContent>
               </ModernCard>
@@ -308,13 +306,13 @@ function FindTradersContent() {
         {/* Empty state */}
         {!matchesLoading && matches.length === 0 && selectedCollectionId && (
           <div className="text-center py-12">
-            <ModernCard className="bg-white/90 backdrop-blur-sm max-w-md mx-auto">
+            <ModernCard className="bg-gray-800 border-2 border-dashed border-gray-600 shadow-xl max-w-md mx-auto">
               <ModernCardContent className="p-8">
-                <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold uppercase text-white mb-2">
                   Sin intercambios disponibles
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-400 text-sm font-medium">
                   Prueba ajustando los filtros o eligiendo otra colección.
                 </p>
               </ModernCardContent>
@@ -324,17 +322,17 @@ function FindTradersContent() {
 
         {/* Pagination */}
         {!matchesLoading && matches.length > 0 && (
-          <div className="flex justify-center space-x-2">
+          <div className="flex justify-center items-center space-x-3">
             <Button
               variant="outline"
               disabled={currentPage === 0}
               onClick={() => setCurrentPage(prev => prev - 1)}
-              className="bg-white/90 text-gray-700 border-gray-300 hover:bg-white"
+              className="bg-gray-800 text-white border-2 border-black hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold uppercase rounded-md"
             >
               Anterior
             </Button>
-            <div className="flex items-center px-4 py-2 bg-white/90 rounded-lg">
-              <span className="text-gray-700 font-medium">
+            <div className="flex items-center px-4 py-2 bg-gray-800 border-2 border-black rounded-md shadow-xl">
+              <span className="text-white font-bold">
                 Página {currentPage + 1}
               </span>
             </div>
@@ -342,7 +340,7 @@ function FindTradersContent() {
               variant="outline"
               disabled={!hasMore || matches.length < pageSize}
               onClick={() => setCurrentPage(prev => prev + 1)}
-              className="bg-white/90 text-gray-700 border-gray-300 hover:bg-white"
+              className="bg-gray-800 text-white border-2 border-black hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed font-bold uppercase rounded-md"
             >
               Siguiente
             </Button>

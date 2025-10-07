@@ -53,48 +53,41 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
-          <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
+          <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
             📧
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+          <h1 className="text-3xl font-black uppercase text-white mb-2">
             ¡Revisa tu email!
           </h1>
         </div>
 
-        {/* Success Card with Glass Effect */}
-        <div
-          className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
-        >
+        {/* Success Card */}
+        <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
           <div className="p-8 text-center">
             <div className="mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl">✅</span>
               </div>
-              <h2 className="text-xl font-bold text-gray-800 mb-2">
+              <h2 className="text-xl font-black uppercase text-white mb-2">
                 Cuenta creada
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-300 font-medium">
                 Te hemos enviado un enlace de confirmación a{' '}
                 <strong>{email}</strong>
               </p>
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300 font-medium">
                 Haz clic en el enlace del email para activar tu cuenta y empezar
                 a coleccionar cromos.
               </p>
 
               <Link href="/login">
-                <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl">
+                <Button className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200">
                   Ir a iniciar sesión
                 </Button>
               </Link>
@@ -106,7 +99,7 @@ export default function SignupPage() {
         <div className="mt-8">
           <Link
             href="/"
-            className="text-white/80 hover:text-white text-sm font-medium hover:underline"
+            className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
           >
             ← Volver al inicio
           </Link>
@@ -116,33 +109,25 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
+        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+        <h1 className="text-3xl font-black uppercase text-white mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
-      {/* Signup Card with Dark Effect */}
-      <div
-        className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
-        style={{
-          backgroundColor: '#1a1a2e',
-          color: 'white',
-          border: 'none',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)',
-        }}
-      >
+      {/* Signup Card */}
+      <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-100 mb-2">
+            <h2 className="text-2xl font-black uppercase text-white mb-2">
               Crear Cuenta
             </h2>
-            <p className="text-gray-300">
+            <p className="text-gray-300 font-medium">
               Únete a la comunidad de coleccionistas
             </p>
           </div>
@@ -151,7 +136,7 @@ export default function SignupPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-semibold text-gray-200"
+                className="text-sm font-bold uppercase text-white"
               >
                 Email
               </label>
@@ -162,14 +147,14 @@ export default function SignupPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-xl bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400 focus:bg-gray-700"
+                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-semibold text-gray-200"
+                className="text-sm font-bold uppercase text-white"
               >
                 Contraseña
               </label>
@@ -180,14 +165,14 @@ export default function SignupPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-xl bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400 focus:bg-gray-700"
+                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-sm font-semibold text-gray-200"
+                className="text-sm font-bold uppercase text-white"
               >
                 Confirmar Contraseña
               </label>
@@ -198,19 +183,19 @@ export default function SignupPage() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
-                className="rounded-xl bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400 focus:bg-gray-700"
+                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             {error && (
-              <div className="bg-red-900/50 border border-red-700 rounded-xl p-4">
-                <p className="text-sm text-red-300 font-medium">{error}</p>
+              <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
+                <p className="text-sm text-white font-bold">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl"
+              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
@@ -218,12 +203,12 @@ export default function SignupPage() {
           </form>
 
           <div className="mt-8 text-center">
-            <div className="border-t border-gray-600 pt-6">
-              <p className="text-sm text-gray-300">
+            <div className="border-t-2 border-gray-700 pt-6">
+              <p className="text-sm text-gray-300 font-medium">
                 ¿Ya tienes cuenta?{' '}
                 <Link
                   href="/login"
-                  className="text-blue-400 hover:text-blue-300 font-bold hover:underline"
+                  className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
                 >
                   Iniciar sesión
                 </Link>
@@ -237,7 +222,7 @@ export default function SignupPage() {
       <div className="mt-8">
         <Link
           href="/"
-          className="text-white/80 hover:text-white text-sm font-medium hover:underline"
+          className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
         >
           ← Volver al inicio
         </Link>

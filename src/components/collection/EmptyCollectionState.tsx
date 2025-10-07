@@ -16,18 +16,18 @@ export default function EmptyCollectionState() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-cyan-500 to-blue-600 flex items-center justify-center">
+    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
       <div className="container mx-auto px-4 max-w-2xl">
-        <ModernCard className="bg-white/90 backdrop-blur-sm border border-white/20">
+        <ModernCard className="bg-gray-800 border-2 border-black shadow-xl">
           <ModernCardContent className="p-12 text-center">
-            <Trophy className="w-20 h-20 text-teal-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            <Trophy className="w-20 h-20 text-[#FFC000] mx-auto mb-6" />
+            <h1 className="text-3xl font-black uppercase text-white mb-4">
               ¡Bienvenido a {siteConfig.name}!
             </h1>
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            <h2 className="text-xl font-bold text-white mb-4">
               Aún no sigues ninguna colección
             </h2>
-            <p className="text-gray-600 text-lg mb-8 leading-relaxed">
+            <p className="text-gray-300 text-lg mb-8 leading-relaxed font-medium">
               Para empezar a intercambiar cromos, primero necesitas seguir una
               colección. Explora las colecciones disponibles y elige la que más
               te guste.
@@ -37,13 +37,13 @@ export default function EmptyCollectionState() {
               <Button
                 onClick={handleGoToProfile}
                 size="lg"
-                className="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 px-8 py-3 text-lg font-black uppercase rounded-md shadow-xl border-2 border-black transition-all duration-200"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Seguir una Colección
               </Button>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400 font-medium">
                 Ve a tu perfil para explorar las colecciones disponibles
               </p>
             </div>

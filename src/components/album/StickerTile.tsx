@@ -101,9 +101,9 @@ export default function StickerTile({
     if (slotRole === 'manager') Icon = User;
 
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/50 border-2 border-dashed border-gray-700 rounded-lg p-2 text-center">
-        <Icon className="w-8 h-8 text-gray-600 mb-2" />
-        <span className="text-xs font-semibold text-gray-500">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 border-2 border-dashed border-gray-600 rounded-md p-2 text-center">
+        <Icon className="w-8 h-8 text-gray-500 mb-2" />
+        <span className="text-xs font-bold text-gray-400 uppercase">
           #{slot.slot_index + 1}
         </span>
       </div>
@@ -116,7 +116,7 @@ export default function StickerTile({
         onClick={handleIncrease}
         disabled={disabledIncrease}
         className={cn(
-          'aspect-[3/4] w-full relative rounded-lg overflow-hidden bg-gray-800 border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:cursor-not-allowed transition-all',
+          'aspect-[3/4] w-full relative rounded-md overflow-hidden bg-gray-800 border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-[#1F2937] disabled:cursor-not-allowed transition-all',
           ownedCount === 0 && 'grayscale hover:grayscale-0'
         )}
         aria-label={`A�adir ${sticker?.player_name ?? 'cromo'}`}
@@ -190,11 +190,11 @@ export default function StickerTile({
         </div>
 
         {sticker && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
-            <p className="font-bold text-base uppercase truncate">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-2 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
+            <p className="font-bold text-base uppercase truncate text-white">
               {sticker.player_name}
             </p>
-            <p className="text-xs opacity-90 truncate">{teamName}</p>
+            <p className="text-xs truncate text-gray-300">{teamName}</p>
           </div>
         )}
 
@@ -212,8 +212,8 @@ export default function StickerTile({
               size="sm"
               className={`hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 ${
                 ownedCount > 0
-                  ? 'bg-[#FFC000] text-gray-900 font-bold border border-black hover:bg-yellow-400'
-                  : 'bg-gray-700 text-white font-bold border border-black hover:bg-gray-600'
+                  ? 'bg-[#FFC000] text-gray-900 font-bold border-2 border-black hover:bg-yellow-400 focus:ring-[#FFC000]'
+                  : 'bg-gray-800 text-white font-bold border-2 border-black hover:bg-gray-700 focus:ring-[#FFC000]'
               }`}
               onClick={handleIncrease}
               disabled={disabledIncrease}
@@ -226,7 +226,7 @@ export default function StickerTile({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="w-full text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
+                  className="w-full text-lg font-bold border-2 border-black bg-[#E84D4D] text-white hover:bg-red-600 focus:ring-[#FFC000]"
                   onClick={handleDecrease}
                   disabled={disabledDecrease}
                   aria-label="Quitar uno"

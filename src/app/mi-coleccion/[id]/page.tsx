@@ -97,19 +97,19 @@ function AlbumView() {
           />
 
           {collections.length > 1 && (
-            <div className="mt-16 pt-8 border-t border-gray-700 flex flex-col items-center gap-4">
-              <h3 className="text-xl font-bold uppercase text-white">
+            <div className="mt-16 pt-8 border-t-2 border-gray-700 flex flex-col items-center gap-4">
+              <h3 className="text-xl font-black uppercase text-white">
                 Otras Colecciones
               </h3>
               <div className="flex flex-col gap-2 items-center">
-                <label className="text-xs uppercase tracking-widest text-white/70">
+                <label className="text-xs uppercase tracking-widest font-bold text-gray-300">
                   Cambiar de colección
                 </label>
                 <select
                   value={activeCollection?.id ?? ''}
                   onChange={e => switchCollection(Number(e.target.value))}
                   disabled={switchingCollection}
-                  className="bg-gray-900 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 border-2 border-black"
+                  className="bg-gray-800 text-white text-sm font-bold px-4 py-2 rounded-md shadow-xl focus:outline-none focus:ring-2 focus:ring-[#FFC000] border-2 border-black"
                 >
                   {collections.map(option => (
                     <option key={option.id} value={option.id}>

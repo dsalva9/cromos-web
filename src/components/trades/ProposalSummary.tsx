@@ -39,20 +39,20 @@ export function ProposalSummary({
   const MAX_MESSAGE_LENGTH = 500;
 
   return (
-    <ModernCard className="bg-gray-800 border-2 border-black">
+    <ModernCard className="bg-gray-800 border-2 border-black shadow-xl">
       <div className="p-6 pb-0">
-        <h2 className="text-lg font-bold uppercase">Resumen de la Propuesta</h2>
+        <h2 className="text-lg font-bold uppercase text-white">Resumen de la Propuesta</h2>
       </div>
       <ModernCardContent className="space-y-6 p-6">
         <div className="space-y-4 text-sm">
-          <div className="flex justify-between items-center">
-            <p className="font-semibold text-white">Tu Oferta:</p>
+          <div className="flex justify-between items-center bg-gray-900 p-3 rounded-md border-2 border-black">
+            <p className="font-bold text-white uppercase">Tu Oferta:</p>
             <p className="font-bold text-[#FFC000]">
               {offerCount} cromo{offerCount !== 1 ? 's' : ''}
             </p>
           </div>
-          <div className="flex justify-between items-center">
-            <p className="font-semibold text-white">
+          <div className="flex justify-between items-center bg-gray-900 p-3 rounded-md border-2 border-black">
+            <p className="font-bold text-white uppercase">
               Tu Pedido a {targetUserNickname}:
             </p>
             <p className="font-bold text-[#FFC000]">
@@ -63,13 +63,13 @@ export function ProposalSummary({
 
         <div>
           <Textarea
-            placeholder="A�ade un mensaje (opcional)..."
+            placeholder="Añade un mensaje (opcional)..."
             value={message}
             onChange={e => onMessageChange(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}
-            className="bg-gray-900 border-black"
+            className="bg-gray-900 border-2 border-black text-white rounded-md focus:ring-2 focus:ring-[#FFC000]"
           />
-          <p className="text-xs text-gray-400 mt-2 text-right">
+          <p className="text-xs text-gray-400 mt-2 text-right font-bold">
             {message.length} / {MAX_MESSAGE_LENGTH}
           </p>
         </div>
@@ -78,7 +78,7 @@ export function ProposalSummary({
           onClick={onSubmit}
           disabled={disabled || loading}
           size="lg"
-          className="w-full"
+          className="w-full bg-[#FFC000] hover:bg-yellow-500 text-gray-900 border-2 border-black font-bold uppercase shadow-xl"
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {loading ? 'Enviando...' : 'Enviar Propuesta'}

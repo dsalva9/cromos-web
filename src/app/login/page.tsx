@@ -42,40 +42,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-white/20 rounded-3xl mx-auto mb-4 flex items-center justify-center text-4xl backdrop-blur-sm border border-white/30">
+        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">
+        <h1 className="text-3xl font-black uppercase text-white mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
-      {/* Login Card with Glass Effect */}
-      <div
-        className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
-        style={{
-          backgroundColor: '#1a1a2e',
-          color: 'white',
-          border: 'none',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)',
-        }}
-      >
+      {/* Login Card */}
+      <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-100 mb-2">
+            <h2 className="text-2xl font-black uppercase text-white mb-2">
               Iniciar Sesión
             </h2>
-            <p className="text-gray-300">Accede a tu colección de cromos</p>
+            <p className="text-gray-300 font-medium">Accede a tu colección de cromos</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-semibold text-gray-200"
+                className="text-sm font-bold uppercase text-white"
               >
                 Email
               </label>
@@ -87,14 +79,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-xl bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400 focus:bg-gray-700"
+                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-semibold text-gray-200"
+                className="text-sm font-bold uppercase text-white"
               >
                 Contraseña
               </label>
@@ -106,19 +98,19 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-xl bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400 focus:bg-gray-700"
+                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <p className="text-sm text-red-700 font-medium">{error}</p>
+              <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
+                <p className="text-sm text-white font-bold">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl"
+              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
@@ -128,17 +120,17 @@ export default function LoginPage() {
           <div className="mt-8 text-center space-y-4">
             <Link
               href="/forgot-password"
-              className="text-sm text-blue-400 hover:text-blue-300 font-medium hover:underline"
+              className="text-sm text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
             >
               ¿Olvidaste tu contraseña?
             </Link>
 
-            <div className="border-t border-gray-200 pt-4">
-              <p className="text-sm text-gray-600">
+            <div className="border-t-2 border-gray-700 pt-4">
+              <p className="text-sm text-gray-300 font-medium">
                 ¿No tienes cuenta?{' '}
                 <Link
                   href="/signup"
-                  className="text-blue-600 hover:text-blue-700 font-bold hover:underline"
+                  className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
                 >
                   Crear cuenta
                 </Link>
@@ -152,7 +144,7 @@ export default function LoginPage() {
       <div className="mt-8">
         <Link
           href="/"
-          className="text-white/80 hover:text-white text-sm font-medium hover:underline"
+          className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
         >
           ← Volver al inicio
         </Link>
