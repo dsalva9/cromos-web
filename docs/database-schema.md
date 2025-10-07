@@ -667,25 +667,32 @@ FUNCTION get_mutual_trade_detail(
 
 #### `create_trade_proposal`
 
-Create a new trade proposal.
+Create a new trade proposal. The message is stored as the first chat message, not in the proposal record.
 
 ```sql
 FUNCTION create_trade_proposal(
   p_collection_id INTEGER,
   p_to_user UUID,
-  p_message TEXT,
-  p_offer_items JSONB,
-  p_request_items JSONB
-) RETURNS JSON
+  p_offer_items proposal_item[],
+  p_request_items proposal_item[],
+  p_message TEXT
+) RETURNS BIGINT
 ```
 
-**Returns:**
+**Parameters:**
+- `p_collection_id`: The collection ID for the trade
+- `p_to_user`: UUID of the user receiving the proposal
+- `p_offer_items`: Array of items the sender is offering
+- `p_request_items`: Array of items the sender is requesting
+- `p_message`: Optional message (stored as first chat message if provided)
 
-```json
-{
-  "proposal_id": 123
-}
-```
+**Returns:** The proposal ID (BIGINT)
+
+**Behavior:**
+- Creates a trade proposal with status 'pending'
+- Inserts offer and request items into trade_proposal_items
+- If a message is provided, inserts it as the first message in trade_chats
+- The proposal.message field is always NULL (messages go to trade_chats)
 
 **Security:** SECURITY DEFINER
 

@@ -13,9 +13,31 @@
 - **Find mutual trading opportunities with other collectors** ✅ **COMPLETE**
 - **Create and manage trade proposals with multi-sticker selection** ✅ **COMPLETE**
 - **Interactive proposal system with inbox/outbox management** ✅ **COMPLETE**
+- **Trade chat with proposal messages** ✅ **COMPLETE (v1.4.2)**
 - **Album-style page navigation with team rosters and special cards** ✅ **CODE COMPLETE**
-- (Backend Ready) Real-time chat for trade negotiations
 - (Backend Ready) Complete trade history tracking
+
+---
+
+## 🆕 Recent Updates (v1.4.2)
+
+### Trade Composer UX Improvements
+- ✅ Fixed tab alignment across all trade screens (OFRECER/PEDIR, RECIBIDAS/ENVIADAS, RESUMEN/MENSAJES)
+- ✅ Team names now display instead of sticker codes in composer
+- ✅ Validation requires both offer AND request items for valid proposals
+- ✅ Fixed UTF-8 encoding for Spanish characters (Tú, Colección)
+- ✅ Proposal messages now appear as first chat message (not separate field)
+
+### Trade Matching Logic Updates
+- ✅ Updated `find_mutual_traders` to work without 'wanted' flag
+- ✅ Now uses count-based logic: missing (count=0), duplicates (count>1)
+- ✅ Fixed incorrect match counts in intercambios screen
+- ✅ Updated `get_mutual_trade_detail` with same logic
+
+### Database Changes
+- Migration: `20251007100000_fix_trade_matching_and_chat.sql`
+- Updated `create_trade_proposal` to store message in `trade_chats`
+- Fixed `find_mutual_traders` and `get_mutual_trade_detail` functions
 
 ---
 
