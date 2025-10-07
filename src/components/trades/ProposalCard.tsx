@@ -3,10 +3,13 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 
+const UNREAD_BADGE_CAP = 9;
+
 interface ProposalCardProps {
   proposal: TradeProposalListItem;
   box: 'inbox' | 'outbox';
   onClick: () => void;
+  unreadCount?: number;
 }
 
 const getStatusBadgeVariant = (status: string) => {
@@ -23,18 +26,31 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
+export function ProposalCard({ proposal, box, onClick, unreadCount = 0 }: ProposalCardProps) {
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
     ? proposal.from_user_nickname
     : proposal.to_user_nickname;
 
+  const displayUnreadCount = unreadCount > UNREAD_BADGE_CAP ? `${UNREAD_BADGE_CAP}+` : unreadCount.toString();
+
   return (
-    <ModernCard
-      onClick={onClick}
-      className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 cursor-pointer border-2 border-black shadow-xl"
-    >
-      <ModernCardContent className="p-4">
+    <div className="relative">
+      {/* Unread badge (top-right corner, outside card) */}
+      {unreadCount > 0 && (
+        <div className="absolute -top-2 -right-2 z-20">
+          <Badge className="bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-2 py-1 shadow-lg">
+            {displayUnreadCount}
+          </Badge>
+        </div>
+      )}
+
+      <ModernCard
+        onClick={onClick}
+        className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 cursor-pointer border-2 border-black shadow-xl"
+      >
+        <ModernCardContent className="p-4">
+
         <div className="flex justify-between items-start">
           <p className="font-bold text-lg text-white uppercase">
             {isInbox ? (
@@ -75,6 +91,7 @@ export function ProposalCard({ proposal, box, onClick }: ProposalCardProps) {
         </div>
       </ModernCardContent>
     </ModernCard>
+    </div>
   );
 }
 

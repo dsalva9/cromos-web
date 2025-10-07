@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useProposals } from '@/hooks/trades/useProposals';
+import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { ProposalCard } from './ProposalCard';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Inbox } from 'lucide-react';
@@ -10,9 +11,10 @@ import type { TradeProposalListItem, TradeProposalStatus } from '@/types';
 
 interface ProposalListProps {
   box: 'inbox' | 'outbox';
+  onUnreadCountChange?: (totalUnread: number) => void;
 }
 
-export function ProposalList({ box }: ProposalListProps) {
+export function ProposalList({ box, onUnreadCountChange }: ProposalListProps) {
   const { proposals, loading, error, fetchProposals, clearProposals } =
     useProposals();
   const [optimisticProposals, setOptimisticProposals] = useState<
@@ -22,9 +24,29 @@ export function ProposalList({ box }: ProposalListProps) {
     null
   );
 
+  // Get trade IDs for unread count fetching
+  const tradeIds = proposals.map(p => p.id);
+
+  const {
+    getCountForTrade,
+    totalUnread,
+    refresh: refreshUnreadCounts,
+  } = useUnreadCounts({
+    box,
+    tradeIds,
+    enabled: tradeIds.length > 0,
+  });
+
   useEffect(() => {
     setOptimisticProposals(proposals);
   }, [proposals]);
+
+  // Notify parent of unread count changes
+  useEffect(() => {
+    if (onUnreadCountChange) {
+      onUnreadCountChange(totalUnread);
+    }
+  }, [totalUnread, onUnreadCountChange]);
 
   const handleStatusChange = useCallback(
     (proposalId: number, newStatus: string) => {
@@ -43,7 +65,11 @@ export function ProposalList({ box }: ProposalListProps) {
     setSelectedProposalId(proposalId);
   };
 
-  const handleCloseModal = () => setSelectedProposalId(null);
+  const handleCloseModal = () => {
+    setSelectedProposalId(null);
+    // Refresh unread counts after closing modal (in case chat was read)
+    refreshUnreadCounts();
+  };
 
   useEffect(() => {
     // Fetch on mount and when box changes
@@ -94,6 +120,7 @@ export function ProposalList({ box }: ProposalListProps) {
             proposal={proposal}
             box={box}
             onClick={() => handleCardClick(proposal.id)}
+            unreadCount={getCountForTrade(proposal.id)}
           />
         ))}
       </div>

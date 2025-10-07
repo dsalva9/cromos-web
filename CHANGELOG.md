@@ -19,6 +19,114 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.4.2] - 2025-10-07
+
+### Added - Trade Chat UI + Unread Message Badges
+
+- **Real-time Trade Chat System**:
+  - Pre-populated chat context: Opening a proposal loads the last 50 messages automatically
+  - Trade-scoped messaging: Composer bound to current trade ID, no manual trade selection needed
+  - Counterparty nickname in placeholder: "Mensaje para {nickname}…"
+  - Empty state message: "Aún no hay mensajes en esta propuesta. ¡Sé el primero en saludar!"
+  - Realtime message updates via Supabase subscriptions (no refresh required)
+  - Message bubbles: right-aligned for sender, left-aligned for counterparty
+  - Timestamps in HH:mm format for each message
+  - Auto-scroll to newest on open and on new message (unless user scrolled up)
+  - "Nuevos mensajes" jump pill when new messages arrive while scrolled up
+  - Composer features:
+    - Enter=send, Shift+Enter=newline
+    - 500 character limit with live counter
+    - Disabled state for cancelled/rejected proposals
+  - Pagination: "Ver mensajes anteriores" button for loading older messages (50 at a time)
+  - Permissions: RLS enforces proposal participants only; 401/403 errors disable composer with toast
+
+- **Unread Message Badges**:
+  - Per-card badges: Show unread count on each ProposalCard (cap at "9+")
+  - Tab aggregate badges: Total unread counts on "Recibidas" and "Enviadas" tabs
+  - Mensajes tab badge: Subtle badge on "Mensajes" tab when unseen messages exist
+  - Mark as read: Automatically marks trade as read when chat panel is opened/focused
+  - Realtime badge updates: Counts increment live when new messages arrive
+  - Performance: Efficient queries avoid N+1 lookups; supports paginated lists
+
+- **Backend Infrastructure**:
+  - New table: `trade_reads` (user_id, trade_id, last_read_at) with PK (user_id, trade_id)
+  - RPC: `mark_trade_read(p_trade_id BIGINT)` → upserts last_read_at = now() for auth.uid()
+  - RPC: `get_unread_counts(p_box TEXT, p_trade_ids INT8[])` → returns per-trade unread_count
+    - Filters by auth.uid() automatically (SECURITY DEFINER)
+    - Accepts optional p_trade_ids array for efficient pagination
+  - Indexes: idx_trade_reads_user_id, idx_trade_reads_trade_id
+  - RLS policies: Owner-only access (user_id = auth.uid()) for all verbs
+  - Migration file: `database/migrations/20251007000000_trade_chat_unread_badges.sql`
+
+- **Frontend Components & Hooks**:
+  - `useTradeChat(tradeId)` hook:
+    - State: messages, loading, error, hasMore
+    - Actions: sendMessage(text), loadMore(), markAsRead()
+    - Initial fetch (50 messages), pagination (older 50), realtime subscribe/unsubscribe
+  - `useUnreadCounts()` hook:
+    - Fetches per-trade unread counts for current box (inbox/outbox)
+    - Exposes aggregate counts for tabs
+    - Realtime updates on INSERT to trade_chats
+  - `TradeChatPanel` component:
+    - Message list with scroll management and auto-scroll logic
+    - Composer with character counter and disabled states
+    - "Load older" affordance and "new messages" pill
+    - Retro-Comic theme: dark cards, gold accents, thick black borders
+  - `ProposalCard` updates:
+    - New `unreadCount` prop displays badge (top-right corner, red with "9+" cap)
+  - `ProposalList` updates:
+    - Integrated useUnreadCounts hook, passes counts to cards
+    - Notifies parent of total unread via onUnreadCountChange callback
+  - `ProposalDetailModal` updates:
+    - New "Mensajes" tab with TradeChatPanel
+    - Tab state preservation: keyed by proposalId, defaults to "Resumen"
+    - Unread badge on "Mensajes" tab when unseen messages exist
+    - Calls markAsRead() when "Mensajes" tab becomes active
+  - Proposals page (`/trades/proposals`):
+    - Aggregate unread badges on "Recibidas" and "Enviadas" tabs
+    - Real-time updates via child ProposalList components
+
+- **E2E Testing**:
+  - New test file: `tests/trade-chat-unread-badges.spec.ts`
+  - Test coverage:
+    - Chat basics: load 50, scroll to bottom, send message, see it immediately
+    - Realtime: second session inserts message → first session sees it without refresh
+    - Unread counts:
+      - Badge increments when counterparty message arrives (chat closed)
+      - Badge clears after opening Mensajes tab
+      - Cap at "9+" verified
+    - Tab aggregates: verify badges on Recibidas/Enviadas tabs
+    - States: composer disabled for cancelled/rejected proposals
+    - Pagination: "Ver mensajes anteriores" prepends older messages, preserves scroll
+    - A11y: labels on inputs/buttons, focus order, screen-reader text for badges
+  - Helper functions: login(), navigateToProposals(), openFirstProposal()
+  - Multi-user tests using Playwright contexts for realtime scenarios
+
+### Changed
+
+- **ProposalCard**: Now accepts `unreadCount` prop and displays badge when > 0
+- **ProposalList**: Accepts `onUnreadCountChange` callback to notify parent of total unread
+- **ProposalDetailModal**: Converted from single-view to tabbed interface (Resumen + Mensajes)
+- **Proposals Page**: Added state for inbox/outbox unread counts, displays on tabs
+
+### Documentation
+
+- **database-schema.md**: Added trade_reads table, mark_trade_read RPC, get_unread_counts RPC
+- **api-endpoints.md**: Added RPC function signatures, parameters, return types, examples
+- **components-guide.md**: Added TradeChatPanel, useTradeChat, useUnreadCounts, badge behavior
+- **current-features.md**: Moved Trade Chat UI to ✅, added Unread Badges under Trading UI
+- **TODO.md**: Ticked "Trade Chat UI" and "Message notifications/badges" for v1.4.2
+
+### Technical
+
+- Realtime subscriptions cleaned up properly on unmount
+- Debounced mark-as-read calls (400ms) to avoid redundant RPC calls
+- Efficient query patterns: single call per box for counts, no per-card queries
+- Batch updates from realtime to avoid re-render storms
+- Zero TypeScript errors across all new components
+- All builds successful with no warnings
+- Maintained accessibility standards (a11y verified in E2E tests)
+
 ## [1.4.1] - 2025-10-07
 
 ### Added - Complete Retro-Comic Theme Rollout

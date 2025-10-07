@@ -7,13 +7,29 @@ import Link from 'next/link';
 import { Menu, X, LogOut } from 'lucide-react';
 import NavLink from '@/components/nav-link';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
+
+  // Get unread counts for both inbox and outbox
+  const { totalUnread: inboxUnread } = useUnreadCounts({
+    box: 'inbox',
+    enabled: !!user,
+  });
+
+  const { totalUnread: outboxUnread } = useUnreadCounts({
+    box: 'outbox',
+    enabled: !!user,
+  });
+
+  // Total unread across both boxes
+  const totalUnread = inboxUnread + outboxUnread;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -86,7 +102,7 @@ export default function SiteHeader() {
           >
             <ul className="flex items-center space-x-2">
               {navigationLinks.map(link => (
-                <li key={link.href}>
+                <li key={link.href} className="relative">
                   <NavLink
                     href={link.href}
                     className={cn(
@@ -97,6 +113,11 @@ export default function SiteHeader() {
                     )}
                   >
                     {link.label}
+                    {link.href === '/trades/proposals' && totalUnread > 0 && (
+                      <Badge className="ml-2 bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-1.5 py-0.5">
+                        {totalUnread > 9 ? '9+' : totalUnread}
+                      </Badge>
+                    )}
                   </NavLink>
                 </li>
               ))}
@@ -161,6 +182,11 @@ export default function SiteHeader() {
                   onClick={closeMenu}
                 >
                   {link.label}
+                  {link.href === '/trades/proposals' && totalUnread > 0 && (
+                    <Badge className="ml-2 bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-1.5 py-0.5">
+                      {totalUnread > 9 ? '9+' : totalUnread}
+                    </Badge>
+                  )}
                 </NavLink>
               </li>
             ))}

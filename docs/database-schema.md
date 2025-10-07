@@ -390,6 +390,44 @@ CREATE TABLE trade_chats (
 
 ---
 
+### `trade_reads` ✅ **v1.4.2 NEW**
+
+Tracks last read timestamp for each user per trade (for unread message badges).
+
+```sql
+CREATE TABLE trade_reads (
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  trade_id BIGINT NOT NULL REFERENCES trade_proposals(id) ON DELETE CASCADE,
+  last_read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  PRIMARY KEY (user_id, trade_id)
+);
+```
+
+**Design:**
+
+- `user_id`: User who read the trade
+- `trade_id`: Trade proposal ID
+- `last_read_at`: Timestamp of last read action
+
+**Indexes:**
+
+- Primary key on `(user_id, trade_id)`
+- `idx_trade_reads_user_id` on `(user_id)` for user lookups
+- `idx_trade_reads_trade_id` on `(trade_id)` for trade lookups
+
+**RLS Policies:**
+
+- Owner-only access: `user_id = auth.uid()` for SELECT, INSERT, UPDATE, DELETE
+- Users can only read/modify their own read timestamps
+
+**Usage:**
+
+- Upserted via `mark_trade_read(p_trade_id)` RPC when user opens chat
+- Queried via `get_unread_counts(p_box, p_trade_ids)` RPC for badge counts
+
+---
+
 ### `trades_history`
 
 Terminal state tracking for completed/cancelled trades.
@@ -730,6 +768,98 @@ FUNCTION cancel_trade(
 ```
 
 **Security:** SECURITY DEFINER, only participants
+
+---
+
+### Trading - Chat & Unread Badges ✅ **v1.4.2 NEW**
+
+#### `mark_trade_read`
+
+Mark a trade as read for the current user (upserts last_read_at timestamp).
+
+```sql
+FUNCTION mark_trade_read(
+  p_trade_id BIGINT
+) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_trade_id`: Trade proposal ID (required)
+
+**Behavior:**
+
+- Automatically uses `auth.uid()` for user_id (SECURITY DEFINER)
+- Upserts `trade_reads` row with `last_read_at = NOW()`
+- Validates user is a participant in the trade
+- Raises exception if not authenticated or not a participant
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { error } = await supabase.rpc('mark_trade_read', {
+  p_trade_id: tradeId,
+});
+
+if (error) {
+  console.error('Error marking trade as read:', error);
+}
+```
+
+---
+
+#### `get_unread_counts`
+
+Returns unread message counts per trade for the current user in the specified box.
+
+```sql
+FUNCTION get_unread_counts(
+  p_box TEXT,
+  p_trade_ids INT8[] DEFAULT NULL
+) RETURNS TABLE (
+  trade_id BIGINT,
+  unread_count BIGINT
+)
+```
+
+**Parameters:**
+
+- `p_box`: Box to query (`'inbox'` or `'outbox'`) (required)
+- `p_trade_ids`: Optional array of trade IDs to filter by (for pagination)
+
+**Returns:**
+
+Array of objects with:
+- `trade_id`: Trade proposal ID
+- `unread_count`: Number of unread messages from counterparty
+
+**Behavior:**
+
+- Automatically scopes to `auth.uid()` (SECURITY DEFINER)
+- Filters trades by box:
+  - `inbox`: trades where `to_user = auth.uid()`
+  - `outbox`: trades where `from_user = auth.uid()`
+- Counts messages from counterparty (`sender_id <> auth.uid()`) where `created_at > COALESCE(last_read_at, 'epoch')`
+- Returns 0 for trades with no unread messages
+- If `p_trade_ids` provided, only returns counts for those trades
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { data, error } = await supabase.rpc('get_unread_counts', {
+  p_box: 'inbox',
+  p_trade_ids: [123, 456, 789], // Optional
+});
+
+if (error) throw error;
+
+// data = [{ trade_id: 123, unread_count: 5 }, { trade_id: 456, unread_count: 0 }, ...]
+const unreadMap = new Map(data.map(item => [item.trade_id, item.unread_count]));
+```
 
 ---
 

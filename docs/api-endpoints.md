@@ -677,20 +677,21 @@ const { data: slotsData, error: slotsError } = await supabase
 
 ---
 
-#### Trade Chats (v1.3.0) ✅ **BACKEND READY**
+#### Trade Chats (v1.3.0) ✅ **BACKEND READY** | ✅ **UI SHIPPED v1.4.2**
 
 ```typescript
-// Get chat messages for a trade
+// Get chat messages for a trade (with pagination)
 const { data: messages } = await supabase
   .from('trade_chats')
   .select(
     `
     *,
-    profiles (nickname)
+    profiles!trade_chats_sender_id_fkey (nickname)
   `
   )
   .eq('trade_id', tradeId)
-  .order('created_at', { ascending: true });
+  .order('created_at', { ascending: false })
+  .limit(50); // Load most recent 50
 
 // Send a message
 await supabase.from('trade_chats').insert({
@@ -721,6 +722,34 @@ const channel = supabase
 return () => {
   channel.unsubscribe();
 };
+```
+
+**v1.4.2 Additions:**
+
+```typescript
+// Mark trade as read (for unread badges)
+const { error } = await supabase.rpc('mark_trade_read', {
+  p_trade_id: tradeId,
+});
+
+if (error) {
+  console.error('Error marking trade as read:', error);
+}
+
+// Get unread message counts
+const { data, error } = await supabase.rpc('get_unread_counts', {
+  p_box: 'inbox', // or 'outbox'
+  p_trade_ids: [123, 456, 789], // Optional: filter by specific trades
+});
+
+if (error) throw error;
+
+// Transform to Map for O(1) lookups
+const unreadMap = new Map(
+  data.map(item => [item.trade_id, item.unread_count])
+);
+
+console.log(unreadMap.get(123)); // Number of unread messages for trade 123
 ```
 
 ---
