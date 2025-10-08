@@ -18,12 +18,13 @@ export interface SegmentedTabsProps {
  * SegmentedTabs - Equal-width paired tab control following Retro-Comic theme
  *
  * Features:
- * - Equal-width columns using grid
- * - Thick borders (border-2 border-black)
+ * - Equal-width columns using CSS Grid
+ * - Outer border on container only (border-2 border-black)
+ * - Flush seams with single-pixel dividers (no double borders)
  * - Gold active state (#FFC000)
- * - Rounded only on outer corners
- * - Zero internal gap for flush seams
- * - Full keyboard navigation
+ * - Rounded outer corners only (inner corners square)
+ * - No layout shift on focus/active (ring without border change)
+ * - Full keyboard navigation (Arrow keys, Home, End)
  * - ARIA compliant
  */
 export function SegmentedTabs({
@@ -31,7 +32,8 @@ export function SegmentedTabs({
   value,
   onValueChange,
   'aria-label': ariaLabel,
-}: SegmentedTabsProps) {
+  className,
+}: SegmentedTabsProps & { className?: string }) {
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLButtonElement>,
     tabValue: string
@@ -43,6 +45,12 @@ export function SegmentedTabs({
       const direction = e.key === 'ArrowLeft' ? -1 : 1;
       const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
       onValueChange(tabs[nextIndex].value);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      onValueChange(tabs[0].value);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      onValueChange(tabs[tabs.length - 1].value);
     }
   };
 
@@ -50,13 +58,13 @@ export function SegmentedTabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className="grid gap-0 bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl"
+      data-testid="segmented-tabs"
+      className={`grid gap-0 border-2 border-black rounded-md overflow-hidden ${className || ''}`}
       style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
     >
       {tabs.map((tab, index) => {
         const isActive = value === tab.value;
         const isFirst = index === 0;
-        const isLast = index === tabs.length - 1;
 
         return (
           <button
@@ -64,22 +72,23 @@ export function SegmentedTabs({
             role="tab"
             aria-selected={isActive}
             aria-controls={`tabpanel-${tab.value}`}
+            data-testid={`segmented-tab-${tab.value}`}
             tabIndex={isActive ? 0 : -1}
             onClick={() => onValueChange(tab.value)}
             onKeyDown={e => handleKeyDown(e, tab.value)}
+            title={tab.label}
             className={`
-              relative px-4 py-2 font-bold uppercase text-sm
-              transition-all duration-200
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-800
-              ${isActive ? 'bg-[#FFC000] text-gray-900 border-2 border-black z-10' : 'bg-transparent text-white border-2 border-transparent'}
-              ${isFirst && isActive ? 'rounded-l-md' : ''}
-              ${isLast && isActive ? 'rounded-r-md' : ''}
-              ${!isActive ? 'hover:bg-gray-700' : ''}
+              relative inline-flex items-center justify-center px-4 py-2
+              font-semibold text-sm uppercase w-full
+              transition-colors duration-200
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-inset
+              ${isActive ? 'bg-[#FFC000] text-black z-10' : 'bg-gray-800 text-white hover:bg-gray-700'}
+              ${!isFirst ? 'before:content-[""] before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-black' : ''}
             `}
           >
-            <span className="flex items-center justify-center gap-2">
+            <span className="flex items-center justify-center gap-2 truncate">
               {tab.icon}
-              {tab.label}
+              <span className="truncate">{tab.label}</span>
               {tab.badge}
             </span>
           </button>

@@ -111,43 +111,80 @@ test.describe('SegmentedTabs Component', () => {
     // expect(Math.abs(offerBox!.width - requestBox!.width)).toBeLessThanOrEqual(1);
   });
 
-  test('Tabs have thick borders (border-2 border-black)', async ({ page }) => {
+  test('Container has thick borders (border-2 border-black)', async ({ page }) => {
     await page.goto('/trades/proposals');
 
-    const inboxTab = page.getByRole('tab', { name: /recibidas/i });
+    const tabsContainer = page.getByTestId('segmented-tabs');
+    await expect(tabsContainer).toBeVisible();
 
-    // Check border width (should be 2px)
-    const borderWidth = await inboxTab.evaluate(el =>
-      window.getComputedStyle(el).borderWidth
+    // Check container border width (should be 2px on all sides)
+    const borderTopWidth = await tabsContainer.evaluate(el =>
+      window.getComputedStyle(el).borderTopWidth
     );
-    expect(borderWidth).toBe('2px');
+    const borderRightWidth = await tabsContainer.evaluate(el =>
+      window.getComputedStyle(el).borderRightWidth
+    );
+    expect(borderTopWidth).toBe('2px');
+    expect(borderRightWidth).toBe('2px');
 
-    // Check border color when active (should be black)
-    const borderColor = await inboxTab.evaluate(el =>
+    // Check border color (should be black)
+    const borderColor = await tabsContainer.evaluate(el =>
       window.getComputedStyle(el).borderColor
     );
     expect(borderColor).toContain('0, 0, 0');
   });
 
-  test('Focus ring is visible on keyboard focus', async ({ page }) => {
+  test('Internal dividers are single-pixel (no double borders)', async ({ page }) => {
+    await page.goto('/trades/proposals');
+
+    const outboxTab = page.getByRole('tab', { name: /enviadas/i });
+
+    // Check for ::before pseudo-element that creates the divider
+    const beforeWidth = await outboxTab.evaluate(el => {
+      const before = window.getComputedStyle(el, '::before');
+      return before.width;
+    });
+
+    expect(beforeWidth).toBe('1px');
+  });
+
+  test('Tabs have rounded outer corners only', async ({ page }) => {
+    await page.goto('/trades/proposals');
+
+    const tabsContainer = page.getByTestId('segmented-tabs');
+
+    // Container should have border-radius
+    const borderRadius = await tabsContainer.evaluate(el =>
+      window.getComputedStyle(el).borderRadius
+    );
+    expect(borderRadius).not.toBe('0px');
+  });
+
+  test('Focus ring is visible on keyboard focus (no layout shift)', async ({ page }) => {
     await page.goto('/trades/proposals');
 
     const inboxTab = page.getByRole('tab', { name: /recibidas/i });
 
+    // Get position before focus
+    const beforeBox = await inboxTab.boundingBox();
+
     // Focus with keyboard
     await inboxTab.focus();
 
-    // Verify focus ring (outline or box-shadow)
-    const outline = await inboxTab.evaluate(el =>
-      window.getComputedStyle(el).outline
-    );
+    // Get position after focus
+    const afterBox = await inboxTab.boundingBox();
+
+    // Verify focus ring (ring-inset means it won't affect layout)
     const boxShadow = await inboxTab.evaluate(el =>
       window.getComputedStyle(el).boxShadow
     );
 
-    // Should have either outline or focus ring box-shadow
-    const hasFocusIndicator = outline !== 'none' || boxShadow !== 'none';
-    expect(hasFocusIndicator).toBe(true);
+    // Should have inset box-shadow (gold ring)
+    expect(boxShadow).toContain('inset');
+
+    // Verify no layout shift
+    expect(afterBox!.width).toBe(beforeBox!.width);
+    expect(afterBox!.height).toBe(beforeBox!.height);
   });
 
   test('Tabs do not shift layout on click or focus', async ({ page }) => {
@@ -170,5 +207,56 @@ test.describe('SegmentedTabs Component', () => {
     // Verify positions haven't shifted
     expect(afterClickInboxBox!.x).toBeCloseTo(initialInboxBox!.x, 1);
     expect(afterClickOutboxBox!.x).toBeCloseTo(initialOutboxBox!.x, 1);
+  });
+
+  test('Home and End keys navigate to first/last tabs', async ({ page }) => {
+    await page.goto('/trades/proposals');
+
+    const outboxTab = page.getByRole('tab', { name: /enviadas/i });
+    await outboxTab.focus();
+
+    // Press Home to go to first tab
+    await page.keyboard.press('Home');
+
+    const inboxTab = page.getByRole('tab', { name: /recibidas/i });
+    await expect(inboxTab).toHaveAttribute('aria-selected', 'true');
+
+    // Press End to go to last tab
+    await page.keyboard.press('End');
+    await expect(outboxTab).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('Long labels truncate with ellipsis (no wrap or overflow)', async ({ page }) => {
+    await page.goto('/trades/proposals');
+
+    const tabs = page.getByRole('tab');
+    const firstTab = tabs.first();
+
+    // Check for truncate class behavior
+    const overflow = await firstTab.evaluate(el => {
+      const span = el.querySelector('span span');
+      if (!span) return 'visible';
+      return window.getComputedStyle(span).overflow;
+    });
+
+    const textOverflow = await firstTab.evaluate(el => {
+      const span = el.querySelector('span span');
+      if (!span) return 'clip';
+      return window.getComputedStyle(span).textOverflow;
+    });
+
+    expect(overflow).toBe('hidden');
+    expect(textOverflow).toBe('ellipsis');
+  });
+
+  test('Test IDs are present for automation', async ({ page }) => {
+    await page.goto('/trades/proposals');
+
+    // Container has data-testid
+    await expect(page.getByTestId('segmented-tabs')).toBeVisible();
+
+    // Each tab has data-testid
+    await expect(page.getByTestId('segmented-tab-inbox')).toBeVisible();
+    await expect(page.getByTestId('segmented-tab-outbox')).toBeVisible();
   });
 });

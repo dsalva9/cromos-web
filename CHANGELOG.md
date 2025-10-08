@@ -19,7 +19,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
-## [1.4.3] - 2025-10-07
+## [1.4.3] - 2025-10-08
+
+### Fixed - SegmentedTabs Equal-Width Alignment
+
+- **SegmentedTabs component perfected** across all three trading UI locations:
+  - **Equal-width alignment**: CSS Grid with `grid-template-columns: repeat(N, 1fr)` ensures perfect width equality
+  - **Flush seams**: Single-pixel dividers via `::before` pseudo-element (no double borders or gaps)
+  - **Outer border only**: Container has `border-2 border-black`, tabs have no individual borders
+  - **Rounded outer corners only**: Container uses `rounded-md overflow-hidden`, inner corners remain square
+  - **No layout shift**: Focus ring uses `ring-inset`, active state changes only background/text color
+  - **Enhanced keyboard navigation**: Added Home/End keys to jump to first/last tab
+  - **Truncation support**: Long labels truncate with ellipsis, `title` attribute provides full text
+  - **Test IDs added**: `data-testid="segmented-tabs"` and `data-testid="segmented-tab-{value}"` for automation
+
+- **Updated all three consumers**:
+  - `/trades/proposals`: RECIBIDAS | ENVIADAS tabs
+  - `ProposalDetailModal`: RESUMEN | MENSAJES tabs
+  - `StickerSelector` (`/trades/compose`): OFRECER | PEDIR tabs (replaced shadcn Tabs)
+
+- **Comprehensive E2E tests** (`tests/segmented-tabs.spec.ts`):
+  - Equal width verification (±0.5px tolerance)
+  - Container border thickness (2px on all sides)
+  - Internal dividers (1px, no double borders)
+  - Rounded corners (container level only)
+  - No layout shift on focus/click
+  - Keyboard navigation (Arrow keys, Home, End)
+  - Text truncation with ellipsis
+  - Gold active state (#FFC000)
+  - Test ID presence for automation
 
 ### Changed - Streamlined Trade Flow
 

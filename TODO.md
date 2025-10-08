@@ -24,16 +24,19 @@
   - [x] Applied to Recibidas|Enviadas in `/trades/proposals`
   - [x] Applied to Resumen|Mensajes in `ProposalDetailModal`
   - [x] Updated Ofrecer|Pedir tabs in `StickerSelector` for consistency
-  - [x] Full keyboard navigation (Arrow keys) and ARIA support
-  - [x] Gold active state, thick borders, flush seams
-- [ ] **Documentation & Tests**
-  - [x] Update components-guide.md with SegmentedTabs and new routes
+  - [x] Full keyboard navigation (Arrow keys, Home, End) and ARIA support
+  - [x] Gold active state, outer border only, flush seams with single-pixel dividers
+  - [x] No layout shift on focus/active (ring-inset implementation)
+  - [x] Truncation support with title tooltips
+  - [x] Test IDs for automation (`data-testid="segmented-tabs"`, `data-testid="segmented-tab-{value}"`)
+- [x] **Documentation & Tests**
+  - [x] Update components-guide.md with SegmentedTabs implementation details
   - [x] Update current-features.md with v1.4.3 changes
   - [x] Update TODO.md completion status
-  - [ ] Update CHANGELOG.md
-  - [ ] Playwright tests: trades-find-vs-search.spec.ts
-  - [ ] Playwright tests: proposal-highlight.spec.ts
-  - [ ] Playwright tests: segmented-tabs.spec.ts
+  - [x] Update CHANGELOG.md
+  - [x] Playwright tests: trades-find-vs-search.spec.ts
+  - [x] Playwright tests: proposal-highlight.spec.ts
+  - [x] Playwright tests: segmented-tabs.spec.ts (enhanced with new tests)
 
 ### v1.4.2 Feature Status
 

@@ -1093,7 +1093,7 @@ All standard shadcn/ui components are available with trading-specific enhancemen
 
 **File**: `src/components/ui/SegmentedTabs.tsx`
 
-Equal-width paired tab control following Retro-Comic theme.
+Equal-width paired tab control following Retro-Comic theme with perfect alignment and flush seams.
 
 ```typescript
 <SegmentedTabs
@@ -1118,19 +1118,33 @@ Equal-width paired tab control following Retro-Comic theme.
 
 **Key Features:**
 
-- **Equal-width columns** using CSS grid (`grid-template-columns: repeat(N, 1fr)`)
-- **Retro-Comic styling**: Thick borders (border-2 border-black), gold active state (#FFC000)
-- **Flush seams**: Zero internal gap between tabs
-- **Rounded outer corners only**: Active tab gets border radius on first/last position
-- **Full keyboard navigation**: Arrow keys to switch tabs, focus ring on active element
+- **Equal-width columns** using CSS Grid (`grid-template-columns: repeat(N, 1fr)`)
+- **Outer border only**: Container has `border-2 border-black`, tabs have no individual borders
+- **Flush seams**: Single-pixel dividers via `::before` pseudo-element (no double borders)
+- **Rounded outer corners only**: Container has `rounded-md overflow-hidden`, inner corners square
+- **No layout shift**: Focus ring uses `ring-inset`, active state changes only background color
+- **Full keyboard navigation**:
+  - Arrow keys (Left/Right) to switch tabs
+  - Home/End to jump to first/last tab
+  - Tab key for standard focus movement
 - **ARIA compliant**: `role="tablist"`, `aria-selected`, `aria-controls` attributes
 - **Icon & badge support**: Optional icon and badge props per tab
+- **Truncation support**: Long labels truncate with ellipsis, title attribute shows full text
+- **Test IDs**: `data-testid="segmented-tabs"` on container, `data-testid="segmented-tab-{value}"` on each tab
+
+**Implementation Details:**
+
+- Container: `grid gap-0 border-2 border-black rounded-md overflow-hidden`
+- Tab (inactive): `bg-gray-800 text-white hover:bg-gray-700`
+- Tab (active): `bg-[#FFC000] text-black z-10`
+- Divider: `before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-black` (on non-first tabs)
+- Focus: `ring-2 ring-[#FFC000] ring-inset` (no border change = no layout shift)
 
 **Usage locations:**
 
-- **Proposals Page**: RECIBIDAS | ENVIADAS tabs
+- **Proposals Page** (`/trades/proposals`): RECIBIDAS | ENVIADAS tabs
 - **ProposalDetailModal**: RESUMEN | MENSAJES tabs
-- **StickerSelector**: OFRECER | PEDIR tabs (shadcn Tabs with aligned styling)
+- **StickerSelector** (`/trades/compose`): OFRECER | PEDIR tabs
 
 #### ModernCard
 

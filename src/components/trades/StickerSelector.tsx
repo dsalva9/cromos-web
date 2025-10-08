@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useMemo, useState } from 'react';
+import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { StickerGrid } from '@/components/trades/StickerGrid';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import type { TradeProposalItem } from '@/types';
 import type { UserStickerWithDetails } from '@/types';
 
@@ -53,6 +54,8 @@ export function StickerSelector({
       .map(s => ({ ...s, duplicates: s.count }));
   }, [myStickers, otherUserStickers]);
 
+  const [activeTab, setActiveTab] = useState<'offer' | 'request'>('offer');
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -68,42 +71,46 @@ export function StickerSelector({
 
   return (
     <div className="w-full">
-      <Tabs defaultValue="offer" className="w-full">
-        <TabsList className="grid grid-cols-2 max-w-[400px] bg-gray-800 border-2 border-black rounded-md p-1 shadow-xl">
-          <TabsTrigger
-            value="offer"
-            className="font-bold uppercase text-white data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:font-black rounded-md transition-all"
-          >
-            Ofrecer ({selectedOfferItems.length})
-          </TabsTrigger>
-          <TabsTrigger
-            value="request"
-            className="font-bold uppercase text-white data-[state=active]:bg-[#FFC000] data-[state=active]:text-gray-900 data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:font-black rounded-md transition-all"
-        >
-          Pedir ({selectedRequestItems.length})
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="offer" className="mt-4">
-        <StickerGrid
-          stickers={availableOffers}
-          selectedItems={selectedOfferItems}
-          onItemsChange={onOfferItemsChange}
-          mode="offer"
-          emptyMessage="No tienes cromos repetidos para ofrecer en esta colección."
+      <div className="max-w-[400px]">
+        <SegmentedTabs
+          tabs={[
+            {
+              value: 'offer',
+              label: `Ofrecer (${selectedOfferItems.length})`,
+              icon: <ArrowDown className="h-4 w-4" />,
+            },
+            {
+              value: 'request',
+              label: `Pedir (${selectedRequestItems.length})`,
+              icon: <ArrowUp className="h-4 w-4" />,
+            },
+          ]}
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as 'offer' | 'request')}
+          aria-label="Selector de cromos para intercambio"
         />
-      </TabsContent>
+      </div>
 
-      <TabsContent value="request" className="mt-4">
-        <StickerGrid
-          stickers={availableRequests}
-          selectedItems={selectedRequestItems}
-          onItemsChange={onRequestItemsChange}
-          mode="request"
-          emptyMessage="Este usuario no tiene cromos repetidos que te falten."
-        />
-      </TabsContent>
-    </Tabs>
+      <div className="mt-4">
+        {activeTab === 'offer' && (
+          <StickerGrid
+            stickers={availableOffers}
+            selectedItems={selectedOfferItems}
+            onItemsChange={onOfferItemsChange}
+            mode="offer"
+            emptyMessage="No tienes cromos repetidos para ofrecer en esta colección."
+          />
+        )}
+        {activeTab === 'request' && (
+          <StickerGrid
+            stickers={availableRequests}
+            selectedItems={selectedRequestItems}
+            onItemsChange={onRequestItemsChange}
+            mode="request"
+            emptyMessage="Este usuario no tiene cromos repetidos que te falten."
+          />
+        )}
+      </div>
     </div>
   );
 }
