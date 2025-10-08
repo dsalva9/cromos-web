@@ -1,15 +1,16 @@
 # Database Schema Documentation
 
-## Current State: v1.4.4 (Trade Finalization & Notifications)
+## Current State: v1.5.0 (Admin Backoffice, Badges UI, Quick Entry, Avatar Seed)
 
 Last updated: 2025-10-08
-Source: Direct export from Supabase production database
+Source: Planned schema for v1.5.0 (pre-implementation)
 
 ## Overview
 
-The CambioCromos database consists of 15 tables supporting:
+The CambioCromos database consists of 16 tables supporting:
 
 - User authentication and profiles
+- **Admin role-based access control (v1.5.0)**
 - Multi-collection sticker management
 - Album-style page navigation (v1.3.0)
 - Complete trading proposal system
@@ -17,6 +18,7 @@ The CambioCromos database consists of 15 tables supporting:
 - Trade finalization handshake (v1.4.4)
 - Notifications system (v1.4.4)
 - User badges and achievements
+- **Admin audit log (v1.5.0)**
 
 ---
 
@@ -31,10 +33,14 @@ CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   nickname TEXT,
   avatar_url TEXT,
+  is_admin BOOLEAN DEFAULT FALSE, -- v1.5.0: Admin role flag
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
+
+**v1.5.0 Addition:**
+- `is_admin`: Boolean flag for admin access. Used with JWT claims enforcement in SECURITY DEFINER RPCs.
 
 **Indexes:**
 
@@ -44,6 +50,7 @@ CREATE TABLE profiles (
 
 - Users can read all profiles
 - Users can only update their own profile
+- `is_admin` column is protected: only admins can modify it (enforced via RPC + JWT claims)
 
 ---
 
@@ -551,6 +558,53 @@ CREATE TABLE notifications (
 - Query via `get_notifications()` RPC (returns enriched data with trade details)
 - Count via `get_notification_count()` RPC (returns unread count)
 - Mark all read via `mark_all_notifications_read()` RPC
+
+---
+
+## Admin & Audit (v1.5.0)
+
+### `audit_log`
+
+Append-only audit log of admin actions.
+
+```sql
+CREATE TABLE audit_log (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  entity TEXT NOT NULL, -- 'collection' | 'page' | 'sticker'
+  entity_id BIGINT,
+  action TEXT NOT NULL, -- 'create' | 'update' | 'delete' | 'bulk_upload'
+  before_json JSONB,
+  after_json JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+**Design:**
+
+- **Append-only**: No updates or deletes allowed (enforced via RLS)
+- **Entity tracking**: Records which table and record ID was affected
+- **Action types**: create, update, delete, bulk_upload
+- **Snapshot storage**: `before_json` and `after_json` store full record state
+- **Admin only**: Populated by SECURITY DEFINER admin RPCs
+
+**Indexes:**
+
+- Primary key on `id`
+- `idx_audit_log_user_id` on `(user_id)` for user-specific queries
+- `idx_audit_log_entity` on `(entity, entity_id)` for entity-specific history
+- `idx_audit_log_created_at` on `(created_at DESC)` for time-based queries
+
+**RLS Policies:**
+
+- Admins can read all audit entries
+- Non-admins cannot access audit_log
+- No UPDATE or DELETE allowed (append-only)
+
+**Usage:**
+
+- Populated automatically by admin RPCs on create/update/delete operations
+- Used for compliance, debugging, and administrative oversight
 
 ---
 
@@ -1153,6 +1207,242 @@ COMMENT ON FUNCTION mark_team_page_complete(UUID, INT, INT) IS
 
 ---
 
+## Admin RPCs (v1.5.0)
+
+### Collections Management
+
+#### `admin_upsert_collection`
+
+Create or update a collection (admin only).
+
+```sql
+FUNCTION admin_upsert_collection(
+  p_collection JSONB
+) RETURNS JSONB
+```
+
+**Parameters:**
+- `p_collection`: JSON object with collection fields (id optional for create)
+  - `id` (optional): Collection ID for update
+  - `name`: Collection name
+  - `competition`: Competition name
+  - `year`: Year
+  - `description`: Description
+  - `image_url`: Cover image URL
+  - `is_active`: Active status (defaults to true)
+
+**Returns:**
+```json
+{
+  "id": 123,
+  "name": "LaLiga 2025-26",
+  "created": true
+}
+```
+
+**Security:** SECURITY DEFINER, requires `is_admin = TRUE` in JWT claims
+
+---
+
+#### `admin_delete_collection`
+
+Delete a collection (admin only).
+
+```sql
+FUNCTION admin_delete_collection(
+  p_collection_id BIGINT
+) RETURNS VOID
+```
+
+**Security:** SECURITY DEFINER, requires admin, cascades to pages/stickers/user data
+
+---
+
+### Pages Management
+
+#### `admin_upsert_page`
+
+Create or update a collection page.
+
+```sql
+FUNCTION admin_upsert_page(
+  p_page JSONB
+) RETURNS JSONB
+```
+
+**Parameters:**
+- `p_page`: JSON object with page fields
+  - `id` (optional): Page ID for update
+  - `collection_id`: Parent collection
+  - `kind`: 'team' or 'special'
+  - `team_id`: Team ID (required if kind='team')
+  - `title`: Page title
+  - `order_index`: Sort order
+
+**Returns:**
+```json
+{
+  "id": 456,
+  "title": "FC Barcelona",
+  "created": false
+}
+```
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+#### `admin_delete_page`
+
+Delete a page and its slots.
+
+```sql
+FUNCTION admin_delete_page(
+  p_page_id BIGINT
+) RETURNS VOID
+```
+
+**Security:** SECURITY DEFINER, requires admin, cascades to page_slots
+
+---
+
+### Stickers Management
+
+#### `admin_upsert_sticker`
+
+Create or update a sticker.
+
+```sql
+FUNCTION admin_upsert_sticker(
+  p_sticker JSONB
+) RETURNS JSONB
+```
+
+**Parameters:**
+- `p_sticker`: JSON object with sticker fields
+  - `id` (optional): Sticker ID for update
+  - `collection_id`: Parent collection
+  - `team_id`: Team ID (optional)
+  - `code`: Sticker code
+  - `player_name`: Player name
+  - `position`: Position (optional)
+  - `nationality`: Nationality (optional)
+  - `rating`: Rating (optional)
+  - `rarity`: Rarity ('common', 'rare', 'epic', 'legendary')
+  - `image_url`: External image URL (optional)
+  - `sticker_number`: Sequential number (optional for now)
+  - `image_path_webp_300`: Storage path for 300px WebP (optional)
+  - `thumb_path_webp_100`: Storage path for 100px thumb (optional)
+
+**Returns:**
+```json
+{
+  "id": 789,
+  "code": "BAR001",
+  "player_name": "Lionel Messi",
+  "created": true
+}
+```
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+#### `admin_delete_sticker`
+
+Delete a sticker.
+
+```sql
+FUNCTION admin_delete_sticker(
+  p_sticker_id BIGINT
+) RETURNS VOID
+```
+
+**Security:** SECURITY DEFINER, requires admin, cascades to user_stickers/page_slots
+
+---
+
+### Bulk Upload
+
+#### `admin_bulk_upload_preview`
+
+Preview bulk upload changes without applying them.
+
+```sql
+FUNCTION admin_bulk_upload_preview(
+  p_upload_data JSONB
+) RETURNS JSONB
+```
+
+**Parameters:**
+- `p_upload_data`: JSON array of stickers/pages/collections with validation rules
+
+**Returns:**
+```json
+{
+  "valid_rows": 50,
+  "invalid_rows": 2,
+  "errors": [
+    {"row": 12, "error": "Missing required field: player_name"},
+    {"row": 25, "error": "Duplicate sticker code: BAR001"}
+  ],
+  "warnings": [
+    {"row": 5, "warning": "sticker_number is optional but recommended"}
+  ],
+  "diffs": [
+    {"action": "create", "entity": "sticker", "data": {...}},
+    {"action": "update", "entity": "sticker", "id": 123, "changes": {...}}
+  ]
+}
+```
+
+**Security:** SECURITY DEFINER, requires admin, read-only (no writes)
+
+---
+
+#### `admin_bulk_upload_apply`
+
+Apply bulk upload changes after preview approval.
+
+```sql
+FUNCTION admin_bulk_upload_apply(
+  p_upload_data JSONB
+) RETURNS JSONB
+```
+
+**Parameters:**
+- `p_upload_data`: Same structure as preview
+
+**Returns:**
+```json
+{
+  "created": 45,
+  "updated": 5,
+  "failed": 0,
+  "audit_log_entries": 50
+}
+```
+
+**Behavior:**
+- Transactional: all or nothing
+- Populates audit_log for each operation
+- Uploads images to Supabase Storage (WebP conversion + thumbnails)
+- Returns summary of operations
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+**Image Upload Note:**
+Admin bulk upload automatically:
+1. Accepts uploaded images (PNG/JPG/WebP)
+2. Converts to WebP format
+3. Generates 300px full-size and 100px thumbnail
+4. Uploads to `sticker-images/{collection_id}/` and `sticker-images/{collection_id}/thumbs/`
+5. Populates `image_path_webp_300` and `thumb_path_webp_100` in stickers table
+
+---
+
 ## Triggers
 
 ### `handle_updated_at`
@@ -1477,7 +1767,8 @@ if (error) {
 
 ## Schema Version History
 
-- **v1.4.4** (Current): Trade finalization handshake, notifications system (MVP)
+- **v1.5.0** (Current): Admin Backoffice (RBAC, CRUD RPCs, bulk upload, audit log), Badges UI hooks, Quick Entry, Avatar Seed
+- **v1.4.4**: Trade finalization handshake, notifications system (MVP)
 - **v1.4.3**: Trade flow optimization, SegmentedTabs component
 - **v1.4.2**: Trade composer UX improvements, trade matching logic fixes
 - **v1.4.1**: Complete Retro-Comic theme rollout
@@ -1489,5 +1780,5 @@ if (error) {
 
 ---
 
-**Status:** ✅ All v1.4.4 features deployed and documented
-**Next:** Realtime notification updates, additional notification types
+**Status:** 🚧 v1.5.0 schema documented (pre-implementation)
+**Next:** Implement Admin RPCs → Admin UI → Badges UI → Quick Entry → Avatar Seed

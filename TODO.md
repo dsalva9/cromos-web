@@ -1,6 +1,51 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: v1.4.4 - Trade Finalization & Notifications
+## 🚀 Current Sprint: v1.5.0 – MVP Finish (Admin Backoffice → Badges UI → Quick Entry → Avatars; Testing later)
+
+### Admin Backoffice (MVP)
+
+- [ ] Add profiles.is_admin boolean + RLS/guard note
+- [ ] SECURITY DEFINER admin RPCs for CRUD: collections/pages/stickers
+- [ ] Bulk upload (CSV/XLSX) preview → apply + image uploader (client → WebP + 100px thumb)
+- [ ] UI at /admin: tabs → Collections | Pages | Stickers | Bulk Upload | Audit
+- [ ] Publish/draft toggle for collections
+- [ ] Append-only audit log of admin actions
+
+**Acceptance**: Non-admins blocked; admin can create/edit/publish collections and add/upload stickers via forms or bulk flow; audit entries recorded.
+
+### Badges UI (Read-only)
+
+- [ ] Hook useUserBadges() (read)
+- [ ] BadgeCard grid in /profile + empty state + Retro-Comic styling
+
+**Acceptance**: Existing badges render correctly; responsive; a11y labels present.
+
+### Quick Entry ("Abrir un sobre")
+
+- [ ] Route /mi-coleccion/[id]/pack (auth)
+- [ ] 5 numeric inputs (paste CSV/space/semicolon → auto-split; dedupe; auto-advance)
+- [ ] Call bulk_add_stickers_by_numbers and show summary (añadidos, repes, inválidos)
+- [ ] Optimistic progress update + clear/"Abrir otro sobre" flow
+
+**Acceptance**: Enter 1–5 numbers and add in one action; invalids flagged; repes increase correctly; mobile keyboard OK.
+
+### Profile Avatars (Seed Phase)
+
+- [ ] Seed 12 avatar images under avatars/seed/…
+- [ ] AvatarPicker in /profile selects a seed avatar (writes profiles.avatar_url)
+- [ ] (Phase B, flagged) later allow secure uploads
+
+**Acceptance**: Selection persists; a11y/keyboard navigation OK.
+
+### Deferred → v1.5.2
+
+- [ ] Playwright test refactor & CI re-enable (use existing plan)
+
+**Note**: Update CHANGELOG on completion of each workstream.
+
+---
+
+## ✅ Previous Sprint: v1.4.4 - Trade Finalization & Notifications Complete
 
 ### v1.4.4 Feature Status
 
@@ -445,8 +490,8 @@
 
 ---
 
-**Last Updated**: 2025-10-08 (v1.4.4 - Trade Finalization & Notifications Complete)
-**Current Focus**: v1.4.4 Complete - Two-step trade finalization handshake, notifications system (MVP), historial tab with rejected view
-**Next Focus**: v1.3.0 Data Migration Sprint → Additional notification features and realtime updates
+**Last Updated**: 2025-10-08 (v1.5.0 - Admin Backoffice, Badges UI, Quick Entry, Avatar Seed in planning)
+**Current Focus**: v1.5.0 MVP Finish - Admin Backoffice MVP, Badges UI (read-only), Quick Entry pack opener, Avatar seed picker
+**Next Focus**: v1.5.2 - Testing re-enable; later phases for realtime enhancements and profile avatars Phase B
 
 

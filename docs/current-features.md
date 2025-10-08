@@ -19,9 +19,41 @@
 
 ---
 
-## 🆕 Recent Updates (v1.4.4)
+## 🆕 Next Release (v1.5.0)
 
-### Trade Finalization & Notifications System ✅
+### Admin Backoffice (MVP) 🚧 In Progress
+
+- **Role-based access control**: `profiles.is_admin` boolean with RLS + JWT claims enforcement
+- **CRUD interfaces**: Collections, Pages, Stickers management with SECURITY DEFINER RPCs
+- **Bulk upload**: CSV/XLSX preview → apply + image uploader (client → WebP + 100px thumb)
+- **Admin dashboard**: `/admin` route with tabs → Collections | Pages | Stickers | Bulk Upload | Audit
+- **Publish/draft toggle**: Collections can be marked as draft (not visible to regular users)
+- **Audit log**: Append-only log of all admin actions (create/update/delete)
+
+### Badges UI (Read-only) 🚧 In Progress
+
+- **useUserBadges hook**: Read-only hook for fetching user badges
+- **BadgeCard component**: Grid display in `/profile` with empty state
+- **Retro-Comic styling**: Matches existing dark theme with gold accents
+
+### Quick Entry ("Abrir un sobre") 🚧 In Progress
+
+- **Pack opener route**: `/mi-coleccion/[id]/pack` (authenticated)
+- **Multi-number input**: 5 inputs with paste support (CSV/space/semicolon → auto-split; dedupe; auto-advance)
+- **Bulk add RPC**: Calls `bulk_add_stickers_by_numbers` and shows summary (añadidos, repes, inválidos)
+- **Optimistic updates**: Progress updates + clear/"Abrir otro sobre" flow
+
+### Profile Avatars (Seed Phase) ✅ Planned
+
+- **Seed avatar pack**: 12 avatar images under `avatars/seed/...`
+- **AvatarPicker component**: In `/profile` to select a seed avatar (writes `profiles.avatar_url`)
+- **Phase B (deferred)**: Secure user uploads in future version
+
+---
+
+## 📋 Recent Releases
+
+### v1.4.4 - Trade Finalization & Notifications System ✅
 
 #### **Two-Step Trade Finalization**
 - **Finalization Workflow**: Both participants must mark a trade as finalized before completion
@@ -428,7 +460,11 @@
 | **Phase 2 - Album**   |         |          |                 |
 | Album Pages           | ✅     | ✅      | Complete        |
 | Enhanced Images       | ✅     | ✅      | Complete        |
-| User Badges           | ✅     | 🚧     | Backend Ready   |
+| User Badges           | ✅     | 🚧     | In Progress (v1.5.0) |
+| **Phase 2.5 - Admin & UX** |         |          |                 |
+| Admin Backoffice      | 🚧     | 🚧     | In Progress (v1.5.0) |
+| Quick Entry (Pack)    | 🚧     | 🚧     | In Progress (v1.5.0) |
+| Avatar Seed           | ✅     | ✅     | Planned (v1.5.0) |
 | **Phase 3 - Future**  |         |          |                 |
 | User Directory        | ❌      | ❌       | Planned         |
 | Public Profiles       | ❌      | ❌       | Planned         |
@@ -802,7 +838,7 @@ Smart performance patterns throughout:
 
 ---
 
-**Last Updated**: 2025-10-08 (v1.4.4 Complete)
+**Last Updated**: 2025-10-08 (v1.5.0 Planning & Docs)
 **Current Version**: Backend v1.4.4 | Frontend v1.4.4
-**Status**: 93% Complete ✅ | Badge UI Pending 🚧
-**Next Focus**: Badge Display UI → Realtime Enhancements
+**Status**: v1.5.0 In Progress 🚧 | Admin Backoffice + Badges UI + Quick Entry + Avatar Seed
+**Next Focus**: Admin Backoffice MVP → Badges UI → Quick Entry → Avatar Seed picker

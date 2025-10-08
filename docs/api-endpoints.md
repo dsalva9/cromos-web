@@ -1,7 +1,7 @@
 ## API Endpoints & Operations
 
-**Version**: v1.4.0  
-**Status**: ✅ All backend features documented
+**Version**: v1.5.0
+**Status**: 🚧 v1.5.0 Admin & Quick Entry endpoints documented (pre-implementation)
 
 ---
 
@@ -515,6 +515,316 @@ try {
 - Updates `trade_proposals.status` to 'cancelled'
 
 **Use Case**: When trade falls through or users change their mind
+
+---
+
+## Admin Endpoints (v1.5.0) ✅ **NEW**
+
+### Collections Management
+
+#### `admin_upsert_collection`
+
+Create or update a collection. Admin only.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_upsert_collection', {
+  p_collection: {
+    id: 123, // Optional for create
+    name: 'LaLiga 2025-26',
+    competition: 'LaLiga',
+    year: '2025-26',
+    description: 'Spanish football season',
+    image_url: 'https://...',
+    is_active: true
+  }
+});
+```
+
+**Response:**
+```json
+{
+  "id": 123,
+  "name": "LaLiga 2025-26",
+  "created": true
+}
+```
+
+**Auth**: Requires `is_admin = TRUE` in JWT claims
+
+---
+
+#### `admin_delete_collection`
+
+Delete a collection and cascade to all related data.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_delete_collection', {
+  p_collection_id: 123
+});
+```
+
+**Auth**: Admin only
+
+---
+
+### Pages Management
+
+#### `admin_upsert_page`
+
+Create or update a collection page.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_upsert_page', {
+  p_page: {
+    id: 456, // Optional for create
+    collection_id: 123,
+    kind: 'team', // or 'special'
+    team_id: 10,
+    title: 'FC Barcelona',
+    order_index: 1
+  }
+});
+```
+
+**Response:**
+```json
+{
+  "id": 456,
+  "title": "FC Barcelona",
+  "created": false
+}
+```
+
+**Auth**: Admin only
+
+---
+
+#### `admin_delete_page`
+
+Delete a page and its slots.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_delete_page', {
+  p_page_id: 456
+});
+```
+
+**Auth**: Admin only
+
+---
+
+### Stickers Management
+
+#### `admin_upsert_sticker`
+
+Create or update a sticker.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_upsert_sticker', {
+  p_sticker: {
+    id: 789, // Optional for create
+    collection_id: 123,
+    team_id: 10,
+    code: 'BAR001',
+    player_name: 'Lionel Messi',
+    position: 'FW',
+    nationality: 'Argentina',
+    rating: 95,
+    rarity: 'legendary',
+    image_url: 'https://...',
+    sticker_number: 1,
+    image_path_webp_300: 'path/to/image.webp',
+    thumb_path_webp_100: 'path/to/thumb.webp'
+  }
+});
+```
+
+**Response:**
+```json
+{
+  "id": 789,
+  "code": "BAR001",
+  "player_name": "Lionel Messi",
+  "created": true
+}
+```
+
+**Auth**: Admin only
+
+---
+
+#### `admin_delete_sticker`
+
+Delete a sticker.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_delete_sticker', {
+  p_sticker_id: 789
+});
+```
+
+**Auth**: Admin only
+
+---
+
+### Bulk Upload
+
+#### `admin_bulk_upload_preview`
+
+Preview bulk upload changes without applying them.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_bulk_upload_preview', {
+  p_upload_data: [
+    {
+      code: 'BAR001',
+      player_name: 'Lionel Messi',
+      team_id: 10,
+      rarity: 'legendary'
+      // ... more fields
+    },
+    // ... more stickers
+  ]
+});
+```
+
+**Response:**
+```json
+{
+  "valid_rows": 50,
+  "invalid_rows": 2,
+  "errors": [
+    {"row": 12, "error": "Missing required field: player_name"}
+  ],
+  "warnings": [
+    {"row": 5, "warning": "sticker_number is optional but recommended"}
+  ],
+  "diffs": [
+    {"action": "create", "entity": "sticker", "data": {...}},
+    {"action": "update", "entity": "sticker", "id": 123, "changes": {...}}
+  ]
+}
+```
+
+**Auth**: Admin only
+
+---
+
+#### `admin_bulk_upload_apply`
+
+Apply bulk upload changes after preview approval.
+
+**Request:**
+```typescript
+await supabase.rpc('admin_bulk_upload_apply', {
+  p_upload_data: [ /* same structure as preview */ ]
+});
+```
+
+**Response:**
+```json
+{
+  "created": 45,
+  "updated": 5,
+  "failed": 0,
+  "audit_log_entries": 50
+}
+```
+
+**Auth**: Admin only
+
+**Note**: This RPC is transactional. All operations succeed or all fail. Audit log entries are created for each operation.
+
+---
+
+### Quick Entry (v1.5.0) ✅ **NEW**
+
+#### `bulk_add_stickers_by_numbers` (Enhanced for Quick Entry)
+
+This existing RPC (v1.3.0) is used by the Quick Entry feature to add 1-5 stickers at once.
+
+**Usage in Quick Entry:**
+
+```typescript
+// User enters: "1, 5, 12, 15, 20"
+// or pastes CSV: "1;5;12;15;20"
+// UI auto-splits, dedupes, and calls:
+
+await supabase.rpc('bulk_add_stickers_by_numbers', {
+  p_user_id: user.id,
+  p_collection_id: activeCollectionId,
+  p_numbers: [1, 5, 12, 15, 20]
+});
+```
+
+**Response:**
+```json
+{
+  "added": 3,
+  "duplicates": [5, 12],
+  "invalid": [999]
+}
+```
+
+**UI Summary (Spanish):**
+- "✅ 3 cromos añadidos"
+- "🔄 2 ya los tenías (repes aumentados)"
+- "❌ 0 números inválidos"
+
+---
+
+### Badges (v1.5.0) ✅ **NEW - Read Only**
+
+Badges are read-only for now. No RPC for awarding badges yet.
+
+**Fetch user badges:**
+
+```typescript
+const { data: badges, error } = await supabase
+  .from('user_badges')
+  .select('*')
+  .eq('user_id', user.id);
+```
+
+**Badge structure:**
+```json
+[
+  {
+    "id": 1,
+    "user_id": "...",
+    "badge_code": "first_collection",
+    "awarded_at": "2025-10-01T12:00:00Z"
+  }
+]
+```
+
+---
+
+### Profile Avatars (v1.5.0) ✅ **NEW - Seed Phase**
+
+#### Update avatar (seed selection)
+
+**Request:**
+```typescript
+await supabase
+  .from('profiles')
+  .update({ avatar_url: 'avatars/seed/avatar-1.webp' })
+  .eq('id', user.id);
+```
+
+**Seed avatar paths:**
+- `avatars/seed/avatar-1.webp`
+- `avatars/seed/avatar-2.webp`
+- ... (12 total)
+
+**Phase B (deferred)**: Secure user uploads with validation and storage quotas.
 
 ---
 

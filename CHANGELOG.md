@@ -19,6 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.5.0] – 2025-10-08
+
+### Added
+- Admin Backoffice (MVP) with RBAC, CRUD, Bulk Upload, and Audit Log.
+- Badges UI (read-only) in Profile page.
+- Quick Entry ("Abrir un sobre") for typing 1–5 sticker numbers into active collection.
+- Avatar Seed Picker for initial profile avatars (uploads deferred).
+
+### Changed
+- Data migration handled progressively via Admin Backoffice (numbers optional for now).
+- Testing re-enable deferred to v1.5.2.
+
+### Docs
+- Updated README, current-features, database-schema, components-guide, and api-endpoints for v1.5.0.
+
 ## [1.4.4] - 2025-10-08
 
 ### Added - Trade Finalization & Notifications System (MVP)

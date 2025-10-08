@@ -1517,6 +1517,240 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 
 ---
 
+## v1.5.0 Components ✅ **NEW**
+
+### Admin Components (v1.5.0)
+
+#### AdminDashboard
+
+**File**: `src/app/admin/page.tsx`
+
+Main admin dashboard with tabbed interface.
+
+**Features:**
+- **RBAC Guard**: Only accessible to users with `is_admin = true`
+- **Tabbed Interface**: Collections | Pages | Stickers | Bulk Upload | Audit
+- **Server-side check**: Verifies admin status on page load
+- **401 Redirect**: Non-admins redirected to home
+
+---
+
+#### CollectionsList
+
+**File**: `src/components/admin/CollectionsList.tsx`
+
+CRUD interface for collections management.
+
+**Features:**
+- **List view**: All collections with status pills (draft/published)
+- **Create/Edit forms**: Modal-based forms with validation
+- **Delete confirmation**: With cascade warning
+- **Publish toggle**: Mark collections as draft or published
+- **Retro-Comic styling**: Dark cards with gold accents
+
+---
+
+#### PageEditor
+
+**File**: `src/components/admin/PageEditor.tsx`
+
+CRUD interface for collection pages.
+
+**Features:**
+- **Team pages**: 20 fixed slots (badge, manager, 18 players)
+- **Special pages**: Variable slots
+- **Order index control**: Drag-and-drop or numeric input
+- **Slot assignment**: Assign stickers to page slots
+
+---
+
+#### StickerEditor
+
+**File**: `src/components/admin/StickerEditor.tsx`
+
+CRUD interface for individual stickers.
+
+**Features:**
+- **Form fields**: All sticker properties with validation
+- **Image upload**: Client-side WebP conversion + 100px thumb generation
+- **Assign to page**: Dropdown to assign to page slot
+- **Number optional**: sticker_number is optional for now
+
+---
+
+#### BulkImportWizard
+
+**File**: `src/components/admin/BulkImportWizard.tsx`
+
+Multi-step wizard for bulk uploads.
+
+**Features:**
+- **Step 1: Upload**: CSV/XLSX file upload with drag-and-drop
+- **Step 2: Preview**: Shows validation errors, warnings, and diffs
+- **Step 3: Apply**: Transactional bulk insert/update
+- **Progress tracking**: Live progress bar during apply
+- **Error handling**: Detailed error messages per row
+
+---
+
+#### AuditTable
+
+**File**: `src/components/admin/AuditTable.tsx`
+
+Read-only audit log viewer.
+
+**Features:**
+- **Filters**: By user, entity, action, date range
+- **Expandable rows**: Show before/after JSON diffs
+- **Pagination**: 50 entries per page
+- **Export**: CSV export of audit entries
+
+---
+
+### Badges Components (v1.5.0)
+
+#### BadgeCard
+
+**File**: `src/components/profile/BadgeCard.tsx`
+
+Display a single badge with icon and metadata.
+
+**Props:**
+```typescript
+interface BadgeCardProps {
+  badge: {
+    badge_code: string;
+    awarded_at: string;
+  };
+}
+```
+
+**Features:**
+- **Icon mapping**: Maps badge_code to icon
+- **Awarded date**: Relative time format ("hace 2 meses")
+- **Retro-Comic styling**: Gold border, dark background
+- **Tooltip**: Shows badge description on hover
+
+---
+
+#### BadgesGrid
+
+**File**: `src/components/profile/BadgesGrid.tsx`
+
+Grid of user badges in profile page.
+
+**Features:**
+- **Responsive grid**: 2-4 columns based on screen size
+- **Empty state**: Friendly message when no badges
+- **useUserBadges hook**: Fetches user badges on mount
+- **Loading skeletons**: Shows placeholders during load
+
+---
+
+#### useUserBadges
+
+**File**: `src/hooks/profile/useUserBadges.ts`
+
+Hook for fetching user badges.
+
+**Usage:**
+```typescript
+const { badges, loading, error } = useUserBadges(userId);
+```
+
+**Features:**
+- **Read-only**: No mutation methods yet
+- **Auto-refresh**: Refetches on userId change
+- **Error handling**: Toast on error
+
+---
+
+### Quick Entry Components (v1.5.0)
+
+#### OpenPackPage
+
+**File**: `src/app/mi-coleccion/[id]/pack/page.tsx`
+
+Quick entry route for adding multiple stickers by number.
+
+**Features:**
+- **Auth guard**: Requires authentication
+- **Active collection**: Uses collection ID from URL
+- **5 numeric inputs**: Auto-advance on input
+- **Paste support**: CSV/space/semicolon auto-split
+- **Dedupe**: Removes duplicate numbers before submit
+- **Bulk add RPC**: Calls `bulk_add_stickers_by_numbers`
+- **Summary display**: Shows añadidos, repes, inválidos
+- **Clear/repeat flow**: "Abrir otro sobre" button
+
+---
+
+#### PackNumberInputs
+
+**File**: `src/components/quick-entry/PackNumberInputs.tsx`
+
+Component for 5 numeric inputs with smart paste handling.
+
+**Features:**
+- **Auto-advance**: Moves focus to next input on valid entry
+- **Paste handling**: Splits CSV/space/semicolon into 5 inputs
+- **Dedupe**: Removes duplicate values
+- **Validation**: Only accepts positive integers
+- **Mobile keyboard**: `inputMode="numeric"` for mobile optimization
+- **Accessibility**: Proper labels and ARIA attributes
+
+---
+
+#### useQuickEntry
+
+**File**: `src/hooks/quick-entry/useQuickEntry.ts`
+
+Hook for quick entry logic.
+
+**Usage:**
+```typescript
+const {
+  numbers,
+  setNumbers,
+  addStickers,
+  loading,
+  result
+} = useQuickEntry(userId, collectionId);
+```
+
+**Features:**
+- **Optimistic updates**: Progress updates before RPC completes
+- **Error handling**: Toast on error, rollback on failure
+- **Result summary**: Returns added, duplicates, invalid arrays
+
+---
+
+### Avatar Seed Components (v1.5.0)
+
+#### AvatarPicker
+
+**File**: `src/components/profile/AvatarPicker.tsx`
+
+Grid selector for seed avatars.
+
+**Features:**
+- **12 seed avatars**: Pre-loaded from `avatars/seed/...`
+- **Grid layout**: 3-4 columns based on screen size
+- **Selection state**: Highlights currently selected avatar
+- **Update profile**: Writes to `profiles.avatar_url` on select
+- **Keyboard navigation**: Arrow keys, Enter/Space
+- **Accessibility**: ARIA labels, focus management
+
+**Props:**
+```typescript
+interface AvatarPickerProps {
+  currentAvatarUrl?: string;
+  onSelect: (avatarUrl: string) => void;
+}
+```
+
+---
+
 ## Component Checklist for New Features
 
 When creating new components:
