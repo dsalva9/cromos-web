@@ -75,7 +75,7 @@ export const useTradeHistory = (): UseTradeHistoryReturn => {
       if (queryError) throw new Error('Error al cargar el historial.');
 
       // Transform data to match interface
-      const transformed: TradeHistoryItem[] = (data || []).map((item: any) => {
+      const transformed: TradeHistoryItem[] = (data || []).map((item: Record<string, unknown>) => {
         const proposal = Array.isArray(item.trade_proposals)
           ? item.trade_proposals[0]
           : item.trade_proposals;
@@ -93,9 +93,9 @@ export const useTradeHistory = (): UseTradeHistoryReturn => {
           updated_at: proposal?.updated_at || '',
           offer_count: 0, // Would need to join trade_proposal_items to get counts
           request_count: 0,
-          history_status: item.status,
-          completed_at: item.completed_at,
-          cancelled_at: item.cancelled_at,
+          history_status: (item.status as 'completed' | 'cancelled') || 'cancelled',
+          completed_at: item.completed_at as string | null,
+          cancelled_at: item.cancelled_at as string | null,
         };
       });
 

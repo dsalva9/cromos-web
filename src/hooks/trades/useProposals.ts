@@ -83,7 +83,7 @@ export const useProposals = (): UseProposalsReturn => {
           if (historyError) throw new Error('Error al cargar el historial.');
 
           // Transform history data to match TradeProposalListItem
-          data = (historyData || []).map((item: any) => {
+          data = (historyData || []).map((item: Record<string, unknown>) => {
             const proposal = Array.isArray(item.trade_proposals)
               ? item.trade_proposals[0]
               : item.trade_proposals;
@@ -91,16 +91,16 @@ export const useProposals = (): UseProposalsReturn => {
             return {
               id: proposal?.id || item.trade_id,
               collection_id: proposal?.collection_id || 0,
-              from_user: proposal?.from_user || '',
-              to_user: proposal?.to_user || '',
+              from_user_id: proposal?.from_user || '',
+              to_user_id: proposal?.to_user || '',
               from_user_nickname: proposal?.from_user_profile?.nickname || null,
               to_user_nickname: proposal?.to_user_profile?.nickname || null,
               status: proposal?.status || 'cancelled',
               message: proposal?.message || null,
               created_at: proposal?.created_at || '',
               updated_at: proposal?.updated_at || '',
-              offer_count: 0,
-              request_count: 0,
+              offer_item_count: 0,
+              request_item_count: 0,
             };
           });
         } else {
@@ -126,7 +126,7 @@ export const useProposals = (): UseProposalsReturn => {
           }
 
           // Limit to requested count after filtering
-          data = data.slice(0, limit);
+          data = data ? data.slice(0, limit) : [];
         }
 
         setProposals(prev =>

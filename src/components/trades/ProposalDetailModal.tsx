@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -114,7 +114,7 @@ export function ProposalDetailModal({
   const unreadCount = proposalId ? getCountForTrade(proposalId) : 0;
 
   // Fetch finalization status
-  const fetchFinalizationStatus = async (tradeId: number) => {
+  const fetchFinalizationStatus = useCallback(async (tradeId: number) => {
     if (!user) return;
 
     try {
@@ -138,7 +138,7 @@ export function ProposalDetailModal({
     } catch (err) {
       console.error('Error fetching finalization status:', err);
     }
-  };
+  }, [user, supabase]);
 
   useEffect(() => {
     if (isOpen && proposalId) {
@@ -153,7 +153,7 @@ export function ProposalDetailModal({
       setFinalizationStatus('none');
       setFinalizationRequesterId(null);
     }
-  }, [isOpen, proposalId, fetchDetail, clearDetail]);
+  }, [isOpen, proposalId, fetchDetail, clearDetail, fetchFinalizationStatus]);
 
   // Save tab state when it changes
   useEffect(() => {
@@ -370,8 +370,8 @@ export function ProposalDetailModal({
             <p className="text-[#E84D4D] text-sm font-bold">{respondError}</p>
           )}
 
-          {/* Finalization buttons (only for accepted proposals) */}
-          {isAccepted && !hasPendingFinalization && (
+          {/* Finalization buttons (only for accepted proposals without any pending finalization) */}
+          {isAccepted && finalizationStatus === 'none' && (
             <Button
               className="bg-green-600 hover:bg-green-700 text-white border-2 border-black font-bold uppercase"
               onClick={handleRequestFinalization}

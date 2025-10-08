@@ -7,7 +7,7 @@ const UNREAD_BADGE_CAP = 9;
 
 interface ProposalCardProps {
   proposal: TradeProposalListItem;
-  box: 'inbox' | 'outbox';
+  box: 'inbox' | 'outbox' | 'history';
   onClick: () => void;
   unreadCount?: number;
   isHighlighted?: boolean;

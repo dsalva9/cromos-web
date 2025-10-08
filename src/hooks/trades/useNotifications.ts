@@ -7,7 +7,7 @@ export interface Notification {
   trade_id: number;
   created_at: string;
   read_at: string | null;
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean | null>;
   proposal_from_user: string;
   proposal_to_user: string;
   proposal_status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
@@ -145,6 +145,32 @@ export const useNotifications = (): UseNotificationsReturn => {
       fetchUnreadCount();
     }
   }, [user, fetchUnreadCount]);
+
+  // Subscribe to notifications changes to keep count in sync
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('notifications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Refresh unread count whenever notifications change
+          fetchUnreadCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, supabase, fetchUnreadCount]);
 
   return {
     notifications,

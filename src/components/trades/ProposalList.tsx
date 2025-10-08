@@ -36,14 +36,15 @@ export function ProposalList({
   // Get trade IDs for unread count fetching
   const tradeIds = proposals.map(p => p.id);
 
+  // Only fetch unread counts for inbox/outbox, not history
   const {
     getCountForTrade,
     totalUnread,
     refresh: refreshUnreadCounts,
   } = useUnreadCounts({
-    box,
+    box: box === 'history' ? 'inbox' : box, // Default to inbox for history
     tradeIds,
-    enabled: tradeIds.length > 0,
+    enabled: tradeIds.length > 0 && box !== 'history',
   });
 
   useEffect(() => {

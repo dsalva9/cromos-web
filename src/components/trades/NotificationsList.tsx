@@ -4,11 +4,10 @@ import { useEffect } from 'react';
 import { useNotifications, type Notification } from '@/hooks/trades/useNotifications';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bell, MessageSquare, CheckCircle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface NotificationsListProps {
