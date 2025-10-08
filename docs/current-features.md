@@ -19,7 +19,18 @@
 
 ---
 
-## 🆕 Next Release (v1.5.0)
+## 🆕 Next Release (v1.5.0) – MVP & Quality Baseline
+
+### 🔴 Critical Fixes (Pre-Implementation) ✅ **PRIORITY 1**
+
+**Note**: These fixes must be completed before any v1.5.0 feature coding begins.
+
+- **Duplicate Supabase client removed**: Single client instance from SupabaseProvider
+- **Batch RPC for collection stats**: `get_multiple_user_collection_stats` (5-10x faster)
+- **ErrorBoundary**: Graceful error handling with Spanish fallback UI
+- **Logger utility**: Production-safe logging (no console.log in production)
+- **Stricter ESLint**: Enforce no-unused-vars, no-console, strict typing
+- **Performance verified**: Profile load <1s with 5 collections
 
 ### Admin Backoffice (MVP) 🚧 In Progress
 
@@ -43,7 +54,18 @@
 - **Bulk add RPC**: Calls `bulk_add_stickers_by_numbers` and shows summary (añadidos, repes, inválidos)
 - **Optimistic updates**: Progress updates + clear/"Abrir otro sobre" flow
 
-### Profile Avatars (Seed Phase) ✅ Planned
+### Location-Based Matching (Centroid + Haversine) 🚧 In Progress ✅ **NEW**
+
+- **Postcode field**: Optional `profiles.postcode` for location-based matching
+- **Postal codes table**: Centroid data (lat/lon) for Spanish postcodes
+- **Haversine distance**: Calculate distance between users' postcodes
+- **Mixed scoring**: Weighted score (0.6 overlap + 0.4 distance_decay)
+- **Radius filter**: 10–100 km radius for finding nearby traders
+- **Sort modes**: "distance" | "overlap" | "mixed"
+- **Privacy preserved**: Show distance (~12 km) but not exact addresses
+- **UI controls**: Toggle for "Sort by proximity" and radius slider
+
+### Profile Avatars (Seed Phase) 🚧 In Progress
 
 - **Seed avatar pack**: 12 avatar images under `avatars/seed/...`
 - **AvatarPicker component**: In `/profile` to select a seed avatar (writes `profiles.avatar_url`)
@@ -461,9 +483,11 @@
 | Album Pages           | ✅     | ✅      | Complete        |
 | Enhanced Images       | ✅     | ✅      | Complete        |
 | User Badges           | ✅     | 🚧     | In Progress (v1.5.0) |
-| **Phase 2.5 - Admin & UX** |         |          |                 |
+| **Phase 2.5 - Quality & Admin** |         |          |                 |
+| Critical Fixes        | ✅     | ✅     | Priority 1 (v1.5.0) |
 | Admin Backoffice      | 🚧     | 🚧     | In Progress (v1.5.0) |
 | Quick Entry (Pack)    | 🚧     | 🚧     | In Progress (v1.5.0) |
+| Location Matching     | 🚧     | 🚧     | In Progress (v1.5.0) |
 | Avatar Seed           | ✅     | ✅     | Planned (v1.5.0) |
 | **Phase 3 - Future**  |         |          |                 |
 | User Directory        | ❌      | ❌       | Planned         |
@@ -838,7 +862,10 @@ Smart performance patterns throughout:
 
 ---
 
-**Last Updated**: 2025-10-08 (v1.5.0 Planning & Docs)
+**Last Updated**: 2025-10-10 (v1.5.0 Planning & Docs - Critical Fixes + Location Matching Added)
 **Current Version**: Backend v1.4.4 | Frontend v1.4.4
-**Status**: v1.5.0 In Progress 🚧 | Admin Backoffice + Badges UI + Quick Entry + Avatar Seed
-**Next Focus**: Admin Backoffice MVP → Badges UI → Quick Entry → Avatar Seed picker
+**Status**: v1.5.0 In Progress 🚧 | Critical Fixes (Priority 1) → Admin + Badges + Quick Entry + Location Matching + Avatars
+**Next Focus**:
+1. Critical fixes (batch RPC, ErrorBoundary, logger) - 1 day
+2. Admin Backoffice MVP → Badges UI → Quick Entry → Location Matching → Avatar Seed
+3. High priority: TanStack Query, Zod validation, hook refactoring

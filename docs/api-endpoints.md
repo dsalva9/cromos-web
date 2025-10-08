@@ -1,7 +1,7 @@
 ## API Endpoints & Operations
 
 **Version**: v1.5.0
-**Status**: 🚧 v1.5.0 Admin & Quick Entry endpoints documented (pre-implementation)
+**Status**: 🚧 v1.5.0 Admin, Location Matching & Quick Entry endpoints documented (pre-implementation)
 
 ---
 
@@ -741,6 +741,81 @@ await supabase.rpc('admin_bulk_upload_apply', {
 **Auth**: Admin only
 
 **Note**: This RPC is transactional. All operations succeed or all fail. Audit log entries are created for each operation.
+
+---
+
+### Location-Based Matching (v1.5.0) ✅ **NEW**
+
+#### `find_mutual_traders` (Enhanced with Location Scoring)
+
+This existing RPC (v1.1.0) has been enhanced to support location-based matching with Haversine distance calculation.
+
+**Request (with location):**
+```typescript
+// First, get user's postcode centroid
+const { data: postalData } = await supabase
+  .from('postal_codes')
+  .select('lat, lon')
+  .eq('postcode', user.postcode)
+  .eq('country', 'ES')
+  .single();
+
+// Then call enhanced RPC
+await supabase.rpc('find_mutual_traders', {
+  p_user_id: user.id,
+  p_collection_id: activeCollectionId,
+  p_lat: postalData?.lat,
+  p_lon: postalData?.lon,
+  p_radius_km: 50, // Filter within 50 km
+  p_sort: 'mixed', // 'distance' | 'overlap' | 'mixed'
+  p_limit: 20
+});
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "match_user_id": "uuid-here",
+      "nickname": "user123",
+      "postcode": "28001", // Optional, for privacy display
+      "overlap_from_them_to_me": 12,
+      "overlap_from_me_to_them": 8,
+      "total_mutual_overlap": 20,
+      "distance_km": 12.5, // NULL if no location data
+      "score": 0.85 // Mixed score (0.6 * overlap + 0.4 * distance_decay)
+    },
+    ...
+  ]
+}
+```
+
+**Sort Modes:**
+- `"distance"`: Sort by proximity (ASC, closest first)
+- `"overlap"`: Sort by trade overlap (DESC, most trades first)
+- `"mixed"`: Weighted score = 0.6 × normalized_overlap + 0.4 × distance_decay
+
+**Privacy:**
+- Only postcode stored (not exact address)
+- Distance calculated from postcode centroids
+- UI shows "~12 km" without revealing exact location
+
+---
+
+#### Update User Postcode
+
+**Request:**
+```typescript
+await supabase
+  .from('profiles')
+  .update({ postcode: '28001' })
+  .eq('id', user.id);
+```
+
+**Validation:**
+- Must be valid postcode in `postal_codes` table
+- Optional field (can be NULL for users who don't want location matching)
 
 ---
 

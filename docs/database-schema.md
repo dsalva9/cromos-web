@@ -1,16 +1,17 @@
 # Database Schema Documentation
 
-## Current State: v1.5.0 (Admin Backoffice, Badges UI, Quick Entry, Avatar Seed)
+## Current State: v1.5.0 (Critical Fixes + Admin + Location Matching + Badges + Quick Entry + Avatars)
 
-Last updated: 2025-10-08
+Last updated: 2025-10-10
 Source: Planned schema for v1.5.0 (pre-implementation)
 
 ## Overview
 
-The CambioCromos database consists of 16 tables supporting:
+The CambioCromos database consists of 17 tables supporting:
 
 - User authentication and profiles
 - **Admin role-based access control (v1.5.0)**
+- **Location-based matching with Haversine distance (v1.5.0)**
 - Multi-collection sticker management
 - Album-style page navigation (v1.3.0)
 - Complete trading proposal system
@@ -19,6 +20,7 @@ The CambioCromos database consists of 16 tables supporting:
 - Notifications system (v1.4.4)
 - User badges and achievements
 - **Admin audit log (v1.5.0)**
+- **Postal codes centroid data (v1.5.0)**
 
 ---
 
@@ -34,13 +36,15 @@ CREATE TABLE profiles (
   nickname TEXT,
   avatar_url TEXT,
   is_admin BOOLEAN DEFAULT FALSE, -- v1.5.0: Admin role flag
+  postcode TEXT NULL, -- v1.5.0: Optional postcode for location-based matching
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ```
 
-**v1.5.0 Addition:**
+**v1.5.0 Additions:**
 - `is_admin`: Boolean flag for admin access. Used with JWT claims enforcement in SECURITY DEFINER RPCs.
+- `postcode`: Optional postcode (e.g., "28001") for location-based trade matching. Privacy-preserving (no exact address).
 
 **Indexes:**
 
@@ -608,6 +612,65 @@ CREATE TABLE audit_log (
 
 ---
 
+## Location Matching (v1.5.0)
+
+### `postal_codes`
+
+Centroid data for location-based trade matching.
+
+```sql
+CREATE TABLE postal_codes (
+  country CHAR(2) NOT NULL DEFAULT 'ES',
+  postcode VARCHAR(10) NOT NULL,
+  lat DOUBLE PRECISION NOT NULL,
+  lon DOUBLE PRECISION NOT NULL,
+  PRIMARY KEY (country, postcode)
+);
+
+CREATE INDEX idx_postal_codes_postcode ON postal_codes(postcode);
+```
+
+**Design:**
+
+- **Centroid approach**: Stores lat/lon for postcode center (not exact addresses)
+- **Privacy-preserving**: Distance calculated from postcode centroids
+- **Country support**: Initially Spanish postcodes (ES), extensible to other countries
+- **Indexed**: Fast lookups for distance calculations
+
+**Usage:**
+
+- Populated via admin import (CSV/XLSX of postcode centroids)
+- Used by `find_mutual_traders` RPC to calculate Haversine distance
+- Distance shown in UI (~12 km) without revealing exact locations
+
+**Haversine Formula:**
+
+```sql
+-- Distance in kilometers between two lat/lon points
+CREATE OR REPLACE FUNCTION haversine_distance(
+  lat1 DOUBLE PRECISION,
+  lon1 DOUBLE PRECISION,
+  lat2 DOUBLE PRECISION,
+  lon2 DOUBLE PRECISION
+) RETURNS DOUBLE PRECISION AS $$
+DECLARE
+  earth_radius CONSTANT DOUBLE PRECISION := 6371; -- km
+  dlat DOUBLE PRECISION;
+  dlon DOUBLE PRECISION;
+  a DOUBLE PRECISION;
+  c DOUBLE PRECISION;
+BEGIN
+  dlat := RADIANS(lat2 - lat1);
+  dlon := RADIANS(lon2 - lon1);
+  a := SIN(dlat/2)^2 + COS(RADIANS(lat1)) * COS(RADIANS(lat2)) * SIN(dlon/2)^2;
+  c := 2 * ATAN2(SQRT(a), SQRT(1-a));
+  RETURN earth_radius * c;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+```
+
+---
+
 ## Badges & Achievements (v1.3.0)
 
 ### `user_badges`
@@ -763,9 +826,11 @@ FUNCTION search_stickers(
 
 ### Trading - Discovery
 
-#### `find_mutual_traders`
+#### `find_mutual_traders` (Enhanced v1.5.0)
 
 Find users with mutual trading opportunities. Sticker intent is inferred from inventory counts: a sticker is missing when the seeker has `count = 0`, and a tradeable duplicate is available when the owner has `count > 1`.
+
+**v1.5.0 Enhancement**: Added location-based scoring with Haversine distance calculation.
 
 ```sql
 FUNCTION find_mutual_traders(
@@ -776,15 +841,47 @@ FUNCTION find_mutual_traders(
   p_query TEXT DEFAULT NULL,
   p_min_overlap INTEGER DEFAULT 1,
   p_limit INTEGER DEFAULT 20,
-  p_offset INTEGER DEFAULT 0
+  p_offset INTEGER DEFAULT 0,
+  -- v1.5.0: Location-based parameters
+  p_lat DOUBLE PRECISION DEFAULT NULL,
+  p_lon DOUBLE PRECISION DEFAULT NULL,
+  p_radius_km INTEGER DEFAULT NULL,
+  p_sort TEXT DEFAULT 'mixed' -- 'distance' | 'overlap' | 'mixed'
 ) RETURNS TABLE (
   match_user_id UUID,
   nickname TEXT,
+  postcode TEXT, -- v1.5.0: For distance display (optional)
   overlap_from_them_to_me BIGINT,
   overlap_from_me_to_them BIGINT,
-  total_mutual_overlap BIGINT
+  total_mutual_overlap BIGINT,
+  distance_km DOUBLE PRECISION, -- v1.5.0: NULL if no location data
+  score DOUBLE PRECISION -- v1.5.0: Mixed score (0.6 * normalized_overlap + 0.4 * distance_decay)
 )
 ```
+
+**v1.5.0 Location Parameters:**
+
+- `p_lat`, `p_lon`: User's location from postcode centroid (from `postal_codes` table)
+- `p_radius_km`: Filter matches within radius (e.g., 10, 25, 50, 100 km)
+- `p_sort`: Sort mode
+  - `'overlap'`: Traditional sort by overlap count (DESC)
+  - `'distance'`: Sort by distance (ASC, closest first)
+  - `'mixed'`: Weighted score = 0.6 × (overlap / max_overlap) + 0.4 × (1 - distance / max_distance)
+
+**Mixed Scoring Algorithm:**
+
+```sql
+-- Normalize overlap to 0-1 range
+normalized_overlap := overlap / NULLIF(MAX(overlap) OVER (), 0)
+
+-- Normalize distance with decay (closer = higher score)
+distance_decay := 1 - (distance_km / NULLIF(MAX(distance_km) OVER (), 0))
+
+-- Final score (60% overlap weight, 40% proximity weight)
+score := 0.6 * normalized_overlap + 0.4 * distance_decay
+```
+
+**Privacy Note:** Only postcode is stored (not exact address). Distance calculated from centroid.
 
 **Security:** SECURITY DEFINER
 
@@ -1767,7 +1864,7 @@ if (error) {
 
 ## Schema Version History
 
-- **v1.5.0** (Current): Admin Backoffice (RBAC, CRUD RPCs, bulk upload, audit log), Badges UI hooks, Quick Entry, Avatar Seed
+- **v1.5.0** (Current): Critical fixes (batch RPC, ErrorBoundary), Admin Backoffice (RBAC, audit log), Location Matching (Haversine), Badges UI, Quick Entry, Avatar Seed
 - **v1.4.4**: Trade finalization handshake, notifications system (MVP)
 - **v1.4.3**: Trade flow optimization, SegmentedTabs component
 - **v1.4.2**: Trade composer UX improvements, trade matching logic fixes
@@ -1781,4 +1878,7 @@ if (error) {
 ---
 
 **Status:** 🚧 v1.5.0 schema documented (pre-implementation)
-**Next:** Implement Admin RPCs → Admin UI → Badges UI → Quick Entry → Avatar Seed
+**Next:**
+1. Critical fixes (1 day) → batch RPC, ErrorBoundary, logger
+2. Implement Admin RPCs → Location matching RPC → Admin UI → Badges UI → Quick Entry → Avatar Seed
+3. High priority: TanStack Query, Zod, CSRF, hook refactoring

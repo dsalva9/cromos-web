@@ -1751,6 +1751,117 @@ interface AvatarPickerProps {
 
 ---
 
+### Location Matching Components (v1.5.0)
+
+#### LocationSettings
+
+**File**: `src/components/profile/LocationSettings.tsx`
+
+Postcode input for location-based matching.
+
+**Props:**
+```typescript
+interface LocationSettingsProps {
+  currentPostcode?: string | null;
+  onUpdate: (postcode: string) => Promise<void>;
+  loading: boolean;
+}
+```
+
+**Features:**
+- **Postcode input**: Validates against `postal_codes` table
+- **Privacy note**: Explains centroid-based distance calculation
+- **Optional field**: Clear indicator that location is optional
+- **Auto-validation**: Real-time check if postcode exists in database
+- **Clear button**: Remove postcode to disable location matching
+
+---
+
+#### TraderListSortControls
+
+**File**: `src/components/trades/TraderListSortControls.tsx`
+
+Sort and filter controls for trade matches with location.
+
+**Props:**
+```typescript
+interface TraderListSortControlsProps {
+  sortMode: 'distance' | 'overlap' | 'mixed';
+  radiusKm: number;
+  onSortChange: (mode: string) => void;
+  onRadiusChange: (radius: number) => void;
+  hasLocation: boolean;
+}
+```
+
+**Features:**
+- **Sort dropdown**: Distance / Overlap / Mixed (60/40 weighted)
+- **Radius slider**: 10–100 km with visual indicators
+- **Disabled state**: Grayed out when user has no postcode set
+- **Tooltip**: Explains mixed scoring algorithm
+- **Responsive**: Stacks vertically on mobile
+
+---
+
+#### MatchCardWithDistance
+
+**File**: `src/components/trades/MatchCardWithDistance.tsx`
+
+Enhanced match card displaying distance.
+
+**Props:**
+```typescript
+interface MatchCardWithDistanceProps {
+  match: {
+    match_user_id: string;
+    nickname: string;
+    overlap_from_them_to_me: number;
+    overlap_from_me_to_them: number;
+    distance_km?: number | null;
+    score?: number | null;
+  };
+  onViewDetails: (userId: string) => void;
+}
+```
+
+**Features:**
+- **Distance badge**: "~12 km" displayed with location icon
+- **Score indicator**: Visual bar for mixed score (0-1)
+- **Fallback state**: "Distancia no disponible" when NULL
+- **Privacy-first**: Never shows exact coordinates
+- **Retro-Comic styling**: Gold accent for nearby traders (<20 km)
+
+---
+
+#### useLocationMatching
+
+**File**: `src/hooks/trades/useLocationMatching.ts`
+
+Hook for location-based trade matching.
+
+**Usage:**
+```typescript
+const {
+  matches,
+  loading,
+  error,
+  sortMode,
+  radiusKm,
+  setSortMode,
+  setRadiusKm,
+  userLocation,
+  fetchMatches
+} = useLocationMatching(userId, collectionId);
+```
+
+**Features:**
+- **Auto-fetch location**: Gets user's postcode centroid on mount
+- **Optimistic filtering**: Updates UI before RPC completes
+- **Error handling**: Toast on location fetch failure
+- **Fallback mode**: Falls back to overlap-only if no location data
+
+---
+
 ## Component Checklist for New Features
 
 When creating new components:

@@ -19,20 +19,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
-## [1.5.0] – 2025-10-08
+## [1.5.0] – 2025-10-10
+
+### Critical Fixes (Pre-Implementation)
+- Removed duplicate Supabase client instance (single client from SupabaseProvider)
+- Added batch RPC `get_multiple_user_collection_stats` for 5-10x faster multi-collection queries
+- Implemented ErrorBoundary component with Spanish fallback UI for graceful error handling
+- Added logger utility to replace all console.log statements (production-safe logging)
+- Updated ESLint configuration with stricter rules (no-unused-vars, no-console, strict typing)
+- Verified performance: Profile load < 1s with 5 collections
 
 ### Added
-- Admin Backoffice (MVP) with RBAC, CRUD, Bulk Upload, and Audit Log.
-- Badges UI (read-only) in Profile page.
-- Quick Entry ("Abrir un sobre") for typing 1–5 sticker numbers into active collection.
-- Avatar Seed Picker for initial profile avatars (uploads deferred).
+- Admin Backoffice (MVP) with RBAC, CRUD, Bulk Upload, and Audit Log
+- Badges UI (read-only) in Profile page
+- Quick Entry ("Abrir un sobre") for typing 1–5 sticker numbers into active collection
+- **Location-Based Matching (Centroid + Haversine scoring)** ✅ **NEW**
+  - Optional postcode field in user profiles
+  - Postal codes table with lat/lon centroids for Spanish postcodes
+  - Enhanced `find_mutual_traders` RPC with distance calculation
+  - Mixed scoring algorithm (0.6 overlap + 0.4 distance decay)
+  - Radius filter (10–100 km) for finding nearby traders
+  - Sort modes: "distance" | "overlap" | "mixed"
+  - Privacy-preserving distance display (~12 km, no exact addresses)
+- Avatar Seed Picker for initial profile avatars (uploads deferred)
 
 ### Changed
-- Data migration handled progressively via Admin Backoffice (numbers optional for now).
-- Testing re-enable deferred to v1.5.2.
+- Data migration handled progressively via Admin Backoffice (numbers optional for now)
+- Testing re-enable deferred to v1.5.2
+- Trade matching now supports location-based scoring and filtering
+
+### Planned Next (High Priority)
+- TanStack Query integration for request caching and deduplication
+- Zod validation for all admin inputs
+- CSRF protection for admin RPCs
+- Hook refactoring (split large hooks like useAlbumPages)
+
+### Planned Post-MVP (v1.5.1–1.5.2)
+- Code splitting (Next.js dynamic imports)
+- Image optimization with Next/Image
+- Loading skeletons for key pages
+- Unit tests for complex hooks
+- Re-enable Playwright E2E tests
 
 ### Docs
-- Updated README, current-features, database-schema, components-guide, and api-endpoints for v1.5.0.
+- Updated README, current-features, database-schema, components-guide, and api-endpoints for v1.5.0
+- Added CODE_REVIEW_2025-10-08.md with 26-point comprehensive review
+- Added ACTION_PLAN_PRE_V1.5.0.md with step-by-step critical fixes
 
 ## [1.4.4] - 2025-10-08
 

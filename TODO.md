@@ -1,8 +1,25 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: v1.5.0 – MVP Finish (Admin Backoffice → Badges UI → Quick Entry → Avatars; Testing later)
+## 🚀 Current Sprint: v1.5.0 – MVP & Quality Baseline
 
-### Admin Backoffice (MVP)
+### 🔴 Critical Fixes (Pre-Implementation) **MUST COMPLETE FIRST**
+
+- [ ] Remove duplicate Supabase client instance (`src/lib/supabase/client.ts`)
+- [ ] Add batch RPC `get_multiple_user_collection_stats` (used in useProfileData and useAlbumPages)
+- [ ] Add ErrorBoundary component to layout.tsx
+- [ ] Add `logger.ts` utility and replace all `console.log` calls
+- [ ] Update ESLint rules (strict typing, no-unused-vars, no-console)
+- [ ] Verify performance: Profile load <1s with 5 collections
+
+**Acceptance**: All lint/tests pass; one Supabase client only; no console logs in production; graceful error handling; batch RPC verified in production DB.
+
+**Estimated Time**: 1 day (7.5 hours)
+
+---
+
+### 🧩 MVP Features (Implementation Order)
+
+#### 1. Admin Backoffice (MVP)
 
 - [ ] Add profiles.is_admin boolean + RLS/guard note
 - [ ] SECURITY DEFINER admin RPCs for CRUD: collections/pages/stickers
@@ -13,14 +30,14 @@
 
 **Acceptance**: Non-admins blocked; admin can create/edit/publish collections and add/upload stickers via forms or bulk flow; audit entries recorded.
 
-### Badges UI (Read-only)
+#### 2. Badges UI (Read-Only)
 
 - [ ] Hook useUserBadges() (read)
 - [ ] BadgeCard grid in /profile + empty state + Retro-Comic styling
 
 **Acceptance**: Existing badges render correctly; responsive; a11y labels present.
 
-### Quick Entry ("Abrir un sobre")
+#### 3. Quick Entry ("Abrir un sobre")
 
 - [ ] Route /mi-coleccion/[id]/pack (auth)
 - [ ] 5 numeric inputs (paste CSV/space/semicolon → auto-split; dedupe; auto-advance)
@@ -29,7 +46,30 @@
 
 **Acceptance**: Enter 1–5 numbers and add in one action; invalids flagged; repes increase correctly; mobile keyboard OK.
 
-### Profile Avatars (Seed Phase)
+#### 4. Location-Based Matching (Centroid + Haversine) ✅ **NEW**
+
+**Database**:
+- [ ] Add `postcode` TEXT NULL to profiles table
+- [ ] Create `postal_codes` table with (country, postcode PK, lat, lon)
+- [ ] Populate postal_codes with centroid data for ES postcodes
+- [ ] Add index on postal_codes(postcode)
+
+**Backend**:
+- [ ] Extend `find_mutual_traders` RPC with optional params: p_lat, p_lon, p_radius_km, p_sort
+- [ ] Implement Haversine distance formula in RPC
+- [ ] Support sort modes: "distance" | "overlap" | "mixed" (0.6 overlap + 0.4 distance_decay)
+- [ ] Filter matches by radius (10–100 km)
+
+**Frontend**:
+- [ ] Add postcode input to ProfilePage (optional field)
+- [ ] Add LocationSettings component with privacy note
+- [ ] Add TraderListSortControls (dropdown for sort mode + radius slider)
+- [ ] Display distance in match cards (~12 km)
+- [ ] Add toggle: "Sort by proximity" / "Prioritize nearby traders"
+
+**Acceptance**: Users with postcodes see matches ordered by distance + overlap; privacy preserved (no exact address shown); radius filter works; mixed scoring balances proximity and trade value.
+
+#### 5. Profile Avatars (Seed Pack)
 
 - [ ] Seed 12 avatar images under avatars/seed/…
 - [ ] AvatarPicker in /profile selects a seed avatar (writes profiles.avatar_url)
@@ -37,9 +77,66 @@
 
 **Acceptance**: Selection persists; a11y/keyboard navigation OK.
 
-### Deferred → v1.5.2
+---
 
-- [ ] Playwright test refactor & CI re-enable (use existing plan)
+### 🟡 High Priority (During v1.5.0)
+
+- [ ] Refactor useAlbumPages into smaller hooks (split 876-line hook)
+- [ ] Integrate TanStack Query for caching and request deduplication
+- [ ] Add Zod input validation for all forms
+- [ ] Add CSRF protection to Admin RPCs
+
+**Acceptance**: Hooks < 200 lines each; TanStack Query DevTools visible; Zod schemas validate all inputs; CSRF tokens required for admin actions.
+
+---
+
+### 🟢 Medium & Low Priority (Post-MVP v1.5.1–1.5.2)
+
+**Performance & Optimization**:
+- [ ] Code splitting (Next.js dynamic imports for heavy components)
+- [ ] Image optimization with Next/Image loader (WebP/AVIF)
+- [ ] Add loading skeletons to key pages (replace "Cargando..." text)
+- [ ] Add SWR or cache pattern for album pages
+- [ ] Add performance monitoring (Vercel Speed Insights or GA4 Web Vitals)
+
+**Code Quality**:
+- [ ] Generate DB types via Supabase CLI (`npm run types:generate`)
+- [ ] Standardize error handling across hooks (consistent pattern)
+- [ ] Clean unused imports/dead code (ESLint auto-fix)
+- [ ] Normalize naming conventions (components = PascalCase, hooks = camelCase)
+
+**Security & Infrastructure**:
+- [ ] Add rate limiting (Supabase Edge Functions)
+- [ ] Add input sanitization middleware
+- [ ] Add RBAC audit logging for all admin actions
+
+**Testing & Documentation**:
+- [ ] Add unit tests for complex hooks (vitest)
+- [ ] Re-enable Playwright E2E tests (v1.5.2)
+- [ ] Add architecture diagram (Mermaid)
+- [ ] Add JSDoc documentation for key hooks
+
+---
+
+### 📊 Milestone Closure Criteria
+
+- [ ] All Critical + MVP features implemented and verified
+- [ ] Performance targets met:
+  - Profile load < 800ms (5 collections)
+  - Album page load < 500ms
+  - Initial bundle < 500KB
+- [ ] QA smoke tests pass on Vercel staging
+- [ ] Location matching verified with real postcode data
+- [ ] Admin backoffice tested with bulk upload (50+ stickers)
+
+---
+
+### Deferred to v1.5.2+
+
+- [ ] Playwright test refactor & CI re-enable
+- [ ] Profile avatar uploads (Phase B - secure user uploads)
+- [ ] Realtime notifications (Supabase Realtime subscriptions)
+- [ ] Feature-based folder structure refactor
 
 **Note**: Update CHANGELOG on completion of each workstream.
 
@@ -490,8 +587,12 @@
 
 ---
 
-**Last Updated**: 2025-10-08 (v1.5.0 - Admin Backoffice, Badges UI, Quick Entry, Avatar Seed in planning)
-**Current Focus**: v1.5.0 MVP Finish - Admin Backoffice MVP, Badges UI (read-only), Quick Entry pack opener, Avatar seed picker
-**Next Focus**: v1.5.2 - Testing re-enable; later phases for realtime enhancements and profile avatars Phase B
+**Last Updated**: 2025-10-10 (v1.5.0 - Critical Fixes + MVP Features + Location Matching)
+**Current Focus**:
+1. Critical fixes (batch RPC, ErrorBoundary, logger) - 1 day
+2. MVP features - Admin + Badges + Quick Entry + Location Matching + Avatars
+3. High priority - TanStack Query, Zod, CSRF, hook refactoring
+
+**Next Focus**: v1.5.2 - Testing re-enable, performance optimization, code splitting, Phase B avatar uploads
 
 
