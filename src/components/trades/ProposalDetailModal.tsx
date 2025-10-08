@@ -150,8 +150,8 @@ export function ProposalDetailModal({
       setActiveTab(savedTab);
     } else {
       clearDetail();
-      setFinalizationCount(0);
-      setHasUserFinalized(false);
+      setFinalizationStatus('none');
+      setFinalizationRequesterId(null);
     }
   }, [isOpen, proposalId, fetchDetail, clearDetail]);
 
@@ -180,17 +180,16 @@ export function ProposalDetailModal({
     }
   };
 
-  const handleFinalize = async () => {
+  const handleRequestFinalization = async () => {
     if (!proposalId) return;
 
-    const result = await markAsFinalized(proposalId);
+    const result = await requestFinalization(proposalId);
     if (result) {
-      // Update local state optimistically
-      setHasUserFinalized(true);
-      setFinalizationCount(prev => prev + 1);
+      // Refresh finalization status
+      await fetchFinalizationStatus(proposalId);
 
-      // If both finalized, refresh and close modal
-      if (result.both_finalized) {
+      // If completed, refresh detail and close modal
+      if (result.status === 'completed') {
         await fetchDetail(proposalId);
         setTimeout(() => {
           onClose();
@@ -199,13 +198,30 @@ export function ProposalDetailModal({
     }
   };
 
+  const handleRejectFinalization = async () => {
+    if (!proposalId) return;
+
+    const result = await rejectFinalization(proposalId);
+    if (result) {
+      // Refresh finalization status
+      await fetchFinalizationStatus(proposalId);
+    }
+  };
+
   const isSender = detail?.proposal.from_user_id === user?.id;
   const isReceiver = detail?.proposal.to_user_id === user?.id;
   const isPending = detail?.proposal.status === 'pending';
   const isAccepted = detail?.proposal.status === 'accepted';
+
+  // Check if current user requested finalization
+  const userRequestedFinalization = finalizationRequesterId === user?.id;
+  const otherUserRequestedFinalization = finalizationRequesterId && finalizationRequesterId !== user?.id;
+  const hasPendingFinalization = finalizationStatus === 'pending';
+
+  // Proposal is active if pending or accepted AND no pending finalization
   const isProposalActive =
-    detail?.proposal.status === 'pending' ||
-    detail?.proposal.status === 'accepted';
+    (detail?.proposal.status === 'pending' || detail?.proposal.status === 'accepted') &&
+    !hasPendingFinalization;
 
   const offeredItems =
     detail?.items.filter(
@@ -304,35 +320,33 @@ export function ProposalDetailModal({
                         <CheckCircle className="h-5 w-5 mr-2 text-green-400" />
                         Estado de Finalización
                       </h3>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-gray-300">
-                            Marcados como finalizados:
-                          </span>
-                          <Badge
-                            className={`${
-                              finalizationCount === 2
-                                ? 'bg-green-600'
-                                : 'bg-[#FFC000]'
-                            } text-gray-900 border-2 border-black font-bold`}
-                          >
-                            {finalizationCount}/2
-                          </Badge>
-                        </div>
-                        {hasUserFinalized && (
-                          <p className="text-xs text-green-400 font-bold">
-                            ✓ Ya has marcado este intercambio como finalizado
+                      <div className="space-y-3">
+                        {!hasPendingFinalization && (
+                          <p className="text-sm text-gray-300">
+                            El intercambio ha sido aceptado. Cuando ambos confirmen que completaron el intercambio, se marcará como finalizado.
                           </p>
                         )}
-                        {finalizationCount === 1 && !hasUserFinalized && (
-                          <p className="text-xs text-yellow-400 font-bold">
-                            ⚠ La otra persona ya marcó como finalizado. Falta tu confirmación.
-                          </p>
+
+                        {userRequestedFinalization && (
+                          <div className="bg-[#FFC000] bg-opacity-20 border-2 border-[#FFC000] rounded-md p-3">
+                            <p className="text-sm font-bold text-[#FFC000]">
+                              ⏳ Has solicitado la finalización
+                            </p>
+                            <p className="text-xs text-gray-900 mt-1">
+                              Esperando que la otra persona acepte o rechace tu solicitud.
+                            </p>
+                          </div>
                         )}
-                        {finalizationCount === 2 && (
-                          <p className="text-xs text-green-400 font-bold">
-                            ✓ Intercambio completado por ambas partes
-                          </p>
+
+                        {otherUserRequestedFinalization && (
+                          <div className="bg-blue-500 bg-opacity-20 border-2 border-blue-400 rounded-md p-3">
+                            <p className="text-sm font-bold text-blue-400">
+                              ⚠ La otra persona solicitó finalizar el intercambio
+                            </p>
+                            <p className="text-xs text-white mt-1">
+                              Si ya completaste el intercambio, acepta la finalización. Si no, puedes rechazarla.
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -356,16 +370,39 @@ export function ProposalDetailModal({
             <p className="text-[#E84D4D] text-sm font-bold">{respondError}</p>
           )}
 
-          {/* Finalization button (only for accepted proposals) */}
-          {isAccepted && !hasUserFinalized && finalizationCount < 2 && (
+          {/* Finalization buttons (only for accepted proposals) */}
+          {isAccepted && !hasPendingFinalization && (
             <Button
               className="bg-green-600 hover:bg-green-700 text-white border-2 border-black font-bold uppercase"
-              onClick={handleFinalize}
+              onClick={handleRequestFinalization}
               disabled={finalizingLoading}
             >
               <CheckCircle className="mr-2 h-4 w-4" />
-              {finalizingLoading ? 'Marcando...' : 'Marcar como finalizado'}
+              {finalizingLoading ? 'Solicitando...' : 'Solicitar finalización'}
             </Button>
+          )}
+
+          {/* Accept/Reject finalization (when other user requested) */}
+          {isAccepted && otherUserRequestedFinalization && (
+            <div className="flex space-x-2">
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white border-2 border-black font-bold uppercase"
+                onClick={handleRequestFinalization}
+                disabled={finalizingLoading}
+              >
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {finalizingLoading ? 'Aceptando...' : 'Aceptar finalización'}
+              </Button>
+              <Button
+                variant="outline"
+                className="bg-gray-800 hover:bg-gray-700 text-white border-2 border-black font-bold uppercase"
+                onClick={handleRejectFinalization}
+                disabled={finalizingLoading}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Rechazar
+              </Button>
+            </div>
           )}
 
           {/* Response buttons (only for pending proposals) */}
