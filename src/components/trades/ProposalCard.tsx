@@ -13,6 +13,21 @@ interface ProposalCardProps {
   isHighlighted?: boolean;
 }
 
+const getStatusLabel = (status: string): string => {
+  switch (status) {
+    case 'pending':
+      return 'Pendiente';
+    case 'accepted':
+      return 'Aceptada';
+    case 'rejected':
+      return 'Rechazada';
+    case 'cancelled':
+      return 'Cancelada';
+    default:
+      return status;
+  }
+};
+
 const getStatusBadgeVariant = (status: string) => {
   switch (status) {
     case 'accepted':
@@ -69,7 +84,7 @@ export function ProposalCard({ proposal, box, onClick, unreadCount = 0, isHighli
             {isInbox ? 'De:' : 'Para:'} {counterpartNickname}
           </p>
           <Badge className={getStatusBadgeVariant(proposal.status)}>
-            {proposal.status}
+            {getStatusLabel(proposal.status)}
           </Badge>
         </div>
         <p className="text-xs text-gray-400 mt-1 mb-4">

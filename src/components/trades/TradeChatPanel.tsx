@@ -39,6 +39,7 @@ export function TradeChatPanel({
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastMessageCountRef = useRef(0);
 
   // Auto-scroll to bottom on initial load or new message (only if not scrolled up)
@@ -60,12 +61,12 @@ export function TradeChatPanel({
     lastMessageCountRef.current = messages.length;
   }, [messages, isUserScrolledUp, user?.id]);
 
-  // Mark as read when panel is visible and messages loaded
+  // Mark as read immediately when panel is opened with a tradeId
   useEffect(() => {
-    if (tradeId && messages.length > 0) {
+    if (tradeId) {
       markAsRead();
     }
-  }, [tradeId, messages.length, markAsRead]);
+  }, [tradeId, markAsRead]);
 
   // Handle scroll detection
   const handleScroll = () => {
@@ -90,6 +91,10 @@ export function TradeChatPanel({
     try {
       await sendMessage(messageText);
       setMessageText('');
+      // Refocus the textarea after sending
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 0);
     } catch (err) {
       console.error('Error sending message:', err);
     } finally {
@@ -120,12 +125,12 @@ export function TradeChatPanel({
   }
 
   return (
-    <div className="flex flex-col h-full max-h-[600px] bg-gray-900 rounded-lg border-2 border-black shadow-xl">
-      {/* Messages area */}
+    <div className="flex flex-col h-[600px] bg-gray-900 rounded-lg border-2 border-black shadow-xl">
+      {/* Messages area with fixed height and scroll */}
       <div
         ref={messagesContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-4 space-y-3 relative"
+        className="flex-1 overflow-y-auto p-4 space-y-3 relative min-h-0"
       >
         {/* Load more button */}
         {hasMore && (
@@ -229,10 +234,11 @@ export function TradeChatPanel({
         </div>
       )}
 
-      {/* Composer */}
-      <div className="border-t-2 border-black p-4 bg-gray-800">
+      {/* Composer - fixed height, no scroll */}
+      <div className="border-t-2 border-black p-4 bg-gray-800 flex-shrink-0">
         <div className="flex flex-col space-y-2">
           <Textarea
+            ref={textareaRef}
             value={messageText}
             onChange={e => setMessageText(e.target.value)}
             onKeyDown={handleKeyDown}

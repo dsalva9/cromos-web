@@ -23,6 +23,7 @@ interface UseNotificationsReturn {
   fetchNotifications: () => Promise<void>;
   fetchUnreadCount: () => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  markAsRead: (notificationId: number) => Promise<void>;
   clearNotifications: () => void;
 }
 
@@ -100,6 +101,38 @@ export const useNotifications = (): UseNotificationsReturn => {
     }
   }, [supabase, user, fetchNotifications, fetchUnreadCount]);
 
+  const markAsRead = useCallback(async (notificationId: number) => {
+    if (!user) return;
+
+    try {
+      // Mark this notification as read in database
+      const { error: updateError } = await supabase
+        .from('notifications')
+        .update({ read_at: new Date().toISOString() })
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state immediately (optimistic)
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId
+            ? { ...n, read_at: n.read_at || new Date().toISOString() }
+            : n
+        )
+      );
+
+      // Refresh unread count
+      await fetchUnreadCount();
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      // Refresh to get actual state
+      await fetchNotifications();
+      await fetchUnreadCount();
+    }
+  }, [supabase, user, fetchNotifications, fetchUnreadCount]);
+
   const clearNotifications = useCallback(() => {
     setNotifications([]);
     setUnreadCount(0);
@@ -121,6 +154,7 @@ export const useNotifications = (): UseNotificationsReturn => {
     fetchNotifications,
     fetchUnreadCount,
     markAllAsRead,
+    markAsRead,
     clearNotifications,
   };
 };

@@ -20,6 +20,7 @@ import { TradeProposalDetailItem } from '@/types';
 import { useUser, useSupabase } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
 import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText, CheckCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ProposalDetailModalProps {
   proposalId: number | null;
@@ -94,11 +95,11 @@ export function ProposalDetailModal({
     error: respondError,
     respond,
   } = useRespondToProposal();
-  const { markAsFinalized, loading: finalizingLoading } = useTradeFinalization();
+  const { requestFinalization, rejectFinalization, loading: finalizingLoading } = useTradeFinalization();
 
   // Finalization state
-  const [finalizationCount, setFinalizationCount] = useState<number>(0);
-  const [hasUserFinalized, setHasUserFinalized] = useState<boolean>(false);
+  const [finalizationStatus, setFinalizationStatus] = useState<'none' | 'pending' | 'accepted' | 'rejected'>('none');
+  const [finalizationRequesterId, setFinalizationRequesterId] = useState<string | null>(null);
 
   // Get saved tab state or default to 'resumen'
   const [activeTab, setActiveTab] = useState<string>('resumen');
@@ -119,14 +120,21 @@ export function ProposalDetailModal({
     try {
       const { data, error } = await supabase
         .from('trade_finalizations')
-        .select('user_id')
-        .eq('trade_id', tradeId);
+        .select('user_id, status')
+        .eq('trade_id', tradeId)
+        .in('status', ['pending', 'accepted']);
 
       if (error) throw error;
 
       const finalizations = data || [];
-      setFinalizationCount(finalizations.length);
-      setHasUserFinalized(finalizations.some(f => f.user_id === user.id));
+      if (finalizations.length > 0) {
+        const finalization = finalizations[0];
+        setFinalizationStatus(finalization.status as 'pending' | 'accepted');
+        setFinalizationRequesterId(finalization.user_id);
+      } else {
+        setFinalizationStatus('none');
+        setFinalizationRequesterId(null);
+      }
     } catch (err) {
       console.error('Error fetching finalization status:', err);
     }
@@ -214,7 +222,7 @@ export function ProposalDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-gray-900 text-white border-2 border-black shadow-xl">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-gray-900 text-white border-2 border-black shadow-xl flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold uppercase">
             Detalle de la Propuesta
@@ -263,9 +271,9 @@ export function ProposalDetailModal({
               aria-label="Detalle de propuesta"
             />
 
-            <div className="mt-4">
+            <div className={cn("mt-4 flex-1 min-h-0", activeTab === 'resumen' ? 'overflow-y-auto' : 'overflow-hidden')}>
               {activeTab === 'resumen' && (
-                <div className="grid gap-6">
+                <div className="grid gap-6 pr-2">
                   <ItemList
                     title="Lo que se ofrece"
                     items={offeredItems}

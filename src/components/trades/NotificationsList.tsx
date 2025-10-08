@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useNotifications, type Notification } from '@/hooks/trades/useNotifications';
+import { useUser } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,19 +68,37 @@ function getNotificationDescription(notification: Notification): string {
 
 export function NotificationsList({ onNotificationClick }: NotificationsListProps) {
   const router = useRouter();
-  const { notifications, loading, error, fetchNotifications, markAllAsRead } =
+  const { user } = useUser();
+  const { notifications, loading, error, fetchNotifications, markAllAsRead, markAsRead } =
     useNotifications();
 
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = async (notification: Notification) => {
+    // Mark as read if it's unread
+    if (!notification.read_at) {
+      await markAsRead(notification.id);
+    }
+
     if (onNotificationClick) {
       onNotificationClick(notification);
     } else {
-      // Default behavior: navigate to proposals page with the trade opened
-      router.push(`/trades/proposals?tradeId=${notification.trade_id}`);
+      // Determine the correct tab based on who sent the proposal
+      // If current user is the sender (from_user), they should see it in "Enviadas" (outbox/sent tab)
+      // If current user is the receiver (to_user), they should see it in "Recibidas" (inbox tab)
+      const isSender = notification.proposal_from_user === user?.id;
+      const tab = isSender ? 'sent' : undefined; // undefined defaults to inbox
+
+      // Build URL with tradeId and optionally tab
+      const url = new URL(`/trades/proposals`, window.location.origin);
+      url.searchParams.set('tradeId', notification.trade_id.toString());
+      if (tab) {
+        url.searchParams.set('tab', tab);
+      }
+
+      router.push(url.pathname + url.search);
     }
   };
 
