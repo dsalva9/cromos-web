@@ -1,10 +1,48 @@
 # Project Roadmap & TODO
 
-## 🚀 Current Sprint: v1.4.3 - Trade Flow Optimization
+## 🚀 Current Sprint: v1.4.4 - Trade Finalization & Notifications
+
+### v1.4.4 Feature Status
+
+**Trade Finalization ✅ | Notifications MVP ✅ | Historial Tab ✅ | All Documentation Complete ✅**
+
+- [x] **Trade Finalization System**
+  - [x] Database: `trade_finalizations` table with composite PK
+  - [x] RPC: `mark_trade_finalized(p_trade_id)` returns both_finalized status
+  - [x] Hook: `useTradeFinalization` with optimistic updates and toasts
+  - [x] UI: Finalization button in ProposalDetailModal for accepted trades
+  - [x] UI: Progress indicator showing X/2 participants finalized
+  - [x] Auto-close modal when both parties confirm finalization
+- [x] **Notifications System (MVP)**
+  - [x] Database: `notifications` table with 4 kinds (chat_unread, proposal_accepted, proposal_rejected, finalization_requested)
+  - [x] Triggers: Auto-create notifications on chat messages, status changes, finalizations
+  - [x] RPCs: `get_notifications()`, `mark_all_notifications_read()`, `get_notification_count()`
+  - [x] Hook: `useNotifications` with fetch, markAllAsRead, fetchUnreadCount
+  - [x] UI: Clickable notification badge in SiteHeader navbar
+  - [x] UI: Full notifications page at `/trades/notifications`
+  - [x] Component: `NotificationsList` with "Nuevas" and "Anteriores" sections
+  - [x] Fixed: ON CONFLICT trigger issues with partial unique indexes
+- [x] **Historial Tab & Rejected View**
+  - [x] Added "Historial" (3rd tab) to proposals dashboard
+  - [x] Added "Ver rechazadas" toggle for Recibidas/Enviadas tabs
+  - [x] Hook: Extended `useProposals` to support box: 'history' and view: 'rejected'
+  - [x] Query: Historial fetches from `trades_history` table
+  - [x] UI: Read-only cards for completed/cancelled trades
+- [x] **Bug Fixes**
+  - [x] Fixed create_trade_proposal ON CONFLICT error
+  - [x] Fixed column name 'count' → 'quantity' in trade_proposal_items
+  - [x] Fixed RLS policies for trade_chats insert
+  - [x] Fixed notify_chat_message trigger ON CONFLICT with partial index
+  - [x] Added date-fns dependency for relative timestamps
+  - [x] Fixed rejected proposals filter to include 'cancelled' status
+- [x] **Documentation**
+  - [x] CHANGELOG.md updated with comprehensive v1.4.4 entry
+  - [x] TODO.md updated with sprint completion
+  - [x] database-schema.md updated with new tables (notifications, trade_finalizations)
 
 ### v1.4.3 Feature Status
 
-**Trade UX Polishes ✅ | SegmentedTabs Component ✅ | Tests Pending 🚧**
+**Trade UX Polishes ✅ | SegmentedTabs Component ✅ | Tests Complete ✅**
 
 - [x] **Task A: Streamline "Intercambios" (Find) and move advanced controls**
   - [x] Simplified `/trades/find` to show matches for active collection only
@@ -407,8 +445,8 @@
 
 ---
 
-**Last Updated**: 2025-10-07 (v1.4.1 - Theme Rollout Complete)
-**Current Focus**: v1.4.1 Complete - Retro-Comic theme applied across entire application
-**Next Focus**: v1.3.0 Data Migration Sprint → Trade Chat UI and History Dashboard
+**Last Updated**: 2025-10-08 (v1.4.4 - Trade Finalization & Notifications Complete)
+**Current Focus**: v1.4.4 Complete - Two-step trade finalization handshake, notifications system (MVP), historial tab with rejected view
+**Next Focus**: v1.3.0 Data Migration Sprint → Additional notification features and realtime updates
 
 

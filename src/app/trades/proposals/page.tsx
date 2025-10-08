@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ProposalList } from '@/components/trades/ProposalList';
-import { PlusCircle, Inbox, Send } from 'lucide-react';
+import { PlusCircle, Inbox, Send, History as HistoryIcon, Eye } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import type { ProposalBox } from '@/hooks/trades';
 
 const UNREAD_BADGE_CAP = 9;
 
@@ -26,9 +27,10 @@ function TradeProposalsContent() {
     highlightParam ? parseInt(highlightParam) : null
   );
 
-  const [activeTab, setActiveTab] = useState<'inbox' | 'outbox'>(initialTab);
+  const [activeTab, setActiveTab] = useState<ProposalBox>(initialTab);
   const [inboxUnread, setInboxUnread] = useState(0);
   const [outboxUnread, setOutboxUnread] = useState(0);
+  const [showRejected, setShowRejected] = useState(false);
 
   // Clear highlight after first render
   useEffect(() => {
@@ -73,7 +75,7 @@ function TradeProposalsContent() {
         </div>
 
         <div className="w-full">
-          <div className="max-w-[400px]">
+          <div className="max-w-[600px]">
             <SegmentedTabs
               tabs={[
                 {
@@ -102,22 +104,82 @@ function TradeProposalsContent() {
                       </Badge>
                     ) : undefined,
                 },
+                {
+                  value: 'history',
+                  label: 'Historial',
+                  icon: <HistoryIcon className="h-4 w-4" />,
+                },
               ]}
               value={activeTab}
-              onValueChange={val => setActiveTab(val as 'inbox' | 'outbox')}
+              onValueChange={val => {
+                setActiveTab(val as ProposalBox);
+                setShowRejected(false); // Reset rejected toggle when switching tabs
+              }}
               aria-label="Propuestas de intercambio"
             />
           </div>
+
+          {/* Ver rechazadas toggle (only for inbox/outbox tabs) */}
+          {(activeTab === 'inbox' || activeTab === 'outbox') && (
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowRejected(!showRejected)}
+                className={`
+                  border-2 border-black font-bold uppercase rounded-md shadow-lg
+                  ${
+                    showRejected
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }
+                `}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                {showRejected ? 'Ocultar rechazadas' : 'Ver rechazadas'}
+              </Button>
+            </div>
+          )}
+
           <div className="mt-6">
-            {activeTab === 'inbox' && (
-              <ProposalList box="inbox" onUnreadCountChange={setInboxUnread} />
+            {activeTab === 'inbox' && !showRejected && (
+              <ProposalList
+                box="inbox"
+                view="active"
+                onUnreadCountChange={setInboxUnread}
+              />
             )}
-            {activeTab === 'outbox' && (
+            {activeTab === 'inbox' && showRejected && (
+              <div>
+                <h3 className="text-xl font-bold uppercase text-gray-400 mb-4">
+                  Propuestas rechazadas (recibidas)
+                </h3>
+                <ProposalList box="inbox" view="rejected" readOnly />
+              </div>
+            )}
+            {activeTab === 'outbox' && !showRejected && (
               <ProposalList
                 box="outbox"
+                view="active"
                 onUnreadCountChange={setOutboxUnread}
                 highlightProposalId={highlightProposalId}
               />
+            )}
+            {activeTab === 'outbox' && showRejected && (
+              <div>
+                <h3 className="text-xl font-bold uppercase text-gray-400 mb-4">
+                  Propuestas rechazadas por otros (enviadas)
+                </h3>
+                <ProposalList box="outbox" view="rejected" readOnly />
+              </div>
+            )}
+            {activeTab === 'history' && (
+              <div>
+                <h3 className="text-xl font-bold uppercase text-white mb-4">
+                  Intercambios finalizados
+                </h3>
+                <ProposalList box="history" readOnly />
+              </div>
             )}
           </div>
         </div>

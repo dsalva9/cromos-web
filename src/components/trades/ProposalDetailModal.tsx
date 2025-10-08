@@ -14,11 +14,12 @@ import { Badge } from '@/components/ui/badge';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { useProposalDetail } from '@/hooks/trades/useProposalDetail';
 import { useRespondToProposal } from '@/hooks/trades/useRespondToProposal';
+import { useTradeFinalization } from '@/hooks/trades/useTradeFinalization';
 import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { TradeProposalDetailItem } from '@/types';
-import { useUser } from '../providers/SupabaseProvider';
+import { useUser, useSupabase } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
-import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText } from 'lucide-react';
+import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText, CheckCircle } from 'lucide-react';
 
 interface ProposalDetailModalProps {
   proposalId: number | null;
@@ -85,6 +86,7 @@ export function ProposalDetailModal({
   onStatusChange,
 }: ProposalDetailModalProps) {
   const { user } = useUser();
+  const { supabase } = useSupabase();
   const { detail, loading, error, fetchDetail, clearDetail } =
     useProposalDetail();
   const {
@@ -92,6 +94,11 @@ export function ProposalDetailModal({
     error: respondError,
     respond,
   } = useRespondToProposal();
+  const { markAsFinalized, loading: finalizingLoading } = useTradeFinalization();
+
+  // Finalization state
+  const [finalizationCount, setFinalizationCount] = useState<number>(0);
+  const [hasUserFinalized, setHasUserFinalized] = useState<boolean>(false);
 
   // Get saved tab state or default to 'resumen'
   const [activeTab, setActiveTab] = useState<string>('resumen');
@@ -105,15 +112,38 @@ export function ProposalDetailModal({
 
   const unreadCount = proposalId ? getCountForTrade(proposalId) : 0;
 
+  // Fetch finalization status
+  const fetchFinalizationStatus = async (tradeId: number) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('trade_finalizations')
+        .select('user_id')
+        .eq('trade_id', tradeId);
+
+      if (error) throw error;
+
+      const finalizations = data || [];
+      setFinalizationCount(finalizations.length);
+      setHasUserFinalized(finalizations.some(f => f.user_id === user.id));
+    } catch (err) {
+      console.error('Error fetching finalization status:', err);
+    }
+  };
+
   useEffect(() => {
     if (isOpen && proposalId) {
       fetchDetail(proposalId);
+      fetchFinalizationStatus(proposalId);
 
       // Restore saved tab state for this proposal
       const savedTab = tabStateMap.get(proposalId) || 'resumen';
       setActiveTab(savedTab);
     } else {
       clearDetail();
+      setFinalizationCount(0);
+      setHasUserFinalized(false);
     }
   }, [isOpen, proposalId, fetchDetail, clearDetail]);
 
@@ -142,9 +172,29 @@ export function ProposalDetailModal({
     }
   };
 
+  const handleFinalize = async () => {
+    if (!proposalId) return;
+
+    const result = await markAsFinalized(proposalId);
+    if (result) {
+      // Update local state optimistically
+      setHasUserFinalized(true);
+      setFinalizationCount(prev => prev + 1);
+
+      // If both finalized, refresh and close modal
+      if (result.both_finalized) {
+        await fetchDetail(proposalId);
+        setTimeout(() => {
+          onClose();
+        }, 1500); // Give user time to see success message
+      }
+    }
+  };
+
   const isSender = detail?.proposal.from_user_id === user?.id;
   const isReceiver = detail?.proposal.to_user_id === user?.id;
   const isPending = detail?.proposal.status === 'pending';
+  const isAccepted = detail?.proposal.status === 'accepted';
   const isProposalActive =
     detail?.proposal.status === 'pending' ||
     detail?.proposal.status === 'accepted';
@@ -238,6 +288,47 @@ export function ProposalDetailModal({
                       </p>
                     </div>
                   )}
+
+                  {/* Finalization status (only show for accepted proposals) */}
+                  {isAccepted && (
+                    <div className="bg-gray-800 border-2 border-black rounded-md p-4">
+                      <h3 className="text-lg font-bold uppercase mb-2 flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-2 text-green-400" />
+                        Estado de Finalización
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-gray-300">
+                            Marcados como finalizados:
+                          </span>
+                          <Badge
+                            className={`${
+                              finalizationCount === 2
+                                ? 'bg-green-600'
+                                : 'bg-[#FFC000]'
+                            } text-gray-900 border-2 border-black font-bold`}
+                          >
+                            {finalizationCount}/2
+                          </Badge>
+                        </div>
+                        {hasUserFinalized && (
+                          <p className="text-xs text-green-400 font-bold">
+                            ✓ Ya has marcado este intercambio como finalizado
+                          </p>
+                        )}
+                        {finalizationCount === 1 && !hasUserFinalized && (
+                          <p className="text-xs text-yellow-400 font-bold">
+                            ⚠ La otra persona ya marcó como finalizado. Falta tu confirmación.
+                          </p>
+                        )}
+                        {finalizationCount === 2 && (
+                          <p className="text-xs text-green-400 font-bold">
+                            ✓ Intercambio completado por ambas partes
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -256,6 +347,20 @@ export function ProposalDetailModal({
           {respondError && (
             <p className="text-[#E84D4D] text-sm font-bold">{respondError}</p>
           )}
+
+          {/* Finalization button (only for accepted proposals) */}
+          {isAccepted && !hasUserFinalized && finalizationCount < 2 && (
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white border-2 border-black font-bold uppercase"
+              onClick={handleFinalize}
+              disabled={finalizingLoading}
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              {finalizingLoading ? 'Marcando...' : 'Marcar como finalizado'}
+            </Button>
+          )}
+
+          {/* Response buttons (only for pending proposals) */}
           {isPending && isReceiver && (
             <div className="flex space-x-2">
               <Button

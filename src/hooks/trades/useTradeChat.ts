@@ -153,7 +153,13 @@ export const useTradeChat = ({
           .select()
           .single();
 
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error('Supabase insert error:', insertError);
+          console.error('Insert error code:', insertError.code);
+          console.error('Insert error message:', insertError.message);
+          console.error('Insert error details:', insertError.details);
+          throw insertError;
+        }
 
         // Replace optimistic message with real one (has correct ID)
         if (data) {
@@ -170,11 +176,13 @@ export const useTradeChat = ({
         }
       } catch (err) {
         console.error('Error sending message:', err);
+        console.error('Error details:', JSON.stringify(err, null, 2));
         // Remove optimistic message on error
         setMessages(prev =>
           prev.filter(msg => msg.id !== optimisticMessage.id)
         );
-        throw new Error('Error al enviar mensaje');
+        const errorMessage = err instanceof Error ? err.message : 'Error al enviar mensaje';
+        throw new Error(errorMessage);
       }
     },
     [supabase, tradeId, user]

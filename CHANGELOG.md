@@ -19,6 +19,109 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.4.4] - 2025-10-08
+
+### Added - Trade Finalization & Notifications System (MVP)
+
+#### **Trade Finalization Workflow**
+- **Two-step finalization handshake**: Both participants must mark a trade as finalized before it moves to completed status
+- **New database table**: `trade_finalizations` tracks which users have finalized each trade
+- **RPC function**: `mark_trade_finalized(p_trade_id)` handles finalization logic with proper auth guards
+- **Finalization UI in ProposalDetailModal**:
+  - Shows finalization progress (0/2 → 1/2 → 2/2 Finalizado)
+  - "Marcar como finalizado" button for accepted trades
+  - Status indicators showing who has marked as finalized
+  - Auto-closes modal when both parties finalize
+- **Historial tab**: New third tab in `/trades/proposals` showing completed/cancelled trades
+- **Ver rechazadas button**: Toggle to view rejected proposals in inbox/outbox tabs (read-only)
+
+#### **Notifications System (MVP)**
+- **New database table**: `notifications` with support for 4 notification types:
+  - `chat_unread`: New messages in pending/accepted trades (coalesced per-trade)
+  - `proposal_accepted`: Proposal status change to accepted
+  - `proposal_rejected`: Proposal status change to rejected
+  - `finalization_requested`: One user has marked trade as finalized
+- **Database triggers**: Automatic notification creation on:
+  - Chat message insert (upserts unread notification)
+  - Proposal status change (accepted/rejected)
+  - Finalization insert (notifies counterparty)
+- **RPC functions**:
+  - `get_notifications()`: Returns all notifications with enriched trade data
+  - `mark_all_notifications_read()`: Marks all unread as read
+  - `get_notification_count()`: Returns count of unread notifications
+- **Notifications page** (`/trades/notifications`):
+  - Lists all notifications sorted by unread first, then newest
+  - Groups into "Nuevas" and "Anteriores" sections
+  - Clickable notifications route to proposal detail
+  - "Marcar todo como leído" button
+- **Clickable notification badge in navbar**:
+  - Bell icon with unread count next to "Mis Propuestas"
+  - Separate clickable target routes to `/trades/notifications`
+  - Badge-click routes to notification list, label-click routes to proposals
+
+#### **Hook Updates**
+- **New hooks**:
+  - `useTradeHistory`: Fetches completed/cancelled trades from `trades_history`
+  - `useNotifications`: Manages notifications with count + mark read
+  - `useTradeFinalization`: Handles trade finalization RPC calls
+- **Extended hooks**:
+  - `useProposals`: Now supports `box: 'inbox'|'outbox'|'history'` and `view: 'active'|'rejected'`
+
+#### **UI Enhancements**
+- **ProposalsDashboard** (`/trades/proposals`):
+  - Added third tab: "Historial" for completed/cancelled trades
+  - Added "Ver rechazadas" toggle for inbox/outbox (shows rejected proposals)
+  - Updated to 3-tab SegmentedTabs with equal-width layout
+- **ProposalDetailModal**:
+  - Finalization status section in Resumen tab (only for accepted proposals)
+  - "Marcar como finalizado" primary button (green)
+  - Progress indicator (X/2 marcados)
+  - Disabled chat/actions when trade is completed
+- **SiteHeader**:
+  - Notification bell badge with unread count
+  - Separate clickable badge routes to `/trades/notifications`
+  - Badge updates in real-time via `useNotifications` hook
+
+### Changed
+
+- **ProposalList component**: Now supports `box`, `view`, and `readOnly` props for flexible filtering
+- **Navbar notification strategy**: Switched from chat unread counts to comprehensive notifications count
+
+### Database
+
+- **New Tables**:
+  - `trade_finalizations` (trade_id, user_id, finalized_at)
+  - `notifications` (id, user_id, kind, trade_id, created_at, read_at, metadata)
+- **New RPCs**:
+  - `mark_trade_finalized(p_trade_id BIGINT) RETURNS JSONB`
+  - `get_notifications() RETURNS TABLE`
+  - `mark_all_notifications_read() RETURNS VOID`
+  - `get_notification_count() RETURNS INTEGER`
+- **New Triggers**:
+  - `notify_chat_message()`: Creates/updates chat_unread notifications
+  - `notify_proposal_status_change()`: Creates accepted/rejected notifications
+  - `notify_finalization_requested()`: Creates finalization_requested notifications
+
+### Fixed
+
+- **Database trigger ON CONFLICT errors**:
+  - Fixed `notify_chat_message()` trigger using ON CONFLICT with partial unique index (replaced with IF/ELSE logic)
+  - Fixed `create_trade_proposal` RPC removing invalid ON CONFLICT clause from chat message insert
+  - Fixed column name from 'count' to 'quantity' in `trade_proposal_items` inserts
+  - Fixed RLS policies for `trade_chats` table to allow participants to insert messages
+- **Rejected proposals not showing**:
+  - Fixed `useProposals` hook to include 'cancelled' status in rejected view filter
+  - Now shows both rejected (receiver) and cancelled (sender) proposals when "Ver rechazadas" is active
+- **Missing dependency**: Added `date-fns` package for relative timestamp formatting in notifications
+
+### Migration Files
+
+- `supabase/migrations/20251008_trade_finalizations.sql`
+- `supabase/migrations/20251008_notifications.sql`
+- `supabase/migrations/20251008_fix_create_trade_proposal.sql` (hotfix)
+- `supabase/migrations/20251008_fix_trade_chats_rls.sql` (hotfix)
+- `supabase/migrations/20251008_fix_notify_chat_trigger.sql` (hotfix)
+
 ## [1.4.3] - 2025-10-08
 
 ### Fixed - SegmentedTabs Equal-Width Alignment

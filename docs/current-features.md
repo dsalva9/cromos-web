@@ -19,9 +19,49 @@
 
 ---
 
-## 🆕 Recent Updates (v1.4.3)
+## 🆕 Recent Updates (v1.4.4)
 
-### Trade Flow UX Polishes ✅
+### Trade Finalization & Notifications System ✅
+
+#### **Two-Step Trade Finalization**
+- **Finalization Workflow**: Both participants must mark a trade as finalized before completion
+- **Database Table**: `trade_finalizations` with composite PK (trade_id, user_id)
+- **RPC Function**: `mark_trade_finalized(p_trade_id)` returns finalization status
+- **UI in ProposalDetailModal**:
+  - Progress indicator (0/2 → 1/2 → 2/2)
+  - "Marcar como finalizado" button for accepted trades
+  - Auto-closes modal when both parties finalize
+  - Automatic creation of `trades_history` record when complete
+
+#### **Notifications System (MVP)**
+- **Database Table**: `notifications` with 4 notification types:
+  - `chat_unread`: New messages in active trades (coalesced per-trade)
+  - `proposal_accepted`: Proposal accepted by recipient
+  - `proposal_rejected`: Proposal rejected by recipient
+  - `finalization_requested`: One party has marked trade as finalized
+- **Auto-notification Triggers**: Database triggers create notifications on:
+  - Chat message insert (upserts unread notification)
+  - Proposal status changes (accepted/rejected)
+  - Trade finalization (notifies counterparty)
+- **RPC Functions**:
+  - `get_notifications()`: Returns all notifications with trade details
+  - `get_notification_count()`: Returns unread count
+  - `mark_all_notifications_read()`: Bulk mark as read
+- **Notifications Page** (`/trades/notifications`):
+  - Grouped by "Nuevas" and "Anteriores"
+  - Clickable notifications route to proposal detail
+  - "Marcar todo como leído" button
+- **Navbar Badge**: Clickable bell icon with unread count next to "Mis Propuestas"
+
+#### **Historial Tab & Rejected View**
+- **Historial Tab**: New 3rd tab in `/trades/proposals` showing completed/cancelled trades
+- **Ver Rechazadas Toggle**: View rejected proposals in inbox/outbox tabs
+- **Extended useProposals Hook**: Now supports `box: 'history'` and `view: 'rejected'`
+- **Read-only Cards**: Historial trades shown as read-only (no actions)
+
+### v1.4.3 Updates
+
+#### Trade Flow UX Polishes ✅
 - **Streamlined /trades/find**: Simplified interface shows matches for active collection only
 - **Advanced Search**: New `/trades/search` page with full filter controls (collection, player, rarity, team, minOverlap)
 - **Post-Create Flow**: After creating proposal, redirect to ENVIADAS tab with one-time highlight animation on the new card
@@ -130,13 +170,16 @@
 
 - `user_badges` - User achievement tracking
 
-**RPC Functions (15):** ✅ **ALL DEPLOYED**
+**RPC Functions (21):** ✅ **ALL DEPLOYED**
 
 - Collection stats: `get_user_collection_stats`, `get_completion_report`
 - Sticker management: `bulk_add_stickers_by_numbers`, `search_stickers`, `mark_team_page_complete` ✅ **v1.4.0**
 - Trading discovery: `find_mutual_traders`, `get_mutual_trade_detail`
 - Trading proposals: `create_trade_proposal`, `respond_to_trade_proposal`, `list_trade_proposals`, `get_trade_proposal_detail`
 - Trading history: `complete_trade`, `cancel_trade`
+- Trading chat: `mark_trade_read`, `get_unread_counts` ✅ **v1.4.2**
+- Trade finalization: `mark_trade_finalized` ✅ **v1.4.4**
+- Notifications: `get_notifications`, `get_notification_count`, `mark_all_notifications_read` ✅ **v1.4.4**
 - Internal: `handle_updated_at`, `update_updated_at_column`
 
 **Files**: Complete schema in `docs/database-schema.md`
@@ -256,44 +299,80 @@
 
 ## 🚧 Backend Ready - UI Pending
 
-### 11. Trade Chat System ✅ **BACKEND DEPLOYED** | 🚧 **UI PENDING**
+### 11. Trade Chat System ✅ **COMPLETE**
 
 **Database Infrastructure:**
 
 - ✅ `trade_chats` table - Message storage with immutable history
+- ✅ `trade_reads` table - Track read timestamps per user/trade
 - ✅ RLS policies - Only participants can read/write
 - ✅ Indexes - Optimized for chronological loading
 - ✅ Foreign keys - Properly linked to trade proposals
+- ✅ `mark_trade_read` RPC - Upsert read timestamp for current user
+- ✅ `get_unread_counts` RPC - Returns unread message counts per trade
 
-**What's Needed:**
+**UI Components:** ✅ **COMPLETE (v1.4.2)**
 
-- Build chat interface components
-- Integrate Supabase Realtime for live messaging
-- Add chat UI to proposal detail modal
-- Implement message notifications
-- Test real-time message delivery
+- ✅ `TradeChatPanel` - Chat interface in ProposalDetailModal
+- ✅ `useTradeChat` hook - Message loading, sending, mark as read
+- ✅ Optimistic message sending with rollback on error
+- ✅ Real-time message updates via Supabase Realtime
+- ✅ Auto-scroll to bottom on new messages
+- ✅ 500 character limit with validation
+- ✅ Integrated into MENSAJES tab in proposal detail
 
-**Files**: Schema in `database-schema.md`, UI components pending
+**Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 12. Trade History ✅ **BACKEND DEPLOYED** | 🚧 **UI PENDING**
+### 12. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 **Database Infrastructure:**
 
 - ✅ `trades_history` table - Terminal state tracking (completed/cancelled)
+- ✅ `trade_finalizations` table - Two-step finalization handshake (v1.4.4)
 - ✅ `complete_trade` RPC - Mark trades as completed
 - ✅ `cancel_trade` RPC - Cancel trades with history
+- ✅ `mark_trade_finalized` RPC - Finalization workflow (v1.4.4)
 - ✅ Metadata support - JSON field for audit trails
 
-**What's Needed:**
+**UI Components:** ✅ **COMPLETE (v1.4.4)**
 
-- Create history dashboard interface
-- Integrate complete/cancel actions in UI
-- Display completed trade statistics
-- Add trade rating system (future enhancement)
+- ✅ Historial tab in `/trades/proposals` - Shows completed/cancelled trades
+- ✅ `useTradeHistory` hook - Fetches from `trades_history` table
+- ✅ `useTradeFinalization` hook - Handles finalization RPC calls
+- ✅ Finalization UI in ProposalDetailModal with progress indicator
+- ✅ "Marcar como finalizado" button for accepted trades
+- ✅ Auto-close modal when both parties finalize
+- ✅ Read-only cards for completed/cancelled trades in historial
 
-**Files**: Schema in `database-schema.md`, UI dashboard pending
+**Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/proposals/page.tsx`
 
-### 13. User Badges ✅ **BACKEND DEPLOYED** | 🚧 **UI PENDING**
+### 13. Notifications System ✅ **COMPLETE (v1.4.4)**
+
+**Database Infrastructure:**
+
+- ✅ `notifications` table - User notifications with 4 kinds
+- ✅ `get_notifications` RPC - Returns enriched notification data
+- ✅ `get_notification_count` RPC - Returns unread count
+- ✅ `mark_all_notifications_read` RPC - Bulk mark as read
+- ✅ Database triggers for auto-notification creation:
+  - `notify_chat_message` - Creates/updates chat_unread notifications
+  - `notify_proposal_status_change` - Creates accepted/rejected notifications
+  - `notify_finalization_requested` - Creates finalization notifications
+
+**UI Components:** ✅ **COMPLETE (v1.4.4)**
+
+- ✅ Notifications page at `/trades/notifications`
+- ✅ `NotificationsList` component - Groups into "Nuevas" and "Anteriores"
+- ✅ `useNotifications` hook - Fetch, count, mark read
+- ✅ Clickable bell badge in navbar with unread count
+- ✅ Real-time count updates
+- ✅ Relative timestamps with date-fns
+
+**Files**: `src/hooks/trades/useNotifications.ts`, `src/components/trades/NotificationsList.tsx`, `src/app/trades/notifications/page.tsx`
+
+---
+
+### 14. User Badges ✅ **BACKEND DEPLOYED** | 🚧 **UI PENDING**
 
 **Database Infrastructure:**
 
@@ -318,8 +397,8 @@
 
 - **Public User Profiles**: View other users' collections
 - **User Directory**: Browse and search collectors
-- **Notification System**: Real-time alerts for trading activities
 - **Collection Completion Celebrations**: Achievement milestones
+- **Realtime Notification Updates**: Live notification updates via Supabase Realtime (MVP uses polling)
 
 ### Current Feature Enhancements
 
@@ -342,16 +421,18 @@
 | **Phase 2 - Trading** |         |          |                 |
 | Find Traders          | ✅     | ✅      | Complete (v1.1) |
 | Trade Proposals       | ✅     | ✅      | Complete (v1.2) |
-| Trade Chat            | ✅     | 🚧     | Backend Ready   |
-| Trade History         | ✅     | 🚧     | Backend Ready   |
+| Trade Chat            | ✅     | ✅      | Complete (v1.4.2) |
+| Trade History         | ✅     | ✅      | Complete (v1.4.4) |
+| Trade Finalization    | ✅     | ✅      | Complete (v1.4.4) |
+| Notifications         | ✅     | ✅      | Complete (v1.4.4) |
 | **Phase 2 - Album**   |         |          |                 |
 | Album Pages           | ✅     | ✅      | Complete        |
 | Enhanced Images       | ✅     | ✅      | Complete        |
 | User Badges           | ✅     | 🚧     | Backend Ready   |
 | **Phase 3 - Future**  |         |          |                 |
 | User Directory        | ❌      | ❌       | Planned         |
-| Notifications         | ❌      | ❌       | Planned         |
 | Public Profiles       | ❌      | ❌       | Planned         |
+| Realtime Notifications| ❌      | ❌       | Planned         |
 
 **Legend:**  
 ✅ Complete | 🚧 In Progress | ❌ Not Started
@@ -588,30 +669,32 @@ Smart performance patterns throughout:
 
 ## 🔍 Current Architecture Status
 
-### Database: v1.3.0 ✅ **PRODUCTION**
+### Database: v1.4.4 ✅ **PRODUCTION**
 
-- All tables deployed and indexed
-- All RPC functions operational
+- All 15 tables deployed and indexed
+- All 21 RPC functions operational
 - All RLS policies active
 - Storage buckets configured
-- Ready for full UI integration
+- Database triggers for auto-notifications
 - Ready for data migration scripts to be run
 
-### Frontend: v1.3.0 ⚠️ **PARTIAL**
+### Frontend: v1.4.4 ✅ **NEARLY COMPLETE**
 
 - ✅ Core features complete (Phase 1)
 - ✅ Trading proposals complete (Phase 2)
 - ✅ Album pages UI complete (Phase 2)
-- 🚧 Missing: Trade chat UI
-- Missing: Trade history UI
-- Missing: Badge display UI
+- ✅ Trade chat UI complete (v1.4.2)
+- ✅ Trade history UI complete (v1.4.4)
+- ✅ Trade finalization UI complete (v1.4.4)
+- ✅ Notifications UI complete (v1.4.4)
+- 🚧 Missing: Badge display UI (only feature remaining)
 
 ### Gap Analysis
 
-**Backend ahead of Frontend by ~1 sprint**
+**Backend and Frontend nearly at parity**
 
-**Priority 2**: Trade Chat UI (completes trading workflow)  
-**Priority 3**: Trade History UI (adds analytics)
+**Priority 1**: Badge display UI (final Phase 2 feature)
+**Priority 2**: Realtime notification updates (enhancement)
 
 ---
 
@@ -625,56 +708,56 @@ Smart performance patterns throughout:
   - Run `npm run backfill:stickers` to upload all images
 - Test navigation and completion tracking
 
-### Sprint 2: Trade Chat (1 week)
+### Sprint 2: Badge Display (2-3 days) ✅ **READY**
 
-- Build chat interface components
-- Integrate Supabase Realtime listeners
-- Add chat to proposal detail modal
-- Implement message notifications
-- Test real-time delivery
+- Display user badges in profile
+- Badge awarding logic (service-side)
+- Achievement showcase interface
+- Badge notification integration
 
-### Sprint 3: Trade History (3-5 days)
+### Sprint 3: Realtime Enhancements (1 week)
 
-- Create history dashboard interface
-- Integrate complete/cancel RPCs
-- Display completion statistics
-- Add analytics views
+- Realtime notification updates via Supabase Realtime
+- Live trade status updates
+- Real-time finalization progress
+- Notification sound/visual alerts
 
 ### Sprint 4: Polish & Testing (3-5 days)
 
-- Badge display implementation
 - Performance optimization
 - Mobile testing and fixes
 - User acceptance testing
+- E2E tests for new features
 
 ---
 
-## 📊 Feature Completion Tracking (v1.3.0 Milestone)
+## 📊 Feature Completion Tracking (v1.4.4 Milestone)
 
-### Completed Features: 10/13 (77%)
+### Completed Features: 13/14 (93%)
 
 1. ✅ Authentication System
 2. ✅ Profile Management
 3. ✅ Collection Navigation
 4. ✅ Sticker Management
-5. ✅ Database v1.3.0 Infrastructure
-6. ✅ Modern UI/UX Design
+5. ✅ Database v1.4.4 Infrastructure
+6. ✅ Modern UI/UX Design (Retro-Comic)
 7. ✅ Trading - Find Traders
 8. ✅ Trading - Proposals
-9. ✅ Album Pages System (Code Complete)
-   10.✅ Enhanced Sticker Images (Code Complete)
+9. ✅ Album Pages System
+10. ✅ Enhanced Sticker Images
+11. ✅ Trade Chat (v1.4.2)
+12. ✅ Trade History & Finalization (v1.4.4)
+13. ✅ Notifications System (v1.4.4)
 
-### In Progress: 3/13 (23%)
+### In Progress: 1/14 (7%)
 
-11. 🚧 Trade Chat (Backend ✅ | Frontend 🚧)
-12. 🚧 Trade History (Backend ✅ | Frontend 🚧)
-13. 🚧 User Badges (Backend ✅ | Frontend 🚧)
+14. 🚧 User Badges (Backend ✅ | Frontend 🚧)
 
-### Overall Progress: ~80% Complete
+### Overall Progress: ~93% Complete
 
-**Backend**: 100% (All v1.3.0 features deployed)
-**Frontend**: ~80% (Core + Trading + Album Pages complete)
-**Gap**: ~20% (3 features need UI integration)
+**Backend**: 100% (All v1.4.4 features deployed - 15 tables, 21 RPCs)
+**Frontend**: ~93% (Only badge display UI remaining)
+**Gap**: ~7% (1 feature needs UI integration)
 
 ---
 
@@ -683,10 +766,12 @@ Smart performance patterns throughout:
 ### Technical Excellence
 
 - Zero-reload architecture across all features
-- Comprehensive RPC-based backend (14 functions)
-- Complete security model (25 RLS policies)
-- Performance-optimized (30 indexes)
+- Comprehensive RPC-based backend (21 functions)
+- Complete security model (30+ RLS policies)
+- Performance-optimized (35+ indexes)
 - Modern TypeScript throughout
+- Database triggers for automation
+- Real-time chat with Supabase Realtime
 
 ### User Experience
 
@@ -708,16 +793,16 @@ Smart performance patterns throughout:
 
 ## 🚀 Next Milestone
 
-**Target**: Complete v1.3.0 UI Integration  
-**Timeline**: 3-4 weeks  
-**Focus**: Data Migration → Chat → History → Badges  
-**Outcome**: Full feature parity between backend and frontend
+**Target**: Complete v1.4.x Polish & Enhancement
+**Timeline**: 2-3 weeks
+**Focus**: Badge Display → Realtime Enhancements → E2E Testing
+**Outcome**: 100% Phase 2 completion, ready for Phase 3
 
-**After v1.3.0**: Begin Phase 3 (Community Features)
+**After v1.4.x**: Begin Phase 3 (Community Features - Public Profiles, User Directory)
 
 ---
 
-**Last Updated**: 2025-01-XX (Post Database Audit)  
-**Current Version**: Backend v1.3.0 | Frontend v1.3.0 (Code Complete)
-**Status**: Code Complete ✅ | Data Migration Needed 🚧  
-**Next Focus**: Data Migration Sprint
+**Last Updated**: 2025-10-08 (v1.4.4 Complete)
+**Current Version**: Backend v1.4.4 | Frontend v1.4.4
+**Status**: 93% Complete ✅ | Badge UI Pending 🚧
+**Next Focus**: Badge Display UI → Realtime Enhancements

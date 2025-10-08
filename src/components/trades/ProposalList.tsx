@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useProposals } from '@/hooks/trades/useProposals';
+import { useProposals, type ProposalBox, type ProposalView } from '@/hooks/trades/useProposals';
 import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { ProposalCard } from './ProposalCard';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -10,12 +10,20 @@ import { ProposalDetailModal } from './ProposalDetailModal';
 import type { TradeProposalListItem, TradeProposalStatus } from '@/types';
 
 interface ProposalListProps {
-  box: 'inbox' | 'outbox';
+  box: ProposalBox;
+  view?: ProposalView;
   onUnreadCountChange?: (totalUnread: number) => void;
   highlightProposalId?: number | null;
+  readOnly?: boolean;
 }
 
-export function ProposalList({ box, onUnreadCountChange, highlightProposalId }: ProposalListProps) {
+export function ProposalList({
+  box,
+  view = 'active',
+  onUnreadCountChange,
+  highlightProposalId,
+  readOnly = false,
+}: ProposalListProps) {
   const { proposals, loading, error, fetchProposals, clearProposals } =
     useProposals();
   const [optimisticProposals, setOptimisticProposals] = useState<
@@ -73,14 +81,14 @@ export function ProposalList({ box, onUnreadCountChange, highlightProposalId }: 
   };
 
   useEffect(() => {
-    // Fetch on mount and when box changes
-    fetchProposals({ box, limit: 20, offset: 0 });
+    // Fetch on mount and when box/view changes
+    fetchProposals({ box, view, limit: 20, offset: 0 });
 
     // Cleanup on unmount
     return () => {
       clearProposals();
     };
-  }, [box, fetchProposals, clearProposals]);
+  }, [box, view, fetchProposals, clearProposals]);
 
   if (loading) {
     return (
@@ -126,12 +134,14 @@ export function ProposalList({ box, onUnreadCountChange, highlightProposalId }: 
           />
         ))}
       </div>
-      <ProposalDetailModal
-        proposalId={selectedProposalId}
-        isOpen={!!selectedProposalId}
-        onClose={handleCloseModal}
-        onStatusChange={handleStatusChange}
-      />
+      {!readOnly && (
+        <ProposalDetailModal
+          proposalId={selectedProposalId}
+          isOpen={!!selectedProposalId}
+          onClose={handleCloseModal}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </>
   );
 }

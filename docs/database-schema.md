@@ -1,19 +1,21 @@
 # Database Schema Documentation
 
-## Current State: v1.4.0 (Phase 4 schema cleanup)
+## Current State: v1.4.4 (Trade Finalization & Notifications)
 
-Last updated: 2025-10-06
+Last updated: 2025-10-08
 Source: Direct export from Supabase production database
 
 ## Overview
 
-The CambioCromos database consists of 13 tables supporting:
+The CambioCromos database consists of 15 tables supporting:
 
 - User authentication and profiles
 - Multi-collection sticker management
 - Album-style page navigation (v1.3.0)
 - Complete trading proposal system
 - Trade history and chat
+- Trade finalization handshake (v1.4.4)
+- Notifications system (v1.4.4)
 - User badges and achievements
 
 ---
@@ -454,6 +456,101 @@ CREATE TABLE trades_history (
 **RLS Policies:**
 
 - Only proposal participants can read history
+
+---
+
+### `trade_finalizations` _(v1.4.4)_
+
+Two-step handshake for trade completion.
+
+```sql
+CREATE TABLE trade_finalizations (
+  trade_id BIGINT NOT NULL REFERENCES trade_proposals(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  finalized_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  PRIMARY KEY (trade_id, user_id)
+);
+```
+
+**Design:**
+
+- Composite PK ensures each user can only finalize once per trade
+- Both participants must finalize before trade moves to `trades_history`
+- `finalized_at`: Timestamp when user confirmed finalization
+
+**Indexes:**
+
+- Primary key on `(trade_id, user_id)`
+- `idx_trade_finalizations_trade_id` on `(trade_id)` for counting participants
+
+**RLS Policies:**
+
+- Only proposal participants can read finalization status
+- Users can only insert their own finalization records
+- No updates or deletes allowed (immutable once created)
+
+**Usage:**
+
+- Insert via `mark_trade_finalized(p_trade_id)` RPC
+- RPC returns `both_finalized` boolean
+- When both finalized, trade automatically moves to `trades_history` with status 'completed'
+
+---
+
+### `notifications` _(v1.4.4)_
+
+User notifications for chat messages, proposal status changes, and finalization requests.
+
+```sql
+CREATE TABLE notifications (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK (kind IN ('chat_unread', 'proposal_accepted', 'proposal_rejected', 'finalization_requested')),
+  trade_id BIGINT NULL REFERENCES trade_proposals(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  read_at TIMESTAMPTZ NULL,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb
+);
+```
+
+**Design:**
+
+- `kind`: Notification type (4 types for MVP)
+  - `chat_unread`: Unread chat messages (coalesced per trade)
+  - `proposal_accepted`: Proposal was accepted
+  - `proposal_rejected`: Proposal was rejected
+  - `finalization_requested`: Counterparty requested finalization
+- `trade_id`: Associated trade (NULL for system notifications)
+- `read_at`: NULL for unread, timestamp when marked read
+- `metadata`: JSON blob for additional data (e.g., last_message_id, requester_id)
+
+**Indexes:**
+
+- Primary key on `id`
+- `idx_notifications_user_read` on `(user_id, read_at)` for unread queries
+- `idx_notifications_user_kind_read` on `(user_id, kind, read_at)` for filtering by type
+- `idx_notifications_user_trade_kind_read` on `(user_id, trade_id, kind, read_at)` for trade-specific queries
+- `idx_notifications_trade_id` on `(trade_id)` for trade lookups
+- `idx_notifications_user_trade_kind_unread_unique` (UNIQUE partial index) on `(user_id, trade_id, kind)` WHERE `kind = 'chat_unread' AND read_at IS NULL` for chat notification coalescing
+
+**RLS Policies:**
+
+- Users can only see their own notifications (`user_id = auth.uid()`)
+- Users can only insert their own notifications (for RPC/trigger usage)
+- Users can only update/delete their own notifications
+
+**Triggers:**
+
+- `trigger_notify_chat_message`: Creates/updates `chat_unread` notification when new chat message is inserted
+- `trigger_notify_proposal_status_change`: Creates notification when proposal status changes to `accepted` or `rejected`
+- `trigger_notify_finalization_requested`: Creates notification when counterparty marks trade as finalized
+
+**Usage:**
+
+- Query via `get_notifications()` RPC (returns enriched data with trade details)
+- Count via `get_notification_count()` RPC (returns unread count)
+- Mark all read via `mark_all_notifications_read()` RPC
 
 ---
 
@@ -1196,14 +1293,201 @@ Key: All joins use index scans, no table scans except tiny CTEs
 
 ---
 
+### Trade Finalization _(v1.4.4)_
+
+#### `mark_trade_finalized`
+
+Two-step handshake for trade completion. Both participants must call this function before the trade is marked as completed.
+
+```sql
+FUNCTION mark_trade_finalized(
+  p_trade_id BIGINT
+) RETURNS JSONB
+```
+
+**Parameters:**
+
+- `p_trade_id`: Trade proposal ID (required)
+
+**Returns:**
+
+```json
+{
+  "both_finalized": true,
+  "finalized_count": 2
+}
+```
+
+**Behavior:**
+
+- Automatically uses `auth.uid()` for user_id (SECURITY DEFINER)
+- Validates user is a participant in the trade (from_user or to_user)
+- Inserts finalization record for current user
+- Checks if both participants have finalized
+- If both finalized, automatically creates `trades_history` record with status 'completed'
+- Idempotent - calling multiple times by same user has no effect
+- Raises exception if not authenticated or not a participant
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { data, error } = await supabase.rpc('mark_trade_finalized', {
+  p_trade_id: tradeId,
+});
+
+if (error) {
+  console.error('Error finalizing trade:', error);
+  return;
+}
+
+if (data.both_finalized) {
+  toast.success('¡Intercambio finalizado! Ambos participantes confirmaron.');
+  // Close modal, refresh history, etc.
+} else {
+  toast.success(`Confirmado. Esperando confirmación de la otra parte (${data.finalized_count}/2).`);
+}
+```
+
+---
+
+### Notifications _(v1.4.4)_
+
+#### `get_notifications`
+
+Returns all notifications for the current user with enriched trade details.
+
+```sql
+FUNCTION get_notifications()
+RETURNS TABLE (
+  id BIGINT,
+  kind TEXT,
+  trade_id BIGINT,
+  created_at TIMESTAMPTZ,
+  read_at TIMESTAMPTZ,
+  metadata JSONB,
+  proposal_from_user UUID,
+  proposal_to_user UUID,
+  proposal_status TEXT,
+  from_user_nickname TEXT,
+  to_user_nickname TEXT
+)
+```
+
+**Returns:**
+
+Array of notification objects with joined trade proposal and profile data:
+- `id`: Notification ID
+- `kind`: Notification type (chat_unread, proposal_accepted, proposal_rejected, finalization_requested)
+- `trade_id`: Associated trade ID
+- `created_at`: When notification was created
+- `read_at`: When notification was marked read (NULL if unread)
+- `metadata`: Additional JSON data
+- `proposal_from_user`: UUID of proposal sender
+- `proposal_to_user`: UUID of proposal recipient
+- `proposal_status`: Current status of trade proposal
+- `from_user_nickname`: Sender's nickname
+- `to_user_nickname`: Recipient's nickname
+
+**Behavior:**
+
+- Automatically scopes to `auth.uid()` (SECURITY DEFINER)
+- Ordered by unread first, then by creation date descending
+- Includes LEFT JOIN to trade_proposals and profiles for enriched data
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { data: notifications, error } = await supabase.rpc('get_notifications');
+
+if (error) throw error;
+
+// data is enriched with trade and profile information
+```
+
+---
+
+#### `get_notification_count`
+
+Returns count of unread notifications for the current user.
+
+```sql
+FUNCTION get_notification_count()
+RETURNS INTEGER
+```
+
+**Returns:**
+
+Integer count of notifications where `read_at IS NULL`
+
+**Behavior:**
+
+- Automatically scopes to `auth.uid()` (SECURITY DEFINER)
+- Fast count query using indexed `read_at` column
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { data: count, error } = await supabase.rpc('get_notification_count');
+
+if (error) throw error;
+
+// Display badge with count
+setBadgeCount(count);
+```
+
+---
+
+#### `mark_all_notifications_read`
+
+Marks all unread notifications as read for the current user.
+
+```sql
+FUNCTION mark_all_notifications_read()
+RETURNS VOID
+```
+
+**Behavior:**
+
+- Automatically scopes to `auth.uid()` (SECURITY DEFINER)
+- Updates all notifications where `read_at IS NULL` to `read_at = NOW()`
+- Idempotent - safe to call multiple times
+
+**Security:** SECURITY DEFINER, requires authentication
+
+**Usage Example:**
+
+```typescript
+const { error } = await supabase.rpc('mark_all_notifications_read');
+
+if (error) {
+  console.error('Error marking notifications as read:', error);
+  return;
+}
+
+// Refresh notification list
+```
+
+---
+
 ## Schema Version History
 
-- **v1.3.0** (Current): Album pages, trade history, badges, enhanced sticker images
+- **v1.4.4** (Current): Trade finalization handshake, notifications system (MVP)
+- **v1.4.3**: Trade flow optimization, SegmentedTabs component
+- **v1.4.2**: Trade composer UX improvements, trade matching logic fixes
+- **v1.4.1**: Complete Retro-Comic theme rollout
+- **v1.4.0**: Mark team page complete feature, schema cleanup
+- **v1.3.0**: Album pages, trade history, badges, enhanced sticker images
 - **v1.2.0**: Complete trade proposals system
 - **v1.1.0**: Trading discovery (find mutual traders)
 - **v1.0.0**: Core collection and sticker management
 
 ---
 
-**Status:** ✅ All v1.3.0 features deployed and documented
-**Next:** Begin Phase 2 continuation (chat UI, history dashboard)
+**Status:** ✅ All v1.4.4 features deployed and documented
+**Next:** Realtime notification updates, additional notification types
