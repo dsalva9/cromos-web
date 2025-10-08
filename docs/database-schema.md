@@ -43,6 +43,7 @@ CREATE TABLE profiles (
 ```
 
 **v1.5.0 Additions:**
+
 - `is_admin`: Boolean flag for admin access. Used with JWT claims enforcement in SECURITY DEFINER RPCs.
 - `postcode`: Optional postcode (e.g., "28001") for location-based trade matching. Privacy-preserving (no exact address).
 
@@ -189,8 +190,6 @@ CREATE TABLE user_collections (
 **RLS Policies:**
 
 - Users can only access their own collection memberships
-
-
 
 ---
 
@@ -728,7 +727,7 @@ FUNCTION get_user_collection_stats(
   "owned_stickers": 450,
   "completion_percentage": 75,
   "duplicates": 120,
-  "missing": 150,
+  "missing": 150
 }
 ```
 
@@ -928,6 +927,7 @@ FUNCTION create_trade_proposal(
 ```
 
 **Parameters:**
+
 - `p_collection_id`: The collection ID for the trade
 - `p_to_user`: UUID of the user receiving the proposal
 - `p_offer_items`: Array of items the sender is offering
@@ -937,6 +937,7 @@ FUNCTION create_trade_proposal(
 **Returns:** The proposal ID (BIGINT)
 
 **Behavior:**
+
 - Creates a trade proposal with status 'pending'
 - Inserts offer and request items into trade_proposal_items
 - If a message is provided, inserts it as the first message in trade_chats
@@ -1087,6 +1088,7 @@ FUNCTION get_unread_counts(
 **Returns:**
 
 Array of objects with:
+
 - `trade_id`: Trade proposal ID
 - `unread_count`: Number of unread messages from counterparty
 
@@ -1319,6 +1321,7 @@ FUNCTION admin_upsert_collection(
 ```
 
 **Parameters:**
+
 - `p_collection`: JSON object with collection fields (id optional for create)
   - `id` (optional): Collection ID for update
   - `name`: Collection name
@@ -1329,6 +1332,7 @@ FUNCTION admin_upsert_collection(
   - `is_active`: Active status (defaults to true)
 
 **Returns:**
+
 ```json
 {
   "id": 123,
@@ -1368,6 +1372,7 @@ FUNCTION admin_upsert_page(
 ```
 
 **Parameters:**
+
 - `p_page`: JSON object with page fields
   - `id` (optional): Page ID for update
   - `collection_id`: Parent collection
@@ -1377,6 +1382,7 @@ FUNCTION admin_upsert_page(
   - `order_index`: Sort order
 
 **Returns:**
+
 ```json
 {
   "id": 456,
@@ -1416,6 +1422,7 @@ FUNCTION admin_upsert_sticker(
 ```
 
 **Parameters:**
+
 - `p_sticker`: JSON object with sticker fields
   - `id` (optional): Sticker ID for update
   - `collection_id`: Parent collection
@@ -1432,6 +1439,7 @@ FUNCTION admin_upsert_sticker(
   - `thumb_path_webp_100`: Storage path for 100px thumb (optional)
 
 **Returns:**
+
 ```json
 {
   "id": 789,
@@ -1472,9 +1480,11 @@ FUNCTION admin_bulk_upload_preview(
 ```
 
 **Parameters:**
+
 - `p_upload_data`: JSON array of stickers/pages/collections with validation rules
 
 **Returns:**
+
 ```json
 {
   "valid_rows": 50,
@@ -1508,9 +1518,11 @@ FUNCTION admin_bulk_upload_apply(
 ```
 
 **Parameters:**
+
 - `p_upload_data`: Same structure as preview
 
 **Returns:**
+
 ```json
 {
   "created": 45,
@@ -1521,6 +1533,7 @@ FUNCTION admin_bulk_upload_apply(
 ```
 
 **Behavior:**
+
 - Transactional: all or nothing
 - Populates audit_log for each operation
 - Uploads images to Supabase Storage (WebP conversion + thumbnails)
@@ -1532,6 +1545,7 @@ FUNCTION admin_bulk_upload_apply(
 
 **Image Upload Note:**
 Admin bulk upload automatically:
+
 1. Accepts uploaded images (PNG/JPG/WebP)
 2. Converts to WebP format
 3. Generates 300px full-size and 100px thumbnail
@@ -1733,7 +1747,9 @@ if (data.both_finalized) {
   toast.success('¡Intercambio finalizado! Ambos participantes confirmaron.');
   // Close modal, refresh history, etc.
 } else {
-  toast.success(`Confirmado. Esperando confirmación de la otra parte (${data.finalized_count}/2).`);
+  toast.success(
+    `Confirmado. Esperando confirmación de la otra parte (${data.finalized_count}/2).`
+  );
 }
 ```
 
@@ -1765,6 +1781,7 @@ RETURNS TABLE (
 **Returns:**
 
 Array of notification objects with joined trade proposal and profile data:
+
 - `id`: Notification ID
 - `kind`: Notification type (chat_unread, proposal_accepted, proposal_rejected, finalization_requested)
 - `trade_id`: Associated trade ID
@@ -1879,6 +1896,7 @@ if (error) {
 
 **Status:** 🚧 v1.5.0 schema documented (pre-implementation)
 **Next:**
+
 1. Critical fixes (1 day) → batch RPC, ErrorBoundary, logger
 2. Implement Admin RPCs → Location matching RPC → Admin UI → Badges UI → Quick Entry → Avatar Seed
 3. High priority: TanStack Query, Zod, CSRF, hook refactoring
