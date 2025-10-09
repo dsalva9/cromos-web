@@ -19,9 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
-## [1.5.0] – 2025-10-10
+## [1.5.0] – 2025-10-12
 
-### Critical Fixes (Pre-Implementation) ✅ **COMPLETE**
+### Critical Fixes ✅ **COMPLETE**
 - **Removed duplicate Supabase client instance**: Deleted `src/lib/supabase/client.ts` (unused duplicate), using only SupabaseProvider globally
 - **Added batch RPC `get_multiple_user_collection_stats`**: Replaces N+1 queries with single batch call, 5-10x faster for users with multiple collections
   - Updated `useProfileData` hook to use batch RPC in both `fetchProfileData` and `softRefresh` functions
@@ -38,30 +38,121 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All errors fixed, only 8 warnings remaining (test files only)
 - **Performance optimizations ready**: Profile load verified <1s (batch RPC eliminates N+1 queries)
 
-### Added
-- Admin Backoffice (MVP) with RBAC, CRUD, Bulk Upload, and Audit Log
+### Added - Admin Backoffice (MVP) ✅ **COMPLETE**
+
+#### **Admin Panel UI** (`/admin`)
+- **CollectionsTab**: CRUD for collections with publish/draft status indicators
+  - Green "PUBLICADO" badge for published collections
+  - Gray "BORRADOR" badge for draft collections
+  - Create, edit, delete collections with confirmation dialogs
+  - Image storage preflight check before deletion
+- **PagesTab**: Create and manage album pages (team rosters, special sections)
+- **StickersTab**: Full sticker management with WebP image upload
+  - Create, edit, delete stickers with confirmation
+  - Pagination controls (25/50/100 per page)
+  - Search by code or player name
+  - Upload full-size (300px) and thumbnail (100px) WebP images
+  - Image removal with storage cleanup
+- **BulkUploadTab**: CSV-based batch sticker creation
+  - CSV template download with example data
+  - Preview and validation before applying
+  - Retry failed rows button
+  - Concurrent upload pool (4 workers)
+  - Automatic WebP conversion and thumbnail generation
+- **UsersTab**: Complete user management system ✅ **NEW**
+  - List all users with search and filtering (admin/suspended/active)
+  - Grant/revoke admin privileges with confirmation
+  - Suspend/unsuspend user accounts
+  - Permanently delete users with cascade warnings
+  - Display user stats (sticker count, trade count)
+  - Pagination controls (25/50/100 per page)
+- **AuditTab**: View admin action history with filters
+
+#### **Admin Database RPCs** ✅ **NEW**
+- **User Management**:
+  - `admin_list_users`: List users with search, filtering, pagination, stats
+  - `admin_update_user_role`: Grant/revoke admin privileges
+  - `admin_suspend_user`: Suspend/unsuspend user accounts
+  - `admin_delete_user`: Permanently delete user and all associated data
+- **Content Management**:
+  - `admin_upsert_collection`: Create/update collections
+  - `admin_delete_collection`: Delete collections with cascade
+  - `admin_upsert_page`: Create/update album pages
+  - `admin_delete_page`: Delete pages with slots
+  - `admin_upsert_sticker`: Create/update stickers with ID auto-generation fix ✅
+  - `admin_delete_sticker`: Delete stickers with cascade
+  - `admin_remove_sticker_image`: Remove sticker images from storage
+  - `admin_get_audit_log`: Fetch audit log entries
+- All RPCs use SECURITY DEFINER with `is_admin_user()` checks
+- Comprehensive audit logging for all admin actions
+
+#### **Database Schema Enhancements** ✅ **NEW**
+- **profiles table**:
+  - Added `is_suspended` column for user suspension
+  - Suspended users blocked from login (checked in `/auth/callback`)
+- **audit_log table**:
+  - Added `admin_nickname` column for cached admin names
+  - Added `'user'` to entity type CHECK constraint
+  - Added `idx_audit_log_admin_nickname` index
+- **Migration**: `20251012_admin_fixes.sql` ✅
+  - Fixed `admin_upsert_sticker` to properly auto-generate IDs for new stickers
+  - Split INSERT/UPDATE paths to avoid NULL ID constraint violations
+  - Updated audit_log entity constraint to support user management
+
+#### **Security & Access Control**
+- **AdminGuard component**: Protects `/admin` route
+  - Checks `is_admin` and `is_suspended` flags
+  - Redirects suspended users to login with message
+  - Shows "Acceso Denegado" page for non-admins
+- **Suspended user checks**:
+  - Auth callback (`/auth/callback`) checks suspension status
+  - Suspended users automatically signed out
+  - Clear error message: "Tu cuenta ha sido suspendida"
+
+### Added - Location-Based Matching (Centroid + Haversine) ✅ **PLANNED**
+- Optional postcode field in user profiles
+- Postal codes table with lat/lon centroids for Spanish postcodes
+- Enhanced `find_mutual_traders` RPC with distance calculation
+- Mixed scoring algorithm (0.6 overlap + 0.4 distance decay)
+- Radius filter (10–100 km) for finding nearby traders
+- Sort modes: "distance" | "overlap" | "mixed"
+- Privacy-preserving distance display (~12 km, no exact addresses)
+
+### Added - Badges & Quick Entry ✅ **PLANNED**
 - Badges UI (read-only) in Profile page
 - Quick Entry ("Abrir un sobre") for typing 1–5 sticker numbers into active collection
-- **Location-Based Matching (Centroid + Haversine scoring)** ✅ **NEW**
-  - Optional postcode field in user profiles
-  - Postal codes table with lat/lon centroids for Spanish postcodes
-  - Enhanced `find_mutual_traders` RPC with distance calculation
-  - Mixed scoring algorithm (0.6 overlap + 0.4 distance decay)
-  - Radius filter (10–100 km) for finding nearby traders
-  - Sort modes: "distance" | "overlap" | "mixed"
-  - Privacy-preserving distance display (~12 km, no exact addresses)
 - Avatar Seed Picker for initial profile avatars (uploads deferred)
+
+### Fixed - Admin Panel Critical Issues ✅ **COMPLETE**
+- **User management errors**: Fixed `admin_nickname` column missing from audit_log
+- **Sticker creation failures**: Fixed NULL ID constraint violations in `admin_upsert_sticker`
+- **Audit log entity errors**: Added 'user' to entity type CHECK constraint
+- **Navigation visibility**: Fixed tab layout to show all 6 admin tabs
+- **Type matching errors**: Fixed `admin_list_users` VARCHAR vs TEXT type mismatches
 
 ### Changed
 - Data migration handled progressively via Admin Backoffice (numbers optional for now)
 - Testing re-enable deferred to v1.5.2
-- Trade matching now supports location-based scoring and filtering
+- Trade matching now supports location-based scoring and filtering (when implemented)
+
+### Migration Files
+- `supabase/migrations/20251010_admin_system.sql` - Initial admin system
+- `supabase/migrations/20251011_user_management.sql` - User management RPCs
+- `supabase/migrations/20251011_user_management_fix.sql` - Fixed admin_list_users types
+- `supabase/migrations/20251012_admin_fixes.sql` - Critical fixes for audit_log and sticker creation
+
+### Docs
+- **database-schema.md**: Updated with user management RPCs, profiles.is_suspended, audit_log.admin_nickname
+- **CHANGELOG.md**: Comprehensive v1.5.0 documentation
+- **CODE_REVIEW_2025-10-08.md**: 26-point comprehensive review
+- **ACTION_PLAN_PRE_V1.5.0.md**: Step-by-step critical fixes
 
 ### Planned Next (High Priority)
 - TanStack Query integration for request caching and deduplication
 - Zod validation for all admin inputs
 - CSRF protection for admin RPCs
 - Hook refactoring (split large hooks like useAlbumPages)
+- Collection teams CRUD interface
 
 ### Planned Post-MVP (v1.5.1–1.5.2)
 - Code splitting (Next.js dynamic imports)
@@ -69,11 +160,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading skeletons for key pages
 - Unit tests for complex hooks
 - Re-enable Playwright E2E tests
-
-### Docs
-- Updated README, current-features, database-schema, components-guide, and api-endpoints for v1.5.0
-- Added CODE_REVIEW_2025-10-08.md with 26-point comprehensive review
-- Added ACTION_PLAN_PRE_V1.5.0.md with step-by-step critical fixes
 
 ## [1.4.4] - 2025-10-08
 
