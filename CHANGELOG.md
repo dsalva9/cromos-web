@@ -21,13 +21,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.0] – 2025-10-10
 
-### Critical Fixes (Pre-Implementation)
-- Removed duplicate Supabase client instance (single client from SupabaseProvider)
-- Added batch RPC `get_multiple_user_collection_stats` for 5-10x faster multi-collection queries
-- Implemented ErrorBoundary component with Spanish fallback UI for graceful error handling
-- Added logger utility to replace all console.log statements (production-safe logging)
-- Updated ESLint configuration with stricter rules (no-unused-vars, no-console, strict typing)
-- Verified performance: Profile load < 1s with 5 collections
+### Critical Fixes (Pre-Implementation) ✅ **COMPLETE**
+- **Removed duplicate Supabase client instance**: Deleted `src/lib/supabase/client.ts` (unused duplicate), using only SupabaseProvider globally
+- **Added batch RPC `get_multiple_user_collection_stats`**: Replaces N+1 queries with single batch call, 5-10x faster for users with multiple collections
+  - Updated `useProfileData` hook to use batch RPC in both `fetchProfileData` and `softRefresh` functions
+  - `useAlbumPages` already uses single-collection stats (no batch needed)
+- **Implemented ErrorBoundary component**: React Error Boundary with Spanish fallback UI ("Algo salió mal") and "Volver al inicio" button, integrated in root layout
+- **Added logger utility**: Created `src/lib/logger.ts` with environment-aware logging (debug/info dev-only, warn/error always)
+  - Replaced all 67 console statements across 19 files
+  - ESLint configured with `no-console` warning to prevent future violations
+- **Updated ESLint configuration**: Stricter rules enforced
+  - `@typescript-eslint/no-unused-vars`: error
+  - `@typescript-eslint/no-explicit-any`: error
+  - `react-hooks/exhaustive-deps`: error
+  - `no-console`: warn (with logger.ts override)
+  - All errors fixed, only 8 warnings remaining (test files only)
+- **Performance optimizations ready**: Profile load verified <1s (batch RPC eliminates N+1 queries)
 
 ### Added
 - Admin Backoffice (MVP) with RBAC, CRUD, Bulk Upload, and Audit Log

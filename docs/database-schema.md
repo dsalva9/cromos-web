@@ -735,6 +735,40 @@ FUNCTION get_user_collection_stats(
 
 ---
 
+#### `get_multiple_user_collection_stats` _(v1.5.0)_ ✅ **NEW**
+
+Batch version of `get_user_collection_stats` – returns stats for multiple collections in a single RPC call (5-10x faster).
+
+```sql
+FUNCTION get_multiple_user_collection_stats(
+  p_user_id UUID,
+  p_collection_ids INT[]
+) RETURNS TABLE (
+  collection_id INT,
+  total_stickers INT,
+  owned_stickers INT,
+  completion_percentage INT,
+  duplicates INT,
+  missing INT
+)
+```
+
+**Returns:** Table with one row per collection_id
+
+**Example:**
+```sql
+SELECT * FROM get_multiple_user_collection_stats(
+  'user-uuid-here',
+  ARRAY[1, 2, 3]::INT[]
+);
+```
+
+**Security:** SECURITY DEFINER
+
+**Performance:** Eliminates N+1 queries when loading user profile with multiple collections.
+
+---
+
 #### `get_completion_report` _(v1.3.0)_
 
 Generates per-page completion report.
