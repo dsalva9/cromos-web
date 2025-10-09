@@ -1,7 +1,6 @@
-﻿'use client';
+'use client';
 
 import { siteConfig } from '@/config/site';
-
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,26 +16,20 @@ export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
 
-  // Get notification count
   const { unreadCount } = useNotifications();
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
+  const toggleMenu = () => setIsMenuOpen(v => !v);
+  const closeMenu = () => setIsMenuOpen(false);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     closeMenu();
   };
 
-  // Different navigation based on auth state
-  const authenticatedLinks = [
+  const baseLinks = [
     { href: '/', label: 'Home' },
     { href: '/mi-coleccion', label: 'Mi Colección' },
     { href: '/trades/find', label: 'Intercambios' },
@@ -50,33 +43,49 @@ export default function SiteHeader() {
     { href: '/signup', label: 'Registrarse' },
   ];
 
-  const navigationLinks = user ? authenticatedLinks : unauthenticatedLinks;
+  const navigationLinks = (() => {
+    if (!user) return unauthenticatedLinks;
+    const links = [...baseLinks];
+    if (isAdmin) {
+      const profileIndex = links.findIndex(l => l.href === '/profile');
+      links.splice(profileIndex >= 0 ? profileIndex : links.length, 0, { href: '/admin', label: 'Admin' });
+    }
+    return links;
+  })();
 
-  // Handle Escape key to close menu
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMenuOpen) {
-        closeMenu();
-      }
+      if (e.key === 'Escape' && isMenuOpen) closeMenu();
     };
-
     if (isMenuOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Trap focus in mobile menu
       document.body.style.overflow = 'hidden';
     }
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function checkAdmin() {
+      if (!user) { setIsAdmin(false); return; }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+      if (!cancelled) setIsAdmin(!!data?.is_admin && !error);
+    }
+    void checkAdmin();
+    return () => { cancelled = true; };
+  }, [user, supabase]);
+
   return (
     <header className="sticky top-0 z-50 bg-gray-900 border-b-2 border-black shadow-xl">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
           <Link
             href="/"
             className="text-2xl font-black uppercase text-white hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md px-2 py-1"
@@ -85,12 +94,7 @@ export default function SiteHeader() {
             {siteConfig.name}
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav
-            role="navigation"
-            aria-label="Main navigation"
-            className="hidden md:flex md:items-center md:space-x-2"
-          >
+          <nav role="navigation" aria-label="Main navigation" className="hidden md:flex md:items-center md:space-x-2">
             <ul className="flex items-center space-x-2">
               {navigationLinks.map(link => (
                 <li key={link.href} className="relative">
@@ -108,10 +112,7 @@ export default function SiteHeader() {
                         {link.label}
                       </NavLink>
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          router.push('/trades/notifications');
-                        }}
+                        onClick={(e) => { e.preventDefault(); router.push('/trades/notifications'); }}
                         className="flex items-center justify-center rounded-md p-1 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
                         aria-label={`${unreadCount} notificaciones no leídas`}
                         title="Ver notificaciones"
@@ -131,6 +132,7 @@ export default function SiteHeader() {
                         'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
                         'text-white hover:bg-gray-800 border-2 border-transparent'
                       )}
+                      onClick={closeMenu}
                     >
                       {link.label}
                     </NavLink>
@@ -138,10 +140,8 @@ export default function SiteHeader() {
                 </li>
               ))}
             </ul>
-
-            {/* Auth Actions */}
             {!loading && (
-              <div className="flex items-center space-x-2 ml-4 pl-4 border-l-2 border-gray-700">
+              <div className="ml-4">
                 {user ? (
                   <Button
                     variant="ghost"
@@ -157,7 +157,6 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          {/* Mobile Menu Toggle */}
           <button
             type="button"
             className="md:hidden p-2 text-white hover:text-[#FFC000] hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md border-2 border-transparent hover:border-black transition-all duration-200"
@@ -166,23 +165,15 @@ export default function SiteHeader() {
             aria-label="Toggle navigation menu"
             onClick={toggleMenu}
           >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            )}
+            {isMenuOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         <nav
           id="mobile-menu"
           role="navigation"
           aria-label="Mobile navigation"
-          className={cn(
-            'md:hidden border-t-2 border-gray-700 bg-gray-800',
-            isMenuOpen ? 'block' : 'hidden'
-          )}
+          className={cn('md:hidden border-t-2 border-gray-700 bg-gray-800', isMenuOpen ? 'block' : 'hidden')}
         >
           <ul className="py-4 space-y-2">
             {navigationLinks.map(link => (
@@ -202,11 +193,7 @@ export default function SiteHeader() {
                       {link.label}
                     </NavLink>
                     <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        router.push('/trades/notifications');
-                        closeMenu();
-                      }}
+                      onClick={(e) => { e.preventDefault(); router.push('/trades/notifications'); closeMenu(); }}
                       className="flex items-center justify-center rounded-md p-2 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800 transition-all"
                       aria-label={`${unreadCount} notificaciones no leídas`}
                     >
@@ -232,7 +219,6 @@ export default function SiteHeader() {
                 )}
               </li>
             ))}
-            {/* Mobile Auth Actions */}
             {!loading && user && (
               <li className="px-2 pt-2 border-t-2 border-gray-700 mt-4">
                 <Button
@@ -252,3 +238,4 @@ export default function SiteHeader() {
     </header>
   );
 }
+
