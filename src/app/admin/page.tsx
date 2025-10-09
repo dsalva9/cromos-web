@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import CollectionsTab from '@/components/admin/CollectionsTab';
+import TeamsTab from '@/components/admin/TeamsTab';
 import PagesTab from '@/components/admin/PagesTab';
 import StickersTab from '@/components/admin/StickersTab';
 import BulkUploadTab from '@/components/admin/BulkUploadTab';
@@ -13,6 +14,7 @@ export default function AdminPage() {
 
   const tabs = [
     { value: 'collections', label: 'Colecciones' },
+    { value: 'teams', label: 'Equipos' },
     { value: 'pages', label: 'Páginas' },
     { value: 'stickers', label: 'Cromos' },
     { value: 'bulk', label: 'Carga Masiva' },
@@ -26,7 +28,7 @@ export default function AdminPage() {
       <div className="bg-[#2D3748] border-b-4 border-black">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-4xl font-black text-white mb-2">Panel de Administración</h1>
-          <p className="text-gray-300">Gestiona colecciones, páginas, cromos, usuarios y audita acciones</p>
+          <p className="text-gray-300">Gestiona colecciones, equipos, páginas, cromos, usuarios y audita acciones</p>
         </div>
       </div>
 
@@ -54,6 +56,7 @@ export default function AdminPage() {
       {/* Tab Content */}
       <div className="container mx-auto px-4 py-8">
         {activeTab === 'collections' && <CollectionsTab />}
+        {activeTab === 'teams' && <TeamsTab />}
         {activeTab === 'pages' && <PagesTab />}
         {activeTab === 'stickers' && <StickersTab />}
         {activeTab === 'bulk' && <BulkUploadTab />}
