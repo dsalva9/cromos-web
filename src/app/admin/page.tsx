@@ -6,6 +6,7 @@ import CollectionsTab from '@/components/admin/CollectionsTab';
 import PagesTab from '@/components/admin/PagesTab';
 import StickersTab from '@/components/admin/StickersTab';
 import BulkUploadTab from '@/components/admin/BulkUploadTab';
+import UsersTab from '@/components/admin/UsersTab';
 import AuditTab from '@/components/admin/AuditTab';
 
 export default function AdminPage() {
@@ -16,6 +17,7 @@ export default function AdminPage() {
     { value: 'pages', label: 'Páginas' },
     { value: 'stickers', label: 'Cromos' },
     { value: 'bulk', label: 'Carga Masiva' },
+    { value: 'users', label: 'Usuarios' },
     { value: 'audit', label: 'Auditoría' },
   ];
 
@@ -25,7 +27,7 @@ export default function AdminPage() {
       <div className="bg-[#2D3748] border-b-4 border-black">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-4xl font-black text-white mb-2">Panel de Administración</h1>
-          <p className="text-gray-300">Gestiona colecciones, páginas, cromos y audita acciones</p>
+          <p className="text-gray-300">Gestiona colecciones, páginas, cromos, usuarios y audita acciones</p>
         </div>
       </div>
 
@@ -42,6 +44,7 @@ export default function AdminPage() {
         {activeTab === 'pages' && <PagesTab />}
         {activeTab === 'stickers' && <StickersTab />}
         {activeTab === 'bulk' && <BulkUploadTab />}
+        {activeTab === 'users' && <UsersTab />}
         {activeTab === 'audit' && <AuditTab />}
       </div>
     </div>

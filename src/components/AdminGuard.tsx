@@ -31,10 +31,10 @@ export default function AdminGuard({
       }
 
       try {
-        // Check if user has is_admin flag in profiles table
+        // Check if user has is_admin flag and is not suspended
         const { data, error } = await supabase
           .from('profiles')
-          .select('is_admin')
+          .select('is_admin, is_suspended')
           .eq('id', user.id)
           .single();
 
@@ -42,6 +42,14 @@ export default function AdminGuard({
           logger.error('AdminGuard: Error checking admin status', { error });
           setIsAdmin(false);
           setLoading(false);
+          return;
+        }
+
+        // Check if user is suspended
+        if (data?.is_suspended) {
+          logger.warn('AdminGuard: User is suspended', { userId: user.id });
+          await supabase.auth.signOut();
+          router.push('/login');
           return;
         }
 
