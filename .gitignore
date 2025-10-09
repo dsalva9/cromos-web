@@ -47,3 +47,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# fixtures (test data, uploaded images)
+/fixtures/
