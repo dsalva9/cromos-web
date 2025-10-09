@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import CollectionsTab from '@/components/admin/CollectionsTab';
 import PagesTab from '@/components/admin/PagesTab';
 import StickersTab from '@/components/admin/StickersTab';
@@ -34,7 +33,21 @@ export default function AdminPage() {
       {/* Tabs Navigation */}
       <div className="bg-[#2D3748] border-b-4 border-black sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <SegmentedTabs tabs={tabs} value={activeTab} onValueChange={setActiveTab} />
+          <div className="flex flex-wrap gap-2">
+            {tabs.map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className={`px-4 py-2 font-semibold text-sm rounded-md border-2 border-black transition-colors ${
+                  activeTab === tab.value
+                    ? 'bg-[#FFC000] text-black'
+                    : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
