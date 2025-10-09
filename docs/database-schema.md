@@ -2,8 +2,8 @@
 
 ## Current State: v1.5.0 (Critical Fixes + Admin + Location Matching + Badges + Quick Entry + Avatars)
 
-Last updated: 2025-10-10
-Source: Planned schema for v1.5.0 (pre-implementation)
+Last updated: 2025-10-12
+Source: Implemented schema for v1.5.0 with user management
 
 ## Overview
 
@@ -36,6 +36,7 @@ CREATE TABLE profiles (
   nickname TEXT,
   avatar_url TEXT,
   is_admin BOOLEAN DEFAULT FALSE, -- v1.5.0: Admin role flag
+  is_suspended BOOLEAN DEFAULT FALSE, -- v1.5.0: User suspension flag
   postcode TEXT NULL, -- v1.5.0: Optional postcode for location-based matching
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -45,6 +46,7 @@ CREATE TABLE profiles (
 **v1.5.0 Additions:**
 
 - `is_admin`: Boolean flag for admin access. Used with JWT claims enforcement in SECURITY DEFINER RPCs.
+- `is_suspended`: Boolean flag for user suspension. Suspended users cannot log in (checked in auth callback).
 - `postcode`: Optional postcode (e.g., "28001") for location-based trade matching. Privacy-preserving (no exact address).
 
 **Indexes:**
@@ -574,7 +576,8 @@ Append-only audit log of admin actions.
 CREATE TABLE audit_log (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  entity TEXT NOT NULL, -- 'collection' | 'page' | 'sticker'
+  admin_nickname TEXT, -- v1.5.0: Cached nickname of admin who performed action
+  entity TEXT NOT NULL CHECK (entity IN ('collection', 'page', 'sticker', 'image', 'user')),
   entity_id BIGINT,
   action TEXT NOT NULL, -- 'create' | 'update' | 'delete' | 'bulk_upload'
   before_json JSONB,
@@ -587,8 +590,10 @@ CREATE TABLE audit_log (
 
 - **Append-only**: No updates or deletes allowed (enforced via RLS)
 - **Entity tracking**: Records which table and record ID was affected
+- **Entity types**: collection, page, sticker, image, user (user added in v1.5.0)
 - **Action types**: create, update, delete, bulk_upload
 - **Snapshot storage**: `before_json` and `after_json` store full record state
+- **Admin nickname**: Cached for performance (avoids JOIN on every audit query)
 - **Admin only**: Populated by SECURITY DEFINER admin RPCs
 
 **Indexes:**
@@ -597,6 +602,7 @@ CREATE TABLE audit_log (
 - `idx_audit_log_user_id` on `(user_id)` for user-specific queries
 - `idx_audit_log_entity` on `(entity, entity_id)` for entity-specific history
 - `idx_audit_log_created_at` on `(created_at DESC)` for time-based queries
+- `idx_audit_log_admin_nickname` on `(admin_nickname)` for admin-specific queries
 
 **RLS Policies:**
 
@@ -1585,6 +1591,137 @@ Admin bulk upload automatically:
 3. Generates 300px full-size and 100px thumbnail
 4. Uploads to `sticker-images/{collection_id}/` and `sticker-images/{collection_id}/thumbs/`
 5. Populates `image_path_webp_300` and `thumb_path_webp_100` in stickers table
+
+---
+
+### User Management _(v1.5.0)_
+
+#### `admin_list_users`
+
+List all users with their stats and admin/suspension status (admin only).
+
+```sql
+FUNCTION admin_list_users(
+  p_search TEXT DEFAULT NULL,
+  p_filter TEXT DEFAULT NULL,
+  p_limit INTEGER DEFAULT 50,
+  p_offset INTEGER DEFAULT 0
+) RETURNS TABLE (
+  user_id UUID,
+  email VARCHAR(255),
+  nickname VARCHAR(255),
+  is_admin BOOLEAN,
+  is_suspended BOOLEAN,
+  created_at TIMESTAMPTZ,
+  last_sign_in_at TIMESTAMPTZ,
+  sticker_count BIGINT,
+  trade_count BIGINT
+)
+```
+
+**Parameters:**
+
+- `p_search`: Optional search string for email or nickname (partial match, case-insensitive)
+- `p_filter`: Optional filter: `'admin'`, `'suspended'`, `'active'`, or `NULL` for all users
+- `p_limit`: Number of results to return (default 50)
+- `p_offset`: Pagination offset (default 0)
+
+**Returns:**
+
+Table with user data including:
+- User profile information (id, email, nickname)
+- Admin and suspension status flags
+- Account metadata (created_at, last_sign_in_at from auth.users)
+- Statistics (sticker_count, trade_count)
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+#### `admin_update_user_role`
+
+Grant or revoke admin privileges for a user (admin only).
+
+```sql
+FUNCTION admin_update_user_role(
+  p_user_id UUID,
+  p_is_admin BOOLEAN
+) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_user_id`: UUID of user to update
+- `p_is_admin`: `TRUE` to grant admin, `FALSE` to revoke
+
+**Behavior:**
+
+- Updates `profiles.is_admin` flag
+- Creates audit log entry with before/after state
+- Requires caller to be admin
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+#### `admin_suspend_user`
+
+Suspend or unsuspend a user account (admin only).
+
+```sql
+FUNCTION admin_suspend_user(
+  p_user_id UUID,
+  p_is_suspended BOOLEAN
+) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_user_id`: UUID of user to suspend/unsuspend
+- `p_is_suspended`: `TRUE` to suspend, `FALSE` to unsuspend
+
+**Behavior:**
+
+- Updates `profiles.is_suspended` flag
+- Suspended users cannot log in (checked in `/auth/callback`)
+- Creates audit log entry with before/after state
+- Requires caller to be admin
+
+**Security:** SECURITY DEFINER, requires admin
+
+---
+
+#### `admin_delete_user`
+
+Permanently delete a user account and all associated data (admin only).
+
+```sql
+FUNCTION admin_delete_user(
+  p_user_id UUID
+) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_user_id`: UUID of user to delete
+
+**Behavior:**
+
+- Creates audit log entry before deletion
+- Deletes user from `auth.users` (requires `auth.admin` privileges)
+- Cascades to all related data:
+  - Profile and settings
+  - Sticker inventory
+  - Trade proposals and history
+  - Chat messages
+  - Badges
+  - Notifications
+- **Irreversible**: Cannot be undone
+- Requires caller to be admin
+
+**Security:** SECURITY DEFINER, requires admin
+
+**Warning:** This is a destructive operation. Consider suspension instead for temporary access removal.
 
 ---
 
