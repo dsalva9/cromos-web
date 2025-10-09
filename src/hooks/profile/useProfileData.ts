@@ -44,6 +44,15 @@ interface CacheSnapshot {
   activeCollectionId: number | null;
 }
 
+interface CollectionStatsRow {
+  collection_id: number;
+  total_stickers: number;
+  owned_stickers: number;
+  completion_percentage: number;
+  duplicates: number;
+  missing: number;
+}
+
 export function useProfileData() {
   const { supabase } = useSupabase();
   const { user, loading: userLoading } = useUser();
@@ -270,10 +279,10 @@ export function useProfileData() {
         const { data: allStats } = await supabase.rpc(
           'get_multiple_user_collection_stats',
           { p_user_id: user.id, p_collection_ids: collectionIds }
-        );
+        ) as { data: CollectionStatsRow[] | null };
 
         const ownedWithStats = validCollections.map(uc => {
-          const stats = allStats?.find(s => s.collection_id === uc.collection.id);
+          const stats = allStats?.find((s: CollectionStatsRow) => s.collection_id === uc.collection.id);
           return {
             ...uc.collection,
             is_user_active: uc.is_active,
@@ -379,10 +388,10 @@ export function useProfileData() {
           const { data: allStats } = await supabase.rpc(
             'get_multiple_user_collection_stats',
             { p_user_id: user.id, p_collection_ids: collectionIds }
-          );
+          ) as { data: CollectionStatsRow[] | null };
 
           validOwnedCollections = validCollections.map(uc => {
-            const stats = allStats?.find(s => s.collection_id === uc.collection.id);
+            const stats = allStats?.find((s: CollectionStatsRow) => s.collection_id === uc.collection.id);
             return {
               ...uc.collection,
               is_user_active: uc.is_active,
