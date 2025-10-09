@@ -58,7 +58,15 @@ export default function PagesTab() {
     else { setPages([]); setTeams([]); }
   }, [selectedCollection, fetchPages, fetchTeams]);
 
-  function newPage() { if (!selectedCollection) return; setEditing({ collection_id: selectedCollection, kind: 'team', team_id: null, title: '', order_index: (pages.at(-1)?.order_index ?? 0) + 1 }); setEditOpen(true); }
+  function newPage() {
+    if (!selectedCollection) return;
+    if (teams.length === 0) {
+      toast('Esta colección no tiene equipos definidos. Añade equipos primero en la pestaña Equipos.', 'error');
+      return;
+    }
+    setEditing({ collection_id: selectedCollection, kind: 'team', team_id: null, title: '', order_index: (pages.at(-1)?.order_index ?? 0) + 1 });
+    setEditOpen(true);
+  }
   function editPage(p: Page) { setEditing({ ...p }); setEditOpen(true); }
   function cancelEdit() { setEditOpen(false); setEditing(null); }
 
@@ -93,6 +101,13 @@ export default function PagesTab() {
           <Button onClick={newPage}>Nueva Página</Button>
         </div>
       </div>
+
+      {teams.length === 0 && selectedCollection && (
+        <div className="bg-yellow-900/30 border-2 border-yellow-600 rounded-md p-3 text-yellow-200">
+          <p className="font-semibold">⚠️ Esta colección no tiene equipos</p>
+          <p className="text-sm mt-1">Debes añadir equipos a esta colección antes de crear páginas. Ve a la pestaña Equipos para gestionar los equipos de cada colección.</p>
+        </div>
+      )}
 
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm bg-[#2D3748] text-white border-4 border-black rounded-md">

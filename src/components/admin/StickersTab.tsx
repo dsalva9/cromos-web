@@ -241,6 +241,13 @@ export default function StickersTab() {
         </span>
       </div>
 
+      {teams.length === 0 && selectedCollection && (
+        <div className="bg-yellow-900/30 border-2 border-yellow-600 rounded-md p-3 text-yellow-200">
+          <p className="font-semibold">⚠️ Esta colección no tiene equipos</p>
+          <p className="text-sm mt-1">Aunque puedes crear cromos sin equipo asignado, la mayoría de cromos deberían tener un equipo. Ve a la pestaña Equipos para gestionar los equipos de cada colección.</p>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm bg-[#2D3748] text-white border-4 border-black rounded-md">
           <thead>
