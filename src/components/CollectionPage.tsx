@@ -6,6 +6,7 @@ import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/lib/logger';
 
 interface Collection {
   id: number;
@@ -139,7 +140,7 @@ function CollectionContent() {
 
       return null;
     } catch (err) {
-      console.error('Error setting up active collection:', err);
+      logger.error('Error setting up active collection:', err);
       return null;
     }
   }, [supabase, user]);
@@ -234,7 +235,7 @@ function CollectionContent() {
 
       setStickers(formattedStickers);
     } catch (err: unknown) {
-      console.error('Error fetching stickers:', err);
+      logger.error('Error fetching stickers:', err);
       const errorMessage =
         err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
@@ -268,7 +269,7 @@ function CollectionContent() {
 
       if (error) throw error;
     } catch (err: unknown) {
-      console.error('Error updating sticker ownership:', err);
+      logger.error('Error updating sticker ownership:', err);
       fetchStickersAndCollection();
     }
   };
@@ -309,7 +310,7 @@ function CollectionContent() {
         if (error) throw error;
       }
     } catch (err: unknown) {
-      console.error('Error reducing sticker ownership:', err);
+      logger.error('Error reducing sticker ownership:', err);
       fetchStickersAndCollection();
     }
   };

@@ -10,6 +10,7 @@ import { AlertTriangle, Users, TrendingUp } from 'lucide-react';
 import { MatchCard } from '@/components/trades/MatchCard';
 import { toast } from '@/lib/toast';
 import { useFindTraders } from '@/hooks/trades/useFindTraders';
+import { logger } from '@/lib/logger';
 
 interface Collection {
   id: number;
@@ -107,7 +108,7 @@ function FindTradersContent() {
         setSelectedCollectionId(collections[0].id);
       }
     } catch (err) {
-      console.error('Error fetching collections:', err);
+      logger.error('Error fetching collections:', err);
     } finally {
       setCollectionsLoading(false);
     }

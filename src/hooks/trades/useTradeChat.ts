@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface TradeChatMessage {
   id: number;
@@ -102,7 +103,7 @@ export const useTradeChat = ({
           setOldestMessageId(Math.min(...transformedMessages.map(m => m.id)));
         }
       } catch (err) {
-        console.error('Error loading messages:', err);
+        logger.error('Error loading messages:', err);
         setError(
           err instanceof Error ? err.message : 'Error al cargar mensajes'
         );
@@ -154,10 +155,10 @@ export const useTradeChat = ({
           .single();
 
         if (insertError) {
-          console.error('Supabase insert error:', insertError);
-          console.error('Insert error code:', insertError.code);
-          console.error('Insert error message:', insertError.message);
-          console.error('Insert error details:', insertError.details);
+          logger.error('Supabase insert error:', insertError);
+          logger.error('Insert error code:', insertError.code);
+          logger.error('Insert error message:', insertError.message);
+          logger.error('Insert error details:', insertError.details);
           throw insertError;
         }
 
@@ -175,8 +176,8 @@ export const useTradeChat = ({
           );
         }
       } catch (err) {
-        console.error('Error sending message:', err);
-        console.error('Error details:', JSON.stringify(err, null, 2));
+        logger.error('Error sending message:', err);
+        logger.error('Error details:', JSON.stringify(err, null, 2));
         // Remove optimistic message on error
         setMessages(prev =>
           prev.filter(msg => msg.id !== optimisticMessage.id)
@@ -205,10 +206,10 @@ export const useTradeChat = ({
         });
 
         if (markError) {
-          console.error('Error marking trade as read:', markError);
+          logger.error('Error marking trade as read:', markError);
         }
       } catch (err) {
-        console.error('Error marking trade as read:', err);
+        logger.error('Error marking trade as read:', err);
       }
     }, 400);
   }, [supabase, tradeId, user]);

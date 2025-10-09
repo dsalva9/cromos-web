@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface TradeSticker {
   sticker_id: number;
@@ -50,7 +51,7 @@ export function useMatchDetail() {
         );
 
         if (rpcError) {
-          console.error('RPC error:', rpcError);
+          logger.error('RPC error:', rpcError);
           throw new Error('Error al cargar detalles del intercambio');
         }
 
@@ -82,7 +83,7 @@ export function useMatchDetail() {
         setTheyOffer(theyOfferList);
         setIOffer(iOfferList);
       } catch (err: unknown) {
-        console.error('Fetch detail error:', err);
+        logger.error('Fetch detail error:', err);
         const errorMessage =
           err instanceof Error ? err.message : 'Error al cargar detalles';
         setError(errorMessage);

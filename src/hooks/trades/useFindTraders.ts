@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface TradeMatch {
   match_user_id: string;
@@ -61,7 +62,7 @@ export function useFindTraders() {
         );
 
         if (rpcError) {
-          console.error('RPC error:', rpcError);
+          logger.error('RPC error:', rpcError);
           throw new Error('Error al buscar intercambios disponibles');
         }
 
@@ -82,7 +83,7 @@ export function useFindTraders() {
           offset === 0 ? results.length : prev + results.length
         );
       } catch (err: unknown) {
-        console.error('Search trades error:', err);
+        logger.error('Search trades error:', err);
         const errorMessage =
           err instanceof Error ? err.message : 'Error al buscar intercambios';
         setError(errorMessage);

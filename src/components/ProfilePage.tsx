@@ -9,6 +9,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/lib/logger';
 import {
   User,
   Trophy,
@@ -107,7 +108,7 @@ function ProfileContent() {
         .maybeSingle();
 
       if (profileError) {
-        console.error('Profile error:', profileError);
+        logger.error('Profile error:', profileError);
       }
 
       setProfile(
@@ -204,7 +205,7 @@ function ProfileContent() {
       if (availableError) throw availableError;
       setAvailableCollections(availableData || []);
     } catch (err: unknown) {
-      console.error('Error fetching profile data:', err);
+      logger.error('Error fetching profile data:', err);
       setError(err instanceof Error ? err.message : 'Error loading profile');
     } finally {
       setLoading(false);
@@ -233,7 +234,7 @@ function ProfileContent() {
       );
       setEditingNickname(false);
     } catch (err: unknown) {
-      console.error('Error updating nickname:', err);
+      logger.error('Error updating nickname:', err);
       setError('Error updating nickname');
     }
   };
@@ -260,7 +261,7 @@ function ProfileContent() {
       // Refresh data
       await fetchProfileData();
     } catch (err: unknown) {
-      console.error('Error adding collection:', err);
+      logger.error('Error adding collection:', err);
       setError('Error al añadir colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
@@ -310,7 +311,7 @@ function ProfileContent() {
       setConfirmModal({ open: false, collectionId: null, collectionName: '' });
       await fetchProfileData();
     } catch (err: unknown) {
-      console.error('Error removing collection:', err);
+      logger.error('Error removing collection:', err);
       setError('Error al eliminar colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
@@ -343,7 +344,7 @@ function ProfileContent() {
       // Refresh data
       await fetchProfileData();
     } catch (err: unknown) {
-      console.error('Error setting active collection:', err);
+      logger.error('Error setting active collection:', err);
       setError('Error al activar colección');
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));

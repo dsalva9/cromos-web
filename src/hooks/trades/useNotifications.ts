@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 export interface Notification {
   id: number;
@@ -73,7 +74,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
       setUnreadCount(data || 0);
     } catch (err) {
-      console.error('Error fetching unread count:', err);
+      logger.error('Error fetching unread count:', err);
       // Don't set error state for background count fetches
     }
   }, [supabase, user]);
@@ -126,7 +127,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       // Refresh unread count
       await fetchUnreadCount();
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      logger.error('Error marking notification as read:', err);
       // Refresh to get actual state
       await fetchNotifications();
       await fetchUnreadCount();

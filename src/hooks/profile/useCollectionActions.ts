@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
+import { logger } from '@/lib/logger';
 
 interface Collection {
   id: number;
@@ -111,7 +112,7 @@ export function useCollectionActions({
         // Soft refresh to sync stats
         await softRefresh();
       } catch (err: unknown) {
-        console.error('Error adding collection:', err);
+        logger.error('Error adding collection:', err);
 
         // Rollback optimistic update
         restoreSnapshot(snapshot);
@@ -195,7 +196,7 @@ export function useCollectionActions({
         // Soft refresh to sync any remaining data
         await softRefresh();
       } catch (err: unknown) {
-        console.error('Error removing collection:', err);
+        logger.error('Error removing collection:', err);
 
         // Rollback optimistic update
         restoreSnapshot(snapshot);
@@ -267,7 +268,7 @@ export function useCollectionActions({
         // Soft refresh to sync
         await softRefresh();
       } catch (err: unknown) {
-        console.error('Error setting active collection:', err);
+        logger.error('Error setting active collection:', err);
 
         // Rollback optimistic update
         restoreSnapshot(snapshot);
@@ -322,7 +323,7 @@ export function useCollectionActions({
 
         if (error) throw error;
       } catch (err: unknown) {
-        console.error('Error updating nickname:', err);
+        logger.error('Error updating nickname:', err);
 
         // Rollback optimistic update
         restoreSnapshot(snapshot);

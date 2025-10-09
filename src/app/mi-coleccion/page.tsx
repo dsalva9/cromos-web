@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/lib/logger';
 
 function CollectionRedirectContent() {
   const { supabase } = useSupabase();
@@ -12,7 +13,7 @@ function CollectionRedirectContent() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    console.log(
+    logger.debug(
       'Collection redirect - userLoading:',
       userLoading,
       'user:',
@@ -22,7 +23,7 @@ function CollectionRedirectContent() {
     if (!userLoading && user) {
       const handleRedirect = async () => {
         try {
-          console.log('Checking user collections...');
+          logger.debug('Checking user collections...');
 
           // Get user's collections
           const { data: userCollections, error } = await supabase
@@ -39,26 +40,26 @@ function CollectionRedirectContent() {
             )
             .eq('user_id', user.id);
 
-          console.log('User collections:', userCollections, 'Error:', error);
+          logger.debug('User collections:', userCollections, 'Error:', error);
 
           if (error) {
-            console.error('Error fetching collections:', error);
+            logger.error('Error fetching collections:', error);
             router.push('/profile');
             return;
           }
 
           if (!userCollections || userCollections.length === 0) {
-            console.log('No collections found, redirecting to profile');
+            logger.debug('No collections found, redirecting to profile');
             router.push('/profile');
             return;
           }
 
           // Find active collection
           const activeCollection = userCollections.find(uc => uc.is_active);
-          console.log('Active collection:', activeCollection);
+          logger.debug('Active collection:', activeCollection);
 
           if (activeCollection) {
-            console.log(
+            logger.debug(
               'Redirecting to active collection:',
               activeCollection.collection_id
             );
@@ -68,7 +69,7 @@ function CollectionRedirectContent() {
 
           // No active collection but user owns some - set first as active and redirect
           const firstCollection = userCollections[0];
-          console.log('Setting first collection as active:', firstCollection);
+          logger.debug('Setting first collection as active:', firstCollection);
 
           if (firstCollection) {
             // Set first collection as active
@@ -83,10 +84,10 @@ function CollectionRedirectContent() {
           }
 
           // Fallback to profile
-          console.log('Fallback to profile');
+          logger.debug('Fallback to profile');
           router.push('/profile');
         } catch (err) {
-          console.error('Error in collection redirect:', err);
+          logger.error('Error in collection redirect:', err);
           router.push('/profile');
         } finally {
           setChecking(false);
@@ -95,7 +96,7 @@ function CollectionRedirectContent() {
 
       handleRedirect();
     } else if (!userLoading && !user) {
-      console.log('No user, redirecting to login');
+      logger.debug('No user, redirecting to login');
       router.push('/login');
       setChecking(false);
     }

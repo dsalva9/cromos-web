@@ -11,6 +11,7 @@ import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { useProfileData } from '@/hooks/profile/useProfileData';
 import { toast } from '@/lib/toast';
+import { logger } from '@/lib/logger';
 import {
   User,
   Trophy,
@@ -125,7 +126,7 @@ function ProfileContent() {
 
       if (error) throw error;
     } catch (err) {
-      console.error('Error updating nickname:', err);
+      logger.error('Error updating nickname:', err);
 
       // Rollback optimistic update
       setOptimisticNickname(previousNickname);
@@ -242,7 +243,7 @@ function ProfileContent() {
 
       // Don't refresh - optimistic update is sufficient
     } catch (err) {
-      console.error('Error removing collection:', err);
+      logger.error('Error removing collection:', err);
 
       // Rollback optimistic updates
       setOptimisticOwnedCollections(previousOwned);
@@ -291,7 +292,7 @@ function ProfileContent() {
 
       if (error) throw error;
     } catch (err) {
-      console.error('Error setting active collection:', err);
+      logger.error('Error setting active collection:', err);
 
       // Rollback optimistic update
       setOptimisticOwnedCollections(previousOwned);
@@ -354,7 +355,7 @@ function ProfileContent() {
 
       // Don't refresh - optimistic update is sufficient for UI
     } catch (err) {
-      console.error('Error adding collection:', err);
+      logger.error('Error adding collection:', err);
 
       // Rollback optimistic updates
       setOptimisticOwnedCollections(previousOwned);

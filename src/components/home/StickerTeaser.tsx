@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import StickerImage from '@/components/ui/sticker-image';
 import { Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Sticker {
   id: number;
@@ -102,7 +103,7 @@ export default function StickerTeaser() {
 
       setStickers(stickersWithUrls);
     } catch (err) {
-      console.error('Error fetching sticker teaser:', err);
+      logger.error('Error fetching sticker teaser:', err);
       // Fail silently - empty grid is acceptable for home page
     } finally {
       setLoading(false);

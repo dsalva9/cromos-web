@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 export default function AuthCallback() {
   const { supabase } = useSupabase();
@@ -13,7 +14,7 @@ export default function AuthCallback() {
       const { error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error('Error during auth callback:', error);
+        logger.error('Error during auth callback:', error);
       }
 
       // Redirect to home page after successful auth

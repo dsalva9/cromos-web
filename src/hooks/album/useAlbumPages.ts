@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Sticker } from '@/types';
 import { normalizeCollectionStats } from '@/lib/collectionStats';
+import { logger } from '@/lib/logger';
 
 export interface CollectionPage {
   id: number;
@@ -154,7 +155,7 @@ export function useAlbumPages(
 
       setActiveCollectionInfo(activeOption);
     } catch (err) {
-      console.error('Error fetching user collections:', err);
+      logger.error('Error fetching user collections:', err);
     }
   }, [collectionId, supabase, user]);
 
@@ -200,7 +201,7 @@ export function useAlbumPages(
           setSummary(createEmptySummary());
         }
       } catch (err) {
-        console.error('Error fetching collection stats:', err);
+        logger.error('Error fetching collection stats:', err);
 
         if (!options?.keepExisting) {
           setSummary(createEmptySummary());
@@ -246,7 +247,7 @@ export function useAlbumPages(
 
       return pageList;
     } catch (err) {
-      console.error('Error fetching album pages:', err);
+      logger.error('Error fetching album pages:', err);
       setPages([]);
       setCurrentPage(null);
       setError(
@@ -394,7 +395,7 @@ export function useAlbumPages(
 
         setCurrentPage(finalPageData);
       } catch (err) {
-        console.error('Error fetching page content:', err);
+        logger.error('Error fetching page content:', err);
         setCurrentPage(null);
         setError(
           err instanceof Error ? err.message : 'Failed to load page content.'
@@ -448,7 +449,7 @@ export function useAlbumPages(
 
         router.push(`/mi-coleccion/${targetCollectionId}`);
       } catch (err) {
-        console.error('Error setting active collection:', err);
+        logger.error('Error setting active collection:', err);
       } finally {
         setSwitchingCollection(false);
       }
@@ -540,7 +541,7 @@ export function useAlbumPages(
 
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } catch (err) {
-        console.error('Error updating sticker ownership:', err);
+        logger.error('Error updating sticker ownership:', err);
         await fetchPageContent(pageId, { silent: true });
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } finally {
@@ -657,7 +658,7 @@ export function useAlbumPages(
 
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } catch (err) {
-        console.error('Error reducing sticker ownership:', err);
+        logger.error('Error reducing sticker ownership:', err);
         await fetchPageContent(pageId, { silent: true });
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } finally {
@@ -680,13 +681,13 @@ export function useAlbumPages(
 
       // Only allow completing the current page
       if (targetPageId !== currentPage.id) {
-        console.error('Can only complete the current page');
+        logger.error('Can only complete the current page');
         return;
       }
 
       // Guard: only team pages supported
       if (currentPage.kind !== 'team') {
-        console.error('Only team pages can be marked complete');
+        logger.error('Only team pages can be marked complete');
         return;
       }
 
@@ -777,7 +778,7 @@ export function useAlbumPages(
           affected_sticker_ids: number[];
         };
 
-        console.log(
+        logger.debug(
           `Page complete: ${added_count} stickers added`,
           affected_sticker_ids
         );
@@ -785,7 +786,7 @@ export function useAlbumPages(
         // Refresh stats to ensure consistency
         await fetchCollectionStats(collectionId, { keepExisting: true });
       } catch (err) {
-        console.error('Error marking page complete:', err);
+        logger.error('Error marking page complete:', err);
 
         // Rollback optimistic updates
         setCurrentPage(snapshotPage);

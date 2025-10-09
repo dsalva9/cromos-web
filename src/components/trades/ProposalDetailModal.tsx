@@ -21,6 +21,7 @@ import { useUser, useSupabase } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
 import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface ProposalDetailModalProps {
   proposalId: number | null;
@@ -136,7 +137,7 @@ export function ProposalDetailModal({
         setFinalizationRequesterId(null);
       }
     } catch (err) {
-      console.error('Error fetching finalization status:', err);
+      logger.error('Error fetching finalization status:', err);
     }
   }, [user, supabase]);
 

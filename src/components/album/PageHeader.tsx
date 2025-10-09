@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { AlbumPageData } from '@/hooks/album';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,7 @@ export default function PageHeader({
       setShowActionSheet(false);
       toast.success('Equipo completado ✔️');
     } catch (error) {
-      console.error('Error completing page:', error);
+      logger.error('Error completing page:', error);
       // Error toast is handled by the hook
     } finally {
       setIsCompleting(false);

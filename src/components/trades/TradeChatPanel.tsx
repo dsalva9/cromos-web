@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, ChevronDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface TradeChatPanelProps {
   tradeId: number | null;
@@ -96,7 +97,7 @@ export function TradeChatPanel({
         textareaRef.current?.focus();
       }, 0);
     } catch (err) {
-      console.error('Error sending message:', err);
+      logger.error('Error sending message:', err);
     } finally {
       setSending(false);
     }

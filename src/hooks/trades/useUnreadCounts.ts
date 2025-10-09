@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface UnreadCount {
   trade_id: number;
@@ -60,7 +61,7 @@ export const useUnreadCounts = ({
 
       setCounts(newCounts);
     } catch (err) {
-      console.error('Error fetching unread counts:', err);
+      logger.error('Error fetching unread counts:', err);
       setError(
         err instanceof Error
           ? err.message
