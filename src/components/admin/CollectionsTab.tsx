@@ -152,7 +152,13 @@ export default function CollectionsTab() {
                   <td className="px-3 py-2 border-b border-black">{col.name}</td>
                   <td className="px-3 py-2 border-b border-black">{col.competition}</td>
                   <td className="px-3 py-2 border-b border-black">{col.year}</td>
-                  <td className="px-3 py-2 border-b border-black">{col.is_active ? 'Sí' : 'No'}</td>
+                  <td className="px-3 py-2 border-b border-black">
+                    {col.is_active ? (
+                      <span className="bg-green-600 text-white px-2 py-0.5 rounded text-xs font-bold">PUBLICADO</span>
+                    ) : (
+                      <span className="bg-gray-600 text-white px-2 py-0.5 rounded text-xs font-bold">BORRADOR</span>
+                    )}
+                  </td>
                   <td className="px-3 py-2 border-b border-black space-x-2">
                     <Button size="sm" onClick={() => editCollection(col)}>Editar</Button>
                     <Button size="sm" variant="destructive" onClick={() => preflightDelete(col)}>Eliminar</Button>

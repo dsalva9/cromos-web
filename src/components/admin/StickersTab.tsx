@@ -43,6 +43,8 @@ export default function StickersTab() {
   const [editOpen, setEditOpen] = useState(false);
   const [imageConfirm, setImageConfirm] = useState<{ type: 'full' | 'thumb' } | null>(null);
   const [imageConfirmOpen, setImageConfirmOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<Sticker | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [pageSize, setPageSize] = useState(25);
   const [pageIndex, setPageIndex] = useState(0);
@@ -177,6 +179,33 @@ export default function StickersTab() {
     }
   }
 
+  async function performDeleteSticker() {
+    if (!deleteConfirm?.id) return;
+    try {
+      const { error } = await supabase.rpc('admin_delete_sticker', { p_sticker_id: deleteConfirm.id });
+      if (error) throw error;
+
+      // Delete images from storage if they exist
+      const imagesToDelete = [];
+      if (deleteConfirm.image_path_webp_300) imagesToDelete.push(deleteConfirm.image_path_webp_300);
+      if (deleteConfirm.thumb_path_webp_100) imagesToDelete.push(deleteConfirm.thumb_path_webp_100);
+
+      if (imagesToDelete.length > 0) {
+        const { error: rmErr } = await supabase.storage.from('sticker-images').remove(imagesToDelete);
+        if (rmErr) logger.warn('Storage remove images error (ignored)', rmErr);
+      }
+
+      toast('Cromo eliminado', 'success');
+      setDeleteConfirmOpen(false);
+      setDeleteConfirm(null);
+      await fetchStickers();
+    } catch (e: unknown) {
+      logger.error('delete sticker error', e);
+      const msg = e instanceof Error ? e.message : 'No se pudo eliminar el cromo';
+      toast(msg, 'error');
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -198,6 +227,18 @@ export default function StickersTab() {
           </select>
           <Button onClick={newSticker}>Nuevo Cromo</Button>
         </div>
+      </div>
+
+      <div className="flex gap-2">
+        <Button onClick={() => setPageIndex(Math.max(0, pageIndex - 1))} disabled={pageIndex === 0}>
+          Anterior
+        </Button>
+        <Button onClick={() => setPageIndex(pageIndex + 1)} disabled={stickers.length < pageSize}>
+          Siguiente
+        </Button>
+        <span className="text-white text-sm self-center ml-2">
+          Página {pageIndex + 1}
+        </span>
       </div>
 
       <div className="overflow-x-auto">
@@ -228,7 +269,10 @@ export default function StickersTab() {
                   <td className="px-3 py-2 border-b border-black">{s.image_path_webp_300 ? '✓' : '—'}</td>
                   <td className="px-3 py-2 border-b border-black">{s.thumb_path_webp_100 ? '✓' : '—'}</td>
                   <td className="px-3 py-2 border-b border-black">
-                    <Button size="sm" onClick={() => editSticker(s)}>Editar</Button>
+                    <div className="flex gap-1 flex-wrap">
+                      <Button size="sm" onClick={() => editSticker(s)}>Editar</Button>
+                      <Button size="sm" variant="destructive" onClick={() => { setDeleteConfirm(s); setDeleteConfirmOpen(true); }}>Eliminar</Button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -333,6 +377,23 @@ export default function StickersTab() {
               <DialogFooter className="mt-4">
                 <Button variant="destructive" onClick={performRemoveImage}>Eliminar</Button>
                 <Button variant="secondary" onClick={() => { setImageConfirmOpen(false); setImageConfirm(null); }}>Cancelar</Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteConfirm && deleteConfirmOpen} onOpenChange={(open) => { setDeleteConfirmOpen(open); if (!open) setDeleteConfirm(null); }}>
+        <DialogContent showCloseButton={false} onEscapeKeyDown={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} className="bg-[#2D3748] border-4 border-black text-white">
+          {deleteConfirm && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Eliminar cromo</DialogTitle>
+              </DialogHeader>
+              <p>¿Eliminar permanentemente el cromo <strong>{deleteConfirm.code} - {deleteConfirm.player_name}</strong>? Esta acción eliminará también sus imágenes asociadas y es irreversible.</p>
+              <DialogFooter className="mt-4">
+                <Button variant="destructive" onClick={performDeleteSticker}>Eliminar</Button>
+                <Button variant="secondary" onClick={() => { setDeleteConfirmOpen(false); setDeleteConfirm(null); }}>Cancelar</Button>
               </DialogFooter>
             </>
           )}

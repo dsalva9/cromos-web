@@ -225,10 +225,40 @@ export default function BulkUploadTab() {
 
   const okCount = results.filter(r => r.ok).length;
   const errCount = results.length - okCount;
+  const failedRows = results.filter(r => !r.ok).map(r => r.code);
+
+  function downloadTemplate() {
+    const template = `sticker_code,player_name,team_name,rarity,rating,page_code,page_number
+EX001,Lionel Messi,Argentina,legendario,95,,
+EX002,Cristiano Ronaldo,Portugal,épico,94,,
+EX003,Kylian Mbappé,Francia,raro,89,,
+EX004,Erling Haaland,Noruega,común,87,,`;
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'plantilla_carga_masiva.csv';
+    link.click();
+    toast('Plantilla descargada', 'success');
+  }
+
+  function retryFailed() {
+    if (failedRows.length === 0) return;
+    // Filter prepared rows to only keep failed ones
+    const failedPrepared = prepared.filter(p => failedRows.includes(p.row.sticker_code));
+    setPrepared(failedPrepared);
+    setCsvRows(failedPrepared.map(p => p.row));
+    setResults([]);
+    toast(`Reintentar ${failedRows.length} filas fallidas`, 'info');
+  }
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-black text-white">Carga Masiva</h2>
+      <div className="flex flex-wrap items-center gap-3 justify-between">
+        <h2 className="text-2xl font-black text-white">Carga Masiva</h2>
+        <Button size="sm" variant="secondary" onClick={downloadTemplate}>
+          Descargar Plantilla CSV
+        </Button>
+      </div>
 
       <div className="bg-[#2D3748] border-4 border-black rounded-md p-4 text-white space-y-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -286,6 +316,11 @@ export default function BulkUploadTab() {
 
       <div className="flex items-center gap-2">
         <Button disabled={running || prepared.length === 0} onClick={runApply}>{running ? 'Procesando…' : 'Aplicar'}</Button>
+        {errCount > 0 && (
+          <Button size="sm" variant="destructive" disabled={running} onClick={retryFailed}>
+            Reintentar fallidos ({errCount})
+          </Button>
+        )}
         {results.length > 0 && <span className="text-white text-sm">OK: {okCount} — Errores: {errCount}</span>}
       </div>
 
