@@ -21,7 +21,7 @@ const TEST_USER = {
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 // Theme verification helpers
-async function verifyThickBorders(locator: any) {
+async function verifyThickBorders(locator: Parameters<typeof test>[1]['page']['locator']) {
   const borderWidth = await locator.evaluate((el: HTMLElement) => {
     return window.getComputedStyle(el).borderWidth;
   });
@@ -29,7 +29,7 @@ async function verifyThickBorders(locator: any) {
   expect(borderWidth).toBe('2px');
 }
 
-async function verifyGoldAccent(locator: any) {
+async function verifyGoldAccent(locator: Parameters<typeof test>[1]['page']['locator']) {
   const backgroundColor = await locator.evaluate((el: HTMLElement) => {
     return window.getComputedStyle(el).backgroundColor;
   });
@@ -37,7 +37,7 @@ async function verifyGoldAccent(locator: any) {
   expect(backgroundColor).toMatch(/rgb\(255,\s*192,\s*0\)/);
 }
 
-async function verifyDarkBackground(locator: any) {
+async function verifyDarkBackground(locator: Parameters<typeof test>[1]['page']['locator']) {
   const backgroundColor = await locator.evaluate((el: HTMLElement) => {
     return window.getComputedStyle(el).backgroundColor;
   });
