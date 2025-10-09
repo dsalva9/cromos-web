@@ -19,16 +19,21 @@
 
 ### 🧩 MVP Features (Implementation Order)
 
-#### 1. Admin Backoffice (MVP)
+#### 1. Admin Backoffice (MVP) ✅ **COMPLETE**
 
-- [ ] Add profiles.is_admin boolean + RLS/guard note
-- [ ] SECURITY DEFINER admin RPCs for CRUD: collections/pages/stickers
-- [ ] Bulk upload (CSV/XLSX) preview → apply + image uploader (client → WebP + 100px thumb)
-- [ ] UI at /admin: tabs → Collections | Pages | Stickers | Bulk Upload | Audit
-- [ ] Publish/draft toggle for collections
-- [ ] Append-only audit log of admin actions
+- [x] Add profiles.is_admin boolean + RLS/guard note
+- [x] SECURITY DEFINER admin RPCs for CRUD: collections/pages/stickers/teams/users
+- [x] Bulk upload (CSV/XLSX) preview → apply + image uploader (client → WebP + 100px thumb)
+- [x] UI at /admin: tabs → Collections | **Teams** | Pages | Stickers | Bulk Upload | Users | Audit ✅ **7 tabs total**
+- [x] Publish/draft toggle for collections
+- [x] Append-only audit log of admin actions
+- [x] User management: suspend, make admin, delete users
+- [x] Team CRUD: manage collection teams with colors and flags ✅ **NEW**
+- [x] Error handling: warnings when collections have no teams ✅ **NEW**
 
-**Acceptance**: Non-admins blocked; admin can create/edit/publish collections and add/upload stickers via forms or bulk flow; audit entries recorded.
+**Acceptance**: ✅ Non-admins blocked; admin can create/edit/publish collections, manage teams, add/upload stickers via forms or bulk flow; audit entries recorded; user management operational.
+
+**Status**: Fully implemented and tested. All admin RPCs deployed with audit logging.
 
 #### 2. Badges UI (Read-Only)
 
@@ -587,12 +592,13 @@
 
 ---
 
-**Last Updated**: 2025-10-10 (v1.5.0 - Critical Fixes + MVP Features + Location Matching)
+**Last Updated**: 2025-10-12 (v1.5.0 - Admin Backoffice Complete + Team Management)
 **Current Focus**:
-1. Critical fixes (batch RPC, ErrorBoundary, logger) - 1 day
-2. MVP features - Admin + Badges + Quick Entry + Location Matching + Avatars
-3. High priority - TanStack Query, Zod, CSRF, hook refactoring
+1. ✅ Critical fixes (batch RPC, ErrorBoundary, logger) - COMPLETE
+2. ✅ Admin Backoffice MVP - COMPLETE (7 tabs: Collections, Teams, Pages, Stickers, Bulk Upload, Users, Audit)
+3. 🚧 Remaining MVP features - Badges + Quick Entry + Location Matching + Avatars
+4. High priority - TanStack Query, Zod, CSRF, hook refactoring
 
-**Next Focus**: v1.5.2 - Testing re-enable, performance optimization, code splitting, Phase B avatar uploads
+**Next Focus**: v1.5.0 completion (Badges + Quick Entry + Location), then v1.5.2 - Testing re-enable, performance optimization, code splitting
 
 

@@ -32,14 +32,19 @@
 - **Stricter ESLint**: Enforce no-unused-vars, no-console, strict typing
 - **Performance verified**: Profile load <1s with 5 collections
 
-### Admin Backoffice (MVP) 🚧 In Progress
+### Admin Backoffice (MVP) ✅ **COMPLETE (v1.5.0)**
 
 - **Role-based access control**: `profiles.is_admin` boolean with RLS + JWT claims enforcement
-- **CRUD interfaces**: Collections, Pages, Stickers management with SECURITY DEFINER RPCs
+- **CRUD interfaces**: Collections, **Teams**, Pages, Stickers, Users management with SECURITY DEFINER RPCs
 - **Bulk upload**: CSV/XLSX preview → apply + image uploader (client → WebP + 100px thumb)
-- **Admin dashboard**: `/admin` route with tabs → Collections | Pages | Stickers | Bulk Upload | Audit
+- **Admin dashboard**: `/admin` route with **7 tabs** → Collections | **Teams** | Pages | Stickers | Bulk Upload | Users | Audit
 - **Publish/draft toggle**: Collections can be marked as draft (not visible to regular users)
-- **Audit log**: Append-only log of all admin actions (create/update/delete)
+- **Audit log**: Append-only log of all admin actions (create/update/delete/suspend)
+- **User management** ✅ **NEW**: Suspend users, grant/revoke admin privileges, delete accounts
+- **Team CRUD** ✅ **NEW**: Manage collection teams with flag URLs, primary/secondary colors
+- **Error handling** ✅ **NEW**: Warning banners when collections have no teams defined
+- **Sticker deletion** ✅ **NEW**: Delete stickers with confirmation and storage cleanup
+- **Pagination** ✅ **NEW**: Page through large sticker lists (25/50/100 per page)
 
 ### Badges UI (Read-only) 🚧 In Progress
 
@@ -862,10 +867,11 @@ Smart performance patterns throughout:
 
 ---
 
-**Last Updated**: 2025-10-10 (v1.5.0 Planning & Docs - Critical Fixes + Location Matching Added)
-**Current Version**: Backend v1.4.4 | Frontend v1.4.4
-**Status**: v1.5.0 In Progress 🚧 | Critical Fixes (Priority 1) → Admin + Badges + Quick Entry + Location Matching + Avatars
+**Last Updated**: 2025-10-12 (v1.5.0 - Admin Backoffice Complete + Team Management)
+**Current Version**: Backend v1.5.0 | Frontend v1.5.0
+**Status**: v1.5.0 In Progress 🚧 | Critical Fixes ✅ COMPLETE | Admin Backoffice ✅ COMPLETE
 **Next Focus**:
-1. Critical fixes (batch RPC, ErrorBoundary, logger) - 1 day
-2. Admin Backoffice MVP → Badges UI → Quick Entry → Location Matching → Avatar Seed
-3. High priority: TanStack Query, Zod validation, hook refactoring
+1. ✅ Critical fixes (batch RPC, ErrorBoundary, logger) - COMPLETE
+2. ✅ Admin Backoffice MVP (7 tabs with full CRUD) - COMPLETE
+3. 🚧 Remaining v1.5.0 features: Badges UI → Quick Entry → Location Matching → Avatar Seed
+4. High priority: TanStack Query, Zod validation, hook refactoring

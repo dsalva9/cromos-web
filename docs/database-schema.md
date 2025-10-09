@@ -577,7 +577,7 @@ CREATE TABLE audit_log (
   id BIGSERIAL PRIMARY KEY,
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   admin_nickname TEXT, -- v1.5.0: Cached nickname of admin who performed action
-  entity TEXT NOT NULL CHECK (entity IN ('collection', 'page', 'sticker', 'image', 'user')),
+  entity TEXT NOT NULL CHECK (entity IN ('collection', 'page', 'sticker', 'image', 'user', 'team')),
   entity_id BIGINT,
   action TEXT NOT NULL, -- 'create' | 'update' | 'delete' | 'bulk_upload'
   before_json JSONB,
@@ -590,7 +590,7 @@ CREATE TABLE audit_log (
 
 - **Append-only**: No updates or deletes allowed (enforced via RLS)
 - **Entity tracking**: Records which table and record ID was affected
-- **Entity types**: collection, page, sticker, image, user (user added in v1.5.0)
+- **Entity types**: collection, page, sticker, image, user, team (user and team added in v1.5.0)
 - **Action types**: create, update, delete, bulk_upload
 - **Snapshot storage**: `before_json` and `after_json` store full record state
 - **Admin nickname**: Cached for performance (avoids JOIN on every audit query)
@@ -1591,6 +1591,69 @@ Admin bulk upload automatically:
 3. Generates 300px full-size and 100px thumbnail
 4. Uploads to `sticker-images/{collection_id}/` and `sticker-images/{collection_id}/thumbs/`
 5. Populates `image_path_webp_300` and `thumb_path_webp_100` in stickers table
+
+---
+
+### Team Management _(v1.5.0)_ ✅ **NEW**
+
+#### `admin_upsert_team`
+
+Create or update a collection team (admin only).
+
+```sql
+FUNCTION admin_upsert_team(
+  p_team JSONB
+) RETURNS INTEGER
+```
+
+**Parameters:**
+
+- `p_team`: JSON object with team fields (id optional for create)
+  - `id` (optional): Team ID for update
+  - `collection_id`: Parent collection
+  - `team_name`: Team name
+  - `flag_url`: Flag image URL (optional)
+  - `primary_color`: Primary team color hex (optional)
+  - `secondary_color`: Secondary team color hex (optional)
+
+**Returns:**
+
+Team ID (INTEGER)
+
+**Behavior:**
+
+- Creates or updates team in `collection_teams` table
+- Creates audit log entry with before/after state
+- Requires caller to be admin
+- Auto-generates ID for new teams
+
+**Security:** SECURITY DEFINER, requires `is_admin = TRUE` in JWT claims
+
+---
+
+#### `admin_delete_team`
+
+Delete a collection team (admin only).
+
+```sql
+FUNCTION admin_delete_team(
+  p_team_id INTEGER
+) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_team_id`: Team ID to delete
+
+**Behavior:**
+
+- Deletes team from `collection_teams` table
+- Creates audit log entry before deletion
+- Cascades to related pages and stickers (via ON DELETE SET NULL)
+- **Warning**: May affect pages and stickers associated with this team
+- Requires caller to be admin
+
+**Security:** SECURITY DEFINER, requires admin
 
 ---
 
