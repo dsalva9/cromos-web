@@ -6,7 +6,13 @@
       "Bash(npm run dev:*)",
       "Bash(timeout 10 bash -c 'until curl -s http://localhost:3000 > /dev/null; do sleep 1; done')",
       "Bash(find:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(git rm:*)",
+      "Bash(powershell:*)",
+      "Bash(node -e \"const fs = require('fs'); const content = fs.readFileSync('C:/Users/David/projects/cromos-web/src/app/admin/page.tsx', 'utf8'); const match = content.match(/label: '(.*)'/g); console.log(match.slice(0,5));\")",
+      "Bash(node -e \"const fs = require('fs'); const content = fs.readFileSync('C:/Users/David/projects/cromos-web/src/components/admin/StickersTab.tsx', 'utf8'); const matches = content.match(/label: '[^']+'/g); console.log(matches.slice(0,10));\")",
+      "Bash(node -e \"const fs = require('fs'); const content = fs.readFileSync('C:/Users/David/projects/cromos-web/docs/database-schema.md', 'utf8'); const match = content.match(/## collection_teams[\\s\\S]*?(?=\\n## |$)/); console.log(match ? match[0] : 'Not found');\")",
+      "Bash(node -e \"const fs = require('fs'); const content = fs.readFileSync('C:/Users/David/projects/cromos-web/src/components/admin/PagesTab.tsx', 'utf8'); const match = content.match(/collection_teams.*select.*\\(/); console.log(match ? match[0] : 'Not found');\")"
     ],
     "deny": [],
     "ask": []
