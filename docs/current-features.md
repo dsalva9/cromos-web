@@ -4,7 +4,7 @@
 
 **CambioCromos** is pivoting from a traditional sticker collection app to a Spanish-language marketplace and community platform for sports cards.
 
-**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Marketplace-Template Integration backend complete. Frontend pending.
+**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Marketplace-Template Integration backend complete. Social and Reputation backend complete. Frontend pending.
 
 ---
 
@@ -48,11 +48,15 @@
 - **Sync management** - Track sync between listings and template progress
 - **View integration** - Listings with template information and sync status
 
-**Integration RPCs:**
+### ✅ Complete - Sprint 4: Social and Reputation (Backend)
 
-- `publish_duplicate_to_marketplace` - Create listing from template slot
-- `mark_listing_sold_and_decrement` - Mark sold and update template count
-- `get_my_listings_with_progress` - View listings with sync information
+**Social Features:**
+
+- **Favourites System** - Users can favourite listings, templates, and users
+- **User Ratings** - Post-transaction ratings with aggregation
+- **Template Ratings** - Community ratings with distribution
+- **Reports System** - Universal reporting for all content types
+- **Reputation Tracking** - Ratings displayed on profiles and templates
 
 **Remaining Features:**
 
@@ -64,7 +68,8 @@
 - ✅ Admin Backoffice
 - ✅ Marketplace Backend
 - ✅ Templates Backend
-- ✅ Marketplace-Template Integration Backend (NEW)
+- ✅ Marketplace-Template Integration Backend
+- ✅ Social and Reputation Backend (NEW)
 - ⚠️ Under Reconstruction: Collection Management, Trading Discovery
 
 ---
@@ -156,7 +161,44 @@ trade_listings (copy_id, slot_id)
 user_template_progress (count + 1)
 ```
 
-### 5. Trading System - Proposals ✅ **COMPLETE**
+### 5. Social and Reputation System ✅ **BACKEND COMPLETE (v1.6.0)**
+
+#### **Favourites System**
+
+- Unified favourites table for all entity types
+- Toggle favourite with single RPC
+- Public counts for listings and templates
+- User's favourites list with pagination
+
+#### **User Ratings System**
+
+- 1-5 star ratings with comments
+- Linked to trades or listings
+- Automatic aggregation on profiles
+- Rating distribution statistics
+
+#### **Template Ratings System**
+
+- 1-5 star ratings with comments
+- Automatic aggregation on templates
+- Rating distribution statistics
+- User's rating displayed in summary
+
+#### **Reports System**
+
+- Universal reporting for all content types
+- Multiple report reasons
+- Admin workflow with status tracking
+- Prevention of duplicate reports
+
+#### **Social RPCs:**
+
+- `toggle_favourite`, `is_favourited`, `get_favourite_count`, `get_user_favourites`
+- `create_user_rating`, `update_user_rating`, `delete_user_rating`, `get_user_ratings`, `get_user_rating_summary`
+- `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
+- `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
+
+### 6. Trading System - Proposals ✅ **COMPLETE**
 
 #### Complete Interactive Workflow
 
@@ -179,7 +221,7 @@ user_template_progress (count + 1)
 
 **Files**: `src/app/trades/proposals/*`, `src/app/trades/compose/*`, `src/components/trades/*`, `src/hooks/trades/*`
 
-### 6. Trade Chat System ✅ **COMPLETE (v1.4.2)**
+### 7. Trade Chat System ✅ **COMPLETE (v1.4.2)**
 
 #### Real-time Chat System
 
@@ -209,7 +251,7 @@ user_template_progress (count + 1)
 
 **Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 7. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
+### 8. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 #### Two-Step Trade Finalization
 
@@ -233,7 +275,7 @@ user_template_progress (count + 1)
 
 **Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
 
-### 8. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
+### 9. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -257,7 +299,7 @@ user_template_progress (count + 1)
 - **Suspended user checks**: Auth callback checks suspension status
 - All RPCs use SECURITY DEFINER with `is_admin_user()` checks
 
-### 9. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
+### 10. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
 
 - **Complete Theme Rollout**: Bold, high-contrast Retro-Comic aesthetic applied to **all** pages
 - **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) standard
@@ -269,6 +311,11 @@ user_template_progress (count + 1)
 ---
 
 ## 🚧 Under Construction
+
+### Social UI
+
+- Status: Backend complete, frontend pending
+- Next: Sprint 10: Social UI
 
 ### Collection Templates UI
 
@@ -289,25 +336,26 @@ user_template_progress (count + 1)
 
 ## 📋 Implementation Status Matrix
 
-| Feature             | Backend | Frontend | Status   |
-| ------------------- | ------- | -------- | -------- |
-| **Core Features**   |         |          |          |
-| Authentication      | ✅      | ✅       | Complete |
-| Trading Proposals   | ✅      | ✅       | Complete |
-| Trade Chat          | ✅      | ✅       | Complete |
-| Trade History       | ✅      | ✅       | Complete |
-| Notifications       | ✅      | ✅       | Complete |
-| Admin Backoffice    | ✅      | ✅       | Complete |
-| **Phase 1 - Pivot** |         |          |          |
-| Collections Cleanup | ✅      | N/A      | Complete |
-| Marketplace Backend | ✅      | ❌       | Complete |
-| Marketplace UI      | ❌      | ❌       | Sprint 7 |
-| Templates Backend   | ✅      | ❌       | Complete |
-| Templates UI        | ❌      | ❌       | Sprint 8 |
-| Integration Backend | ✅      | ❌       | Complete |
-| Integration UI      | ❌      | ❌       | Sprint 9 |
-| Social & Reputation | ❌      | ❌       | Sprint 4 |
-| Admin Extensions    | ❌      | ❌       | Sprint 5 |
+| Feature             | Backend | Frontend | Status    |
+| ------------------- | ------- | -------- | --------- |
+| **Core Features**   |         |          |           |
+| Authentication      | ✅      | ✅       | Complete  |
+| Trading Proposals   | ✅      | ✅       | Complete  |
+| Trade Chat          | ✅      | ✅       | Complete  |
+| Trade History       | ✅      | ✅       | Complete  |
+| Notifications       | ✅      | ✅       | Complete  |
+| Admin Backoffice    | ✅      | ✅       | Complete  |
+| **Phase 1 - Pivot** |         |          |           |
+| Collections Cleanup | ✅      | N/A      | Complete  |
+| Marketplace Backend | ✅      | ❌       | Complete  |
+| Marketplace UI      | ❌      | ❌       | Sprint 7  |
+| Templates Backend   | ✅      | ❌       | Complete  |
+| Templates UI        | ❌      | ❌       | Sprint 8  |
+| Integration Backend | ✅      | ❌       | Complete  |
+| Integration UI      | ❌      | ❌       | Sprint 9  |
+| Social Backend      | ✅      | ❌       | Complete  |
+| Social UI           | ❌      | ❌       | Sprint 10 |
+| Admin Extensions    | ❌      | ❌       | Sprint 5  |
 
 **Legend:**  
 ✅ Complete | 🚧 In Progress | ❌ Not Started
@@ -379,6 +427,14 @@ user_template_progress (count + 1)
 - Created RPC to get listings with progress
 - Updated documentation
 
+### Sprint 4: Social and Reputation ✅ **COMPLETE (Backend)**
+
+- Created favourites system with 4 RPCs
+- Created user ratings system with 5 RPCs
+- Created template ratings system with 5 RPCs
+- Created reports system with 5 RPCs
+- Updated documentation
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -405,21 +461,21 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 4: Social and Reputation
+**Next Focus**: Sprint 5: Admin Moderation
 
 ---
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated with marketplace + templates + integration system
-- **current-features.md**: ✅ Updated to reflect Sprint 3 completion
-- **CHANGELOG.md**: ✅ Updated with Sprint 3 progress
-- **TODO.md**: ✅ Updated with Sprint 3 completion
-- **api-endpoints.md**: ⏳ Needs update with integration RPCs
+- **database-schema.md**: ✅ Updated with all systems including social
+- **current-features.md**: ✅ Updated to reflect Sprint 4 completion
+- **CHANGELOG.md**: ✅ Updated with Sprint 4 progress
+- **TODO.md**: ✅ Updated with Sprint 4 completion
+- **api-endpoints.md**: ⏳ Needs update with social RPCs
 - **components-guide.md**: ⏳ Needs update for new components
 
 ---
 
-**Last Updated**: 2025-10-20 (Sprint 3 Complete)
+**Last Updated**: 2025-10-20 (Sprint 4 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Ready to begin Sprint 4: Social and Reputation
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Ready to begin Sprint 5: Admin Moderation

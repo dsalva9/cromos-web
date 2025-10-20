@@ -109,6 +109,43 @@ trade_listings (copy_id, slot_id)
 user_template_progress (count + 1)
 ```
 
+### ✨ Added - Social and Reputation System (Sprint 4)
+
+**Favourites System**
+
+- Unified favourites table for all entity types
+- Toggle favourite with single RPC
+- Public counts for listings and templates
+- User's favourites list with pagination
+
+**User Ratings System**
+
+- 1-5 star ratings with comments
+- Linked to trades or listings
+- Automatic aggregation on profiles
+- Rating distribution statistics
+
+**Template Ratings System**
+
+- 1-5 star ratings with comments
+- Automatic aggregation on templates
+- Rating distribution statistics
+- User's rating displayed in summary
+
+**Reports System**
+
+- Universal reporting for all content types
+- Multiple report reasons
+- Admin workflow with status tracking
+- Prevention of duplicate reports
+
+**Social RPCs:**
+
+- `toggle_favourite`, `is_favourited`, `get_favourite_count`, `get_user_favourites`
+- `create_user_rating`, `update_user_rating`, `delete_user_rating`, `get_user_ratings`, `get_user_rating_summary`
+- `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
+- `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
+
 ### Changed
 
 **Database Schema**
@@ -118,12 +155,13 @@ user_template_progress (count + 1)
 - Added marketplace system on top of existing foundation
 - Added complete templates system with 5 tables
 - Added marketplace-template integration with bidirectional sync
+- Added comprehensive social and reputation system
 
 **Documentation**
 
-- Updated database-schema.md to reflect marketplace + templates + integration system
-- Updated current-features.md with Sprint 3 completion
-- Added marketplace + templates + integration sections to documentation
+- Updated database-schema.md to reflect all new systems
+- Updated current-features.md with Sprint 4 completion
+- Added all new systems to documentation
 
 ---
 
@@ -373,6 +411,13 @@ user_template_progress (count + 1)
 - **3 Integration RPCs**: Publish, sell, and sync tracking
 - **Documentation Updated**: All docs reflect integration system
 
+### Sprint 4 Complete (v1.6.0-alpha) ✅ **100%**
+
+- **Social Backend**: Complete social and reputation system
+- **4 Social Tables**: Favourites, user ratings, template ratings, reports
+- **17 Social RPCs**: Favourites, ratings, reports management
+- **Documentation Updated**: All docs reflect social system
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -399,7 +444,7 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 4: Social and Reputation
+**Next Focus**: Sprint 5: Admin Moderation
 
 ---
 
@@ -414,5 +459,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Ready for Sprint 4: Social and Reputation 🚧  
-**Next**: Begin Sprint 4 implementation (favourites, ratings, reports system)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Ready for Sprint 5: Admin Moderation 🚧  
+**Next**: Begin Sprint 5 implementation (admin audit log, moderation RPCs)

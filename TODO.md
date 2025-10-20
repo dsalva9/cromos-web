@@ -40,25 +40,27 @@
 
 ---
 
-## 🚧 In Progress - Sprint 4: Social and Reputation
+## ✅ Completed - Sprint 4: Social and Reputation (Backend)
 
-- [ ] Create favourites system
-- [ ] Create user ratings system
-- [ ] Create template ratings system
-- [ ] Create universal reports system
-- [ ] Update documentation Social and Reputation
+- [x] Create favourites system
+- [x] Create user ratings system
+- [x] Create template ratings system
+- [x] Create universal reports system
+- [x] Update documentation Social and Reputation
 
 ---
 
-## 📋 Upcoming Sprints
-
-### Sprint 5: Admin moderation
+## 🚧 In Progress - Sprint 5: Admin Moderation
 
 - [ ] Create admin audit log
 - [ ] Extend moderation RPCs with audit log
 - [ ] Create admin dashboard RPCs
 - [ ] Create moderation action RPCs
 - [ ] Update documentation - Admin moderation
+
+---
+
+## 📋 Upcoming Sprints
 
 ### Sprint 6: Final Documentation
 
@@ -139,21 +141,21 @@
 - Sprint 1: Marketplace MVP ✅ Complete (1 day)
 - Sprint 2: Collection Templates ✅ Complete (1 day)
 - Sprint 3: Integration ✅ Complete (1 day)
-- Sprint 4: Social & Reputation (1 week)
+- Sprint 4: Social & Reputation ✅ Complete (1 day)
 - Sprint 5: Admin moderation (1 week)
 - Sprint 6: Documentation (1 week)
 - Sprint 6.5: Frontend Foundation (1 week)
 - Sprint 7-12: UI Implementation (6 weeks)
 
-**Total Estimated:** ~11 weeks for complete v1.6.0 implementation
+**Total Estimated:** ~10 weeks for complete v1.6.0 implementation
 
 ---
 
 ## 🎯 Current Priority
 
-**Next Sprint:** Sprint 4: Social and Reputation
-**First Task:** Create favourites system
-**Goal**: Enable users to favourite listings, templates, and users
+**Next Sprint:** Sprint 5: Admin Moderation
+**First Task:** Create admin audit log
+**Goal**: Enable admin tracking of all moderation actions
 
 ---
 
@@ -199,4 +201,12 @@
 - Extended trade_listings with template references
 - Created bidirectional sync between marketplace and templates
 - 3 integration RPCs (publish, sell, sync tracking)
+- Complete documentation updates
+
+**Sprint 4 Achievements:**
+
+- Complete social backend infrastructure
+- 4 social tables (favourites, user_ratings, template_ratings, reports)
+- 17 social RPCs for management and discovery
+- Comprehensive reputation system
 - Complete documentation updates

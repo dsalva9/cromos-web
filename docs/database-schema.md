@@ -28,6 +28,8 @@ Extends Supabase auth.users with additional user data.
 - `idx_profiles_nickname` ON (nickname)
 - `idx_profiles_admin` ON (is_admin) WHERE is_admin = TRUE
 - `idx_profiles_suspended` ON (is_suspended) WHERE is_suspended = TRUE
+- `idx_profiles_rating_avg` ON (rating_avg DESC) WHERE rating_count > 0
+- `idx_profiles_rating_count` ON (rating_count DESC)
 
 **RLS Policies:**
 
@@ -245,6 +247,163 @@ Progress tracking for each slot in user's copy.
 
 - `get_template_progress(copy_id)`
 - `update_template_progress(copy_id, slot_id, status, count)`
+
+## Social and Reputation System (v1.6.0)
+
+### favourites
+
+Unified table for all favourite types.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `target_type` TEXT NOT NULL CHECK (target_type IN ('listing', 'template', 'user'))
+- `target_id` BIGINT NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(user_id, target_type, target_id)
+
+**Indices:**
+
+- `idx_favourites_user` ON (user_id)
+- `idx_favourites_target` ON (target_type, target_id)
+- `idx_favourites_listing` ON (target_type, target_id) WHERE target_type = 'listing'
+- `idx_favourites_template` ON (target_type, target_id) WHERE target_type = 'template'
+- `idx_favourites_user_target` ON (target_type, target_id) WHERE target_type = 'user'
+
+**RLS Policies:**
+
+- Users can read their own favourites
+- Users can insert/delete their own favourites
+- Public read for listing and template favourites (for counts)
+
+**Related RPCs:**
+
+- `toggle_favourite(target_type, target_id)`
+- `is_favourited(target_type, target_id)`
+- `get_favourite_count(target_type, target_id)`
+- `get_user_favourites(target_type, limit, offset)`
+
+### user_ratings
+
+Ratings given by users to other users.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `rater_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `rated_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `rating` INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5)
+- `comment` TEXT
+- `context_type` TEXT NOT NULL CHECK (context_type IN ('trade', 'listing'))
+- `context_id` BIGINT NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(rater_id, rated_id, context_type, context_id)
+
+**Indices:**
+
+- `idx_user_ratings_rater` ON (rater_id)
+- `idx_user_ratings_rated` ON (rated_id)
+- `idx_user_ratings_context` ON (context_type, context_id)
+- `idx_user_ratings_created` ON (created_at DESC)
+
+**RLS Policies:**
+
+- Public read access (ratings are public)
+- Users can insert/update/delete their own ratings
+
+**Related RPCs:**
+
+- `create_user_rating(rated_id, rating, comment, context_type, context_id)`
+- `update_user_rating(rating_id, rating, comment)`
+- `delete_user_rating(rating_id)`
+- `get_user_ratings(user_id, limit, offset)`
+- `get_user_rating_summary(user_id)`
+
+### template_ratings
+
+Ratings given by users to templates.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `rating` INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5)
+- `comment` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(user_id, template_id)
+
+**Indices:**
+
+- `idx_template_ratings_user` ON (user_id)
+- `idx_template_ratings_template` ON (template_id)
+- `idx_template_ratings_created` ON (created_at DESC)
+
+**RLS Policies:**
+
+- Public read access (ratings are public)
+- Users can insert/update/delete their own ratings
+
+**Related RPCs:**
+
+- `create_template_rating(template_id, rating, comment)`
+- `update_template_rating(rating_id, rating, comment)`
+- `delete_template_rating(rating_id)`
+- `get_template_ratings(template_id, limit, offset)`
+- `get_template_rating_summary(template_id)`
+
+### reports
+
+Unified table for all report types.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `reporter_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `target_type` TEXT NOT NULL CHECK (target_type IN ('listing', 'template', 'user', 'rating'))
+- `target_id` BIGINT NOT NULL
+- `reason` TEXT NOT NULL CHECK (reason IN ('spam', 'inappropriate_content', 'harassment', 'copyright_violation', 'misleading_information', 'fake_listing', 'offensive_language', 'other'))
+- `description` TEXT
+- `status` TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewing', 'resolved', 'dismissed'))
+- `admin_notes` TEXT
+- `admin_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(reporter_id, target_type, target_id)
+
+**Indices:**
+
+- `idx_reports_reporter` ON (reporter_id)
+- `idx_reports_target` ON (target_type, target_id)
+- `idx_reports_status` ON (status) WHERE status = 'pending'
+- `idx_reports_created` ON (created_at DESC)
+- `idx_reports_admin` ON (admin_id) WHERE admin_id IS NOT NULL
+
+**RLS Policies:**
+
+- Users can insert/read their own reports
+- Admins can read/update all reports
+
+**Related RPCs:**
+
+- `create_report(target_type, target_id, reason, description)`
+- `get_reports(status, target_type, limit, offset)`
+- `update_report_status(report_id, status, admin_notes)`
+- `get_user_reports(status, limit, offset)`
+- `check_entity_reported(target_type, target_id)`
 
 ## Trading Tables
 
@@ -474,6 +633,28 @@ Append-only log of all admin actions.
 - `get_template_progress`
 - `update_template_progress`
 
+### Social and Reputation Functions
+
+- `toggle_favourite`
+- `is_favourited`
+- `get_favourite_count`
+- `get_user_favourites`
+- `create_user_rating`
+- `update_user_rating`
+- `delete_user_rating`
+- `get_user_ratings`
+- `get_user_rating_summary`
+- `create_template_rating`
+- `update_template_rating`
+- `delete_template_rating`
+- `get_template_ratings`
+- `get_template_rating_summary`
+- `create_report`
+- `get_reports`
+- `update_report_status`
+- `get_user_reports`
+- `check_entity_reported`
+
 ### Trading Functions
 
 - `create_trade_proposal`
@@ -525,7 +706,7 @@ Append-only log of all admin actions.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration
+**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration + Social
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
@@ -536,6 +717,8 @@ Append-only log of all admin actions.
 - Added 8 template RPCs
 - Added marketplace-template integration
 - Added 3 integration RPCs
+- Added 4 social tables (favourites, user_ratings, template_ratings, reports)
+- Added 17 social RPCs
 
 **v1.5.0** - Original collections system (deprecated)
 
