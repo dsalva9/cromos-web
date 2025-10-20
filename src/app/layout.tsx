@@ -5,7 +5,7 @@ import '@/styles/highlight-animation.css';
 import SiteHeader from '@/components/site-header';
 import { Toaster } from 'sonner';
 import 'sonner/dist/styles.css';
-import SupabaseProvider from '@/components/providers/SupabaseProvider';
+import { SupabaseProvider } from '@/components/providers/SupabaseProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { siteConfig } from '@/config/site';
 
@@ -59,5 +59,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-

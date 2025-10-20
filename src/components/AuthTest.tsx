@@ -90,8 +90,7 @@ export default function AuthTest() {
         {session && (
           <div className="text-xs text-muted-foreground">
             <p>
-              <strong>Session expires:</strong>{' '}
-              {new Date(session.expires_at! * 1000).toLocaleString()}
+              <strong>Session active:</strong> {session ? 'Yes' : 'No'}
             </p>
           </div>
         )}
@@ -171,4 +170,3 @@ export default function AuthTest() {
     </div>
   );
 }
-
