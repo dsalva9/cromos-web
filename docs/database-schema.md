@@ -54,6 +54,8 @@ User-created marketplace listings for physical cards.
 - `views_count` INTEGER DEFAULT 0
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
+- `copy_id` BIGINT REFERENCES user_template_copies(id) ON DELETE SET NULL
+- `slot_id` BIGINT REFERENCES template_slots(id) ON DELETE SET NULL
 
 **Indices:**
 
@@ -61,6 +63,8 @@ User-created marketplace listings for physical cards.
 - `idx_listings_status` ON (status) WHERE status = 'active'
 - `idx_listings_created` ON (created_at DESC)
 - `idx_listings_search` USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, '')))
+- `idx_listings_copy` ON (copy_id) WHERE copy_id IS NOT NULL
+- `idx_listings_slot` ON (slot_id) WHERE slot_id IS NOT NULL
 
 **RLS Policies:**
 
@@ -75,6 +79,13 @@ User-created marketplace listings for physical cards.
 - `list_trade_listings(limit, offset, search)`
 - `get_user_listings(user_id, limit, offset)`
 - `update_listing_status(listing_id, new_status)`
+- `publish_duplicate_to_marketplace(copy_id, slot_id, title, description, image_url)`
+- `mark_listing_sold_and_decrement(listing_id)`
+- `get_my_listings_with_progress(status)`
+
+**Views:**
+
+- `listings_with_template_info` - Listings with optional template information
 
 ## Collection Templates System (v1.6.0)
 
@@ -188,7 +199,6 @@ User copies of templates.
 **Constraints:**
 
 - UNIQUE(user_id, template_id)
-- UNIQUE(user_id, is_active) WHERE is_active = TRUE
 
 **Indices:**
 
@@ -449,6 +459,9 @@ Append-only log of all admin actions.
 - `update_listing_status`
 - `get_listing_chats`
 - `send_listing_message`
+- `publish_duplicate_to_marketplace`
+- `mark_listing_sold_and_decrement`
+- `get_my_listings_with_progress`
 
 ### Template Functions
 
@@ -512,7 +525,7 @@ Append-only log of all admin actions.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates
+**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
@@ -521,6 +534,8 @@ Append-only log of all admin actions.
 - Extended trade_chats for listings
 - Added 5 template system tables
 - Added 8 template RPCs
+- Added marketplace-template integration
+- Added 3 integration RPCs
 
 **v1.5.0** - Original collections system (deprecated)
 

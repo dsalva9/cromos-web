@@ -30,25 +30,27 @@
 
 ---
 
-## 🚧 In Progress - Sprint 3: Collection Marketplace Integration
+## ✅ Completed - Sprint 3: Collection Marketplace Integration (Backend)
 
-- [ ] Extend trade_listings with template refs
-- [ ] Create RPC publish duplicate to marketplace
-- [ ] Create RPC mark_listing_sold_and_decrement
-- [ ] Create RPC get_my_listings_with_progress
-- [ ] Update documentation - integration
+- [x] Extend trade_listings with template refs
+- [x] Create RPC publish duplicate to marketplace
+- [x] Create RPC mark_listing_sold_and_decrement
+- [x] Create RPC get_my_listings_with_progress
+- [x] Update documentation - integration
 
 ---
 
-## 📋 Upcoming Sprints
-
-### Sprint 4: Social and Reputation
+## 🚧 In Progress - Sprint 4: Social and Reputation
 
 - [ ] Create favourites system
 - [ ] Create user ratings system
 - [ ] Create template ratings system
 - [ ] Create universal reports system
 - [ ] Update documentation Social and Reputation
+
+---
+
+## 📋 Upcoming Sprints
 
 ### Sprint 5: Admin moderation
 
@@ -136,22 +138,22 @@
 - Phase 0: Cleanup ✅ Complete (1 day)
 - Sprint 1: Marketplace MVP ✅ Complete (1 day)
 - Sprint 2: Collection Templates ✅ Complete (1 day)
-- Sprint 3: Integration (1 week)
+- Sprint 3: Integration ✅ Complete (1 day)
 - Sprint 4: Social & Reputation (1 week)
 - Sprint 5: Admin moderation (1 week)
 - Sprint 6: Documentation (1 week)
 - Sprint 6.5: Frontend Foundation (1 week)
 - Sprint 7-12: UI Implementation (6 weeks)
 
-**Total Estimated:** ~12 weeks for complete v1.6.0 implementation
+**Total Estimated:** ~11 weeks for complete v1.6.0 implementation
 
 ---
 
 ## 🎯 Current Priority
 
-**Next Sprint:** Sprint 3: Collection Marketplace Integration
-**First Task:** Extend trade_listings with template refs
-**Goal**: Enable publishing duplicates from templates to marketplace
+**Next Sprint:** Sprint 4: Social and Reputation
+**First Task:** Create favourites system
+**Goal**: Enable users to favourite listings, templates, and users
 
 ---
 
@@ -189,4 +191,12 @@
 - 5 template tables with pages and slots
 - 8 template RPCs for management, discovery, and progress
 - Copy system with automatic progress tracking
+- Complete documentation updates
+
+**Sprint 3 Achievements:**
+
+- Complete integration backend infrastructure
+- Extended trade_listings with template references
+- Created bidirectional sync between marketplace and templates
+- 3 integration RPCs (publish, sell, sync tracking)
 - Complete documentation updates

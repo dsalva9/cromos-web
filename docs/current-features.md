@@ -4,7 +4,7 @@
 
 **CambioCromos** is pivoting from a traditional sticker collection app to a Spanish-language marketplace and community platform for sports cards.
 
-**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Frontend pending.
+**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Marketplace-Template Integration backend complete. Frontend pending.
 
 ---
 
@@ -39,6 +39,21 @@
 - **Public/Private Templates** - Authors control visibility
 - **Copy System** - Users can copy public templates and track progress
 
+### ✅ Complete - Sprint 3: Collection Marketplace Integration (Backend)
+
+**Marketplace-Template Bridge:**
+
+- **Template-linked listings** - Listings can reference template copies and slots
+- **Publish duplicates** - Users can publish duplicate cards to marketplace
+- **Sync management** - Track sync between listings and template progress
+- **View integration** - Listings with template information and sync status
+
+**Integration RPCs:**
+
+- `publish_duplicate_to_marketplace` - Create listing from template slot
+- `mark_listing_sold_and_decrement` - Mark sold and update template count
+- `get_my_listings_with_progress` - View listings with sync information
+
 **Remaining Features:**
 
 - ✅ Authentication System
@@ -48,7 +63,8 @@
 - ✅ Notifications System
 - ✅ Admin Backoffice
 - ✅ Marketplace Backend
-- ✅ Templates Backend (NEW)
+- ✅ Templates Backend
+- ✅ Marketplace-Template Integration Backend (NEW)
 - ⚠️ Under Reconstruction: Collection Management, Trading Discovery
 
 ---
@@ -74,6 +90,7 @@
 - Search and filtering
 - View listings by user profile
 - Direct chat from listing
+- Template linking (copy_id, slot_id)
 
 #### **RPCs:**
 
@@ -114,7 +131,32 @@
 - `list_public_templates`, `copy_template`, `get_my_template_copies`
 - `get_template_progress`, `update_template_progress`
 
-### 4. Trading System - Proposals ✅ **COMPLETE**
+### 4. Marketplace-Template Integration ✅ **BACKEND COMPLETE (v1.6.0)**
+
+#### **Bidirectional Bridge**
+
+- Listings can reference template copies and slots
+- Template duplicates can be published to marketplace
+- Sync status tracking between listings and progress
+- Automatic count management on publish/sale
+
+#### **Integration RPCs:**
+
+- `publish_duplicate_to_marketplace` - Create listing from template slot
+- `mark_listing_sold_and_decrement` - Mark sold and update template count
+- `get_my_listings_with_progress` - View listings with sync information
+
+#### **Flow:**
+
+```
+user_template_progress (count > 0)
+    ↓ [publish_duplicate_to_marketplace]
+trade_listings (copy_id, slot_id)
+    ↓ [mark_listing_sold_and_decrement]
+user_template_progress (count + 1)
+```
+
+### 5. Trading System - Proposals ✅ **COMPLETE**
 
 #### Complete Interactive Workflow
 
@@ -137,7 +179,7 @@
 
 **Files**: `src/app/trades/proposals/*`, `src/app/trades/compose/*`, `src/components/trades/*`, `src/hooks/trades/*`
 
-### 5. Trade Chat System ✅ **COMPLETE (v1.4.2)**
+### 6. Trade Chat System ✅ **COMPLETE (v1.4.2)**
 
 #### Real-time Chat System
 
@@ -167,7 +209,7 @@
 
 **Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 6. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
+### 7. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 #### Two-Step Trade Finalization
 
@@ -191,7 +233,7 @@
 
 **Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
 
-### 7. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
+### 8. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -215,7 +257,7 @@
 - **Suspended user checks**: Auth callback checks suspension status
 - All RPCs use SECURITY DEFINER with `is_admin_user()` checks
 
-### 8. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
+### 9. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
 
 - **Complete Theme Rollout**: Bold, high-contrast Retro-Comic aesthetic applied to **all** pages
 - **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) standard
@@ -238,6 +280,11 @@
 - Status: Backend complete, frontend pending
 - Next: Sprint 7: Marketplace UI
 
+### Integration UI
+
+- Status: Backend complete, frontend pending
+- Next: Sprint 9: Integration UI
+
 ---
 
 ## 📋 Implementation Status Matrix
@@ -257,7 +304,8 @@
 | Marketplace UI      | ❌      | ❌       | Sprint 7 |
 | Templates Backend   | ✅      | ❌       | Complete |
 | Templates UI        | ❌      | ❌       | Sprint 8 |
-| Integration         | ❌      | ❌       | Sprint 3 |
+| Integration Backend | ✅      | ❌       | Complete |
+| Integration UI      | ❌      | ❌       | Sprint 9 |
 | Social & Reputation | ❌      | ❌       | Sprint 4 |
 | Admin Extensions    | ❌      | ❌       | Sprint 5 |
 
@@ -323,6 +371,14 @@
 - Created 2 progress RPCs
 - Updated documentation
 
+### Sprint 3: Collection Marketplace Integration ✅ **COMPLETE (Backend)**
+
+- Extended trade_listings with template refs
+- Created RPC to publish duplicates to marketplace
+- Created RPC to mark sold and decrement
+- Created RPC to get listings with progress
+- Updated documentation
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -349,21 +405,21 @@
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 3: Collection-Marketplace Integration
+**Next Focus**: Sprint 4: Social and Reputation
 
 ---
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated with marketplace + templates system
-- **current-features.md**: ✅ Updated to reflect Sprint 2 completion
-- **CHANGELOG.md**: ✅ Updated with Sprint 2 progress
-- **TODO.md**: ✅ Updated with Sprint 2 completion
-- **api-endpoints.md**: ⏳ Needs update with templates RPCs
+- **database-schema.md**: ✅ Updated with marketplace + templates + integration system
+- **current-features.md**: ✅ Updated to reflect Sprint 3 completion
+- **CHANGELOG.md**: ✅ Updated with Sprint 3 progress
+- **TODO.md**: ✅ Updated with Sprint 3 completion
+- **api-endpoints.md**: ⏳ Needs update with integration RPCs
 - **components-guide.md**: ⏳ Needs update for new components
 
 ---
 
-**Last Updated**: 2025-10-20 (Sprint 2 Complete)
+**Last Updated**: 2025-10-20 (Sprint 3 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Ready to begin Sprint 3: Collection-Marketplace Integration
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Ready to begin Sprint 4: Social and Reputation

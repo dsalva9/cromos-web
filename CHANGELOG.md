@@ -84,6 +84,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `list_public_templates`, `copy_template`, `get_my_template_copies`
 - `get_template_progress`, `update_template_progress`
 
+### ✨ Added - Marketplace-Template Integration (Sprint 3)
+
+**Bidirectional Bridge**
+
+- Listings can reference template copies and slots
+- Template duplicates can be published to marketplace
+- Sync status tracking between listings and progress
+- Automatic count management on publish/sale
+
+**Integration RPCs:**
+
+- `publish_duplicate_to_marketplace` - Create listing from template slot
+- `mark_listing_sold_and_decrement` - Mark sold and update template count
+- `get_my_listings_with_progress` - View listings with sync information
+
+**Flow:**
+
+```
+user_template_progress (count > 0)
+    ↓ [publish_duplicate_to_marketplace]
+trade_listings (copy_id, slot_id)
+    ↓ [mark_listing_sold_and_decrement]
+user_template_progress (count + 1)
+```
+
 ### Changed
 
 **Database Schema**
@@ -92,12 +117,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Authentication, trading, and admin systems intact
 - Added marketplace system on top of existing foundation
 - Added complete templates system with 5 tables
+- Added marketplace-template integration with bidirectional sync
 
 **Documentation**
 
-- Updated database-schema.md to reflect marketplace + templates system
-- Updated current-features.md with Sprint 2 completion
-- Added marketplace + templates sections to documentation
+- Updated database-schema.md to reflect marketplace + templates + integration system
+- Updated current-features.md with Sprint 3 completion
+- Added marketplace + templates + integration sections to documentation
 
 ---
 
@@ -340,6 +366,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **8 Template RPCs**: Management, discovery, and progress tracking
 - **Documentation Updated**: All docs reflect templates system
 
+### Sprint 3 Complete (v1.6.0-alpha) ✅ **100%**
+
+- **Integration Backend**: Complete marketplace-template bridge
+- **Bidirectional Sync**: Template ↔ marketplace with count management
+- **3 Integration RPCs**: Publish, sell, and sync tracking
+- **Documentation Updated**: All docs reflect integration system
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -366,7 +399,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 3: Collection-Marketplace Integration
+**Next Focus**: Sprint 4: Social and Reputation
 
 ---
 
@@ -381,5 +414,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Ready for Sprint 3: Collection-Marketplace Integration 🚧  
-**Next**: Begin Sprint 3 implementation (link listings ↔ templates, publish duplicates, sync)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Ready for Sprint 4: Social and Reputation 🚧  
+**Next**: Begin Sprint 4 implementation (favourites, ratings, reports system)
