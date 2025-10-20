@@ -20,25 +20,27 @@
 
 ---
 
-## 🚧 In Progress - Sprint 2: Collection Templates
+## ✅ Completed - Sprint 2: Collection Templates (Backend)
 
-- [ ] Create base template tables
-- [ ] Create template management RPCs
-- [ ] Create discovery and copy RPCs
-- [ ] Create user progress RPCs
-- [ ] Update documentation - templates
+- [x] Create base template tables
+- [x] Create template management RPCs
+- [x] Create discovery and copy RPCs
+- [x] Create user progress RPCs
+- [x] Update documentation - templates
 
 ---
 
-## 📋 Upcoming Sprints
-
-### Sprint 3: Collection Marketplace Integration
+## 🚧 In Progress - Sprint 3: Collection Marketplace Integration
 
 - [ ] Extend trade_listings with template refs
 - [ ] Create RPC publish duplicate to marketplace
 - [ ] Create RPC mark_listing_sold_and_decrement
 - [ ] Create RPC get_my_listings_with_progress
 - [ ] Update documentation - integration
+
+---
+
+## 📋 Upcoming Sprints
 
 ### Sprint 4: Social and Reputation
 
@@ -133,7 +135,7 @@
 
 - Phase 0: Cleanup ✅ Complete (1 day)
 - Sprint 1: Marketplace MVP ✅ Complete (1 day)
-- Sprint 2: Collection Templates (1 week)
+- Sprint 2: Collection Templates ✅ Complete (1 day)
 - Sprint 3: Integration (1 week)
 - Sprint 4: Social & Reputation (1 week)
 - Sprint 5: Admin moderation (1 week)
@@ -147,9 +149,9 @@
 
 ## 🎯 Current Priority
 
-**Next Sprint:** Sprint 2: Collection Templates
-**First Task:** Create base template tables
-**Goal:** Establish foundation for community-generated collection system
+**Next Sprint:** Sprint 3: Collection Marketplace Integration
+**First Task:** Extend trade_listings with template refs
+**Goal**: Enable publishing duplicates from templates to marketplace
 
 ---
 
@@ -179,4 +181,12 @@
 - Trade listings table with full-text search
 - 4 marketplace RPCs for CRUD operations
 - Extended trade_chats for listing conversations
+- Complete documentation updates
+
+**Sprint 2 Achievements:**
+
+- Complete templates backend infrastructure
+- 5 template tables with pages and slots
+- 8 template RPCs for management, discovery, and progress
+- Copy system with automatic progress tracking
 - Complete documentation updates

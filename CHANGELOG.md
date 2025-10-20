@@ -60,6 +60,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RPCs: `get_listing_chats`, `send_listing_message`
 - Separate chat flows for proposals and listings
 
+### ✨ Added - Collection Templates System (Sprint 2)
+
+**Community Templates**
+
+- Users create collection structures
+- Publish as public or private
+- Other users copy templates
+- Track progress: HAVE/NEED/DUPES
+- Integrated rating system (tables ready, functions pending)
+
+**Tables:**
+
+- `collection_templates` - Created templates
+- `template_pages` - Pages within templates
+- `template_slots` - Individual slots
+- `user_template_copies` - User copies
+- `user_template_progress` - Progress on each slot
+
+**RPCs:**
+
+- `create_template`, `add_template_page`, `publish_template`
+- `list_public_templates`, `copy_template`, `get_my_template_copies`
+- `get_template_progress`, `update_template_progress`
+
 ### Changed
 
 **Database Schema**
@@ -67,12 +91,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Clean foundation with core infrastructure preserved
 - Authentication, trading, and admin systems intact
 - Added marketplace system on top of existing foundation
+- Added complete templates system with 5 tables
 
 **Documentation**
 
-- Updated database-schema.md to reflect marketplace system
-- Updated current-features.md with Sprint 1 completion
-- Added marketplace section to documentation
+- Updated database-schema.md to reflect marketplace + templates system
+- Updated current-features.md with Sprint 2 completion
+- Added marketplace + templates sections to documentation
 
 ---
 
@@ -308,6 +333,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chat from Listings**: Extended trade_chats for marketplace
 - **Documentation Updated**: All docs reflect marketplace system
 
+### Sprint 2 Complete (v1.6.0-alpha) ✅ **100%**
+
+- **Templates Backend**: Complete template system with RPCs
+- **5 Template Tables**: Full template structure with pages and slots
+- **8 Template RPCs**: Management, discovery, and progress tracking
+- **Documentation Updated**: All docs reflect templates system
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -334,7 +366,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 2: Collection Templates
+**Next Focus**: Sprint 3: Collection-Marketplace Integration
 
 ---
 
@@ -349,5 +381,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Ready for Sprint 2: Collection Templates 🚧  
-**Next**: Begin Sprint 2 implementation (template system tables + RPCs)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Ready for Sprint 3: Collection-Marketplace Integration 🚧  
+**Next**: Begin Sprint 3 implementation (link listings ↔ templates, publish duplicates, sync)

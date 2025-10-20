@@ -76,6 +76,166 @@ User-created marketplace listings for physical cards.
 - `get_user_listings(user_id, limit, offset)`
 - `update_listing_status(listing_id, new_status)`
 
+## Collection Templates System (v1.6.0)
+
+### collection_templates
+
+Community-created collection templates.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `author_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `description` TEXT
+- `image_url` TEXT
+- `is_public` BOOLEAN DEFAULT FALSE
+- `rating_avg` DECIMAL(3,2) DEFAULT 0.0
+- `rating_count` INTEGER DEFAULT 0
+- `copies_count` INTEGER DEFAULT 0
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+
+- `idx_templates_author` ON (author_id)
+- `idx_templates_public` ON (is_public) WHERE is_public = TRUE
+- `idx_templates_rating` ON (rating_avg DESC, rating_count DESC) WHERE is_public = TRUE
+- `idx_templates_created` ON (created_at DESC) WHERE is_public = TRUE
+
+**RLS Policies:**
+
+- Public read WHERE is_public = TRUE
+- Authors can read their own templates
+- Authors can insert/update/delete their own templates
+- Admins can update/delete any template
+
+**Related RPCs:**
+
+- `create_template(title, description, image_url, is_public)`
+- `publish_template(template_id, is_public)`
+- `list_public_templates(limit, offset, search, sort_by)`
+
+### template_pages
+
+Pages within a template.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `page_number` INTEGER NOT NULL
+- `title` TEXT NOT NULL
+- `type` TEXT CHECK (type IN ('team', 'special'))
+- `slots_count` INTEGER NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(template_id, page_number)
+
+**Indices:**
+
+- `idx_template_pages_template` ON (template_id, page_number)
+
+**RLS Policies:**
+
+- Public read WHERE template is public
+- Authors can manage their template pages
+
+**Related RPCs:**
+
+- `add_template_page(template_id, title, type, slots)`
+
+### template_slots
+
+Individual slots within pages.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `page_id` BIGINT REFERENCES template_pages(id) ON DELETE CASCADE NOT NULL
+- `slot_number` INTEGER NOT NULL
+- `label` TEXT
+- `is_special` BOOLEAN DEFAULT FALSE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(page_id, slot_number)
+
+**Indices:**
+
+- `idx_template_slots_page` ON (page_id, slot_number)
+
+**RLS Policies:**
+
+- Follows template_pages policies
+
+### user_template_copies
+
+User copies of templates.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `is_active` BOOLEAN DEFAULT FALSE
+- `copied_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(user_id, template_id)
+- UNIQUE(user_id, is_active) WHERE is_active = TRUE
+
+**Indices:**
+
+- `idx_copies_user` ON (user_id, is_active)
+- `idx_copies_template` ON (template_id)
+
+**RLS Policies:**
+
+- Users can read their own copies
+- Users can insert/update/delete their own copies
+
+**Related RPCs:**
+
+- `copy_template(template_id, custom_title)`
+- `get_my_template_copies()`
+
+### user_template_progress
+
+Progress tracking for each slot in user's copy.
+
+**Columns:**
+
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE
+- `copy_id` BIGINT REFERENCES user_template_copies(id) ON DELETE CASCADE
+- `slot_id` BIGINT REFERENCES template_slots(id) ON DELETE CASCADE
+- `status` TEXT DEFAULT 'missing' CHECK (status IN ('missing', 'owned', 'duplicate'))
+- `count` INTEGER DEFAULT 0 CHECK (count >= 0)
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- PRIMARY KEY (user_id, copy_id, slot_id)
+
+**Indices:**
+
+- `idx_progress_copy` ON (copy_id, status)
+- `idx_progress_duplicates` ON (user_id, copy_id, slot_id) WHERE status = 'duplicate'
+
+**RLS Policies:**
+
+- Users can manage their own progress
+
+**Related RPCs:**
+
+- `get_template_progress(copy_id)`
+- `update_template_progress(copy_id, slot_id, status, count)`
+
 ## Trading Tables
 
 ### trade_proposals
@@ -290,6 +450,17 @@ Append-only log of all admin actions.
 - `get_listing_chats`
 - `send_listing_message`
 
+### Template Functions
+
+- `create_template`
+- `add_template_page`
+- `publish_template`
+- `list_public_templates`
+- `copy_template`
+- `get_my_template_copies`
+- `get_template_progress`
+- `update_template_progress`
+
 ### Trading Functions
 
 - `create_trade_proposal`
@@ -341,13 +512,15 @@ Append-only log of all admin actions.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace MVP
+**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
 - Added trade_listings table
 - Added 6 marketplace RPCs
 - Extended trade_chats for listings
+- Added 5 template system tables
+- Added 8 template RPCs
 
 **v1.5.0** - Original collections system (deprecated)
 

@@ -4,11 +4,11 @@
 
 **CambioCromos** is pivoting from a traditional sticker collection app to a Spanish-language marketplace and community platform for sports cards.
 
-**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system pending.
+**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Frontend pending.
 
 ---
 
-## 🆕 Current Release (v1.6.0-alpha) – Marketplace Pivot
+## 🆕 Current Release (v1.6.0-alpha) – Marketplace + Templates Pivot
 
 ### ✅ Complete - Phase 0: Cleanup
 
@@ -28,6 +28,17 @@
 - **Search functionality** - Full-text search on title and collection name
 - **Status management** - Active, sold, removed states
 
+### ✅ Complete - Sprint 2: Collection Templates (Backend)
+
+**Template System:**
+
+- **5 template tables** - Complete template system with pages and slots
+- **Template Management RPCs** - Create, add pages, publish templates
+- **Discovery RPCs** - List public templates, copy templates, get user copies
+- **Progress RPCs** - Track HAVE/NEED/DUPES for each slot
+- **Public/Private Templates** - Authors control visibility
+- **Copy System** - Users can copy public templates and track progress
+
 **Remaining Features:**
 
 - ✅ Authentication System
@@ -36,7 +47,8 @@
 - ✅ Trade History & Finalization
 - ✅ Notifications System
 - ✅ Admin Backoffice
-- ✅ Marketplace Backend (NEW)
+- ✅ Marketplace Backend
+- ✅ Templates Backend (NEW)
 - ⚠️ Under Reconstruction: Collection Management, Trading Discovery
 
 ---
@@ -78,7 +90,31 @@
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
 
-### 3. Trading System - Proposals ✅ **COMPLETE**
+### 3. Collection Templates System ✅ **BACKEND COMPLETE (v1.6.0)**
+
+#### **Community Templates**
+
+- Users create collection structures
+- Publish as public or private
+- Other users copy templates
+- Track progress: HAVE/NEED/DUPES
+- Integrated rating system (tables ready, functions pending)
+
+#### **Tables:**
+
+- `collection_templates` - Created templates
+- `template_pages` - Pages within templates
+- `template_slots` - Individual slots
+- `user_template_copies` - User copies
+- `user_template_progress` - Progress on each slot
+
+#### **RPCs:**
+
+- `create_template`, `add_template_page`, `publish_template`
+- `list_public_templates`, `copy_template`, `get_my_template_copies`
+- `get_template_progress`, `update_template_progress`
+
+### 4. Trading System - Proposals ✅ **COMPLETE**
 
 #### Complete Interactive Workflow
 
@@ -101,7 +137,7 @@
 
 **Files**: `src/app/trades/proposals/*`, `src/app/trades/compose/*`, `src/components/trades/*`, `src/hooks/trades/*`
 
-### 4. Trade Chat System ✅ **COMPLETE (v1.4.2)**
+### 5. Trade Chat System ✅ **COMPLETE (v1.4.2)**
 
 #### Real-time Chat System
 
@@ -127,11 +163,11 @@
 
 - New table: `trade_reads` (user_id, trade_id, last_read_at)
 - RPC: `mark_trade_read(p_trade_id)` → upserts last_read_at
-- RPC: `get_unread_counts(p_box, p_trade_ids)` → returns per-trade unread counts
+- RPC: `get_unread_counts(p_box, p_trade_ids)` → returns per-trade unread_count
 
 **Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 5. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
+### 6. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 #### Two-Step Trade Finalization
 
@@ -155,7 +191,7 @@
 
 **Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
 
-### 6. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
+### 7. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -179,7 +215,7 @@
 - **Suspended user checks**: Auth callback checks suspension status
 - All RPCs use SECURITY DEFINER with `is_admin_user()` checks
 
-### 7. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
+### 8. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
 
 - **Complete Theme Rollout**: Bold, high-contrast Retro-Comic aesthetic applied to **all** pages
 - **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) standard
@@ -192,10 +228,10 @@
 
 ## 🚧 Under Construction
 
-### Collection Templates
+### Collection Templates UI
 
-- Status: Not yet implemented
-- Next: Sprint 2: Collection Templates
+- Status: Backend complete, frontend pending
+- Next: Sprint 8: Templates UI
 
 ### Marketplace UI
 
@@ -219,7 +255,8 @@
 | Collections Cleanup | ✅      | N/A      | Complete |
 | Marketplace Backend | ✅      | ❌       | Complete |
 | Marketplace UI      | ❌      | ❌       | Sprint 7 |
-| Templates           | ❌      | ❌       | Sprint 2 |
+| Templates Backend   | ✅      | ❌       | Complete |
+| Templates UI        | ❌      | ❌       | Sprint 8 |
 | Integration         | ❌      | ❌       | Sprint 3 |
 | Social & Reputation | ❌      | ❌       | Sprint 4 |
 | Admin Extensions    | ❌      | ❌       | Sprint 5 |
@@ -278,26 +315,55 @@
 - Extended trade_chats for listings
 - Updated documentation
 
-### Phase 2: Collection Templates 📋 **NEXT**
+### Sprint 2: Collection Templates ✅ **COMPLETE (Backend)**
 
-- Create base template tables
-- Template management RPCs
-- Discovery and copy RPCs
-- User progress RPCs
+- Created 5 template system tables
+- Created 3 template management RPCs
+- Created 3 discovery RPCs
+- Created 2 progress RPCs
+- Updated documentation
+
+### Phase 2.5 Complete (v1.4.1)
+
+- **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
+- Modern, high-contrast "Retro-Comic" theme fully implemented
+- Consistent styling across **all** pages and components
+
+### Phase 1 Complete (v1.0.0)
+
+- Zero-reload profile management
+- Seamless collection navigation
+- Modern responsive design
+- Complete sticker inventory system
+
+### Phase 2 Core Features Complete (v1.2.0)
+
+- **Interactive Trading System with Proposals MVP**
+- RPC-based secure trading architecture
+- Advanced search and filtering for trading partners
+
+### Phase 2 Complete (v1.3.0)
+
+- **Album Pages System Fully Implemented**
+- Complete UI for page-based navigation
+- Enhanced sticker management with WebP optimization
+
+**Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
+**Next Focus**: Sprint 3: Collection-Marketplace Integration
 
 ---
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated with marketplace system
-- **current-features.md**: ✅ Updated to reflect Sprint 1 completion
-- **CHANGELOG.md**: ✅ Updated with Sprint 1 progress
-- **TODO.md**: ✅ Updated with Sprint 1 completion
-- **api-endpoints.md**: ⏳ Needs update with marketplace RPCs
+- **database-schema.md**: ✅ Updated with marketplace + templates system
+- **current-features.md**: ✅ Updated to reflect Sprint 2 completion
+- **CHANGELOG.md**: ✅ Updated with Sprint 2 progress
+- **TODO.md**: ✅ Updated with Sprint 2 completion
+- **api-endpoints.md**: ⏳ Needs update with templates RPCs
 - **components-guide.md**: ⏳ Needs update for new components
 
 ---
 
-**Last Updated**: 2025-10-20 (Sprint 1 Complete)
+**Last Updated**: 2025-10-20 (Sprint 2 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Ready to begin Sprint 2: Collection Templates
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Ready to begin Sprint 3: Collection-Marketplace Integration
