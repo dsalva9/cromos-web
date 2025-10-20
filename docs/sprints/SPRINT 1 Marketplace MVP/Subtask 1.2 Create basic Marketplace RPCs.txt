@@ -1,0 +1,76 @@
+## 📦 Subtask 1.2: Create basic marketplace RPCs
+
+### Prompt for Claude CLI:
+```
+I need the fundamental RPCs for the marketplace.
+
+CONTEXT:
+- trade_listings table already exists
+- We need: create, list, get by user, update status
+
+TASK:
+Create a SQL migration with 4 RPC functions:
+
+FUNCTION 1: create_trade_listing
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_title TEXT (required)
+- p_description TEXT (optional, default NULL)
+- p_sticker_number TEXT (optional, default NULL)
+- p_collection_name TEXT (optional, default NULL)
+- p_image_url TEXT (optional, default NULL)
+RETURNS: BIGINT (the created listing ID)
+LOGIC:
+1. Validate auth.uid() is not NULL
+2. Validate TRIM(p_title) != ''
+3. INSERT INTO trade_listings with user_id = auth.uid()
+4. RETURN listing_id
+
+FUNCTION 2: list_trade_listings
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_limit INTEGER DEFAULT 20
+- p_offset INTEGER DEFAULT 0
+- p_search TEXT DEFAULT NULL
+RETURNS: TABLE (id, user_id, author_nickname, author_avatar_url, title, description, sticker_number, collection_name, image_url, status, views_count, created_at)
+LOGIC:
+1. JOIN with profiles to get author
+2. Filter by status = 'active'
+3. If p_search is not NULL, search in title and collection_name (ILIKE)
+4. ORDER BY created_at DESC
+5. Apply LIMIT and OFFSET
+
+FUNCTION 3: get_user_listings
+PARAMETERS:
+- p_user_id UUID
+- p_limit INTEGER DEFAULT 20
+- p_offset INTEGER DEFAULT 0
+RETURNS: TABLE (same structure as list_trade_listings)
+LOGIC:
+- Similar to list but filtered by specific user_id
+- Include all statuses (not just active)
+
+FUNCTION 4: update_listing_status
+PARAMETERS:
+- p_listing_id BIGINT
+- p_new_status TEXT
+RETURNS: VOID
+LOGIC:
+1. Validate p_new_status is in ('active', 'sold', 'removed')
+2. Validate listing belongs to user OR user is admin
+3. UPDATE status and updated_at
+4. If no rows updated: RAISE EXCEPTION
+
+PERMISSIONS:
+- GRANT EXECUTE ON create_trade_listing TO authenticated
+- GRANT EXECUTE ON list_trade_listings TO anon, authenticated
+- GRANT EXECUTE ON get_user_listings TO anon, authenticated
+- GRANT EXECUTE ON update_listing_status TO authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_marketplace_rpcs.sql
+2. Include usage examples in comments
+3. Error handling with messages in English
+
+Give me git commands afterwards.
+```

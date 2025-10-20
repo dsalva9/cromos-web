@@ -1,0 +1,61 @@
+
+## 📦 Subtask 3.5: Update documentation - Integration
+
+### Prompt for Claude CLI:
+```
+I need to document the bidirectional integration between collection and marketplace.
+
+CONTEXT:
+- Complete system to publish from collection
+- Links: listing ↔ slot ↔ progress
+- Automatic sync when selling
+
+TASK:
+Update documentation:
+
+1. docs/database-schema.md
+   - Update trade_listings section with new columns (copy_id, slot_id)
+   - Add section "## Collection ↔ Marketplace Integration"
+   - Flow diagram (ASCII):
+```
+     user_template_progress (count > 0)
+         ↓ [publish_duplicate_to_marketplace]
+     trade_listings (copy_id, slot_id)
+         ↓ [mark_listing_sold_and_decrement]
+     user_template_progress (count - 1)
+```
+   - Document RPCs:
+     * publish_duplicate_to_marketplace
+     * mark_listing_sold_and_decrement
+     * get_my_listings_with_progress
+
+2. docs/api-endpoints.md
+   - Section "## Collection ↔ Marketplace Integration"
+   - Expected hooks:
+     * usePublishDuplicate (button from collection)
+     * useMyListings (view my listings with sync)
+     * useMarkSold (action with auto decrement)
+   - Complete flow examples
+
+3. docs/current-features.md
+   - Update Marketplace with:
+     * ✅ Publish from collection with 1 click
+     * ✅ Automatic inventory sync
+     * ✅ "My Listings" view with alerts
+   - Update Templates with:
+     * ✅ Bidirectional marketplace integration
+
+4. CHANGELOG.md
+   - Subsection "### Added - Collection-Marketplace Integration"
+   - List the 3 migrations
+
+5. TODO.md
+   - Mark Sprint 3 as complete
+
+DELIVERABLES:
+1. 5 updated files
+2. Clear flow diagrams
+3. Use case examples
+
+Give me git commands to commit all together.
+```

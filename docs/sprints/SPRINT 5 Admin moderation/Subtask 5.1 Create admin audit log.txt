@@ -1,0 +1,62 @@
+
+## 📦 Subtask 5.1: Create admin audit log
+
+### Prompt for Claude CLI:
+```
+I need an audit log table to record all moderation actions.
+
+CONTEXT:
+- Record all admin actions (suspend, remove, dismiss)
+- Immutable (only INSERT, no UPDATE/DELETE)
+- Accountability and compliance
+
+TASK:
+Create a SQL migration with:
+
+TABLE: admin_actions
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- admin_id: UUID REFERENCES profiles(id) ON DELETE SET NULL
+- action_type: TEXT NOT NULL (e.g., 'suspend_user', 'remove_listing', 'dismiss_report')
+- target_type: TEXT NOT NULL (e.g., 'user', 'listing', 'template', 'report')
+- target_id: BIGINT NOT NULL
+- reason: TEXT
+- metadata: JSONB (additional data: old_status, new_status, etc.)
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+
+INDICES:
+- idx_admin_actions_admin ON (admin_id)
+- idx_admin_actions_target ON (target_type, target_id)
+- idx_admin_actions_type ON (action_type)
+- idx_admin_actions_created ON (created_at DESC)
+
+RLS POLICIES:
+- Only admins can read
+- System can insert (via RPCs with SECURITY DEFINER)
+- NO UPDATE or DELETE allowed (immutable audit log)
+
+HELPER FUNCTION: log_admin_action
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_action_type TEXT
+- p_target_type TEXT
+- p_target_id BIGINT
+- p_reason TEXT
+- p_metadata JSONB DEFAULT NULL
+RETURNS: VOID
+LOGIC:
+1. Validate auth.uid() is admin
+2. INSERT INTO admin_actions (admin_id, action_type, target_type, target_id, reason, metadata)
+   VALUES (auth.uid(), p_action_type, p_target_type, p_target_id, p_reason, p_metadata)
+
+PERMISSIONS:
+- GRANT EXECUTE ON log_admin_action TO authenticated (internal validation)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_admin_audit_log.sql
+2. Include table + helper function
+3. Examples of common action_types in comments
+4. Strict RLS policies (admins read only, system insert)
+
+Give me git commands afterwards.
+```

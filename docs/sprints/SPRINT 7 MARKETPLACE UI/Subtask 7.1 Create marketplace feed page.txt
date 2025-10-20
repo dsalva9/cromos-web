@@ -1,0 +1,250 @@
+📦 Subtask 7.1: Create marketplace feed page
+Prompt for Claude CLI:
+I need to create the main marketplace feed page with search and filtering.
+
+CONTEXT:
+- Backend RPCs ready: list_trade_listings, create_trade_listing
+- Main discovery page for users to browse listings
+- Infinite scroll for pagination
+- Search by text (title, collection)
+
+TASK:
+Create the marketplace feed implementation:
+
+FILES TO CREATE:
+
+1. src/app/marketplace/page.tsx
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { useListings } from '@/hooks/marketplace/useListings';
+import { ListingCard } from '@/components/marketplace/ListingCard';
+import { SearchBar } from '@/components/marketplace/SearchBar';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useUser } from '@/components/providers/SupabaseProvider';
+
+export default function MarketplacePage() {
+  const { user } = useUser();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { listings, loading, error, hasMore, loadMore } = useListings({
+    search: searchQuery,
+    limit: 20
+  });
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-black uppercase text-white mb-2">
+              Marketplace
+            </h1>
+            <p className="text-gray-400">
+              Discover cards from the community
+            </p>
+          </div>
+          
+          {user && (
+            <Link href="/marketplace/create">
+              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+                <Plus className="mr-2 h-4 w-4" />
+                Publish Listing
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Search */}
+        <SearchBar 
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by title, collection..."
+        />
+
+        {/* Listings Grid */}
+        {error && (
+          <div className="text-red-500 text-center py-8">
+            Error loading listings: {error}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+          {listings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+          </div>
+        )}
+
+        {/* Load More */}
+        {hasMore && !loading && (
+          <div className="flex justify-center mt-8">
+            <Button onClick={loadMore} variant="outline">
+              Load More
+            </Button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && listings.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg mb-4">
+              No listings found
+            </p>
+            {user && (
+              <Link href="/marketplace/create">
+                <Button className="bg-[#FFC000] text-black">
+                  Be the first to publish
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+2. src/components/marketplace/SearchBar.tsx
+```typescript
+'use client';
+
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useEffect, useState } from 'react';
+
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export function SearchBar({ value, onChange, placeholder }: SearchBarProps) {
+  const [localValue, setLocalValue] = useState(value);
+  const debouncedValue = useDebounce(localValue, 500);
+
+  useEffect(() => {
+    onChange(debouncedValue);
+  }, [debouncedValue, onChange]);
+
+  return (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+      <Input
+        type="text"
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        placeholder={placeholder || "Search..."}
+        className="pl-10 bg-[#374151] border-2 border-black text-white"
+      />
+    </div>
+  );
+}
+```
+
+3. src/hooks/marketplace/useListings.ts
+```typescript
+import { useState, useEffect, useCallback } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+
+interface Listing {
+  id: string;
+  user_id: string;
+  author_nickname: string;
+  author_avatar_url: string | null;
+  title: string;
+  description: string | null;
+  sticker_number: string | null;
+  collection_name: string | null;
+  image_url: string | null;
+  status: string;
+  views_count: number;
+  created_at: string;
+}
+
+interface UseListingsParams {
+  search?: string;
+  limit?: number;
+}
+
+export function useListings({ search = '', limit = 20 }: UseListingsParams = {}) {
+  const supabase = useSupabaseClient();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchListings = useCallback(async (isLoadMore = false) => {
+    try {
+      setLoading(true);
+      const currentOffset = isLoadMore ? offset : 0;
+      
+      const { data, error: rpcError } = await supabase.rpc('list_trade_listings', {
+        p_limit: limit,
+        p_offset: currentOffset,
+        p_search: search || null
+      });
+
+      if (rpcError) throw rpcError;
+
+      if (isLoadMore) {
+        setListings(prev => [...prev, ...(data || [])]);
+      } else {
+        setListings(data || []);
+      }
+
+      setHasMore((data || []).length === limit);
+      if (isLoadMore) {
+        setOffset(prev => prev + limit);
+      } else {
+        setOffset(limit);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase, search, limit, offset]);
+
+  useEffect(() => {
+    setOffset(0);
+    fetchListings(false);
+  }, [search]); // Refetch when search changes
+
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      fetchListings(true);
+    }
+  }, [loading, hasMore, fetchListings]);
+
+  return { listings, loading, error, hasMore, loadMore, refetch: () => fetchListings(false) };
+}
+```
+
+STYLING:
+- Use existing theme: dark background (#1F2937), gold accents (#FFC000)
+- Thick black borders (border-2 border-black)
+- Retro-comic aesthetic
+- Responsive grid: 1 col mobile, 2 tablet, 3-4 desktop
+
+DELIVERABLES:
+1. Complete marketplace feed page
+2. Search with debounce
+3. Infinite scroll
+4. Empty states
+5. Loading states
+
+Give me git commands afterwards.
+```

@@ -1,0 +1,166 @@
+
+## 📦 Subtask 9.4: Create edit listing page
+
+### Prompt for Claude CLI:
+```
+I need an edit page for existing listings.
+
+CONTEXT:
+- Reuses ListingForm component
+- Pre-fills with existing data
+- Updates via Supabase direct update
+- Only owner can edit
+
+TASK:
+Create the edit listing page:
+
+FILE: src/app/marketplace/[id]/edit/page.tsx
+```typescript
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useListing } from '@/hooks/marketplace/useListing';
+import { ListingForm } from '@/components/marketplace/ListingForm';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
+import AuthGuard from '@/components/AuthGuard';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { toast } from 'sonner';
+
+function EditListingContent() {
+  const params = useParams();
+  const router = useRouter();
+  const { user } = useUser();
+  const supabase = useSupabaseClient();
+  const listingId = params.id as string;
+  
+  const { listing, loading: fetchLoading } = useListing(listingId);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    // Check ownership
+    if (listing && user && listing.user_id !== user.id) {
+      toast.error('You can only edit your own listings');
+      router.push(`/marketplace/${listingId}`);
+    }
+  }, [listing, user, listingId, router]);
+
+  const handleUpdate = async (data: {
+    title: string;
+    description?: string;
+    sticker_number?: string;
+    collection_name?: string;
+    image_url?: string;
+  }) => {
+    try {
+      setUpdating(true);
+
+      const { error } = await supabase
+        .from('trade_listings')
+        .update({
+          title: data.title,
+          description: data.description || null,
+          sticker_number: data.sticker_number || null,
+          collection_name: data.collection_name || null,
+          image_url: data.image_url || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', listingId);
+
+      if (error) throw error;
+
+      toast.success('Listing updated successfully!');
+      router.push(`/marketplace/${listingId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update listing');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (fetchLoading) {
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">Listing not found</p>
+          <Link href="/marketplace">
+            <Button>Back to Marketplace</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Back Button */}
+        <Link href={`/marketplace/${listingId}`}>
+          <Button variant="ghost" className="mb-4 text-gray-400 hover:text-white">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Listing
+          </Button>
+        </Link>
+
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black uppercase text-white mb-2">
+            Edit Listing
+          </h1>
+          <p className="text-gray-400">
+            Update your listing details
+          </p>
+        </div>
+
+        {/* Form */}
+        <ListingForm
+          initialData={{
+            title: listing.title,
+            description: listing.description || undefined,
+            sticker_number: listing.sticker_number || undefined,
+            collection_name: listing.collection_name || undefined,
+            image_url: listing.image_url || undefined
+          }}
+          onSubmit={handleUpdate}
+          loading={updating}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function EditListingPage() {
+  return (
+    <AuthGuard>
+      <EditListingContent />
+    </AuthGuard>
+  );
+}
+```
+
+FEATURES:
+- Pre-filled form with existing data
+- Ownership validation
+- Direct Supabase update
+- Redirect on success
+- Back button to listing
+
+DELIVERABLES:
+1. Edit listing page
+2. Ownership validation
+3. Form pre-filling with existing data
+4. Success redirect
+
+Give me git commands afterwards.
+
+---

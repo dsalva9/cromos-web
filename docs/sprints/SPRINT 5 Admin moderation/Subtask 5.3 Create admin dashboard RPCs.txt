@@ -1,0 +1,113 @@
+## 📦 Subtask 5.3: Create admin dashboard RPCs
+
+### Prompt for Claude CLI:
+I need RPCs for admin dashboard (stats and search).
+CONTEXT:
+
+Dashboard shows key metrics
+User search with filters
+Admin-only access
+
+TASK:
+Create a SQL migration with 2 functions:
+FUNCTION 1: get_admin_stats
+SECURITY: SECURITY DEFINER
+PARAMETERS: none
+RETURNS: JSON
+JSON STRUCTURE:
+{
+"total_users": INTEGER,
+"active_users_last_30_days": INTEGER,
+"suspended_users": INTEGER,
+"pending_reports": INTEGER,
+"active_listings": INTEGER,
+"public_templates": INTEGER,
+"completed_trades_last_30_days": INTEGER,
+"total_admin_actions_last_30_days": INTEGER
+}
+LOGIC:
+
+Validate auth.uid() is admin:
+SELECT is_admin FROM profiles WHERE id = auth.uid()
+If not admin: RAISE EXCEPTION 'Only admins can view stats'
+Build JSON with subqueries (use CTEs for organization):
+WITH stats AS (
+SELECT
+(SELECT COUNT() FROM profiles) as total_users,
+(SELECT COUNT(DISTINCT user_id) FROM trade_chats WHERE created_at > NOW() - INTERVAL '30 days') as active_users,
+(SELECT COUNT() FROM profiles WHERE is_suspended = TRUE) as suspended_users,
+(SELECT COUNT() FROM reports WHERE status = 'pending') as pending_reports,
+(SELECT COUNT() FROM trade_listings WHERE status = 'active') as active_listings,
+(SELECT COUNT() FROM collection_templates WHERE is_public = TRUE) as public_templates,
+(SELECT COUNT() FROM trades_history WHERE status = 'completed' AND updated_at > NOW() - INTERVAL '30 days') as completed_trades,
+(SELECT COUNT(*) FROM admin_actions WHERE created_at > NOW() - INTERVAL '30 days') as admin_actions
+)
+SELECT jsonb_build_object(
+'total_users', total_users,
+'active_users_last_30_days', active_users,
+...
+) FROM stats
+
+RETURN JSON
+
+FUNCTION 2: search_users_admin
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+
+p_query TEXT DEFAULT NULL (search in nickname or email)
+p_status TEXT DEFAULT NULL ('active', 'suspended', 'all')
+p_limit INTEGER DEFAULT 20
+p_offset INTEGER DEFAULT 0
+
+RETURNS: TABLE
+
+user_id UUID
+email TEXT (requires access to auth.users - admin only)
+nickname TEXT
+avatar_url TEXT
+is_admin BOOLEAN
+is_suspended BOOLEAN
+rating_avg DECIMAL
+rating_count INTEGER
+active_listings_count INTEGER
+reports_received_count INTEGER
+created_at TIMESTAMPTZ
+
+LOGIC:
+
+Validate auth.uid() is admin
+JOIN profiles with auth.users to get email (SECURITY DEFINER allows this)
+LEFT JOIN aggregations:
+
+COUNT of trade_listings WHERE status = 'active'
+COUNT of reports WHERE reported_entity_type = 'user' AND reported_entity_id = user_id
+
+
+Filter by p_query if not NULL (ILIKE on nickname or email)
+Filter by p_status:
+
+'active': is_suspended = FALSE
+'suspended': is_suspended = TRUE
+'all': no filter
+
+
+ORDER BY created_at DESC
+LIMIT and OFFSET
+
+IMPORTANT NOTE:
+
+Accessing auth.users requires SECURITY DEFINER and special permissions
+Only admins can see other users' emails
+
+PERMISSIONS:
+
+GRANT EXECUTE TO authenticated (internal validation)
+
+DELIVERABLES:
+
+File: supabase/migrations/YYYYMMDDHHMMSS_create_admin_dashboard_rpcs.sql
+Include both functions
+Example JSON response for get_admin_stats
+Note about auth.users access
+
+Give me git commands afterwards.

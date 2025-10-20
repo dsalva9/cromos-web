@@ -1,0 +1,328 @@
+## 📦 Subtask 7.4: Create listing detail page
+
+### Prompt for Claude CLI:
+```
+I need the listing detail page with chat option.
+
+CONTEXT:
+- Full listing view with all details
+- Chat button to contact seller
+- View counter increment
+- Edit/delete for owner
+
+TASK:
+Create the listing detail page:
+
+FILE: src/app/marketplace/[id]/page.tsx
+```typescript
+'use client';
+
+import { useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useListing } from '@/hooks/marketplace/useListing';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import Link from 'next/link';
+import { User, MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { toast } from 'sonner';
+
+export default function ListingDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { user } = useUser();
+  const listingId = params.id as string;
+  
+  const { listing, loading, error, incrementViews, deleteListing } = useListing(listingId);
+
+  useEffect(() => {
+    if (listing && user?.id !== listing.user_id) {
+      incrementViews();
+    }
+  }, [listing, user, incrementViews]);
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this listing?')) return;
+    
+    try {
+      await deleteListing();
+      toast.success('Listing deleted successfully');
+      router.push('/marketplace');
+    } catch (error) {
+      toast.error('Failed to delete listing');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (error || !listing) {
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">Listing not found</p>
+          <Link href="/marketplace">
+            <Button>Back to Marketplace</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const isOwner = user?.id === listing.user_id;
+  const canContact = user && !isOwner && listing.status === 'active';
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* Image */}
+          <div>
+            <ModernCard>
+              <ModernCardContent className="p-0">
+                <div className="relative aspect-square bg-[#374151]">
+                  {listing.image_url ? (
+                    <Image
+                      src={listing.image_url}
+                      alt={listing.title}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-9xl font-black text-gray-600">
+                        {listing.title.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ModernCardContent>
+            </ModernCard>
+          </div>
+
+          {/* Details */}
+          <div className="space-y-6">
+            <div>
+              <div className="flex items-start justify-between mb-4">
+                <Badge className={`
+                  ${listing.status === 'active' ? 'bg-green-500' : ''}
+                  ${listing.status === 'sold' ? 'bg-gray-500' : ''}
+                  ${listing.status === 'removed' ? 'bg-red-500' : ''}
+                  text-white uppercase
+                `}>
+                  {listing.status}
+                </Badge>
+
+                {isOwner && (
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={`/marketplace/${listing.id}/edit`}>
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleDelete}
+                      className="text-red-500"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <h1 className="text-3xl font-black text-white mb-4">
+                {listing.title}
+              </h1>
+
+              {/* Metadata */}
+              <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-6">
+                {listing.collection_name && (
+                  <div>
+                    <span className="font-bold">Collection:</span> {listing.collection_name}
+                  </div>
+                )}
+                {listing.sticker_number && (
+                  <div>
+                    <span className="font-bold">Number:</span> #{listing.sticker_number}
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <Eye className="h-4 w-4" />
+                  {listing.views_count} views
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  {new Date(listing.created_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* Description */}
+              {listing.description && (
+                <ModernCard className="mb-6">
+                  <ModernCardContent className="p-4">
+                    <h3 className="font-bold text-white mb-2">Description</h3>
+                    <p className="text-gray-300 whitespace-pre-wrap">
+                      {listing.description}
+                    </p>
+                  </ModernCardContent>
+                </ModernCard>
+              )}
+
+              {/* Seller */}
+              <ModernCard className="mb-6">
+                <ModernCardContent className="p-4">
+                  <h3 className="font-bold text-white mb-3">Seller</h3>
+                  <Link href={`/users/${listing.user_id}`}>
+                    <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                      {listing.author_avatar_url ? (
+                        <Image
+                          src={listing.author_avatar_url}
+                          alt={listing.author_nickname}
+                          width={48}
+                          height={48}
+                          className="rounded-full border-2 border-black"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center">
+                          <User className="h-6 w-6 text-black" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-bold text-white">{listing.author_nickname}</p>
+                        <p className="text-sm text-gray-400">View profile</p>
+                      </div>
+                    </div>
+                  </Link>
+                </ModernCardContent>
+              </ModernCard>
+
+              {/* Contact Button */}
+              {canContact && (
+                <Button
+                  size="lg"
+                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                  asChild
+                >
+                  <Link href={`/marketplace/${listing.id}/chat`}>
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Contact Seller
+                  </Link>
+                </Button>
+              )}
+
+              {isOwner && (
+                <p className="text-center text-gray-400 text-sm mt-4">
+                  This is your listing
+                </p>
+              )}
+
+              {!user && (
+<p className="text-center text-gray-400 text-sm mt-4">
+<Link href="/login" className="text-[#FFC000] hover:underline">
+Sign in
+</Link>
+{' '}to contact the seller
+</p>
+)}
+</div>
+</div>
+</div>
+</div>
+</div>
+);
+}
+
+2. src/hooks/marketplace/useListing.ts
+```typescriptimport { useState, useEffect, useCallback } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';interface Listing {
+id: string;
+user_id: string;
+author_nickname: string;
+author_avatar_url: string | null;
+title: string;
+description: string | null;
+sticker_number: string | null;
+collection_name: string | null;
+image_url: string | null;
+status: string;
+views_count: number;
+created_at: string;
+}export function useListing(listingId: string) {
+const supabase = useSupabaseClient();
+const [listing, setListing] = useState<Listing | null>(null);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState<string | null>(null);useEffect(() => {
+fetchListing();
+}, [listingId]);const fetchListing = async () => {
+try {
+setLoading(true);  // Get listing with author info
+  const { data, error: fetchError } = await supabase
+    .from('trade_listings')
+    .select(`
+      *,
+      author:profiles!user_id (
+        nickname,
+        avatar_url
+      )
+    `)
+    .eq('id', listingId)
+    .single();  if (fetchError) throw fetchError;  if (data) {
+    setListing({
+      ...data,
+      author_nickname: data.author.nickname,
+      author_avatar_url: data.author.avatar_url
+    });
+  }
+} catch (err) {
+  setError(err instanceof Error ? err.message : 'Unknown error');
+} finally {
+  setLoading(false);
+}
+};const incrementViews = useCallback(async () => {
+try {
+await supabase
+.from('trade_listings')
+.update({ views_count: (listing?.views_count || 0) + 1 })
+.eq('id', listingId);  // Update local state
+  setListing(prev => prev ? { ...prev, views_count: prev.views_count + 1 } : null);
+} catch (err) {
+  console.error('Failed to increment views:', err);
+}
+}, [supabase, listingId, listing?.views_count]);const deleteListing = useCallback(async () => {
+try {
+const { error: deleteError } = await supabase.rpc('update_listing_status', {
+p_listing_id: parseInt(listingId),
+p_new_status: 'removed'
+});  if (deleteError) throw deleteError;
+} catch (err) {
+  throw err;
+}
+}, [supabase, listingId]);return { listing, loading, error, incrementViews, deleteListing, refetch: fetchListing };
+}
+
+FEATURES:
+- Full listing details with image
+- Seller profile link
+- View counter (auto-increment for non-owners)
+- Contact seller button (for authenticated non-owners)
+- Edit/delete for owner
+- Status badge
+- Responsive layout
+
+DELIVERABLES:
+1. Complete listing detail page
+2. useListing hook with view tracking
+3. Owner actions (edit/delete)
+4. Contact seller flow
+
+Give me git commands afterwards.

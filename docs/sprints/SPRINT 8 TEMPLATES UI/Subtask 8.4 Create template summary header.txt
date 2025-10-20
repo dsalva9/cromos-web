@@ -1,0 +1,144 @@
+Subtask 8.4: Create template summary headerPrompt for Claude CLI:I need a summary header showing template progress statistics.
+
+CONTEXT:
+- Shows completion percentage
+- Displays owned, missing, duplicates counts
+- Active/inactive indicator
+- Template info
+
+TASK:
+Create the summary header:
+
+FILE: src/components/templates/TemplateSummaryHeader.tsx
+```typescript'use client';import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Check, X, Copy as CopyIcon } from 'lucide-react';
+import { useMemo } from 'react';interface TemplateCopy {
+copy_id: string;
+template_id: string;
+title: string;
+is_active: boolean;
+copied_at: string;
+original_author_nickname: string;
+completed_slots: number;
+total_slots: number;
+}interface SlotProgress {
+status: 'missing' | 'owned' | 'duplicate';
+count: number;
+}interface TemplateSummaryHeaderProps {
+copy: TemplateCopy;
+progress: SlotProgress[];
+}export function TemplateSummaryHeader({ copy, progress }: TemplateSummaryHeaderProps) {
+const stats = useMemo(() => {
+const owned = progress.filter(s => s.status === 'owned').length;
+const duplicates = progress.filter(s => s.status === 'duplicate').length;
+const missing = progress.filter(s => s.status === 'missing').length;
+const totalDuplicatesCount = progress
+.filter(s => s.status === 'duplicate')
+.reduce((sum, s) => sum + s.count, 0);const completionPercentage = copy.total_slots > 0 
+  ? Math.round((copy.completed_slots / copy.total_slots) * 100)
+  : 0;return {
+  owned,
+  duplicates,
+  missing,
+  totalDuplicatesCount,
+  completionPercentage
+};
+}, [copy, progress]);return (
+<ModernCard className="mb-6">
+<ModernCardContent className="p-6">
+<div className="space-y-6">
+{/* Title and Active Badge */}
+<div className="flex items-start justify-between">
+<div>
+<h1 className="text-3xl font-black text-white mb-2">
+{copy.title}
+</h1>
+<p className="text-gray-400 text-sm">
+by {copy.original_author_nickname}
+</p>
+</div>        <Badge 
+          className={`
+            ${copy.is_active ? 'bg-green-500' : 'bg-gray-500'} 
+            text-white uppercase
+          `}
+        >
+          {copy.is_active ? 'Active' : 'Inactive'}
+        </Badge>
+      </div>      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-400">Completion</span>
+          <span className="text-white font-bold">
+            {stats.completionPercentage}%
+          </span>
+        </div>
+        <Progress 
+          value={stats.completionPercentage} 
+          className="h-3 bg-gray-700"
+        />
+        <p className="text-sm text-gray-400 text-center">
+          {copy.completed_slots} / {copy.total_slots} cards
+        </p>
+      </div>      {/* Stats Pills */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Owned */}
+        <div className="bg-green-900/30 border-2 border-green-700 rounded-md p-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Check className="h-5 w-5 text-green-400" />
+            <span className="text-sm uppercase font-bold text-green-400">
+              Owned
+            </span>
+          </div>
+          <p className="text-3xl font-black text-white">
+            {stats.owned}
+          </p>
+        </div>        {/* Duplicates */}
+        <div className="bg-[#FFC000]/20 border-2 border-[#FFC000] rounded-md p-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <CopyIcon className="h-5 w-5 text-[#FFC000]" />
+            <span className="text-sm uppercase font-bold text-[#FFC000]">
+              Duplicates
+            </span>
+          </div>
+          <p className="text-3xl font-black text-white">
+            {stats.duplicates}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            ({stats.totalDuplicatesCount} total)
+          </p>
+        </div>        {/* Missing */}
+        <div className="bg-gray-800/30 border-2 border-gray-600 rounded-md p-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <X className="h-5 w-5 text-gray-400" />
+            <span className="text-sm uppercase font-bold text-gray-400">
+              Missing
+            </span>
+          </div>
+          <p className="text-3xl font-black text-white">
+            {stats.missing}
+          </p>
+        </div>
+      </div>
+    </div>
+  </ModernCardContent>
+</ModernCard>
+);
+}
+
+FEATURES:
+- Completion percentage with progress bar
+- Three stat pills: owned, duplicates, missing
+- Active/inactive badge
+- Template title and author
+- Color-coded stats (green, gold, gray)
+- Responsive grid layout
+
+DELIVERABLES:
+1. TemplateSummaryHeader component
+2. Progress bar
+3. Stats pills with icons
+4. Responsive layout
+
+Give me git commands afterwards.

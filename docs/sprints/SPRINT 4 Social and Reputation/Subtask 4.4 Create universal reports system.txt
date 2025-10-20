@@ -1,0 +1,96 @@
+
+## 📦 Subtask 4.4: Create universal reports system
+
+### Prompt for Claude CLI:
+```
+I need the reports system to moderate UGC content.
+
+CONTEXT:
+- Any content can be reported: users, listings, templates, chats
+- Reports go to moderation queue
+- Admin can resolve, dismiss, or take action
+
+TASK:
+Create a SQL migration with:
+
+TABLE: reports
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- reporter_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- reported_entity_type: TEXT CHECK (reported_entity_type IN ('user', 'listing', 'template', 'chat'))
+- reported_entity_id: BIGINT NOT NULL
+- reason: TEXT NOT NULL (category: spam, inappropriate, scam, etc.)
+- description: TEXT
+- status: TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'dismissed'))
+- reviewed_by: UUID REFERENCES profiles(id)
+- reviewed_at: TIMESTAMPTZ
+- admin_notes: TEXT
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+
+CONSTRAINTS:
+- UNIQUE(reporter_id, reported_entity_type, reported_entity_id) WHERE status = 'pending'
+  (prevent report spam)
+
+INDICES:
+- idx_reports_status ON (status) WHERE status = 'pending'
+- idx_reports_entity ON (reported_entity_type, reported_entity_id)
+- idx_reports_reporter ON (reporter_id)
+
+RLS POLICIES:
+- Users can insert (create report)
+- Users can read only their own reports
+- Admins can read all
+- Admins can update (resolve)
+
+3 RPC FUNCTIONS:
+
+FUNCTION 1: create_report
+PARAMETERS:
+- p_entity_type TEXT
+- p_entity_id BIGINT
+- p_reason TEXT
+- p_description TEXT DEFAULT NULL
+RETURNS: BIGINT (report_id)
+LOGIC:
+1. Validate p_entity_type in allowed values
+2. Validate p_reason not empty
+3. Verify no pending report exists from same user for same entity
+4. INSERT INTO reports
+5. RETURN report_id
+
+FUNCTION 2: list_pending_reports (ADMIN ONLY)
+PARAMETERS:
+- p_limit INTEGER DEFAULT 20
+- p_offset INTEGER DEFAULT 0
+RETURNS: TABLE (report_id, reporter_nickname, entity_type, entity_id, reason, description, created_at)
+LOGIC:
+1. Validate auth.uid() is admin:
+   SELECT is_admin FROM profiles WHERE id = auth.uid()
+   If not admin: RAISE EXCEPTION 'Only admins can view reports'
+2. SELECT from reports WHERE status = 'pending'
+3. JOIN profiles for reporter_nickname
+4. ORDER BY created_at ASC (oldest first)
+
+FUNCTION 3: resolve_report (ADMIN ONLY)
+PARAMETERS:
+- p_report_id BIGINT
+- p_action TEXT ('dismiss', 'resolved')
+- p_admin_notes TEXT DEFAULT NULL
+RETURNS: VOID
+LOGIC:
+1. Validate auth.uid() is admin
+2. Validate p_action in allowed values
+3. UPDATE reports SET status = 'reviewed', reviewed_by = auth.uid(), reviewed_at = NOW(), admin_notes = p_admin_notes
+4. If p_action requires additional action (will be extended in Sprint 5)
+
+PERMISSIONS:
+- GRANT EXECUTE ON create_report TO authenticated
+- GRANT EXECUTE ON list_pending_reports, resolve_report TO authenticated (internal validation)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_reports_system.sql
+2. Include table + 3 RPCs
+3. Comment moderation flow
+
+Give me git commands afterwards.
+```

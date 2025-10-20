@@ -1,0 +1,108 @@
+
+## 📦 Subtask 9.3: Add navigation links for integration
+
+### Prompt for Claude CLI:
+```
+I need to update navigation to include new integration routes.
+
+CONTEXT:
+- Add "My Listings" link to header
+- Add "Publish" buttons in collection view
+- Ensure proper routing between features
+
+TASK:
+Update navigation components:
+
+1. src/components/site-header.tsx
+   - Add "My Listings" link after "My Templates"
+   - Update navigation links array
+```typescript
+// In site-header.tsx, update baseLinks:
+
+const baseLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/marketplace', label: 'Marketplace' },
+  { href: '/templates', label: 'Templates' },
+  { href: '/my-templates', label: 'My Templates' },
+  { href: '/marketplace/my-listings', label: 'My Listings' }, // NEW
+  { href: '/profile', label: 'Profile' },
+];
+```
+
+2. Create breadcrumb component for nested routes:
+
+FILE: src/components/Breadcrumbs.tsx
+```typescript
+'use client';
+
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface BreadcrumbsProps {
+  items: BreadcrumbItem[];
+}
+
+export function Breadcrumbs({ items }: BreadcrumbsProps) {
+  return (
+    <nav className="flex items-center space-x-2 text-sm text-gray-400 mb-6">
+      {items.map((item, index) => (
+        <div key={index} className="flex items-center">
+          {index > 0 && <ChevronRight className="h-4 w-4 mx-2" />}
+          {item.href ? (
+            <Link 
+              href={item.href}
+              className="hover:text-white transition-colors"
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <span className="text-white font-bold">{item.label}</span>
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+```
+
+3. Add quick action buttons to template progress view:
+
+Update src/app/my-templates/[copyId]/page.tsx to add action buttons:
+```typescript
+// Add before TemplateProgressGrid component:
+
+<div className="flex flex-wrap gap-4 mb-6">
+  <Link href="/marketplace/my-listings">
+    <Button variant="outline">
+      <List className="mr-2 h-4 w-4" />
+      View My Listings
+    </Button>
+  </Link>
+  
+  <Link href="/marketplace/create">
+    <Button variant="outline">
+      <Plus className="mr-2 h-4 w-4" />
+      Create Manual Listing
+    </Button>
+  </Link>
+</div>
+```
+
+FEATURES:
+- Updated header navigation
+- Breadcrumbs for nested routes
+- Quick action buttons in collection view
+- Consistent routing between features
+
+DELIVERABLES:
+1. Updated site-header.tsx
+2. Breadcrumbs component
+3. Quick action buttons in collection view
+
+Give me git commands afterwards.
+```

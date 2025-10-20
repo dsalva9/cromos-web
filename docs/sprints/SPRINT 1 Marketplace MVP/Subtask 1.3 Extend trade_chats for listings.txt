@@ -1,0 +1,54 @@
+
+## 📦 Subtask 1.3: Extend `trade_chats` for listings
+
+### Prompt for Claude CLI:
+```
+I need to extend the chat system to support conversations from listings.
+
+CONTEXT:
+- trade_chats already exists for trade proposals (trade_proposal_id)
+- Now users can start chat from a listing without formal proposal
+- Both types of chat coexist
+
+TASK:
+Create a SQL migration that:
+
+1. ADD COLUMN:
+   ALTER TABLE trade_chats ADD COLUMN listing_id BIGINT REFERENCES trade_listings(id) ON DELETE SET NULL;
+
+2. COMMENT column:
+   COMMENT ON COLUMN trade_chats.listing_id IS 'Optional: reference to listing if chat started from a listing';
+
+3. CREATE INDEX:
+   CREATE INDEX idx_trade_chats_listing ON trade_chats(listing_id) WHERE listing_id IS NOT NULL;
+
+4. ADD CHECK CONSTRAINT (logic):
+   -- Comment that trade_proposal_id and listing_id are mutually exclusive
+   -- A chat is ABOUT a proposal OR ABOUT a listing, not both
+   -- (Don't create real constraint, just document in comments)
+
+5. CREATE RPC: get_listing_chats
+   PARAMETERS: p_listing_id BIGINT
+   RETURNS: TABLE (id, sender_id, sender_nickname, message, created_at)
+   LOGIC:
+   - SELECT from trade_chats WHERE listing_id = p_listing_id
+   - JOIN profiles for sender_nickname
+   - Validate auth.uid() is participant (listing owner OR has sent message)
+   - ORDER BY created_at ASC
+
+6. MODIFY existing RPC (if exists): send message
+   - Or create new: send_listing_message(p_listing_id, p_message)
+   - Validate listing exists and is active
+   - Validate auth.uid() != listing owner
+   - INSERT into trade_chats with listing_id
+
+RLS POLICIES:
+- Extend existing trade_chats policies to include listing_id
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_extend_trade_chats_for_listings.sql
+2. Include backward compatibility (existing chats without listing_id keep working)
+3. Usage example
+
+Give me git commands afterwards.
+```

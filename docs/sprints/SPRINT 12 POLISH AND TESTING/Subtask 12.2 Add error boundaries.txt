@@ -1,0 +1,193 @@
+ Subtask 12.2: Add error boundariesPrompt for Claude CLI:I need error boundaries to catch and display errors gracefully.
+
+CONTEXT:
+- Prevent white screen of death
+- User-friendly error messages
+- Error reporting to console
+- Reset functionality
+
+TASK:
+Create error boundaries:
+
+FILES TO CREATE:
+
+1. src/components/ErrorBoundary.tsx
+```typescript'use client';import { Component, ReactNode } from 'react';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';interface Props {
+children: ReactNode;
+fallback?: ReactNode;
+}interface State {
+hasError: boolean;
+error?: Error;
+}export class ErrorBoundary extends Component<Props, State> {
+constructor(props: Props) {
+super(props);
+this.state = { hasError: false };
+}static getDerivedStateFromError(error: Error): State {
+return { hasError: true, error };
+}componentDidCatch(error: Error, errorInfo: any) {
+console.error('Error caught by boundary:', error, errorInfo);
+}render() {
+if (this.state.hasError) {
+if (this.props.fallback) {
+return this.props.fallback;
+}  return (
+    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center p-4">
+      <ModernCard className="max-w-md w-full">
+        <ModernCardContent className="p-8 text-center space-y-6">
+          <AlertTriangle className="h-16 w-16 mx-auto text-red-500" />          <div>
+            <h2 className="text-2xl font-black text-white mb-2">
+              Oops! Something went wrong
+            </h2>
+            <p className="text-gray-400">
+              We're sorry, but something unexpected happened. Please try again.
+            </p>
+          </div>          {process.env.NODE_ENV === 'development' && this.state.error && (
+            <details className="text-left">
+              <summary className="text-sm text-gray-400 cursor-pointer">
+                Error details (dev only)
+              </summary>
+              <pre className="mt-2 text-xs text-red-400 overflow-auto p-2 bg-black rounded">
+                {this.state.error.message}
+              </pre>
+            </details>
+          )}          <div className="flex gap-3">
+            <Button
+              onClick={() => this.setState({ hasError: false, error: undefined })}
+              className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700]"
+            >
+              Try Again
+            </Button>
+            <Button
+              onClick={() => window.location.href = '/'}
+              variant="outline"
+              className="flex-1"
+            >
+              Go Home
+            </Button>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
+    </div>
+  );
+}return this.props.children;
+}
+}
+
+2. src/app/error.tsx (Next.js error page)
+```typescript'use client';import { useEffect } from 'react';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';export default function Error({
+error,
+reset,
+}: {
+error: Error & { digest?: string };
+reset: () => void;
+}) {
+useEffect(() => {
+console.error('Page error:', error);
+}, [error]);return (
+<div className="min-h-screen bg-[#1F2937] flex items-center justify-center p-4">
+<ModernCard className="max-w-md w-full">
+<ModernCardContent className="p-8 text-center space-y-6">
+<AlertTriangle className="h-16 w-16 mx-auto text-red-500" />      <div>
+        <h2 className="text-2xl font-black text-white mb-2">
+          Something went wrong!
+        </h2>
+        <p className="text-gray-400">
+          We encountered an error while loading this page.
+        </p>
+      </div>      <div className="flex gap-3">
+        <Button
+          onClick={reset}
+          className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700]"
+        >
+          Try Again
+        </Button>
+        <Button
+          onClick={() => window.location.href = '/'}
+          variant="outline"
+          className="flex-1"
+        >
+          Go Home
+        </Button>
+      </div>
+    </ModernCardContent>
+  </ModernCard>
+</div>
+);
+}
+
+3. src/app/global-error.tsx
+```typescript'use client';import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';export default function GlobalError({
+error,
+reset,
+}: {
+error: Error & { digest?: string };
+reset: () => void;
+}) {
+return (
+<html>
+<body>
+<div className="min-h-screen bg-[#1F2937] flex items-center justify-center p-4">
+<ModernCard className="max-w-md w-full">
+<ModernCardContent className="p-8 text-center space-y-6">
+<AlertTriangle className="h-16 w-16 mx-auto text-red-500" />          <div>
+            <h2 className="text-2xl font-black text-white mb-2">
+              Critical Error
+            </h2>
+            <p className="text-gray-400">
+              A critical error occurred. Please refresh the page.
+            </p>
+          </div>          <Button
+            onClick={reset}
+            className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700]"
+          >
+            Refresh Page
+          </Button>
+        </ModernCardContent>
+      </ModernCard>
+    </div>
+  </body>
+</html>
+);
+}
+
+4. Wrap critical components with ErrorBoundary:
+
+Update src/app/layout.tsx:
+```typescriptimport { ErrorBoundary } from '@/components/ErrorBoundary';export default function RootLayout({ children }: { children: ReactNode }) {
+return (
+<html lang="en">
+<body>
+<ErrorBoundary>
+<SupabaseProvider>
+<SiteHeader />
+{children}
+</SupabaseProvider>
+</ErrorBoundary>
+</body>
+</html>
+);
+}
+
+FEATURES:
+- Catches React component errors
+- User-friendly error display
+- Try again and go home actions
+- Dev mode error details
+- Next.js error pages
+- Global error handler
+
+DELIVERABLES:
+1. ErrorBoundary component
+2. Next.js error pages
+3. Wrapped critical components
+4. Console error logging
+
+Give me git commands afterwards.

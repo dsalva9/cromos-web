@@ -1,0 +1,240 @@
+ Subtask 6.5.1: Project setup and dependenciesPrompt for Claude CLI:I need to setup the complete Next.js 14 project with all dependencies and configurations.
+
+CONTEXT:
+- Starting frontend development after backend is complete
+- Need all dependencies, configs, and environment setup
+- TypeScript, Tailwind, Supabase client, and UI libraries
+
+TASK:
+Setup complete project foundation:
+
+FILES TO CREATE/UPDATE:
+
+1. package.json (complete)
+```json{
+"name": "cambio-cromos",
+"version": "1.6.0",
+"private": true,
+"scripts": {
+"dev": "next dev",
+"build": "next build",
+"start": "next start",
+"lint": "next lint",
+"type-check": "tsc --noEmit",
+"analyze": "ANALYZE=true next build"
+},
+"dependencies": {
+"next": "14.2.5",
+"react": "^18.3.1",
+"react-dom": "^18.3.1",
+"@supabase/supabase-js": "^2.39.0",
+"@supabase/ssr": "^0.1.0",
+"sonner": "^1.4.0",
+"lucide-react": "^0.263.1",
+"clsx": "^2.1.0",
+"tailwind-merge": "^2.2.0",
+"class-variance-authority": "^0.7.0",
+"@radix-ui/react-dialog": "^1.0.5",
+"@radix-ui/react-select": "^2.0.0",
+"@radix-ui/react-tabs": "^1.0.4",
+"@radix-ui/react-radio-group": "^1.1.3",
+"@radix-ui/react-alert-dialog": "^1.0.5",
+"@radix-ui/react-progress": "^1.0.3"
+},
+"devDependencies": {
+"typescript": "^5.3.3",
+"@types/node": "^20.11.5",
+"@types/react": "^18.2.48",
+"@types/react-dom": "^18.2.18",
+"autoprefixer": "^10.4.17",
+"postcss": "^8.4.33",
+"tailwindcss": "^3.4.1",
+"eslint": "^8.56.0",
+"eslint-config-next": "14.2.5",
+"@next/bundle-analyzer": "^14.2.5"
+}
+}
+
+2. .env.local.example
+```envSupabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your-project-url.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-keyApp Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000Optional: Analytics, Error Tracking, etc.
+NEXT_PUBLIC_GA_ID=
+SENTRY_DSN=
+
+3. tailwind.config.ts
+```typescriptimport type { Config } from 'tailwindcss'const config: Config = {
+darkMode: 'class',
+content: [
+'./src/pages//*.{js,ts,jsx,tsx,mdx}',
+'./src/components//.{js,ts,jsx,tsx,mdx}',
+'./src/app/**/.{js,ts,jsx,tsx,mdx}',
+],
+theme: {
+extend: {
+colors: {
+// Custom brand colors
+primary: {
+DEFAULT: '#FFC000',
+dark: '#FFD700',
+},
+background: {
+DEFAULT: '#1F2937',
+dark: '#111827',
+light: '#374151',
+},
+border: '#000000',
+},
+borderWidth: {
+'3': '3px',
+},
+animation: {
+'spin': 'spin 1s linear infinite',
+},
+},
+},
+plugins: [],
+}
+export default config
+
+4. tsconfig.json (update paths)
+```json{
+"compilerOptions": {
+"target": "ES2017",
+"lib": ["dom", "dom.iterable", "esnext"],
+"allowJs": true,
+"skipLibCheck": true,
+"strict": true,
+"noEmit": true,
+"esModuleInterop": true,
+"module": "esnext",
+"moduleResolution": "bundler",
+"resolveJsonModule": true,
+"isolatedModules": true,
+"jsx": "preserve",
+"incremental": true,
+"plugins": [
+{
+"name": "next"
+}
+],
+"paths": {
+"@/": ["./src/"],
+"@/components/": ["./src/components/"],
+"@/hooks/": ["./src/hooks/"],
+"@/lib/": ["./src/lib/"],
+"@/types/": ["./src/types/"]
+}
+},
+"include": ["next-env.d.ts", "/*.ts", "/.tsx", ".next/types/**/.ts"],
+"exclude": ["node_modules"]
+}
+
+5. next.config.js
+```javascript/** @type {import('next').NextConfig} */
+const nextConfig = {
+images: {
+remotePatterns: [
+{
+protocol: 'https',
+hostname: '**.supabase.co',
+},
+],
+formats: ['image/avif', 'image/webp'],
+},
+swcMinify: true,
+compiler: {
+removeConsole: process.env.NODE_ENV === 'production',
+},
+}module.exports = nextConfig
+
+6. .eslintrc.json
+```json{
+"extends": "next/core-web-vitals",
+"rules": {
+"@next/next/no-img-element": "off",
+"react-hooks/exhaustive-deps": "warn"
+}
+}
+
+7. .gitignore (verify/update)dependencies
+/node_modules
+/.pnp
+.pnp.jstesting
+/coveragenext.js
+/.next/
+/out/production
+/buildmisc
+.DS_Store
+*.pemdebug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*local env files
+.env*.local
+.envvercel
+.verceltypescript
+*.tsbuildinfo
+next-env.d.ts
+
+8. src/globals.css (update with custom styles)
+```css@tailwind base;
+@tailwind components;
+@tailwind utilities;@layer base {
+:root {
+--background: 31 41 55; /* #1F2937 /
+--foreground: 255 255 255;
+--primary: 255 192 0; / #FFC000 */
+}
+{
+@apply border-border;
+}
+body {
+@apply bg-background text-foreground;
+font-feature-settings: "rlig" 1, "calt" 1;
+}/* Enhanced focus styles */
+*:focus-visible {
+@apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+}@layer utilities {
+/* Screen reader only */
+.sr-only {
+position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0, 0, 0, 0);
+white-space: nowrap;
+border-width: 0;
+}.focus:not-sr-only:focus {
+position: static;
+width: auto;
+height: auto;
+padding: inherit;
+margin: inherit;
+overflow: visible;
+clip: auto;
+white-space: normal;
+}
+}
+
+INSTALLATION COMMANDS:
+```bashInstall all dependencies
+npm installVerify installation
+npm run type-checkCreate .env.local from example
+cp .env.local.example .env.local
+Edit .env.local with your Supabase credentialsTest dev server
+npm run dev
+
+DELIVERABLES:
+1. Complete package.json with all dependencies
+2. Tailwind config with custom colors
+3. TypeScript config with paths
+4. Next.js config optimized
+5. Environment template
+6. ESLint config
+7. Updated globals.css
+
+Give me git commands afterwards.

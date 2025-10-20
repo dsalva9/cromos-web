@@ -1,0 +1,301 @@
+## 📦 Subtask 12.4: Performance optimizations
+
+### Prompt for Claude CLI:
+```
+I need to optimize performance across the application.
+
+CONTEXT:
+- Image optimization
+- Code splitting
+- Lazy loading
+- Caching strategies
+- Bundle size reduction
+
+TASK:
+Implement performance optimizations:
+
+CHANGES TO MAKE:
+
+1. Update next.config.js:
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    domains: ['your-supabase-project.supabase.co'],
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  // Enable SWC minification
+  swcMinify: true,
+  // Compiler options
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Experimental features
+  experimental: {
+    optimizeCss: true,
+  },
+};
+
+module.exports = nextConfig;
+```
+
+2. Create src/components/LazyImage.tsx:
+```typescript
+'use client';
+
+import { useState } from 'react';
+import Image, { ImageProps } from 'next/image';
+import { cn } from '@/lib/utils';
+
+interface LazyImageProps extends Omit<ImageProps, 'onLoad'> {
+  fallback?: React.ReactNode;
+}
+
+export function LazyImage({ 
+  className, 
+  fallback,
+  ...props 
+}: LazyImageProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  if (error && fallback) {
+    return <>{fallback}</>;
+  }
+
+  return (
+    <div className="relative">
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-700 animate-pulse" />
+      )}
+      <Image
+        {...props}
+        className={cn(
+          'transition-opacity duration-300',
+          isLoading ? 'opacity-0' : 'opacity-100',
+          className
+        )}
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setIsLoading(false);
+          setError(true);
+        }}
+      />
+    </div>
+  );
+}
+```
+
+3. Update image components to use LazyImage:
+
+Replace Image imports with LazyImage:
+```typescript
+import { LazyImage } from '@/components/LazyImage';
+
+// Usage
+<LazyImage
+  src={listing.image_url}
+  alt={listing.title}
+  fill
+  className="object-cover"
+  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+  fallback={
+    <div className="w-full h-full flex items-center justify-center bg-gray-700">
+      <span className="text-4xl">📷</span>
+    </div>
+  }
+/>
+```
+
+4. Implement route-based code splitting:
+
+Create src/app/loading.tsx:
+```typescript
+export default function Loading() {
+  return (
+    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full mx-auto mb-4" />
+        <p className="text-gray-400">Loading...</p>
+      </div>
+    </div>
+  );
+}
+```
+
+5. Add React.lazy for heavy components:
+
+src/components/admin/ReportDetailModal.tsx:
+```typescript
+import dynamic from 'next/dynamic';
+
+// Lazy load heavy modal
+const ReportDetailModal = dynamic(
+  () => import('@/components/admin/ReportDetailModal').then(mod => ({ default: mod.ReportDetailModal })),
+  {
+    loading: () => (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+      </div>
+    ),
+    ssr: false
+  }
+);
+```
+
+6. Implement intersection observer for infinite scroll:
+
+Update src/hooks/marketplace/useListings.ts:
+```typescript
+import { useEffect, useRef } from 'react';
+
+export function useListings({ search = '', limit = 20 }: UseListingsParams = {}) {
+  // ... existing code
+
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadMore]);
+
+  return { 
+    listings, 
+    loading, 
+    error, 
+    hasMore, 
+    loadMore,
+    observerTarget // Return ref for component to use
+  };
+}
+```
+
+7. Add request deduplication:
+
+Create src/lib/cache.ts:
+```typescript
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+export function getCached<T>(key: string): T | null {
+  const cached = cache.get(key);
+  if (!cached) return null;
+  
+  if (Date.now() - cached.timestamp > CACHE_DURATION) {
+    cache.delete(key);
+    return null;
+  }
+  
+  return cached.data as T;
+}
+
+export function setCache(key: string, data: any): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
+export function clearCache(key?: string): void {
+  if (key) {
+    cache.delete(key);
+  } else {
+    cache.clear();
+  }
+}
+```
+
+8. Optimize bundle size:
+
+package.json scripts:
+```json
+{
+  "scripts": {
+    "analyze": "ANALYZE=true next build",
+    "build": "next build",
+    "postbuild": "next-bundle-analyzer"
+  }
+}
+```
+
+Install bundle analyzer:
+```bash
+npm install -D @next/bundle-analyzer
+```
+
+Update next.config.js:
+```javascript
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer(nextConfig);
+```
+
+9. Add viewport meta for mobile:
+
+Update src/app/layout.tsx:
+```typescript
+export const metadata = {
+  title: 'CambioCromos',
+  description: 'Sports card marketplace',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  themeColor: '#1F2937',
+};
+```
+
+10. Implement stale-while-revalidate:
+
+Update hooks to use SWR pattern:
+```typescript
+// In hooks, add revalidation logic
+const [staleData, setStaleData] = useState(null);
+
+useEffect(() => {
+  // Serve stale data immediately
+  const cached = getCached(cacheKey);
+  if (cached) {
+    setStaleData(cached);
+  }
+  
+  // Revalidate in background
+  fetchFreshData();
+}, []);
+```
+
+PERFORMANCE CHECKLIST:
+- [ ] Images optimized and lazy loaded
+- [ ] Code splitting implemented
+- [ ] Route-based loading states
+- [ ] Heavy components lazy loaded
+- [ ] Intersection observer for infinite scroll
+- [ ] Request caching
+- [ ] Bundle analyzer configured
+- [ ] Viewport meta tags
+- [ ] Console logs removed in production
+- [ ] CSS optimized
+
+DELIVERABLES:
+1. Optimized Next.js config
+2. LazyImage component
+3. Code splitting setup
+4. Caching utilities
+5. Performance monitoring
+
+Give me git commands afterwards.
+```

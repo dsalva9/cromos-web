@@ -1,0 +1,190 @@
+## 📦 Subtask 12.1: Add loading skeletons and empty states
+
+### Prompt for Claude CLI:
+````
+I need to add loading skeletons and improve empty states across the app.
+
+CONTEXT:
+- Replace spinners with skeleton loaders where appropriate
+- Ensure all pages have proper empty states
+- Consistent design language
+
+TASK:
+Create reusable skeleton components and update existing pages:
+
+FILES TO CREATE/UPDATE:
+
+1. src/components/ui/skeleton.tsx
+````typescript
+import { cn } from '@/lib/utils';
+
+export function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn('animate-pulse rounded-md bg-gray-700', className)}
+      {...props}
+    />
+  );
+}
+````
+
+2. src/components/skeletons/ListingCardSkeleton.tsx
+````typescript
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export function ListingCardSkeleton() {
+  return (
+    <ModernCard>
+      <ModernCardContent className="p-0">
+        {/* Image Skeleton */}
+        <Skeleton className="aspect-square w-full" />
+
+        {/* Content */}
+        <div className="p-4 space-y-3">
+          {/* Title */}
+          <Skeleton className="h-6 w-3/4" />
+          
+          {/* Collection */}
+          <Skeleton className="h-4 w-1/2" />
+          
+          {/* Author */}
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 w-4 rounded-full" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+          
+          {/* Date */}
+          <Skeleton className="h-3 w-20" />
+        </div>
+      </ModernCardContent>
+    </ModernCard>
+  );
+}
+````
+
+3. src/components/skeletons/TemplateCardSkeleton.tsx
+````typescript
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Skeleton } from '@/components/ui/skeleton';
+
+export function TemplateCardSkeleton() {
+  return (
+    <ModernCard>
+      <ModernCardContent className="p-0">
+        {/* Image */}
+        <Skeleton className="aspect-video w-full" />
+
+        {/* Content */}
+        <div className="p-4 space-y-3">
+          {/* Title */}
+          <Skeleton className="h-6 w-4/5" />
+          
+          {/* Description */}
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          
+          {/* Stats */}
+          <div className="flex gap-4">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+          
+          {/* Author */}
+          <Skeleton className="h-4 w-32" />
+          
+          {/* Button */}
+          <Skeleton className="h-9 w-full" />
+        </div>
+      </ModernCardContent>
+    </ModernCard>
+  );
+}
+````
+
+4. src/components/EmptyState.tsx
+````typescript
+import { Button } from '@/components/ui/button';
+import { LucideIcon } from 'lucide-react';
+
+interface EmptyStateProps {
+  icon: LucideIcon;
+  title: string;
+  description?: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
+return (
+<div className="text-center py-16">
+<Icon className="h-16 w-16 mx-auto mb-4 text-gray-600" />
+<h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+{description && (
+<p className="text-gray-400 mb-6 max-w-md mx-auto">{description}</p>
+)}
+{action && (
+<Button
+       onClick={action.onClick}
+       className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+     >
+{action.label}
+</Button>
+)}
+</div>
+);
+}
+
+5. Update src/app/marketplace/page.tsx to use skeletons:
+```typescript// Replace loading spinner with:
+{loading && (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {Array.from({ length: 8 }).map((_, i) => (
+      <ListingCardSkeleton key={i} />
+    ))}
+  </div>
+)}// Replace empty state with:
+{!loading && listings.length === 0 && (
+<EmptyState
+icon={Package}
+title="No listings found"
+description="Be the first to share your cards with the community"
+action={user ? {
+label: "Create First Listing",
+onClick: () => router.push('/marketplace/create')
+} : undefined}
+/>
+)}
+
+6. Update src/app/templates/page.tsx to use skeletons:
+```typescript// Replace loading spinner with:
+{loading && (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <TemplateCardSkeleton key={i} />
+    ))}
+  </div>
+)}// Replace empty state with EmptyState component
+
+7. Update other pages (favorites, my-listings, etc.) similarly
+
+FEATURES:
+- Skeleton loaders matching actual content
+- Reusable EmptyState component
+- Consistent design across pages
+- Better perceived performance
+
+DELIVERABLES:
+1. Skeleton UI component
+2. ListingCardSkeleton
+3. TemplateCardSkeleton
+4. EmptyState component
+5. Updated pages with skeletons
+
+Give me git commands afterwards.

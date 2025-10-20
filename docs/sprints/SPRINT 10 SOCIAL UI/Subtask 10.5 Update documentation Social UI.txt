@@ -1,0 +1,167 @@
+Subtask 10.5: Update documentation - Social UI
+
+Prompt for Claude CLI:
+
+I need to update documentation for completed Social UI.
+
+CONTEXT:
+- Sprint 10 complete: public profiles, favorites, reports
+- 3 new pages, 4+ components, 4+ hooks
+- Social features ready for users
+
+TASK:
+Update documentation files:
+
+1. docs/current-features.md
+   - Update "### Social & Reputation System" section:
+```markdown ### Social & Reputation System ✅ **COMPLETE (v1.6.0)** **Backend:** ✅ Complete
+ **Frontend:** ✅ Complete - ✅ Public user profiles with stats
+ - ✅ Rating display (stars + average)
+ - ✅ Active listings on profile
+ - ✅ Favorite button to follow users
+ - ✅ Favorites list page
+ - ✅ Remove favorite functionality
+ - ✅ Universal report button
+ - ✅ Report modal with categories
+ - ✅ Report submission flow
+ - ⏳ Post-trade rating modal (Sprint 10 ongoing)
+ - ⏳ Rating display on profiles (Sprint 10 ongoing)
+
+2. docs/components-guide.md
+   - Add section "## Social Components ✅"
+```markdownSocial Components ✅FavoriteButton
+File: src/components/social/FavoriteButton.tsxToggle button to favorite/unfavorite users.Props:
+
+userId: string - Target user ID
+Features:
+
+Heart icon (filled when favorited)
+Optimistic updates
+Loading state
+Toast notifications
+Error handling with revert
+Usage:
+tsx   <FavoriteButton userId={userId} />ReportButton
+File: src/components/social/ReportButton.tsxButton to open report modal.Props:
+
+entityType: 'user' | 'listing' | 'template' | 'chat'
+entityId: string
+variant?: 'default' | 'outline' | 'ghost'
+size?: 'default' | 'sm' | 'lg'
+Usage:
+tsx   <ReportButton entityType="listing" entityId={listingId} />ReportModal
+File: src/components/social/ReportModal.tsxModal with report form.Props:
+
+open: boolean - Modal visibility
+onClose: () => void - Close handler
+entityType: string - Content type
+entityId: string - Content ID
+Features:
+
+Radio button reason selection
+Optional description textarea
+Character counter (500 max)
+Validation (reason required)
+Loading state
+Success/error feedback
+Report Reasons:
+
+Spam or misleading
+Inappropriate content
+Scam or fraud
+Harassment or abuse
+Fake or counterfeit items
+Other
+
+
+3. docs/api-endpoints.md
+   - Add section "## Social Hooks"
+```markdownSocial HooksuseUserProfile
+File: src/hooks/social/useUserProfile.tsFetches public user profile with stats and listings.Returns:
+
+profile - User profile data
+listings - User's active listings
+loading - Loading state
+error - Error message if any
+refetch - Function to refresh
+useFavorites
+File: src/hooks/social/useFavorites.tsManages user favorites.Functions:
+
+checkFavorite(userId) - Check if user is favorited
+toggleFavorite(userId) - Toggle favorite status
+Backend RPC: toggle_favoriteuseMyFavorites
+File: src/hooks/social/useMyFavorites.tsFetches current user's favorites list.Returns:
+
+favorites - Array of favorited users with stats
+loading - Loading state
+error - Error message
+refetch - Refresh function
+Backend RPC: list_my_favoritesuseReport
+File: src/hooks/social/useReport.tsSubmits content reports.Usage:
+typescript   const { submitReport, loading } = useReport();
+   
+   await submitReport(
+     'listing',  // entityType
+     '123',      // entityId
+     'spam',     // reason
+     'This listing appears to be spam'  // description (optional)
+   );Backend RPC: create_report
+
+4. CHANGELOG.md
+   - Add to [1.6.0] entry:
+```markdown ### Added - Social UI (Frontend) **Pages:**
+ - `/users/[userId]` - Public user profile
+ - `/favorites` - User's favorites list **Components:**
+ - `FavoriteButton` - Toggle favorite with optimistic updates
+ - `ReportButton` - Universal report trigger
+ - `ReportModal` - Report form with categories **Hooks:**
+ - `useUserProfile` - Fetch public profile with listings
+ - `useFavorites` - Manage favorites (check, toggle)
+ - `useMyFavorites` - Fetch user's favorites list
+ - `useReport` - Submit content reports **Features:**
+ - Public user profiles with avatar, rating, stats
+ - Active listings grid on profile
+ - Favorite/unfavorite users
+ - Favorites list with stats
+ - Remove from favorites
+ - Universal report system (users, listings, templates)
+ - Report modal with 6 categories
+ - Optional description field
+ - Report submission validation
+ - Toast notifications for all actions
+ - Empty states with CTAs
+
+5. TODO.md
+   - Update Sprint 10:
+```markdown ## ✅ Completed - Sprint 10: Social UI
+ - [x] Public user profile page
+ - [x] useUserProfile hook
+ - [x] FavoriteButton component
+ - [x] useFavorites hook
+ - [x] Favorites list page
+ - [x] useMyFavorites hook
+ - [x] ReportButton component
+ - [x] ReportModal with form
+ - [x] useReport hook
+ - [ ] Post-trade rating modal (moved to future)
+ - [ ] Rating display improvements (moved to future)
+
+6. Add to site-header.tsx navigation:
+```markdownNavigation UpdateAdd "Favorites" link to header navigation:typescript   const baseLinks = [
+     { href: '/', label: 'Home' },
+     { href: '/marketplace', label: 'Marketplace' },
+     { href: '/templates', label: 'Templates' },
+     { href: '/my-templates', label: 'My Templates' },
+     { href: '/marketplace/my-listings', label: 'My Listings' },
+     { href: '/favorites', label: 'Favorites' }, // NEW
+     { href: '/profile', label: 'Profile' },
+   ];
+DELIVERABLES:
+1. Updated current-features.md
+2. Updated components-guide.md with social components
+3. Updated api-endpoints.md with social hooks
+4. Updated CHANGELOG.md with Sprint 10 additions
+5. Updated TODO.md marking Sprint 10 complete
+6. Navigation update instructions
+
+Give me git commands to commit all docs together.

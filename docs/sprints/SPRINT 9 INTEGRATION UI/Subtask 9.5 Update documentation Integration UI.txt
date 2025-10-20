@@ -1,0 +1,175 @@
+
+## 📦 Subtask 9.5: Update documentation - Integration UI
+
+### Prompt for Claude CLI:I need to update documentation for completed Integration UI.CONTEXT:
+
+Sprint 9 complete: publish duplicates, my listings with sync, edit
+Bidirectional collection ↔ marketplace integration working
+3 new pages, 2+ components, 3+ hooks
+TASK:
+Update documentation files:
+docs/current-features.md
+
+Update "### Collection-Marketplace Integration" section:
+
+
+
+ ### Collection-Marketplace Integration ✅ **COMPLETE (v1.6.0)**
+     
+     **Backend:** ✅ Complete
+     **Frontend:** ✅ Complete
+     
+     - ✅ Publish duplicates from collection with 1 click
+     - ✅ Pre-filled listing form from slot data
+     - ✅ Editable details before publishing
+     - ✅ "My Listings" view with inventory sync
+     - ✅ Sync indicator for template-linked listings
+     - ✅ Current duplicate count display
+     - ✅ Alert badge when count = 0 but listing active
+     - ✅ Mark as sold button with automatic decrement
+     - ✅ Edit listing functionality
+     - ✅ Confirm dialogs for critical actions
+     - ✅ Navigation links between features
+docs/components-guide.md
+
+Add section "## Integration Components ✅"
+
+
+
+## Integration Components ✅
+   
+   ### MyListingCard
+   **File:** `src/components/integration/MyListingCard.tsx`
+   
+   Card for user's listings with sync information.
+   
+   **Props:**
+   - `listing: MyListing` - Listing with sync data
+   - `onUpdate: () => void` - Callback after actions
+   
+   **Features:**
+   - Status badge (active/sold/removed)
+   - Alert if needs attention (count = 0)
+   - Sync indicator for template-linked listings
+   - Current duplicate count display
+   - Mark as sold button with confirm
+   - Edit button for active listings
+   - View count and creation date
+   - Automatic decrement on sold
+   
+   ### Breadcrumbs
+   **File:** `src/components/Breadcrumbs.tsx`
+   
+   Navigation breadcrumbs for nested routes.
+   
+   **Props:**
+   - `items: BreadcrumbItem[]` - Array of breadcrumb items
+   
+   **Features:**
+   - Clickable links for parent routes
+   - Current page highlighted
+   - Chevron separators
+   - Responsive text sizing
+docs/api-endpoints.md
+
+Add section "## Integration Hooks"
+
+
+
+## Integration Hooks
+   
+   ### usePublishDuplicate
+   **File:** `src/hooks/integration/usePublishDuplicate.ts`
+   
+   Publishes a duplicate from collection to marketplace.
+   
+   **Usage:**
+```typescriptconst { publishDuplicate, loading } = usePublishDuplicate();const listingId = await publishDuplicate(copyId, slotId, {
+title: 'Custom Title',
+description: 'Custom description',
+// ... other optional fields
+});
+   
+   **Backend RPC:** `publish_duplicate_to_marketplace`
+   
+   ### useMyListings
+   **File:** `src/hooks/integration/useMyListings.ts`
+   
+   Fetches user's listings with inventory sync data.
+   
+   **Returns:**
+   - `listings` - Array with sync information
+   - `loading` - Loading state
+   - `error` - Error message if any
+   - `refetch` - Function to refresh data
+   
+   **Backend RPC:** `get_my_listings_with_progress`
+   
+   ### useMarkSold
+   **File:** `src/hooks/integration/useMarkSold.ts`
+   
+   Marks listing as sold and decrements duplicate count.
+   
+   **Usage:**
+```typescriptconst { markSold, loading } = useMarkSold();await markSold(listingId); // Auto-decrements if linked to template
+   
+   **Backend RPC:** `mark_listing_sold_and_decrement`
+CHANGELOG.md
+
+Add to [1.6.0] entry:
+
+
+
+### Added - Integration UI (Frontend)
+     
+     **Pages:**
+     - `/my-templates/[copyId]/publish/[slotId]` - Publish duplicate modal
+     - `/marketplace/my-listings` - My listings with sync
+     - `/marketplace/[id]/edit` - Edit listing
+     
+     **Components:**
+     - `MyListingCard` - Listing card with sync info and alerts
+     - `Breadcrumbs` - Navigation breadcrumbs
+     
+     **Hooks:**
+     - `usePublishDuplicate` - Publish from collection to marketplace
+     - `useMyListings` - Fetch listings with sync data
+     - `useMarkSold` - Mark sold with auto-decrement
+     
+     **Features:**
+     - Publish duplicates with 1 click from collection
+     - Pre-filled listing form from slot data
+     - "My Listings" view with tabs (active/sold/removed)
+     - Sync indicator for template-linked listings
+     - Alert badge when listing active but count = 0
+     - Mark as sold with automatic duplicate decrement
+     - Edit listing functionality
+     - Confirm dialogs for critical actions
+     - Updated navigation with "My Listings" link
+     - Quick action buttons in collection view
+     - Ownership validation on edit
+TODO.md
+
+Update Sprint 9:
+
+
+
+ ## ✅ Completed - Sprint 9: Integration UI
+     - [x] Publish duplicate modal with pre-filling
+     - [x] usePublishDuplicate hook
+     - [x] "My Listings" page with tabs
+     - [x] MyListingCard with sync info
+     - [x] useMyListings hook with progress data
+     - [x] Mark as sold with auto-decrement
+     - [x] useMarkSold hook
+     - [x] Edit listing page
+     - [x] Navigation updates
+     - [x] Breadcrumbs component
+     - [x] Quick action buttonsDELIVERABLES:
+
+Updated current-features.md
+Updated components-guide.md with integration components
+Updated api-endpoints.md with integration hooks
+Updated CHANGELOG.md with Sprint 9 additions
+Updated TODO.md marking Sprint 9 complete
+Give me git commands to commit all docs together.

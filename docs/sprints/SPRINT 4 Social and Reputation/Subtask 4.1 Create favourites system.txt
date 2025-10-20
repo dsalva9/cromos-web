@@ -1,0 +1,69 @@
+## 📦 Subtask 4.1: Create favorites system
+
+### Prompt for Claude CLI:
+```
+I need the favorites system to follow other users.
+
+CONTEXT:
+- Mark users as favorites
+- See their new listings easily
+- Favorites counter
+
+TASK:
+Create a SQL migration with:
+
+TABLE: user_favorites
+COLUMNS:
+- user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- favorite_user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINTS:
+- PRIMARY KEY (user_id, favorite_user_id)
+- CHECK (user_id != favorite_user_id)
+
+INDICES:
+- idx_favorites_user ON (user_id)
+- idx_favorites_target ON (favorite_user_id)
+
+RLS POLICIES:
+- Users can read only WHERE user_id = auth.uid()
+- Users can insert only with user_id = auth.uid()
+- Users can delete only their own favorites
+- No UPDATE allowed
+
+3 RPC FUNCTIONS:
+
+FUNCTION 1: toggle_favorite
+PARAMETERS: p_target_user_id UUID
+RETURNS: BOOLEAN (TRUE if added, FALSE if removed)
+LOGIC:
+1. Validate auth.uid() != p_target_user_id
+2. Check if exists: SELECT FROM user_favorites WHERE...
+3. If exists: DELETE and return FALSE
+4. If not exists: INSERT and return TRUE
+
+FUNCTION 2: list_my_favorites
+PARAMETERS: p_limit INTEGER DEFAULT 50, p_offset INTEGER DEFAULT 0
+RETURNS: TABLE (favorite_user_id, nickname, avatar_url, active_listings_count, created_at)
+LOGIC:
+1. SELECT from user_favorites WHERE user_id = auth.uid()
+2. JOIN with profiles
+3. LEFT JOIN count of active listings
+4. ORDER BY created_at DESC
+
+FUNCTION 3: get_favorites_count
+PARAMETERS: p_user_id UUID
+RETURNS: INTEGER
+LOGIC: SELECT COUNT(*) FROM user_favorites WHERE favorite_user_id = p_user_id
+
+PERMISSIONS:
+- GRANT EXECUTE ON toggle_favorite, list_my_favorites TO authenticated
+- GRANT EXECUTE ON get_favorites_count TO anon, authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_favorites_system.sql
+2. Include table + 3 RPCs in one file
+3. Usage examples
+
+Give me git commands afterwards.
+```

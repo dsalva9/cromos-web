@@ -1,0 +1,223 @@
+
+## 📦 Subtask 8.2: Create template card component
+
+### Prompt for Claude CLI:
+```
+I need the template card component for templates explorer.
+
+CONTEXT:
+- Displays template preview in grid
+- Shows author, rating, copies count, pages count
+- Copy button for authenticated users
+- Click to preview page
+
+TASK:
+Create the template card:
+
+FILE: src/components/templates/TemplateCard.tsx
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import Image from 'next/image';
+import { User, Star, Copy, FileText } from 'lucide-react';
+import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
+interface Template {
+  id: string;
+  author_id: string;
+  author_nickname: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  rating_avg: number;
+  rating_count: number;
+  copies_count: number;
+  pages_count: number;
+  created_at: string;
+}
+
+interface TemplateCardProps {
+  template: Template;
+}
+
+export function TemplateCard({ template }: TemplateCardProps) {
+  const { user } = useUser();
+  const router = useRouter();
+  const { copyTemplate, loading } = useCopyTemplate();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to detail page
+    
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const copyId = await copyTemplate(template.id);
+      setCopied(true);
+      toast.success('Template copied successfully!');
+      setTimeout(() => {
+        router.push(`/my-templates/${copyId}`);
+      }, 1000);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to copy template');
+    }
+  };
+
+  return (
+    <Link href={`/templates/${template.id}`}>
+      <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
+        <ModernCardContent className="p-0">
+          {/* Image */}
+          <div className="relative aspect-video bg-[#374151]">
+            {template.image_url ? (
+              <Image
+                src={template.image_url}
+                alt={template.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-6xl font-black text-gray-600">
+                  {template.title.charAt(0).toUpperCase()}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="p-4 space-y-3">
+            {/* Title */}
+            <h3 className="font-bold text-white text-lg line-clamp-2">
+              {template.title}
+            </h3>
+
+            {/* Description */}
+            {template.description && (
+              <p className="text-sm text-gray-400 line-clamp-2">
+                {template.description}
+              </p>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center gap-4 text-sm text-gray-400">
+              {/* Rating */}
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                <span className="font-bold text-white">
+                  {template.rating_avg.toFixed(1)}
+                </span>
+                <span>({template.rating_count})</span>
+              </div>
+
+              {/* Copies */}
+              <div className="flex items-center gap-1">
+                <Copy className="h-4 w-4" />
+                <span>{template.copies_count}</span>
+              </div>
+
+              {/* Pages */}
+              <div className="flex items-center gap-1">
+                <FileText className="h-4 w-4" />
+                <span>{template.pages_count} pages</span>
+              </div>
+            </div>
+
+            {/* Author */}
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <User className="h-4 w-4" />
+              <span className="line-clamp-1">by {template.author_nickname}</span>
+            </div>
+
+            {/* Copy Button */}
+            <Button
+              onClick={handleCopy}
+              disabled={loading || copied}
+              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+              size="sm"
+            >
+              {copied ? (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copied!
+                </>
+              ) : loading ? (
+                'Copying...'
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy Template
+                </>
+              )}
+            </Button>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
+    </Link>
+  );
+}
+```
+
+2. src/hooks/templates/useCopyTemplate.ts
+```typescript
+import { useState } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+
+export function useCopyTemplate() {
+  const supabase = useSupabaseClient();
+  const [loading, setLoading] = useState(false);
+
+  const copyTemplate = async (templateId: string, customTitle?: string): Promise<string> => {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase.rpc('copy_template', {
+        p_template_id: parseInt(templateId),
+        p_custom_title: customTitle || null
+      });
+
+      if (error) throw error;
+      if (!data) throw new Error('No copy ID returned');
+
+      return data.toString();
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { copyTemplate, loading };
+}
+```
+
+FEATURES:
+- Image with fallback
+- Rating display with stars
+- Copies and pages count
+- Author info
+- Copy button with loading state
+- Success feedback with redirect
+- Login redirect if not authenticated
+- Hover scale effect
+
+DELIVERABLES:
+1. Complete TemplateCard component
+2. useCopyTemplate hook
+3. Copy button with feedback
+4. Redirect to copied template
+
+Give me git commands afterwards.
+```

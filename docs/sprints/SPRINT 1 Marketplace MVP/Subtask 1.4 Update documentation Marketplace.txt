@@ -1,0 +1,72 @@
+## 📦 Subtask 1.4: Update documentation - Marketplace
+
+### Prompt for Claude CLI:
+```
+I need to document the newly created marketplace system.
+
+CONTEXT:
+- 1 new table: trade_listings
+- 4 new RPCs: create, list, get_user, update_status
+- 1 extension: trade_chats with listing_id
+- 2 chat RPCs: get_listing_chats, send_listing_message
+
+TASK:
+Update documentation:
+
+1. docs/database-schema.md
+   - Add section "## Marketplace System (v1.6.0)" after Trading Tables
+   - Document trade_listings with all columns
+   - Document trade_chats extension
+   - Add section "## Marketplace RPCs":
+     * create_trade_listing (with example)
+     * list_trade_listings (with search example)
+     * get_user_listings (public profile)
+     * update_listing_status (sold/removed)
+     * get_listing_chats, send_listing_message
+
+2. docs/api-endpoints.md
+   - Add section "## Marketplace Endpoints"
+   - Expected hooks (frontend TODO):
+     * useListings (feed with search)
+     * useCreateListing (form)
+     * useUserListings (profile)
+     * useListingChat (chat from listing)
+   - Hook call examples
+
+3. docs/current-features.md
+   - Add "### Marketplace System ✅ **BACKEND COMPLETE (v1.6.0)**"
+   - List:
+     * ✅ trade_listings table
+     * ✅ Marketplace RPCs
+     * ✅ Chat from listings
+     * ⏳ Frontend in development
+
+4. CHANGELOG.md
+   - Update [1.6.0-alpha] entry
+   - Subsection "### Added - Marketplace System"
+   - List all migrations and RPCs created
+
+5. TODO.md
+   - Mark Sprint 1 as complete:
+```
+     ## ✅ Completed - Sprint 1: Marketplace Backend
+     - [x] trade_listings table
+     - [x] Marketplace RPCs
+     - [x] Chat extension for listings
+```
+   - Next sprint visible
+
+FORMAT:
+- Standard markdown
+- Commented SQL examples
+- Keep technical but clear tone
+
+DELIVERABLES:
+1. 5 updated files
+2. Complete Sprint 1 documentation
+3. Cross-references between docs
+
+Give me git commands to commit all doc files together.
+```
+
+---

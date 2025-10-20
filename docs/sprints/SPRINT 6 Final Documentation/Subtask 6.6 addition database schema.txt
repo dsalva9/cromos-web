@@ -1,0 +1,708 @@
+Prompt for Claude CLI (Sprint 6 addition):
+I need to completely update database-schema.md to reflect the v1.6.0 schema after the pivot.
+
+CONTEXT:
+- Removed 7 old tables (collections system)
+- Added 12 new tables (marketplace, templates, social, admin)
+- 25+ new RPCs
+- Complete schema overhaul
+
+TASK:
+Rewrite database-schema.md with the complete v1.6.0 schema:
+
+FILE: docs/database-schema.md
+```markdown
+# Database Schema - v1.6.0
+
+**Last Updated:** [Current Date]  
+**Version:** 1.6.0  
+**Status:** Production Ready
+
+---
+
+## Overview
+
+The CambioCromos database uses PostgreSQL 15 via Supabase with Row Level Security (RLS) enabled on all tables.
+
+**Schema Breakdown:**
+- **Auth & Users:** 1 table (profiles)
+- **Marketplace:** 2 tables (trade_listings, user_favorites)
+- **Templates:** 5 tables (collection_templates, template_pages, template_slots, user_template_copies, user_template_progress)
+- **Trading:** 4 tables (trade_proposals, trade_proposal_items, trade_chats, trades_history)
+- **Social:** 3 tables (user_ratings, template_ratings, reports)
+- **Admin:** 1 table (admin_actions)
+
+**Total:** 13 tables + 25+ RPC functions
+
+---
+
+## 1. Auth & Users
+
+### profiles
+Extends Supabase auth.users with additional user data.
+
+**Columns:**
+- `id` UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE
+- `nickname` TEXT NOT NULL UNIQUE
+- `avatar_url` TEXT
+- `rating_avg` DECIMAL(3,2) DEFAULT 0.0
+- `rating_count` INTEGER DEFAULT 0
+- `is_admin` BOOLEAN DEFAULT FALSE
+- `is_suspended` BOOLEAN DEFAULT FALSE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_profiles_nickname` ON (nickname)
+- `idx_profiles_admin` ON (is_admin) WHERE is_admin = TRUE
+- `idx_profiles_suspended` ON (is_suspended) WHERE is_suspended = TRUE
+
+**RLS Policies:**
+- Public read access
+- Users can update their own profile (except is_admin, is_suspended)
+- Admins can update any profile
+
+**Triggers:**
+- `on_auth_user_created` - Creates profile automatically on signup
+
+---
+
+## 2. Marketplace System
+
+### trade_listings
+User-created marketplace listings for physical cards.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `description` TEXT
+- `sticker_number` TEXT
+- `collection_name` TEXT
+- `image_url` TEXT
+- `status` TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'removed'))
+- `views_count` INTEGER DEFAULT 0
+- `copy_id` BIGINT REFERENCES user_template_copies(id) ON DELETE SET NULL
+- `slot_id` BIGINT REFERENCES template_slots(id) ON DELETE SET NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_listings_user` ON (user_id)
+- `idx_listings_status` ON (status) WHERE status = 'active'
+- `idx_listings_created` ON (created_at DESC)
+- `idx_listings_copy` ON (copy_id) WHERE copy_id IS NOT NULL
+- `idx_listings_slot` ON (slot_id) WHERE slot_id IS NOT NULL
+
+**RLS Policies:**
+- Public read WHERE status = 'active'
+- Users can insert their own listings
+- Users can update/delete their own listings
+- Admins can update/delete any listing
+
+**Related RPCs:**
+- `create_trade_listing(title, description, sticker_number, collection_name, image_url)`
+- `list_trade_listings(limit, offset, search)`
+- `get_user_listings(user_id, limit, offset)`
+- `update_listing_status(listing_id, new_status)`
+
+### user_favorites
+Users can favorite other users to follow their listings.
+
+**Columns:**
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE
+- `favorite_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- PRIMARY KEY (user_id, favorite_user_id)
+- CHECK (user_id != favorite_user_id)
+
+**Indices:**
+- `idx_favorites_user` ON (user_id)
+- `idx_favorites_target` ON (favorite_user_id)
+
+**RLS Policies:**
+- Users can read WHERE user_id = auth.uid()
+- Users can insert with user_id = auth.uid()
+- Users can delete their own favorites
+- No UPDATE allowed
+
+**Related RPCs:**
+- `toggle_favorite(target_user_id)` - Returns BOOLEAN (added or removed)
+- `list_my_favorites(limit, offset)` - Returns favorite users with stats
+- `get_favorites_count(user_id)` - Returns count of users who favorited this user
+
+---
+
+## 3. Collection Templates System
+
+### collection_templates
+Community-created collection templates.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `author_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `description` TEXT
+- `image_url` TEXT
+- `is_public` BOOLEAN DEFAULT FALSE
+- `rating_avg` DECIMAL(3,2) DEFAULT 0.0
+- `rating_count` INTEGER DEFAULT 0
+- `copies_count` INTEGER DEFAULT 0
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_templates_author` ON (author_id)
+- `idx_templates_public` ON (is_public) WHERE is_public = TRUE
+- `idx_templates_rating` ON (rating_avg DESC) WHERE is_public = TRUE
+- `idx_templates_created` ON (created_at DESC) WHERE is_public = TRUE
+
+**RLS Policies:**
+- Public read WHERE is_public = TRUE
+- Authors can read their own templates
+- Authors can insert/update/delete their own templates
+- Admins can update/delete any template
+
+**Related RPCs:**
+- `create_template(title, description, image_url)`
+- `publish_template(template_id)`
+- `list_public_templates(limit, offset, search, sort_by)`
+
+### template_pages
+Pages within a template (like album pages).
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `page_number` INTEGER NOT NULL
+- `title` TEXT NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(template_id, page_number)
+
+**Indices:**
+- `idx_pages_template` ON (template_id, page_number)
+
+**RLS Policies:**
+- Public read WHERE template is public
+- Authors can manage their template pages
+
+**Related RPCs:**
+- `add_template_page(template_id, page_number, title)`
+
+### template_slots
+Individual slots within pages (card positions).
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `page_id` BIGINT REFERENCES template_pages(id) ON DELETE CASCADE NOT NULL
+- `slot_number` INTEGER NOT NULL
+- `label` TEXT
+- `is_special` BOOLEAN DEFAULT FALSE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(page_id, slot_number)
+
+**Indices:**
+- `idx_slots_page` ON (page_id, slot_number)
+
+**RLS Policies:**
+- Follows template_pages policies
+
+### user_template_copies
+User copies of templates (like owning an album).
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `is_active` BOOLEAN DEFAULT TRUE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(user_id, template_id)
+
+**Indices:**
+- `idx_copies_user` ON (user_id, is_active)
+- `idx_copies_template` ON (template_id)
+
+**RLS Policies:**
+- Users can read their own copies
+- Users can insert/update/delete their own copies
+
+**Related RPCs:**
+- `copy_template(template_id, custom_title)`
+- `get_my_template_copies()`
+
+### user_template_progress
+Progress tracking for each slot in user's copy.
+
+**Columns:**
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE
+- `copy_id` BIGINT REFERENCES user_template_copies(id) ON DELETE CASCADE
+- `slot_id` BIGINT REFERENCES template_slots(id) ON DELETE CASCADE
+- `status` TEXT DEFAULT 'missing' CHECK (status IN ('missing', 'owned', 'duplicate'))
+- `count` INTEGER DEFAULT 0 CHECK (count >= 0)
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- PRIMARY KEY (user_id, copy_id, slot_id)
+
+**Indices:**
+- `idx_progress_copy` ON (copy_id, status)
+- `idx_progress_duplicates` ON (user_id, copy_id, slot_id) WHERE status = 'duplicate'
+
+**RLS Policies:**
+- Users can manage their own progress
+
+**Related RPCs:**
+- `get_template_progress(copy_id)`
+- `update_template_progress(copy_id, slot_id, status, count)`
+
+---
+
+## 4. Trading System (Existing)
+
+### trade_proposals
+Trade proposals between users.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `proposer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `status` TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'completed', 'cancelled'))
+- `message` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_proposals_proposer` ON (proposer_id, status)
+- `idx_proposals_receiver` ON (receiver_id, status)
+
+**RLS Policies:**
+- Users can read their own proposals (as proposer or receiver)
+- Users can create proposals
+- Users can update their own proposals
+
+### trade_proposal_items
+Items included in trade proposals.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE NOT NULL
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `sticker_number` TEXT NOT NULL
+- `collection_name` TEXT NOT NULL
+
+**Indices:**
+- `idx_items_proposal` ON (proposal_id)
+
+**RLS Policies:**
+- Follows trade_proposals policies
+
+### trade_chats
+Chat messages within trades (extended for listings).
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE
+- `sender_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `message` TEXT NOT NULL
+- `is_read` BOOLEAN DEFAULT FALSE
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- CHECK: (proposal_id IS NOT NULL) OR (listing_id IS NOT NULL)
+
+**Indices:**
+- `idx_chats_proposal` ON (proposal_id, created_at)
+- `idx_chats_listing` ON (listing_id, created_at)
+- `idx_chats_receiver` ON (receiver_id, is_read) WHERE is_read = FALSE
+
+**RLS Policies:**
+- Users can read chats where they are sender or receiver
+- Users can insert chats
+- Users can update is_read on received messages
+
+**Related RPCs:**
+- `get_listing_chats(listing_id)`
+- `send_listing_message(listing_id, receiver_id, message)`
+
+### trades_history
+Completed trade history.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE NOT NULL
+- `proposer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `status` TEXT NOT NULL CHECK (status IN ('completed', 'cancelled'))
+- `completed_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_history_users` ON (proposer_id, receiver_id)
+- `idx_history_completed` ON (completed_at DESC) WHERE status = 'completed'
+
+**RLS Policies:**
+- Users can read their own trade history
+
+---
+
+## 5. Social & Reputation System
+
+### user_ratings
+Post-trade ratings between users.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `rater_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `rated_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `trade_id` BIGINT REFERENCES trades_history(id) ON DELETE CASCADE NOT NULL
+- `rating` INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5)
+- `comment` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(rater_id, trade_id)
+- CHECK (rater_id != rated_user_id)
+
+**Indices:**
+- `idx_user_ratings_rated` ON (rated_user_id)
+- `idx_user_ratings_trade` ON (trade_id)
+
+**RLS Policies:**
+- Public read
+- Users can insert ratings for trades they participated in
+- Users can update/delete their own ratings
+
+**Triggers:**
+- `recalculate_user_rating()` - Updates profiles.rating_avg after INSERT/UPDATE/DELETE
+
+**Related RPCs:**
+- `rate_user_from_trade(trade_id, rating, comment)`
+- `get_user_ratings(user_id, limit, offset)`
+
+### template_ratings
+Ratings for templates by users who copied them.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
+- `rating` INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5)
+- `comment` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(user_id, template_id)
+
+**Indices:**
+- `idx_template_ratings_template` ON (template_id)
+- `idx_template_ratings_user` ON (user_id)
+
+**RLS Policies:**
+- Public read
+- Users can insert ratings for templates they copied
+- Users can update/delete their own ratings
+
+**Triggers:**
+- `recalculate_template_rating()` - Updates collection_templates.rating_avg after INSERT/UPDATE/DELETE
+
+**Related RPCs:**
+- `rate_template(template_id, rating, comment)`
+- `get_template_ratings(template_id, limit, offset)`
+
+### reports
+Universal content reporting system.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `reporter_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `reported_entity_type` TEXT NOT NULL CHECK (reported_entity_type IN ('user', 'listing', 'template', 'chat'))
+- `reported_entity_id` BIGINT NOT NULL
+- `reason` TEXT NOT NULL
+- `description` TEXT
+- `status` TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'dismissed'))
+- `reviewed_by` UUID REFERENCES profiles(id)
+- `reviewed_at` TIMESTAMPTZ
+- `admin_notes` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+- UNIQUE(reporter_id, reported_entity_type, reported_entity_id) WHERE status = 'pending'
+
+**Indices:**
+- `idx_reports_status` ON (status) WHERE status = 'pending'
+- `idx_reports_entity` ON (reported_entity_type, reported_entity_id)
+- `idx_reports_reporter` ON (reporter_id)
+
+**RLS Policies:**
+- Users can insert reports
+- Users can read their own reports
+- Admins can read all reports
+- Admins can update reports
+
+**Related RPCs:**
+- `create_report(entity_type, entity_id, reason, description)`
+- `list_pending_reports(limit, offset)`
+- `get_report_details_with_context(report_id)`
+- `resolve_report(report_id, action, admin_notes)`
+
+---
+
+## 6. Admin & Moderation System
+
+### admin_actions
+Immutable audit log of all admin actions.
+
+**Columns:**
+- `id` BIGSERIAL PRIMARY KEY
+- `admin_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
+- `action_type` TEXT NOT NULL
+- `target_type` TEXT NOT NULL
+- `target_id` BIGINT NOT NULL
+- `reason` TEXT
+- `metadata` JSONB
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+- `idx_admin_actions_admin` ON (admin_id)
+- `idx_admin_actions_target` ON (target_type, target_id)
+- `idx_admin_actions_type` ON (action_type)
+- `idx_admin_actions_created` ON (created_at DESC)
+
+**RLS Policies:**
+- Only admins can read
+- System can insert (via RPCs with SECURITY DEFINER)
+- NO UPDATE or DELETE allowed (immutable)
+
+**Related RPCs:**
+- `log_admin_action(action_type, target_type, target_id, reason, metadata)` - Internal helper
+- `get_admin_stats()` - Dashboard statistics
+- `search_users_admin(query, status, limit, offset)` - User search
+- `suspend_user_with_reason(user_id, reason)`
+- `unsuspend_user(user_id, reason)`
+
+---
+
+## 7. Collection ↔ Marketplace Integration
+
+The bidirectional integration between templates and marketplace is achieved through:
+
+**Links:**
+- `trade_listings.copy_id` → references user_template_copies
+- `trade_listings.slot_id` → references template_slots
+
+**Flow:**
+```
+user_template_progress (count > 0)
+    ↓ [publish_duplicate_to_marketplace]
+trade_listings (copy_id, slot_id)
+    ↓ [mark_listing_sold_and_decrement]
+user_template_progress (count - 1)
+Related RPCs:
+
+publish_duplicate_to_marketplace(copy_id, slot_id) - Creates listing linked to slot
+mark_listing_sold_and_decrement(listing_id) - Marks sold and decrements count
+get_my_listings_with_progress(status, limit, offset) - Lists with sync info
+
+
+8. Security & RLS
+All tables have RLS enabled.
+General Principles:
+
+Public read for discoverable content (active listings, public templates, ratings)
+Users can only modify their own data
+Admins have elevated permissions
+System functions use SECURITY DEFINER for privileged operations
+Audit log is immutable
+
+RLS Testing:
+Test policies thoroughly before production:
+sql-- Verify all tables have RLS
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = 'public' 
+AND rowsecurity = false;
+-- Should return 0 rows
+```
+
+---
+
+## 9. Triggers
+
+### Automatic Profile Creation
+**Trigger:** `on_auth_user_created`  
+**When:** After INSERT on auth.users  
+**Action:** Creates profile with nickname from metadata
+
+### Rating Calculation
+**Trigger:** `recalculate_user_rating()`  
+**When:** After INSERT/UPDATE/DELETE on user_ratings  
+**Action:** Updates profiles.rating_avg and rating_count
+
+**Trigger:** `recalculate_template_rating()`  
+**When:** After INSERT/UPDATE/DELETE on template_ratings  
+**Action:** Updates collection_templates.rating_avg and rating_count
+
+---
+
+## 10. Complete RPC Functions List
+
+### Marketplace (5 RPCs)
+- `create_trade_listing`
+- `list_trade_listings`
+- `get_user_listings`
+- `update_listing_status`
+- `get_listing_chats`, `send_listing_message`
+
+### Templates (8 RPCs)
+- `create_template`
+- `add_template_page`
+- `publish_template`
+- `list_public_templates`
+- `copy_template`
+- `get_my_template_copies`
+- `get_template_progress`
+- `update_template_progress`
+
+### Integration (3 RPCs)
+- `publish_duplicate_to_marketplace`
+- `mark_listing_sold_and_decrement`
+- `get_my_listings_with_progress`
+
+### Social (6 RPCs)
+- `toggle_favorite`
+- `list_my_favorites`
+- `get_favorites_count`
+- `rate_user_from_trade`
+- `get_user_ratings`
+- `rate_template`, `get_template_ratings`
+
+### Reports (4 RPCs)
+- `create_report`
+- `list_pending_reports`
+- `get_report_details_with_context`
+- `resolve_report`
+
+### Admin (6 RPCs)
+- `log_admin_action`
+- `get_admin_stats`
+- `search_users_admin`
+- `suspend_user_with_reason`
+- `unsuspend_user`
+- Plus extended `resolve_report`
+
+**Total:** 25+ RPC functions
+
+---
+
+## 11. Storage Buckets
+
+### sticker-images
+**Public:** Yes  
+**Max Size:** 5 MB  
+**Types:** image/jpeg, image/png, image/webp  
+**Usage:** Listing and template images
+
+**Policies:**
+- Public read
+- Authenticated users can upload
+
+### avatars
+**Public:** Yes  
+**Max Size:** 2 MB  
+**Types:** image/jpeg, image/png, image/webp  
+**Usage:** User profile pictures
+
+**Policies:**
+- Public read
+- Users can upload to their own folder (auth.uid())
+
+---
+
+## 12. Migrations
+
+All schema changes are version controlled in `supabase/migrations/`.
+
+**Migration naming:** `YYYYMMDDHHMMSS_description.sql`
+
+**Key migrations in v1.6.0:**
+1. `drop_old_collections_system.sql`
+2. `create_trade_listings_table.sql`
+3. `create_marketplace_rpcs.sql`
+4. `extend_trade_chats_for_listings.sql`
+5. `create_template_system_tables.sql`
+6. `create_template_management_rpcs.sql`
+7. `create_template_discovery_rpcs.sql`
+8. `create_template_progress_rpcs.sql`
+9. `link_listings_to_templates.sql`
+10. `publish_duplicate_to_marketplace_rpc.sql`
+11. `mark_listing_sold_and_decrement_rpc.sql`
+12. `get_my_listings_with_progress_rpc.sql`
+13. `create_favorites_system.sql`
+14. `create_user_ratings_system.sql`
+15. `create_template_ratings_system.sql`
+16. `create_reports_system.sql`
+17. `create_admin_audit_log.sql`
+18. `extend_resolve_report_with_audit.sql`
+19. `create_admin_dashboard_rpcs.sql`
+20. `create_moderation_action_rpcs.sql`
+
+**Total:** ~20 migrations
+
+---
+
+## 13. Performance Optimizations
+
+**Indices:**
+- 30+ indices across all tables
+- Covering most common query patterns
+- Partial indices for filtered queries (WHERE clauses)
+
+**Common Queries:**
+- List active listings: Uses `idx_listings_status`
+- List public templates: Uses `idx_templates_public`
+- Get user's favorites: Uses `idx_favorites_user`
+- Find pending reports: Uses `idx_reports_status`
+
+**Materialized Views:** (Future optimization if needed)
+- User stats aggregation
+- Popular templates ranking
+
+---
+
+## Schema Version History
+
+**v1.6.0** (Current) - Complete pivot to neutral marketplace
+- Removed 7 tables (old collections system)
+- Added 12 new tables
+- 25+ new RPCs
+- Complete moderation system
+
+**v1.5.0** - Original collections system (deprecated)
+
+---
+
+**For complete RPC signatures and usage examples, see `docs/api-endpoints.md`**
+```
+
+DELIVERABLES:
+1. Complete database-schema.md for v1.6.0
+2. All 13 tables documented
+3. All 25+ RPCs listed
+4. RLS policies explained
+5. Triggers documented
+6. Migration list
+7. Performance notes
+
+This should be added to Sprint 6 documentation updates.
+
+Give me git commands afterwards.

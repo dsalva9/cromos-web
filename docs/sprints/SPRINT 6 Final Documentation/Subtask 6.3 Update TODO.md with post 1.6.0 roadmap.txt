@@ -1,0 +1,278 @@
+
+## 📦 Subtask 6.3: Update TODO.md with post-v1.6.0 roadmap
+
+### Prompt for Claude CLI:
+```
+I need to update TODO.md with complete post-backend roadmap.
+
+CONTEXT:
+- Backend v1.6.0 complete
+- No users in production
+- Next: Frontend implementation
+
+TASK:
+Completely rewrite TODO.md:
+
+# TODO - CambioCromos v1.6.0+
+
+## ✅ Completed - Backend v1.6.0
+
+### Sprint 0: Cleanup
+- [x] Remove official collections system
+- [x] Update base documentation
+
+### Sprint 1: Marketplace MVP
+- [x] trade_listings table
+- [x] Marketplace RPCs
+- [x] Chat extension for listings
+
+### Sprint 2: Collection Templates
+- [x] 5 template system tables
+- [x] Management RPCs
+- [x] Discovery and copy RPCs
+- [x] Progress RPCs
+
+### Sprint 3: Collection-Marketplace Integration
+- [x] Link listings ↔ templates
+- [x] Publish duplicates to marketplace
+- [x] Automatic synchronization
+
+### Sprint 4: Social & Reputation
+- [x] Favorites system
+- [x] User ratings
+- [x] Template ratings
+- [x] Reports system
+
+### Sprint 5: Admin & Moderation
+- [x] Audit log
+- [x] Admin dashboard
+- [x] User search
+- [x] Moderation actions
+
+### Sprint 6: Documentation
+- [x] Complete README
+- [x] Consolidated CHANGELOG
+- [x] All updated documentation
+
+---
+
+## 🚧 In Progress - Frontend v1.6.0 (6-8 weeks)
+
+### Sprint 7: Marketplace UI (2 weeks)
+- [ ] `/marketplace` - Feed with search
+- [ ] `/marketplace/create` - Listing form
+- [ ] `/marketplace/[id]` - Listing detail
+- [ ] `/marketplace/my-listings` - My listings
+- [ ] Chat from listing (extend existing component)
+- [ ] Components:
+  - [ ] ListingCard
+  - [ ] ListingForm
+  - [ ] ListingDetail
+  - [ ] ListingFeed (with infinite scroll)
+- [ ] Hooks:
+  - [ ] useListings
+  - [ ] useCreateListing
+  - [ ] useListingChat
+
+### Sprint 8: Templates UI (2 weeks)
+- [ ] `/templates` - Explore public templates
+- [ ] `/templates/[id]` - Template preview before copying
+- [ ] `/templates/create` - Multi-step wizard for creation
+- [ ] `/my-templates` - My template copies
+- [ ] `/my-templates/[copyId]` - Progress view (slot grid)
+- [ ] Components:
+  - [ ] TemplateCard
+  - [ ] TemplateExplorer (with filters and sorting)
+  - [ ] CreateTemplateWizard
+  - [ ] CopyTemplateModal
+  - [ ] TemplateProgressGrid (20-slot grid album-style)
+  - [ ] SlotTile (with status: missing/owned/duplicate)
+- [ ] Hooks:
+  - [ ] useTemplates
+  - [ ] useCreateTemplate
+  - [ ] useCopyTemplate
+  - [ ] useTemplateProgress
+
+### Sprint 9: Integration UI (1 week)
+- [ ] "Put up for trade" button on slots with duplicates
+- [ ] Confirmation modal for publishing
+- [ ] "My Listings" view with synchronization
+  - [ ] Alert badge if count = 0 but listing active
+  - [ ] "Mark as sold" button with automatic decrement
+- [ ] Components:
+  - [ ] PublishToMarketplaceModal
+  - [ ] MyListingsWithSync
+- [ ] Hooks:
+  - [ ] usePublishDuplicate
+  - [ ] useMarkSold
+
+### Sprint 10: Social UI (1 week)
+- [ ] `/users/[userId]` - Public profile with listings
+- [ ] Favorite button on profiles
+- [ ] `/favorites` - Favorites list
+- [ ] Post-trade rating modal
+- [ ] Ratings display on profiles (stars + average)
+- [ ] Universal "Report" button
+- [ ] Report modal with categories
+- [ ] Components:
+  - [ ] UserProfile (public)
+  - [ ] FavoriteButton
+  - [ ] RatingModal
+  - [ ] RatingStars (display)
+  - [ ] ReportButton
+  - [ ] ReportModal
+- [ ] Hooks:
+  - [ ] useFavorites
+  - [ ] useRating
+  - [ ] useReport
+
+### Sprint 11: Admin UI (1.5 weeks)
+- [ ] `/admin/dashboard` - Statistics with charts
+- [ ] `/admin/reports` - Reports queue (new tab)
+  - [ ] Pending reports list
+  - [ ] Detail modal with complete context
+  - [ ] Actions: Dismiss, Remove Content, Suspend User
+- [ ] `/admin/users` - Advanced search (new tab)
+  - [ ] Filters: status, query
+  - [ ] Direct actions: Suspend, Unsuspend
+- [ ] `/admin/audit` - Audit log viewer (new tab)
+  - [ ] Admin actions timeline
+  - [ ] Filters by admin, action_type, date range
+- [ ] Components:
+  - [ ] AdminDashboard (with stats cards)
+  - [ ] ReportsQueue
+  - [ ] ReportDetailModal
+  - [ ] UserSearchAdmin
+  - [ ] ModerationActions
+  - [ ] AuditLogViewer
+- [ ] Hooks:
+  - [ ] useAdminStats
+  - [ ] useReportDetails
+  - [ ] useModeration
+  - [ ] useAuditLog
+
+### Sprint 12: Polish & Testing (1 week)
+- [ ] Complete responsive design (mobile-first)
+- [ ] Empty states for all views
+- [ ] Loading skeletons
+- [ ] Error boundaries
+- [ ] Optimistic updates in all actions
+- [ ] E2E tests (Playwright):
+  - [ ] Complete marketplace flow
+  - [ ] Complete templates flow
+  - [ ] Rating flow
+  - [ ] Admin moderation flow
+- [ ] Accessibility audit (a11y)
+- [ ] Performance optimization:
+  - [ ] Route lazy loading
+  - [ ] Image optimization
+  - [ ] Code splitting
+
+---
+
+## 📋 Backlog - v1.7.0 (Q1 2026)
+
+### Improved Notifications
+- [ ] Push notifications (web push API)
+- [ ] Email notifications (optional)
+- [ ] Notification preferences
+- [ ] Notify when favorite publishes new listing
+- [ ] Weekly activity summary
+
+### Geolocated Search
+- [ ] Filter by distance (using postcode)
+- [ ] "Users near you"
+- [ ] Listings map (optional)
+
+### Advanced Messaging
+- [ ] "Typing..." indicator
+- [ ] Messages with images
+- [ ] Archive conversations
+- [ ] Chat search
+
+### Gamification
+- [ ] Expanded badges/achievements system
+- [ ] User levels
+- [ ] Active traders leaderboard
+- [ ] Detailed personal statistics
+
+---
+
+## 🔮 Future - v1.8.0+
+
+### Mobile App
+- [ ] React Native app (iOS + Android)
+- [ ] Native push notifications
+- [ ] Card scanning with camera (OCR)
+- [ ] Offline mode for viewing collection
+
+### Advanced Features
+- [ ] Card valuation system (pricing)
+- [ ] Sales marketplace (not just trades)
+- [ ] Structured offers/counter-offers system
+- [ ] Authenticity verification (AI?)
+
+### Business Model
+- [ ] Premium plan for users
+- [ ] Featured listings (monetization)
+- [ ] Sales commission (if we implement sales)
+
+### Internationalization
+- [ ] Multi-language (English, Portuguese)
+- [ ] Multi-currency (if sales)
+
+---
+
+## 🐛 Known Issues & Tech Debt
+
+### High Priority
+- [ ] Rate limiting on public RPCs
+- [ ] Uploaded image validation (format, size, NSFW content)
+- [ ] Automatic database backup
+- [ ] Error monitoring and alerts (Sentry?)
+
+### Medium Priority
+- [ ] Refactor large components if needed
+- [ ] Consistent error handling
+- [ ] Accessibility tests
+
+### Low Priority
+- [ ] Complete dark mode
+- [ ] Improved transition animations
+- [ ] SEO optimization for public pages
+
+---
+
+## 📝 Notes
+
+**Estimated Timeline:**
+- Backend v1.6.0: ✅ Complete (5 sprints)
+- Frontend v1.6.0: 🚧 6-8 weeks (Sprints 7-12)
+- **Total for v1.6.0 launch:** ~10-12 weeks from pivot start
+
+**Immediate Priorities (Sprints 7-8):**
+1. Marketplace UI (critical)
+2. Templates UI (critical)
+3. Integration (high)
+4. Social (medium)
+5. Admin (medium)
+
+**Pending Decisions:**
+- Implement sales with money or only trades? (affects v1.7+)
+- Public API for third parties? (v1.8+)
+- Native mobile app or PWA first? (v1.8+)
+- Monetization model? (v1.7+)
+
+**Deploy Strategy:**
+- Backend already deployable (migrations ready)
+- Frontend: incremental deploy by sprints
+- Feature flags for gradual releases (optional)
+- Beta testing with real users before public launch
+
+DELIVERABLES:
+1. Completely updated TODO.md
+2. Clear roadmap with frontend sprints
+3. Realistic timeline
+
+Give me git commands afterwards.
+```

@@ -1,0 +1,68 @@
+## 📦 Subtask 3.3: Create RPC `mark_listing_sold_and_decrement`
+
+### Prompt for Claude CLI:
+```
+I need the RPC to mark listing as sold AND decrement count in collection.
+
+CONTEXT:
+- When marking as 'sold', should sync with inventory
+- Validate count doesn't go negative
+- Only applies if listing has copy_id and slot_id
+
+TASK:
+Create a SQL migration with the function:
+
+FUNCTION: mark_listing_sold_and_decrement
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_listing_id BIGINT
+RETURNS: VOID
+
+LOGIC:
+1. Validate auth.uid() not NULL
+
+2. Get listing and validate ownership:
+   SELECT user_id, copy_id, slot_id, status 
+   FROM trade_listings 
+   WHERE id = p_listing_id AND user_id = auth.uid()
+   If doesn't exist: RAISE EXCEPTION 'Listing not found or doesn't belong to you'
+   If status != 'active': RAISE EXCEPTION 'This listing is no longer active'
+
+3. Mark as sold:
+   UPDATE trade_listings 
+   SET status = 'sold', updated_at = NOW() 
+   WHERE id = p_listing_id
+
+4. If copy_id IS NOT NULL and slot_id IS NOT NULL:
+   a) Decrement count:
+      UPDATE user_template_progress 
+      SET count = count - 1 
+      WHERE user_id = auth.uid() 
+        AND copy_id = listing_copy_id 
+        AND slot_id = listing_slot_id
+        AND count > 0  -- Prevent negatives
+   
+   b) If count reached 1 and decrements to 0:
+      UPDATE user_template_progress 
+      SET status = 'owned', count = 0 
+      WHERE user_id = auth.uid() 
+        AND copy_id = listing_copy_id 
+        AND slot_id = listing_slot_id
+        AND count = 0
+
+5. If copy_id IS NULL (manual listing), just mark as sold
+
+VALIDATIONS:
+- Don't allow decrement if count is already 0
+- Log warning if trying to decrement listing without copy_id (inconsistency)
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_mark_listing_sold_and_decrement_rpc.sql
+2. Include robust validations
+3. Comment edge cases (count = 0, manual listing, etc.)
+
+Give me git commands afterwards.
+```

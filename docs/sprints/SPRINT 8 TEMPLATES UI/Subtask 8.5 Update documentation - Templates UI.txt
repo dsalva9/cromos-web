@@ -1,0 +1,168 @@
+
+## 📦 Subtask 8.5: Update documentation - Templates UI
+
+### Prompt for Claude CLI:
+```
+I need to update documentation for completed Templates UI.
+
+CONTEXT:
+- Sprint 8 complete: templates explorer, cards, progress grid, summary
+- 4+ new pages, 6+ components, 3+ hooks
+- Ready for user testing
+
+TASK:
+Update documentation files:
+
+1. docs/current-features.md
+   - Update "### Collection Templates System" section:
+```markdown
+     ### Collection Templates System ✅ **COMPLETE (v1.6.0)**
+     
+     **Backend:** ✅ Complete
+     **Frontend:** ✅ Complete
+     
+     - ✅ Templates explorer with search and sort
+     - ✅ Template cards with ratings and stats
+     - ✅ Copy template with 1 click
+     - ✅ My templates list
+     - ✅ Progress tracking grid (HAVE/NEED/DUPES)
+     - ✅ Page-based navigation
+     - ✅ Slot status management
+     - ✅ Duplicate count controls
+     - ✅ Summary header with completion stats
+     - ⏳ Create template wizard (Sprint 8 ongoing)
+     - ⏳ Publish duplicates integration (Sprint 9)
+```
+
+2. docs/components-guide.md
+   - Add section "## Template Components ✅"
+```markdown
+   ## Template Components ✅
+   
+   ### TemplateCard
+   **File:** `src/components/templates/TemplateCard.tsx`
+   
+   Template preview card for explorer grid.
+   
+   **Props:**
+   - `template: Template` - Template data
+   
+   **Features:**
+   - Rating display with stars
+   - Copies and pages count
+   - Author info
+   - Copy button with loading state
+   - Success feedback with redirect
+   - Login redirect if unauthenticated
+   
+   ### TemplateProgressGrid
+   **File:** `src/components/templates/TemplateProgressGrid.tsx`
+   
+   Grid of slots grouped by pages with tabs.
+   
+   **Props:**
+   - `progress: SlotProgress[]` - All slot progress data
+   - `onUpdateSlot: (slotId, status, count) => Promise<void>` - Update handler
+   - `copyId: string` - Template copy ID
+   
+   **Features:**
+   - Page tabs for navigation
+   - Responsive grid (2-5 columns)
+   - Grouped by page number
+   - Sorted slots within pages
+   
+   ### SlotTile
+   **File:** `src/components/templates/SlotTile.tsx`
+   
+   Individual slot with status and count controls.
+   
+   **Props:**
+   - `slot: SlotProgress` - Slot data
+   - `onUpdate: (slotId, status, count) => Promise<void>` - Update handler
+   - `copyId: string` - Template copy ID
+   
+   **Features:**
+   - Click to cycle status (missing → owned → duplicate → missing)
+   - Count controls for duplicates (+/- buttons)
+   - Publish button for duplicates
+   - Color-coded by status
+   - Optimistic updates
+   - Loading overlay
+   
+   ### TemplateSummaryHeader
+   **File:** `src/components/templates/TemplateSummaryHeader.tsx`
+   
+   Statistics header for template progress.
+   
+   **Props:**
+   - `copy: TemplateCopy` - Template copy info
+   - `progress: SlotProgress[]` - Progress data
+   
+   **Features:**
+   - Completion percentage with progress bar
+   - Three stat pills (owned, duplicates, missing)
+   - Active/inactive badge
+   - Color-coded stats
+```
+
+3. CHANGELOG.md
+   - Add to [1.6.0] entry:
+```markdown
+     ### Added - Templates UI (Frontend)
+     
+     **Pages:**
+     - `/templates` - Explorer with search, filters, sort
+     - `/templates/[id]` - Template preview (planned)
+     - `/my-templates` - User's template copies
+     - `/my-templates/[copyId]` - Progress tracking grid
+     
+     **Components:**
+     - `TemplateCard` - Card with rating, stats, copy button
+     - `TemplateFilters` - Search and sort controls
+     - `TemplateProgressGrid` - Paginated slot grid
+     - `SlotTile` - Interactive slot with status controls
+     - `TemplateSummaryHeader` - Progress statistics
+     
+     **Hooks:**
+     - `useTemplates` - Fetch public templates with filters
+     - `useCopyTemplate` - Copy template to user account
+     - `useTemplateProgress` - Fetch and update slot progress
+     
+     **Features:**
+     - Search templates by title/description
+     - Sort by recent, rating, or popularity
+     - Copy template with redirect
+     - Track progress: missing/owned/duplicate
+     - Page-based navigation (tabs)
+     - Click slot to cycle status
+     - Count controls for duplicates
+     - Publish button on duplicate slots
+     - Completion percentage tracking
+     - Optimistic UI updates
+```
+
+4. TODO.md
+   - Update Sprint 8:
+```markdown
+     ## ✅ Completed - Sprint 8: Templates UI
+     - [x] `/templates` - Explorer with filters
+     - [x] Template card component
+     - [x] Copy template functionality
+     - [x] `/my-templates/[copyId]` - Progress view
+     - [x] Progress grid with page tabs
+     - [x] Slot tile with status controls
+     - [x] Summary header with stats
+     - [x] useTemplates hook
+     - [x] useCopyTemplate hook
+     - [x] useTemplateProgress hook
+     - [ ] Create template wizard (moved to future)
+     - [ ] Template preview page (moved to future)
+```
+
+DELIVERABLES:
+1. Updated current-features.md
+2. Updated components-guide.md with all template components
+3. Updated CHANGELOG.md with Sprint 8 additions
+4. Updated TODO.md marking Sprint 8 complete
+
+Give me git commands to commit all docs together.

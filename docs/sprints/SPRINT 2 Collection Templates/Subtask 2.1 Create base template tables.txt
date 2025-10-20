@@ -1,0 +1,103 @@
+## 📦 Subtask 2.1: Create base template tables
+
+### Prompt for Claude CLI:
+```
+I need to create the community templates system that replaces official collections.
+
+CONTEXT:
+- Users create collection structures (templates)
+- Other users copy these templates to track their cards
+- Templates can be public or private
+- Integrated rating system
+
+TASK:
+Create a SQL migration with 5 tables:
+
+TABLE 1: collection_templates
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- author_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- title: TEXT NOT NULL
+- description: TEXT
+- image_url: TEXT (template cover)
+- is_public: BOOLEAN DEFAULT FALSE
+- rating_avg: DECIMAL(3,2) DEFAULT 0.0
+- rating_count: INTEGER DEFAULT 0
+- copies_count: INTEGER DEFAULT 0
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+- updated_at: TIMESTAMPTZ DEFAULT NOW()
+
+TABLE 2: template_pages
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- template_id: BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE
+- page_number: INTEGER NOT NULL
+- title: TEXT NOT NULL
+- type: TEXT CHECK (type IN ('team', 'special'))
+- slots_count: INTEGER NOT NULL
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINT: UNIQUE(template_id, page_number)
+
+TABLE 3: template_slots
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- page_id: BIGINT REFERENCES template_pages(id) ON DELETE CASCADE
+- slot_number: INTEGER NOT NULL
+- label: TEXT
+- is_special: BOOLEAN DEFAULT FALSE
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINT: UNIQUE(page_id, slot_number)
+
+TABLE 4: user_template_copies
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- template_id: BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE
+- title: TEXT NOT NULL
+- is_active: BOOLEAN DEFAULT FALSE
+- copied_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINTS:
+- UNIQUE(user_id, template_id) - can't copy same template twice
+- UNIQUE(user_id, is_active) WHERE is_active = TRUE - only one active copy
+
+TABLE 5: user_template_progress
+COLUMNS:
+- user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- copy_id: BIGINT REFERENCES user_template_copies(id) ON DELETE CASCADE
+- slot_id: BIGINT REFERENCES template_slots(id) ON DELETE CASCADE
+- status: TEXT CHECK (status IN ('missing', 'owned', 'duplicate')) DEFAULT 'missing'
+- count: INTEGER DEFAULT 0
+PRIMARY KEY: (user_id, copy_id, slot_id)
+
+INDICES:
+- idx_templates_author ON collection_templates(author_id)
+- idx_templates_public ON collection_templates(is_public) WHERE is_public = TRUE
+- idx_templates_rating ON collection_templates(rating_avg DESC, rating_count DESC)
+- idx_template_pages_template ON template_pages(template_id, page_number)
+- idx_template_slots_page ON template_slots(page_id, slot_number)
+- idx_user_copies_user ON user_template_copies(user_id)
+- idx_user_copies_active ON user_template_copies(user_id, is_active) WHERE is_active = TRUE
+- idx_user_progress_copy ON user_template_progress(copy_id, status)
+- idx_user_progress_duplicates ON user_template_progress(copy_id, status, count) WHERE status = 'duplicate' AND count > 0
+
+TRIGGERS:
+- updated_at on collection_templates
+
+RLS POLICIES:
+- collection_templates:
+  * Public read WHERE is_public = TRUE
+  * Authors can CRUD their own templates
+  * Admins can do everything
+- template_pages, template_slots:
+  * Public read if template is public
+  * Authors can CRUD
+- user_template_copies, user_template_progress:
+  * Users can CRUD only their own copies/progress
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_template_system_tables.sql
+2. Include ASCII diagram showing table relationships
+3. Comments explaining flow: create → publish → copy → track
+
+Give me git commands afterwards.
+```

@@ -1,0 +1,182 @@
+ Subtask 12.3: Add accessibility improvementsPrompt for Claude CLI:I need to improve accessibility across the application.
+
+CONTEXT:
+- ARIA labels for interactive elements
+- Keyboard navigation support
+- Focus states
+- Screen reader support
+- Color contrast verification
+
+TASK:
+Add accessibility improvements:
+
+CHANGES TO MAKE:
+
+1. Update src/components/ui/button.tsx:
+```typescript// Add focus-visible styles
+className={cn(
+"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]",
+// ... existing classes
+)}
+
+2. Update src/components/marketplace/ListingCard.tsx:
+```typescript// Add aria-label
+<Link href={`/marketplace/${listing.id}`} aria-label={`View listing: ${listing.title}`}>
+  <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
+    {/* ... */}
+  </ModernCard>
+</Link>
+````
+
+Update src/components/templates/TemplateCard.tsx:
+
+// Add aria-label
+<Link href={`/templates/${template.id}`} aria-label={`View template: ${template.title}`}>
+  {/* ... */}
+</Link>// Add aria-label to copy button
+<Button
+onClick={handleCopy}
+disabled={loading || copied}
+className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+size="sm"
+aria-label={Copy template: ${template.title}}
+
+
+{/* ... */}
+</Button>
+
+4. Update src/components/social/FavoriteButton.tsx:
+```typescript// Add aria-label
+<Button
+onClick={handleToggle}
+disabled={loading}
+variant={favorited ? 'default' : 'outline'}
+className={favorited ? 'bg-red-600 hover:bg-red-700' : ''}
+aria-label={favorited ? 'Remove from favorites' : 'Add to favorites'}
+aria-pressed={favorited}
+
+
+{/* ... */}
+</Button>
+
+5. Update src/components/marketplace/SearchBar.tsx:
+```typescript// Add aria-label
+<Input
+type="text"
+value={localValue}
+onChange={(e) => setLocalValue(e.target.value)}
+placeholder={placeholder || "Search..."}
+className="pl-10 bg-[#374151] border-2 border-black text-white"
+aria-label={placeholder || "Search"}
+/>
+
+6. Update modal components to trap focus:
+
+Add to src/components/admin/ReportDetailModal.tsx:
+```typescript// Add role and aria attributes
+<Dialog open={true} onOpenChange={onClose}>
+  <DialogContent 
+    className="bg-[#1F2937] border-2 border-black max-w-3xl max-h-[90vh] overflow-y-auto"
+    aria-describedby="report-details-description"
+  >
+    <DialogHeader>
+      <DialogTitle className="text-white flex items-center gap-2">
+        <AlertTriangle className="h-5 w-5 text-red-500" aria-hidden="true" />
+        Report Details
+      </DialogTitle>
+    </DialogHeader><div id="report-details-description" className="space-y-6">
+  {/* ... content */}
+</div>
+  </DialogContent>
+</Dialog>
+````
+
+Create src/components/SkipToContent.tsx:
+
+'use client';export function SkipToContent() {
+return (  href="#main-content"
+  className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold"
+>
+  Skip to main content
+</a>
+);
+}
+
+8. Update src/app/layout.tsx:
+```typescriptimport { SkipToContent } from '@/components/SkipToContent';export default function RootLayout({ children }: { children: ReactNode }) {
+return (
+<html lang="en">
+<body>
+<SkipToContent />
+<ErrorBoundary>
+<SupabaseProvider>
+<SiteHeader />
+<main id="main-content" role="main">
+{children}
+</main>
+</SupabaseProvider>
+</ErrorBoundary>
+</body>
+</html>
+);
+}
+
+9. Add focus indicators to interactive elements:
+
+Update globals.css:
+```css/* Enhanced focus styles */
+*:focus-visible {
+outline: 2px solid #FFC000;
+outline-offset: 2px;
+}/* Skip to content link */
+.sr-only {
+position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0, 0, 0, 0);
+white-space: nowrap;
+border-width: 0;
+}.focus:not-sr-only:focus {
+position: static;
+width: auto;
+height: auto;
+padding: inherit;
+margin: inherit;
+overflow: visible;
+clip: auto;
+white-space: normal;
+}
+
+10. Add semantic HTML:
+
+Update page headers to use proper heading hierarchy:
+```typescript// Ensure h1 > h2 > h3 structure
+<h1>Page Title</h1>
+<h2>Section Title</h2>
+<h3>Subsection Title</h3>
+```
+ACCESSIBILITY CHECKLIST:
+
+ All interactive elements have focus styles
+ Images have alt text
+ Links have descriptive aria-labels
+ Buttons have aria-labels
+ Forms have proper labels
+ Modals trap focus
+ Skip to content link
+ Semantic HTML
+ Color contrast meets WCAG AA
+ Keyboard navigation works
+
+DELIVERABLES:
+
+Focus styles on all interactive elements
+ARIA labels on links and buttons
+Skip to content link
+Semantic HTML structure
+Enhanced keyboard navigation
+
+Give me git commands afterwards.

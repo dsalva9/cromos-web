@@ -1,0 +1,371 @@
+
+
+## 📦 Subtask 6.5.7: Update documentation for foundation
+
+### Prompt for Claude CLI:
+````
+I need to document the frontend foundation setup.
+
+CONTEXT:
+- Sprint 6.5 complete
+- All base infrastructure ready
+- Ready to start UI development
+
+TASK:
+Update documentation:
+
+1. docs/current-features.md
+   - Add new section at top:
+````markdown
+   ## 🏗️ Frontend Foundation ✅ **COMPLETE (Sprint 6.5)**
+   
+   **Infrastructure:**
+   - ✅ Complete project setup (Next.js 14, TypeScript)
+   - ✅ Tailwind CSS with custom theme
+   - ✅ All dependencies installed
+   - ✅ Environment configuration
+   
+   **Base UI Components:**
+   - ✅ ModernCard with thick borders
+   - ✅ Button with variants
+   - ✅ Form controls (Input, Textarea, Label, Select)
+   - ✅ Navigation components (Tabs)
+   - ✅ Feedback components (Dialog, Alert, Badge, Progress)
+   - ✅ Radio groups
+   
+   **Providers & Guards:**
+   - ✅ SupabaseProvider with context
+   - ✅ useUser and useSupabaseClient hooks
+   - ✅ AuthGuard for protected routes
+   - ✅ AdminGuard for admin routes
+   
+   **Utilities:**
+   - ✅ lib/utils (cn helper, formatters)
+   - ✅ Type definitions
+   - ✅ Constants
+   - ✅ useDebounce hook
+   
+   **Layout:**
+   - ✅ Site header with navigation
+   - ✅ Responsive mobile menu
+   - ✅ Toast notifications
+   - ✅ Root layout setup
+````
+
+2. docs/components-guide.md
+   - Add initial structure:
+````markdown
+   # Components Guide - v1.6.0
+   
+   This document describes all reusable components in the application.
+   
+   ## Base UI Components ✅
+   
+   Located in `src/components/ui/`.
+   
+   ### ModernCard
+   **File:** `src/components/ui/modern-card.tsx`
+   
+   Card component with thick black borders and dark background.
+   
+   **Usage:**
+```tsx
+   import { ModernCard, ModernCardContent, ModernCardHeader, ModernCardTitle } from '@/components/ui/modern-card';
+   
+   <ModernCard>
+     <ModernCardHeader>
+       <ModernCardTitle>Card Title</ModernCardTitle>
+     </ModernCardHeader>
+     <ModernCardContent>
+       Card content here
+     </ModernCardContent>
+   </ModernCard>
+```
+   
+   ### Button
+   **File:** `src/components/ui/button.tsx`
+   
+   Button with multiple variants and sizes.
+   
+   **Props:**
+   - `variant?: 'default' | 'outline' | 'ghost' | 'destructive'`
+   - `size?: 'default' | 'sm' | 'lg' | 'icon'`
+   - `asChild?: boolean`
+   
+   **Usage:**
+```tsx
+   import { Button } from '@/components/ui/button';
+   
+   <Button>Default</Button>
+   <Button variant="outline">Outline</Button>
+   <Button size="sm">Small</Button>
+```
+   
+   [Add similar sections for other components]
+   
+   ## Providers
+   
+   ### SupabaseProvider
+   **File:** `src/components/providers/SupabaseProvider.tsx`
+   
+   Provides Supabase client and auth state to the app.
+   
+   **Hooks:**
+   - `useSupabaseClient()` - Returns Supabase client
+   - `useUser()` - Returns `{ user, loading }`
+   
+   ## Guards
+   
+   ### AuthGuard
+   **File:** `src/components/AuthGuard.tsx`
+   
+   Protects routes requiring authentication.
+   
+   **Usage:**
+```tsx
+   export default function ProtectedPage() {
+     return (
+       <AuthGuard>
+         {/* Content */}
+       </AuthGuard>
+     );
+   }
+```
+   
+   ### AdminGuard
+   **File:** `src/components/AdminGuard.tsx`
+   
+   Protects routes requiring admin access.
+````
+
+3. docs/code-patterns.md
+   - Create initial content:
+````markdown
+   # Code Patterns - v1.6.0
+   
+   Standard patterns and conventions used throughout the codebase.
+   
+   ## File Organization
+````
+   src/
+   ├── app/                    # Next.js pages (App Router)
+   ├── components/
+   │   ├── ui/                # Base UI components
+   │   ├── marketplace/       # Marketplace-specific components
+   │   ├── templates/         # Template-specific components
+   │   ├── social/           # Social feature components
+   │   ├── admin/            # Admin panel components
+   │   └── providers/        # Context providers
+   ├── hooks/                 # Custom React hooks
+   │   ├── marketplace/
+   │   ├── templates/
+   │   ├── social/
+   │   ├── admin/
+   │   └── integration/
+   ├── lib/                   # Utility functions
+   └── types/                 # TypeScript types
+Component Patterns
+Client Components
+All components using hooks or browser APIs must have 'use client' directive:
+typescript   'use client';
+   
+   import { useState } from 'react';
+   
+   export function MyComponent() {
+     const [state, setState] = useState();
+     // ...
+   }
+Server Components (default)
+Components without interactivity can be server components:
+typescript   // No 'use client' needed
+   export function StaticComponent({ data }: Props) {
+     return <div>{data}</div>;
+   }
+Hook Patterns
+Data Fetching Hooks
+Pattern for hooks that fetch data:
+typescript   export function useData(params) {
+     const supabase = useSupabaseClient();
+     const [data, setData] = useState([]);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState<string | null>(null);
+   
+     const fetchData = useCallback(async () => {
+       try {
+         setLoading(true);
+         // Fetch data
+         setData(result);
+       } catch (err) {
+         setError(err.message);
+       } finally {
+         setLoading(false);
+       }
+     }, [dependencies]);
+   
+     useEffect(() => {
+       fetchData();
+     }, [fetchData]);
+   
+     return { data, loading, error, refetch: fetchData };
+   }
+Action Hooks
+Pattern for hooks that perform actions:
+typescript   export function useAction() {
+     const supabase = useSupabaseClient();
+     const [loading, setLoading] = useState(false);
+   
+     const performAction = async (params) => {
+       try {
+         setLoading(true);
+         // Perform action
+         return result;
+       } catch (error) {
+         throw error;
+       } finally {
+         setLoading(false);
+       }
+     };
+   
+     return { performAction, loading };
+   }
+Styling Patterns
+className Merging
+Always use cn() helper for conditional classes:
+typescript   import { cn } from '@/lib/utils';
+   
+   <div className={cn(
+     'base-classes',
+     condition && 'conditional-classes',
+     className
+   )} />
+Theme Colors
+Use Tailwind classes with our custom colors:
+
+Primary: bg-[#FFC000], text-[#FFC000], border-[#FFC000]
+Background: bg-[#1F2937], bg-[#374151], bg-[#111827]
+Border: border-black, border-2
+
+Error Handling
+In Components
+typescript   try {
+     await action();
+     toast.success('Success message');
+   } catch (error) {
+     toast.error(error instanceof Error ? error.message : 'Unknown error');
+   }
+In Hooks
+typescript   try {
+     // Action
+   } catch (error) {
+     setError(error instanceof Error ? error.message : 'Unknown error');
+     throw error; // Re-throw for component to handle
+   }
+TypeScript Patterns
+Component Props
+typescript   interface MyComponentProps {
+     title: string;
+     optional?: string;
+     onAction: () => void;
+     children?: React.ReactNode;
+   }
+   
+   export function MyComponent({ title, optional, onAction, children }: MyComponentProps) {
+     // ...
+   }
+API Response Types
+Import from @/types:
+typescript   import type { Listing, Template, Profile } from '@/types';
+````
+   
+   ## Accessibility
+   
+   - All interactive elements have focus styles
+   - Use semantic HTML (`<button>`, `<nav>`, `<main>`)
+   - Add `aria-label` to icon-only buttons
+   - Add `alt` text to images
+   
+   ## Performance
+   
+   - Use `useCallback` for functions passed as props
+   - Use `useMemo` for expensive calculations
+   - Lazy load heavy components with `dynamic`
+   - Optimize images with Next.js Image component
+````
+
+4. CHANGELOG.md
+   - Add Sprint 6.5:
+````markdown
+   ### Added - Frontend Foundation (Sprint 6.5)
+   
+   **Setup:**
+   - Complete Next.js 14 project setup
+   - TypeScript configuration with path aliases
+   - Tailwind CSS with custom theme (#FFC000, #1F2937)
+   - All dependencies installed (Radix UI, Sonner, Lucide)
+   - Environment template (.env.local.example)
+   - ESLint configuration
+   
+   **Base UI Components:**
+   - ModernCard with thick black borders
+   - Button (4 variants, 4 sizes)
+   - Input and Textarea
+   - Label
+   - Select with Radix UI
+   - Tabs
+   - Dialog
+   - RadioGroup
+   - Alert
+   - Badge
+   - Progress
+   
+   **Infrastructure:**
+   - SupabaseProvider with auth state
+   - useUser and useSupabaseClient hooks
+   - AuthGuard for protected routes
+   - AdminGuard for admin routes
+   - useDebounce hook
+   
+   **Utilities:**
+   - lib/utils (cn, formatters, validators)
+   - Type definitions for all database entities
+   - Constants file
+   
+   **Layout:**
+   - SiteHeader with responsive navigation
+   - Mobile menu
+   - Root layout with providers
+   - Toaster for notifications
+   - Temporary homepage
+   
+   **Documentation:**
+   - components-guide.md initial structure
+   - code-patterns.md with conventions
+````
+
+5. TODO.md
+   - Add Sprint 6.5:
+````markdown
+   ## ✅ Completed - Sprint 6.5: Frontend Foundation
+   - [x] Project setup and dependencies
+   - [x] Tailwind configuration
+   - [x] Base UI components (12 components)
+   - [x] SupabaseProvider and hooks
+   - [x] AuthGuard and AdminGuard
+   - [x] useDebounce hook
+   - [x] Utility functions and types
+   - [x] Site header with navigation
+   - [x] Root layout with toaster
+   - [x] Temporary homepage
+   - [x] Documentation (components-guide, code-patterns)
+````
+
+DELIVERABLES:
+1. Updated current-features.md
+2. Created components-guide.md structure
+3. Created code-patterns.md
+4. Updated CHANGELOG.md
+5. Updated TODO.md
+
+Give me git commands to commit all together.
+
+

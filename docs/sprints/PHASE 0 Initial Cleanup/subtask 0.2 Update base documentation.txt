@@ -1,0 +1,94 @@
+
+## 📦 Subtask 0.2: Update base documentation
+
+### Prompt for Claude CLI:
+```
+I need to update documentation to reflect that the official collections system was removed.
+
+CONTEXT:
+- Just removed ~7 tables from the old system
+- New system not yet built
+- Documentation should reflect clean state
+
+TASK:
+Update the following files:
+
+1. docs/database-schema.md
+   - REMOVE complete sections:
+     * "## Core Tables" (collections, stickers, etc.)
+     * "## Album Pages System"
+     * RPCs for collections/stickers
+   - KEEP:
+     * profiles (intact)
+     * Trading tables (trade_proposals, trade_chats, trades_history)
+     * Notifications
+   - ADD note at the beginning:
+```
+     # Database Schema - v1.6.0-alpha (Post-Cleanup)
+     
+     **Current state:** Official collections system removed.
+     Marketplace + templates system under construction.
+     
+     See CHANGELOG.md for pivot details.
+```
+
+2. docs/current-features.md
+   - REMOVE official collections features
+   - KEEP:
+     * Auth system
+     * Trading proposals
+     * Chat system
+     * Notifications
+     * Admin backoffice
+   - MARK as "⚠️ UNDER RECONSTRUCTION":
+     * Collection management
+     * Trading discovery
+
+3. CHANGELOG.md
+   - ADD new entry:
+```
+     ## [1.6.0-alpha] - 2025-XX-XX - PIVOT: Marketplace + Templates
+     
+     ### 🔄 Breaking Changes
+     
+     **Official Collections System REMOVED**
+     - Removed 7 tables: collections, stickers, collection_teams, etc.
+     - Removed 7 RPCs: find_mutual_traders, search_stickers, etc.
+     - Reason: Pivot to neutral marketplace model + community templates
+     - No affected users (pre-production)
+     
+     **Next steps:**
+     - Sprint 1: Marketplace tables + RPCs
+     - Sprint 2: Templates system
+     - Sprint 3-5: Integration + Social + Admin
+```
+
+4. TODO.md
+   - UPDATE with simplified structure:
+```
+     # TODO - CambioCromos v1.6.0
+     
+     ## ✅ Completed - Cleanup
+     - [x] Remove official collections system
+     - [x] Update base documentation
+     
+     ## 🚧 In Progress - Sprint 1: Marketplace MVP
+     - [ ] Create trade_listings table
+     - [ ] Marketplace RPCs
+     - [ ] Marketplace frontend
+     
+     [... rest of sprints ...]
+```
+
+FORMAT:
+- Keep professional but direct tone
+- Don't mention "deprecated" (it was removed, not deprecated)
+- Focus on future, not past
+
+DELIVERABLES:
+1. 4 updated files: database-schema.md, current-features.md, CHANGELOG.md, TODO.md
+2. Clear current state structure
+3. Visible roadmap
+
+Give me git commands to commit all together.
+```

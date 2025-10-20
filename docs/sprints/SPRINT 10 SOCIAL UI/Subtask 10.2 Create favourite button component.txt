@@ -1,0 +1,142 @@
+## 📦 Subtask 10.2: Create favorite button component
+
+### Prompt for Claude CLI:
+
+I need a favorite button component to follow/unfollow users.
+CONTEXT:
+
+Toggle button (heart icon)
+Shows if user is favorited
+Backend RPC: toggle_favorite
+Optimistic updates
+
+TASK:
+Create the favorite button:
+FILE: src/components/social/FavoriteButton.tsx
+typescript
+
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
+import { useFavorites } from '@/hooks/social/useFavorites';
+import { toast } from 'sonner';
+
+interface FavoriteButtonProps {
+  userId: string;
+}
+
+export function FavoriteButton({ userId }: FavoriteButtonProps) {
+  const { isFavorite, toggleFavorite, loading, checkFavorite } = useFavorites();
+  const [favorited, setFavorited] = useState(false);
+
+  useEffect(() => {
+    loadFavoriteStatus();
+  }, [userId]);
+
+  const loadFavoriteStatus = async () => {
+    const status = await checkFavorite(userId);
+    setFavorited(status);
+  };
+
+  const handleToggle = async () => {
+    try {
+      // Optimistic update
+      setFavorited(!favorited);
+
+      const isNowFavorited = await toggleFavorite(userId);
+      setFavorited(isNowFavorited);
+
+      if (isNowFavorited) {
+        toast.success('Added to favorites');
+      } else {
+        toast.success('Removed from favorites');
+      }
+    } catch (error) {
+      // Revert on error
+      setFavorited(!favorited);
+      toast.error('Failed to update favorite');
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleToggle}
+      disabled={loading}
+      variant={favorited ? 'default' : 'outline'}
+      className={favorited ? 'bg-red-600 hover:bg-red-700' : ''}
+    >
+      <Heart 
+        className={`mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`} 
+      />
+      {favorited ? 'Favorited' : 'Add Favorite'}
+    </Button>
+  );
+}
+
+src/hooks/social/useFavorites.ts
+
+typescriptimport { useState } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+
+export function useFavorites() {
+  const supabase = useSupabaseClient();
+  const [loading, setLoading] = useState(false);
+
+  const checkFavorite = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('favorite_user_id')
+        .eq('favorite_user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      return !!data;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const toggleFavorite = async (userId: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase.rpc('toggle_favorite', {
+        p_target_user_id: userId
+      });
+
+      if (error) throw error;
+
+      return data; // true if added, false if removed
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { checkFavorite, toggleFavorite, loading };
+}
+```
+
+FEATURES:
+- Heart icon (filled when favorited)
+- Optimistic updates
+- Loading state
+- Toast notifications
+- Toggle functionality
+- Error handling with revert
+
+DELIVERABLES:
+1. FavoriteButton component
+2. useFavorites hook
+3. Optimistic UI updates
+4. Error handling
+
+Give me git commands afterwards.
+```
+
+---

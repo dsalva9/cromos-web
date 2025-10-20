@@ -1,0 +1,154 @@
+## 📦 Subtask 6.1: Update complete README
+
+### Prompt for Claude CLI:
+I need to completely rewrite the project README.md to reflect the new model.
+CONTEXT:
+
+Complete pivot to neutral marketplace
+NO users in production yet
+System ready for initial deploy
+
+TASK:
+Completely rewrite README.md with this structure:
+CambioCromos - Sports Card Marketplace
+📋 Description
+Community platform and legally neutral for exchanging physical sports cards.
+Model:
+
+Neutral marketplace for physical card listings
+Community template system for collection management
+Neutral hosting (LSSI/DSA compliant)
+All content is user-generated (UGC)
+
+✨ Key Features
+🏪 Marketplace
+
+Publish card listings with optional real photo
+Search and filter listings
+View public profiles with listings
+Direct chat from listing
+Favorites system
+Ratings and reputation
+
+📋 Community Templates
+
+Create custom collection templates
+Publish templates for others to use
+Copy public templates
+HAVE/NEED/DUPES tracking system
+Publish duplicates to marketplace with 1 click
+Template ratings
+
+🤝 Social & Reputation
+
+Follow favorite users
+Post-trade ratings (1-5 stars)
+Universal reports system
+Public profiles
+
+👮 Moderation & Security
+
+Reports system
+Moderation queue for admins
+Immutable audit log
+User suspension
+LSSI/DSA compliance
+
+🛠️ Tech Stack
+
+Frontend: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
+Backend: Supabase (PostgreSQL + Auth + Storage + Realtime)
+Deploy: Vercel
+Database: PostgreSQL 15 with Row Level Security
+Storage: Supabase Storage for images
+
+📦 Installation
+bash# Clone repository
+git clone https://github.com/your-user/cambio-cromos.git
+cd cambio-cromos
+
+# Install dependencies
+npm install
+
+# Configure environment variables
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Run migrations
+npm run supabase:migrate
+
+# Start development server
+npm run dev
+```
+
+## 🗄️ Database
+
+### Schema v1.6.0
+- **Auth & Users**: profiles (with ratings, admin flags)
+- **Marketplace**: trade_listings, user_favorites
+- **Templates**: collection_templates, template_pages, template_slots, user_template_copies, user_template_progress
+- **Trading**: trade_proposals, trade_proposal_items, trade_chats, trades_history
+- **Social**: user_ratings, template_ratings, reports
+- **Admin**: admin_actions (audit log)
+
+See complete documentation in [docs/database-schema.md](./docs/database-schema.md)
+
+## 🚀 Roadmap
+
+### ✅ v1.6.0 - Marketplace MVP (Current)
+- [x] Listings system
+- [x] Community templates
+- [x] Collection-marketplace integration
+- [x] Reputation system
+- [x] Moderation panel
+- [ ] Frontend implementation (in progress)
+
+### 📋 v1.7.0 - Advanced Features
+- [ ] Push notifications
+- [ ] Geolocated search
+- [ ] Badges/achievements system
+- [ ] Personal statistics
+
+### 🔮 v1.8.0 - Future
+- [ ] Native mobile app
+- [ ] Card valuation system
+- [ ] Sales marketplace (not just trades)
+
+## 📖 Documentation
+
+- [Database Schema](./docs/database-schema.md) - Complete schema
+- [API Endpoints](./docs/api-endpoints.md) - Available RPCs
+- [Components Guide](./docs/components-guide.md) - Components guide
+- [Current Features](./docs/current-features.md) - Feature status
+- [Changelog](./CHANGELOG.md) - Version history
+
+## 🔒 Security and Legal
+
+### Neutral Hosting Model (LSSI/DSA)
+- **We don't create content**: Everything is UGC
+- **Reactive moderation**: We respond to reports
+- **No authenticity validation**: We don't verify cards
+- **Limited liability**: Technological intermediary
+
+### Moderation System
+- Content reports
+- Manual review by admins
+- User suspension
+- Action audit log
+- Illegal content removal
+
+## 📄 License
+
+[Your license here]
+
+## 📞 Contact
+
+[Your contact information]
+
+DELIVERABLES:
+1. Completely rewritten README.md
+2. Clear and professional structure
+3. Updated badges (if applicable)
+
+Give me git commands afterwards.
+```

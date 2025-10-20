@@ -1,0 +1,80 @@
+## 📦 Subtask 2.3: Create discovery and copy RPCs
+
+### Prompt for Claude CLI:
+```
+I need RPCs for users to explore public templates and copy them.
+
+CONTEXT:
+- Feed of templates available to copy
+- Search and sorting (by rating, popularity, recent)
+- Copying template initializes progress
+
+TASK:
+Create a SQL migration with 3 functions:
+
+FUNCTION 1: list_public_templates
+PARAMETERS:
+- p_limit INTEGER DEFAULT 20
+- p_offset INTEGER DEFAULT 0
+- p_search TEXT DEFAULT NULL
+- p_sort_by TEXT DEFAULT 'recent' (options: 'recent', 'rating', 'popular')
+RETURNS: TABLE (id, author_id, author_nickname, title, description, image_url, rating_avg, rating_count, copies_count, pages_count, created_at)
+LOGIC:
+1. JOIN collection_templates with profiles for author_nickname
+2. LEFT JOIN with template_pages to count pages (GROUP BY)
+3. Filter WHERE is_public = TRUE
+4. If p_search not NULL: ILIKE on title and description
+5. Sort by p_sort_by:
+   - 'recent': created_at DESC
+   - 'rating': rating_avg DESC, rating_count DESC
+   - 'popular': copies_count DESC, rating_avg DESC
+6. LIMIT and OFFSET
+
+FUNCTION 2: copy_template
+PARAMETERS:
+- p_template_id BIGINT
+- p_custom_title TEXT DEFAULT NULL (if NULL, use template's title)
+RETURNS: BIGINT (copy_id)
+LOGIC:
+1. Validate auth.uid() not NULL
+2. Validate template exists and is public:
+   SELECT is_public, title FROM collection_templates WHERE id = p_template_id
+   If doesn't exist or not public: RAISE EXCEPTION
+3. Verify user hasn't already copied this template:
+   SELECT FROM user_template_copies WHERE user_id = auth.uid() AND template_id = p_template_id
+   If exists: RAISE EXCEPTION 'You have already copied this template'
+4. If p_custom_title is NULL, use template's title
+5. INSERT INTO user_template_copies (user_id, template_id, title)
+6. Get all slots from the template:
+   SELECT ts.id FROM template_slots ts 
+   JOIN template_pages tp ON ts.page_id = tp.id 
+   WHERE tp.template_id = p_template_id
+7. Batch INSERT into user_template_progress:
+   INSERT INTO user_template_progress (user_id, copy_id, slot_id, status, count)
+   SELECT auth.uid(), copy_id, ts.id, 'missing', 0
+   FROM (SELECT id FROM template_slots ts JOIN ...) ts
+8. UPDATE collection_templates SET copies_count = copies_count + 1 WHERE id = p_template_id
+9. RETURN copy_id
+
+FUNCTION 3: get_my_template_copies
+PARAMETERS: none
+RETURNS: TABLE (copy_id, template_id, title, is_active, copied_at, original_author_nickname, completed_slots, total_slots)
+LOGIC:
+1. SELECT from user_template_copies WHERE user_id = auth.uid()
+2. JOIN with collection_templates for original_author
+3. LEFT JOIN with user_template_progress to count:
+   - completed_slots: COUNT WHERE status IN ('owned', 'duplicate')
+   - total_slots: COUNT(*)
+4. ORDER BY is_active DESC, copied_at DESC
+
+PERMISSIONS:
+- GRANT EXECUTE TO anon, authenticated (list_public_templates)
+- GRANT EXECUTE TO authenticated (copy_template, get_my_template_copies)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_template_discovery_rpcs.sql
+2. Include examples for each sort type
+3. Warning about performance on large templates (500+ slots)
+
+Give me git commands afterwards.
+```

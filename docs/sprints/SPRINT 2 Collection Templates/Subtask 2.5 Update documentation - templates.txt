@@ -1,0 +1,88 @@
+## 📦 Subtask 2.5: Update documentation - Templates
+
+### Prompt for Claude CLI:
+```
+I need to document the complete templates system.
+
+CONTEXT:
+- 5 new tables in templates system
+- 8 RPCs: create, add_page, publish, list, copy, get_copies, update_progress, get_progress
+
+TASK:
+Update documentation:
+
+1. docs/database-schema.md
+   - Add section "## Collection Templates System (v1.6.0)"
+   - Document the 5 tables:
+     * collection_templates
+     * template_pages
+     * template_slots
+     * user_template_copies
+     * user_template_progress
+   - Include ASCII relationship diagram:
+```
+     collection_templates (author creates structure)
+         ↓
+     template_pages (divides into pages)
+         ↓
+     template_slots (individual slots)
+         ↓
+     user_template_copies (user copies template)
+         ↓
+     user_template_progress (tracks each slot)
+```
+   - Document the 8 RPCs with examples:
+     * Management: create_template, add_template_page, publish_template
+     * Discovery: list_public_templates, copy_template, get_my_template_copies
+     * Progress: update_template_progress, get_template_progress
+
+2. docs/api-endpoints.md
+   - Section "## Collection Templates Endpoints"
+   - Expected hooks (frontend TODO):
+     * useTemplates (explore public)
+     * useCreateTemplate (creation wizard)
+     * useCopyTemplate (copy and start tracking)
+     * useTemplateProgress (slot grid)
+   - Call examples
+
+3. docs/current-features.md
+   - Add "### Collection Templates System ✅ **BACKEND COMPLETE (v1.6.0)**"
+   - Features:
+     * ✅ Create custom templates
+     * ✅ Add pages and slots
+     * ✅ Publish templates for community
+     * ✅ Copy public templates
+     * ✅ Track progress (HAVE/NEED/DUPES)
+     * ⏳ Ratings (Sprint 4)
+     * ⏳ Frontend in development
+
+4. CHANGELOG.md
+   - Update [1.6.0-alpha]
+   - Subsection "### Added - Collection Templates System"
+   - List all migrations and RPCs
+   - Note: "Replaces removed official collections system"
+
+5. TODO.md
+   - Mark Sprint 2 as complete
+   - Update overall progress
+
+6. docs/components-guide.md (NEW content)
+   - Section "## Template System Components (Frontend TODO)"
+   - Expected components:
+     * TemplateCard - Card for exploring templates
+     * TemplateExplorer - Feed with search and filters
+     * CreateTemplateWizard - Multi-step for creation
+     * CopyTemplateModal - Confirmation and rename
+     * TemplateProgressGrid - Slot grid with status
+
+FORMAT:
+- Keep consistency with existing documentation
+- Use emojis for sections (✅, ⏳, 📦)
+- Commented SQL examples
+
+DELIVERABLES:
+1. 6 updated files
+2. Complete templates system documentation
+3. References to pending frontend
+
+Give me git commands to commit all together.

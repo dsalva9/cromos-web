@@ -1,0 +1,62 @@
+
+## 📦 Subtask 5.2: Extend moderation RPCs with audit log
+
+### Prompt for Claude CLI:
+```
+I need to update moderation RPCs to record actions in audit log.
+
+CONTEXT:
+- resolve_report already exists from Sprint 4
+- log_admin_action already exists from Sprint 5.1
+- Now resolve_report should automatically record actions
+
+TASK:
+Create a SQL migration that:
+
+1. DROP FUNCTION resolve_report (previous version without audit)
+
+2. CREATE OR REPLACE FUNCTION resolve_report with extended logic:
+PARAMETERS:
+- p_report_id BIGINT
+- p_action TEXT ('dismiss', 'remove_content', 'suspend_user')
+- p_admin_notes TEXT DEFAULT NULL
+RETURNS: VOID
+LOGIC:
+1. Validate auth.uid() is admin
+2. Get report data:
+   SELECT reported_entity_type, reported_entity_id, reporter_id, reason 
+   FROM reports WHERE id = p_report_id
+3. Update report status:
+   UPDATE reports SET status = 'reviewed', reviewed_by = auth.uid(), reviewed_at = NOW(), admin_notes = p_admin_notes
+4. Execute action based on p_action:
+   
+   a) If 'dismiss':
+      - Call log_admin_action('dismiss_report', 'report', p_report_id, p_admin_notes, jsonb_build_object('reason', reason))
+   
+   b) If 'remove_content':
+      - If entity_type = 'listing': UPDATE trade_listings SET status = 'removed' WHERE id = entity_id
+      - If entity_type = 'template': UPDATE collection_templates SET is_public = FALSE WHERE id = entity_id
+      - Call log_admin_action('remove_content', entity_type, entity_id, p_admin_notes, metadata)
+   
+   c) If 'suspend_user':
+      - If entity_type = 'user': UPDATE profiles SET is_suspended = TRUE WHERE id = entity_id
+      - UPDATE trade_listings SET status = 'removed' WHERE user_id = entity_id AND status = 'active'
+      - Call log_admin_action('suspend_user', 'user', entity_id, p_admin_notes, metadata)
+
+5. UPDATE reports SET status = 'resolved' WHERE id = p_report_id
+
+VALIDATIONS:
+- If p_action not in allowed values: RAISE EXCEPTION
+- If report doesn't exist or isn't pending: RAISE EXCEPTION
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated (internal admin validation)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_extend_resolve_report_with_audit.sql
+2. Include DROP + CREATE of resolve_report
+3. Examples of metadata JSON for each action type
+4. Comment moderation actions
+
+Give me git commands afterwards.
+```

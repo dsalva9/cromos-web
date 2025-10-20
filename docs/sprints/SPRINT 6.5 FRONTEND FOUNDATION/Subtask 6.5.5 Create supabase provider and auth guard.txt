@@ -1,0 +1,148 @@
+Subtask 6.5.5: Create Supabase provider and auth guardPrompt for Claude CLI:I need to create the Supabase provider and authentication guards.
+
+CONTEXT:
+- Context provider for Supabase client
+- useUser hook for current user
+- AuthGuard for protected routes
+- AdminGuard for admin-only routes
+
+TASK:
+Create authentication infrastructure:
+
+FILES TO CREATE:
+
+1. src/lib/supabase/client.ts
+```typescriptimport { createBrowserClient } from '@supabase/ssr';export function createClient() {
+return createBrowserClient(
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+}
+
+2. src/components/providers/SupabaseProvider.tsx
+```typescript'use client';import { createContext, useContext, useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { SupabaseClient, User } from '@supabase/supabase-js';type SupabaseContext = {
+supabase: SupabaseClient;
+user: User | null;
+loading: boolean;
+};const Context = createContext<SupabaseContext | undefined>(undefined);export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+const [supabase] = useState(() => createClient());
+const [user, setUser] = useState<User | null>(null);
+const [loading, setLoading] = useState(true);useEffect(() => {
+const {
+data: { subscription },
+} = supabase.auth.onAuthStateChange((_event, session) => {
+setUser(session?.user ?? null);
+setLoading(false);
+});// Get initial session
+supabase.auth.getSession().then(({ data: { session } }) => {
+  setUser(session?.user ?? null);
+  setLoading(false);
+});return () => {
+  subscription.unsubscribe();
+};
+}, [supabase]);return (
+<Context.Provider value={{ supabase, user, loading }}>
+{children}
+</Context.Provider>
+);
+}export function useSupabaseClient() {
+const context = useContext(Context);
+if (context === undefined) {
+throw new Error('useSupabaseClient must be used inside SupabaseProvider');
+}
+return context.supabase;
+}export function useUser() {
+const context = useContext(Context);
+if (context === undefined) {
+throw new Error('useUser must be used inside SupabaseProvider');
+}
+return { user: context.user, loading: context.loading };
+}
+
+3. src/components/AuthGuard.tsx
+```typescript'use client';import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { toast } from 'sonner';export default function AuthGuard({ children }: { children: React.ReactNode }) {
+const { user, loading } = useUser();
+const router = useRouter();useEffect(() => {
+if (!loading && !user) {
+toast.error('You must be logged in to access this page');
+router.push('/login');
+}
+}, [user, loading, router]);if (loading) {
+return (
+<div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+<div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+</div>
+);
+}if (!user) {
+return null;
+}return <>{children}</>;
+}
+
+4. src/components/AdminGuard.tsx
+```typescript'use client';import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { toast } from 'sonner';export default function AdminGuard({ children }: { children: React.ReactNode }) {
+const { user, loading: userLoading } = useUser();
+const supabase = useSupabaseClient();
+const router = useRouter();
+const [isAdmin, setIsAdmin] = useState(false);
+const [checking, setChecking] = useState(true);useEffect(() => {
+checkAdmin();
+}, [user]);const checkAdmin = async () => {
+if (userLoading) return;if (!user) {
+  toast.error('You must be logged in');
+  router.push('/login');
+  return;
+}try {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single();  if (error) throw error;  if (!data?.is_admin) {
+    toast.error('Admin access required');
+    router.push('/');
+    return;
+  }  setIsAdmin(true);
+} catch (error) {
+  toast.error('Failed to verify admin access');
+  router.push('/');
+} finally {
+  setChecking(false);
+}
+};if (userLoading || checking) {
+return (
+<div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+<div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+</div>
+);
+}if (!isAdmin) {
+return null;
+}return <>{children}</>;
+}
+
+5. src/hooks/useDebounce.ts
+```typescriptimport { useEffect, useState } from 'react';export function useDebounce<T>(value: T, delay: number = 500): T {
+const [debouncedValue, setDebouncedValue] = useState<T>(value);useEffect(() => {
+const handler = setTimeout(() => {
+setDebouncedValue(value);
+}, delay);return () => {
+  clearTimeout(handler);
+};
+}, [value, delay]);return debouncedValue;
+}
+
+DELIVERABLES:
+1. Supabase client setup
+2. SupabaseProvider with context
+3. useUser and useSupabaseClient hooks
+4. AuthGuard component
+5. AdminGuard component
+6. useDebounce hook
+
+Give me git commands afterwards.

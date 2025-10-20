@@ -1,0 +1,110 @@
+
+## 📦 Subtask 5.4: Create moderation action RPCs
+
+### Prompt for Claude CLI:
+```
+I need specific RPCs for direct moderation actions.
+
+CONTEXT:
+- Admin can suspend/unsuspend users directly
+- Admin can view complete report details with context
+- All actions recorded in audit log
+
+TASK:
+Create a SQL migration with 3 functions:
+
+FUNCTION 1: suspend_user_with_reason
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_user_id UUID
+- p_reason TEXT
+RETURNS: VOID
+
+LOGIC:
+1. Validate auth.uid() is admin
+2. Validate p_user_id is not admin (can't suspend another admin):
+   SELECT is_admin FROM profiles WHERE id = p_user_id
+   If is admin: RAISE EXCEPTION 'Cannot suspend another administrator'
+3. Count listings and templates that will be affected:
+   affected_listings = SELECT COUNT(*) FROM trade_listings WHERE user_id = p_user_id AND status = 'active'
+   affected_templates = SELECT COUNT(*) FROM collection_templates WHERE author_id = p_user_id AND is_public = TRUE
+4. UPDATE profiles SET is_suspended = TRUE WHERE id = p_user_id
+5. UPDATE trade_listings SET status = 'removed' WHERE user_id = p_user_id AND status = 'active'
+6. UPDATE collection_templates SET is_public = FALSE WHERE author_id = p_user_id AND is_public = TRUE
+7. Record in audit log:
+   PERFORM log_admin_action(
+     'suspend_user', 
+     'user', 
+     p_user_id::TEXT::BIGINT,  -- Cast UUID to BIGINT for consistency
+     p_reason,
+     jsonb_build_object('listings_removed', affected_listings, 'templates_unpublished', affected_templates)
+   )
+
+FUNCTION 2: unsuspend_user
+PARAMETERS:
+- p_user_id UUID
+- p_reason TEXT
+RETURNS: VOID
+LOGIC:
+- Similar but reverse (is_suspended = FALSE)
+- DO NOT automatically restore listings/templates (user must re-publish manually)
+- Record in audit log with action_type = 'unsuspend_user'
+
+FUNCTION 3: get_report_details_with_context
+PARAMETERS:
+- p_report_id BIGINT
+RETURNS: JSON
+
+JSON STRUCTURE:
+{
+  "report": {
+    "id": BIGINT,
+    "reporter_id": UUID,
+    "reporter_nickname": TEXT,
+    "entity_type": TEXT,
+    "entity_id": BIGINT,
+    "reason": TEXT,
+    "description": TEXT,
+    "status": TEXT,
+    "created_at": TIMESTAMPTZ
+  },
+  "reported_content": {
+    // Depends on entity_type - see comments in LOGIC
+  },
+  "reported_user_history": {
+    "total_reports_received": INTEGER,
+    "total_listings": INTEGER,
+    "total_templates_created": INTEGER,
+    "rating_avg": DECIMAL
+  }
+}
+
+LOGIC:
+1. Validate auth.uid() is admin
+2. Get report data
+3. Build reported_content based on entity_type:
+   - 'user': {nickname, email, is_suspended, rating_avg, reports_count}
+   - 'listing': {title, description, image_url, user_nickname, status}
+   - 'template': {title, author_nickname, rating_avg, is_public}
+   - 'chat': {participant_nicknames, message_excerpt}
+4. Get reported user history (if applicable):
+   - Count previous reports
+   - Count listings, templates created
+   - Average rating
+5. Build nested JSON with jsonb_build_object
+
+COMPLEXITY:
+- Use CASE WHEN to build different reported_content based on entity_type
+- Consider that chat may not have a clear "owner"
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated (internal validation)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_moderation_action_rpcs.sql
+2. Include all 3 functions
+3. Example JSON result for get_report_details_with_context
+4. Validation to not suspend admin
+
+Give me git commands afterwards.
+```

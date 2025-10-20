@@ -1,0 +1,108 @@
+Final Git Commands for Sprint 6.5:
+bash# Commit 1: Project setup
+git add package.json .env.local.example tailwind.config.ts tsconfig.json next.config.js .eslintrc.json .gitignore src/globals.css
+git commit -m "feat: setup Next.js 14 project with complete configuration
+
+- Add all dependencies (Next.js, Supabase, Radix UI, etc.)
+- Configure Tailwind with custom colors
+- Setup TypeScript with path aliases
+- Configure Next.js for optimization
+- Add environment template
+- Update globals.css with custom styles
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 2: Utilities and types
+git add src/lib/ src/types/
+git commit -m "feat: add utility functions and type definitions
+
+- Add lib/utils.ts (cn, formatters, validators)
+- Add type definitions for all entities
+- Add constants file
+- Setup helper functions
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 3: Base UI components (Part 1)
+git add src/components/ui/modern-card.tsx src/components/ui/button.tsx src/components/ui/input.tsx src/components/ui/textarea.tsx src/components/ui/label.tsx src/components/ui/badge.tsx
+git commit -m "feat: add base UI components (part 1)
+
+- Add ModernCard with thick black borders
+- Add Button with 4 variants and 4 sizes
+- Add Input and Textarea
+- Add Label
+- Add Badge
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 4: Base UI components (Part 2)
+git add src/components/ui/select.tsx src/components/ui/tabs.tsx src/components/ui/dialog.tsx src/components/ui/radio-group.tsx src/components/ui/alert.tsx src/components/ui/progress.tsx
+git commit -m "feat: add base UI components (part 2)
+
+- Add Select with Radix UI
+- Add Tabs
+- Add Dialog
+- Add RadioGroup
+- Add Alert
+- Add Progress
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 5: Providers and guards
+git add src/lib/supabase/ src/components/providers/ src/components/AuthGuard.tsx src/components/AdminGuard.tsx src/hooks/useDebounce.ts
+git commit -m "feat: add Supabase provider and auth guards
+
+- Add Supabase client setup
+- Add SupabaseProvider with context
+- Add useUser and useSupabaseClient hooks
+- Add AuthGuard for protected routes
+- Add AdminGuard for admin routes
+- Add useDebounce hook
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 6: Layout and navigation
+git add src/components/site-header.tsx src/app/layout.tsx src/app/page.tsx
+git commit -m "feat: add base layout and navigation
+
+- Add SiteHeader with responsive navigation
+- Add mobile menu
+- Update root layout with providers
+- Add Toaster setup
+- Add temporary homepage
+
+Part of Sprint 6.5: Frontend Foundation"
+git push origin main
+
+# Commit 7: Documentation
+git add docs/current-features.md docs/components-guide.md docs/code-patterns.md docs/CHANGELOG.md docs/TODO.md
+git commit -m "docs: add frontend foundation documentation
+
+- Update current-features.md with foundation section
+- Create components-guide.md structure
+- Create code-patterns.md with conventions
+- Update CHANGELOG.md with Sprint 6.5
+- Update TODO.md with completed tasks
+
+Sprint 6.5 Complete: Frontend Foundation Ready 🎨"
+git push origin main
+
+# Tag Sprint 6.5
+git tag -a v1.6.0-sprint-6.5 -m "Sprint 6.5 Complete: Frontend Foundation
+
+All base infrastructure ready for UI development:
+- Complete Next.js 14 setup
+- 12 base UI components
+- Supabase provider and auth guards
+- Utilities and type definitions
+- Site header and navigation
+- Documentation
+
+Ready to start Sprint 7: Marketplace UI"
+
+git push origin v1.6.0-sprint-6.5

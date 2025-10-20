@@ -1,0 +1,283 @@
+
+## 📦 Subtask 7.3: Create listing form (create/edit)
+
+### Prompt for Claude CLI:
+```
+I need the form to create/edit marketplace listings.
+
+CONTEXT:
+- Form for creating new listings
+- Upload image (optional)
+- Free-form fields: title, description, number, collection
+- Form validation
+
+TASK:
+Create the listing form:
+
+FILES TO CREATE:
+
+1. src/app/marketplace/create/page.tsx
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ListingForm } from '@/components/marketplace/ListingForm';
+import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
+import AuthGuard from '@/components/AuthGuard';
+import { toast } from 'sonner';
+
+function CreateListingContent() {
+  const router = useRouter();
+  const { createListing, loading } = useCreateListing();
+
+  const handleSubmit = async (data: {
+    title: string;
+    description?: string;
+    sticker_number?: string;
+    collection_name?: string;
+    image_url?: string;
+  }) => {
+    try {
+      const listingId = await createListing(data);
+      toast.success('Listing published successfully!');
+      router.push(`/marketplace/${listingId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create listing');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-black uppercase text-white mb-2">
+            Publish Listing
+          </h1>
+          <p className="text-gray-400">
+            Share your card with the community
+          </p>
+        </div>
+
+        <ListingForm onSubmit={handleSubmit} loading={loading} />
+      </div>
+    </div>
+  );
+}
+
+export default function CreateListingPage() {
+  return (
+    <AuthGuard>
+      <CreateListingContent />
+    </AuthGuard>
+  );
+}
+```
+
+2. src/components/marketplace/ListingForm.tsx
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { ImageUpload } from '@/components/marketplace/ImageUpload';
+
+interface ListingFormData {
+  title: string;
+  description?: string;
+  sticker_number?: string;
+  collection_name?: string;
+  image_url?: string;
+}
+
+interface ListingFormProps {
+  initialData?: ListingFormData;
+  onSubmit: (data: ListingFormData) => Promise<void>;
+  loading?: boolean;
+}
+
+export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps) {
+  const [formData, setFormData] = useState<ListingFormData>({
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    sticker_number: initialData?.sticker_number || '',
+    collection_name: initialData?.collection_name || '',
+    image_url: initialData?.image_url || ''
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (formData.title.length < 3) {
+      newErrors.title = 'Title must be at least 3 characters';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validate()) return;
+
+    await onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <ModernCard>
+        <ModernCardContent className="p-6 space-y-6">
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <Label>Card Image (Optional)</Label>
+            <ImageUpload
+              value={formData.image_url}
+              onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+            />
+            <p className="text-sm text-gray-400">
+              Upload a photo of your card for better visibility
+            </p>
+          </div>
+
+          {/* Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">
+              Title <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="e.g., Messi Inter Miami 2024"
+              className="bg-[#374151] border-2 border-black text-white"
+            />
+            {errors.title && (
+              <p className="text-sm text-red-500">{errors.title}</p>
+            )}
+          </div>
+
+          {/* Collection Name */}
+          <div className="space-y-2">
+            <Label htmlFor="collection">Collection (Optional)</Label>
+            <Input
+              id="collection"
+              value={formData.collection_name || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, collection_name: e.target.value }))}
+              placeholder="e.g., Panini LaLiga 2024/25"
+              className="bg-[#374151] border-2 border-black text-white"
+            />
+          </div>
+
+          {/* Card Number */}
+          <div className="space-y-2">
+            <Label htmlFor="number">Card Number (Optional)</Label>
+            <Input
+              id="number"
+              value={formData.sticker_number || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, sticker_number: e.target.value }))}
+              placeholder="e.g., 245"
+              className="bg-[#374151] border-2 border-black text-white"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea
+              id="description"
+              value={formData.description || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Additional details about the card..."
+              rows={4}
+              className="bg-[#374151] border-2 border-black text-white"
+            />
+            <p className="text-sm text-gray-400">
+              {formData.description?.length || 0} / 500 characters
+            </p>
+          </div>
+
+          {/* Submit */}
+          <div className="flex gap-4">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+            >
+              {loading ? 'Publishing...' : 'Publish Listing'}
+            </Button>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
+    </form>
+  );
+}
+```
+
+3. src/hooks/marketplace/useCreateListing.ts
+```typescript
+import { useState } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+
+export function useCreateListing() {
+  const supabase = useSupabaseClient();
+  const [loading, setLoading] = useState(false);
+
+  const createListing = async (data: {
+    title: string;
+    description?: string;
+    sticker_number?: string;
+    collection_name?: string;
+    image_url?: string;
+  }): Promise<string> => {
+    try {
+      setLoading(true);
+
+      const { data: result, error } = await supabase.rpc('create_trade_listing', {
+        p_title: data.title,
+        p_description: data.description || null,
+        p_sticker_number: data.sticker_number || null,
+        p_collection_name: data.collection_name || null,
+        p_image_url: data.image_url || null
+      });
+
+      if (error) throw error;
+      if (!result) throw new Error('No listing ID returned');
+
+      return result.toString();
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { createListing, loading };
+}
+```
+
+FEATURES:
+- Required title field
+- Optional fields: description, number, collection, image
+- Client-side validation
+- Character counter for description
+- Image upload component
+- Loading states
+- Error handling
+
+DELIVERABLES:
+1. Complete create listing page
+2. Reusable ListingForm component
+3. Form validation
+4. useCreateListing hook
+
+Give me git commands afterwards.
+```

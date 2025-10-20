@@ -1,0 +1,198 @@
+
+## 📦 Subtask 6.2: Create consolidated CHANGELOG v1.6.0
+
+### Prompt for Claude CLI:
+```
+I need to consolidate the complete CHANGELOG for v1.6.0.
+
+CONTEXT:
+- 5 sprints completed
+- ~20 migrations created
+- ~25 new RPCs
+- Complete marketplace + templates + social + admin system
+
+TASK:
+Update CHANGELOG.md with complete entry:
+
+## [1.6.0] - 2025-XX-XX - MARKETPLACE PIVOT
+
+### 🎯 Breaking Changes
+
+**Official Collections System REMOVED**
+- Removed 7 tables: collections, stickers, collection_teams, collection_pages, page_slots, user_collections, user_stickers
+- Removed 7 RPCs: find_mutual_traders, get_mutual_trade_detail, bulk_add_stickers, search_stickers, mark_team_page_complete, get_user_collection_stats, get_completion_report
+- Reason: Pivot to neutral marketplace + community templates
+- No affected users (pre-production)
+
+**New Model: Neutral Marketplace**
+- From automatic matching to manual discovery
+- From official albums to community templates
+- Legal model: neutral hosting (LSSI/DSA)
+
+### ✨ Added - Marketplace System
+
+**Trade Listings**
+- `trade_listings` table for physical card listings
+- Publish with optional real photo
+- Free-form fields: title, description, number, collection
+- Search and filtering
+- View listings by user profile
+- Direct chat from listing
+
+**RPCs:**
+- `create_trade_listing` - Create listing
+- `list_trade_listings` - List with search
+- `get_user_listings` - View user's listings
+- `update_listing_status` - Mark sold/removed
+- `get_listing_chats`, `send_listing_message` - Chat from listing
+
+### ✨ Added - Collection Templates System
+
+**Community Templates**
+- Users create collection structures
+- Publish as public or private
+- Other users copy templates
+- Track progress: HAVE/NEED/DUPES
+- Integrated rating system
+
+**Tables:**
+- `collection_templates` - Created templates
+- `template_pages` - Pages within templates
+- `template_slots` - Individual slots
+- `user_template_copies` - User copies
+- `user_template_progress` - Progress on each slot
+
+**RPCs:**
+- `create_template`, `add_template_page`, `publish_template`
+- `list_public_templates`, `copy_template`, `get_my_template_copies`
+- `update_template_progress`, `get_template_progress`
+
+### ✨ Added - Collection-Marketplace Integration
+
+**Publish from Collection**
+- Bidirectional link: listing ↔ slot ↔ progress
+- "Put up for trade" button from duplicates
+- Automatic sync when selling
+
+**Extensions:**
+- `trade_listings.copy_id`, `trade_listings.slot_id`
+
+**RPCs:**
+- `publish_duplicate_to_marketplace` - Create listing from slot
+- `mark_listing_sold_and_decrement` - Sell and update inventory
+- `get_my_listings_with_progress` - Synced view
+
+### ✨ Added - Social & Reputation System
+
+**Favorites**
+- Follow users
+- View favorites list with stats
+
+**Ratings**
+- Rate users post-trade (1-5 stars)
+- Rate copied templates
+- Automatic rating_avg calculation with triggers
+
+**Reports**
+- Universal system: users, listings, templates, chats
+- Moderation queue
+
+**Tables:**
+- `user_favorites`
+- `user_ratings`, `template_ratings`
+- `reports`
+
+**RPCs:**
+- `toggle_favorite`, `list_my_favorites`, `get_favorites_count`
+- `rate_user_from_trade`, `get_user_ratings`
+- `rate_template`, `get_template_ratings`
+- `create_report`, `list_pending_reports`, `resolve_report`
+
+### ✨ Added - Admin & Moderation System
+
+**Moderation Panel**
+- Dashboard with statistics
+- Advanced user search
+- Reports queue with complete context
+- Actions: suspend, unsuspend, remove content, dismiss
+
+**Audit Log**
+- Immutable admin action log
+- Compliance and accountability
+
+**Table:**
+- `admin_actions`
+
+**RPCs:**
+- `log_admin_action` (helper)
+- `get_admin_stats`
+- `search_users_admin`
+- `suspend_user_with_reason`, `unsuspend_user`
+- `get_report_details_with_context`
+
+**Modifications to profiles:**
+- `rating_avg`, `rating_count` (for users)
+
+### 🔄 Changed
+
+**Database Schema**
+- 12 new tables
+- 25+ new RPCs
+- Automatic triggers for ratings
+- Clean system without legacy
+
+**Legal Model**
+- Neutral hosting (LSSI/DSA)
+- All content is UGC
+- Reactive moderation
+
+**User Experience**
+- From automatic matching to manual discovery
+- More control over publications
+- Public profiles
+- Social features
+
+### 🗑️ Removed
+
+**Complete Official Collections System**
+- 7 removed tables
+- 7 removed RPCs
+- Reason: legal risk + non-scalable model
+
+### 📚 Documentation
+
+**Updated:**
+- README.md - Complete new model
+- database-schema.md - Schema v1.6.0
+- api-endpoints.md - All new RPCs
+- current-features.md - Updated status
+- components-guide.md - Expected components
+
+### 🔒 Security & Compliance
+
+- UGC content reports system
+- Manual moderation by administrators
+- Immutable admin audit log
+- Updated RLS policies for new tables
+- LSSI/DSA compliance (Digital Services Act)
+
+### 📊 Backend Complete
+
+**Status:** ✅ Backend 100% complete and tested
+**Next:** Frontend implementation (6-8 weeks)
+
+---
+
+## [1.5.0] - 2025-XX-XX
+
+[Keep previous entry if exists]
+
+DELIVERABLES:
+1. CHANGELOG.md with consolidated v1.6.0 entry
+2. Keep a Changelog format
+3. Clear pivot references
+
+Give me git commands afterwards.
+```
+
+---

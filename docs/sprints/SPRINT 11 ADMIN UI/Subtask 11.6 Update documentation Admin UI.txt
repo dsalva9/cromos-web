@@ -1,0 +1,254 @@
+## 📦 Subtask 11.6: Update documentation - Admin UI
+
+### Prompt for Claude CLI:
+````
+I need to update documentation for completed Admin UI.
+
+CONTEXT:
+- Sprint 11 complete: dashboard, reports, users, audit log
+- 4 admin pages, 5+ components, 7+ hooks
+- Complete moderation system
+
+TASK:
+Update documentation files:
+
+1. docs/current-features.md
+   - Update "### Admin & Moderation System" section:
+````markdown
+     ### Admin & Moderation System ✅ **COMPLETE (v1.6.0)**
+     
+     **Backend:** ✅ Complete
+     **Frontend:** ✅ Complete
+     
+     **Dashboard:**
+     - ✅ Key metrics cards (users, listings, reports, etc.)
+     - ✅ 30-day activity stats
+     - ✅ Suspended users alert
+     - ✅ Visual statistics
+     
+     **Reports Queue:**
+     - ✅ List pending reports with filters
+     - ✅ Report detail modal with complete context
+     - ✅ User history display
+     - ✅ Three actions: dismiss, remove content, suspend user
+     - ✅ Required admin notes
+     - ✅ Confirm dialogs
+     
+     **User Management:**
+     - ✅ Search by nickname or email
+     - ✅ Filter by status (all, active, suspended)
+     - ✅ User cards with stats
+     - ✅ Suspend/unsuspend actions
+     - ✅ Reason prompts
+     - ✅ Protection against suspending admins
+     
+     **Audit Log:**
+     - ✅ Chronological timeline
+     - ✅ Filter by action type
+     - ✅ Admin attribution
+     - ✅ Metadata viewer
+     - ✅ Immutable log
+     - ✅ Pagination support
+     
+     **Navigation:**
+     - ✅ Admin layout with tabs
+     - ✅ Admin link in header (for admins only)
+     - ✅ AdminGuard protection
+````
+
+2. docs/components-guide.md
+   - Add section "## Admin Components ✅"
+````markdown
+   ## Admin Components ✅
+   
+   ### AdminGuard
+   **File:** `src/components/AdminGuard.tsx`
+   
+   Protects routes to admin-only access.
+   
+   **Usage:**
+```tsx
+   export default function AdminPage() {
+     return (
+       <AdminGuard>
+         {/* Admin content */}
+       </AdminGuard>
+     );
+   }
+```
+   
+   **Features:**
+   - Checks user authentication
+   - Verifies is_admin flag
+   - Redirects non-admins
+   - Loading state
+   - Toast notifications
+   
+   ### ReportDetailModal
+   **File:** `src/components/admin/ReportDetailModal.tsx`
+   
+   Modal with complete report context and actions.
+   
+   **Props:**
+   - `reportId: string` - Report ID
+   - `onClose: () => void` - Close handler
+   - `onResolved: () => void` - Callback after resolution
+   
+   **Features:**
+   - Report information display
+   - Reported content details
+   - User history (if applicable)
+   - Three action buttons
+   - Required admin notes textarea
+   - Confirm dialogs
+   - Loading states
+````
+
+3. docs/api-endpoints.md
+   - Add section "## Admin Hooks"
+````markdown
+   ## Admin Hooks
+   
+   ### useAdminStats
+   **File:** `src/hooks/admin/useAdminStats.ts`
+   
+   Fetches dashboard statistics.
+   
+   **Returns:**
+   - `stats` - Statistics object
+   - `loading` - Loading state
+   - `error` - Error message
+   - `refetch` - Refresh function
+   
+   **Backend RPC:** `get_admin_stats`
+   
+   ### usePendingReports
+   **File:** `src/hooks/admin/usePendingReports.ts`
+   
+   Fetches list of pending reports.
+   
+   **Backend RPC:** `list_pending_reports`
+   
+   ### useReportDetails
+   **File:** `src/hooks/admin/useReportDetails.ts`
+   
+   Fetches complete report details with context.
+   
+   **Backend RPC:** `get_report_details_with_context`
+   
+   ### useResolveReport
+   **File:** `src/hooks/admin/useResolveReport.ts`
+   
+   Resolves a report with action.
+   
+   **Actions:**
+   - `dismiss` - Dismiss report without action
+   - `remove_content` - Remove the reported content
+   - `suspend_user` - Suspend the user
+   
+   **Backend RPC:** `resolve_report`
+   
+   ### useUserSearch
+   **File:** `src/hooks/admin/useUserSearch.ts`
+   
+   Searches users with filters.
+   
+   **Parameters:**
+   - `query: string` - Search query
+   - `status: 'all' | 'active' | 'suspended'` - Status filter
+   
+   **Backend RPC:** `search_users_admin`
+   
+   ### useSuspendUser
+   **File:** `src/hooks/admin/useSuspendUser.ts`
+   
+   Suspends or unsuspends users.
+   
+   **Functions:**
+   - `suspendUser(userId, reason)`
+   - `unsuspendUser(userId, reason)`
+   
+   **Backend RPCs:** `suspend_user_with_reason`, `unsuspend_user`
+   
+   ### useAuditLog
+   **File:** `src/hooks/admin/useAuditLog.ts`
+   
+   Fetches audit log with filtering.
+   
+   **Parameters:**
+   - `actionType: string` - Filter by action type
+   
+   **Returns:** Paginated audit log entries
+````
+
+4. CHANGELOG.md
+   - Add to [1.6.0] entry:
+````markdown
+     ### Added - Admin UI (Frontend)
+     
+     **Pages:**
+     - `/admin/dashboard` - Statistics dashboard
+     - `/admin/reports` - Reports queue
+     - `/admin/users` - User search and management
+     - `/admin/audit` - Audit log viewer
+     
+     **Components:**
+     - `AdminGuard` - Admin-only route protection
+     - `ReportDetailModal` - Report review with context
+     - Admin layout with tabs navigation
+     
+     **Hooks:**
+     - `useAdminStats` - Dashboard statistics
+     - `usePendingReports` - Pending reports list
+     - `useReportDetails` - Report details with context
+     - `useResolveReport` - Resolve report actions
+     - `useUserSearch` - Search users with filters
+     - `useSuspendUser` - Suspend/unsuspend users
+     - `useAuditLog` - Audit log with pagination
+     
+     **Features:**
+     - Dashboard with 8 key metrics
+     - Color-coded stat cards
+     - Reports queue with detail modal
+     - Three resolution actions (dismiss, remove, suspend)
+     - User search by nickname or email
+     - Status filter (all, active, suspended)
+     - Suspend/unsuspend with reason prompts
+     - Protection against suspending admins
+     - Audit log timeline with metadata
+     - Filter audit log by action type
+     - Admin tabs navigation
+     - Admin link in header (admin-only)
+     - Complete admin guard protection
+````
+
+5. TODO.md
+   - Update Sprint 11:
+````markdown
+     ## ✅ Completed - Sprint 11: Admin UI
+     - [x] Admin dashboard with statistics
+     - [x] useAdminStats hook
+     - [x] Reports queue page
+     - [x] ReportDetailModal component
+     - [x] usePendingReports hook
+     - [x] useReportDetails hook
+     - [x] useResolveReport hook
+     - [x] User search page
+     - [x] useUserSearch hook
+     - [x] useSuspendUser hook
+     - [x] Audit log viewer
+     - [x] useAuditLog hook
+     - [x] Admin layout with tabs
+     - [x] AdminGuard component
+     - [x] Admin link in header
+````
+
+DELIVERABLES:
+1. Updated current-features.md
+2. Updated components-guide.md with admin components
+3. Updated api-endpoints.md with admin hooks
+4. Updated CHANGELOG.md with Sprint 11 additions
+5. Updated TODO.md marking Sprint 11 complete
+
+Give me git commands to commit all docs together.
+````

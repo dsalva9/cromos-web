@@ -1,0 +1,38 @@
+ Subtask 3.1: Extend trade_listings with template refs
+Prompt for Claude CLI:
+I need to link marketplace with templates system.
+
+CONTEXT:
+- Listings created from "Put up for trade" should remember which slot they come from
+- This allows decrementing count when sold
+- Optional columns (NULL) because listings can also be created manually
+
+TASK:
+Create a SQL migration that:
+
+1. ADD COLUMNS to trade_listings:
+   ALTER TABLE trade_listings ADD COLUMN copy_id BIGINT REFERENCES user_template_copies(id) ON DELETE SET NULL;
+   ALTER TABLE trade_listings ADD COLUMN slot_id BIGINT REFERENCES template_slots(id) ON DELETE SET NULL;
+
+2. ADD CHECK CONSTRAINT:
+   ALTER TABLE trade_listings ADD CONSTRAINT check_copy_slot_consistency
+CHECK (
+(copy_id IS NULL AND slot_id IS NULL) OR
+(copy_id IS NOT NULL AND slot_id IS NOT NULL)
+);
+-- Both NULL (manual listing) OR both NOT NULL (listing from template)
+
+CREATE INDICES:
+CREATE INDEX idx_listings_copy ON trade_listings(copy_id) WHERE copy_id IS NOT NULL;
+CREATE INDEX idx_listings_slot ON trade_listings(slot_id) WHERE slot_id IS NOT NULL;
+COMMENT columns:
+COMMENT ON COLUMN trade_listings.copy_id IS 'Optional: reference to template copy where this was published from';
+COMMENT ON COLUMN trade_listings.slot_id IS 'Optional: reference to specific slot being sold';
+
+DELIVERABLES:
+
+File: supabase/migrations/YYYYMMDDHHMMSS_link_listings_to_templates.sql
+Include comments explaining use cases
+Backward compatibility (existing listings have NULL)
+
+Give me git commands afterwards.

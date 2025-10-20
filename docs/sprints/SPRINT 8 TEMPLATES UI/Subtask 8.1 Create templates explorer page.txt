@@ -1,0 +1,272 @@
+
+## 📦 Subtask 8.1: Create templates explorer page
+
+### Prompt for Claude CLI:
+```
+I need the templates explorer page to browse and copy public templates.
+
+CONTEXT:
+- Backend RPCs ready: list_public_templates, copy_template
+- Main discovery page for community templates
+- Search, filters, and sorting
+- Copy button on each template
+
+TASK:
+Create the templates explorer:
+
+FILE: src/app/templates/page.tsx
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { useTemplates } from '@/hooks/templates/useTemplates';
+import { TemplateCard } from '@/components/templates/TemplateCard';
+import { TemplateFilters } from '@/components/templates/TemplateFilters';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useUser } from '@/components/providers/SupabaseProvider';
+
+type SortOption = 'recent' | 'rating' | 'popular';
+
+export default function TemplatesPage() {
+  const { user } = useUser();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('recent');
+  
+  const { templates, loading, error, hasMore, loadMore } = useTemplates({
+    search: searchQuery,
+    sortBy,
+    limit: 12
+  });
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-black uppercase text-white mb-2">
+              Community Templates
+            </h1>
+            <p className="text-gray-400">
+              Discover and copy collection templates created by the community
+            </p>
+          </div>
+          
+          {user && (
+            <Link href="/templates/create">
+              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Template
+              </Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Filters */}
+        <TemplateFilters
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+        />
+
+        {/* Error State */}
+        {error && (
+          <div className="text-red-500 text-center py-8">
+            Error loading templates: {error}
+          </div>
+        )}
+
+        {/* Templates Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {templates.map((template) => (
+            <TemplateCard key={template.id} template={template} />
+          ))}
+        </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+          </div>
+        )}
+
+        {/* Load More */}
+        {hasMore && !loading && (
+          <div className="flex justify-center mt-8">
+            <Button onClick={loadMore} variant="outline">
+              Load More
+            </Button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && templates.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg mb-4">
+              No templates found
+            </p>
+            {user && (
+              <Link href="/templates/create">
+                <Button className="bg-[#FFC000] text-black">
+                  Create the first template
+                </Button>
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+2. src/components/templates/TemplateFilters.tsx
+```typescript
+'use client';
+
+import { SearchBar } from '@/components/marketplace/SearchBar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+
+type SortOption = 'recent' | 'rating' | 'popular';
+
+interface TemplateFiltersProps {
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  sortBy: SortOption;
+  onSortChange: (value: SortOption) => void;
+}
+
+export function TemplateFilters({
+  searchQuery,
+  onSearchChange,
+  sortBy,
+  onSortChange
+}: TemplateFiltersProps) {
+  return (
+    <div className="space-y-4">
+      {/* Search */}
+      <SearchBar
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder="Search templates by title or description..."
+      />
+
+      {/* Sort */}
+      <div className="flex items-center gap-4">
+        <Label className="text-white">Sort by:</Label>
+        <Select value={sortBy} onValueChange={onSortChange}>
+          <SelectTrigger className="w-48 bg-[#374151] border-2 border-black text-white">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="recent">Most Recent</SelectItem>
+            <SelectItem value="rating">Highest Rated</SelectItem>
+            <SelectItem value="popular">Most Popular</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+```
+
+3. src/hooks/templates/useTemplates.ts
+```typescript
+import { useState, useEffect, useCallback } from 'react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+
+interface Template {
+  id: string;
+  author_id: string;
+  author_nickname: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  rating_avg: number;
+  rating_count: number;
+  copies_count: number;
+  pages_count: number;
+  created_at: string;
+}
+
+interface UseTemplatesParams {
+  search?: string;
+  sortBy?: 'recent' | 'rating' | 'popular';
+  limit?: number;
+}
+
+export function useTemplates({ search = '', sortBy = 'recent', limit = 12 }: UseTemplatesParams = {}) {
+  const supabase = useSupabaseClient();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  const fetchTemplates = useCallback(async (isLoadMore = false) => {
+    try {
+      setLoading(true);
+      const currentOffset = isLoadMore ? offset : 0;
+      
+      const { data, error: rpcError } = await supabase.rpc('list_public_templates', {
+        p_limit: limit,
+        p_offset: currentOffset,
+        p_search: search || null,
+        p_sort_by: sortBy
+      });
+
+      if (rpcError) throw rpcError;
+
+      if (isLoadMore) {
+        setTemplates(prev => [...prev, ...(data || [])]);
+      } else {
+        setTemplates(data || []);
+      }
+
+      setHasMore((data || []).length === limit);
+      if (isLoadMore) {
+        setOffset(prev => prev + limit);
+      } else {
+        setOffset(limit);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase, search, sortBy, limit, offset]);
+
+  useEffect(() => {
+    setOffset(0);
+    fetchTemplates(false);
+  }, [search, sortBy]);
+
+  const loadMore = useCallback(() => {
+    if (!loading && hasMore) {
+      fetchTemplates(true);
+    }
+  }, [loading, hasMore, fetchTemplates]);
+
+  return { templates, loading, error, hasMore, loadMore, refetch: () => fetchTemplates(false) };
+}
+```
+
+FEATURES:
+- Search templates by title/description
+- Sort by recent, rating, or popularity
+- Responsive grid layout
+- Infinite scroll
+- Empty and loading states
+- Create template CTA for authenticated users
+
+DELIVERABLES:
+1. Templates explorer page
+2. Filter component with search and sort
+3. useTemplates hook with pagination
+
+Give me git commands afterwards.
+```

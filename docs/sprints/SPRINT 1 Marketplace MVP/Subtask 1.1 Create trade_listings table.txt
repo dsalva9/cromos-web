@@ -1,0 +1,50 @@
+## 📦 Subtask 1.1: Create `trade_listings` table
+
+### Prompt for Claude CLI:
+```
+I need to create the marketplace listings table for the new neutral model.
+
+CONTEXT:
+- The app becomes a Wallapop-style marketplace for physical trading cards
+- Users publish listings with optional real photo
+- Free-form fields: title, description, card number, collection
+- NO automatic matching, users discover listings manually
+
+TASK:
+Create a SQL migration for the `trade_listings` table:
+
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- title: TEXT NOT NULL (e.g., "Messi Inter Miami 2024")
+- description: TEXT (free description, can be NULL)
+- sticker_number: TEXT (card number, free text, can be NULL)
+- collection_name: TEXT (collection name, free text, can be NULL)
+- image_url: TEXT (real photo URL in Storage, can be NULL)
+- status: TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'removed'))
+- views_count: INTEGER DEFAULT 0
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+- updated_at: TIMESTAMPTZ DEFAULT NOW()
+
+INDICES:
+- idx_listings_user ON (user_id)
+- idx_listings_status ON (status) WHERE status = 'active'
+- idx_listings_created ON (created_at DESC)
+- idx_listings_search USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, '')))
+
+TRIGGER:
+- Add updated_at trigger using existing update_updated_at_column function
+
+RLS POLICIES:
+- Public read for active listings (WHERE status = 'active')
+- Users can insert only if authenticated
+- Users can update/delete only their own listings (user_id = auth.uid())
+- Admins can do anything
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_trade_listings_table.sql
+2. Include SQL comments explaining each section
+3. Include example queries in comments
+
+After creating the file, give me git commands to commit.
+```

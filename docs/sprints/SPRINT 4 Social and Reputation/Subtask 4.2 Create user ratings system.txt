@@ -1,0 +1,87 @@
+
+## 📦 Subtask 4.2: Create user ratings system
+
+### Prompt for Claude CLI:
+```
+I need the user ratings system (post-trade).
+
+CONTEXT:
+- When completing a trade, both users can rate each other
+- Rating 1-5 stars + optional comment
+- Only 1 rating per user per trade
+- Average rating calculated with trigger
+
+TASK:
+Create a SQL migration with:
+
+1. ADD COLUMNS to profiles:
+   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS rating_avg DECIMAL(3,2) DEFAULT 0.0;
+   ALTER TABLE profiles ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
+
+2. TABLE: user_ratings
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- rater_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- rated_user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- trade_id: BIGINT REFERENCES trades_history(id) ON DELETE CASCADE
+- rating: INTEGER CHECK (rating BETWEEN 1 AND 5)
+- comment: TEXT
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINTS:
+- UNIQUE(rater_id, trade_id)
+- CHECK (rater_id != rated_user_id)
+
+INDICES:
+- idx_user_ratings_rated ON (rated_user_id)
+- idx_user_ratings_trade ON (trade_id)
+
+3. TRIGGER FUNCTION: recalculate_user_rating()
+LOGIC:
+- Executes AFTER INSERT OR UPDATE OR DELETE ON user_ratings
+- Recalculates rating_avg and rating_count for affected user:
+  UPDATE profiles SET 
+    rating_avg = (SELECT AVG(rating) FROM user_ratings WHERE rated_user_id = ...),
+    rating_count = (SELECT COUNT(*) FROM user_ratings WHERE rated_user_id = ...)
+  WHERE id = affected_user_id
+
+4. RPC FUNCTION: rate_user_from_trade
+PARAMETERS:
+- p_trade_id BIGINT
+- p_rating INTEGER (1-5)
+- p_comment TEXT DEFAULT NULL
+RETURNS: VOID
+LOGIC:
+1. Validate p_rating BETWEEN 1 AND 5
+2. Verify trade exists and is completed (status = 'completed' in trades_history)
+3. Determine who is rated_user (the other trade participant)
+4. Verify no previous rating exists
+5. INSERT INTO user_ratings
+6. Trigger automatically updates profiles.rating_avg
+
+5. RPC FUNCTION: get_user_ratings
+PARAMETERS:
+- p_user_id UUID
+- p_limit INTEGER DEFAULT 10
+- p_offset INTEGER DEFAULT 0
+RETURNS: TABLE (rater_nickname, rating, comment, created_at)
+LOGIC:
+1. SELECT from user_ratings WHERE rated_user_id = p_user_id
+2. JOIN profiles for rater_nickname
+3. ORDER BY created_at DESC
+
+RLS POLICIES:
+- Public read on user_ratings
+- Users can insert only if they're trade participants
+- Users can update/delete their own ratings (optional)
+
+PERMISSIONS:
+- GRANT EXECUTE ON rate_user_from_trade TO authenticated
+- GRANT EXECUTE ON get_user_ratings TO anon, authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_user_ratings_system.sql
+2. Include trigger function to recalculate rating_avg
+3. Robust validations in rate_user_from_trade
+
+Give me git commands afterwards.
+```

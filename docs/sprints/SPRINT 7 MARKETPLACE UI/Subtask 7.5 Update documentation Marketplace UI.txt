@@ -1,0 +1,104 @@
+📦 Subtask 7.5: Update documentation - Marketplace UIPrompt for Claude CLI:I need to update documentation for completed Marketplace UI.
+
+CONTEXT:
+- Sprint 7 complete: marketplace feed, cards, form, detail
+- 4 new pages, 5+ components, 3 hooks
+- Ready for user testing
+
+TASK:
+Update documentation files:
+
+1. docs/current-features.md
+   - Update "### Marketplace System" section: ### Marketplace System ✅ **COMPLETE (v1.6.0)** **Backend:** ✅ Complete
+ **Frontend:** ✅ Complete - ✅ Marketplace feed with search
+ - ✅ Listing cards with image/status
+ - ✅ Create listing form with validation
+ - ✅ Listing detail page
+ - ✅ Contact seller flow
+ - ✅ Owner actions (edit/delete)
+ - ✅ View counter
+ - ⏳ Chat integration (Sprint 7 ongoing)
+
+2. docs/components-guide.md
+   - Add section "## Marketplace Components ✅"
+```markdownMarketplace Components ✅ListingCard
+File: src/components/marketplace/ListingCard.tsxDisplays listing preview in grid layouts.Props:
+
+listing: Listing - Listing data object
+Features:
+
+Image with fallback (initials)
+Status badge (active/sold/removed)
+Author info with avatar
+Views count
+Relative date display
+Hover scale effect
+Click to detail page
+ListingForm
+File: src/components/marketplace/ListingForm.tsxReusable form for create/edit listing.Props:
+
+initialData?: ListingFormData - Pre-fill data for editing
+onSubmit: (data) => Promise<void> - Submit handler
+loading?: boolean - Loading state
+Features:
+
+Required title field with validation
+Optional fields: description, number, collection, image
+Character counter (500 max)
+Client-side validation
+Image upload integration
+SearchBar
+File: src/components/marketplace/SearchBar.tsxSearch input with debounce for marketplace feed.Props:
+
+value: string - Controlled value
+onChange: (value: string) => void - Change handler
+placeholder?: string - Input placeholder
+Features:
+
+500ms debounce
+Search icon
+Dark theme styling
+
+
+3. CHANGELOG.md
+   - Add to [1.6.0] entry:
+```markdown ### Added - Marketplace UI (Frontend) **Pages:**
+ - `/marketplace` - Main feed with search and infinite scroll
+ - `/marketplace/create` - Create listing form
+ - `/marketplace/[id]` - Listing detail page **Components:**
+ - `ListingCard` - Grid card with image, status, author
+ - `ListingForm` - Reusable create/edit form
+ - `SearchBar` - Debounced search input
+ - `ImageUpload` - Image upload to Supabase Storage **Hooks:**
+ - `useListings` - Fetch marketplace feed with pagination
+ - `useListing` - Fetch single listing with view tracking
+ - `useCreateListing` - Create new listing **Features:**
+ - Responsive grid layout (1-4 columns)
+ - Infinite scroll pagination
+ - Real-time search with debounce
+ - Image upload with preview
+ - View counter auto-increment
+ - Owner actions (edit/delete)
+ - Empty states and loading skeletons
+
+4. TODO.md
+   - Update Sprint 7:
+```markdown ## ✅ Completed - Sprint 7: Marketplace UI
+ - [x] `/marketplace` - Feed with search
+ - [x] `/marketplace/create` - Listing form
+ - [x] `/marketplace/[id]` - Listing detail
+ - [x] Listing card component
+ - [x] Search with debounce
+ - [x] useListings hook
+ - [x] useListing hook
+ - [x] useCreateListing hook
+ - [ ] Chat from listing (moved to Sprint 9)
+ - [ ] Edit listing page (Sprint 9)
+
+DELIVERABLES:
+1. Updated current-features.md
+2. Updated components-guide.md with all new components
+3. Updated CHANGELOG.md with Sprint 7 additions
+4. Updated TODO.md marking Sprint 7 complete
+
+Give me git commands to commit all docs together.

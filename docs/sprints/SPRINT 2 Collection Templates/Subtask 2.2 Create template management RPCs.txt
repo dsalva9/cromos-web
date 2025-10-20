@@ -1,0 +1,72 @@
+## 📦 Subtask 2.2: Create template management RPCs
+
+### Prompt for Claude CLI:
+```
+I need RPCs to create and manage templates.
+
+CONTEXT:
+- The 5 template system tables already exist
+- Users create templates, add pages with slots, publish them
+
+TASK:
+Create a SQL migration with 3 functions:
+
+FUNCTION 1: create_template
+PARAMETERS:
+- p_title TEXT
+- p_description TEXT DEFAULT NULL
+- p_image_url TEXT DEFAULT NULL
+- p_is_public BOOLEAN DEFAULT FALSE
+RETURNS: BIGINT (template_id)
+LOGIC:
+1. Validate auth.uid() not NULL
+2. Validate TRIM(p_title) != ''
+3. INSERT INTO collection_templates (author_id, title, ...)
+4. RETURN template_id
+
+FUNCTION 2: add_template_page
+PARAMETERS:
+- p_template_id BIGINT
+- p_title TEXT
+- p_type TEXT (must be 'team' or 'special')
+- p_slots JSONB (array of objects: [{label: "Goalkeeper", is_special: false}, ...])
+RETURNS: BIGINT (page_id)
+LOGIC:
+1. Validate template belongs to auth.uid():
+   SELECT author_id FROM collection_templates WHERE id = p_template_id
+2. Calculate next page_number:
+   SELECT COALESCE(MAX(page_number), 0) + 1 FROM template_pages WHERE template_id = ...
+3. Calculate slots_count: jsonb_array_length(p_slots)
+4. INSERT INTO template_pages
+5. Loop over p_slots with jsonb_array_elements:
+   FOR each slot IN p_slots LOOP
+     INSERT INTO template_slots (page_id, slot_number, label, is_special)
+   END LOOP
+6. RETURN page_id
+VALIDATIONS:
+- If not author: RAISE EXCEPTION 'No permission'
+- If p_slots is empty: RAISE EXCEPTION 'Must provide at least one slot'
+- If p_type not 'team' or 'special': RAISE EXCEPTION
+
+FUNCTION 3: publish_template
+PARAMETERS:
+- p_template_id BIGINT
+- p_is_public BOOLEAN
+RETURNS: VOID
+LOGIC:
+1. Validate template belongs to auth.uid()
+2. Validate has at least 1 page:
+   SELECT COUNT(*) FROM template_pages WHERE template_id = ...
+3. UPDATE collection_templates SET is_public = p_is_public WHERE id = ...
+4. If no update: RAISE EXCEPTION
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated (all)
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_template_management_rpcs.sql
+2. Include usage example with JSONB for slots
+3. Robust validations with English messages
+
+Give me git commands afterwards.
+```

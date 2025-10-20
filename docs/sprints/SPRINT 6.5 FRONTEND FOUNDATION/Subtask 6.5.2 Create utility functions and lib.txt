@@ -1,0 +1,206 @@
+📦 Subtask 6.5.2: Create utility functions and libPrompt for Claude CLI:I need to create core utility functions used throughout the app.
+
+CONTEXT:
+- Utilities for className merging, formatting, validation
+- Type definitions for common interfaces
+- Helper functions
+
+TASK:
+Create utility library:
+
+FILES TO CREATE:
+
+1. src/lib/utils.ts
+```typescriptimport { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';/**
+
+Merges Tailwind CSS classes with proper precedence
+*/
+export function cn(...inputs: ClassValue[]) {
+return twMerge(clsx(inputs));
+}
+/**
+
+Format date to relative time (e.g., "2 days ago")
+*/
+export function formatRelativeTime(date: Date | string): string {
+const dateObj = typeof date === 'string' ? new Date(date) : date;
+const now = new Date();
+const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });if (diffInSeconds < 60) {
+return rtf.format(-diffInSeconds, 'second');
+} else if (diffInSeconds < 3600) {
+return rtf.format(-Math.floor(diffInSeconds / 60), 'minute');
+} else if (diffInSeconds < 86400) {
+return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour');
+} else if (diffInSeconds < 604800) {
+return rtf.format(-Math.floor(diffInSeconds / 86400), 'day');
+} else if (diffInSeconds < 2592000) {
+return rtf.format(-Math.floor(diffInSeconds / 604800), 'week');
+} else if (diffInSeconds < 31536000) {
+return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month');
+} else {
+return rtf.format(-Math.floor(diffInSeconds / 31536000), 'year');
+}
+}/**
+
+Format date to local string
+*/
+export function formatDate(date: Date | string): string {
+const dateObj = typeof date === 'string' ? new Date(date) : date;
+return dateObj.toLocaleDateString('en-US', {
+year: 'numeric',
+month: 'long',
+day: 'numeric',
+});
+}
+/**
+
+Truncate text to specified length
+*/
+export function truncate(text: string, length: number): string {
+if (text.length <= length) return text;
+return text.slice(0, length) + '...';
+}
+/**
+
+Check if string is valid URL
+*/
+export function isValidUrl(url: string): boolean {
+try {
+new URL(url);
+return true;
+} catch {
+return false;
+}
+}
+/**
+
+Sleep for specified milliseconds (useful for testing)
+*/
+export function sleep(ms: number): Promise<void> {
+return new Promise(resolve => setTimeout(resolve, ms));
+}
+/**
+
+Generate unique ID (simple version)
+*/
+export function generateId(): string {
+return Math.random().toString(36).substring(2, 15);
+}
+
+
+2. src/types/index.ts
+```typescript// Database types matching Supabase schemaexport interface Profile {
+id: string;
+nickname: string;
+avatar_url: string | null;
+rating_avg: number;
+rating_count: number;
+is_admin: boolean;
+is_suspended: boolean;
+created_at: string;
+updated_at: string;
+}export interface Listing {
+id: string;
+user_id: string;
+author_nickname: string;
+author_avatar_url: string | null;
+title: string;
+description: string | null;
+sticker_number: string | null;
+collection_name: string | null;
+image_url: string | null;
+status: 'active' | 'sold' | 'removed';
+views_count: number;
+created_at: string;
+copy_id?: string | null;
+slot_id?: string | null;
+}export interface Template {
+id: string;
+author_id: string;
+author_nickname: string;
+title: string;
+description: string | null;
+image_url: string | null;
+is_public: boolean;
+rating_avg: number;
+rating_count: number;
+copies_count: number;
+pages_count: number;
+created_at: string;
+}export interface TemplateCopy {
+copy_id: string;
+template_id: string;
+title: string;
+is_active: boolean;
+copied_at: string;
+original_author_nickname: string;
+completed_slots: number;
+total_slots: number;
+}export interface SlotProgress {
+slot_id: string;
+page_id: string;
+page_number: number;
+slot_number: number;
+label: string | null;
+is_special: boolean;
+status: 'missing' | 'owned' | 'duplicate';
+count: number;
+}export interface UserProfile extends Profile {
+favorites_count: number;
+}export interface Favorite {
+favorite_user_id: string;
+nickname: string;
+avatar_url: string | null;
+active_listings_count: number;
+rating_avg: number;
+created_at: string;
+}// Common utility typesexport type SortOption = 'recent' | 'rating' | 'popular';export type ListingStatus = 'active' | 'sold' | 'removed';export type SlotStatus = 'missing' | 'owned' | 'duplicate';export type ReportReason = 'spam' | 'inappropriate' | 'scam' | 'harassment' | 'fake' | 'other';export type ReportStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed';// API response typesexport interface ApiError {
+message: string;
+code?: string;
+}export interface PaginatedResponse<T> {
+data: T[];
+hasMore: boolean;
+total?: number;
+}
+
+3. src/lib/constants.ts
+```typescript// App-wide constantsexport const APP_NAME = 'CambioCromos';
+export const APP_DESCRIPTION = 'Sports card marketplace and collection manager';export const ROUTES = {
+HOME: '/',
+MARKETPLACE: '/marketplace',
+MARKETPLACE_CREATE: '/marketplace/create',
+MARKETPLACE_MY_LISTINGS: '/marketplace/my-listings',
+TEMPLATES: '/templates',
+TEMPLATES_CREATE: '/templates/create',
+MY_TEMPLATES: '/my-templates',
+FAVORITES: '/favorites',
+PROFILE: '/profile',
+ADMIN_DASHBOARD: '/admin/dashboard',
+ADMIN_REPORTS: '/admin/reports',
+ADMIN_USERS: '/admin/users',
+ADMIN_AUDIT: '/admin/audit',
+LOGIN: '/login',
+REGISTER: '/register',
+} as const;export const PAGINATION = {
+DEFAULT_LIMIT: 20,
+MAX_LIMIT: 100,
+} as const;export const VALIDATION = {
+MIN_TITLE_LENGTH: 3,
+MAX_TITLE_LENGTH: 100,
+MAX_DESCRIPTION_LENGTH: 500,
+MAX_IMAGE_SIZE_MB: 5,
+ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+} as const;export const TOAST_DURATION = {
+SUCCESS: 3000,
+ERROR: 5000,
+INFO: 3000,
+} as const;
+
+DELIVERABLES:
+1. src/lib/utils.ts with helpers
+2. src/types/index.ts with all types
+3. src/lib/constants.ts with app constants
+
+Give me git commands afterwards.

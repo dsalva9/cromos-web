@@ -1,0 +1,78 @@
+
+## 📦 Subtask 5.5: Update documentation - Admin Moderation
+
+### Prompt for Claude CLI:
+```
+I need to document the complete admin moderation system.
+
+CONTEXT:
+- Admin panel with stats, search, reports, actions
+- Immutable audit log
+- ~6 new admin-only RPCs
+
+TASK:
+Update documentation:
+
+1. docs/database-schema.md
+   - Section "## Admin & Moderation System (v1.6.0)"
+   - Table: admin_actions
+   - Document all admin RPCs:
+     * log_admin_action (helper)
+     * get_admin_stats
+     * search_users_admin
+     * suspend_user_with_reason
+     * unsuspend_user
+     * get_report_details_with_context
+     * resolve_report (updated version with audit)
+   - Explain complete moderation flow
+   - Explain audit log and accountability
+
+2. docs/api-endpoints.md
+   - Section "## Admin Panel Endpoints"
+   - Expected hooks (frontend TODO):
+     * useAdminStats (dashboard)
+     * useAdminUserSearch (search)
+     * useReportDetails (detail with context)
+     * useModeration (suspend, unsuspend, resolve)
+   - Note: "All require is_admin = TRUE"
+   - Call examples
+
+3. docs/current-features.md
+   - Update "### Admin Backoffice ✅ **EXTENDED (v1.6.0)**"
+   - New features on top of existing (v1.5):
+     * ✅ Dashboard with statistics
+     * ✅ Advanced user search
+     * ✅ Reports queue with complete context
+     * ✅ Moderation actions (suspend, remove, dismiss)
+     * ✅ Immutable audit log
+     * ✅ Report resolution with reason
+     * ⏳ Frontend tabs in development
+
+4. CHANGELOG.md
+   - Subsection "### Added - Admin & Moderation"
+   - List all migrations and RPCs
+   - Note about compliance and audit log
+
+5. TODO.md
+   - Mark Sprint 5 as complete
+   - Next: Frontend implementation
+
+6. README.md
+   - Update "Admin Features" section
+   - Mention neutral hosting model and moderation
+   - Compliance LSSI/DSA
+
+FORMAT:
+- Standard markdown
+- Moderation flow diagrams (ASCII)
+- Admin action examples
+
+DELIVERABLES:
+1. 6 updated files
+2. Complete moderation documentation
+3. Legal compliance references
+
+Give me git commands to commit all together.
+```
+
+---

@@ -1,0 +1,57 @@
+## 📦 Subtask 2.4: Create user progress RPCs
+
+### Prompt for Claude CLI:
+```
+I need RPCs for users to track their progress on template copies.
+
+CONTEXT:
+- User updates slot status: missing → owned → duplicate
+- Increment/decrement duplicate count
+- View overall progress
+
+TASK:
+Create a SQL migration with 2 functions:
+
+FUNCTION 1: update_template_progress
+PARAMETERS:
+- p_copy_id BIGINT
+- p_slot_id BIGINT
+- p_status TEXT (must be in 'missing', 'owned', 'duplicate')
+- p_count INTEGER DEFAULT 0
+RETURNS: VOID
+LOGIC:
+1. Validate auth.uid() not NULL
+2. Validate p_status is in allowed values
+3. Validate copy belongs to user:
+   SELECT user_id FROM user_template_copies WHERE id = p_copy_id AND user_id = auth.uid()
+   If doesn't exist: RAISE EXCEPTION 'Copy not found or doesn't belong to you'
+4. If p_status != 'duplicate', force p_count = 0
+5. If p_status = 'duplicate' and p_count < 1, RAISE EXCEPTION 'Count must be >= 1 for duplicates'
+6. UPSERT into user_template_progress:
+   INSERT INTO user_template_progress (user_id, copy_id, slot_id, status, count)
+   VALUES (auth.uid(), p_copy_id, p_slot_id, p_status, p_count)
+   ON CONFLICT (user_id, copy_id, slot_id) DO UPDATE
+   SET status = EXCLUDED.status, count = EXCLUDED.count
+
+FUNCTION 2: get_template_progress
+PARAMETERS:
+- p_copy_id BIGINT
+RETURNS: TABLE (slot_id, page_id, page_number, slot_number, label, is_special, status, count)
+LOGIC:
+1. Validate copy belongs to auth.uid() OR is public (to view others' progress)
+2. SELECT from user_template_progress
+3. JOIN with template_slots to get label, is_special
+4. JOIN with template_pages to get page_number, title
+5. ORDER BY page_number, slot_number
+6. Return all template slots (even if no progress, status = 'missing')
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_template_progress_rpcs.sql
+2. Include status validations
+3. Usage example with optimistic updates (comment)
+
+Give me git commands afterwards.
+```

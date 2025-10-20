@@ -1,0 +1,82 @@
+
+## 📦 Subtask 4.3: Create template ratings system
+
+### Prompt for Claude CLI:
+```
+I need the template ratings system (similar to user ratings).
+
+CONTEXT:
+- Users who copied a template can rate it
+- Rating 1-5 stars + optional comment
+- Only 1 rating per user per template
+- Average rating with trigger
+
+TASK:
+Create a SQL migration with:
+
+TABLE: template_ratings
+COLUMNS:
+- id: BIGSERIAL PRIMARY KEY
+- user_id: UUID REFERENCES profiles(id) ON DELETE CASCADE
+- template_id: BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE
+- rating: INTEGER CHECK (rating BETWEEN 1 AND 5)
+- comment: TEXT
+- created_at: TIMESTAMPTZ DEFAULT NOW()
+CONSTRAINTS:
+- UNIQUE(user_id, template_id)
+
+INDICES:
+- idx_template_ratings_template ON (template_id)
+- idx_template_ratings_user ON (user_id)
+
+TRIGGER FUNCTION: recalculate_template_rating()
+LOGIC:
+- Executes AFTER INSERT OR UPDATE OR DELETE ON template_ratings
+- Recalculates rating_avg and rating_count in collection_templates:
+  UPDATE collection_templates SET 
+    rating_avg = (SELECT AVG(rating) FROM template_ratings WHERE template_id = ...),
+    rating_count = (SELECT COUNT(*) FROM template_ratings WHERE template_id = ...)
+  WHERE id = affected_template_id
+
+RPC FUNCTION: rate_template
+PARAMETERS:
+- p_template_id BIGINT
+- p_rating INTEGER (1-5)
+- p_comment TEXT DEFAULT NULL
+RETURNS: VOID
+LOGIC:
+1. Validate p_rating BETWEEN 1 AND 5
+2. Verify user copied the template:
+   SELECT FROM user_template_copies WHERE user_id = auth.uid() AND template_id = p_template_id
+   If doesn't exist: RAISE EXCEPTION 'You can only rate templates you have copied'
+3. Verify no previous rating
+4. INSERT INTO template_ratings
+5. Trigger updates collection_templates.rating_avg
+
+RPC FUNCTION: get_template_ratings
+PARAMETERS:
+- p_template_id BIGINT
+- p_limit INTEGER DEFAULT 10
+- p_offset INTEGER DEFAULT 0
+RETURNS: TABLE (user_nickname, rating, comment, created_at)
+LOGIC:
+1. SELECT from template_ratings WHERE template_id = p_template_id
+2. JOIN profiles for user_nickname
+3. ORDER BY created_at DESC
+
+RLS POLICIES:
+- Public read
+- Users can insert only if they copied the template (check in RPC)
+- Users can update/delete their own ratings
+
+PERMISSIONS:
+- GRANT EXECUTE ON rate_template TO authenticated
+- GRANT EXECUTE ON get_template_ratings TO anon, authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_create_template_ratings_system.sql
+2. Include trigger function
+3. Copy validation in rate_template
+
+Give me git commands afterwards.
+```

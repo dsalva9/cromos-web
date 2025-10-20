@@ -1,0 +1,71 @@
+## 📦 Subtask 3.2: Create RPC `publish_duplicate_to_marketplace`
+
+### Prompt for Claude CLI:
+```
+I need the RPC to publish a duplicate from collection to marketplace with 1 click.
+
+CONTEXT:
+- User has cards with count > 0 in user_template_progress
+- Click "Put up for trade" creates listing automatically
+- Listing is linked to slot for synchronization
+
+TASK:
+Create a SQL migration with the function:
+
+FUNCTION: publish_duplicate_to_marketplace
+SECURITY: SECURITY DEFINER
+PARAMETERS:
+- p_copy_id BIGINT
+- p_slot_id BIGINT
+RETURNS: BIGINT (created listing_id)
+
+LOGIC:
+1. Validate auth.uid() not NULL
+
+2. Validate copy belongs to user:
+   SELECT user_id, title FROM user_template_copies WHERE id = p_copy_id AND user_id = auth.uid()
+   If doesn't exist: RAISE EXCEPTION 'Copy not found or doesn't belong to you'
+
+3. Verify slot has duplicates:
+   SELECT status, count FROM user_template_progress 
+   WHERE user_id = auth.uid() AND copy_id = p_copy_id AND slot_id = p_slot_id
+   If status != 'duplicate' OR count < 1: RAISE EXCEPTION 'This card is not available for trade'
+
+4. Get slot data for pre-filling:
+   SELECT ts.label, tp.title as page_title 
+   FROM template_slots ts 
+   JOIN template_pages tp ON ts.page_id = tp.id 
+   WHERE ts.id = p_slot_id
+
+5. Get template title:
+   SELECT ct.title 
+   FROM collection_templates ct
+   JOIN user_template_copies utc ON ct.id = utc.template_id
+   WHERE utc.id = p_copy_id
+
+6. Build listing data:
+   - title: "[label] - [template_title]"
+   - description: "Card from [page_title]. I have [count] available."
+   - collection_name: template_title
+   - sticker_number: NULL (or extract from label if possible)
+
+7. INSERT INTO trade_listings:
+   INSERT INTO trade_listings (user_id, title, description, collection_name, status, copy_id, slot_id)
+   VALUES (auth.uid(), ..., 'active', p_copy_id, p_slot_id)
+   RETURNING id INTO listing_id
+
+8. RETURN listing_id
+
+NOTE:
+- DO NOT decrement count here
+- That happens when marking as sold
+
+PERMISSIONS:
+- GRANT EXECUTE TO authenticated
+
+DELIVERABLES:
+1. File: supabase/migrations/YYYYMMDDHHMMSS_publish_duplicate_to_marketplace_rpc.sql
+2. Include usage example
+3. Comment flow: publish → user edits (frontend) → mark sold → decrement
+
+Give me git commands afterwards.

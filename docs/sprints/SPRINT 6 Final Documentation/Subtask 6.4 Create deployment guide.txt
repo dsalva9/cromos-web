@@ -1,0 +1,282 @@
+## 📦 Subtask 6.4: Create deployment guide
+
+### Prompt for Claude CLI:
+I need a deployment guide for v1.6.0.
+CONTEXT:
+
+Complete backend, production-ready
+Frontend in development
+Supabase + Vercel stack
+
+TASK:
+Create new file: docs/DEPLOYMENT.md
+Deployment Guide - v1.6.0
+📋 Prerequisites
+Required Accounts
+
+ Supabase account (project created)
+ Vercel account (project connected)
+ Custom domain (optional)
+
+Pre-Deploy Verifications
+
+ All migrations executed in Supabase staging
+ Environment variables configured
+ RLS policies tested
+ Storage buckets configured
+ Seed data loaded (if applicable)
+
+
+🗄️ Database Setup
+1. Execute Migrations
+bash# Connect to your Supabase project
+npx supabase link --project-ref your-project-ref
+
+# Apply all migrations
+npx supabase db push
+
+# Verify everything was applied correctly
+npx supabase migration list
+Expected migrations (in order):
+
+drop_old_collections_system.sql
+create_trade_listings_table.sql
+create_marketplace_rpcs.sql
+extend_trade_chats_for_listings.sql
+create_template_system_tables.sql
+create_template_management_rpcs.sql
+create_template_discovery_rpcs.sql
+create_template_progress_rpcs.sql
+link_listings_to_templates.sql
+publish_duplicate_to_marketplace_rpc.sql
+mark_listing_sold_and_decrement_rpc.sql
+get_my_listings_with_progress_rpc.sql
+create_favorites_system.sql
+create_user_ratings_system.sql
+create_template_ratings_system.sql
+create_reports_system.sql
+create_admin_audit_log.sql
+extend_resolve_report_with_audit.sql
+create_admin_dashboard_rpcs.sql
+create_moderation_action_rpcs.sql
+
+2. Verify RLS Policies
+sql-- Verify all tables have RLS enabled
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE schemaname = 'public' 
+AND rowsecurity = false;
+
+-- Should return 0 rows (all have RLS)
+3. Configure Storage Buckets
+In Supabase Dashboard → Storage:
+Bucket: sticker-images
+
+Public: ✅ Yes
+File size limit: 5 MB
+Allowed MIME types: image/jpeg, image/png, image/webp
+
+Bucket: avatars
+
+Public: ✅ Yes
+File size limit: 2 MB
+Allowed MIME types: image/jpeg, image/png, image/webp
+
+Policies:
+sql-- sticker-images: Public read, authenticated write
+CREATE POLICY "Public read access" ON storage.objects FOR SELECT USING (bucket_id = 'sticker-images');
+CREATE POLICY "Authenticated users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'sticker-images' AND auth.role() = 'authenticated');
+
+-- avatars: Public read, users can upload their own
+CREATE POLICY "Public read access" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
+CREATE POLICY "Users can upload their avatar" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+4. Create Initial Admin User
+sql-- After registering your user,promote to admin:
+UPDATE profiles SET is_admin = TRUE WHERE id = 'your-user-uuid';
+
+---
+
+## 🚀 Vercel Deployment
+
+### 1. Configure Environment Variables
+
+In Vercel Dashboard → Settings → Environment Variables:
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
+# App
+NEXT_PUBLIC_APP_URL=https://your-domain.com
+```
+
+### 2. Build Settings
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs"
+}
+```
+
+### 3. Deploy
+```bash
+# From your local repo
+vercel --prod
+
+# Or push to main if you have auto-deploy configured
+git push origin main
+```
+
+---
+
+## ✅ Post-Deploy Checklist
+
+### Functional Verifications
+
+- [ ] **Auth Flow:**
+  - [ ] New user registration works
+  - [ ] Login works
+  - [ ] Logout works
+  - [ ] Profile created automatically
+
+- [ ] **Marketplace:**
+  - [ ] Create listing works
+  - [ ] List listings works
+  - [ ] Search works
+  - [ ] Chat from listing works
+
+- [ ] **Templates:**
+  - [ ] Create template works
+  - [ ] Add pages works
+  - [ ] Publish template works
+  - [ ] Copy template works
+  - [ ] Update progress works
+
+- [ ] **Social:**
+  - [ ] Toggle favorite works
+  - [ ] Post-trade rating works
+  - [ ] Report content works
+
+- [ ] **Admin:**
+  - [ ] Dashboard shows stats
+  - [ ] User search works
+  - [ ] Resolve reports works
+  - [ ] Suspend user works
+  - [ ] Audit log records actions
+
+### Security Verifications
+
+- [ ] RLS policies block unauthorized access
+- [ ] Only admins can view reports
+- [ ] Only owners can edit their listings
+- [ ] Private templates cannot be copied
+- [ ] Storage policies work correctly
+
+### Performance
+
+- [ ] List queries < 500ms
+- [ ] Critical RPCs < 300ms
+- [ ] Images optimized (webp)
+- [ ] Lazy loading implemented
+
+---
+
+## 🔄 Rollback Plan
+
+In case of critical issues:
+
+### 1. Vercel Rollback
+```bash
+# List deploys
+vercel ls
+
+# Rollback to previous deploy
+vercel rollback [deployment-url]
+```
+
+### 2. Database Rollback (emergency)
+
+⚠️ **WARNING:** DB rollback is complicated. Better to prevent:
+
+**Prevention:**
+- Complete backup before each major deploy
+- Test migrations in staging first
+- Use transactions in migrations
+
+**If you need rollback:**
+```bash
+# Restore from backup
+# (Specific process in Supabase Dashboard → Database → Backups)
+```
+
+---
+
+## 📊 Monitoring
+
+### Supabase Dashboard
+- Database → Query Performance
+- Auth → Users (verify registrations)
+- Storage → Usage
+
+### Vercel Dashboard
+- Analytics → Pageviews, Performance
+- Logs → Runtime errors
+- Functions → Execution time
+
+### Logs to Review
+```bash
+# Authentication errors
+SELECT * FROM auth.audit_log_entries WHERE created_at > NOW() - INTERVAL '1 hour';
+
+# Recent reports
+SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at DESC LIMIT 10;
+
+# Recent admin actions
+SELECT * FROM admin_actions ORDER BY created_at DESC LIMIT 20;
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: "RLS policy violation"
+- Verify user is authenticated
+- Verify policies are correct
+- Review Supabase logs
+
+### Error: "Function not found"
+- Verify all migrations were applied
+- Run `supabase db push` again
+
+### Images not loading
+- Verify buckets are public
+- Verify storage policies exist
+- Verify CORS in Supabase
+
+### Slow performance
+- Review query performance in dashboard
+- Verify indices are created
+- Consider materializing views
+
+---
+
+## 📞 Support
+
+- Supabase Docs: https://supabase.com/docs
+- Vercel Docs: https://vercel.com/docs
+- Next.js Docs: https://nextjs.org/docs
+
+**Contact:**
+- Email: your-email@example.com
+- Discord: (if applicable)
+
+DELIVERABLES:
+1. docs/DEPLOYMENT.md
+2. Complete step-by-step guide
+3. Verification checklists
+4. Rollback plan
+
+Give me git commands afterwards.
+```
