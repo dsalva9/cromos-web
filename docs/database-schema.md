@@ -35,6 +35,47 @@ Extends Supabase auth.users with additional user data.
 - Users can update their own profile (except is_admin, is_suspended)
 - Admins can update any profile
 
+## Marketplace System (v1.6.0)
+
+### trade_listings
+
+User-created marketplace listings for physical cards.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `title` TEXT NOT NULL
+- `description` TEXT
+- `sticker_number` TEXT
+- `collection_name` TEXT
+- `image_url` TEXT
+- `status` TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'removed'))
+- `views_count` INTEGER DEFAULT 0
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+
+- `idx_listings_user` ON (user_id)
+- `idx_listings_status` ON (status) WHERE status = 'active'
+- `idx_listings_created` ON (created_at DESC)
+- `idx_listings_search` USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, '')))
+
+**RLS Policies:**
+
+- Public read WHERE status = 'active'
+- Users can insert their own listings
+- Users can update/delete their own listings
+- Admins can update/delete any listing
+
+**Related RPCs:**
+
+- `create_trade_listing(title, description, sticker_number, collection_name, image_url)`
+- `list_trade_listings(limit, offset, search)`
+- `get_user_listings(user_id, limit, offset)`
+- `update_listing_status(listing_id, new_status)`
+
 ## Trading Tables
 
 ### trade_proposals
@@ -84,21 +125,27 @@ Items included in trade proposals.
 
 ### trade_chats
 
-Chat messages within trades.
+Chat messages within trades and listings.
 
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
 - `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE
 - `sender_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
 - `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
 - `message` TEXT NOT NULL
 - `is_read` BOOLEAN DEFAULT FALSE
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 
+**Constraints:**
+
+- CHECK: (proposal_id IS NOT NULL) OR (listing_id IS NOT NULL)
+
 **Indices:**
 
 - `idx_chats_proposal` ON (proposal_id, created_at)
+- `idx_chats_listing` ON (listing_id, created_at) WHERE listing_id IS NOT NULL
 - `idx_chats_receiver` ON (receiver_id, is_read) WHERE is_read = FALSE
 
 **RLS Policies:**
@@ -106,6 +153,11 @@ Chat messages within trades.
 - Users can read chats where they are sender or receiver
 - Users can insert chats
 - Users can update is_read on received messages
+
+**Related RPCs:**
+
+- `get_listing_chats(listing_id)`
+- `send_listing_message(listing_id, message)`
 
 ### trades_history
 
@@ -229,6 +281,15 @@ Append-only log of all admin actions.
 
 ## RPC Functions
 
+### Marketplace Functions
+
+- `create_trade_listing`
+- `list_trade_listings`
+- `get_user_listings`
+- `update_listing_status`
+- `get_listing_chats`
+- `send_listing_message`
+
 ### Trading Functions
 
 - `create_trade_proposal`
@@ -280,11 +341,13 @@ Append-only log of all admin actions.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup
+**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace MVP
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
-- Ready for marketplace + templates system
+- Added trade_listings table
+- Added 6 marketplace RPCs
+- Extended trade_chats for listings
 
 **v1.5.0** - Original collections system (deprecated)
 

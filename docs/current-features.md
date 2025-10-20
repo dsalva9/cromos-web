@@ -4,13 +4,13 @@
 
 **CambioCromos** is pivoting from a traditional sticker collection app to a Spanish-language marketplace and community platform for sports cards.
 
-**Current State:** Official collections system removed. Marketplace + templates system under construction.
+**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system pending.
 
 ---
 
-## 🆕 Next Release (v1.6.0) – Marketplace Pivot
+## 🆕 Current Release (v1.6.0-alpha) – Marketplace Pivot
 
-### 🔴 Current State (Post-Cleanup) ✅ **COMPLETE**
+### ✅ Complete - Phase 0: Cleanup
 
 **System Status:**
 
@@ -18,14 +18,25 @@
 - **Core Infrastructure Preserved** - Authentication, trading, and admin systems intact
 - **Ready for New System** - Clean foundation for marketplace + templates
 
+### ✅ Complete - Sprint 1: Marketplace MVP (Backend)
+
+**Marketplace System:**
+
+- **trade_listings table** - Physical card listings with free-form fields
+- **Marketplace RPCs** - Create, list, get by user, update status
+- **Chat from listings** - Extended trade_chats to support listing conversations
+- **Search functionality** - Full-text search on title and collection name
+- **Status management** - Active, sold, removed states
+
 **Remaining Features:**
 
 - ✅ Authentication System
 - ✅ Trading Proposals
-- ✅ Trade Chat System
+- ✅ Trade Chat System (extended for listings)
 - ✅ Trade History & Finalization
 - ✅ Notifications System
 - ✅ Admin Backoffice
+- ✅ Marketplace Backend (NEW)
 - ⚠️ Under Reconstruction: Collection Management, Trading Discovery
 
 ---
@@ -41,7 +52,33 @@
 
 **Files**: `src/components/providers/SupabaseProvider.tsx`, `src/components/AuthGuard.tsx`
 
-### 2. Trading System - Proposals ✅ **COMPLETE**
+### 2. Marketplace System ✅ **BACKEND COMPLETE (v1.6.0)**
+
+#### **Trade Listings**
+
+- `trade_listings` table for physical card listings
+- Publish with optional real photo
+- Free-form fields: title, description, number, collection
+- Search and filtering
+- View listings by user profile
+- Direct chat from listing
+
+#### **RPCs:**
+
+- `create_trade_listing` - Create listing
+- `list_trade_listings` - List with search
+- `get_user_listings` - View user's listings
+- `update_listing_status` - Mark sold/removed
+- `get_listing_chats`, `send_listing_message` - Chat from listing
+
+#### **Chat from Listings**
+
+- Extended trade_chats table with listing_id
+- Separate chat flows for proposals and listings
+- Message validation (500 character limit)
+- Permission checks (owner vs. buyer)
+
+### 3. Trading System - Proposals ✅ **COMPLETE**
 
 #### Complete Interactive Workflow
 
@@ -64,7 +101,7 @@
 
 **Files**: `src/app/trades/proposals/*`, `src/app/trades/compose/*`, `src/components/trades/*`, `src/hooks/trades/*`
 
-### 3. Trade Chat System ✅ **COMPLETE (v1.4.2)**
+### 4. Trade Chat System ✅ **COMPLETE (v1.4.2)**
 
 #### Real-time Chat System
 
@@ -94,7 +131,7 @@
 
 **Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 4. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
+### 5. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 #### Two-Step Trade Finalization
 
@@ -115,11 +152,10 @@
 
 - **Historial Tab**: New 3rd tab showing completed/cancelled trades
 - **Ver Rechazadas Toggle**: View rejected proposals in inbox/outbox tabs
-- **Extended useProposals Hook**: Supports `box: 'history'` and `view: 'rejected'`
 
 **Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
 
-### 5. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
+### 6. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -143,7 +179,7 @@
 - **Suspended user checks**: Auth callback checks suspension status
 - All RPCs use SECURITY DEFINER with `is_admin_user()` checks
 
-### 6. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
+### 7. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
 
 - **Complete Theme Rollout**: Bold, high-contrast Retro-Comic aesthetic applied to **all** pages
 - **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) standard
@@ -154,17 +190,17 @@
 
 ---
 
-## 🚧 Under Reconstruction
+## 🚧 Under Construction
 
-### Collection Management
+### Collection Templates
 
-- Status: Removed old system, new templates system pending
-- Next: Implement community templates (Sprint 2)
+- Status: Not yet implemented
+- Next: Sprint 2: Collection Templates
 
-### Trading Discovery
+### Marketplace UI
 
-- Status: Old mutual trading system removed
-- Next: Implement neutral marketplace (Sprint 1)
+- Status: Backend complete, frontend pending
+- Next: Sprint 7: Marketplace UI
 
 ---
 
@@ -181,7 +217,8 @@
 | Admin Backoffice    | ✅      | ✅       | Complete |
 | **Phase 1 - Pivot** |         |          |          |
 | Collections Cleanup | ✅      | N/A      | Complete |
-| Marketplace         | ❌      | ❌       | Sprint 1 |
+| Marketplace Backend | ✅      | ❌       | Complete |
+| Marketplace UI      | ❌      | ❌       | Sprint 7 |
 | Templates           | ❌      | ❌       | Sprint 2 |
 | Integration         | ❌      | ❌       | Sprint 3 |
 | Social & Reputation | ❌      | ❌       | Sprint 4 |
@@ -209,7 +246,7 @@
 - **Accessibility**: ARIA labels, keyboard navigation, focus management
 - **Error Boundaries**: Comprehensive error handling
 
-### Database Layer ✅ **Post-Cleanup**
+### Database Layer ✅ **v1.6.0-alpha**
 
 - **RPC-First**: Complex queries via Supabase functions
 - **Performance Indexes**: Optimized for existing queries
@@ -234,13 +271,14 @@
 - Updated documentation to reflect clean state
 - Ready for new marketplace + templates implementation
 
-### Phase 1: Marketplace MVP 🚧 **NEXT**
+### Sprint 1: Marketplace MVP ✅ **COMPLETE (Backend)**
 
-- Create trade_listings table
-- Basic marketplace RPCs
-- Extend trade_chats for listings
+- Created trade_listings table
+- Created 4 basic marketplace RPCs
+- Extended trade_chats for listings
+- Updated documentation
 
-### Phase 2: Collection Templates 📋 **PLANNED**
+### Phase 2: Collection Templates 📋 **NEXT**
 
 - Create base template tables
 - Template management RPCs
@@ -251,15 +289,15 @@
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated for post-cleanup state
-- **current-features.md**: ✅ Updated to reflect pivot
-- **CHANGELOG.md**: ⏳ Pending update
-- **TODO.md**: ⏳ Pending update
-- **api-endpoints.md**: ⏳ Needs update after marketplace implementation
+- **database-schema.md**: ✅ Updated with marketplace system
+- **current-features.md**: ✅ Updated to reflect Sprint 1 completion
+- **CHANGELOG.md**: ✅ Updated with Sprint 1 progress
+- **TODO.md**: ✅ Updated with Sprint 1 completion
+- **api-endpoints.md**: ⏳ Needs update with marketplace RPCs
 - **components-guide.md**: ⏳ Needs update for new components
 
 ---
 
-**Last Updated**: 2025-10-20 (Post-Cleanup)
+**Last Updated**: 2025-10-20 (Sprint 1 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Ready to begin Sprint 1: Marketplace MVP
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Ready to begin Sprint 2: Collection Templates

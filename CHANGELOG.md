@@ -36,19 +36,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - From official albums to community templates
 - Legal model: neutral hosting (LSSI/DSA)
 
+### ✨ Added - Marketplace System (Sprint 1)
+
+**Trade Listings**
+
+- `trade_listings` table for physical card listings
+- Publish with optional real photo
+- Free-form fields: title, description, number, collection
+- Search and filtering
+- View listings by user profile
+- Direct chat from listing
+
+**RPCs:**
+
+- `create_trade_listing` - Create listing
+- `list_trade_listings` - List with search
+- `get_user_listings` - View user's listings
+- `update_listing_status` - Mark sold/removed
+
+**Chat from Listings**
+
+- Extended `trade_chats` table with `listing_id`
+- RPCs: `get_listing_chats`, `send_listing_message`
+- Separate chat flows for proposals and listings
+
 ### Changed
 
 **Database Schema**
 
 - Clean foundation with core infrastructure preserved
 - Authentication, trading, and admin systems intact
-- Ready for new marketplace + templates implementation
+- Added marketplace system on top of existing foundation
 
 **Documentation**
 
-- Updated database-schema.md to reflect post-cleanup state
-- Updated current-features.md with pivot information
-- Clear roadmap for upcoming sprints
+- Updated database-schema.md to reflect marketplace system
+- Updated current-features.md with Sprint 1 completion
+- Added marketplace section to documentation
 
 ---
 
@@ -278,6 +302,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clean Foundation**: Ready for marketplace + templates implementation
 - **Documentation Updated**: Reflects new direction and current state
 
+### Sprint 1 Complete (v1.6.0-alpha) ✅ **100%**
+
+- **Marketplace Backend**: Complete listings system with RPCs
+- **Chat from Listings**: Extended trade_chats for marketplace
+- **Documentation Updated**: All docs reflect marketplace system
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -304,7 +334,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 1: Marketplace MVP
+**Next Focus**: Sprint 2: Collection Templates
 
 ---
 
@@ -319,5 +349,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Ready for Sprint 1: Marketplace MVP 🚧  
-**Next**: Begin Sprint 1 implementation (trade_listings table + marketplace RPCs)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Ready for Sprint 2: Collection Templates 🚧  
+**Next**: Begin Sprint 2 implementation (template system tables + RPCs)
