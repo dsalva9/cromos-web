@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,16 +11,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Custom CSS variables for shadcn/ui compatibility
+        // Custom brand colors for CambioCromos
+        primary: {
+          DEFAULT: '#FFC000',
+          dark: '#FFD700',
+        },
+        background: {
+          DEFAULT: '#1F2937',
+          dark: '#111827',
+          light: '#374151',
+        },
+
+        // Keep shadcn/ui variables for compatibility
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-        },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
@@ -45,20 +52,17 @@ const config: Config = {
           foreground: 'hsl(var(--card-foreground))',
         },
       },
+      borderWidth: {
+        '3': '3px',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: [
-          'var(--font-geist-sans)',
-          ...defaultTheme.fontFamily.sans,
-        ],
-        mono: [
-          'var(--font-geist-mono)',
-          ...defaultTheme.fontFamily.mono,
-        ],
+        sans: ['var(--font-geist-sans)', ...defaultTheme.fontFamily.sans],
+        mono: ['var(--font-geist-mono)', ...defaultTheme.fontFamily.mono],
       },
       // Custom additions for sports cards theme
       aspectRatio: {
@@ -67,6 +71,7 @@ const config: Config = {
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
+        spin: 'spin 1s linear infinite',
       },
       keyframes: {
         fadeIn: {
