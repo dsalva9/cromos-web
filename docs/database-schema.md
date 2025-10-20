@@ -84,6 +84,7 @@ User-created marketplace listings for physical cards.
 - `publish_duplicate_to_marketplace(copy_id, slot_id, title, description, image_url)`
 - `mark_listing_sold_and_decrement(listing_id)`
 - `get_my_listings_with_progress(status)`
+- `admin_delete_content(content_type, content_id, reason)`
 
 **Views:**
 
@@ -128,6 +129,7 @@ Community-created collection templates.
 - `create_template(title, description, image_url, is_public)`
 - `publish_template(template_id, is_public)`
 - `list_public_templates(limit, offset, search, sort_by)`
+- `admin_delete_content(content_type, content_id, reason)`
 
 ### template_pages
 
@@ -325,6 +327,7 @@ Ratings given by users to other users.
 - `delete_user_rating(rating_id)`
 - `get_user_ratings(user_id, limit, offset)`
 - `get_user_rating_summary(user_id)`
+- `admin_delete_content(content_type, content_id, reason)`
 
 ### template_ratings
 
@@ -361,6 +364,7 @@ Ratings given by users to templates.
 - `delete_template_rating(rating_id)`
 - `get_template_ratings(template_id, limit, offset)`
 - `get_template_rating_summary(template_id)`
+- `admin_delete_content(content_type, content_id, reason)`
 
 ### reports
 
@@ -404,6 +408,70 @@ Unified table for all report types.
 - `update_report_status(report_id, status, admin_notes)`
 - `get_user_reports(status, limit, offset)`
 - `check_entity_reported(target_type, target_id)`
+- `bulk_update_report_status(report_ids, status, admin_notes)`
+- `escalate_report(report_id, priority_level, reason)`
+
+## Admin Moderation System (v1.6.0)
+
+### audit_log
+
+Append-only log of all admin actions.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `admin_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
+- `admin_nickname` TEXT
+- `entity_type` TEXT NOT NULL
+- `entity_id` BIGINT NOT NULL
+- `action` TEXT NOT NULL
+- `old_values` JSONB
+- `new_values` JSONB
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `moderation_action_type` TEXT
+- `moderated_entity_type` TEXT
+- `moderated_entity_id` BIGINT
+- `moderation_reason` TEXT
+
+**Indices:**
+
+- `idx_audit_log_admin` ON (admin_id)
+- `idx_audit_log_entity` ON (entity_type, entity_id)
+- `idx_audit_log_admin_nickname` ON (admin_nickname)
+- `idx_audit_log_moderation_action` ON (moderation_action_type) WHERE moderation_action_type IS NOT NULL
+- `idx_audit_log_moderated_entity` ON (moderated_entity_type, moderated_entity_id) WHERE moderated_entity_type IS NOT NULL
+
+**RLS Policies:**
+
+- Only admins can read
+- System can insert (via RPCs with SECURITY DEFINER)
+- NO UPDATE or DELETE allowed (immutable)
+
+**Views:**
+
+- `moderation_audit_logs` - Audit logs filtered for moderation actions only
+
+**Related RPCs:**
+
+- `log_moderation_action(moderation_action_type, moderated_entity_type, moderated_entity_id, moderation_reason, old_values, new_values)`
+- `get_moderation_audit_logs(moderation_action_type, moderated_entity_type, admin_id, limit, offset)`
+- `get_entity_moderation_history(entity_type, entity_id)`
+- `get_admin_dashboard_stats()`
+- `get_recent_reports(limit)`
+- `get_moderation_activity(limit)`
+- `get_report_statistics()`
+- `get_admin_performance_metrics(days_back)`
+
+**Moderation RPCs:**
+
+- `admin_update_user_role(user_id, is_admin, reason)`
+- `admin_suspend_user(user_id, is_suspended, reason)`
+- `admin_delete_user(user_id, reason)`
+- `admin_delete_content(content_type, content_id, reason)`
+- `bulk_update_report_status(report_ids, status, admin_notes)`
+- `bulk_suspend_users(user_ids, is_suspended, reason)`
+- `bulk_delete_content(content_type, content_ids, reason)`
+- `escalate_report(report_id, priority_level, reason)`
 
 ## Trading Tables
 
@@ -578,36 +646,6 @@ User achievement badges.
 - Users can read their own badges
 - System can insert (service-managed)
 
-## Admin System
-
-### audit_log
-
-Append-only log of all admin actions.
-
-**Columns:**
-
-- `id` BIGSERIAL PRIMARY KEY
-- `admin_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
-- `entity_type` TEXT NOT NULL
-- `entity_id` BIGINT NOT NULL
-- `action` TEXT NOT NULL
-- `old_values` JSONB
-- `new_values` JSONB
-- `created_at` TIMESTAMPTZ DEFAULT NOW()
-- `admin_nickname` TEXT
-
-**Indices:**
-
-- `idx_audit_log_admin` ON (admin_id)
-- `idx_audit_log_entity` ON (entity_type, entity_id)
-- `idx_audit_log_admin_nickname` ON (admin_nickname)
-
-**RLS Policies:**
-
-- Only admins can read
-- System can insert (via RPCs with SECURITY DEFINER)
-- NO UPDATE or DELETE allowed (immutable)
-
 ## RPC Functions
 
 ### Marketplace Functions
@@ -621,6 +659,7 @@ Append-only log of all admin actions.
 - `publish_duplicate_to_marketplace`
 - `mark_listing_sold_and_decrement`
 - `get_my_listings_with_progress`
+- `admin_delete_content`
 
 ### Template Functions
 
@@ -632,6 +671,7 @@ Append-only log of all admin actions.
 - `get_my_template_copies`
 - `get_template_progress`
 - `update_template_progress`
+- `admin_delete_content`
 
 ### Social and Reputation Functions
 
@@ -654,6 +694,25 @@ Append-only log of all admin actions.
 - `update_report_status`
 - `get_user_reports`
 - `check_entity_reported`
+
+### Admin Moderation Functions
+
+- `log_moderation_action`
+- `get_moderation_audit_logs`
+- `get_entity_moderation_history`
+- `admin_update_user_role`
+- `admin_suspend_user`
+- `admin_delete_user`
+- `admin_delete_content`
+- `bulk_update_report_status`
+- `bulk_suspend_users`
+- `bulk_delete_content`
+- `escalate_report`
+- `get_admin_dashboard_stats`
+- `get_recent_reports`
+- `get_moderation_activity`
+- `get_report_statistics`
+- `get_admin_performance_metrics`
 
 ### Trading Functions
 
@@ -706,7 +765,7 @@ Append-only log of all admin actions.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration + Social
+**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration + Social + Admin Moderation
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
@@ -719,6 +778,9 @@ Append-only log of all admin actions.
 - Added 3 integration RPCs
 - Added 4 social tables (favourites, user_ratings, template_ratings, reports)
 - Added 17 social RPCs
+- Extended audit_log for moderation
+- Added 13 admin moderation RPCs
+- Added admin dashboard statistics and metrics
 
 **v1.5.0** - Original collections system (deprecated)
 

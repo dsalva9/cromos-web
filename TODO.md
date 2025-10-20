@@ -50,19 +50,17 @@
 
 ---
 
-## 🚧 In Progress - Sprint 5: Admin Moderation
+## ✅ Completed - Sprint 5: Admin Moderation (Backend)
 
-- [ ] Create admin audit log
-- [ ] Extend moderation RPCs with audit log
-- [ ] Create admin dashboard RPCs
-- [ ] Create moderation action RPCs
-- [ ] Update documentation - Admin moderation
+- [x] Create admin audit log
+- [x] Extend moderation RPCs with audit log
+- [x] Create admin dashboard RPCs
+- [x] Create moderation action RPCs
+- [x] Update documentation - Admin moderation
 
 ---
 
-## 📋 Upcoming Sprints
-
-### Sprint 6: Final Documentation
+## 🚧 In Progress - Sprint 6: Final Documentation
 
 - [ ] Update complete README
 - [ ] Create consolidated CHANGELOG 1.6
@@ -70,6 +68,10 @@
 - [ ] Create deployment guide
 - [ ] Create executive summary
 - [ ] Update database schema documentation
+
+---
+
+## 📋 Upcoming Sprints
 
 ### Sprint 6.5: Frontend Foundation
 
@@ -142,20 +144,20 @@
 - Sprint 2: Collection Templates ✅ Complete (1 day)
 - Sprint 3: Integration ✅ Complete (1 day)
 - Sprint 4: Social & Reputation ✅ Complete (1 day)
-- Sprint 5: Admin moderation (1 week)
+- Sprint 5: Admin moderation ✅ Complete (1 day)
 - Sprint 6: Documentation (1 week)
 - Sprint 6.5: Frontend Foundation (1 week)
 - Sprint 7-12: UI Implementation (6 weeks)
 
-**Total Estimated:** ~10 weeks for complete v1.6.0 implementation
+**Total Estimated:** ~9 weeks for complete v1.6.0 implementation
 
 ---
 
 ## 🎯 Current Priority
 
-**Next Sprint:** Sprint 5: Admin Moderation
-**First Task:** Create admin audit log
-**Goal**: Enable admin tracking of all moderation actions
+**Next Sprint:** Sprint 6: Final Documentation
+**First Task:** Update complete README
+**Goal**: Complete documentation for v1.6.0 backend implementation
 
 ---
 
@@ -209,4 +211,12 @@
 - 4 social tables (favourites, user_ratings, template_ratings, reports)
 - 17 social RPCs for management and discovery
 - Comprehensive reputation system
+- Complete documentation updates
+
+**Sprint 5 Achievements:**
+
+- Complete admin moderation backend infrastructure
+- Extended audit log with moderation-specific fields
+- 13 moderation RPCs (audit, dashboard, bulk actions)
+- Comprehensive admin workflow with audit logging
 - Complete documentation updates

@@ -146,6 +146,44 @@ user_template_progress (count + 1)
 - `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
 
+### ✨ Added - Admin Moderation System (Sprint 5)
+
+**Audit Log Extensions**
+
+- Enhanced audit log with moderation-specific fields
+- View for moderation actions only
+- Context tracking for all moderation actions
+
+**Moderation RPCs with Audit**
+
+- All moderation actions logged with context
+- User management with audit logging
+- Content deletion with audit logging
+- Report handling with audit logging
+
+**Admin Dashboard RPCs**
+
+- Overall statistics (users, listings, templates, reports)
+- Recent reports with entity details
+- Recent moderation activity
+- Report statistics by type and status
+- Admin performance metrics
+
+**Bulk Moderation Actions**
+
+- Bulk update report status
+- Bulk suspend/unsuspend users
+- Bulk delete content
+- Report escalation
+
+**Moderation RPCs:**
+
+- `log_moderation_action`, `get_moderation_audit_logs`, `get_entity_moderation_history`
+- `admin_update_user_role`, `admin_suspend_user`, `admin_delete_user`, `admin_delete_content`
+- `get_admin_dashboard_stats`, `get_recent_reports`, `get_moderation_activity`
+- `get_report_statistics`, `get_admin_performance_metrics`
+- `bulk_update_report_status`, `bulk_suspend_users`, `bulk_delete_content`, `escalate_report`
+
 ### Changed
 
 **Database Schema**
@@ -156,11 +194,12 @@ user_template_progress (count + 1)
 - Added complete templates system with 5 tables
 - Added marketplace-template integration with bidirectional sync
 - Added comprehensive social and reputation system
+- Added complete admin moderation system with audit logging
 
 **Documentation**
 
 - Updated database-schema.md to reflect all new systems
-- Updated current-features.md with Sprint 4 completion
+- Updated current-features.md with Sprint 5 completion
 - Added all new systems to documentation
 
 ---
@@ -414,9 +453,16 @@ user_template_progress (count + 1)
 ### Sprint 4 Complete (v1.6.0-alpha) ✅ **100%**
 
 - **Social Backend**: Complete social and reputation system
-- **4 Social Tables**: Favourites, user ratings, template ratings, reports
+- **4 Social Tables**: Favourites, user_ratings, template_ratings, reports
 - **17 Social RPCs**: Favourites, ratings, reports management
 - **Documentation Updated**: All docs reflect social system
+
+### Sprint 5 Complete (v1.6.0-alpha) ✅ **100%**
+
+- **Admin Moderation Backend**: Complete admin moderation system
+- **Audit Log Extensions**: Enhanced audit log with moderation-specific fields
+- **13 Moderation RPCs**: Audit logging, dashboard, bulk actions
+- **Documentation Updated**: All docs reflect admin moderation system
 
 ### Phase 2.5 Complete (v1.4.1)
 
@@ -444,7 +490,7 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 5: Admin Moderation
+**Next Focus**: Sprint 6: Final Documentation
 
 ---
 
@@ -459,5 +505,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Ready for Sprint 5: Admin Moderation 🚧  
-**Next**: Begin Sprint 5 implementation (admin audit log, moderation RPCs)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Ready for Sprint 6: Final Documentation 🚧  
+**Next**: Begin Sprint 6 implementation (README, CHANGELOG, deployment guide)

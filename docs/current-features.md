@@ -4,7 +4,7 @@
 
 **CambioCromos** is pivoting from a traditional sticker collection app to a Spanish-language marketplace and community platform for sports cards.
 
-**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Marketplace-Template Integration backend complete. Social and Reputation backend complete. Frontend pending.
+**Current State:** Official collections system removed. Marketplace MVP backend complete. Templates system backend complete. Marketplace-Template Integration backend complete. Social and Reputation backend complete. Admin Moderation backend complete. Frontend pending.
 
 ---
 
@@ -58,6 +58,16 @@
 - **Reports System** - Universal reporting for all content types
 - **Reputation Tracking** - Ratings displayed on profiles and templates
 
+### ✅ Complete - Sprint 5: Admin Moderation (Backend)
+
+**Admin Moderation:**
+
+- **Audit Log Extensions** - Enhanced audit log with moderation-specific fields
+- **Moderation RPCs with Audit** - All moderation actions logged with context
+- **Admin Dashboard RPCs** - Statistics, reports, and moderation activity
+- **Bulk Moderation Actions** - Efficient handling of multiple items
+- **Performance Metrics** - Admin activity tracking and analytics
+
 **Remaining Features:**
 
 - ✅ Authentication System
@@ -69,7 +79,8 @@
 - ✅ Marketplace Backend
 - ✅ Templates Backend
 - ✅ Marketplace-Template Integration Backend
-- ✅ Social and Reputation Backend (NEW)
+- ✅ Social and Reputation Backend
+- ✅ Admin Moderation Backend (NEW)
 - ⚠️ Under Reconstruction: Collection Management, Trading Discovery
 
 ---
@@ -198,7 +209,45 @@ user_template_progress (count + 1)
 - `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
 
-### 6. Trading System - Proposals ✅ **COMPLETE**
+### 6. Admin Moderation System ✅ **BACKEND COMPLETE (v1.6.0)**
+
+#### **Audit Log Extensions**
+
+- Enhanced audit log with moderation-specific fields
+- View for moderation actions only
+- Context tracking for all moderation actions
+
+#### **Moderation RPCs with Audit**
+
+- All moderation actions logged with context
+- User management with audit logging
+- Content deletion with audit logging
+- Report handling with audit logging
+
+#### **Admin Dashboard RPCs**
+
+- Overall statistics (users, listings, templates, reports)
+- Recent reports with entity details
+- Recent moderation activity
+- Report statistics by type and status
+- Admin performance metrics
+
+#### **Bulk Moderation Actions**
+
+- Bulk update report status
+- Bulk suspend/unsuspend users
+- Bulk delete content
+- Report escalation
+
+#### **Moderation RPCs:**
+
+- `log_moderation_action`, `get_moderation_audit_logs`, `get_entity_moderation_history`
+- `admin_update_user_role`, `admin_suspend_user`, `admin_delete_user`, `admin_delete_content`
+- `get_admin_dashboard_stats`, `get_recent_reports`, `get_moderation_activity`
+- `get_report_statistics`, `get_admin_performance_metrics`
+- `bulk_update_report_status`, `bulk_suspend_users`, `bulk_delete_content`, `escalate_report`
+
+### 7. Trading System - Proposals ✅ **COMPLETE**
 
 #### Complete Interactive Workflow
 
@@ -221,7 +270,7 @@ user_template_progress (count + 1)
 
 **Files**: `src/app/trades/proposals/*`, `src/app/trades/compose/*`, `src/components/trades/*`, `src/hooks/trades/*`
 
-### 7. Trade Chat System ✅ **COMPLETE (v1.4.2)**
+### 8. Trade Chat System ✅ **COMPLETE (v1.4.2)**
 
 #### Real-time Chat System
 
@@ -251,11 +300,11 @@ user_template_progress (count + 1)
 
 **Files**: `src/hooks/trades/useTradeChat.ts`, `src/components/trades/TradeChatPanel.tsx`
 
-### 8. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
+### 9. Trade History & Finalization ✅ **COMPLETE (v1.4.4)**
 
 #### Two-Step Trade Finalization
 
-- **Finalization Workflow**: Both participants must mark a trade as finalized
+- **Finalization Workflow**: Both participants must mark a trade as finalized before completion
 - **Database Table**: `trade_finalizations` with composite PK (trade_id, user_id)
 - **RPC Function**: `mark_trade_finalized(p_trade_id)` returns finalization status
 - **UI in ProposalDetailModal**: Progress indicator, "Marcar como finalizado" button
@@ -275,7 +324,7 @@ user_template_progress (count + 1)
 
 **Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
 
-### 9. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
+### 10. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -299,7 +348,7 @@ user_template_progress (count + 1)
 - **Suspended user checks**: Auth callback checks suspension status
 - All RPCs use SECURITY DEFINER with `is_admin_user()` checks
 
-### 10. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
+### 11. Retro-Comic UI/UX Design System ✅ **COMPLETE (v1.4.1)**
 
 - **Complete Theme Rollout**: Bold, high-contrast Retro-Comic aesthetic applied to **all** pages
 - **Dark Mode First**: Solid deep charcoal/navy background (`bg-[#1F2937]`) standard
@@ -311,6 +360,11 @@ user_template_progress (count + 1)
 ---
 
 ## 🚧 Under Construction
+
+### Admin Moderation UI
+
+- Status: Backend complete, frontend pending
+- Next: Sprint 11: Admin UI
 
 ### Social UI
 
@@ -355,7 +409,8 @@ user_template_progress (count + 1)
 | Integration UI      | ❌      | ❌       | Sprint 9  |
 | Social Backend      | ✅      | ❌       | Complete  |
 | Social UI           | ❌      | ❌       | Sprint 10 |
-| Admin Extensions    | ❌      | ❌       | Sprint 5  |
+| Admin Moderation    | ✅      | ❌       | Complete  |
+| Admin UI            | ❌      | ❌       | Sprint 11 |
 
 **Legend:**  
 ✅ Complete | 🚧 In Progress | ❌ Not Started
@@ -435,6 +490,14 @@ user_template_progress (count + 1)
 - Created reports system with 5 RPCs
 - Updated documentation
 
+### Sprint 5: Admin Moderation ✅ **COMPLETE (Backend)**
+
+- Extended audit log with moderation-specific fields
+- Created 3 moderation RPCs with audit logging
+- Created 5 admin dashboard RPCs
+- Created 4 bulk moderation action RPCs
+- Updated documentation
+
 ### Phase 2.5 Complete (v1.4.1)
 
 - **Complete UI/UX Redesign** ✅ **100% ROLLOUT**
@@ -461,21 +524,21 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 5: Admin Moderation
+**Next Focus**: Sprint 6: Final Documentation
 
 ---
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated with all systems including social
-- **current-features.md**: ✅ Updated to reflect Sprint 4 completion
-- **CHANGELOG.md**: ✅ Updated with Sprint 4 progress
-- **TODO.md**: ✅ Updated with Sprint 4 completion
-- **api-endpoints.md**: ⏳ Needs update with social RPCs
+- **database-schema.md**: ✅ Updated with all systems including admin moderation
+- **current-features.md**: ✅ Updated to reflect Sprint 5 completion
+- **CHANGELOG.md**: ✅ Updated with Sprint 5 progress
+- **TODO.md**: ✅ Updated with Sprint 5 completion
+- **api-endpoints.md**: ⏳ Needs update with admin moderation RPCs
 - **components-guide.md**: ⏳ Needs update for new components
 
 ---
 
-**Last Updated**: 2025-10-20 (Sprint 4 Complete)
+**Last Updated**: 2025-10-20 (Sprint 5 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Ready to begin Sprint 5: Admin Moderation
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Ready to begin Sprint 6: Final Documentation
