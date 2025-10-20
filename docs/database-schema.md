@@ -1,15 +1,107 @@
-# Database Schema - v1.6.0-alpha (Post-Cleanup)
+# Database Schema - v1.6.0-alpha (Complete)
 
-**Current state:** Official collections system removed.
-Marketplace + templates system under construction.
+**Current state:** Complete backend migration for marketplace + templates pivot.
+Frontend implementation pending.
 
-See CHANGELOG.md for pivot details.
+See CHANGELOG_1.6.md for complete pivot details.
+
+## Overview
+
+The CambioCromos v1.6.0 database schema represents a complete pivot from a traditional sticker collection app to a marketplace and community platform. This schema supports:
+
+- **Marketplace System**: Physical card listings with free-form fields
+- **Template System**: Community-created collection structures
+- **Integration System**: Bidirectional sync between marketplace and templates
+- **Social System**: Favourites, ratings, and reports
+- **Admin Moderation System**: Comprehensive audit logging and moderation tools
+
+## Schema Diagram
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│    profiles     │    │  trade_listings │    │collection_templates│
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ id (PK)         │    │ id (PK)         │    │ id (PK)         │
+│ nickname        │    │ user_id (FK)    │    │ author_id (FK)  │
+│ avatar_url      │◄──►│ title           │◄──►│ title           │
+│ rating_avg      │    │ description     │    │ description     │
+│ rating_count    │    │ sticker_number  │    │ image_url       │
+│ is_admin        │    │ collection_name │    │ is_public       │
+│ is_suspended    │    │ image_url       │    │ rating_avg      │
+│ created_at      │    │ status          │    │ rating_count    │
+│ updated_at      │    │ views_count     │    │ copies_count    │
+└─────────────────┘    │ created_at      │    │ created_at      │
+         │              │ updated_at      │    │ updated_at      │
+         │              │ copy_id (FK)    │    └─────────────────┘
+         │              │ slot_id (FK)    │             │
+         │              └─────────────────┘             │
+         │                       │                    │
+         │                       │                    │
+         │                       ▼                    ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   favourites    │    │ template_pages  │    │ template_slots  │
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ id (PK)         │    │ id (PK)         │    │ id (PK)         │
+│ user_id (FK)    │    │ template_id (FK)│    │ page_id (FK)    │
+│ target_type     │    │ page_number     │    │ slot_number     │
+│ target_id       │    │ title           │    │ label           │
+│ created_at      │    │ type            │    │ is_special      │
+└─────────────────┘    │ slots_count     │    │ created_at      │
+         │              │ created_at      │    └─────────────────┘
+         │              └─────────────────┘             │
+         │                       │                    │
+         │                       ▼                    ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  user_ratings   │    │user_template_copies│   │user_template_progress│
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ id (PK)         │    │ id (PK)         │    │ user_id (PK)    │
+│ rater_id (FK)   │    │ user_id (FK)    │    │ copy_id (FK)    │
+│ rated_id (FK)   │    │ template_id (FK)│    │ slot_id (FK)    │
+│ rating          │    │ title           │    │ status          │
+│ comment         │    │ is_active       │    │ count           │
+│ context_type    │    │ copied_at       │    │ updated_at      │
+│ context_id      │    └─────────────────┘    └─────────────────┘
+│ created_at      │             │                    │
+└─────────────────┘             ▼                    ▼
+         │              ┌─────────────────┐    ┌─────────────────┐
+         │              │template_ratings │    │     reports     │
+         │              ├─────────────────┤    ├─────────────────┤
+         │              │ id (PK)         │    │ id (PK)         │
+         │              │ user_id (FK)    │    │ reporter_id (FK)│
+         │              │ template_id (FK)│    │ target_type     │
+         │              │ rating          │    │ target_id       │
+         │              │ comment         │    │ reason          │
+         │              │ created_at      │    │ description     │
+         │              └─────────────────┘    │ status          │
+         │                       │           │ admin_notes      │
+         │                       ▼           │ admin_id (FK)    │
+         │              ┌─────────────────┐    │ created_at      │
+         │              │    audit_log     │    │ updated_at      │
+         │              ├─────────────────┤    └─────────────────┘
+         │              │ id (PK)         │             │
+         │              │ admin_id (FK)   │             ▼
+         │              │ admin_nickname  │    ┌─────────────────┐
+         │              │ entity_type     │    │  notifications  │
+         │              │ entity_id       │    ├─────────────────┤
+         │              │ action          │    │ id (PK)         │
+         │              │ old_values      │    │ user_id (FK)    │
+         │              │ new_values      │    │ kind            │
+         │              │ created_at      │    │ trade_id (FK)   │
+         │              │ moderation_*    │    │ created_at      │
+         │              └─────────────────┘    │ read_at         │
+         │                       │           │ metadata         │
+         │                       ▼           └─────────────────┘
+         │              ┌─────────────────┐
+         │              │ trading_system  │
+         │              │ (legacy)        │
+         │              └─────────────────┘
+```
 
 ## Core Tables
 
 ### profiles
 
-Extends Supabase auth.users with additional user data.
+User profiles with ratings and admin status.
 
 **Columns:**
 
@@ -37,7 +129,7 @@ Extends Supabase auth.users with additional user data.
 - Users can update their own profile (except is_admin, is_suspended)
 - Admins can update any profile
 
-## Marketplace System (v1.6.0)
+## Marketplace System
 
 ### trade_listings
 
@@ -81,16 +173,14 @@ User-created marketplace listings for physical cards.
 - `list_trade_listings(limit, offset, search)`
 - `get_user_listings(user_id, limit, offset)`
 - `update_listing_status(listing_id, new_status)`
+- `get_listing_chats(listing_id)`
+- `send_listing_message(listing_id, message)`
 - `publish_duplicate_to_marketplace(copy_id, slot_id, title, description, image_url)`
 - `mark_listing_sold_and_decrement(listing_id)`
 - `get_my_listings_with_progress(status)`
 - `admin_delete_content(content_type, content_id, reason)`
 
-**Views:**
-
-- `listings_with_template_info` - Listings with optional template information
-
-## Collection Templates System (v1.6.0)
+## Collection Templates System
 
 ### collection_templates
 
@@ -250,7 +340,7 @@ Progress tracking for each slot in user's copy.
 - `get_template_progress(copy_id)`
 - `update_template_progress(copy_id, slot_id, status, count)`
 
-## Social and Reputation System (v1.6.0)
+## Social and Reputation System
 
 ### favourites
 
@@ -411,7 +501,7 @@ Unified table for all report types.
 - `bulk_update_report_status(report_ids, status, admin_notes)`
 - `escalate_report(report_id, priority_level, reason)`
 
-## Admin Moderation System (v1.6.0)
+## Admin Moderation System
 
 ### audit_log
 
@@ -422,9 +512,9 @@ Append-only log of all admin actions.
 - `id` BIGSERIAL PRIMARY KEY
 - `admin_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
 - `admin_nickname` TEXT
-- `entity_type` TEXT NOT NULL
-- `entity_id` BIGINT NOT NULL
-- `action` TEXT NOT NULL
+- `entity_type` TEXT
+- `entity_id` BIGINT
+- `action` TEXT
 - `old_values` JSONB
 - `new_values` JSONB
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
@@ -435,11 +525,12 @@ Append-only log of all admin actions.
 
 **Indices:**
 
-- `idx_audit_log_admin` ON (admin_id)
-- `idx_audit_log_entity` ON (entity_type, entity_id)
+- `idx_audit_log_admin_id` ON (admin_id) WHERE admin_id IS NOT NULL
+- `idx_audit_log_entity` ON (entity_type, entity_id) WHERE entity_type IS NOT NULL
 - `idx_audit_log_admin_nickname` ON (admin_nickname)
 - `idx_audit_log_moderation_action` ON (moderation_action_type) WHERE moderation_action_type IS NOT NULL
 - `idx_audit_log_moderated_entity` ON (moderated_entity_type, moderated_entity_id) WHERE moderated_entity_type IS NOT NULL
+- `idx_audit_log_created_at` ON (created_at DESC)
 
 **RLS Policies:**
 
@@ -461,19 +552,18 @@ Append-only log of all admin actions.
 - `get_moderation_activity(limit)`
 - `get_report_statistics()`
 - `get_admin_performance_metrics(days_back)`
-
-**Moderation RPCs:**
-
 - `admin_update_user_role(user_id, is_admin, reason)`
 - `admin_suspend_user(user_id, is_suspended, reason)`
 - `admin_delete_user(user_id, reason)`
 - `admin_delete_content(content_type, content_id, reason)`
+
+**Moderation RPCs:**
+
 - `bulk_update_report_status(report_ids, status, admin_notes)`
 - `bulk_suspend_users(user_ids, is_suspended, reason)`
 - `bulk_delete_content(content_type, content_ids, reason)`
-- `escalate_report(report_id, priority_level, reason)`
 
-## Trading Tables
+## Trading Tables (Legacy)
 
 ### trade_proposals
 
@@ -673,7 +763,13 @@ User achievement badges.
 - `update_template_progress`
 - `admin_delete_content`
 
-### Social and Reputation Functions
+### Integration Functions
+
+- `publish_duplicate_to_marketplace`
+- `mark_listing_sold_and_decrement`
+- `get_my_listings_with_progress`
+
+### Social Functions
 
 - `toggle_favourite`
 - `is_favourited`
@@ -704,15 +800,15 @@ User achievement badges.
 - `admin_suspend_user`
 - `admin_delete_user`
 - `admin_delete_content`
-- `bulk_update_report_status`
-- `bulk_suspend_users`
-- `bulk_delete_content`
-- `escalate_report`
 - `get_admin_dashboard_stats`
 - `get_recent_reports`
 - `get_moderation_activity`
 - `get_report_statistics`
 - `get_admin_performance_metrics`
+- `bulk_update_report_status`
+- `bulk_suspend_users`
+- `bulk_delete_content`
+- `escalate_report`
 
 ### Trading Functions
 
@@ -765,22 +861,14 @@ User achievement badges.
 
 ## Schema Version History
 
-**v1.6.0-alpha** (Current) - Post-cleanup + Marketplace + Templates + Integration + Social + Admin Moderation
+**v1.6.0-alpha** (Current) - Complete Marketplace + Templates Pivot
 
 - Removed 7 tables (old collections system)
 - Removed 7 RPCs
-- Added trade_listings table
-- Added 6 marketplace RPCs
-- Extended trade_chats for listings
-- Added 5 template system tables
-- Added 8 template RPCs
-- Added marketplace-template integration
-- Added 3 integration RPCs
-- Added 4 social tables (favourites, user_ratings, template_ratings, reports)
-- Added 17 social RPCs
-- Extended audit_log for moderation
-- Added 13 admin moderation RPCs
-- Added admin dashboard statistics and metrics
+- Added 13 new tables
+- Added 47 new RPCs
+- Complete admin moderation system with audit logging
+- Comprehensive social and reputation system
 
 **v1.5.0** - Original collections system (deprecated)
 
