@@ -376,10 +376,20 @@ user_template_progress (count + 1)
 - Status: Backend complete, frontend pending
 - Next: Sprint 8: Templates UI
 
-### Marketplace UI
+### Marketplace UI ✅ **COMPLETE (v1.6.0)**
 
-- Status: Backend complete, frontend pending
-- Next: Sprint 7: Marketplace UI
+**Backend:** ✅ Complete
+**Frontend:** ✅ Complete
+
+- ✅ Marketplace feed with search and infinite scroll
+- ✅ Listing cards with image/status/metadata
+- ✅ Create listing form with validation
+- ✅ Listing detail page with view tracking
+- ✅ Contact seller flow (ready for chat integration)
+- ✅ Owner actions (edit/delete)
+- ✅ Image upload to Supabase Storage
+- ✅ Navigation integration
+- ⏳ Chat integration (Sprint 7 ongoing)
 
 ### Integration UI
 
@@ -401,8 +411,8 @@ user_template_progress (count + 1)
 | Admin Backoffice    | ✅      | ✅       | Complete  |
 | **Phase 1 - Pivot** |         |          |           |
 | Collections Cleanup | ✅      | N/A      | Complete  |
-| Marketplace Backend | ✅      | ❌       | Complete  |
-| Marketplace UI      | ❌      | ❌       | Sprint 7  |
+| Marketplace Backend | ✅      | ✅       | Complete  |
+| Marketplace UI      | ✅      | ✅       | Complete  |
 | Templates Backend   | ✅      | ❌       | Complete  |
 | Templates UI        | ❌      | ❌       | Sprint 8  |
 | Integration Backend | ✅      | ❌       | Complete  |
@@ -523,8 +533,8 @@ user_template_progress (count + 1)
 - Complete UI for page-based navigation
 - Enhanced sticker management with WebP optimization
 
-**Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 6: Final Documentation
+**Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.6.0
+**Next Focus**: Sprint 8: Templates UI
 
 ---
 
@@ -539,6 +549,6 @@ user_template_progress (count + 1)
 
 ---
 
-**Last Updated**: 2025-10-20 (Sprint 5 Complete)
-**Current Version**: Backend v1.6.0-alpha | Frontend v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Ready to begin Sprint 6: Final Documentation
+**Last Updated**: 2025-10-21 (Sprint 7 Complete)
+**Current Version**: Backend v1.6.0-alpha | Frontend v1.6.0
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Ready to begin Sprint 8: Templates UI

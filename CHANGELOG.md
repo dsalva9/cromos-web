@@ -19,6 +19,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.0] – 2025-10-21 - Marketplace UI (Frontend)
+
+### ✨ Added - Marketplace UI (Frontend) **Sprint 7 Complete**
+
+**Pages:**
+
+- `/marketplace` - Main feed with search and infinite scroll
+- `/marketplace/create` - Create listing form
+- `/marketplace/[id]` - Listing detail page
+
+**Components:**
+
+- `ListingCard` - Grid card with image, status, author
+- `ListingForm` - Reusable create/edit form
+- `SearchBar` - Debounced search input
+- `ImageUpload` - Image upload to Supabase Storage
+
+**Hooks:**
+
+- `useListings` - Fetch marketplace feed with pagination
+- `useListing` - Fetch single listing with view tracking
+- `useCreateListing` - Create new listing
+
+**Features:**
+
+- Responsive grid layout (1-4 columns)
+- Infinite scroll pagination
+- Real-time search with debounce
+- Image upload with preview
+- View counter auto-increment
+- Owner actions (edit/delete)
+- Empty states and loading skeletons
+- Navigation integration
+
+### Changed
+
+- Updated site navigation to include Marketplace link
+- Added marketplace components to CambioCromos theme system
+- Integrated with existing authentication and toast systems
+
+### Fixed
+
+- TypeScript errors in marketplace hooks by defining proper RPC response types
+- Image upload handling with proper error states
+- Form validation with character counters
+
 ## [1.6.0-alpha] – 2025-10-20 - PIVOT: Marketplace + Templates
 
 ### 🔄 Breaking Changes
@@ -489,8 +535,8 @@ user_template_progress (count + 1)
 - Complete UI for page-based navigation
 - Enhanced sticker management with WebP optimization
 
-**Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.5.0
-**Next Focus**: Sprint 6: Final Documentation
+**Current Status**: Database at v1.6.0 ✅ | Frontend at v1.6.0
+**Next Focus**: Sprint 8: Templates UI
 
 ---
 
@@ -505,5 +551,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Ready for Sprint 6: Final Documentation 🚧  
-**Next**: Begin Sprint 6 implementation (README, CHANGELOG, deployment guide)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Ready for Sprint 8: Templates UI 🚧
+**Next**: Begin Sprint 8 implementation (Templates UI)

@@ -25,13 +25,18 @@ export default function SiteHeader() {
   const closeMenu = () => setIsMenuOpen(false);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
     closeMenu();
   };
 
   const baseLinks = [
     { href: '/', label: 'Home' },
     { href: '/mi-coleccion', label: 'Mi Colección' },
+    { href: '/marketplace', label: 'Marketplace' },
     { href: '/trades/find', label: 'Intercambios' },
     { href: '/trades/proposals', label: 'Mis Propuestas' },
     { href: '/profile', label: 'Perfil' },
@@ -48,7 +53,10 @@ export default function SiteHeader() {
     const links = [...baseLinks];
     if (isAdmin) {
       const profileIndex = links.findIndex(l => l.href === '/profile');
-      links.splice(profileIndex >= 0 ? profileIndex : links.length, 0, { href: '/admin', label: 'Admin' });
+      links.splice(profileIndex >= 0 ? profileIndex : links.length, 0, {
+        href: '/admin',
+        label: 'Admin',
+      });
     }
     return links;
   })();
@@ -70,7 +78,10 @@ export default function SiteHeader() {
   useEffect(() => {
     let cancelled = false;
     async function checkAdmin() {
-      if (!user) { setIsAdmin(false); return; }
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
       const { data, error } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -79,7 +90,9 @@ export default function SiteHeader() {
       if (!cancelled) setIsAdmin(!!data?.is_admin && !error);
     }
     void checkAdmin();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user, supabase]);
 
   return (
@@ -94,7 +107,11 @@ export default function SiteHeader() {
             {siteConfig.name}
           </Link>
 
-          <nav role="navigation" aria-label="Main navigation" className="hidden md:flex md:items-center md:space-x-2">
+          <nav
+            role="navigation"
+            aria-label="Main navigation"
+            className="hidden md:flex md:items-center md:space-x-2"
+          >
             <ul className="flex items-center space-x-2">
               {navigationLinks.map(link => (
                 <li key={link.href} className="relative">
@@ -112,7 +129,10 @@ export default function SiteHeader() {
                         {link.label}
                       </NavLink>
                       <button
-                        onClick={(e) => { e.preventDefault(); router.push('/trades/notifications'); }}
+                        onClick={e => {
+                          e.preventDefault();
+                          router.push('/trades/notifications');
+                        }}
                         className="flex items-center justify-center rounded-md p-1 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
                         aria-label={`${unreadCount} notificaciones no leídas`}
                         title="Ver notificaciones"
@@ -165,7 +185,11 @@ export default function SiteHeader() {
             aria-label="Toggle navigation menu"
             onClick={toggleMenu}
           >
-            {isMenuOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <Menu className="h-6 w-6" aria-hidden="true" />}
+            {isMenuOpen ? (
+              <X className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            )}
           </button>
         </div>
 
@@ -173,7 +197,10 @@ export default function SiteHeader() {
           id="mobile-menu"
           role="navigation"
           aria-label="Mobile navigation"
-          className={cn('md:hidden border-t-2 border-gray-700 bg-gray-800', isMenuOpen ? 'block' : 'hidden')}
+          className={cn(
+            'md:hidden border-t-2 border-gray-700 bg-gray-800',
+            isMenuOpen ? 'block' : 'hidden'
+          )}
         >
           <ul className="py-4 space-y-2">
             {navigationLinks.map(link => (
@@ -193,7 +220,11 @@ export default function SiteHeader() {
                       {link.label}
                     </NavLink>
                     <button
-                      onClick={(e) => { e.preventDefault(); router.push('/trades/notifications'); closeMenu(); }}
+                      onClick={e => {
+                        e.preventDefault();
+                        router.push('/trades/notifications');
+                        closeMenu();
+                      }}
                       className="flex items-center justify-center rounded-md p-2 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800 transition-all"
                       aria-label={`${unreadCount} notificaciones no leídas`}
                     >
@@ -238,4 +269,3 @@ export default function SiteHeader() {
     </header>
   );
 }
-
