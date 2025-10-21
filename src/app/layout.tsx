@@ -53,7 +53,20 @@ export default function RootLayout({
               </div>
             </footer>
           </ErrorBoundary>
-          <Toaster position="top-right" richColors expand />
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            expand={false}
+            duration={3000}
+            toastOptions={{
+              className: 'border-2 border-black',
+              style: {
+                background: '#374151',
+                color: 'white',
+              },
+            }}
+          />
         </SupabaseProvider>
       </body>
     </html>
