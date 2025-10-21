@@ -244,6 +244,7 @@ Displays the title, progress, and completion actions for the current album page 
 **Features:**
 
 **Desktop (≥ md):**
+
 - Displays page title and progress bar
 - Shows "Marcar equipo completo" button when:
   - Page is a team page (`kind === 'team'`)
@@ -253,6 +254,7 @@ Displays the title, progress, and completion actions for the current album page 
 - Green button styling for positive action
 
 **Mobile (< md):**
+
 - Long-press on title area (600ms) opens ActionSheet
 - Overflow menu button (⋯) provides discoverable alternative
 - ActionSheet (bottom sheet) with:
@@ -262,12 +264,14 @@ Displays the title, progress, and completion actions for the current album page 
 - Visual feedback during long-press (opacity change)
 
 **Accessibility:**
+
 - Long-press area supports keyboard navigation (Enter/Space)
 - Proper ARIA labels for screen readers
 - Focus management in dialogs
 - Disabled states when page is already complete
 
 **Behavior:**
+
 - Calls `onMarkPageComplete(pageId)` from hook
 - Optimistic UI updates for instant feedback
 - Success toast: "Equipo completado ✔️"
@@ -1528,6 +1532,7 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 Main admin dashboard with tabbed interface.
 
 **Features:**
+
 - **RBAC Guard**: Only accessible to users with `is_admin = true`
 - **Tabbed Interface**: Collections | Pages | Stickers | Bulk Upload | Audit
 - **Server-side check**: Verifies admin status on page load
@@ -1542,6 +1547,7 @@ Main admin dashboard with tabbed interface.
 CRUD interface for collections management.
 
 **Features:**
+
 - **List view**: All collections with status pills (draft/published)
 - **Create/Edit forms**: Modal-based forms with validation
 - **Delete confirmation**: With cascade warning
@@ -1557,6 +1563,7 @@ CRUD interface for collections management.
 CRUD interface for collection pages.
 
 **Features:**
+
 - **Team pages**: 20 fixed slots (badge, manager, 18 players)
 - **Special pages**: Variable slots
 - **Order index control**: Drag-and-drop or numeric input
@@ -1571,6 +1578,7 @@ CRUD interface for collection pages.
 CRUD interface for individual stickers.
 
 **Features:**
+
 - **Form fields**: All sticker properties with validation
 - **Image upload**: Client-side WebP conversion + 100px thumb generation
 - **Assign to page**: Dropdown to assign to page slot
@@ -1585,6 +1593,7 @@ CRUD interface for individual stickers.
 Multi-step wizard for bulk uploads.
 
 **Features:**
+
 - **Step 1: Upload**: CSV/XLSX file upload with drag-and-drop
 - **Step 2: Preview**: Shows validation errors, warnings, and diffs
 - **Step 3: Apply**: Transactional bulk insert/update
@@ -1600,6 +1609,7 @@ Multi-step wizard for bulk uploads.
 Read-only audit log viewer.
 
 **Features:**
+
 - **Filters**: By user, entity, action, date range
 - **Expandable rows**: Show before/after JSON diffs
 - **Pagination**: 50 entries per page
@@ -1616,6 +1626,7 @@ Read-only audit log viewer.
 Display a single badge with icon and metadata.
 
 **Props:**
+
 ```typescript
 interface BadgeCardProps {
   badge: {
@@ -1626,6 +1637,7 @@ interface BadgeCardProps {
 ```
 
 **Features:**
+
 - **Icon mapping**: Maps badge_code to icon
 - **Awarded date**: Relative time format ("hace 2 meses")
 - **Retro-Comic styling**: Gold border, dark background
@@ -1640,6 +1652,7 @@ interface BadgeCardProps {
 Grid of user badges in profile page.
 
 **Features:**
+
 - **Responsive grid**: 2-4 columns based on screen size
 - **Empty state**: Friendly message when no badges
 - **useUserBadges hook**: Fetches user badges on mount
@@ -1654,11 +1667,13 @@ Grid of user badges in profile page.
 Hook for fetching user badges.
 
 **Usage:**
+
 ```typescript
 const { badges, loading, error } = useUserBadges(userId);
 ```
 
 **Features:**
+
 - **Read-only**: No mutation methods yet
 - **Auto-refresh**: Refetches on userId change
 - **Error handling**: Toast on error
@@ -1674,6 +1689,7 @@ const { badges, loading, error } = useUserBadges(userId);
 Quick entry route for adding multiple stickers by number.
 
 **Features:**
+
 - **Auth guard**: Requires authentication
 - **Active collection**: Uses collection ID from URL
 - **5 numeric inputs**: Auto-advance on input
@@ -1692,6 +1708,7 @@ Quick entry route for adding multiple stickers by number.
 Component for 5 numeric inputs with smart paste handling.
 
 **Features:**
+
 - **Auto-advance**: Moves focus to next input on valid entry
 - **Paste handling**: Splits CSV/space/semicolon into 5 inputs
 - **Dedupe**: Removes duplicate values
@@ -1708,17 +1725,16 @@ Component for 5 numeric inputs with smart paste handling.
 Hook for quick entry logic.
 
 **Usage:**
+
 ```typescript
-const {
-  numbers,
-  setNumbers,
-  addStickers,
-  loading,
-  result
-} = useQuickEntry(userId, collectionId);
+const { numbers, setNumbers, addStickers, loading, result } = useQuickEntry(
+  userId,
+  collectionId
+);
 ```
 
 **Features:**
+
 - **Optimistic updates**: Progress updates before RPC completes
 - **Error handling**: Toast on error, rollback on failure
 - **Result summary**: Returns added, duplicates, invalid arrays
@@ -1734,6 +1750,7 @@ const {
 Grid selector for seed avatars.
 
 **Features:**
+
 - **12 seed avatars**: Pre-loaded from `avatars/seed/...`
 - **Grid layout**: 3-4 columns based on screen size
 - **Selection state**: Highlights currently selected avatar
@@ -1742,6 +1759,7 @@ Grid selector for seed avatars.
 - **Accessibility**: ARIA labels, focus management
 
 **Props:**
+
 ```typescript
 interface AvatarPickerProps {
   currentAvatarUrl?: string;
@@ -1760,6 +1778,7 @@ interface AvatarPickerProps {
 Postcode input for location-based matching.
 
 **Props:**
+
 ```typescript
 interface LocationSettingsProps {
   currentPostcode?: string | null;
@@ -1769,6 +1788,7 @@ interface LocationSettingsProps {
 ```
 
 **Features:**
+
 - **Postcode input**: Validates against `postal_codes` table
 - **Privacy note**: Explains centroid-based distance calculation
 - **Optional field**: Clear indicator that location is optional
@@ -1784,6 +1804,7 @@ interface LocationSettingsProps {
 Sort and filter controls for trade matches with location.
 
 **Props:**
+
 ```typescript
 interface TraderListSortControlsProps {
   sortMode: 'distance' | 'overlap' | 'mixed';
@@ -1795,6 +1816,7 @@ interface TraderListSortControlsProps {
 ```
 
 **Features:**
+
 - **Sort dropdown**: Distance / Overlap / Mixed (60/40 weighted)
 - **Radius slider**: 10–100 km with visual indicators
 - **Disabled state**: Grayed out when user has no postcode set
@@ -1810,6 +1832,7 @@ interface TraderListSortControlsProps {
 Enhanced match card displaying distance.
 
 **Props:**
+
 ```typescript
 interface MatchCardWithDistanceProps {
   match: {
@@ -1825,6 +1848,7 @@ interface MatchCardWithDistanceProps {
 ```
 
 **Features:**
+
 - **Distance badge**: "~12 km" displayed with location icon
 - **Score indicator**: Visual bar for mixed score (0-1)
 - **Fallback state**: "Distancia no disponible" when NULL
@@ -1840,6 +1864,7 @@ interface MatchCardWithDistanceProps {
 Hook for location-based trade matching.
 
 **Usage:**
+
 ```typescript
 const {
   matches,
@@ -1850,11 +1875,12 @@ const {
   setSortMode,
   setRadiusKm,
   userLocation,
-  fetchMatches
+  fetchMatches,
 } = useLocationMatching(userId, collectionId);
 ```
 
 **Features:**
+
 - **Auto-fetch location**: Gets user's postcode centroid on mount
 - **Optimistic filtering**: Updates UI before RPC completes
 - **Error handling**: Toast on location fetch failure
@@ -1914,3 +1940,170 @@ When creating new components:
 - Extensive documentation and patterns for future development
 
 **Phase 2 Component Architecture Status**: ✅ **COMPLETE AND PRODUCTION-READY**
+
+---
+
+## Template Components ✅ **NEW (v1.6.0)**
+
+### TemplateCard
+
+**File**: `src/components/templates/TemplateCard.tsx`
+
+Template preview card for explorer grid.
+
+**Props:**
+
+- `template: Template` - Template data
+
+**Features:**
+
+- Rating display with stars
+- Copies and pages count
+- Author info
+- Copy button with loading state
+- Success feedback with redirect
+- Login redirect if unauthenticated
+
+### TemplateFilters
+
+**File**: `src/components/templates/TemplateFilters.tsx`
+
+Search and sort controls for templates explorer.
+
+**Props:**
+
+- `searchQuery: string` - Current search query
+- `onSearchChange: (value: string) => void` - Search change handler
+- `sortBy: SortOption` - Current sort option
+- `onSortChange: (value: SortOption) => void` - Sort change handler
+
+**Features:**
+
+- Search templates by title/description
+- Sort by recent, rating, or popularity
+- Spanish labels
+
+### TemplateProgressGrid
+
+**File**: `src/components/templates/TemplateProgressGrid.tsx`
+
+Grid of slots grouped by pages with tabs.
+
+**Props:**
+
+- `progress: SlotProgress[]` - All slot progress data
+- `onUpdateSlot: (slotId, status, count) => Promise<void>` - Update handler
+- `copyId: string` - Template copy ID
+
+**Features:**
+
+- Page tabs for navigation
+- Responsive grid (2-5 columns)
+- Grouped by page number
+- Sorted slots within pages
+- Spanish page labels
+
+### SlotTile
+
+**File**: `src/components/templates/SlotTile.tsx`
+
+Individual slot with status and count controls.
+
+**Props:**
+
+- `slot: SlotProgress` - Slot data
+- `onUpdate: (slotId, status, count) => Promise<void>` - Update handler
+- `copyId: string` - Template copy ID
+
+**Features:**
+
+- Click to cycle status (missing → owned → duplicate → missing)
+- Count controls for duplicates (+/- buttons)
+- Publish button for duplicates
+- Color-coded by status
+- Optimistic updates
+- Loading overlay
+- Spanish status labels
+
+### TemplateSummaryHeader
+
+**File**: `src/components/templates/TemplateSummaryHeader.tsx`
+
+Statistics header for template progress.
+
+**Props:**
+
+- `copy: TemplateCopy` - Template copy info
+- `progress: SlotProgress[]` - Progress data
+
+**Features:**
+
+- Completion percentage with progress bar
+- Three stat pills (owned, duplicates, missing)
+- Active/inactive badge
+- Color-coded stats
+- Spanish labels
+
+### Template Hooks
+
+#### useTemplates
+
+**File**: `src/hooks/templates/useTemplates.ts`
+
+Fetch public templates with pagination and filters.
+
+**Usage:**
+
+```typescript
+const { templates, loading, error, hasMore, loadMore } = useTemplates({
+  search: query,
+  sortBy: 'recent',
+  limit: 12,
+});
+```
+
+**Features:**
+
+- Search templates by title/description
+- Sort by recent, rating, or popularity
+- Pagination with load more
+- Error handling
+
+#### useCopyTemplate
+
+**File**: `src/hooks/templates/useCopyTemplate.ts`
+
+Copy template to user account.
+
+**Usage:**
+
+```typescript
+const { copyTemplate, loading } = useCopyTemplate();
+const copyId = await copyTemplate(templateId);
+```
+
+**Features:**
+
+- Copy template with custom title
+- Loading state
+- Error handling
+
+#### useTemplateProgress
+
+**File**: `src/hooks/templates/useTemplateProgress.ts`
+
+Fetch and update slot progress.
+
+**Usage:**
+
+```typescript
+const { copy, progress, loading, error, updateSlotStatus } =
+  useTemplateProgress(copyId);
+```
+
+**Features:**
+
+- Fetch template copy info
+- Fetch slot progress data
+- Update slot status with optimistic updates
+- Error handling

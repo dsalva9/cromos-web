@@ -35,10 +35,9 @@ export default function SiteHeader() {
 
   const baseLinks = [
     { href: '/', label: 'Home' },
-    { href: '/mi-coleccion', label: 'Mi Colección' },
     { href: '/marketplace', label: 'Marketplace' },
-    { href: '/trades/find', label: 'Intercambios' },
-    { href: '/trades/proposals', label: 'Mis Propuestas' },
+    { href: '/templates', label: 'Plantillas' },
+    { href: '/mis-plantillas', label: 'Mis Plantillas' },
     { href: '/profile', label: 'Perfil' },
   ];
 

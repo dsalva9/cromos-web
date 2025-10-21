@@ -371,10 +371,22 @@ user_template_progress (count + 1)
 - Status: Backend complete, frontend pending
 - Next: Sprint 10: Social UI
 
-### Collection Templates UI
+### Collection Templates System ✅ **COMPLETE (v1.6.0)**
 
-- Status: Backend complete, frontend pending
-- Next: Sprint 8: Templates UI
+**Backend:** ✅ Complete
+**Frontend:** ✅ Complete
+
+- ✅ Templates explorer with search and sort
+- ✅ Template cards with ratings and stats
+- ✅ Copy template with 1 click
+- ✅ My templates list
+- ✅ Progress tracking grid (HAVE/NEED/DUPES)
+- ✅ Page-based navigation
+- ✅ Slot status management
+- ✅ Duplicate count controls
+- ✅ Summary header with completion stats
+- ⏳ Create template wizard (future)
+- ⏳ Publish duplicates integration (Sprint 9)
 
 ### Marketplace UI ✅ **COMPLETE (v1.6.0)**
 
@@ -413,8 +425,8 @@ user_template_progress (count + 1)
 | Collections Cleanup | ✅      | N/A      | Complete  |
 | Marketplace Backend | ✅      | ✅       | Complete  |
 | Marketplace UI      | ✅      | ✅       | Complete  |
-| Templates Backend   | ✅      | ❌       | Complete  |
-| Templates UI        | ❌      | ❌       | Sprint 8  |
+| Templates Backend   | ✅      | ✅       | Complete  |
+| Templates UI        | ✅      | ✅       | Complete  |
 | Integration Backend | ✅      | ❌       | Complete  |
 | Integration UI      | ❌      | ❌       | Sprint 9  |
 | Social Backend      | ✅      | ❌       | Complete  |
@@ -534,7 +546,7 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.6.0
-**Next Focus**: Sprint 8: Templates UI
+**Next Focus**: Sprint 9: Integration UI
 
 ---
 
@@ -549,6 +561,6 @@ user_template_progress (count + 1)
 
 ---
 
-**Last Updated**: 2025-10-21 (Sprint 7 Complete)
+**Last Updated**: 2025-10-21 (Sprint 8 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Ready to begin Sprint 8: Templates UI
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready to begin Sprint 9: Integration UI

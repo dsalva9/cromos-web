@@ -19,6 +19,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.0] – 2025-10-21 - Templates UI (Frontend)
+
+### ✨ Added - Templates UI (Frontend) **Sprint 8 Complete**
+
+**Pages:**
+
+- `/templates` - Explorer with search, filters, and sort
+- `/mis-plantillas` - User's template copies list
+- `/mis-plantillas/[copyId]` - Progress tracking grid
+
+**Components:**
+
+- `TemplateCard` - Card with rating, stats, copy button
+- `TemplateFilters` - Search and sort controls
+- `TemplateProgressGrid` - Paginated slot grid
+- `SlotTile` - Interactive slot with status controls
+- `TemplateSummaryHeader` - Progress statistics
+
+**Hooks:**
+
+- `useTemplates` - Fetch public templates with filters
+- `useCopyTemplate` - Copy template to user account
+- `useTemplateProgress` - Fetch and update slot progress
+
+**Features:**
+
+- Search templates by title/description
+- Sort by recent, rating, or popularity
+- Copy template with redirect
+- Track progress: missing/owned/duplicate
+- Page-based navigation (tabs)
+- Click slot to cycle status
+- Count controls for duplicates
+- Publish button on duplicate slots
+- Completion percentage tracking
+- Optimistic UI updates
+- Full Spanish localization
+- Mobile responsive design
+
+### Changed
+
+- Updated site navigation to include "Plantillas" and "Mis Plantillas" links
+- Added templates components to CambioCromos theme system
+- Integrated with existing authentication and toast systems
+
+### Fixed
+
+- TypeScript errors in template hooks by defining proper RPC response types
+- ESLint warnings for unused imports and variables
+- Mobile responsiveness issues with grid layouts
+
 ## [1.6.0] – 2025-10-21 - Marketplace UI (Frontend)
 
 ### ✨ Added - Marketplace UI (Frontend) **Sprint 7 Complete**
@@ -536,7 +587,7 @@ user_template_progress (count + 1)
 - Enhanced sticker management with WebP optimization
 
 **Current Status**: Database at v1.6.0 ✅ | Frontend at v1.6.0
-**Next Focus**: Sprint 8: Templates UI
+**Next Focus**: Sprint 9: Integration UI
 
 ---
 
@@ -551,5 +602,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Ready for Sprint 8: Templates UI 🚧
-**Next**: Begin Sprint 8 implementation (Templates UI)
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready for Sprint 9: Integration UI 🚧
+**Next**: Begin Sprint 9 implementation (Integration UI)

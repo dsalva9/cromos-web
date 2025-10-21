@@ -104,15 +104,33 @@
 
 ---
 
+## ✅ Completed - Sprint 8: Templates UI
+
+- [x] Create templates explorer page (/templates)
+- [x] Create template card component with Spanish text
+- [x] Create template filters component with Spanish labels
+- [x] Create useTemplates hook for fetching templates
+- [x] Create useCopyTemplate hook for copying templates
+- [x] Create template progress view page (/mis-plantillas/[copyId])
+- [x] Create template progress grid component with page tabs
+- [x] Create slot tile component with status controls
+- [x] Create template summary header component
+- [x] Create useTemplateProgress hook for tracking progress
+- [x] Create "My Templates" page (/mis-plantillas)
+- [x] Update site navigation to include templates links
+- [x] Spanish localization for all components
+- [ ] Update documentation - Templates UI
+
+---
+
 ## 📋 Upcoming Sprints
 
-### Sprint 8: Templates UI
+### Sprint 9: Integration UI
 
-- [ ] Create templates explorer page
-- [ ] Create template card component
-- [ ] Create template progress view (my templates)
-- [ ] Create template summary header
-- [ ] Update documentation - Templates UI
+- [ ] Create publish duplicate model
+- [ ] Create My Listings view with sync
+- [ ] Add navigation links for integration
+- [ ] Update documentation Integration UI
 
 ### Sprint 9: Integration UI
 
@@ -332,6 +350,6 @@
 
 ---
 
-**Last Updated**: 2025-10-21 (Sprint 7 Complete)
+**Last Updated**: 2025-10-21 (Sprint 8 Complete)
 **Current Version**: Backend v1.6.0 | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Ready to begin Sprint 8: Templates UI
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready to begin Sprint 9: Integration UI
