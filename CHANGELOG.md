@@ -19,6 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.5] - 2025-01-22
+
+### Added
+- Integrated Zod validation with marketplace listing form and template wizard (step-level)
+- Loading skeletons (Card, List, Profile, Template) to improve perceived performance
+- ARIA labels and accessibility improvements across header, cards, and upload
+- Skip link and semantic landmarks in layout for better navigation
+- Error boundaries for app, marketplace, and templates routes with recovery actions
+
+### Improved
+- Keyboard and screen reader experience with aria attributes and focusable elements
+- Form validation feedback with Spanish messages surfaced inline and as summaries
+- Visual loading states aligned to content layouts
+- Spanish copy normalized across Plantillas flows and marketplace listings to eliminate mojibake
+- Wizard validation messaging deferred until user interaction for a cleaner first-load experience
+
 ## [1.6.4] - 2025-01-22 - Performance & Documentation Enhancements
 
 ### Added
