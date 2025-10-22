@@ -13,6 +13,8 @@ import { logger } from '@/lib/logger';
 import { OwnedCollectionCard } from '@/components/profile/OwnedCollectionCard';
 import { AvailableCollectionCard } from '@/components/profile/AvailableCollectionCard';
 import { CollectionGridSkeleton } from '@/components/profile/CollectionCardSkeleton';
+import { ViewToggle } from '@/components/ui/view-toggle';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   User,
   Trophy,
@@ -73,6 +75,10 @@ function ProfileContent() {
   const [error, setError] = useState<string | null>(null);
   const [editingNickname, setEditingNickname] = useState(false);
   const [nickname, setNickname] = useState('');
+  const [viewMode, setViewMode] = useLocalStorage<'comfortable' | 'compact'>(
+    'collections-view-mode',
+    'comfortable'
+  );
 
   // Modal states
   const [confirmModal, setConfirmModal] = useState<{
@@ -544,13 +550,16 @@ function ProfileContent() {
 
         {/* MIS COLECCIONES SECTION */}
         <div className="mb-12">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-3xl font-bold text-white drop-shadow-lg">
-              Mis Colecciones
-            </h3>
-            <Badge className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-lg">
-              {ownedCollections.length} propias
-            </Badge>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <h3 className="text-3xl font-bold text-white drop-shadow-lg">
+                Mis Colecciones
+              </h3>
+              <Badge className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 text-lg">
+                {ownedCollections.length} propias
+              </Badge>
+            </div>
+            <ViewToggle view={viewMode} onViewChange={setViewMode} />
           </div>
 
           {ownedCollections.length === 0 ? (
@@ -567,7 +576,13 @@ function ProfileContent() {
               </ModernCardContent>
             </ModernCard>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div
+              className={
+                viewMode === 'compact'
+                  ? 'grid gap-4 md:grid-cols-3 lg:grid-cols-4'
+                  : 'grid gap-6 md:grid-cols-2 lg:grid-cols-3'
+              }
+            >
               {ownedCollections.map(collection => (
                 <OwnedCollectionCard
                   key={collection.id}

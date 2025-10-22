@@ -69,8 +69,14 @@ export default function TemplatesPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-              {templates.map(template => (
-                <TemplateCard key={template.id} template={template} />
+              {templates.map((template, index) => (
+                <div
+                  key={template.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <TemplateCard template={template} />
+                </div>
               ))}
             </div>
 

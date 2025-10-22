@@ -139,9 +139,9 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
       {/* Existing Pages */}
       {data.pages.map((page, pageIndex) => (
         <Card key={pageIndex} className="bg-[#1F2937] border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between group">
             <div className="flex items-center gap-2">
-              <GripVertical className="h-5 w-5 text-gray-400" />
+              <GripVertical className="h-6 w-6 text-slate-400 hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
               <div>
                 <CardTitle className="text-white">{page.title}</CardTitle>
                 <p className="text-sm text-gray-400">
@@ -224,8 +224,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
               </div>
               <div className="space-y-2">
                 {page.slots.map((slot, slotIndex) => (
-                  <div key={slotIndex} className="flex items-center gap-2">
-                    <GripVertical className="h-4 w-4 text-gray-400" />
+                  <div key={slotIndex} className="flex items-center gap-2 group hover:bg-slate-800/30 rounded p-1 transition-all duration-200">
+                    <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
                     <Input
                       value={slot.label}
                       onChange={e =>

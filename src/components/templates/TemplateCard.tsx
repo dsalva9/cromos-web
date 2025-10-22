@@ -10,6 +10,7 @@ import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { createRipple } from '@/lib/animations';
 
 interface Template {
   id: string;
@@ -36,8 +37,9 @@ export function TemplateCard({ template }: TemplateCardProps) {
   const { copyTemplate, loading } = useCopyTemplate();
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async (e: React.MouseEvent) => {
+  const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Prevent navigation to detail page
+    createRipple(e, 'rgba(0, 0, 0, 0.3)');
 
     if (!user) {
       router.push('/login');
@@ -60,7 +62,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <Link href={`/templates/${template.id}`}>
-      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
+      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
         <ModernCardContent className="p-0">
           {/* Image */}
           <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800">
@@ -121,17 +123,21 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
             {/* Author */}
             <div className="flex items-center gap-2 text-sm text-slate-400">
-              <User className="h-4 w-4" />
-              <span className="line-clamp-1">
-                por {template.author_nickname}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
+                  <User className="h-3 w-3 text-slate-400" />
+                </div>
+                <span className="line-clamp-1">
+                  por {template.author_nickname}
+                </span>
+              </div>
             </div>
 
             {/* Copy Button */}
             <Button
               onClick={handleCopy}
               disabled={loading || copied}
-              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium"
+              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
               size="sm"
             >
               {copied ? (
