@@ -60,7 +60,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <Link href={`/templates/${template.id}`}>
-      <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
+      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 cursor-pointer h-full">
         <ModernCardContent className="p-0">
           {/* Image */}
           <div className="relative aspect-video bg-[#374151]">

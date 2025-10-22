@@ -43,7 +43,7 @@ export default function AlbumSummaryHeader({
           </h1>
         </div>
 
-        <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 text-sm">
+        <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 items-center text-sm">
           <div className="font-black">
             <span className="text-white">TENGO</span>{' '}
             <span className="text-[#FFC000]">
@@ -64,7 +64,7 @@ export default function AlbumSummaryHeader({
           </div>
           <div className="font-black">
             <span className="text-white">TOTAL</span>{' '}
-            <span className="text-[#FFC000]">
+            <span className="text-2xl bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
               {completion !== null ? `${completion}%` : '--%'}
             </span>
           </div>

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { Star, Target, Copy, Heart, Trash2, CheckCircle } from 'lucide-react';
+import { Star, CheckCircle, Copy, X, Trash2 } from 'lucide-react';
 import type { UserCollection } from '@/types/collections';
 
 interface OwnedCollectionCardProps {
@@ -22,7 +22,7 @@ export function OwnedCollectionCard({
   isRemoving = false,
 }: OwnedCollectionCardProps) {
   return (
-    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-105 hover:shadow-2xl transition-all duration-300 overflow-hidden ring-1 ring-black/5">
+    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 overflow-hidden ring-1 ring-black/5">
       {/* Gradient Header Strip with overlay */}
       <div
         className={`h-4 relative ${
@@ -37,7 +37,7 @@ export function OwnedCollectionCard({
       <ModernCardContent className="p-6">
         {/* Collection Header */}
         <div className="flex justify-between items-start mb-5">
-          <div className="flex-1">
+          <div className="flex-1 pr-2">
             <h4 className="font-bold text-gray-700 text-xl leading-tight mb-2">
               {collection.name}
             </h4>
@@ -45,19 +45,26 @@ export function OwnedCollectionCard({
               {collection.competition} {collection.year}
             </p>
           </div>
-          {collection.is_user_active ? (
-            <Badge className="bg-green-500 text-white shadow-lg ring-1 ring-green-500/20">
-              <Star className="w-3 h-3 mr-1" />
-              Activa
-            </Badge>
-          ) : (
-            <Badge
-              variant="outline"
-              className="text-gray-600 border-gray-300 bg-white/50"
-            >
-              Inactiva
-            </Badge>
-          )}
+          <div className="flex flex-col items-end gap-2">
+            {collection.is_user_active ? (
+              <Badge className="bg-green-500 text-white shadow-lg ring-1 ring-green-500/20">
+                <Star className="w-3 h-3 mr-1" />
+                Activa
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="text-gray-600 border-gray-300 bg-white/50"
+              >
+                Inactiva
+              </Badge>
+            )}
+            {collection.stats && (
+              <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+                {Math.round(collection.stats.completion_percentage)}%
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Stats Section */}
@@ -69,9 +76,6 @@ export function OwnedCollectionCard({
                 <span className="text-sm font-medium text-gray-700">
                   Progreso
                 </span>
-                <span className="text-sm font-bold text-green-600">
-                  {Math.round(collection.stats.completion_percentage)}%
-                </span>
               </div>
               <div
                 className="w-full bg-white/40 rounded-xl h-3 overflow-hidden"
@@ -81,7 +85,7 @@ export function OwnedCollectionCard({
                 aria-valuenow={collection.stats.completion_percentage}
               >
                 <div
-                  className="bg-gradient-to-r from-green-400 to-green-500 h-full rounded-xl transition-all duration-700"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-lg shadow-yellow-500/50 h-full rounded-xl transition-all duration-500"
                   style={{
                     width: `${collection.stats.completion_percentage}%`,
                   }}
@@ -90,34 +94,39 @@ export function OwnedCollectionCard({
             </div>
 
             {/* Stats Pills Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="text-center bg-blue-50 rounded-xl p-4 ring-1 ring-blue-100">
-                <div className="text-2xl font-bold text-blue-700 mb-1">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center bg-green-900/30 border border-green-700 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                </div>
+                <div className="text-2xl font-bold text-green-700 mb-1">
                   {collection.stats.owned_stickers}
                 </div>
-                <div className="text-xs text-blue-700 flex items-center justify-center font-medium">
-                  <Target className="w-3 h-3 mr-1" />
-                  Cromos
+                <div className="text-xs text-green-700 font-medium">
+                  TENGO
                 </div>
               </div>
-              <div className="text-center bg-purple-50 rounded-xl p-4 ring-1 ring-purple-100">
-                <div className="text-2xl font-bold text-purple-700 mb-1">
+              <div className="text-center bg-amber-900/30 border border-amber-700 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-2">
+                  <Copy className="w-5 h-5 text-amber-500" />
+                </div>
+                <div className="text-2xl font-bold text-amber-700 mb-1">
                   {collection.stats.duplicates}
                 </div>
-                <div className="text-xs text-purple-700 flex items-center justify-center font-medium">
-                  <Copy className="w-3 h-3 mr-1" />
-                  Repetidos
+                <div className="text-xs text-amber-700 font-medium">
+                  REPES
                 </div>
               </div>
-            </div>
-
-            <div className="text-center bg-amber-50 rounded-xl p-4 ring-1 ring-amber-100">
-              <div className="text-xl font-bold text-amber-700 mb-1">
-                {collection.stats.missing}
-              </div>
-              <div className="text-xs text-amber-700 flex items-center justify-center font-medium">
-                <Heart className="w-3 h-3 mr-1" />
-                Me faltan
+              <div className="text-center bg-red-900/30 border border-red-700 rounded-lg p-4">
+                <div className="flex items-center justify-center mb-2">
+                  <X className="w-5 h-5 text-red-400" />
+                </div>
+                <div className="text-2xl font-bold text-red-700 mb-1">
+                  {collection.stats.missing}
+                </div>
+                <div className="text-xs text-red-700 font-medium">
+                  FALTAN
+                </div>
               </div>
             </div>
           </div>

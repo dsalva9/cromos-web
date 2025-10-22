@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTemplates } from '@/hooks/templates/useTemplates';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplateFilters } from '@/components/templates/TemplateFilters';
+import { TemplateGridSkeleton } from '@/components/templates/TemplateCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -62,17 +63,23 @@ export default function TemplatesPage() {
         )}
 
         {/* Templates Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {templates.map(template => (
-            <TemplateCard key={template.id} template={template} />
-          ))}
-        </div>
+        {loading && templates.length === 0 ? (
+          <TemplateGridSkeleton count={12} />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+              {templates.map(template => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
-          </div>
+            {/* Loading More State */}
+            {loading && templates.length > 0 && (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+              </div>
+            )}
+          </>
         )}
 
         {/* Load More */}

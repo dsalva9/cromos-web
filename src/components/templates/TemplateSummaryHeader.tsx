@@ -69,7 +69,7 @@ export function TemplateSummaryHeader({
       ownedForCompletion,
       totalSlots,
     };
-  }, [copy, progress]);
+  }, [progress]);
 
   return (
     <ModernCard className="mb-6">
@@ -98,9 +98,9 @@ export function TemplateSummaryHeader({
 
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm items-center">
               <span className="text-gray-400">Completado</span>
-              <span className="text-white font-bold">
+              <span className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
                 {stats.completionPercentage}%
               </span>
             </div>
@@ -116,9 +116,9 @@ export function TemplateSummaryHeader({
           {/* Stats Pills */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Owned */}
-            <div className="bg-green-900/30 border-2 border-green-700 rounded-md p-4 text-center">
+            <div className="bg-green-900/30 border-2 border-green-700 rounded-lg p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Check className="h-5 w-5 text-green-400" />
+                <Check className="h-6 w-6 text-green-400" />
                 <span className="text-sm uppercase font-bold text-green-400">
                   Tengo
                 </span>
@@ -127,10 +127,10 @@ export function TemplateSummaryHeader({
             </div>
 
             {/* Duplicates */}
-            <div className="bg-[#FFC000]/20 border-2 border-[#FFC000] rounded-md p-4 text-center">
+            <div className="bg-amber-900/30 border-2 border-amber-700 rounded-lg p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <CopyIcon className="h-5 w-5 text-[#FFC000]" />
-                <span className="text-sm uppercase font-bold text-[#FFC000]">
+                <CopyIcon className="h-6 w-6 text-amber-500" />
+                <span className="text-sm uppercase font-bold text-amber-500">
                   Repes
                 </span>
               </div>
@@ -143,10 +143,10 @@ export function TemplateSummaryHeader({
             </div>
 
             {/* Missing */}
-            <div className="bg-gray-800/30 border-2 border-gray-600 rounded-md p-4 text-center">
+            <div className="bg-red-900/30 border-2 border-red-700 rounded-lg p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <X className="h-5 w-5 text-gray-400" />
-                <span className="text-sm uppercase font-bold text-gray-400">
+                <X className="h-6 w-6 text-red-400" />
+                <span className="text-sm uppercase font-bold text-red-400">
                   Faltan
                 </span>
               </div>

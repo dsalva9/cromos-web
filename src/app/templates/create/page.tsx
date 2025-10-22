@@ -25,7 +25,7 @@ interface TemplateData {
 
 export default function CreateTemplatePage() {
   const router = useRouter();
-  const { createTemplate, loading, error } = useCreateTemplate();
+  const { createTemplate, loading } = useCreateTemplate();
 
   const handleCreateTemplate = async (templateData: TemplateData) => {
     try {

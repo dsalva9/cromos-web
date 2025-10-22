@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { TemplateBasicInfoForm } from './TemplateBasicInfoForm';
 import { TemplatePagesForm } from './TemplatePagesForm';
 import { TemplateReviewForm } from './TemplateReviewForm';
