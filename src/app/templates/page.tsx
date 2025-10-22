@@ -5,8 +5,9 @@ import { useTemplates } from '@/hooks/templates/useTemplates';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplateFilters } from '@/components/templates/TemplateFilters';
 import { TemplateGridSkeleton } from '@/components/templates/TemplateCardSkeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, FolderOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/providers/SupabaseProvider';
 
@@ -29,17 +30,17 @@ export default function TemplatesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black uppercase text-white mb-2">
+            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-white mb-2">
               Plantillas Comunitarias
             </h1>
-            <p className="text-gray-400">
+            <p className="text-slate-300">
               Descubre y copia plantillas de colección creadas por la comunidad
             </p>
           </div>
 
           {user && (
             <Link href="/templates/create">
-              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
                 <Plus className="mr-2 h-4 w-4" />
                 Crear Plantilla
               </Button>
@@ -93,18 +94,17 @@ export default function TemplatesPage() {
 
         {/* Empty State */}
         {!loading && templates.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-400 text-lg mb-4">
-              No se encontraron plantillas
-            </p>
-            {user && (
-              <Link href="/templates/create">
-                <Button className="bg-[#FFC000] text-black">
-                  Crear la primera plantilla
-                </Button>
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            icon={FolderOpen}
+            title="No se encontraron plantillas"
+            description={
+              searchQuery
+                ? 'No hay plantillas que coincidan con tu búsqueda. Intenta con otros términos o crea una nueva plantilla.'
+                : 'Todavía no hay plantillas comunitarias. ¡Sé el primero en crear una!'
+            }
+            actionLabel={user ? 'Crear la primera plantilla' : undefined}
+            actionHref={user ? '/templates/create' : undefined}
+          />
         )}
       </div>
     </div>

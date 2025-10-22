@@ -22,7 +22,7 @@ export function OwnedCollectionCard({
   isRemoving = false,
 }: OwnedCollectionCardProps) {
   return (
-    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 overflow-hidden ring-1 ring-black/5">
+    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 overflow-hidden border border-slate-700/50 shadow-lg shadow-slate-900/30">
       {/* Gradient Header Strip with overlay */}
       <div
         className={`h-4 relative ${

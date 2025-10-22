@@ -54,7 +54,7 @@ export default function CreateTemplatePage() {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <h1 className="text-3xl font-black uppercase text-white">
+            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-white">
               Crear Plantilla
             </h1>
           </div>

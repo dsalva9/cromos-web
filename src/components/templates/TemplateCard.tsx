@@ -5,7 +5,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Star, Copy, FileText } from 'lucide-react';
+import { User, Star, Copy, FileText, Layout } from 'lucide-react';
 import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
@@ -60,10 +60,10 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
   return (
     <Link href={`/templates/${template.id}`}>
-      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 cursor-pointer h-full">
+      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-200 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
         <ModernCardContent className="p-0">
           {/* Image */}
-          <div className="relative aspect-video bg-[#374151]">
+          <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800">
             {template.image_url ? (
               <Image
                 src={template.image_url}
@@ -74,9 +74,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <div className="text-6xl font-black text-gray-600">
-                  {template.title.charAt(0).toUpperCase()}
-                </div>
+                <Layout className="w-16 h-16 text-slate-400/50" />
               </div>
             )}
           </div>
@@ -90,13 +88,13 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
             {/* Description */}
             {template.description && (
-              <p className="text-sm text-gray-400 line-clamp-2">
+              <p className="text-sm text-slate-400 line-clamp-2">
                 {template.description}
               </p>
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-4 text-sm text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-slate-400">
               {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
@@ -122,7 +120,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
             </div>
 
             {/* Author */}
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-slate-400">
               <User className="h-4 w-4" />
               <span className="line-clamp-1">
                 por {template.author_nickname}
@@ -133,7 +131,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
             <Button
               onClick={handleCopy}
               disabled={loading || copied}
-              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium"
               size="sm"
             >
               {copied ? (

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TemplateBasicInfoForm } from './TemplateBasicInfoForm';
 import { TemplatePagesForm } from './TemplatePagesForm';
 import { TemplateReviewForm } from './TemplateReviewForm';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Check, CheckCircle } from 'lucide-react';
 
 interface TemplateData {
   title: string;
@@ -90,48 +90,75 @@ export function TemplateCreationWizard({
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Progress */}
+      {/* Progress Stepper */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
           {steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                  index <= currentStep ? 'bg-[#FFC000]' : 'bg-gray-600'
-                }`}
-              >
-                {index < currentStep ? (
-                  <Check className="h-5 w-5 text-black" />
-                ) : (
-                  <span className="text-sm font-medium">{index + 1}</span>
-                )}
-              </div>
-              {index < steps.length - 1 && (
+            <div key={index} className="flex items-center flex-1">
+              <div className="flex flex-col items-center flex-1">
+                {/* Step Circle */}
                 <div
-                  className={`w-full h-1 mx-2 ${
-                    index < currentStep ? 'bg-[#FFC000]' : 'bg-gray-600'
+                  className={`flex items-center justify-center rounded-full transition-all duration-300 ${
+                    index < currentStep
+                      ? 'w-12 h-12 bg-green-400'
+                      : index === currentStep
+                      ? 'w-14 h-14 bg-yellow-400 animate-pulse shadow-lg shadow-yellow-400/50'
+                      : 'w-10 h-10 bg-slate-600'
                   }`}
-                />
+                >
+                  {index < currentStep ? (
+                    <CheckCircle className="h-6 w-6 text-white" />
+                  ) : (
+                    <span
+                      className={`font-bold ${
+                        index === currentStep ? 'text-lg text-black' : 'text-sm text-white'
+                      }`}
+                    >
+                      {index + 1}
+                    </span>
+                  )}
+                </div>
+
+                {/* Step Label - Hidden on mobile, visible on desktop */}
+                <div className="mt-2 text-center hidden md:block">
+                  <p
+                    className={`text-sm font-medium ${
+                      index < currentStep
+                        ? 'text-green-400'
+                        : index === currentStep
+                        ? 'text-yellow-400'
+                        : 'text-slate-600'
+                    }`}
+                  >
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Connecting Line */}
+              {index < steps.length - 1 && (
+                <div className="flex-1 h-1 mx-2 -mt-8 md:mt-0 relative">
+                  <div className="absolute inset-0 bg-slate-600 rounded" />
+                  {index < currentStep && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-yellow-400 rounded transition-all duration-500" />
+                  )}
+                </div>
               )}
             </div>
           ))}
         </div>
-        <div className="flex justify-between">
-          {steps.map((step, index) => (
-            <div
-              key={index}
-              className="text-center"
-              style={{ width: `${100 / steps.length}%` }}
-            >
-              <p
-                className={`text-xs mt-1 ${
-                  index <= currentStep ? 'text-[#FFC000]' : 'text-gray-400'
-                }`}
-              >
-                {step.title}
-              </p>
-            </div>
-          ))}
+
+        {/* Mobile step labels */}
+        <div className="md:hidden text-center mt-4">
+          <p className="text-base font-semibold text-yellow-400">
+            {steps[currentStep].title}
+          </p>
+          <p className="text-sm text-slate-400 mt-1">
+            {steps[currentStep].description}
+          </p>
         </div>
       </div>
 

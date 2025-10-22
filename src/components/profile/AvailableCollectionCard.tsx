@@ -18,7 +18,7 @@ export function AvailableCollectionCard({
   isAdding = false,
 }: AvailableCollectionCardProps) {
   return (
-    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 hover:ring-1 hover:ring-white/30 transition-all duration-200 overflow-hidden border-2 border-dashed border-yellow-200/60 ring-1 ring-black/5 relative">
+    <ModernCard className="bg-white/70 backdrop-blur-sm hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 hover:ring-1 hover:ring-white/30 transition-all duration-200 overflow-hidden border-2 border-dashed border-yellow-200/60 shadow-lg shadow-slate-900/30 relative">
       {/* Left Accent Rail */}
       <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-400 to-yellow-500" />
 
