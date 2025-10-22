@@ -61,12 +61,13 @@ export function useTemplates({
         console.log('RPC response:', { data, error: rpcError });
 
         if (rpcError) {
-          // Handle 404/400 errors gracefully - RPC doesn't exist yet
+          // Handle RPC errors gracefully and display actual error message
           console.error('RPC Error:', rpcError);
           setTemplates([]);
           setHasMore(false);
+          // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
           setError(
-            `Error: ${rpcError.message || 'Las plantillas no están disponibles todavía. Próximamente en Sprint 9.'}`
+            rpcError.message || 'Error al cargar las plantillas. Por favor, intenta de nuevo.'
           );
           return;
         }

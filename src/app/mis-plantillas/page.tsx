@@ -35,60 +35,18 @@ function MyTemplatesContent() {
         console.log('Fetching template copies...');
         console.log('Current user:', await supabase.auth.getUser());
 
-        // First try the test function
-        console.log('Trying test function...');
-        const { data: testData, error: testError } = await supabase.rpc(
-          'test_get_my_template_copies'
-        );
-        console.log('Test RPC response:', { data: testData, error: testError });
-
-        // Try the basic version first
-        console.log('Trying basic function...');
-        const { data: basicData, error: basicError } = await supabase.rpc(
-          'get_my_template_copies_basic'
-        );
-        console.log('Basic RPC response:', {
-          data: basicData,
-          error: basicError,
-        });
-
-        // Now try the full function
-        console.log('Trying full function...');
+        // Fixed: Simplified RPC calls to use only the canonical function (get_my_template_copies)
+        // Database schema confirms this is the only existing RPC function for this purpose
+        // Removed fallback logic for test_get_my_template_copies and get_my_template_copies_basic
+        // as these functions do not exist in the database schema
         const { data, error: rpcError } = await supabase.rpc(
           'get_my_template_copies'
         );
 
-        console.log('Full RPC response:', { data, error: rpcError });
+        console.log('RPC response:', { data, error: rpcError });
 
         if (rpcError) {
-          console.error('Full RPC Error details:', rpcError);
-          // If the full function fails but basic works, use basic data
-          if (basicData && !basicError) {
-            console.log('Using basic data as fallback');
-            setCopies(
-              basicData.map((item: TemplateCopy) => ({
-                ...item,
-                completed_slots: 0,
-                total_slots: 0,
-                completion_percentage: 0,
-              }))
-            );
-            return;
-          }
-          // If both fail, try to use test data
-          if (testData && !testError) {
-            console.log('Using test data as fallback');
-            setCopies(
-              testData.map((item: TemplateCopy) => ({
-                ...item,
-                original_author_id: '',
-                completed_slots: 0,
-                total_slots: 0,
-                completion_percentage: 0,
-              }))
-            );
-            return;
-          }
+          console.error('RPC Error details:', rpcError);
           throw rpcError;
         }
 

@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.2] - 2025-01-22
+
+### Fixed
+
+- **Removed hardcoded Sprint 9 error messages**: Template hooks now display actual RPC error messages instead of placeholder text
+  - Fixed `useTemplates.ts` to show proper error messages when loading public templates fails
+  - Fixed `useTemplateProgress.ts` to show proper error messages when loading template copies and progress fails
+- **Simplified RPC function calls in mis-plantillas page**: Removed unnecessary fallback logic for non-existent RPC functions
+  - Removed calls to `test_get_my_template_copies` (test script, not an actual RPC)
+  - Removed calls to `get_my_template_copies_basic` (does not exist in database)
+  - Now uses only the canonical `get_my_template_copies` RPC function
+  - Added explanatory comments documenting the change
+- **Re-enabled Playwright test suite**: Changed test script from disabled placeholder to functional `playwright test` command
+
 ## [1.6.1] – 2025-10-22 - Template Creation and Collection Management Fixes
 
 ### ✨ Added

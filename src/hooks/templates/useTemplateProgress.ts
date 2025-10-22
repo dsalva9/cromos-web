@@ -40,9 +40,10 @@ export function useTemplateProgress(copyId: string) {
       );
 
       if (copyError) {
-        // Handle 404/400 errors gracefully - RPC doesn't exist yet
+        // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
+        console.error('RPC Error fetching template copies:', copyError);
         setError(
-          'Las plantillas no están disponibles todavía. Próximamente en Sprint 9.'
+          copyError.message || 'Error al cargar las copias de plantillas. Por favor, intenta de nuevo.'
         );
         return;
       }
@@ -63,9 +64,10 @@ export function useTemplateProgress(copyId: string) {
       );
 
       if (progressError) {
-        // Handle 404/400 errors gracefully - RPC doesn't exist yet
+        // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
+        console.error('RPC Error fetching template progress:', progressError);
         setError(
-          'Las plantillas no están disponibles todavía. Próximamente en Sprint 9.'
+          progressError.message || 'Error al cargar el progreso de la plantilla. Por favor, intenta de nuevo.'
         );
         return;
       }

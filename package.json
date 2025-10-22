@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "analyze": "ANALYZE=true next build",
-    "test": "echo 'Playwright tests are disabled for now. Run manually when needed.' && exit 0",
+    "test": "playwright test",
     "test:e2e": "playwright test",
     "test:ui": "playwright test --ui",
     "format": "prettier --write .",
