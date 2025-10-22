@@ -10,6 +10,7 @@ This document provides a quick reference for the "Retro-Comic" design system use
 
 - **Background**: A solid, deep charcoal/navy is the standard for all main page backgrounds.
   - **Class**: `bg-[#1F2937]`
+  - **Global**: Both `html` and `body` use `background: #1F2937` with `overflow-x: hidden` to prevent white borders
 
 - **Typography**: Major titles are bold, condensed, and uppercase for a strong visual impact.
   - **Classes**: `text-4xl font-extrabold uppercase text-white`
@@ -19,6 +20,10 @@ This document provides a quick reference for the "Retro-Comic" design system use
 
 - **Rounding**: Corner rounding is reduced for a blockier, sticker-like appearance.
   - **Classes**: `rounded-lg` or `rounded-md`
+
+- **Responsive Layout**: Container classes use full viewport width on mobile/tablet, with max-width only on large screens
+  - **Tablet Range (768px-1024px)**: Containers fill viewport width (`100%`)
+  - **Desktop (>1024px)**: Containers apply max-width constraints (`xl: 1280px`, `2xl: 1536px`)
 
 ---
 
@@ -89,3 +94,4 @@ This document provides a quick reference for the "Retro-Comic" design system use
   P�gina Inactiva
 </a>
 ```
+
