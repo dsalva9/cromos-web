@@ -55,30 +55,62 @@ added 1 package, and audited 455 packages in 1s
 - Vercel requires environment variables to be set in the build configuration, not inline with commands
 
 **Solution:**
-1. Removed inline environment variable from `installCommand`
-2. Changed install command to `npm install --legacy-peer-deps`
-3. Added proper `build.env` configuration section
-4. Set `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` as a build environment variable
+1. Removed custom `installCommand` that was causing hangs
+2. Removed `ignoreCommand` and `github.silent` (unnecessary)
+3. Created `.npmrc` file for npm configuration
+4. Set `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` in `.npmrc`
+5. Added `legacy-peer-deps=true` in `.npmrc`
+6. Set build environment variable in `vercel.json`
 
-**File Modified:**
-- `vercel.json`
+**Files Modified:**
+- `vercel.json` - Simplified configuration
+- `.npmrc` (new) - NPM configuration file
 
 **Code Changes:**
 ```json
-// Before
+// vercel.json - Before
 {
-  "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install"
+  "buildCommand": "npm run build",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "framework": "nextjs",
+  "installCommand": "npm install --legacy-peer-deps",
+  "devCommand": "npm run dev",
+  "outputDirectory": ".next",
+  "build": {
+    "env": {
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
+    }
+  },
+  "github": {
+    "silent": true
+  }
 }
 
-// After
+// vercel.json - After (Simplified)
 {
-  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
   "build": {
     "env": {
       "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
     }
   }
 }
+```
+
+**.npmrc (New File):**
+```ini
+# Playwright configuration
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+
+# Legacy peer deps for compatibility
+legacy-peer-deps=true
+
+# Speed up installs
+prefer-offline=true
+audit=false
+fund=false
 ```
 
 ### Testing
@@ -97,16 +129,24 @@ added 1 package, and audited 455 packages in 1s
 
 ### Additional Notes
 
-- The `--legacy-peer-deps` flag helps avoid peer dependency conflicts during npm install
+**Navbar:**
 - Z-index of 100 ensures navbar stays above most UI elements (modals typically use z-50 to z-90)
 - Fixed positioning is more reliable than sticky for always-visible headers
 - Padding-top on main content prevents navbar from covering page content
+
+**Vercel Build:**
+- `.npmrc` is the recommended way to configure npm on Vercel (better than custom installCommand)
+- `legacy-peer-deps=true` helps avoid peer dependency conflicts during npm install
+- Disabling `audit` and `fund` speeds up npm install in CI/CD environments
+- `prefer-offline=true` uses cache when possible for faster builds
+- Custom `installCommand` can cause hangs on Vercel's build system
 
 ### Related Files
 
 - `src/components/site-header.tsx` - Main navigation component
 - `src/app/layout.tsx` - Root layout with header
 - `vercel.json` - Vercel deployment configuration
+- `.npmrc` - NPM configuration (NEW)
 - `package.json` - Dependencies (Playwright is dev dependency)
 
 ### Future Improvements
