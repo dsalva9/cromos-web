@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
 
 export default function MarketplacePage() {
   const { user } = useUser();
@@ -56,16 +57,22 @@ export default function MarketplacePage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {listings.map(listing => (
-            <ListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+        {loading && listings.length === 0 ? (
+          <div className="h-1 w-full bg-slate-700/50 overflow-hidden rounded mt-2">
+            <div className="h-full w-1/3 bg-[#FFC000] animate-pulse" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {listings.map(listing => (
+              <ListingCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        )}
 
         {/* Loading State */}
-        {loading && (
+        {loading && listings.length > 0 && (
           <div className="flex justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            <CardSkeleton count={1} />
           </div>
         )}
 

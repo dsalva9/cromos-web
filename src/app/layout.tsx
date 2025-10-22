@@ -31,25 +31,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" className="overflow-x-hidden">
+    <html lang="es" data-theme="light" className="overflow-x-hidden">
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-[#1F2937] text-foreground antialiased overflow-x-hidden`}
       >
         <SupabaseProvider>
           <ErrorBoundary>
-            <a
-              href="#main"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-black text-white px-3 py-1 rounded z-50"
+            <a 
+              href="#main-content" 
+              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 z-50 bg-primary text-primary-foreground px-3 py-2 rounded"
             >
-              Skip to content
+              Saltar al contenido principal
             </a>
-            <SiteHeader />
-            <main id="main" className="min-h-screen pt-16">
+            <header role="banner">
+              <SiteHeader />
+            </header>
+            <main id="main-content" role="main" className="min-h-screen pt-16">
               {children}
             </main>
-            <footer className="border-t">
+            <footer role="contentinfo" className="border-t">
               <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-                © {new Date().getFullYear()} {siteConfig.name}
+                Ac {new Date().getFullYear()} {siteConfig.name}
               </div>
             </footer>
           </ErrorBoundary>
@@ -72,3 +74,4 @@ export default function RootLayout({
     </html>
   );
 }
+

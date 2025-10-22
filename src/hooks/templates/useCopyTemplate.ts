@@ -18,12 +18,17 @@ export function useCopyTemplate() {
       });
 
       if (error) {
-        // Handle 404/400 errors gracefully - RPC doesn't exist yet
-        throw new Error(
-          'Las plantillas no están disponibles todavía. Próximamente en Sprint 9.'
-        );
+        const code = (error as { code?: string; message?: string }).code;
+        const message = (error as { code?: string; message?: string }).message || '';
+        if (code === '23505' || message.toLowerCase().includes('duplicate')) {
+          throw new Error('Ya has copiado esta plantilla.');
+        }
+        throw new Error(message || 'Error al copiar la plantilla.');
       }
-      if (!data) throw new Error('No se devolvió ningún ID de copia');
+
+      if (!data) {
+        throw new Error('No se devolvió ningún ID de copia');
+      }
 
       return data.toString();
     } catch (error) {

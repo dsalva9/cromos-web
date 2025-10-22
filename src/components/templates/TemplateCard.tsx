@@ -38,7 +38,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Prevent navigation to detail page
+    e.preventDefault();
     createRipple(e, 'rgba(0, 0, 0, 0.3)');
 
     if (!user) {
@@ -49,7 +49,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
     try {
       const copyId = await copyTemplate(template.id);
       setCopied(true);
-      toast.success('¡Plantilla copiada con éxito!');
+      toast.success('¡Plantilla copiada con Éxito!');
       setTimeout(() => {
         router.push(`/mis-plantillas/${copyId}`);
       }, 1000);
@@ -61,7 +61,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
   };
 
   return (
-    <Link href={`/templates/${template.id}`}>
+    <Link href={`/templates/${template.id}`} aria-label={`Ver plantilla: ${template.title}`}>
       <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
         <ModernCardContent className="p-0">
           {/* Image */}
@@ -69,7 +69,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
             {template.image_url ? (
               <Image
                 src={template.image_url}
-                alt={template.title}
+                alt={`Portada de la plantilla ${template.title}`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -83,21 +83,17 @@ export function TemplateCard({ template }: TemplateCardProps) {
 
           {/* Content */}
           <div className="p-4 space-y-3">
-            {/* Title */}
             <h3 className="font-bold text-white text-lg line-clamp-2">
               {template.title}
             </h3>
 
-            {/* Description */}
             {template.description && (
               <p className="text-sm text-slate-400 line-clamp-2">
                 {template.description}
               </p>
             )}
 
-            {/* Stats */}
             <div className="flex items-center gap-4 text-sm text-slate-400">
-              {/* Rating */}
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
                 <span className="font-bold text-white">
@@ -106,22 +102,19 @@ export function TemplateCard({ template }: TemplateCardProps) {
                 <span>({template.rating_count})</span>
               </div>
 
-              {/* Copies */}
               <div className="flex items-center gap-1">
                 <Copy className="h-4 w-4" />
                 <span>{template.copies_count}</span>
               </div>
 
-              {/* Pages */}
               <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>
-                  {template.pages_count} páginas • {template.total_slots} cromos
+                  {template.pages_count} páginas · {template.total_slots} cromos
                 </span>
               </div>
             </div>
 
-            {/* Author */}
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <div className="flex items-center gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
@@ -133,7 +126,6 @@ export function TemplateCard({ template }: TemplateCardProps) {
               </div>
             </div>
 
-            {/* Copy Button */}
             <Button
               onClick={handleCopy}
               disabled={loading || copied}

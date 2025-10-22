@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import Image from 'next/image';
+import type { TemplateBasicInfoData } from '@/lib/validations/template.schemas';
 
 interface TemplateBasicInfoFormProps {
   data: {
@@ -24,11 +25,13 @@ interface TemplateBasicInfoFormProps {
       is_public: boolean;
     }>
   ) => void;
+  errors?: Partial<Record<keyof TemplateBasicInfoData, string>>;
 }
 
 export function TemplateBasicInfoForm({
   data,
   onChange,
+  errors,
 }: TemplateBasicInfoFormProps) {
   const [imagePreview, setImagePreview] = useState<string | null>(
     data.image_url || null
@@ -37,8 +40,6 @@ export function TemplateBasicInfoForm({
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real implementation, you would upload to a storage service
-      // For now, we'll use a local preview
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
@@ -61,12 +62,21 @@ export function TemplateBasicInfoForm({
         <Label htmlFor="title">Título de la Plantilla *</Label>
         <Input
           id="title"
+          aria-invalid={!!errors?.title}
+          aria-describedby={errors?.title ? 'template-title-error' : undefined}
           value={data.title}
           onChange={e => onChange({ title: e.target.value })}
           placeholder="Ej: Álbum Cromos Euro 2024"
-          className="bg-[#1F2937] border-gray-600 text-white"
+          className={`bg-[#1F2937] text-white ${
+            errors?.title ? 'border-red-500' : 'border-gray-600'
+          }`}
           required
         />
+        {errors?.title && (
+          <p id="template-title-error" className="text-sm text-red-500">
+            {errors.title}
+          </p>
+        )}
       </div>
 
       {/* Description */}
@@ -74,12 +84,23 @@ export function TemplateBasicInfoForm({
         <Label htmlFor="description">Descripción</Label>
         <Textarea
           id="description"
+          aria-invalid={!!errors?.description}
+          aria-describedby={
+            errors?.description ? 'template-description-error' : undefined
+          }
           value={data.description}
           onChange={e => onChange({ description: e.target.value })}
           placeholder="Describe tu plantilla..."
           rows={4}
-          className="bg-[#1F2937] border-gray-600 text-white resize-none"
+          className={`bg-[#1F2937] text-white resize-none ${
+            errors?.description ? 'border-red-500' : 'border-gray-600'
+          }`}
         />
+        {errors?.description && (
+          <p id="template-description-error" className="text-sm text-red-500">
+            {errors.description}
+          </p>
+        )}
       </div>
 
       {/* Image */}

@@ -82,7 +82,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
               <div className="relative aspect-square bg-[#374151]">
                 <Image
                   src={value}
-                  alt="Listing preview"
+                  alt="Vista previa del anuncio"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
                   className="object-cover"
@@ -92,9 +92,10 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                   variant="destructive"
                   className="absolute top-2 right-2"
                   onClick={handleRemove}
+                  aria-label="Eliminar imagen"
                   disabled={uploading}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
             </ModernCardContent>
@@ -104,7 +105,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         <ModernCard>
           <ModernCardContent className="p-8">
             <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[#374151] border-2 border-black flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-[#374151] border-2 border-black flex items-center justify-center" aria-hidden="true">
                 <ImageIcon className="h-8 w-8 text-gray-400" />
               </div>
               <div className="text-center">
@@ -122,18 +123,19 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                   />
                   <Button
                     type="button"
+                    aria-label={uploading ? 'Subiendo imagen' : 'Elegir imagen'}
                     disabled={uploading}
                     className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
                   >
                     {uploading ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-black border-r-transparent rounded-full mr-2" />
-                        Uploading...
+                        Subiendo...
                       </>
                     ) : (
                       <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Choose Image
+                        <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Elegir imagen
                       </>
                     )}
                   </Button>

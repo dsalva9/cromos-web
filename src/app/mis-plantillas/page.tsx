@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Check, X, Copy as CopyIcon } from 'lucide-react';
+import { TemplateSkeleton } from '@/components/skeletons/TemplateSkeleton';
 import AuthGuard from '@/components/AuthGuard';
 import { logger } from '@/lib/logger';
 
@@ -91,8 +92,10 @@ function MyTemplatesContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+      <div className="min-h-screen bg-[#1F2937]">
+        <div className="container mx-auto px-4 py-8">
+          <TemplateSkeleton count={6} />
+        </div>
       </div>
     );
   }
@@ -135,7 +138,7 @@ function MyTemplatesContent() {
             <Link href="/templates/create">
               <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
                 <Plus className="mr-2 h-4 w-4" />
-                Crear Colección
+                {'Crear Colecci\u00f3n'}
               </Button>
             </Link>
           </div>
@@ -145,7 +148,7 @@ function MyTemplatesContent() {
         {copies.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-lg mb-4">
-              Aún no has copiado ninguna colección
+              {'A\u00fan no has copiado ninguna colecci\u00f3n'}
             </p>
             <Link href="/templates">
               <Button className="bg-[#FFC000] text-black">

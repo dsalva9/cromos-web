@@ -1,6 +1,5 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ImageUpload } from '@/components/marketplace/ImageUpload';
 import { CreateListingForm } from '@/types/v1.6.0';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  listingSchema,
+  type ListingFormData,
+} from '@/lib/validations/marketplace.schemas';
 
 interface ListingFormProps {
   initialData?: Partial<CreateListingForm>;
@@ -15,77 +20,48 @@ interface ListingFormProps {
   loading?: boolean;
 }
 
-export function ListingForm({
-  initialData,
-  onSubmit,
-  loading,
-}: ListingFormProps) {
-  const [formData, setFormData] = useState<CreateListingForm>({
-    title: initialData?.title || '',
-    description: initialData?.description || '',
-    sticker_number: initialData?.sticker_number || '',
-    collection_name: initialData?.collection_name || '',
-    image_url: initialData?.image_url || '',
+export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<ListingFormData>({
+    resolver: zodResolver(listingSchema),
+    defaultValues: {
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      sticker_number: initialData?.sticker_number || '',
+      collection_name: initialData?.collection_name || '',
+      image_url: initialData?.image_url || '',
+    },
+    mode: 'onChange',
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const imageUrl = watch('image_url');
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.title.trim()) {
-      newErrors.title = 'El título es requerido';
-    } else if (formData.title.length < 3) {
-      newErrors.title = 'El título debe tener al menos 3 caracteres';
-    } else if (formData.title.length > 100) {
-      newErrors.title = 'El título debe tener menos de 100 caracteres';
-    }
-
-    if (formData.description && formData.description.length > 500) {
-      newErrors.description =
-        'La descripción debe tener menos de 500 caracteres';
-    }
-
-    if (formData.sticker_number && formData.sticker_number.length > 20) {
-      newErrors.sticker_number =
-        'El número del cromo debe tener menos de 20 caracteres';
-    }
-
-    if (formData.collection_name && formData.collection_name.length > 100) {
-      newErrors.collection_name =
-        'El nombre de la colección debe tener menos de 100 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    await onSubmit(formData);
-  };
-
-  const handleInputChange = (field: keyof CreateListingForm, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
+  const submitHandler = async (data: ListingFormData) => {
+    const payload: CreateListingForm = {
+      title: data.title,
+      description: data.description || '',
+      sticker_number: data.sticker_number || '',
+      collection_name: data.collection_name || '',
+      image_url: data.image_url || undefined,
+    };
+    await onSubmit(payload);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(submitHandler)} noValidate>
       <ModernCard>
         <ModernCardContent className="p-6 space-y-6">
           {/* Image Upload */}
           <div className="space-y-2">
             <Label>Imagen del Cromo (Opcional)</Label>
             <ImageUpload
-              value={formData.image_url}
-              onChange={url => handleInputChange('image_url', url || '')}
+              value={imageUrl}
+              onChange={url => setValue('image_url', url || '')}
             />
             <p className="text-sm text-gray-400">
               Sube una foto de tu cromo para mayor visibilidad
@@ -99,18 +75,19 @@ export function ListingForm({
             </Label>
             <Input
               id="title"
-              value={formData.title}
-              onChange={e => handleInputChange('title', e.target.value)}
+              aria-invalid={!!errors.title}
+              aria-describedby={errors.title ? 'title-error' : undefined}
+              {...register('title')}
               placeholder="ej. Messi Inter Miami 2024"
-              className="bg-[#374151] border-2 border-black text-white"
-              maxLength={100}
+              className={`bg-[#374151] border-2 text-white ${
+                errors.title ? 'border-red-500' : 'border-black'
+              }`}
             />
             {errors.title && (
-              <p className="text-sm text-red-500">{errors.title}</p>
+              <p id="title-error" className="text-sm text-red-500">
+                {errors.title.message as string}
+              </p>
             )}
-            <p className="text-sm text-gray-500">
-              {formData.title.length} / 100 caracteres
-            </p>
           </div>
 
           {/* Collection Name */}
@@ -118,37 +95,42 @@ export function ListingForm({
             <Label htmlFor="collection">Colección (Opcional)</Label>
             <Input
               id="collection"
-              value={formData.collection_name || ''}
-              onChange={e =>
-                handleInputChange('collection_name', e.target.value)
+              aria-invalid={!!errors.collection_name}
+              aria-describedby={
+                errors.collection_name ? 'collection-error' : undefined
               }
+              {...register('collection_name')}
               placeholder="ej. Panini LaLiga 2024/25"
-              className="bg-[#374151] border-2 border-black text-white"
-              maxLength={100}
+              className={`bg-[#374151] border-2 text-white ${
+                errors.collection_name ? 'border-red-500' : 'border-black'
+              }`}
             />
             {errors.collection_name && (
-              <p className="text-sm text-red-500">{errors.collection_name}</p>
+              <p id="collection-error" className="text-sm text-red-500">
+                {errors.collection_name.message as string}
+              </p>
             )}
-            <p className="text-sm text-gray-500">
-              {formData.collection_name.length} / 100 caracteres
-            </p>
           </div>
 
-          {/* Card Number */}
+          {/* Sticker Number */}
           <div className="space-y-2">
-            <Label htmlFor="number">Número del Cromo (Opcional)</Label>
+            <Label htmlFor="sticker">NAï¿½ï¿½ï¿½mero del Cromo (Opcional)</Label>
             <Input
-              id="number"
-              value={formData.sticker_number || ''}
-              onChange={e =>
-                handleInputChange('sticker_number', e.target.value)
+              id="sticker"
+              aria-invalid={!!errors.sticker_number}
+              aria-describedby={
+                errors.sticker_number ? 'sticker-error' : undefined
               }
-              placeholder="ej. 245"
-              className="bg-[#374151] border-2 border-black text-white"
-              maxLength={20}
+              {...register('sticker_number')}
+              placeholder="ej. #10"
+              className={`bg-[#374151] border-2 text-white ${
+                errors.sticker_number ? 'border-red-500' : 'border-black'
+              }`}
             />
             {errors.sticker_number && (
-              <p className="text-sm text-red-500">{errors.sticker_number}</p>
+              <p id="sticker-error" className="text-sm text-red-500">
+                {errors.sticker_number.message as string}
+              </p>
             )}
           </div>
 
@@ -157,29 +139,33 @@ export function ListingForm({
             <Label htmlFor="description">Descripción (Opcional)</Label>
             <Textarea
               id="description"
-              value={formData.description || ''}
-              onChange={e => handleInputChange('description', e.target.value)}
-              placeholder="Detalles adicionales sobre el cromo..."
+              aria-invalid={!!errors.description}
+              aria-describedby={
+                errors.description ? 'description-error' : undefined
+              }
+              {...register('description')}
+              placeholder="Describe el estado del cromo, si estA! nuevo, usado, etc."
               rows={4}
-              className="bg-[#374151] border-2 border-black text-white"
-              maxLength={500}
+              className={`bg-[#374151] border-2 text-white resize-none ${
+                errors.description ? 'border-red-500' : 'border-black'
+              }`}
             />
             {errors.description && (
-              <p className="text-sm text-red-500">{errors.description}</p>
+              <p id="description-error" className="text-sm text-red-500">
+                {errors.description.message as string}
+              </p>
             )}
-            <p className="text-sm text-gray-500">
-              {formData.description?.length || 0} / 500 caracteres
-            </p>
           </div>
 
-          {/* Submit */}
-          <div className="flex gap-4">
+          {/* Actions */}
+          <div className="pt-2 flex justify-end">
             <Button
               type="submit"
-              disabled={loading}
-              className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+              aria-label="Publicar anuncio"
+              disabled={loading || isSubmitting}
+              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
             >
-              {loading ? 'Publicando...' : 'Publicar Anuncio'}
+              {loading || isSubmitting ? 'Publicando...' : 'Publicar'}
             </Button>
           </div>
         </ModernCardContent>
@@ -187,3 +173,4 @@ export function ListingForm({
     </form>
   );
 }
+
