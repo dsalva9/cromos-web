@@ -92,8 +92,23 @@ function MyTemplatesContent() {
           throw rpcError;
         }
 
-        console.log('Template copies fetched:', data?.length || 0);
-        setCopies(data || []);
+        // Update each copy with correct progress data
+        const updatedCopies = (data || []).map((copy: TemplateCopy) => {
+          // Calculate progress based on the actual progress data
+          const completed = copy.completed_slots || 0;
+          const total = copy.total_slots || 0;
+          const completionPercentage =
+            total > 0 ? Math.round((completed / total) * 100) : 0;
+
+          return {
+            ...copy,
+            completed_slots: completed,
+            total_slots: total,
+            completion_percentage: completionPercentage,
+          };
+        });
+
+        setCopies(updatedCopies);
       } catch (err) {
         console.error('Error fetching template copies:', err);
         setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -141,10 +156,10 @@ function MyTemplatesContent() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black uppercase text-white mb-2">
-              Mis Plantillas
+              Mis Colecciones
             </h1>
             <p className="text-gray-400">
-              Gestiona tu progreso en las plantillas que has copiado
+              Gestiona tu progreso en las colecciones que has copiado
             </p>
           </div>
 
@@ -155,13 +170,13 @@ function MyTemplatesContent() {
                 className="text-white border-gray-600 hover:bg-gray-800"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Explorar Plantillas
+                Explorar Colecciones
               </Button>
             </Link>
             <Link href="/templates/create">
               <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
                 <Plus className="mr-2 h-4 w-4" />
-                Crear Plantilla
+                Crear Colección
               </Button>
             </Link>
           </div>
@@ -171,93 +186,95 @@ function MyTemplatesContent() {
         {copies.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-lg mb-4">
-              Aún no has copiado ninguna plantilla
+              Aún no has copiado ninguna colección
             </p>
             <Link href="/templates">
               <Button className="bg-[#FFC000] text-black">
-                Explorar Plantillas
+                Explorar Colecciones
               </Button>
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {copies.map(copy => (
-              <ModernCard
-                key={copy.copy_id}
-                className="hover:scale-105 transition-transform"
-              >
-                <ModernCardContent className="p-6">
-                  <div className="space-y-4">
-                    {/* Title and Status */}
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-bold text-white text-lg line-clamp-2">
-                        {copy.title}
-                      </h3>
-                      <Badge
-                        className={`
+              <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`}>
+                <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
+                  <ModernCardContent className="p-6">
+                    <div className="space-y-4">
+                      {/* Title and Status */}
+                      <div className="flex items-start justify-between">
+                        <h3 className="font-bold text-white text-lg line-clamp-2">
+                          {copy.title}
+                        </h3>
+                        <Badge
+                          className={`
                           ${copy.is_active ? 'bg-green-500' : 'bg-gray-500'} 
                           text-white uppercase text-xs
                         `}
-                      >
-                        {copy.is_active ? 'Activa' : 'Inactiva'}
-                      </Badge>
-                    </div>
-
-                    {/* Author */}
-                    <p className="text-sm text-gray-400">
-                      por {copy.original_author_nickname}
-                    </p>
-
-                    {/* Progress */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Completado</span>
-                        <span className="text-white font-bold">
-                          {getCompletionPercentage(copy)}%
-                        </span>
+                        >
+                          {copy.is_active ? 'Activa' : 'Inactiva'}
+                        </Badge>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div
-                          className="bg-[#FFC000] h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${getCompletionPercentage(copy)}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-400 text-center">
-                        {copy.completed_slots} / {copy.total_slots} cromos
+
+                      {/* Author */}
+                      <p className="text-sm text-gray-400">
+                        por {copy.original_author_nickname}
                       </p>
-                    </div>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-green-900/30 rounded p-2">
-                        <Check className="h-4 w-4 text-green-400 mx-auto mb-1" />
-                        <p className="text-xs text-white font-bold">
-                          {copy.completed_slots}
+                      {/* Progress */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Completado</span>
+                          <span className="text-white font-bold">
+                            {getCompletionPercentage(copy)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className="bg-[#FFC000] h-2 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${getCompletionPercentage(copy)}%`,
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-400 text-center">
+                          {copy.completed_slots || 0} / {copy.total_slots || 0}{' '}
+                          cromos
                         </p>
                       </div>
-                      <div className="bg-[#FFC000]/20 rounded p-2">
-                        <CopyIcon className="h-4 w-4 text-[#FFC000] mx-auto mb-1" />
-                        <p className="text-xs text-white font-bold">
-                          {copy.total_slots - copy.completed_slots}
-                        </p>
-                      </div>
-                      <div className="bg-gray-800/30 rounded p-2">
-                        <X className="h-4 w-4 text-gray-400 mx-auto mb-1" />
-                        <p className="text-xs text-white font-bold">
-                          {copy.total_slots - copy.completed_slots}
-                        </p>
-                      </div>
-                    </div>
 
-                    {/* Action Button */}
-                    <Link href={`/mis-plantillas/${copy.copy_id}`}>
-                      <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
-                        Ver Progreso
-                      </Button>
-                    </Link>
-                  </div>
-                </ModernCardContent>
-              </ModernCard>
+                      {/* Stats */}
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-green-900/30 rounded p-2">
+                          <Check className="h-4 w-4 text-green-400 mx-auto mb-1" />
+                          <p className="text-xs text-white font-bold">
+                            {copy.completed_slots}
+                          </p>
+                        </div>
+                        <div className="bg-[#FFC000]/20 rounded p-2">
+                          <CopyIcon className="h-4 w-4 text-[#FFC000] mx-auto mb-1" />
+                          <p className="text-xs text-white font-bold">
+                            {copy.total_slots - copy.completed_slots}
+                          </p>
+                        </div>
+                        <div className="bg-gray-800/30 rounded p-2">
+                          <X className="h-4 w-4 text-gray-400 mx-auto mb-1" />
+                          <p className="text-xs text-white font-bold">
+                            {copy.total_slots - copy.completed_slots}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <Link href={`/mis-plantillas/${copy.copy_id}`}>
+                        <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+                          Ver Progreso
+                        </Button>
+                      </Link>
+                    </div>
+                  </ModernCardContent>
+                </ModernCard>
+              </Link>
             ))}
           </div>
         )}

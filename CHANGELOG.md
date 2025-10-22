@@ -19,6 +19,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.1] – 2025-10-22 - Template Creation and Collection Management Fixes
+
+### ✨ Added
+
+- Switch UI component for toggle functionality
+- Sticker count display in templates and collections
+- Clickable collection cards in "Mis Colecciones" page
+
+### 🔄 Changed
+
+- Updated "Mis Plantillas" to "Mis Colecciones" throughout the application
+- Updated status labels: "Tenidas" to "Lo Tengo", "Duplicadas" to "Repes"/"Repe", "Faltantes" to "Faltan"
+- Improved sticker status logic: Falta (0), Lo Tengo (1), Repe (2+)
+- Added +/- buttons for "Lo Tengo" and "Repe" status
+
+### 🐛 Fixed
+
+- Fixed scalar array error in add_template_page RPC
+- Fixed progress calculation for collections
+- Fixed RPC functions to correctly calculate progress
+- Fixed empty slot validation in template creation
+- Fixed counts showing as 0/0 in "Mis Colecciones" page
+
+## [1.6.0] – 2025-10-22 - Templates Creation UI (Frontend)
+
+### ✨ Added - Templates Creation UI (Frontend) **Sprint 8.5 Complete**
+
+**Pages:**
+
+- `/templates/create` - Multi-step template creation wizard
+
+**Components:**
+
+- `TemplateCreationWizard` - Main wizard container with progress indicator
+- `TemplateBasicInfoForm` - Step 1: Title, description, image, public/private
+- `TemplatePagesForm` - Step 2: Dynamic page and slot management
+- `TemplateReviewForm` - Step 3: Review and publish confirmation
+- `Switch` - Toggle component for public/private settings
+
+**Hooks:**
+
+- `useCreateTemplate` - Template creation with validation and error handling
+
+**Features:**
+
+- Multi-step wizard with progress tracking (3 steps)
+- Dynamic page and slot management with add/remove
+- Image upload with preview functionality
+- Public/private template visibility toggle
+- Form validation at each step
+- Review and confirmation before publishing
+- Integration with existing Sprint 2 RPCs
+- Full Spanish localization
+- Mobile responsive design
+- Error handling with user-friendly messages
+
+### Changed
+
+- Added @radix-ui/react-switch dependency for toggle functionality
+- Updated template creation flow to use dedicated hook
+- Enhanced form validation throughout the wizard
+
+### Fixed
+
+- TypeScript errors in template forms with proper type definitions
+- ESLint warnings for unused imports and variables
+
 ## [1.6.0] – 2025-10-21 - Templates UI (Frontend)
 
 ### ✨ Added - Templates UI (Frontend) **Sprint 8 Complete**
@@ -602,5 +669,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready for Sprint 9: Integration UI 🚧
+**Phase 0 Status**: Cleanup Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Ready for Sprint 9: Integration UI 🚧
 **Next**: Begin Sprint 9 implementation (Integration UI)

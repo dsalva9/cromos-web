@@ -379,13 +379,14 @@ user_template_progress (count + 1)
 - ✅ Templates explorer with search and sort
 - ✅ Template cards with ratings and stats
 - ✅ Copy template with 1 click
-- ✅ My templates list
-- ✅ Progress tracking grid (HAVE/NEED/DUPES)
+- ✅ My templates list ("Mis Colecciones")
+- ✅ Progress tracking grid (Falta/Lo Tengo/Repe)
 - ✅ Page-based navigation
-- ✅ Slot status management
-- ✅ Duplicate count controls
-- ✅ Summary header with completion stats
-- ⏳ Create template wizard (future)
+- ✅ Slot status management with +/- buttons
+- ✅ Duplicate count controls with proper spare calculation
+- ✅ Summary header with accurate completion stats
+- ✅ Create template wizard (Sprint 8.5)
+- ✅ Template creation fixes (Sprint 8.6)
 - ⏳ Publish duplicates integration (Sprint 9)
 
 ### Marketplace UI ✅ **COMPLETE (v1.6.0)**
@@ -561,6 +562,6 @@ user_template_progress (count + 1)
 
 ---
 
-**Last Updated**: 2025-10-21 (Sprint 8 Complete)
+**Last Updated**: 2025-10-22 (Sprint 8.6 Complete)
 **Current Version**: Backend v1.6.0-alpha | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready to begin Sprint 9: Integration UI
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Ready to begin Sprint 9: Integration UI

@@ -71,6 +71,28 @@ export function useTemplateProgress(copyId: string) {
       }
 
       setProgress(progressData || []);
+
+      // Update copy with correct total slots
+      if (progressData && progressData.length > 0) {
+        setCopy(prev => {
+          if (!prev) return prev;
+
+          // Count owned + duplicates as completed
+          const completed = progressData.filter(
+            (s: SlotProgress) =>
+              s.status === 'owned' || s.status === 'duplicate'
+          ).length;
+
+          // Total slots is the total number of unique stickers
+          const totalSlots = progressData.length;
+
+          return {
+            ...prev,
+            completed_slots: completed,
+            total_slots: totalSlots,
+          };
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
@@ -113,9 +135,23 @@ export function useTemplateProgress(copyId: string) {
         // Update copy stats
         setCopy(prev => {
           if (!prev) return prev;
-          const completed = progress.filter(s =>
-            s.slot_id === slotId ? status !== 'missing' : s.status !== 'missing'
+
+          // Calculate completed slots based on owned + duplicates
+          const updatedProgress = progress.map(slot =>
+            slot.slot_id === slotId
+              ? {
+                  ...slot,
+                  status: status as 'missing' | 'owned' | 'duplicate',
+                  count,
+                }
+              : slot
+          );
+
+          // Count owned + duplicates as completed
+          const completed = updatedProgress.filter(
+            s => s.status === 'owned' || s.status === 'duplicate'
           ).length;
+
           return { ...prev, completed_slots: completed };
         });
       } catch (err) {

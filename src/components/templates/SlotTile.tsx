@@ -43,11 +43,11 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
   const getStatusLabel = () => {
     switch (slot.status) {
       case 'missing':
-        return 'Faltante';
+        return 'Falta';
       case 'owned':
-        return 'Tenida';
+        return 'Lo Tengo';
       case 'duplicate':
-        return 'Duplicada';
+        return 'Repe';
       default:
         return slot.status;
     }
@@ -57,11 +57,29 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
     const statusCycle = {
       missing: 'owned',
       owned: 'duplicate',
-      duplicate: 'missing',
+      duplicate: 'owned', // If duplicate count goes to 1, change to owned
     } as const;
 
-    const newStatus = statusCycle[slot.status];
-    const newCount = newStatus === 'duplicate' ? 2 : 0;
+    let newStatus: string;
+    let newCount: number;
+
+    if (slot.status === 'missing') {
+      // Missing -> Owned (count = 1)
+      newStatus = 'owned';
+      newCount = 1;
+    } else if (slot.status === 'owned') {
+      // Owned -> Duplicate (count = 2)
+      newStatus = 'duplicate';
+      newCount = 2;
+    } else if (slot.status === 'duplicate' && localCount > 1) {
+      // Duplicate with count > 1 -> Duplicate with count - 1
+      newStatus = 'duplicate';
+      newCount = localCount - 1;
+    } else {
+      // Duplicate with count = 1 -> Owned
+      newStatus = 'owned';
+      newCount = 1;
+    }
 
     try {
       setUpdating(true);
@@ -76,13 +94,47 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
   };
 
   const handleCountChange = async (delta: number) => {
-    if (slot.status !== 'duplicate') return;
+    let newStatus: string;
+    let newCount: number;
 
-    const newCount = Math.max(1, localCount + delta);
+    if (slot.status === 'missing') {
+      // Missing should never get here, but just in case
+      return;
+    } else if (slot.status === 'owned') {
+      // Owned (count = 1)
+      if (delta > 0) {
+        // Add one -> Duplicate (count = 2)
+        newStatus = 'duplicate';
+        newCount = 2;
+      } else {
+        // Subtract one -> Missing (count = 0)
+        newStatus = 'missing';
+        newCount = 0;
+      }
+    } else if (slot.status === 'duplicate') {
+      // Duplicate (count >= 2)
+      const newTotalCount = localCount + delta;
+
+      if (newTotalCount <= 0) {
+        // Count goes to 0 or less -> Missing
+        newStatus = 'missing';
+        newCount = 0;
+      } else if (newTotalCount === 1) {
+        // Count goes to 1 -> Owned
+        newStatus = 'owned';
+        newCount = 1;
+      } else {
+        // Count is 2 or more -> Duplicate
+        newStatus = 'duplicate';
+        newCount = newTotalCount;
+      }
+    } else {
+      return;
+    }
 
     try {
       setUpdating(true);
-      await onUpdate(slot.slot_id, 'duplicate', newCount);
+      await onUpdate(slot.slot_id, newStatus, newCount);
       setLocalCount(newCount);
     } catch {
       toast.error('Error al actualizar cantidad');
@@ -117,21 +169,26 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
           </Badge>
         </div>
 
-        {/* Count Controls (only for duplicates) */}
-        {slot.status === 'duplicate' && (
+        {/* Count Controls (for owned and duplicates) */}
+        {(slot.status === 'owned' || slot.status === 'duplicate') && (
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-2">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => handleCountChange(-1)}
-                disabled={updating || localCount <= 1}
+                disabled={updating}
                 className="h-6 w-6 p-0"
               >
                 <Minus className="h-3 w-3" />
               </Button>
               <span className="text-white font-bold w-8 text-center">
-                {localCount}
+                {slot.status === 'owned'
+                  ? '1'
+                  : localCount - 1 > 0
+                    ? `${localCount - 1}`
+                    : '1'}{' '}
+                {/* Display 1 for owned or spares count (total - 1) for duplicates */}
               </span>
               <Button
                 size="sm"

@@ -28,9 +28,9 @@ function TemplateProgressContent() {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-xl mb-4">Plantilla no encontrada</p>
+          <p className="text-white text-xl mb-4">Colección no encontrada</p>
           <Link href="/mis-plantillas">
-            <Button>Volver a Mis Plantillas</Button>
+            <Button>Volver a Mis Colecciones</Button>
           </Link>
         </div>
       </div>
@@ -47,7 +47,7 @@ function TemplateProgressContent() {
             className="mb-4 text-gray-400 hover:text-white"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Mis Plantillas
+            Volver a Mis Colecciones
           </Button>
         </Link>
 

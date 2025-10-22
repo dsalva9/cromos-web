@@ -22,6 +22,7 @@ interface Template {
   rating_count: number;
   copies_count: number;
   pages_count: number;
+  total_slots: number;
   created_at: string;
 }
 
@@ -114,7 +115,9 @@ export function TemplateCard({ template }: TemplateCardProps) {
               {/* Pages */}
               <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
-                <span>{template.pages_count} páginas</span>
+                <span>
+                  {template.pages_count} páginas • {template.total_slots} cromos
+                </span>
               </div>
             </div>
 

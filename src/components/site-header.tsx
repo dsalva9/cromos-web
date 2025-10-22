@@ -37,7 +37,7 @@ export default function SiteHeader() {
     { href: '/', label: 'Home' },
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/templates', label: 'Plantillas' },
-    { href: '/mis-plantillas', label: 'Mis Plantillas' },
+    { href: '/mis-plantillas', label: 'Mis Colecciones' },
     { href: '/profile', label: 'Perfil' },
   ];
 

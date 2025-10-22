@@ -119,7 +119,34 @@
 - [x] Create "My Templates" page (/mis-plantillas)
 - [x] Update site navigation to include templates links
 - [x] Spanish localization for all components
-- [ ] Update documentation - Templates UI
+- [x] Update documentation - Templates UI
+
+---
+
+## ✅ Completed - Sprint 8.5: Templates Creation UI
+
+- [x] Create Switch UI component (missing from the UI library)
+- [x] Create template creation wizard page (/templates/create)
+- [x] Create wizard container component with progress indicator
+- [x] Create basic info form component (title, description, image, public/private)
+- [x] Create pages and slots form component (dynamic page/slot management)
+- [x] Create review form component (review and publish confirmation)
+- [x] Create template creation hook with validation and error handling
+- [x] Test complete template creation flow
+- [x] Update documentation - Templates Creation UI
+
+## ✅ Completed - Sprint 8.6: Template Creation and Collection Management Fixes
+
+- [x] Fix scalar array error in add_template_page RPC
+- [x] Fix empty slot validation in template creation
+- [x] Update "Mis Plantillas" to "Mis Colecciones" throughout the application
+- [x] Fix sticker status logic: Falta (0), Lo Tengo (1), Repe (2+)
+- [x] Add +/- buttons for "Lo Tengo" and "Repe" status
+- [x] Fix progress calculation for collections
+- [x] Add sticker count display in templates and collections
+- [x] Make collection cards clickable in "Mis Colecciones" page
+- [x] Fix RPC functions to correctly calculate progress
+- [x] Update documentation for template creation fixes
 
 ---
 
@@ -350,6 +377,6 @@
 
 ---
 
-**Last Updated**: 2025-10-21 (Sprint 8 Complete)
+**Last Updated**: 2025-10-22 (Sprint 8.6 Complete)
 **Current Version**: Backend v1.6.0 | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Ready to begin Sprint 9: Integration UI
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Ready to begin Sprint 9: Integration UI
