@@ -1,8 +1,17 @@
-# CambioCromos v1.6.0-alpha
+# CambioCromos
 
-> **Spanish-language marketplace and community platform for sports cards**
+[![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current State**: Backend migration complete, frontend pending
+> **Marketplace y plataforma de colecciones generadas por usuarios para cromos deportivos**
+
+**Estado Actual**: v1.6.3 - Backend completo, Frontend en progreso
+
+[Ver Demo](https://cambio-cromos.vercel.app) | [Documentación](./docs/) | [Changelog](./CHANGELOG.md) | [Contribuir](./docs/CONTRIBUTING.md)
 
 ---
 

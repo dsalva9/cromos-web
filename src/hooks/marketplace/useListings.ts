@@ -25,6 +25,36 @@ interface UseListingsParams {
   limit?: number;
 }
 
+/**
+ * Hook for fetching and managing marketplace listings with pagination
+ *
+ * @param params - Configuration options for listings
+ * @param params.search - Optional search query to filter listings by title or collection name
+ * @param params.limit - Number of listings per page (default: 20)
+ *
+ * @returns Object containing:
+ * - `listings`: Array of listing objects
+ * - `loading`: Boolean indicating if data is being fetched
+ * - `error`: Error message if fetch failed, null otherwise
+ * - `hasMore`: Boolean indicating if more listings are available
+ * - `loadMore`: Function to load next page of listings
+ * - `refetch`: Function to reload listings from the beginning
+ *
+ * @example
+ * ```tsx
+ * const { listings, loading, loadMore, hasMore } = useListings({
+ *   search: 'Panini',
+ *   limit: 10
+ * });
+ *
+ * return (
+ *   <div>
+ *     {listings.map(listing => <ListingCard key={listing.id} listing={listing} />)}
+ *     {hasMore && <button onClick={loadMore}>Cargar más</button>}
+ *   </div>
+ * );
+ * ```
+ */
 export function useListings({
   search = '',
   limit = 20,

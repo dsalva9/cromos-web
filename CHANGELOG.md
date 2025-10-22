@@ -19,6 +19,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.4] - 2025-01-22 - Performance & Documentation Enhancements
+
+### Added
+
+- **Form Validation**
+  - Installed Zod 4.1 and @hookform/resolvers for runtime validation
+  - Created `marketplace.schemas.ts` with listing validation schemas
+  - Created `template.schemas.ts` with template validation schemas
+  - Added TypeScript type inference from Zod schemas
+
+- **Error Handling**
+  - Created centralized error message constants in `src/lib/constants/errors.ts`
+  - Added success message constants
+  - Added helper functions for error message extraction
+  - Consistent Spanish error messages across the application
+
+- **Documentation**
+  - Created `docs/PERFORMANCE.md` - Bundle analysis, database optimization, and performance monitoring guide
+  - Created `docs/CONTRIBUTING.md` - Comprehensive contribution guidelines with code standards
+  - Created `docs/ARCHITECTURE.md` - System architecture, design patterns, and technical decisions
+  - Created `docs/DEPLOYMENT.md` - Complete deployment guide for Vercel and Supabase
+  - Added JSDoc comments to public APIs in hooks (starting with `useListings`)
+
+- **README Enhancements**
+  - Added tech stack badges (Next.js, TypeScript, React, Supabase, Tailwind)
+  - Added quick links to demo, documentation, and contributing guides
+  - Updated version to v1.6.3
+
+### Changed
+
+- **Code Organization**
+  - Created `src/lib/validations/` directory for Zod schemas
+  - Created `src/lib/constants/` directory for application constants
+  - Improved code documentation with JSDoc comments
+
+### Performance
+
+- **Bundle Analysis**
+  - Documented current bundle metrics (~102 kB first load JS)
+  - Identified optimization opportunities for future sprints
+  - Created performance monitoring checklist
+
+- **Database Performance**
+  - Documented indexed columns and query optimization strategies
+  - Identified critical queries for monitoring
+  - Added recommendations for future database optimizations
+
 ## [1.6.3] - 2025-01-22
 
 ### Fixed
