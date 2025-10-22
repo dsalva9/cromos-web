@@ -145,7 +145,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
               <div>
                 <CardTitle className="text-white">{page.title}</CardTitle>
                 <p className="text-sm text-gray-400">
-                  {page.slots.length} cromos • (
+                  {page.slots.length} cromos · (
                   {page.type === 'team' ? 'Equipo' : 'Especial'})
                 </p>
               </div>
@@ -193,14 +193,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value="special"
-                      id={`special-${pageIndex}`}
-                    />
-                    <Label
-                      htmlFor={`special-${pageIndex}`}
-                      className="text-white"
-                    >
+                    <RadioGroupItem value="special" id={`special-${pageIndex}`} />
+                    <Label htmlFor={`special-${pageIndex}`} className="text-white">
                       Especial
                     </Label>
                   </div>
@@ -224,7 +218,10 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
               </div>
               <div className="space-y-2">
                 {page.slots.map((slot, slotIndex) => (
-                  <div key={slotIndex} className="flex items-center gap-2 group hover:bg-slate-800/30 rounded p-1 transition-all duration-200">
+                  <div
+                    key={slotIndex}
+                    className="flex items-center gap-2 group hover:bg-slate-800/30 rounded p-1 transition-all duration-200"
+                  >
                     <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
                     <Input
                       value={slot.label}

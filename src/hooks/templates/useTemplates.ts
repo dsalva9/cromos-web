@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
@@ -34,12 +34,13 @@ export function useTemplates({
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchTemplates = useCallback(
-    async (isLoadMore = false) => {
+    async (fetchOffset: number, isLoadMore = false) => {
       try {
         setLoading(true);
-        const currentOffset = isLoadMore ? offset : 0;
+        const currentOffset = isLoadMore ? fetchOffset : 0;
 
         // Debug logging
         logger.debug('Fetching templates with params:', {
@@ -86,25 +87,35 @@ export function useTemplates({
         } else {
           setOffset(limit);
         }
-      } catch (err) {
+      } catch (err: unknown) {
+        if (typeof err === 'object' && err !== null && (err as { name?: string }).name === 'AbortError') {
+          return; // ignore aborted fetches
+        }
         setError(err instanceof Error ? err.message : 'Error desconocido');
       } finally {
         setLoading(false);
       }
     },
-    [supabase, search, sortBy, limit, offset]
+    [supabase, search, sortBy, limit]
   );
 
   useEffect(() => {
+    // Debounce initial fetch on search/sort changes
     setOffset(0);
-    fetchTemplates(false);
-  }, [search, sortBy, fetchTemplates]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchTemplates(0, false);
+    }, 250);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search, sortBy, limit, fetchTemplates]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      fetchTemplates(true);
+      fetchTemplates(offset, true);
     }
-  }, [loading, hasMore, fetchTemplates]);
+  }, [loading, hasMore, fetchTemplates, offset]);
 
   return {
     templates,
@@ -112,6 +123,6 @@ export function useTemplates({
     error,
     hasMore,
     loadMore,
-    refetch: () => fetchTemplates(false),
+    refetch: () => fetchTemplates(0, false),
   };
 }

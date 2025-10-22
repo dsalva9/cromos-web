@@ -21,9 +21,7 @@ export const templatePageSchema = z.object({
     .min(1, 'El título de la página es obligatorio')
     .max(100, 'El título no puede exceder 100 caracteres'),
 
-  type: z.enum(['team', 'special'], {
-    errorMap: () => ({ message: 'Tipo de página inválido' }),
-  }),
+  type: z.enum(['team', 'special'], { message: 'Tipo de página inválido' }),
 
   slots: z
     .array(templateSlotSchema)
@@ -84,9 +82,7 @@ export type TemplateBasicInfoData = z.infer<typeof templateBasicInfoSchema>;
  */
 export const templateProgressSchema = z.object({
   slot_id: z.string().uuid('ID de slot inválido'),
-  status: z.enum(['missing', 'owned', 'duplicate'], {
-    errorMap: () => ({ message: 'Estado inválido' }),
-  }),
+  status: z.enum(['missing', 'owned', 'duplicate'], { message: 'Estado inválido' }),
   count: z
     .number()
     .int('La cantidad debe ser un número entero')

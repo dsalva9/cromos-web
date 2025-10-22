@@ -108,6 +108,10 @@ export function getErrorMessage(error: unknown, fallback: string = ERROR_MESSAGE
  * @param code - Error code to check
  * @returns Boolean indicating if error matches the code
  */
-export function isErrorCode(error: any, code: string): boolean {
-  return error?.code === code || error?.status === code;
+export function isErrorCode(error: unknown, code: string): boolean {
+  if (typeof error === 'object' && error !== null) {
+    const e = error as { code?: string; status?: string };
+    return e.code === code || e.status === code;
+  }
+  return false;
 }

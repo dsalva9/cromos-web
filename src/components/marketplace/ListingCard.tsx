@@ -39,7 +39,7 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <Link href={`/marketplace/${listing.id}`}>
+    <Link href={`/marketplace/${listing.id}`} aria-label={`Ver anuncio: ${listing.title}`}>
       <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
         <ModernCardContent className="p-0">
           {/* Image */}
@@ -47,7 +47,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             {listing.image_url ? (
               <Image
                 src={listing.image_url}
-                alt={listing.title}
+                alt={`Imagen del anuncio ${listing.title}`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

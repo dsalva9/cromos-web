@@ -43,9 +43,7 @@ export type ListingFormData = z.infer<typeof listingSchema>;
  * Validation schema for listing status updates
  */
 export const listingStatusSchema = z.object({
-  status: z.enum(['active', 'sold', 'removed'], {
-    errorMap: () => ({ message: 'Estado inválido' }),
-  }),
+  status: z.enum(['active', 'sold', 'removed'], { message: 'Estado inválido' }),
 });
 
 export type ListingStatusData = z.infer<typeof listingStatusSchema>;

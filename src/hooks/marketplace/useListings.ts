@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Listing } from '@/types/v1.6.0';
 
@@ -65,12 +65,13 @@ export function useListings({
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchListings = useCallback(
-    async (isLoadMore = false) => {
+    async (fetchOffset: number, isLoadMore = false) => {
       try {
         setLoading(true);
-        const currentOffset = isLoadMore ? offset : 0;
+        const currentOffset = isLoadMore ? fetchOffset : 0;
 
         const { data, error: rpcError } = await supabase.rpc(
           'list_trade_listings',
@@ -121,19 +122,26 @@ export function useListings({
         setLoading(false);
       }
     },
-    [supabase, search, limit, offset]
+    [supabase, search, limit]
   );
 
   useEffect(() => {
+    // Debounce initial fetch on search change
     setOffset(0);
-    fetchListings(false);
-  }, [search, fetchListings]); // Refetch when search changes
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      fetchListings(0, false);
+    }, 250);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search, limit, fetchListings]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      fetchListings(true);
+      fetchListings(offset, true);
     }
-  }, [loading, hasMore, fetchListings]);
+  }, [loading, hasMore, fetchListings, offset]);
 
   return {
     listings,
@@ -141,6 +149,6 @@ export function useListings({
     error,
     hasMore,
     loadMore,
-    refetch: () => fetchListings(false),
+    refetch: () => fetchListings(0, false),
   };
 }

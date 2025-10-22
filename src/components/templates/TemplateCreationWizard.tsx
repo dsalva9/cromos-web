@@ -1,12 +1,17 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TemplateBasicInfoForm } from './TemplateBasicInfoForm';
 import { TemplatePagesForm } from './TemplatePagesForm';
 import { TemplateReviewForm } from './TemplateReviewForm';
 import { ChevronLeft, ChevronRight, Check, CheckCircle } from 'lucide-react';
+import {
+  templateBasicInfoSchema,
+  templatePageSchema,
+  type TemplateBasicInfoData,
+} from '@/lib/validations/template.schemas';
 
 interface TemplateData {
   title: string;
@@ -33,6 +38,9 @@ export function TemplateCreationWizard({
   isSubmitting,
 }: TemplateCreationWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [attempted, setAttempted] = useState<{ basic: boolean; pages: boolean }>(
+    { basic: false, pages: false }
+  );
   const [templateData, setTemplateData] = useState<TemplateData>({
     title: '',
     description: '',
@@ -41,7 +49,7 @@ export function TemplateCreationWizard({
     pages: [],
   });
 
-  const steps = [
+    const steps = [
     { title: 'Información Básica', description: 'Título y descripción' },
     { title: 'Páginas y Cromos', description: 'Añade páginas y cromos' },
     { title: 'Revisión', description: 'Revisa y publica' },
@@ -52,6 +60,9 @@ export function TemplateCreationWizard({
   };
 
   const handleNext = () => {
+    if (currentStep === 0) setAttempted(prev => ({ ...prev, basic: true }));
+    if (currentStep === 1) setAttempted(prev => ({ ...prev, pages: true }));
+    if (!canGoNext()) return;
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -64,23 +75,37 @@ export function TemplateCreationWizard({
   };
 
   const handleSubmit = async () => {
+    setAttempted({ basic: true, pages: true });
     await onSubmit(templateData);
   };
+
+  const basicInfoErrors = useMemo(() => {
+    const result = templateBasicInfoSchema.safeParse({
+      title: templateData.title,
+      description: templateData.description,
+      image_url: templateData.image_url,
+      is_public: templateData.is_public,
+    });
+    if (result.success) return {} as Partial<Record<keyof TemplateBasicInfoData, string>>;
+    const errors: Partial<Record<keyof TemplateBasicInfoData, string>> = {};
+    for (const issue of result.error.issues) {
+      const path = issue.path?.[0] as keyof TemplateBasicInfoData | undefined;
+      if (path) errors[path] = issue.message;
+    }
+    return errors;
+  }, [templateData.title, templateData.description, templateData.image_url, templateData.is_public]);
+
+  const pagesStepValid = useMemo(() => {
+    if (!templateData.pages || templateData.pages.length === 0) return false;
+    return templateData.pages.every(page => templatePageSchema.safeParse(page).success);
+  }, [templateData.pages]);
 
   const canGoNext = () => {
     switch (currentStep) {
       case 0:
-        return templateData.title.trim() !== '';
+        return Object.keys(basicInfoErrors).length === 0;
       case 1:
-        // Check if there's at least one valid page with at least one non-empty slot
-        return (
-          templateData.pages.length > 0 &&
-          templateData.pages.some(
-            page =>
-              page.title.trim() !== '' &&
-              page.slots.some(slot => slot.label && slot.label.trim() !== '')
-          )
-        );
+        return pagesStepValid;
       case 2:
         return true;
       default:
@@ -132,9 +157,7 @@ export function TemplateCreationWizard({
                   >
                     {step.title}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    {step.description}
-                  </p>
+                  <p className="text-xs text-slate-400 mt-1">{step.description}</p>
                 </div>
               </div>
 
@@ -173,10 +196,29 @@ export function TemplateCreationWizard({
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Validation summary */}
+          {currentStep === 0 && attempted.basic && Object.keys(basicInfoErrors).length > 0 && (
+            <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
+              <p className="font-semibold mb-1">Por favor corrige los siguientes errores:</p>
+              <ul className="list-disc pl-5">
+                {Object.entries(basicInfoErrors).map(([field, msg]) => (
+                  <li key={field}>{msg}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {currentStep === 1 && attempted.pages && !pagesStepValid && (
+            <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
+              <p className="font-semibold">Revisa las páginas:</p>
+              <p>• Cada página necesita título válido y al menos un cromo con etiqueta.</p>
+              <p>• Un máximo de 50 cromos por página.</p>
+            </div>
+          )}
           {currentStep === 0 && (
             <TemplateBasicInfoForm
               data={templateData}
               onChange={updateTemplateData}
+              errors={attempted.basic ? basicInfoErrors : undefined}
             />
           )}
           {currentStep === 1 && (
