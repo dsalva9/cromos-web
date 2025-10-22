@@ -54,12 +54,6 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
   };
 
   const handleStatusClick = async () => {
-    const statusCycle = {
-      missing: 'owned',
-      owned: 'duplicate',
-      duplicate: 'owned', // If duplicate count goes to 1, change to owned
-    } as const;
-
     let newStatus: string;
     let newCount: number;
 

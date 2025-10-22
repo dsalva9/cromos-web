@@ -6,6 +6,8 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import Image from 'next/image';
+import { logger } from '@/lib/logger';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -60,7 +62,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       onChange(publicUrl);
       toast.success('Imagen subida con éxito');
     } catch (error) {
-      console.error('Upload error:', error);
+      logger.error('Upload error:', error);
       toast.error('Error al subir la imagen');
     } finally {
       setUploading(false);
@@ -78,10 +80,12 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
           <ModernCard>
             <ModernCardContent className="p-0">
               <div className="relative aspect-square bg-[#374151]">
-                <img
+                <Image
                   src={value}
                   alt="Listing preview"
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover"
                 />
                 <Button
                   size="sm"

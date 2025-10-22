@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface TemplateSlotData {
   label: string;
@@ -70,7 +71,7 @@ export function useCreateTemplate() {
       );
 
       if (templateError) {
-        console.error('Template creation error:', templateError);
+        logger.error('Template creation error:', templateError);
         throw new Error(templateError.message || 'Error al crear la plantilla');
       }
 
@@ -82,14 +83,14 @@ export function useCreateTemplate() {
         const slotsArray = Array.isArray(page.slots) ? page.slots : [];
         const slotsJson = JSON.stringify(slotsArray);
 
-        console.log('Sending slots data:', {
+        logger.debug('Sending slots data:', {
           page: page.title,
           slotsCount: slotsArray.length,
           slotsArray,
           slotsJson,
         });
 
-        const { data: pageData, error: pageError } = await supabase.rpc(
+        const { error: pageError } = await supabase.rpc(
           'add_template_page_v2', // Use the new RPC with better JSON handling
           {
             p_template_id: templateId,
@@ -100,9 +101,9 @@ export function useCreateTemplate() {
         );
 
         if (pageError) {
-          console.error('Page creation error:', pageError);
-          console.error('Slots data that caused error:', slotsArray);
-          console.error('Slots JSON that caused error:', slotsJson);
+          logger.error('Page creation error:', pageError);
+          logger.error('Slots data that caused error:', slotsArray);
+          logger.error('Slots JSON that caused error:', slotsJson);
           throw new Error(
             pageError.message || `Error al añadir la página "${page.title}"`
           );
@@ -116,7 +117,7 @@ export function useCreateTemplate() {
       });
 
       if (publishError) {
-        console.error('Publish error:', publishError);
+        logger.error('Publish error:', publishError);
         throw new Error(
           publishError.message || 'Error al publicar la plantilla'
         );

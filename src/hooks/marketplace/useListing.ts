@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Listing } from '@/types/v1.6.0';
+import { logger } from '@/lib/logger';
 
 export function useListing(listingId: string) {
   const supabase = useSupabaseClient();
@@ -8,11 +9,7 @@ export function useListing(listingId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchListing();
-  }, [listingId]);
-
-  const fetchListing = async () => {
+  const fetchListing = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -56,7 +53,11 @@ export function useListing(listingId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, listingId]);
+
+  useEffect(() => {
+    fetchListing();
+  }, [fetchListing]);
 
   const incrementViews = useCallback(async () => {
     try {
@@ -70,7 +71,7 @@ export function useListing(listingId: string) {
         prev ? { ...prev, views_count: prev.views_count + 1 } : null
       );
     } catch (err) {
-      console.error('Failed to increment views:', err);
+      logger.error('Failed to increment views:', err);
     }
   }, [supabase, listingId, listing?.views_count]);
 

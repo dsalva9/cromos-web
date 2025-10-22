@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Check, X, Copy as CopyIcon } from 'lucide-react';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/lib/logger';
 
 interface TemplateCopy {
   copy_id: string;
@@ -32,8 +33,8 @@ function MyTemplatesContent() {
     const fetchCopies = async () => {
       try {
         setLoading(true);
-        console.log('Fetching template copies...');
-        console.log('Current user:', await supabase.auth.getUser());
+        logger.debug('Fetching template copies...');
+        logger.debug('Current user:', await supabase.auth.getUser());
 
         // Fixed: Simplified RPC calls to use only the canonical function (get_my_template_copies)
         // Database schema confirms this is the only existing RPC function for this purpose
@@ -43,10 +44,10 @@ function MyTemplatesContent() {
           'get_my_template_copies'
         );
 
-        console.log('RPC response:', { data, error: rpcError });
+        logger.debug('RPC response:', { data, error: rpcError });
 
         if (rpcError) {
-          console.error('RPC Error details:', rpcError);
+          logger.error('RPC Error details:', rpcError);
           throw rpcError;
         }
 
@@ -68,7 +69,7 @@ function MyTemplatesContent() {
 
         setCopies(updatedCopies);
       } catch (err) {
-        console.error('Error fetching template copies:', err);
+        logger.error('Error fetching template copies:', err);
         setError(err instanceof Error ? err.message : 'Error desconocido');
       } finally {
         setLoading(false);

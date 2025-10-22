@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface Template {
   id: string;
@@ -12,6 +13,7 @@ interface Template {
   rating_count: number;
   copies_count: number;
   pages_count: number;
+  total_slots: number;
   created_at: string;
 }
 
@@ -40,7 +42,7 @@ export function useTemplates({
         const currentOffset = isLoadMore ? offset : 0;
 
         // Debug logging
-        console.log('Fetching templates with params:', {
+        logger.debug('Fetching templates with params:', {
           p_limit: parseInt(limit.toString()),
           p_offset: parseInt(currentOffset.toString()),
           p_search: search || null,
@@ -58,11 +60,11 @@ export function useTemplates({
         );
 
         // Debug logging
-        console.log('RPC response:', { data, error: rpcError });
+        logger.debug('RPC response:', { data, error: rpcError });
 
         if (rpcError) {
           // Handle RPC errors gracefully and display actual error message
-          console.error('RPC Error:', rpcError);
+          logger.error('RPC Error:', rpcError);
           setTemplates([]);
           setHasMore(false);
           // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
@@ -96,7 +98,7 @@ export function useTemplates({
   useEffect(() => {
     setOffset(0);
     fetchTemplates(false);
-  }, [search, sortBy]);
+  }, [search, sortBy, fetchTemplates]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

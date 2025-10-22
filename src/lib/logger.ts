@@ -5,10 +5,13 @@
  * - logger.debug(...) - Development only, for verbose debugging
  * - logger.info(...) - Development only, for informational messages
  * - logger.warn(...) - Always logs, for warnings
- * - logger.error(...) - Always logs, for errors (TODO: send to error tracking service)
+ * - logger.error(...) - Always logs, for errors (sends to Sentry in production)
  */
 
+import * as Sentry from '@sentry/nextjs';
+
 const isDev = process.env.NODE_ENV === 'development';
+const isSentryEnabled = !isDev && !!process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 export const logger = {
   /**
@@ -37,15 +40,36 @@ export const logger = {
    */
   warn: (...args: unknown[]) => {
     console.warn('[WARN]', ...args);
+
+    // Send warnings to Sentry in production
+    if (isSentryEnabled) {
+      Sentry.captureMessage(String(args[0]), 'warning');
+    }
   },
 
   /**
    * Error-level logging (always logs)
    * Use for errors and exceptions
-   * TODO v1.5.1: Send to error tracking service (Sentry, etc.)
+   * Automatically sends to Sentry in production
    */
   error: (...args: unknown[]) => {
     console.error('[ERROR]', ...args);
-    // TODO v1.5.1: Send to error tracking service
+
+    // Send errors to Sentry in production
+    if (isSentryEnabled) {
+      const firstArg = args[0];
+      if (firstArg instanceof Error) {
+        Sentry.captureException(firstArg);
+      } else {
+        Sentry.captureException(new Error(String(firstArg)));
+      }
+
+      // Add additional context if provided
+      if (args.length > 1) {
+        Sentry.setContext('additional_info', {
+          details: args.slice(1),
+        });
+      }
+    }
   },
 };

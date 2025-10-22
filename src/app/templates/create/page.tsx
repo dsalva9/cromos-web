@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
+import { logger } from '@/lib/logger';
 
 interface TemplateData {
   title: string;
@@ -35,7 +36,7 @@ export default function CreateTemplatePage() {
       router.push('/templates?created=true');
     } catch (error) {
       // Error is already handled in the hook
-      console.error('Error in template creation page:', error);
+      logger.error('Error in template creation page:', error);
     }
   };
 

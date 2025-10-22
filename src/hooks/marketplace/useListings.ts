@@ -97,7 +97,7 @@ export function useListings({
   useEffect(() => {
     setOffset(0);
     fetchListings(false);
-  }, [search]); // Refetch when search changes
+  }, [search, fetchListings]); // Refetch when search changes
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

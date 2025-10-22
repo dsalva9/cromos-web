@@ -19,6 +19,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TBD
 
+## [1.6.3] - 2025-01-22
+
+### Fixed
+
+- **Fixed all ESLint warnings (11 total)**
+  - Fixed React Hook dependencies in 4 files (marketplace pages and template hooks)
+  - Wrapped `fetchListing` in `useCallback` to stabilize reference in `useListing.ts:13`
+  - Added `fetchListings` to dependencies array in `useListings.ts:100`
+  - Added `fetchTemplates` to dependencies array in `useTemplates.ts:98`
+  - Added `incrementViews` to dependencies array in marketplace detail page
+  - Removed 4 unused variables across marketplace and template files
+  - Removed unused `useState` imports from create and edit listing pages
+  - Removed unused `refetch` variable from edit listing page
+  - Removed unused `statusCycle` variable from `SlotTile.tsx:57`
+  - Removed unused `pageData` variable from `useCreateTemplate.ts:92`
+
+- **Optimized images with Next.js Image component (3 warnings)**
+  - Replaced `<img>` tags with Next.js `<Image>` component in `ImageUpload.tsx:81`
+  - Replaced `<img>` tags with Next.js `<Image>` component in `TemplateBasicInfoForm.tsx:89`
+  - Replaced `<img>` tags with Next.js `<Image>` component in `TemplateReviewForm.tsx:119`
+  - Added proper `fill`, `sizes`, and `alt` attributes for automatic optimization
+
+- **Replaced console logging with logger utility (33 instances)**
+  - Replaced all `console.error()` calls with `logger.error()` across 12 files
+  - Replaced debug `console.log()` calls with `logger.debug()` in template hooks
+  - Replaced `console.warn()` calls with `logger.warn()` in localStorage hook
+  - Added logger import to all affected files
+
+### Added
+
+- **Integrated Sentry error tracking service**
+  - Installed `@sentry/nextjs` package
+  - Created Sentry configuration files (`sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`)
+  - Updated logger utility to send errors to Sentry in production
+  - Added `NEXT_PUBLIC_SENTRY_DSN` environment variable to `.env.example`
+  - Configured automatic error reporting with replay integration
+
+- **Reorganized repository structure**
+  - Created `scripts/` directory
+  - Moved SQL files (`clear_user_trades.sql`, `load_collection.sql`) to `scripts/`
+  - Created `tests/` directory
+  - Moved test files (`mi-coleccion-images.spec.ts`) to `tests/`
+
+- **Comprehensive environment variables documentation**
+  - Added detailed "Environment Variables" section to README.md
+  - Documented required vs optional variables
+  - Added instructions for obtaining Supabase credentials
+  - Explained environment file structure (`.env.local` vs `.env.production`)
+
+- **Type generation script**
+  - Created `scripts/generate-types.sh` for generating TypeScript types from Supabase
+  - Added `generate-types` npm script to package.json
+  - Updated README.md with type generation documentation
+
+- **Testing documentation**
+  - Created `docs/TESTING.md` with comprehensive testing guide
+  - Documented Playwright test patterns and best practices
+  - Added CI/CD integration examples
+  - Included debugging and troubleshooting tips
+
+- **Development scripts**
+  - Added `lint:fix` script for automatic linting fixes
+  - Added `test:e2e:ui` script for interactive test UI
+  - Added `test:e2e:report` script for generating test reports
+
+### Changed
+
+- **Consolidated documentation**
+  - Archived redundant component guide files to `docs/archive/`
+  - Kept `docs/components-guide.md` as the single source of truth
+  - Updated README.md with new "Development Scripts" section
+  - Enhanced README.md with testing documentation reference
+
 ## [1.6.2] - 2025-01-22
 
 ### Fixed

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useListing } from '@/hooks/marketplace/useListing';
 import { useUpdateListing } from '@/hooks/marketplace/useUpdateListing';
@@ -12,13 +11,14 @@ import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { CreateListingForm } from '@/types/v1.6.0';
+import { logger } from '@/lib/logger';
 
 function EditListingContent() {
   const params = useParams();
   const router = useRouter();
   const { user } = useUser();
   const listingId = params.id as string;
-  const { listing, loading, error, refetch } = useListing(listingId);
+  const { listing, loading, error } = useListing(listingId);
   const { updateListing, loading: saving } = useUpdateListing();
 
   const handleSubmit = async (data: CreateListingForm) => {
@@ -27,7 +27,7 @@ function EditListingContent() {
       toast.success('¡Anuncio actualizado con éxito!');
       router.push(`/marketplace/${listingId}`);
     } catch (error) {
-      console.error('Update listing error:', error);
+      logger.error('Update listing error:', error);
       toast.error(
         error instanceof Error
           ? error.message

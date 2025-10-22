@@ -240,11 +240,8 @@ For complete API documentation, see [docs/api-endpoints.md](docs/api-endpoints.m
    - Set up storage buckets for images
 
 4. **Configure environment variables**
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   ```
+
+   See the [Environment Variables](#-environment-variables) section below for detailed configuration.
 
 ### Database Migration
 
@@ -292,6 +289,46 @@ VALUES ('avatars', 'avatars', true, 2097152, ARRAY['image/jpeg', 'image/png', 'i
 
 ---
 
+## 🌍 Environment Variables
+
+CambioCromos uses environment variables for configuration. Copy `.env.example` to `.env.local` for development.
+
+### Required Variables
+
+```bash
+# Supabase Configuration (Required)
+# Get these from your Supabase project dashboard (Settings > API)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+```
+
+**Where to find Supabase credentials:**
+1. Go to your Supabase project dashboard
+2. Navigate to Settings > API
+3. Copy the Project URL and anon/public key
+
+### Optional Variables
+
+```bash
+# Error Tracking (Optional - Production)
+# Sign up at https://sentry.io to get your DSN
+NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn-here
+
+# Environment
+NODE_ENV=development  # Use "production" for production builds
+```
+
+### Environment Files
+
+- **`.env.local`**: Local development (not committed to git)
+- **`.env.production`**: Production environment variables (on Vercel)
+- **`.env.example`**: Template file with all available variables
+
+**Note:** Never commit `.env.local` or any file containing real credentials to version control.
+
+---
+
 ## 💻 Development
 
 ### Local Development
@@ -305,24 +342,49 @@ VALUES ('avatars', 'avatars', true, 2097152, ARRAY['image/jpeg', 'image/png', 'i
 2. **View the application**
    Open [http://localhost:3000](http://localhost:3000)
 
+### Development Scripts
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Run linter
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+
+# Generate TypeScript types from Supabase
+npm run generate-types
+```
+
 ### Code Style
 
 - **ESLint**: Follows Next.js recommended configuration
 - **Prettier**: Standardized code formatting
 - **TypeScript**: Strict type checking enabled
+- **Logger**: Use `logger` utility instead of `console.log` for production-safe logging
 
 ### Testing
 
 ```bash
-# Run tests
-npm test
+# Run Playwright E2E tests
+npm run test:e2e
 
-# Run tests in watch mode
-npm run test:watch
+# Run Playwright tests in UI mode
+npm run test:e2e:ui
 
-# Run tests with coverage
-npm run test:coverage
+# Generate test report
+npm run test:e2e:report
 ```
+
+For more details on testing, see [docs/TESTING.md](docs/TESTING.md).
 
 ---
 

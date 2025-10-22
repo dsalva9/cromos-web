@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
+import Image from 'next/image';
 
 interface TemplateBasicInfoFormProps {
   data: {
@@ -85,11 +86,13 @@ export function TemplateBasicInfoForm({
       <div className="space-y-2">
         <Label>Imagen de la Plantilla</Label>
         {imagePreview ? (
-          <div className="relative">
-            <img
+          <div className="relative h-48 w-full">
+            <Image
               src={imagePreview}
               alt="Template preview"
-              className="w-full h-48 object-cover rounded-md"
+              fill
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="object-cover rounded-md"
             />
             <Button
               type="button"

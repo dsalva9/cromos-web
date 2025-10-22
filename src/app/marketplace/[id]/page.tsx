@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { User, MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -22,10 +23,11 @@ export default function ListingDetailPage() {
     useListing(listingId);
 
   useEffect(() => {
-    if (listing && user?.id !== listing.user_id) {
+    if (listing && user?.id && user.id !== listing.user_id) {
       incrementViews();
     }
-  }, [listing?.id, user?.id]); // Only depend on IDs, not the entire objects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listing?.id, user?.id]); // Only run when listing or user ID changes, incrementViews is stable
 
   const handleDelete = async () => {
     if (!confirm('¿Estás seguro de que quieres eliminar este anuncio?')) return;
@@ -35,7 +37,7 @@ export default function ListingDetailPage() {
       toast.success('Anuncio eliminado con éxito');
       router.push('/marketplace');
     } catch (error) {
-      console.error('Delete error:', error);
+      logger.error('Delete error:', error);
       toast.error('Error al eliminar el anuncio');
     }
   };

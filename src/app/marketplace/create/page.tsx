@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ListingForm } from '@/components/marketplace/ListingForm';
 import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
 import { CreateListingForm } from '@/types/v1.6.0';
+import { logger } from '@/lib/logger';
 
 function CreateListingContent() {
   const router = useRouter();
@@ -18,7 +18,7 @@ function CreateListingContent() {
       toast.success('¡Anuncio publicado con éxito!');
       router.push(`/marketplace/${listingId}`);
     } catch (error) {
-      console.error('Create listing error:', error);
+      logger.error('Create listing error:', error);
       toast.error(
         error instanceof Error ? error.message : 'Error al crear el anuncio'
       );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface TemplateCopy {
   copy_id: string;
@@ -41,7 +42,7 @@ export function useTemplateProgress(copyId: string) {
 
       if (copyError) {
         // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
-        console.error('RPC Error fetching template copies:', copyError);
+        logger.error('RPC Error fetching template copies:', copyError);
         setError(
           copyError.message || 'Error al cargar las copias de plantillas. Por favor, intenta de nuevo.'
         );
@@ -65,7 +66,7 @@ export function useTemplateProgress(copyId: string) {
 
       if (progressError) {
         // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
-        console.error('RPC Error fetching template progress:', progressError);
+        logger.error('RPC Error fetching template progress:', progressError);
         setError(
           progressError.message || 'Error al cargar el progreso de la plantilla. Por favor, intenta de nuevo.'
         );

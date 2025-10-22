@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, EyeOff, FileText, Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface TemplateSlotData {
   label: string;
@@ -116,11 +117,15 @@ export function TemplateReviewForm({
           {data.image_url && (
             <div className="space-y-2">
               <Label>Imagen</Label>
-              <img
-                src={data.image_url}
-                alt="Template preview"
-                className="w-full h-48 object-cover rounded-md"
-              />
+              <div className="relative h-48 w-full">
+                <Image
+                  src={data.image_url}
+                  alt="Template preview"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover rounded-md"
+                />
+              </div>
             </div>
           )}
 
