@@ -2,9 +2,14 @@
   "buildCommand": "npm run build",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
   "framework": "nextjs",
-  "installCommand": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install",
+  "installCommand": "npm install --legacy-peer-deps",
   "devCommand": "npm run dev",
   "outputDirectory": ".next",
+  "build": {
+    "env": {
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1"
+    }
+  },
   "github": {
     "silent": true
   }

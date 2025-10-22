@@ -351,6 +351,7 @@ We welcome contributions! Please follow our contributing guidelines:
 - [API Endpoints](docs/api-endpoints.md)
 - [Current Features](docs/current-features.md)
 - [UI Improvements Sprint](docs/ui-improvements-sprint.md)
+- [Bug Fixes: Navbar & Vercel](docs/bugfixes-navbar-vercel.md)
 - [Change Log](CHANGELOG.md)
 - [TODO List](TODO.md)
 

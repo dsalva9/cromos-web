@@ -95,7 +95,7 @@ export default function SiteHeader() {
   }, [user, supabase]);
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-900 border-b-2 border-black shadow-xl">
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-gray-900 border-b-2 border-black shadow-xl">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link

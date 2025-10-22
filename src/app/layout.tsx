@@ -44,7 +44,7 @@ export default function RootLayout({
               Skip to content
             </a>
             <SiteHeader />
-            <main id="main" className="min-h-screen">
+            <main id="main" className="min-h-screen pt-16">
               {children}
             </main>
             <footer className="border-t">
