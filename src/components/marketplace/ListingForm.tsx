@@ -114,7 +114,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
           {/* Sticker Number */}
           <div className="space-y-2">
-            <Label htmlFor="sticker">NAï¿½ï¿½ï¿½mero del Cromo (Opcional)</Label>
+            <Label htmlFor="sticker">Número del Cromo (Opcional)</Label>
             <Input
               id="sticker"
               aria-invalid={!!errors.sticker_number}
