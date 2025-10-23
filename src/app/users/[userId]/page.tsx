@@ -265,7 +265,7 @@ export default function UserProfilePage() {
   };
 
   const renderStatCard = (
-    icon: JSX.Element,
+    icon: React.ReactElement,
     value: number | string,
     label: string,
     href?: string
