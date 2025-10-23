@@ -17,10 +17,10 @@ function FavoritesContent() {
   const handleRemove = async (userId: string) => {
     try {
       await toggleFavorite(userId);
-      toast.success('Removed from favorites');
+      toast.success('Favorito eliminado');
       refetch();
     } catch {
-      toast.error('Failed to remove favorite');
+      toast.error('No se pudo eliminar el favorito');
     }
   };
 
@@ -38,10 +38,10 @@ function FavoritesContent() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-black uppercase text-white mb-2">
-            My Favorites
+            Mis favoritos
           </h1>
           <p className="text-gray-400">
-            Users you&apos;re following
+            Usuarios que sigues
           </p>
         </div>
 
@@ -50,14 +50,14 @@ function FavoritesContent() {
           <div className="text-center py-16">
             <Heart className="h-16 w-16 mx-auto mb-4 text-gray-600" />
             <p className="text-gray-400 text-lg mb-4">
-              No favorites yet
+              Todavia no tienes favoritos
             </p>
             <p className="text-gray-500 text-sm mb-6">
-              Visit user profiles and add them to your favorites to see their listings here
+              Visita perfiles de usuarios y agregalos a tus favoritos para ver sus publicaciones aqui
             </p>
             <Link href="/marketplace">
               <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
-                Explore Marketplace
+                Explorar el marketplace
               </Button>
             </Link>
           </div>
@@ -111,7 +111,7 @@ function FavoritesContent() {
                   <div className="flex gap-2 w-full">
                     <Link href={`/users/${favorite.favorite_user_id}`} className="flex-1">
                       <Button variant="outline" className="w-full">
-                        View Profile
+                        Ver perfil
                       </Button>
                     </Link>
                     <Button
@@ -125,7 +125,7 @@ function FavoritesContent() {
 
                   {/* Added Date */}
                   <p className="text-xs text-gray-500">
-                    Added {new Date(favorite.created_at).toLocaleDateString()}
+                    Agregado el {new Date(favorite.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </ModernCardContent>

@@ -51,9 +51,9 @@ export function FavoriteButton({ userId, onFavoriteDelta }: FavoriteButtonProps)
       }
 
       if (isNowFavorited) {
-        toast.success('Added to favorites');
+        toast.success('Agregado a favoritos');
       } else {
-        toast.success('Removed from favorites');
+        toast.success('Eliminado de favoritos');
       }
     } catch (error) {
       // Revert on error
@@ -62,7 +62,7 @@ export function FavoriteButton({ userId, onFavoriteDelta }: FavoriteButtonProps)
         onFavoriteDelta(-(optimistic ? 1 : -1));
       }
       console.error('Favorite toggle error:', error);
-      toast.error('Failed to update favorite');
+      toast.error('No se pudo actualizar el favorito');
     }
   };
 
@@ -70,7 +70,7 @@ export function FavoriteButton({ userId, onFavoriteDelta }: FavoriteButtonProps)
     return (
       <Button variant="outline" disabled>
         <Heart className="mr-2 h-4 w-4" />
-        Loading...
+        Cargando...
       </Button>
     );
   }
@@ -85,7 +85,7 @@ export function FavoriteButton({ userId, onFavoriteDelta }: FavoriteButtonProps)
       <Heart
         className={`mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`}
       />
-      {favorited ? 'Favorited' : 'Add Favorite'}
+      {favorited ? 'En favoritos' : 'Agregar a favoritos'}
     </Button>
   );
 }
