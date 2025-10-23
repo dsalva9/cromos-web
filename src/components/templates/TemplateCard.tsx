@@ -63,7 +63,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
   return (
     <Link href={`/templates/${template.id}`} aria-label={`Ver plantilla: ${template.title}`}>
       <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
-        <ModernCardContent className="p-0">
+        <ModernCardContent className="p-0 flex flex-col h-full">
           {/* Image */}
           <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800">
             {template.image_url ? (
@@ -82,10 +82,11 @@ export function TemplateCard({ template }: TemplateCardProps) {
           </div>
 
           {/* Content */}
-          <div className="p-4 space-y-3">
-            <h3 className="font-bold text-white text-lg line-clamp-2">
-              {template.title}
-            </h3>
+          <div className="p-4 flex flex-col h-full">
+            <div className="flex-grow space-y-3">
+              <h3 className="font-bold text-white text-lg line-clamp-2">
+                {template.title}
+              </h3>
 
             {template.description && (
               <p className="text-sm text-slate-400 line-clamp-2">
@@ -110,7 +111,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
               <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>
-                  {template.pages_count} páginas · {template.total_slots} cromos
+                  {template.pages_count} páginas - {template.total_slots} cromos
                 </span>
               </div>
             </div>
@@ -125,28 +126,29 @@ export function TemplateCard({ template }: TemplateCardProps) {
                 </span>
               </div>
             </div>
-
-            <Button
-              onClick={handleCopy}
-              disabled={loading || copied}
-              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
-              size="sm"
-            >
-              {copied ? (
-                <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  ¡Copiada!
-                </>
-              ) : loading ? (
-                'Copiando...'
-              ) : (
-                <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copiar Plantilla
-                </>
-              )}
-            </Button>
           </div>
+
+          <Button
+            onClick={handleCopy}
+            disabled={loading || copied}
+            className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+            size="sm"
+          >
+            {copied ? (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                ¡Copiada!
+              </>
+            ) : loading ? (
+              'Copiando...'
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar Plantilla
+              </>
+            )}
+          </Button>
+            </div>
         </ModernCardContent>
       </ModernCard>
     </Link>

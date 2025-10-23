@@ -8,7 +8,9 @@
       "Bash(npm install:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Read(//c/Users/David/Pictures/Screenshots/**)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []
