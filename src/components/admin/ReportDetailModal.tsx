@@ -125,7 +125,7 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
                   <span className="text-gray-400">Email:</span> {content.email}
                 </p>
                 <p className="text-gray-300">
-                  <span className="text-gray-400">Rating:</span> {content.rating_avg?.toFixed(1) || '0.0'} ⭐
+                  <span className="text-gray-400">Rating:</span> {typeof content.rating_avg === 'number' ? content.rating_avg.toFixed(1) : '0.0'} ⭐
                 </p>
                 {content.is_suspended && (
                   <Badge className="bg-red-600 text-white">Suspended</Badge>
@@ -159,7 +159,7 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
                   <span className="text-gray-400">Author:</span> {content.author_nickname}
                 </p>
                 <p className="text-gray-300">
-                  <span className="text-gray-400">Rating:</span> {content.rating_avg?.toFixed(1) || '0.0'} ⭐
+                  <span className="text-gray-400">Rating:</span> {typeof content.rating_avg === 'number' ? content.rating_avg.toFixed(1) : '0.0'} ⭐
                 </p>
                 <p className="text-gray-300">
                   <span className="text-gray-400">Public:</span> {content.is_public ? 'Yes' : 'No'}
@@ -187,7 +187,7 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
                 </div>
                 <div>
                   <p className="text-gray-400">Rating Average</p>
-                  <p className="text-white font-bold">{history.rating_avg?.toFixed(1) || '0.0'}</p>
+                  <p className="text-white font-bold">{history.rating_avg && typeof history.rating_avg === 'number' ? history.rating_avg.toFixed(1) : '0.0'}</p>
                 </div>
               </div>
             </div>
