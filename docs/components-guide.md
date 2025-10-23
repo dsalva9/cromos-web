@@ -1642,6 +1642,68 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 
 ---
 
+#### User Search Page
+
+**File**: `src/app/admin/users/page.tsx`
+
+**Purpose:** Search and manage platform users
+
+**Features:**
+- Debounced search input (500ms delay)
+- Search by nickname or email
+- Status filter dropdown (all/active/suspended)
+- User cards showing:
+  - Avatar with fallback
+  - Nickname and email
+  - Admin/Suspended badges
+  - Rating with star count
+  - Active listings count
+  - Reports received count
+  - Join date
+- View Profile link
+- Suspend/Unsuspend buttons (disabled for admins)
+- Reason prompt for actions
+- Warning indicator for users with reports
+- Empty state for no results
+- Protected by AdminGuard
+
+**Hooks:**
+- `useUserSearch` - Searches users with filters, calls `search_users_admin` RPC
+- `useSuspendUser` - Suspend/unsuspend actions
+
+---
+
+#### Audit Log Viewer
+
+**File**: `src/app/admin/audit/page.tsx`
+
+**Purpose:** View complete history of admin moderation actions
+
+**Features:**
+- Timeline view of audit entries
+- Filter by action type dropdown
+- Color-coded action badges:
+  - Suspend User (red)
+  - Unsuspend User (green)
+  - Remove Content (orange)
+  - Dismiss Report (gray)
+- Each entry shows:
+  - Action icon
+  - Admin who performed action
+  - Timestamp
+  - Target type and ID
+  - Reason (in gray box)
+  - Expandable metadata viewer
+- Infinite scroll pagination (20 per page)
+- "Load More" button
+- Empty state for no logs
+- Protected by AdminGuard
+
+**Hook:**
+- `useAuditLog` - Fetches audit logs from `admin_actions` table with pagination
+
+---
+
 #### Old Admin Components (Legacy - Pre-Sprint 11)
 
 **File**: `src/app/admin/page.tsx` (OLD - may be deprecated)

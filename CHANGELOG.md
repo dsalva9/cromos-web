@@ -9,40 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Admin UI - Phase 1 (Sprint 11 - Partial)**
-  - Admin Dashboard (`/admin/dashboard`)
-    - 8 real-time statistics cards (users, reports, listings, templates, trades, admin actions)
-    - Color-coded metrics with icons
-    - Suspended users alert banner
-    - Responsive grid layout
-  - Reports Queue (`/admin/reports`)
-    - List of pending reports with filters
-    - Color-coded entity type badges (user, listing, template, chat)
-    - Reason badges and reporter info
-    - "Review Report" button opens detail modal
-    - Empty state for when queue is clear
-  - Report Detail Modal
-    - Full report context display
-    - Entity-specific information (user details, listing info, template info)
-    - User history section for moderation context
-    - Three moderation actions: Dismiss, Remove Content, Suspend User
-    - Required admin notes with validation
-    - Confirmation prompts for destructive actions
-    - Loading states and toast notifications
-  - Admin Navigation Layout
-    - Tab-based navigation (Dashboard, Reports, Users, Audit)
-    - Active tab highlighting
-    - Admin link in site header (visible only to admins)
-    - Shared layout for all admin pages
+- **Admin UI (Sprint 11 - COMPLETE)**
+  - **Phase 1 - Core Moderation:**
+    - Admin Dashboard (`/admin/dashboard`)
+      - 8 real-time statistics cards (users, reports, listings, templates, trades, admin actions)
+      - Color-coded metrics with icons
+      - Suspended users alert banner
+      - Responsive grid layout
+    - Reports Queue (`/admin/reports`)
+      - List of pending reports with filters
+      - Color-coded entity type badges (user, listing, template, chat)
+      - Reason badges and reporter info
+      - "Review Report" button opens detail modal
+      - Empty state for when queue is clear
+    - Report Detail Modal
+      - Full report context display
+      - Entity-specific information (user details, listing info, template info)
+      - User history section for moderation context
+      - Three moderation actions: Dismiss, Remove Content, Suspend User
+      - Required admin notes with validation
+      - Confirmation prompts for destructive actions
+      - Loading states and toast notifications
+    - Admin Navigation Layout
+      - Tab-based navigation (Dashboard, Reports, Users, Audit)
+      - Active tab highlighting
+      - Admin link in site header (visible only to admins)
+      - Shared layout for all admin pages
+  - **Phase 2 - User Management & Audit:**
+    - User Search Page (`/admin/users`)
+      - Debounced search by nickname or email (500ms)
+      - Status filter (all/active/suspended)
+      - User cards with avatar, stats, and details
+      - Suspend/Unsuspend actions with reason prompts
+      - View profile links
+      - Warning indicator for users with reports
+      - Admin users cannot be suspended
+    - Audit Log Viewer (`/admin/audit`)
+      - Timeline view of all admin actions
+      - Filter by action type (suspend, unsuspend, remove, dismiss)
+      - Color-coded action badges with icons
+      - Shows admin performer, timestamp, target, reason
+      - Expandable metadata viewer
+      - Infinite scroll pagination (20 per page)
   - Admin Components
     - `AdminGuard` - Route protection with admin verification
     - `ReportDetailModal` - Report review and moderation
-  - Admin Hooks
+  - Admin Hooks (7 total)
     - `useAdminStats` - Dashboard statistics
     - `usePendingReports` - Reports queue
     - `useReportDetails` - Single report with context
     - `useResolveReport` - Moderation actions
-  - **Note:** User Search (11.3) and Audit Log Viewer (11.4) are pending in Phase 2
+    - `useUserSearch` - Search users with filters
+    - `useSuspendUser` - Suspend/unsuspend users
+    - `useAuditLog` - Audit log with pagination
 
 - **Social UI (Sprint 10)**
   - Public user profile page (`/users/[userId]`)

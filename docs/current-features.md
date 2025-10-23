@@ -245,9 +245,9 @@ user_template_progress (count - 1)
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
 - `get_user_listings` (for profile pages)
 
-### 6. Admin Moderation System ⚠️ **PHASE 1 UI COMPLETE (Sprint 11)**
+### 6. Admin Moderation System ✅ **COMPLETE (Sprint 11)**
 
-#### **✅ Phase 1 - Core Moderation UI (COMPLETE)**
+#### **✅ Phase 1 - Core Moderation UI**
 
 **Admin Dashboard:**
 - 8 statistics cards with real-time metrics
@@ -273,19 +273,30 @@ user_template_progress (count - 1)
 - Admin link in site header
 - Files: `src/app/admin/layout.tsx`
 
-#### **⏳ Phase 2 - User Management & Audit (PENDING)**
+#### **✅ Phase 2 - User Management & Audit**
 
 **User Search (Subtask 11.3):**
-- Search users by nickname/email
-- User status filters (active/suspended)
-- Suspend/unsuspend actions
-- User activity overview
+- Search users by nickname/email with debouncing
+- User status filters (all/active/suspended)
+- User cards with avatar, stats, and details
+- Suspend/unsuspend actions with reason prompts
+- User activity overview (ratings, listings, reports received)
+- Admin users cannot be suspended
+- Warning indicator for users with reports
+- Files: `src/app/admin/users/page.tsx`
+- Hooks: `useUserSearch`, `useSuspendUser`
 
 **Audit Log Viewer (Subtask 11.4):**
-- Timeline view of admin actions
-- Filter by action type and admin
-- Pagination for performance
-- Export capabilities
+- Timeline view of all admin actions
+- Filter by action type (suspend, unsuspend, remove, dismiss)
+- Color-coded action badges with icons
+- Shows admin who performed action
+- Displays target type, ID, and reason
+- Expandable metadata viewer
+- Infinite scroll pagination (20 per page)
+- Empty state for no logs
+- Files: `src/app/admin/audit/page.tsx`
+- Hook: `useAuditLog`
 
 #### **Backend (COMPLETE - v1.6.0)**
 
