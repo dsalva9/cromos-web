@@ -7,15 +7,14 @@ export function useFavorites() {
 
   const checkFavorite = async (userId: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase
-        .from('user_favorites')
-        .select('favorite_user_id')
-        .eq('favorite_user_id', userId)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc('is_favourited', {
+        p_target_type: 'user',
+        p_target_id: userId
+      });
 
       if (error) throw error;
 
-      return !!data;
+      return data || false;
     } catch {
       return false;
     }
@@ -26,7 +25,8 @@ export function useFavorites() {
       setLoading(true);
 
       const { data, error } = await supabase.rpc('toggle_favourite', {
-        p_target_user_id: userId
+        p_target_type: 'user',
+        p_target_id: userId
       });
 
       if (error) throw error;

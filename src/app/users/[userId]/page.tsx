@@ -29,7 +29,7 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-xl mb-4">User not found</p>
+          <p className="text-white text-xl mb-4">Usuario no encontrado</p>
         </div>
       </div>
     );
@@ -78,17 +78,17 @@ export default function UserProfilePage() {
                         </span>
                       </div>
                       <span className="text-gray-400">
-                        ({profile.rating_count} {profile.rating_count === 1 ? 'rating' : 'ratings'})
+                        ({profile.rating_count} {profile.rating_count === 1 ? 'valoración' : 'valoraciones'})
                       </span>
                     </div>
 
                     {/* Badges */}
                     <div className="flex gap-2">
                       {profile.is_admin && (
-                        <Badge className="bg-red-600 text-white">Admin</Badge>
+                        <Badge className="bg-red-600 text-white">Administrador</Badge>
                       )}
                       {profile.is_suspended && (
-                        <Badge className="bg-gray-600 text-white">Suspended</Badge>
+                        <Badge className="bg-gray-600 text-white">Suspendido</Badge>
                       )}
                     </div>
                   </div>
@@ -106,7 +106,7 @@ export default function UserProfilePage() {
                     <p className="text-2xl font-black text-white">
                       {listings.length}
                     </p>
-                    <p className="text-sm text-gray-400">Active Listings</p>
+                    <p className="text-sm text-gray-400">Anuncios Activos</p>
                   </div>
 
                   <div className="text-center">
@@ -114,7 +114,7 @@ export default function UserProfilePage() {
                     <p className="text-2xl font-black text-white">
                       {profile.favorites_count}
                     </p>
-                    <p className="text-sm text-gray-400">Favorites</p>
+                    <p className="text-sm text-gray-400">Favoritos</p>
                   </div>
 
                   <div className="text-center">
@@ -122,7 +122,7 @@ export default function UserProfilePage() {
                     <p className="text-2xl font-black text-white">
                       {profile.rating_count}
                     </p>
-                    <p className="text-sm text-gray-400">Ratings</p>
+                    <p className="text-sm text-gray-400">Valoraciones</p>
                   </div>
                 </div>
               </div>
@@ -133,14 +133,14 @@ export default function UserProfilePage() {
         {/* Listings */}
         <div className="mb-4">
           <h2 className="text-2xl font-black text-white mb-4">
-            Active Listings
+            Anuncios Activos
           </h2>
         </div>
 
         {listings.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-gray-400 text-lg">
-              No active listings yet
+              No hay anuncios activos
             </p>
           </div>
         ) : (

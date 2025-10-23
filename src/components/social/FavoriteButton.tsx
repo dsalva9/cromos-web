@@ -42,9 +42,10 @@ export function FavoriteButton({ userId }: FavoriteButtonProps) {
       } else {
         toast.success('Removed from favorites');
       }
-    } catch {
+    } catch (error) {
       // Revert on error
       setFavorited(!favorited);
+      console.error('Favorite toggle error:', error);
       toast.error('Failed to update favorite');
     }
   };

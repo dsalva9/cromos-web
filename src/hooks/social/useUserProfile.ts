@@ -33,14 +33,16 @@ export function useUserProfile(userId: string) {
 
       if (profileError) throw profileError;
 
-      // Get favorites count
-      const { data: favCountData } = await supabase.rpc('get_favourite_count', {
-        p_user_id: userId
-      });
+      // Get favorites count (how many users have favorited this user)
+      const { count: favCount } = await supabase
+        .from('favourites')
+        .select('*', { count: 'exact', head: true })
+        .eq('target_type', 'user')
+        .eq('target_id', userId);
 
       setProfile({
         ...profileData,
-        favorites_count: favCountData || 0
+        favorites_count: favCount || 0
       });
 
       // Get user listings

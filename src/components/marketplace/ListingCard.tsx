@@ -25,17 +25,34 @@ export function ListingCard({ listing }: ListingCardProps) {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Activo';
+      case 'sold':
+        return 'Vendido';
+      case 'removed':
+        return 'Eliminado';
+      default:
+        return status;
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'today';
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    return `${Math.floor(diffDays / 30)} months ago`;
+    if (diffDays === 0) return 'hoy';
+    if (diffDays === 1) return 'ayer';
+    if (diffDays < 7) return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+    if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+    }
+    const months = Math.floor(diffDays / 30);
+    return `hace ${months} ${months === 1 ? 'mes' : 'meses'}`;
   };
 
   return (
@@ -65,7 +82,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               <Badge
                 className={`${getStatusColor(listing.status)} text-white uppercase text-xs border-2 border-black`}
               >
-                {listing.status}
+                {getStatusLabel(listing.status)}
               </Badge>
             </div>
           </div>
