@@ -1523,13 +1523,130 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 
 ## v1.5.0 Components ✅ **NEW**
 
-### Admin Components (v1.5.0)
+### Admin Components (Sprint 11 - Phase 1) ⚠️
 
-#### AdminDashboard
+#### AdminGuard
 
-**File**: `src/app/admin/page.tsx`
+**File**: `src/components/AdminGuard.tsx`
 
-Main admin dashboard with tabbed interface.
+**Purpose:** Protects admin routes from unauthorized access
+
+**Features:**
+- Checks `is_admin` flag from profiles table
+- Verifies user is not suspended
+- Shows loading spinner during verification
+- Displays "Access Denied" page for non-admins
+- Auto-signs out suspended users
+- Redirects to login if not authenticated
+
+**Usage:**
+```tsx
+<AdminGuard>
+  <AdminContent />
+</AdminGuard>
+```
+
+---
+
+#### Admin Dashboard
+
+**File**: `src/app/admin/dashboard/page.tsx`
+
+**Purpose:** Main admin dashboard with platform statistics
+
+**Features:**
+- 8 real-time statistics cards
+  - Total Users
+  - Active Users (30d)
+  - Pending Reports
+  - Active Listings
+  - Public Templates
+  - Completed Trades (30d)
+  - Admin Actions (30d)
+  - Suspended Users
+- Color-coded icons for each metric
+- Suspended users alert banner
+- Responsive grid layout
+- Protected by AdminGuard
+
+**Hook:** `useAdminStats` - Calls `get_admin_stats` RPC
+
+---
+
+#### Reports Queue Page
+
+**File**: `src/app/admin/reports/page.tsx`
+
+**Purpose:** List and manage pending reports
+
+**Features:**
+- List of all pending reports
+- Color-coded entity type badges (user, listing, template, chat)
+- Reason badges
+- Reporter information
+- Report timestamp
+- Entity ID display
+- "Review Report" button opens detail modal
+- Empty state when no reports
+
+**Hook:** `usePendingReports` - Calls `list_pending_reports` RPC
+
+---
+
+#### ReportDetailModal
+
+**File**: `src/components/admin/ReportDetailModal.tsx`
+
+**Purpose:** Detailed view and moderation actions for a single report
+
+**Features:**
+- Full report context display
+- Entity-specific information:
+  - User reports: nickname, email, rating, suspension status
+  - Listing reports: title, description, status, owner
+  - Template reports: title, author, rating, public status
+- User history section (total reports, listings, templates, rating)
+- Required admin notes textarea
+- Three action buttons:
+  - Dismiss Report (outline)
+  - Remove Content (orange)
+  - Suspend User (red)
+- Confirmation on second click
+- Loading states
+- Toast notifications
+
+**Hooks:**
+- `useReportDetails` - Calls `get_report_details_with_context` RPC
+- `useResolveReport` - Calls `resolve_report` RPC
+
+---
+
+#### Admin Layout
+
+**File**: `src/app/admin/layout.tsx`
+
+**Purpose:** Shared layout with tab navigation for all admin pages
+
+**Features:**
+- Tab navigation with 4 sections:
+  - Dashboard (LayoutDashboard icon)
+  - Reports (AlertTriangle icon)
+  - Users (Users icon) - Phase 2
+  - Audit Log (FileText icon) - Phase 2
+- Active tab highlighting in yellow (#FFC000)
+- Admin Panel header
+- Protected by AdminGuard
+- Dark theme styling
+
+**Navigation:** Links to `/admin/dashboard`, `/admin/reports`, `/admin/users`, `/admin/audit`
+
+---
+
+#### Old Admin Components (Legacy - Pre-Sprint 11)
+
+**File**: `src/app/admin/page.tsx` (OLD - may be deprecated)
+
+Main admin dashboard with tabbed interface for old collection system.
 
 **Features:**
 

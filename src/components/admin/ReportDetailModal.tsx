@@ -1,0 +1,245 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { useReportDetails } from '@/hooks/admin/useReportDetails';
+import { useResolveReport } from '@/hooks/admin/useResolveReport';
+import { toast } from 'sonner';
+import { AlertTriangle, X, Trash, Ban } from 'lucide-react';
+
+interface ReportDetailModalProps {
+  reportId: string;
+  onClose: () => void;
+  onResolved: () => void;
+}
+
+export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetailModalProps) {
+  const { details, loading, error } = useReportDetails(reportId);
+  const { resolveReport, loading: resolving } = useResolveReport();
+  const [adminNotes, setAdminNotes] = useState('');
+  const [confirming, setConfirming] = useState<string | null>(null);
+
+  const handleResolve = async (action: 'dismiss' | 'remove_content' | 'suspend_user') => {
+    if (confirming !== action) {
+      setConfirming(action);
+      return;
+    }
+
+    if (!adminNotes.trim()) {
+      toast.error('Please provide a reason for this action');
+      return;
+    }
+
+    try {
+      await resolveReport(reportId, action, adminNotes);
+      toast.success('Report resolved successfully');
+      onResolved();
+      onClose();
+    } catch {
+      toast.error('Failed to resolve report');
+    } finally {
+      setConfirming(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="bg-[#1F2937] border-2 border-black max-w-3xl">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!details) {
+    return (
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="bg-[#1F2937] border-2 border-black">
+          <div className="text-center py-8">
+            <p className="text-red-500">Failed to load report details</p>
+            {error && <p className="text-gray-400 text-sm mt-2">{error}</p>}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  const report = details.report;
+  const content = details.reported_content as Record<string, string | number | boolean | null | undefined>;
+  const history = details.reported_user_history;
+
+  return (
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="bg-[#1F2937] border-2 border-black max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+            Report Details
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Report Info */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Badge className="bg-blue-500 text-white">
+                {report.entity_type}
+              </Badge>
+              <Badge variant="outline">
+                {report.reason}
+              </Badge>
+            </div>
+            <p className="text-gray-400 text-sm">
+              Reported by <span className="text-white font-bold">{report.reporter_nickname}</span>
+              {' '}on {new Date(report.created_at).toLocaleString()}
+            </p>
+            {report.description && (
+              <div className="bg-[#374151] p-3 rounded-md">
+                <p className="text-gray-300 text-sm">{report.description}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Reported Content */}
+          <div className="border-2 border-gray-700 rounded-md p-4 space-y-3">
+            <h3 className="font-bold text-white">Reported Content</h3>
+
+            {report.entity_type === 'user' && content.nickname && (
+              <div className="space-y-2">
+                <p className="text-gray-300">
+                  <span className="text-gray-400">User:</span> {content.nickname}
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Email:</span> {content.email}
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Rating:</span> {content.rating_avg?.toFixed(1) || '0.0'} ⭐
+                </p>
+                {content.is_suspended && (
+                  <Badge className="bg-red-600 text-white">Suspended</Badge>
+                )}
+              </div>
+            )}
+
+            {report.entity_type === 'listing' && content.title && (
+              <div className="space-y-2">
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Title:</span> {content.title}
+                </p>
+                {content.description && (
+                  <p className="text-gray-300 text-sm">{content.description}</p>
+                )}
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Status:</span> {content.status}
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">By:</span> {content.user_nickname}
+                </p>
+              </div>
+            )}
+
+            {report.entity_type === 'template' && content.title && (
+              <div className="space-y-2">
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Title:</span> {content.title}
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Author:</span> {content.author_nickname}
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Rating:</span> {content.rating_avg?.toFixed(1) || '0.0'} ⭐
+                </p>
+                <p className="text-gray-300">
+                  <span className="text-gray-400">Public:</span> {content.is_public ? 'Yes' : 'No'}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* User History (if applicable) */}
+          {history && (
+            <div className="border-2 border-gray-700 rounded-md p-4 space-y-2">
+              <h3 className="font-bold text-white">User History</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-400">Total Reports Received</p>
+                  <p className="text-white font-bold">{history.total_reports_received}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Total Listings</p>
+                  <p className="text-white font-bold">{history.total_listings}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Templates Created</p>
+                  <p className="text-white font-bold">{history.total_templates_created}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400">Rating Average</p>
+                  <p className="text-white font-bold">{history.rating_avg?.toFixed(1) || '0.0'}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Admin Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-white">
+              Admin Notes (Required)
+            </Label>
+            <Textarea
+              id="notes"
+              value={adminNotes}
+              onChange={(e) => setAdminNotes(e.target.value)}
+              placeholder="Explain your decision..."
+              rows={3}
+              className="bg-[#374151] border-2 border-black text-white"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => handleResolve('dismiss')}
+              disabled={resolving || !adminNotes.trim()}
+              variant="outline"
+              className="w-full"
+            >
+              <X className="mr-2 h-4 w-4" />
+              {confirming === 'dismiss' ? 'Click again to confirm' : 'Dismiss Report'}
+            </Button>
+
+            <Button
+              onClick={() => handleResolve('remove_content')}
+              disabled={resolving || !adminNotes.trim()}
+              className="w-full bg-orange-600 hover:bg-orange-700"
+            >
+              <Trash className="mr-2 h-4 w-4" />
+              {confirming === 'remove_content' ? 'Click again to confirm' : 'Remove Content'}
+            </Button>
+
+            <Button
+              onClick={() => handleResolve('suspend_user')}
+              disabled={resolving || !adminNotes.trim()}
+              className="w-full bg-red-600 hover:bg-red-700"
+            >
+              <Ban className="mr-2 h-4 w-4" />
+              {confirming === 'suspend_user' ? 'Click again to confirm' : 'Suspend User'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

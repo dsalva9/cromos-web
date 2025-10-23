@@ -10,7 +10,10 @@
       "Bash(mv:*)",
       "Bash(npm run lint:*)",
       "Read(//c/Users/David/Pictures/Screenshots/**)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run build:test:*)",
+      "Bash(del /F nul)"
     ],
     "deny": [],
     "ask": []

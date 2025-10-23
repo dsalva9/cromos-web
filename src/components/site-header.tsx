@@ -56,7 +56,7 @@ export default function SiteHeader() {
     if (isAdmin) {
       const profileIndex = links.findIndex(l => l.href === '/profile');
       links.splice(profileIndex >= 0 ? profileIndex : links.length, 0, {
-        href: '/admin',
+        href: '/admin/dashboard',
         label: 'Admin',
       });
     }

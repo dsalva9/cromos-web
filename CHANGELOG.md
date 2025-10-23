@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Admin UI - Phase 1 (Sprint 11 - Partial)**
+  - Admin Dashboard (`/admin/dashboard`)
+    - 8 real-time statistics cards (users, reports, listings, templates, trades, admin actions)
+    - Color-coded metrics with icons
+    - Suspended users alert banner
+    - Responsive grid layout
+  - Reports Queue (`/admin/reports`)
+    - List of pending reports with filters
+    - Color-coded entity type badges (user, listing, template, chat)
+    - Reason badges and reporter info
+    - "Review Report" button opens detail modal
+    - Empty state for when queue is clear
+  - Report Detail Modal
+    - Full report context display
+    - Entity-specific information (user details, listing info, template info)
+    - User history section for moderation context
+    - Three moderation actions: Dismiss, Remove Content, Suspend User
+    - Required admin notes with validation
+    - Confirmation prompts for destructive actions
+    - Loading states and toast notifications
+  - Admin Navigation Layout
+    - Tab-based navigation (Dashboard, Reports, Users, Audit)
+    - Active tab highlighting
+    - Admin link in site header (visible only to admins)
+    - Shared layout for all admin pages
+  - Admin Components
+    - `AdminGuard` - Route protection with admin verification
+    - `ReportDetailModal` - Report review and moderation
+  - Admin Hooks
+    - `useAdminStats` - Dashboard statistics
+    - `usePendingReports` - Reports queue
+    - `useReportDetails` - Single report with context
+    - `useResolveReport` - Moderation actions
+  - **Note:** User Search (11.3) and Audit Log Viewer (11.4) are pending in Phase 2
+
 - **Social UI (Sprint 10)**
   - Public user profile page (`/users/[userId]`)
     - Avatar with fallback icon

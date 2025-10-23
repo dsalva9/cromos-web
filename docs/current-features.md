@@ -245,41 +245,72 @@ user_template_progress (count - 1)
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
 - `get_user_listings` (for profile pages)
 
-### 6. Admin Moderation System ✅ **BACKEND COMPLETE (v1.6.0)**
+### 6. Admin Moderation System ⚠️ **PHASE 1 UI COMPLETE (Sprint 11)**
 
-#### **Audit Log Extensions**
+#### **✅ Phase 1 - Core Moderation UI (COMPLETE)**
 
+**Admin Dashboard:**
+- 8 statistics cards with real-time metrics
+- Color-coded stats (users, reports, listings, templates)
+- Suspended users alert banner
+- Admin-only access guard
+- Files: `src/app/admin/dashboard/page.tsx`, `src/hooks/admin/useAdminStats.ts`
+
+**Reports Queue:**
+- List of pending reports with filtering
+- Color-coded entity type badges
+- Report detail modal with full context
+- Three moderation actions (dismiss, remove content, suspend user)
+- User history display for context
+- Confirmation prompts for destructive actions
+- Files: `src/app/admin/reports/page.tsx`, `src/components/admin/ReportDetailModal.tsx`
+- Hooks: `usePendingReports`, `useReportDetails`, `useResolveReport`
+
+**Admin Navigation:**
+- Tab-based navigation layout
+- Four sections: Dashboard, Reports, Users, Audit
+- Active tab highlighting
+- Admin link in site header
+- Files: `src/app/admin/layout.tsx`
+
+#### **⏳ Phase 2 - User Management & Audit (PENDING)**
+
+**User Search (Subtask 11.3):**
+- Search users by nickname/email
+- User status filters (active/suspended)
+- Suspend/unsuspend actions
+- User activity overview
+
+**Audit Log Viewer (Subtask 11.4):**
+- Timeline view of admin actions
+- Filter by action type and admin
+- Pagination for performance
+- Export capabilities
+
+#### **Backend (COMPLETE - v1.6.0)**
+
+**Audit Log Extensions:**
 - Enhanced audit log with moderation-specific fields
 - View for moderation actions only
 - Context tracking for all moderation actions
 
-#### **Moderation RPCs with Audit**
-
+**Moderation RPCs with Audit:**
 - All moderation actions logged with context
 - User management with audit logging
 - Content deletion with audit logging
 - Report handling with audit logging
 
-#### **Admin Dashboard RPCs**
-
+**Admin Dashboard RPCs:**
 - Overall statistics (users, listings, templates, reports)
 - Recent reports with entity details
 - Recent moderation activity
 - Report statistics by type and status
 - Admin performance metrics
 
-#### **Bulk Moderation Actions**
-
-- Bulk update report status
-- Bulk suspend/unsuspend users
-- Bulk delete content
-- Report escalation
-
-#### **Moderation RPCs:**
-
+**Moderation RPCs:**
 - `log_moderation_action`, `get_moderation_audit_logs`, `get_entity_moderation_history`
 - `admin_update_user_role`, `admin_suspend_user`, `admin_delete_user`, `admin_delete_content`
-- `get_admin_dashboard_stats`, `get_recent_reports`, `get_moderation_activity`
+- `get_admin_stats`, `list_pending_reports`, `get_report_details_with_context`, `resolve_report`
 - `get_report_statistics`, `get_admin_performance_metrics`
 - `bulk_update_report_status`, `bulk_suspend_users`, `bulk_delete_content`, `escalate_report`
 
