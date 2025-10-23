@@ -1,0 +1,495 @@
+ Sprint 10: Social UI - Manual Testing Guide
+
+  Test Environment Setup
+
+  Prerequisites:
+  1. Two user accounts (to test social interactions between users)
+    - User A: Your primary test account
+    - User B: Secondary test account (use different browser/incognito mode)
+  2. At least one marketplace listing created by User B
+  3. Dev server running: npm run dev
+  4. Browser DevTools console open (check for errors)
+  5. Note both user IDs for testing (find in Supabase or profile page)
+
+  ---
+  Test Suite 1: Public User Profiles (/users/[userId])
+
+  Test 1.1: View Own Profile
+
+  Steps:
+  1. Log in as User A
+  2. Get your user ID from Supabase profiles table or /profile page
+  3. Navigate to /users/[your-user-id]
+
+  Expected Results:
+  - ✅ Profile displays with your nickname
+  - ✅ Avatar shows (or fallback User icon if no avatar set)
+  - ✅ Rating displays (0.0 if no ratings yet)
+  - ✅ Rating count shows (0 ratings)
+  - ✅ Active listings count matches your actual listings
+  - ✅ Favorites count displays
+  - ✅ Ratings stat displays
+  - ✅ Your active listings appear in grid below
+  - ✅ NO favorite button (can't favorite yourself)
+  - ✅ No console errors
+
+  Test 1.2: View Another User's Profile
+
+  Steps:
+  1. Remain logged in as User A
+  2. Navigate to /users/[user-b-id]
+
+  Expected Results:
+  - ✅ User B's profile displays correctly
+  - ✅ Avatar or fallback icon shows
+  - ✅ Rating and all stats display
+  - ✅ Favorite button APPEARS (viewing someone else)
+  - ✅ User B's listings appear in grid
+  - ✅ Can click listings to view details
+  - ✅ No console errors
+
+  Test 1.3: View Profile While Logged Out
+
+  Steps:
+  1. Log out completely
+  2. Navigate to /users/[any-user-id]
+
+  Expected Results:
+  - ✅ Profile displays normally
+  - ✅ Stats and listings visible
+  - ✅ NO favorite button (not authenticated)
+  - ✅ Page doesn't crash
+  - ✅ No console errors
+
+  Test 1.4: Profile with No Listings
+
+  Steps:
+  1. Create User C with no marketplace listings
+  2. Visit /users/[user-c-id]
+
+  Expected Results:
+  - ✅ Profile header displays correctly
+  - ✅ Active listings count shows 0
+  - ✅ Empty state message: "No active listings yet"
+  - ✅ No listing grid/cards appear
+  - ✅ No errors
+
+  Test 1.5: Invalid User ID
+
+  Steps:
+  1. Navigate to /users/invalid-uuid-here
+
+  Expected Results:
+  - ✅ "User not found" error message displays
+  - ✅ No crash or white screen
+  - ✅ Can navigate back normally
+
+  ---
+  Test Suite 2: Favorite Button Component
+
+  Test 2.1: Add User to Favorites
+
+  Steps:
+  1. Log in as User A
+  2. Navigate to /users/[user-b-id]
+  3. Click "Add Favorite" button
+
+  Expected Results:
+  - ✅ Button shows loading state briefly
+  - ✅ Button changes to "Favorited" with filled heart icon
+  - ✅ Button background changes to red
+  - ✅ Toast notification: "Added to favorites"
+  - ✅ Favorites count on profile increments by 1
+  - ✅ No console errors
+
+  Test 2.2: Remove User from Favorites (from Profile)
+
+  Steps:
+  1. While on User B's profile (already favorited)
+  2. Click "Favorited" button
+
+  Expected Results:
+  - ✅ Button changes to "Add Favorite" with outline heart
+  - ✅ Toast notification: "Removed from favorites"
+  - ✅ Button background returns to outline style
+  - ✅ No console errors
+
+  Test 2.3: Favorite Button Persistence
+
+  Steps:
+  1. Favorite User B
+  2. Navigate away to another page
+  3. Return to /users/[user-b-id]
+
+  Expected Results:
+  - ✅ Button still shows "Favorited" state
+  - ✅ Filled heart icon displayed
+  - ✅ State persisted correctly
+
+  Test 2.4: Optimistic Update Error Handling
+
+  Steps:
+  1. Open DevTools Network tab
+  2. Throttle to "Offline"
+  3. Try to favorite a user
+
+  Expected Results:
+  - ✅ Button shows optimistic update first
+  - ✅ Then reverts to previous state
+  - ✅ Toast error: "Failed to update favorite"
+  - ✅ No crash
+
+  ---
+  Test Suite 3: Favorites List Page (/favorites)
+
+  Test 3.1: View Favorites List
+
+  Steps:
+  1. Log in as User A
+  2. Ensure you have favorited at least 2-3 users
+  3. Click "Favoritos" in navigation
+  4. Navigate to /favorites
+
+  Expected Results:
+  - ✅ Page title: "My Favorites"
+  - ✅ Subtitle: "Users you're following"
+  - ✅ Grid of favorited users displays
+  - ✅ Each card shows:
+    - Avatar or fallback icon
+    - Nickname
+    - Active listings count
+    - Rating average
+    - "View Profile" button
+    - Heart button to remove
+    - "Added [date]" text
+  - ✅ No console errors
+
+  Test 3.2: Remove Favorite from List
+
+  Steps:
+  1. On /favorites page
+  2. Click the heart icon button on any user card
+
+  Expected Results:
+  - ✅ Toast notification: "Removed from favorites"
+  - ✅ Card disappears from grid immediately
+  - ✅ Grid re-flows smoothly
+  - ✅ No console errors
+
+  Test 3.3: Empty Favorites List
+
+  Steps:
+  1. Remove all favorites
+  2. Reload /favorites page
+
+  Expected Results:
+  - ✅ Empty state displays:
+    - Large heart icon (gray)
+    - "No favorites yet" message
+    - Helper text about adding favorites
+    - "Explore Marketplace" CTA button
+  - ✅ No grid displayed
+  - ✅ No errors
+
+  Test 3.4: Click View Profile
+
+  Steps:
+  1. On /favorites with favorites listed
+  2. Click "View Profile" button on a card
+
+  Expected Results:
+  - ✅ Navigates to /users/[userId]
+  - ✅ Correct user profile loads
+  - ✅ No errors
+
+  Test 3.5: Favorites Page While Logged Out
+
+  Steps:
+  1. Log out
+  2. Try to navigate to /favorites
+
+  Expected Results:
+  - ✅ Redirected to login page (AuthGuard protection)
+  - ✅ Or shows "Please log in" message
+  - ✅ No crash
+
+  ---
+  Test Suite 4: Report System
+
+  Test 4.1: Open Report Modal
+
+  Steps:
+  1. Navigate to any user profile /users/[userId]
+  2. Find and click "Report" button
+
+  Expected Results:
+  - ✅ Modal opens with dark theme styling
+  - ✅ Title: "Report Content"
+  - ✅ Description about maintaining safe community
+  - ✅ 6 radio button options visible
+  - ✅ Optional description textarea
+  - ✅ Character counter shows "0 / 500"
+  - ✅ Cancel and Submit Report buttons
+  - ✅ Submit button is disabled (no reason selected)
+
+  Test 4.2: Submit Report with All Fields
+
+  Steps:
+  1. Open report modal
+  2. Select reason: "Spam or misleading"
+  3. Type in description: "Test report description"
+  4. Click "Submit Report"
+
+  Expected Results:
+  - ✅ Submit button shows "Submitting..." briefly
+  - ✅ Modal closes automatically
+  - ✅ Toast success: "Report submitted successfully. Our team will review it."
+  - ✅ Form resets (if you reopen modal)
+  - ✅ No console errors
+
+  Test 4.3: Submit Report with Only Reason
+
+  Steps:
+  1. Open report modal
+  2. Select any reason
+  3. Leave description empty
+  4. Click "Submit Report"
+
+  Expected Results:
+  - ✅ Report submits successfully
+  - ✅ Modal closes
+  - ✅ Success toast appears
+  - ✅ Works without description (it's optional)
+
+  Test 4.4: Try Submit Without Reason
+
+  Steps:
+  1. Open report modal
+  2. Don't select any reason
+  3. Try to click "Submit Report"
+
+  Expected Results:
+  - ✅ Button is disabled (can't click)
+  - ✅ OR if clickable, shows toast: "Please select a reason"
+  - ✅ Modal stays open
+
+  Test 4.5: Character Counter
+
+  Steps:
+  1. Open report modal
+  2. Type in description field
+  3. Watch character counter
+
+  Expected Results:
+  - ✅ Counter updates in real-time "X / 500"
+  - ✅ Can type up to 500 characters
+  - ✅ Counter turns red or shows warning near 500
+  - ✅ Cannot type beyond 500 characters
+
+  Test 4.6: Cancel Report
+
+  Steps:
+  1. Open report modal
+  2. Select a reason and type description
+  3. Click "Cancel"
+
+  Expected Results:
+  - ✅ Modal closes immediately
+  - ✅ No report submitted
+  - ✅ No toast notifications
+  - ✅ Form data discarded
+
+  Test 4.7: Report Different Entity Types
+
+  Steps:
+  1. Try adding <ReportButton> to:
+    - Listing detail page
+    - Template page
+    - User profile
+
+  Expected Results:
+  - ✅ Button appears correctly on all pages
+  - ✅ Modal works with different entityType props
+  - ✅ Submits with correct entity type to backend
+
+  ---
+  Test Suite 5: Navigation
+
+  Test 5.1: Favorites Link in Navigation
+
+  Steps:
+  1. Log in
+  2. Check main navigation bar
+
+  Expected Results:
+  - ✅ "Favoritos" link appears in navigation
+  - ✅ Link is between "Mis Anuncios" and "Perfil"
+  - ✅ Clicking navigates to /favorites
+  - ✅ Active state highlights when on /favorites page
+
+  Test 5.2: Favorites Link Mobile
+
+  Steps:
+  1. Log in
+  2. Resize browser to mobile width
+  3. Open hamburger menu
+
+  Expected Results:
+  - ✅ "Favoritos" appears in mobile menu
+  - ✅ Clicking navigates correctly
+  - ✅ Menu closes after navigation
+
+  ---
+  Test Suite 6: Integration & Edge Cases
+
+  Test 6.1: Favorite User Then View Favorites
+
+  Steps:
+  1. Go to /users/[user-b-id]
+  2. Click "Add Favorite"
+  3. Navigate to /favorites
+
+  Expected Results:
+  - ✅ User B appears in favorites list immediately
+  - ✅ Stats are current/accurate
+  - ✅ No duplicate entries
+
+  Test 6.2: Rapid Favorite Toggle
+
+  Steps:
+  1. On user profile
+  2. Click favorite button 5 times rapidly
+
+  Expected Results:
+  - ✅ Button handles rapid clicks gracefully
+  - ✅ Final state is correct (not stuck)
+  - ✅ No duplicate database entries
+  - ✅ No console errors
+
+  Test 6.3: Profile After User Creates Listing
+
+  Steps:
+  1. Note User B's listing count
+  2. Have User B create a new listing
+  3. Refresh User B's profile page
+
+  Expected Results:
+  - ✅ Active listings count increments
+  - ✅ New listing appears in grid
+  - ✅ Stats update correctly
+
+  Test 6.4: Multiple Browser Sessions
+
+  Steps:
+  1. Log in as User A in Chrome
+  2. Log in as User A in Firefox
+  3. Favorite a user in Chrome
+  4. Check /favorites in Firefox
+
+  Expected Results:
+  - ✅ Favorite appears in both browsers after refresh
+  - ✅ Data syncs correctly
+  - ✅ No conflicts
+
+  ---
+  Test Suite 7: Performance & UX
+
+  Test 7.1: Loading States
+
+  Steps:
+  1. Navigate to /users/[userId]
+  2. Watch initial load
+
+  Expected Results:
+  - ✅ Loading spinner appears while fetching
+  - ✅ Smooth transition to content
+  - ✅ No layout shift
+  - ✅ Loads in < 2 seconds
+
+  Test 7.2: Toast Notifications Appearance
+
+  Steps:
+  1. Trigger various toasts (favorite, report, errors)
+
+  Expected Results:
+  - ✅ Toasts appear in top-right corner
+  - ✅ Dark theme with border styling
+  - ✅ Auto-dismiss after 3 seconds
+  - ✅ Close button works
+  - ✅ Multiple toasts stack properly
+
+  Test 7.3: Responsive Design
+
+  Steps:
+  1. Test on mobile (375px width)
+  2. Test on tablet (768px width)
+  3. Test on desktop (1920px width)
+
+  Expected Results:
+  - ✅ Profile grid adjusts columns appropriately
+  - ✅ Favorites grid responsive
+  - ✅ Buttons sized correctly
+  - ✅ Text readable on all sizes
+  - ✅ No horizontal scroll
+
+  ---
+  Checklist Summary
+
+  Use this checklist to track your testing:
+
+  Public Profiles:
+  - View own profile
+  - View other user profile
+  - View while logged out
+  - Profile with no listings
+  - Invalid user ID
+
+  Favorite Button:
+  - Add favorite
+  - Remove favorite
+  - Persistence check
+  - Error handling
+
+  Favorites Page:
+  - View favorites list
+  - Remove from list
+  - Empty state
+  - Click view profile
+  - Auth guard
+
+  Report System:
+  - Open modal
+  - Submit with all fields
+  - Submit reason only
+  - Validation (no reason)
+  - Character counter
+  - Cancel button
+  - Different entity types
+
+  Navigation:
+  - Desktop nav link
+  - Mobile nav link
+
+  Integration:
+  - Favorite → view list flow
+  - Rapid toggling
+  - Live data updates
+  - Multi-session sync
+
+  Performance:
+  - Loading states
+  - Toast notifications
+  - Responsive design
+
+  ---
+  Reporting Issues
+
+  If you find bugs, note:
+  1. What you did (steps to reproduce)
+  2. What happened (actual result)
+  3. What should happen (expected result)
+  4. Browser & console errors (if any)
+  5. Screenshots (if helpful)
+
+  ---
+  Good luck testing Sprint 10! 🚀
