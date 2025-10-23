@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 export function useFavorites() {
   const supabase = useSupabaseClient();
   const [loading, setLoading] = useState(false);
 
-  const checkFavorite = async (userId: string): Promise<boolean> => {
+  const checkFavorite = useCallback(async (userId: string): Promise<boolean> => {
     try {
       const { data, error } = await supabase.rpc('is_favourited', {
         p_target_type: 'user',
@@ -18,9 +18,9 @@ export function useFavorites() {
     } catch {
       return false;
     }
-  };
+  }, [supabase]);
 
-  const toggleFavorite = async (userId: string): Promise<boolean> => {
+  const toggleFavorite = useCallback(async (userId: string): Promise<boolean> => {
     try {
       setLoading(true);
 
@@ -37,7 +37,7 @@ export function useFavorites() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   return { checkFavorite, toggleFavorite, loading };
 }

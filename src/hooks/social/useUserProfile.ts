@@ -34,15 +34,19 @@ export function useUserProfile(userId: string) {
       if (profileError) throw profileError;
 
       // Get favorites count (how many users have favorited this user)
-      const { count: favCount } = await supabase
-        .from('favourites')
-        .select('*', { count: 'exact', head: true })
-        .eq('target_type', 'user')
-        .eq('target_id', userId);
+      const { data: favCountData, error: favCountError } = await supabase.rpc(
+        'get_favourite_count',
+        {
+          p_target_type: 'user',
+          p_target_id: userId
+        }
+      );
+
+      if (favCountError) throw favCountError;
 
       setProfile({
         ...profileData,
-        favorites_count: favCount || 0
+        favorites_count: Number(favCountData) || 0
       });
 
       // Get user listings
@@ -62,9 +66,29 @@ export function useUserProfile(userId: string) {
     }
   }, [userId, supabase]);
 
+  const adjustFavoritesCount = useCallback((delta: number) => {
+    setProfile(prev => {
+      if (!prev) return prev;
+
+      const nextCount = Math.max(0, (prev.favorites_count ?? 0) + delta);
+
+      return {
+        ...prev,
+        favorites_count: nextCount
+      };
+    });
+  }, []);
+
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
 
-  return { profile, listings, loading, error, refetch: fetchProfile };
+  return {
+    profile,
+    listings,
+    loading,
+    error,
+    refetch: fetchProfile,
+    adjustFavoritesCount
+  };
 }

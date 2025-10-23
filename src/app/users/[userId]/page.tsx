@@ -15,7 +15,7 @@ export default function UserProfilePage() {
   const { user: currentUser } = useUser();
   const userId = params.userId as string;
 
-  const { profile, listings, loading, error } = useUserProfile(userId);
+  const { profile, listings, loading, error, adjustFavoritesCount } = useUserProfile(userId);
 
   if (loading) {
     return (
@@ -95,7 +95,10 @@ export default function UserProfilePage() {
 
                   {/* Favorite Button */}
                   {!isOwnProfile && currentUser && (
-                    <FavoriteButton userId={userId} />
+                    <FavoriteButton
+                      userId={userId}
+                      onFavoriteDelta={adjustFavoritesCount}
+                    />
                   )}
                 </div>
 
