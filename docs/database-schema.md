@@ -108,6 +108,7 @@ User profiles with ratings and admin status.
 - `id` UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE
 - `nickname` TEXT NOT NULL UNIQUE
 - `avatar_url` TEXT
+- `postcode` TEXT
 - `rating_avg` DECIMAL(3,2) DEFAULT 0.0
 - `rating_count` INTEGER DEFAULT 0
 - `is_admin` BOOLEAN DEFAULT FALSE

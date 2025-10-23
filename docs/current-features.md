@@ -448,6 +448,7 @@ user_template_progress (count - 1)
 
 - Status: Backend complete, frontend pending
 - Next: Sprint 10: Social UI
+- Latest: Perfil propio muestra email, ubicacion (codigo postal) y modal de edicion con avatar/nickname/CP; listados filtrables por estado (solo el propietario ve completados/eliminados)
 
 ### Collection Templates System ✅ **COMPLETE (v1.6.0)**
 

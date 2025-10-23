@@ -29,6 +29,7 @@ interface Profile {
   nickname: string | null;
   avatar_url: string | null;
   created_at: string;
+  postcode: string | null;
 }
 
 interface UserCollectionRawData {
@@ -209,7 +210,7 @@ export function useProfileData() {
       // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, nickname, avatar_url, created_at')
+        .select('id, nickname, avatar_url, created_at, postcode')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -222,6 +223,7 @@ export function useProfileData() {
         nickname: null,
         avatar_url: null,
         created_at: user.created_at,
+        postcode: null,
       };
 
       setProfile(userProfile);

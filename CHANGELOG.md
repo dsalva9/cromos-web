@@ -38,6 +38,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Phase 2 - User Management & Audit:**
     - User Search Page (`/admin/users`)
       - Debounced search by nickname or email (500ms)
+  - **Profile Experience Enhancements (Sprint 10 Social UI)**
+    - `/users/[userId]` now surfaces the signed-in user's email and postcode-based location hint
+    - Added an "Editar perfil" dialog with avatar upload (Supabase `avatars` bucket), nickname, and postcode controls
+    - Listing grid supports Activos/Completados/Eliminados filters with status-aware empty states and quick links to `Mis Anuncios`/`Favoritos`
+    - Visitors see only active listings; sold/removed filters remain exclusive to the profile owner
       - Status filter (all/active/suspended)
       - User cards with avatar, stats, and details
       - Suspend/Unsuspend actions with reason prompts

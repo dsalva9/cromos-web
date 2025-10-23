@@ -218,6 +218,12 @@
 - [x] Create ReportButton component
 - [x] Create ReportModal with form
 - [x] Create useReport hook
+## Pending - Sprint 10 QA follow-up
+
+- [ ] Validar modal de edicion de perfil (avatar, nickname, codigo postal)
+- [ ] Verificar filtros Activos/Completados/Eliminados en `/users/[userId]`
+- [ ] Confirmar enlaces rapidos a `/marketplace/my-listings` y `/favorites`
+
 - [x] Update navigation with Favorites link
 - [x] Update documentation Social UI
 - [x] Create list_my_favourites RPC in Supabase

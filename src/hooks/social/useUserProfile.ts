@@ -11,6 +11,8 @@ interface UserProfile {
   favorites_count: number;
   is_admin: boolean;
   is_suspended: boolean;
+  postcode: string | null;
+  location_label: string | null;
 }
 
 export function useUserProfile(userId: string) {
@@ -44,10 +46,51 @@ export function useUserProfile(userId: string) {
 
       if (favCountError) throw favCountError;
 
-      setProfile({
-        ...profileData,
-        favorites_count: Number(favCountData) || 0
-      });
+      let locationLabel: string | null = null;
+
+      if (profileData?.postcode) {
+        try {
+          const { data: postalData, error: postalError } = await supabase
+            .from('postal_codes')
+            .select('municipality, city, locality, name, province, state')
+            .eq('postcode', profileData.postcode)
+            .eq('country', 'ES')
+            .limit(1);
+
+          if (!postalError && postalData && postalData.length > 0) {
+            const record = postalData[0] as Record<string, unknown>;
+            const cityLike =
+              (record.municipality as string | undefined) ||
+              (record.city as string | undefined) ||
+              (record.locality as string | undefined) ||
+              (record.name as string | undefined);
+            const provinceLike =
+              (record.province as string | undefined) ||
+              (record.state as string | undefined);
+            const segments = [cityLike, provinceLike].filter(
+              (segment): segment is string => Boolean(segment && segment.length)
+            );
+            locationLabel = segments.length > 0 ? segments.join(', ') : null;
+          }
+        } catch (postalLookupError) {
+          console.warn('Failed to resolve postcode location', postalLookupError);
+        }
+      }
+
+      const normalizedProfile: UserProfile = {
+        id: profileData.id,
+        nickname: profileData.nickname ?? 'Sin nombre',
+        avatar_url: profileData.avatar_url ?? null,
+        rating_avg: Number(profileData.rating_avg ?? 0),
+        rating_count: Number(profileData.rating_count ?? 0),
+        favorites_count: Number(favCountData) || 0,
+        is_admin: Boolean(profileData.is_admin),
+        is_suspended: Boolean(profileData.is_suspended),
+        postcode: profileData.postcode ?? null,
+        location_label: locationLabel,
+      };
+
+      setProfile(normalizedProfile);
 
       // Get user listings
       const { data: listingsData, error: listingsError } = await supabase.rpc('get_user_listings', {

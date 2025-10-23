@@ -4,6 +4,7 @@ export interface Profile {
   id: string;
   nickname: string;
   avatar_url: string | null;
+  postcode: string | null;
   rating_avg: number;
   rating_count: number;
   is_admin: boolean;
