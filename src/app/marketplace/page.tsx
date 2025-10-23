@@ -5,7 +5,7 @@ import { useListings } from '@/hooks/marketplace/useListings';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, List } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { CardSkeleton } from '@/components/skeletons/CardSkeleton';
@@ -31,12 +31,20 @@ export default function MarketplacePage() {
           </div>
 
           {user && (
-            <Link href="/marketplace/create">
-              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
-                <Plus className="mr-2 h-4 w-4" />
-                Publicar Anuncio
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/marketplace/my-listings">
+                <Button variant="outline" className="border-2 border-black text-white hover:bg-[#374151]">
+                  <List className="mr-2 h-4 w-4" />
+                  Mis Anuncios
+                </Button>
+              </Link>
+              <Link href="/marketplace/create">
+                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Publicar Anuncio
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 
