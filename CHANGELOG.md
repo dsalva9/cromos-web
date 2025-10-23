@@ -192,6 +192,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed empty slot validation in template creation
 - Fixed counts showing as 0/0 in "Mis Colecciones" page
 
+## [1.6.0] – 2025-10-22 - Integration UI (Frontend)
+
+### ✨ Added - Integration UI (Frontend) **Sprint 9 Complete**
+
+**Pages:**
+- `/mis-plantillas/[copyId]/publicar/[slotId]` - Publish duplicate modal
+- `/marketplace/my-listings` - My listings with sync
+- `/marketplace/[id]/edit` - Edit listing
+
+**Components:**
+- `MyListingCard` - Listing card with sync info and alerts
+- `Breadcrumbs` - Navigation breadcrumbs
+
+**Hooks:**
+- `usePublishDuplicate` - Publish from collection to marketplace
+- `useMyListings` - Fetch listings with sync data
+- `useMarkSold` - Mark sold with auto-decrement
+
+**Features:**
+- Publish duplicates with 1 click from collection
+- Pre-filled listing form from slot data
+- "My Listings" view with tabs (active/sold/removed)
+- Sync indicator for template-linked listings
+- Alert badge when listing active but count = 0
+- Mark as sold with automatic duplicate decrement
+- Edit listing functionality
+- Confirm dialogs for critical actions
+- Updated navigation with "Mis Anuncios" link
+- Quick action buttons in collection view
+- Ownership validation on edit
+
 ## [1.6.0] – 2025-10-22 - Templates Creation UI (Frontend)
 
 ### ✨ Added - Templates Creation UI (Frontend) **Sprint 8.5 Complete**

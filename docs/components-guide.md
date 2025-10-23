@@ -2107,3 +2107,40 @@ const { copy, progress, loading, error, updateSlotStatus } =
 - Fetch slot progress data
 - Update slot status with optimistic updates
 - Error handling
+
+## Integration Components ✅
+
+### MyListingCard
+
+**File:** `src/components/integration/MyListingCard.tsx`
+
+Card for user's listings with sync information.
+
+**Props:**
+- `listing: MyListing` - Listing with sync data
+- `onUpdate: () => void` - Callback after actions
+
+**Features:**
+- Status badge (active/sold/removed)
+- Alert if needs attention (count = 0)
+- Sync indicator for template-linked listings
+- Current duplicate count display
+- Mark as sold button with confirm
+- Edit button for active listings
+- View count and creation date
+- Automatic decrement on sold
+
+### Breadcrumbs
+
+**File:** `src/components/Breadcrumbs.tsx`
+
+Navigation breadcrumbs for nested routes.
+
+**Props:**
+- `items: BreadcrumbItem[]` - Array of breadcrumb items
+
+**Features:**
+- Clickable links for parent routes
+- Current page highlighted
+- Chevron separators
+- Responsive text sizing

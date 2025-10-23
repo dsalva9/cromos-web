@@ -147,7 +147,22 @@
 - `list_public_templates`, `copy_template`, `get_my_template_copies`
 - `get_template_progress`, `update_template_progress`
 
-### 4. Marketplace-Template Integration ✅ **BACKEND COMPLETE (v1.6.0)**
+### 4. Collection-Marketplace Integration ✅ **COMPLETE (v1.6.0)**
+
+**Backend:** ✅ Complete
+**Frontend:** ✅ Complete
+
+- ✅ Publish duplicates from collection with 1 click
+- ✅ Pre-filled listing form from slot data
+- ✅ Editable details before publishing
+- ✅ "My Listings" view with inventory sync
+- ✅ Sync indicator for template-linked listings
+- ✅ Current duplicate count display
+- ✅ Alert badge when count = 0 but listing active
+- ✅ Mark as sold button with automatic decrement
+- ✅ Edit listing functionality
+- ✅ Confirm dialogs for critical actions
+- ✅ Navigation links between features
 
 #### **Bidirectional Bridge**
 
@@ -169,7 +184,7 @@ user_template_progress (count > 0)
     ↓ [publish_duplicate_to_marketplace]
 trade_listings (copy_id, slot_id)
     ↓ [mark_listing_sold_and_decrement]
-user_template_progress (count + 1)
+user_template_progress (count - 1)
 ```
 
 ### 5. Social and Reputation System ✅ **BACKEND COMPLETE (v1.6.0)**

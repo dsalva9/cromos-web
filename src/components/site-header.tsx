@@ -39,6 +39,7 @@ export default function SiteHeader() {
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/templates', label: 'Plantillas' },
     { href: '/mis-plantillas', label: 'Mis Colecciones' },
+    { href: '/marketplace/my-listings', label: 'Mis Anuncios' },
     { href: '/profile', label: 'Perfil' },
   ];
 

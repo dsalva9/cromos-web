@@ -1709,3 +1709,54 @@ When deploying v1.3.0 features:
 **Ready for**: Full Phase 2 feature completion
 
 
+
+---
+
+## Integration Hooks
+
+### usePublishDuplicate
+
+**File:** `src/hooks/integration/usePublishDuplicate.ts`
+
+Publishes a duplicate from collection to marketplace.
+
+**Usage:**
+```typescript
+const { publishDuplicate, loading } = usePublishDuplicate();
+
+const listingId = await publishDuplicate(copyId, slotId, {
+  title: 'Custom Title',
+  description: 'Custom description',
+  // ... other optional fields
+});
+```
+
+**Backend RPC:** `publish_duplicate_to_marketplace`
+
+### useMyListings
+
+**File:** `src/hooks/integration/useMyListings.ts`
+
+Fetches user's listings with inventory sync data.
+
+**Returns:**
+- `listings` - Array with sync information
+- `loading` - Loading state
+- `error` - Error message if any
+- `refetch` - Function to refresh data
+
+**Backend RPC:** `get_my_listings_with_progress`
+
+### useMarkSold
+
+**File:** `src/hooks/integration/useMarkSold.ts`
+
+Marks listing as sold and decrements duplicate count.
+
+**Usage:**
+```typescript
+const { markSold, loading } = useMarkSold();
+await markSold(listingId); // Auto-decrements if linked to template
+```
+
+**Backend RPC:** `mark_listing_sold_and_decrement`
