@@ -2144,3 +2144,159 @@ Navigation breadcrumbs for nested routes.
 - Current page highlighted
 - Chevron separators
 - Responsive text sizing
+
+## Social Components ✅ **NEW (v1.6.0 - Sprint 10)**
+
+### FavoriteButton
+
+**File:** `src/components/social/FavoriteButton.tsx`
+
+Toggle button to favorite/unfavorite users.
+
+**Props:**
+- `userId: string` - Target user ID
+
+**Features:**
+- Heart icon (filled when favorited)
+- Optimistic updates
+- Loading state during check
+- Toast notifications
+- Error handling with revert
+- Auto-checks favorite status on mount
+
+**Usage:**
+```tsx
+<FavoriteButton userId={userId} />
+```
+
+### ReportButton
+
+**File:** `src/components/social/ReportButton.tsx`
+
+Button to open report modal for content moderation.
+
+**Props:**
+- `entityType: 'user' | 'listing' | 'template' | 'chat'` - Content type
+- `entityId: string` - Content ID
+- `variant?: 'default' | 'outline' | 'ghost'` - Button style
+- `size?: 'default' | 'sm' | 'lg'` - Button size
+
+**Features:**
+- Flag icon with hover state
+- Opens ReportModal on click
+- Universal for all content types
+
+**Usage:**
+```tsx
+<ReportButton entityType="listing" entityId={listingId} />
+```
+
+### ReportModal
+
+**File:** `src/components/social/ReportModal.tsx`
+
+Modal with report form for content moderation.
+
+**Props:**
+- `open: boolean` - Modal visibility
+- `onClose: () => void` - Close handler
+- `entityType: 'user' | 'listing' | 'template' | 'chat'` - Content type
+- `entityId: string` - Content ID
+
+**Features:**
+- Radio button reason selection (6 categories)
+- Optional description textarea
+- Character counter (500 max)
+- Validation (reason required)
+- Loading state during submission
+- Success/error toast notifications
+- Form reset on successful submit
+
+**Report Reasons:**
+- Spam or misleading
+- Inappropriate content
+- Scam or fraud
+- Harassment or abuse
+- Fake or counterfeit items
+- Other
+
+### Social Hooks
+
+#### useUserProfile
+
+**File:** `src/hooks/social/useUserProfile.ts`
+
+Fetches public user profile with stats and listings.
+
+**Usage:**
+```tsx
+const { profile, listings, loading, error, refetch } = useUserProfile(userId);
+```
+
+**Returns:**
+- `profile: UserProfile | null` - User profile data
+- `listings: Listing[]` - User's active listings
+- `loading: boolean` - Loading state
+- `error: string | null` - Error message if any
+- `refetch: () => void` - Function to refresh data
+
+**Profile Fields:**
+- `id`, `nickname`, `avatar_url`
+- `rating_avg`, `rating_count`, `favorites_count`
+- `is_admin`, `is_suspended`
+
+#### useFavorites
+
+**File:** `src/hooks/social/useFavorites.ts`
+
+Manages user favorites (check, toggle).
+
+**Functions:**
+- `checkFavorite(userId: string): Promise<boolean>` - Check if user is favorited
+- `toggleFavorite(userId: string): Promise<boolean>` - Toggle favorite status (returns true if added, false if removed)
+
+**Backend RPC:** `toggle_favourite`
+
+#### useMyFavorites
+
+**File:** `src/hooks/social/useMyFavorites.ts`
+
+Fetches current user's favorites list with stats.
+
+**Usage:**
+```tsx
+const { favorites, loading, error, refetch } = useMyFavorites();
+```
+
+**Returns:**
+- `favorites: Favorite[]` - Array of favorited users with stats
+- `loading: boolean` - Loading state
+- `error: string | null` - Error message
+- `refetch: () => void` - Refresh function
+
+**Favorite Fields:**
+- `favorite_user_id`, `nickname`, `avatar_url`
+- `active_listings_count`, `rating_avg`
+- `created_at`
+
+**Backend RPC:** `list_my_favourites`
+
+#### useReport
+
+**File:** `src/hooks/social/useReport.ts`
+
+Submits content reports.
+
+**Usage:**
+```tsx
+const { submitReport, loading } = useReport();
+
+await submitReport(
+  'listing',  // entityType
+  '123',      // entityId
+  'spam',     // reason
+  'This listing appears to be spam'  // description (optional)
+);
+```
+
+**Backend RPC:** `create_report`

@@ -207,13 +207,22 @@
 - [x] Quick action buttons
 - [x] Update documentation Integration UI
 
-### Sprint 10: Social UI
+## ✅ Completed - Sprint 10: Social UI
 
-- [ ] Create public user profile page
-- [ ] Create favourite button component
-- [ ] Create favourites list page
-- [ ] Create report button and modal
-- [ ] Update documentation Social UI
+- [x] Create public user profile page (`/users/[userId]`)
+- [x] Create useUserProfile hook
+- [x] Create FavoriteButton component
+- [x] Create useFavorites hook
+- [x] Create favourites list page (`/favorites`)
+- [x] Create useMyFavorites hook
+- [x] Create ReportButton component
+- [x] Create ReportModal with form
+- [x] Create useReport hook
+- [x] Update navigation with Favorites link
+- [x] Update documentation Social UI
+- [x] Create list_my_favourites RPC in Supabase
+
+---
 
 ### Sprint 11: Admin UI
 
@@ -418,6 +427,6 @@
 
 ---
 
-**Last Updated**: 2025-10-22 (Sprint 8.6 Complete)
+**Last Updated**: 2025-10-23 (Sprint 10 Complete)
 **Current Version**: Backend v1.6.0 | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Sprint 9 Complete ✅ | Ready to begin Sprint 10: Social UI
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Sprint 9 Complete ✅ | Sprint 10 Complete ✅ | Ready to begin Sprint 11: Admin UI

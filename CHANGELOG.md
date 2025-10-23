@@ -9,7 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- TBD
+- **Social UI (Sprint 10)**
+  - Public user profile page (`/users/[userId]`)
+    - Avatar with fallback icon
+    - Rating display with stars and count
+    - Active listings grid
+    - Favorites count and ratings count stats
+    - Admin/suspended badges
+    - Favorite button for other users
+  - Favorites system
+    - `FavoriteButton` component with optimistic updates
+    - Favorites list page (`/favorites`)
+    - Grid of followed users with stats
+    - Remove favorite functionality
+    - Empty state with CTA to marketplace
+  - Universal report system
+    - `ReportButton` component (works for users, listings, templates, chat)
+    - `ReportModal` with form validation
+    - 6 report categories (spam, inappropriate, scam, harassment, fake, other)
+    - Optional description field (500 chars max)
+    - Character counter
+    - Toast notifications for success/error
+  - Social hooks
+    - `useUserProfile` - Fetch public user profiles with listings
+    - `useFavorites` - Check and toggle favorite status
+    - `useMyFavorites` - Fetch current user's favorites list
+    - `useReport` - Submit content reports
+  - Navigation
+    - Added "Favoritos" link to main navigation
+  - Backend
+    - Created `list_my_favourites` RPC for favorites list with stats
 
 ### Changed
 

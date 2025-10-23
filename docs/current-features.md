@@ -187,42 +187,63 @@ trade_listings (copy_id, slot_id)
 user_template_progress (count - 1)
 ```
 
-### 5. Social and Reputation System ✅ **BACKEND COMPLETE (v1.6.0)**
+### 5. Social and Reputation System ✅ **COMPLETE (v1.6.0)**
+
+**Backend:** ✅ Complete
+**Frontend:** ✅ Complete (Sprint 10)
 
 #### **Favourites System**
 
-- Unified favourites table for all entity types
-- Toggle favourite with single RPC
-- Public counts for listings and templates
-- User's favourites list with pagination
+- ✅ Unified favourites table for all entity types
+- ✅ Toggle favourite with single RPC
+- ✅ Public counts for listings and templates
+- ✅ User's favourites list with pagination
+- ✅ FavoriteButton component with optimistic updates
+- ✅ Favorites page showing followed users with stats
+- ✅ Remove favorite functionality
 
 #### **User Ratings System**
 
-- 1-5 star ratings with comments
-- Linked to trades or listings
-- Automatic aggregation on profiles
-- Rating distribution statistics
+- ✅ 1-5 star ratings with comments
+- ✅ Linked to trades or listings
+- ✅ Automatic aggregation on profiles
+- ✅ Rating distribution statistics
+- ✅ Public user profiles with rating display
+- ⏳ Post-trade rating modal (future)
 
 #### **Template Ratings System**
 
-- 1-5 star ratings with comments
-- Automatic aggregation on templates
-- Rating distribution statistics
-- User's rating displayed in summary
+- ✅ 1-5 star ratings with comments
+- ✅ Automatic aggregation on templates
+- ✅ Rating distribution statistics
+- ✅ User's rating displayed in summary
 
 #### **Reports System**
 
-- Universal reporting for all content types
-- Multiple report reasons
-- Admin workflow with status tracking
-- Prevention of duplicate reports
+- ✅ Universal reporting for all content types
+- ✅ Multiple report reasons (6 categories)
+- ✅ Admin workflow with status tracking
+- ✅ Prevention of duplicate reports
+- ✅ ReportButton component (universal)
+- ✅ ReportModal with form validation
+- ✅ Report submission flow with toast notifications
+
+#### **Public User Profiles**
+
+- ✅ Avatar with fallback
+- ✅ Rating display with stars
+- ✅ Active listings count and grid
+- ✅ Favorites count
+- ✅ Admin/suspended badges
+- ✅ Favorite button for other users
 
 #### **Social RPCs:**
 
-- `toggle_favourite`, `is_favourited`, `get_favourite_count`, `get_user_favourites`
+- `toggle_favourite`, `is_favourited`, `get_favourite_count`, `list_my_favourites`
 - `create_user_rating`, `update_user_rating`, `delete_user_rating`, `get_user_ratings`, `get_user_rating_summary`
 - `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
+- `get_user_listings` (for profile pages)
 
 ### 6. Admin Moderation System ✅ **BACKEND COMPLETE (v1.6.0)**
 
