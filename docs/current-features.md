@@ -439,16 +439,34 @@ user_template_progress (count - 1)
 
 ## 🚧 Under Construction
 
-### Admin Moderation UI
+### Sprint 12: Polish & Testing ✅ **COMPLETE**
 
-- Status: Backend complete, frontend pending
-- Next: Sprint 11: Admin UI
+**UX Improvements:**
+- ✅ Loading skeletons for all card types (ListingCardSkeleton, TemplateCardSkeleton)
+- ✅ EmptyState component with CTAs
+- ✅ Consistent empty states across all pages
+- ✅ Better perceived performance
 
-### Social UI
+**Error Handling:**
+- ✅ Enhanced ErrorBoundary component
+- ✅ Next.js error pages (error.tsx, global-error.tsx)
+- ✅ User-friendly error messages
+- ✅ Try again and go home actions
+- ✅ Dev mode error details
 
-- Status: Backend complete, frontend pending
-- Next: Sprint 10: Social UI
-- Latest: Perfil propio muestra email, ubicacion (codigo postal) y modal de edicion con avatar/nickname/CP; listados filtrables por estado (solo el propietario ve completados/eliminados)
+**Accessibility:**
+- ✅ Enhanced skip to content link
+- ✅ Focus styles with #FFC000 ring
+- ✅ Viewport and theme meta tags
+- ✅ Screen reader utilities
+- ✅ WCAG AA compliance
+
+**Performance:**
+- ✅ LazyImage component
+- ✅ Next.js image optimization
+- ✅ Route-based loading states
+- ✅ Request caching utilities
+- ✅ Production optimizations
 
 ### Collection Templates System ✅ **COMPLETE (v1.6.0)**
 
@@ -641,6 +659,6 @@ user_template_progress (count - 1)
 
 ---
 
-**Last Updated**: 2025-10-22 (Sprint 8.6 Complete)
-**Current Version**: Backend v1.6.0-alpha | Frontend v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Ready to begin Sprint 9: Integration UI
+**Last Updated**: 2025-10-24 (Sprint 12 Complete - PRODUCTION READY)
+**Current Version**: v1.6.0
+**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Sprint 9 Complete ✅ | Sprint 10 Complete ✅ | Sprint 11 Complete ✅ | Sprint 12 Complete ✅ | **PRODUCTION READY** 🚀
