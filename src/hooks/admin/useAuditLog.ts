@@ -28,7 +28,7 @@ export function useAuditLog(actionType: string = 'all') {
       const currentOffset = isLoadMore ? offset : 0;
 
       let query = supabase
-        .from('admin_actions')
+        .from('audit_log')
         .select(`
           *,
           admin:profiles!admin_id(nickname)
