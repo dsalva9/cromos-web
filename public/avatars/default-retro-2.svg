@@ -1,0 +1,6 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="#A8E6CF"/>
+  <path d="M 80 180 L 100 80 L 120 180 L 140 60 L 160 180 L 180 100" stroke="#000" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <circle cx="140" cy="60" r="15" fill="#FFD700" stroke="#000" stroke-width="3"/>
+  <text x="128" y="230" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#000" text-anchor="middle">⚡</text>
+</svg>

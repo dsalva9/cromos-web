@@ -4,14 +4,13 @@ import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, LogOut, Bell } from 'lucide-react';
+import { Menu, X, Bell } from 'lucide-react';
 import NavLink from '@/components/nav-link';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { useNotifications } from '@/hooks/trades/useNotifications';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
+import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,23 +24,11 @@ export default function SiteHeader() {
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      logger.error('Sign out error:', error);
-    }
-    closeMenu();
-  };
-
   const baseLinks = [
     { href: '/', label: 'Home' },
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/templates', label: 'Plantillas' },
     { href: '/mis-plantillas', label: 'Mis Colecciones' },
-    { href: '/favorites', label: 'Favoritos' },
-    // Sprint 10: Updated to use new public user profile
-    { href: user ? `/users/${user.id}` : '/profile', label: 'Perfil' },
   ];
 
   const unauthenticatedLinks = [
@@ -50,18 +37,7 @@ export default function SiteHeader() {
     { href: '/signup', label: 'Registrarse' },
   ];
 
-  const navigationLinks = (() => {
-    if (!user) return unauthenticatedLinks;
-    const links = [...baseLinks];
-    if (isAdmin) {
-      const profileIndex = links.findIndex(l => l.href === '/profile');
-      links.splice(profileIndex >= 0 ? profileIndex : links.length, 0, {
-        href: '/admin/dashboard',
-        label: 'Admin',
-      });
-    }
-    return links;
-  })();
+  const navigationLinks = user ? baseLinks : unauthenticatedLinks;
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -162,19 +138,9 @@ export default function SiteHeader() {
                 </li>
               ))}
             </ul>
-            {!loading && (
+            {!loading && user && (
               <div className="ml-4">
-                {user ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-2 text-white hover:text-white hover:bg-[#E84D4D] rounded-md px-4 py-2 font-bold uppercase text-sm transition-all duration-200 border-2 border-transparent hover:border-black focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Salir</span>
-                  </Button>
-                ) : null}
+                <UserAvatarDropdown isAdmin={isAdmin} />
               </div>
             )}
           </nav>
@@ -252,19 +218,6 @@ export default function SiteHeader() {
                 )}
               </li>
             ))}
-            {!loading && user && (
-              <li className="px-2 pt-2 border-t-2 border-gray-700 mt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="w-full justify-start flex items-center space-x-2 text-white hover:text-white hover:bg-[#E84D4D] rounded-md px-4 py-3 font-bold uppercase text-base border-2 border-transparent hover:border-black focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Salir</span>
-                </Button>
-              </li>
-            )}
           </ul>
         </nav>
       </div>

@@ -4,8 +4,6 @@ import {
   useMemo,
   useState,
   useEffect,
-  useRef,
-  ChangeEvent,
 } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -39,8 +37,9 @@ import {
   Package,
   MapPin,
   Pencil,
-  Upload,
 } from 'lucide-react';
+import { AvatarPicker, AvatarSelection } from '@/components/profile/AvatarPicker';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 const STATUS_LABELS = {
   active: 'Activos',
@@ -79,9 +78,9 @@ export default function UserProfilePage() {
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
   const [formAvatarPath, setFormAvatarPath] = useState<string | null>(null);
+  const [avatarBlob, setAvatarBlob] = useState<{ blob: Blob; fileName: string } | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!profile) return;
@@ -92,23 +91,17 @@ export default function UserProfilePage() {
     );
     setFormPostcode(profile.postcode ?? '');
     setFormAvatarPath(profile.avatar_url ?? null);
+    setAvatarBlob(null);
   }, [profile, editDialogOpen]);
 
-  const resolveAvatarUrl = (value: string | null) => {
-    if (!value) return null;
-    if (value.startsWith('http')) return value;
-    const { data } = supabase.storage.from('avatars').getPublicUrl(value);
-    return data.publicUrl;
-  };
-
   const displayAvatarUrl = useMemo(
-    () => resolveAvatarUrl(profile?.avatar_url ?? null),
+    () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [profile?.avatar_url]
   );
 
   const previewAvatarUrl = useMemo(
-    () => resolveAvatarUrl(formAvatarPath),
+    () => resolveAvatarUrl(formAvatarPath, supabase),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [formAvatarPath]
   );
@@ -188,42 +181,20 @@ export default function UserProfilePage() {
     ),
   }));
 
-  const handleAvatarUpload = async (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    if (!currentUser) return;
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Selecciona una imagen de menos de 2MB');
-      event.target.value = '';
-      return;
-    }
-
-    const fileExt = file.name.split('.').pop() ?? 'png';
-    const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
-
-    try {
-      setUploadingAvatar(true);
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file, {
-          upsert: true,
-          cacheControl: '3600',
-          contentType: file.type,
-        });
-
-      if (uploadError) throw uploadError;
-
-      setFormAvatarPath(fileName);
-      toast.success('Avatar cargado correctamente');
-    } catch (uploadErr) {
-      console.error('Error uploading avatar', uploadErr);
-      toast.error('No se pudo subir la imagen');
-    } finally {
-      setUploadingAvatar(false);
-      event.target.value = '';
+  const handleAvatarSelection = async (selection: AvatarSelection) => {
+    if (selection.type === 'preset') {
+      // Preset avatar - just store the public path
+      setFormAvatarPath(selection.value);
+      setAvatarBlob(null);
+    } else if (selection.type === 'upload') {
+      // Uploaded image - store blob for later upload
+      setAvatarBlob({ blob: selection.value, fileName: selection.fileName });
+      // Create temporary preview
+      const previewUrl = URL.createObjectURL(selection.value);
+      setFormAvatarPath(previewUrl);
+    } else if (selection.type === 'remove') {
+      setFormAvatarPath(null);
+      setAvatarBlob(null);
     }
   };
 
@@ -242,12 +213,34 @@ export default function UserProfilePage() {
 
     try {
       setSavingProfile(true);
+
+      let finalAvatarPath = formAvatarPath;
+
+      // Upload avatar blob if exists
+      if (avatarBlob) {
+        setUploadingAvatar(true);
+        const storagePath = `avatars/${currentUser.id}/${avatarBlob.fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(storagePath, avatarBlob.blob, {
+            upsert: true,
+            cacheControl: '3600',
+            contentType: 'image/webp',
+          });
+
+        if (uploadError) throw uploadError;
+
+        finalAvatarPath = storagePath;
+        setUploadingAvatar(false);
+      }
+
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
           nickname: trimmedNickname || null,
           postcode: normalizedPostcode,
-          avatar_url: formAvatarPath,
+          avatar_url: finalAvatarPath,
         })
         .eq('id', currentUser.id);
 
@@ -261,6 +254,7 @@ export default function UserProfilePage() {
       toast.error('No se pudo actualizar el perfil');
     } finally {
       setSavingProfile(false);
+      setUploadingAvatar(false);
     }
   };
 
@@ -394,57 +388,22 @@ export default function UserProfilePage() {
                             </Button>
                           </DialogTrigger>
 
-                          <DialogContent className="space-y-4">
+                          <DialogContent className="space-y-4 max-w-2xl">
                             <DialogHeader>
                               <DialogTitle>Editar perfil</DialogTitle>
                               <DialogDescription>
-                                Actualiza tu avatar, nombre y ubicaciA3n aproximada.
+                                Actualiza tu avatar, nombre y ubicación aproximada.
                               </DialogDescription>
                             </DialogHeader>
 
                             <div className="space-y-6">
-                              <div className="flex items-center gap-4">
-                                <div className="relative">
-                                  {previewAvatarUrl ? (
-                                    <Image
-                                      src={previewAvatarUrl}
-                                      alt="Avatar"
-                                      width={96}
-                                      height={96}
-                                      className="rounded-full border-4 border-black object-cover"
-                                    />
-                                  ) : (
-                                    <div className="w-24 h-24 rounded-full bg-[#FFC000] border-4 border-black flex items-center justify-center">
-                                      <User className="h-10 w-10 text-black" />
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="space-y-2">
-                                  <Label htmlFor="avatar-upload">Avatar</Label>
-                                  <p className="text-xs text-gray-400 max-w-xs">
-                                    Usa una imagen cuadrada (PNG o JPG) de hasta 2MB.
-                                  </p>
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
-                                      disabled={uploadingAvatar}
-                                      onClick={() => fileInputRef.current?.click()}
-                                    >
-                                      <Upload className="w-4 h-4 mr-2" />
-                                      {uploadingAvatar ? 'Subiendo...' : 'Seleccionar imagen'}
-                                    </Button>
-                                    <input
-                                      ref={fileInputRef}
-                                      id="avatar-upload"
-                                      type="file"
-                                      accept="image/*"
-                                      className="hidden"
-                                      onChange={handleAvatarUpload}
-                                    />
-                                  </div>
-                                </div>
+                              <div className="space-y-3">
+                                <Label>Avatar</Label>
+                                <AvatarPicker
+                                  currentAvatarUrl={previewAvatarUrl}
+                                  onSelect={handleAvatarSelection}
+                                  uploading={uploadingAvatar}
+                                />
                               </div>
 
                               <div className="space-y-2">
@@ -459,7 +418,7 @@ export default function UserProfilePage() {
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="postcode">CA3digo postal</Label>
+                                <Label htmlFor="postcode">Código postal</Label>
                                 <Input
                                   id="postcode"
                                   value={formPostcode}
@@ -469,7 +428,7 @@ export default function UserProfilePage() {
                                   inputMode="numeric"
                                 />
                                 <p className="text-xs text-gray-400">
-                                  Mostramos tu ubicaciA3n aproximada en base al cA3digo postal.
+                                  Mostramos tu ubicación aproximada en base al código postal.
                                 </p>
                               </div>
                             </div>

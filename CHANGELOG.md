@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Sprint 13: Marketplace Transactions (IN PROGRESS)**
+  - **Avatar System:**
+    - 8 preset retro-comic avatars (SVG)
+    - Custom avatar upload with auto-processing (square crop, WebP conversion, compression)
+    - Two-tab avatar picker (gallery/upload)
+    - Profile avatar editing with preview
+    - Avatar resolution helper for presets and storage paths
+  - **Header Improvements:**
+    - User avatar dropdown in site header
+    - Mini-profile menu (My Profile, My Listings, Favorites, Sign Out)
+    - Conditional admin panel link
+    - Mobile-responsive avatar display
+  - **Marketplace Chat:**
+    - Bidirectional chat between buyers and sellers
+    - Seller can view and manage multiple buyer conversations
+    - Real-time message updates via Supabase
+    - Auto-read receipts
+    - Character limit (500) with counter
+    - Comic-style message bubbles
+    - Chat page at `/marketplace/[id]/chat`
+  - **Transaction Workflow (Database):**
+    - Listing reservation system
+    - Transaction states: reserved → completed/cancelled
+    - Seller can reserve listing for specific buyer
+    - Both parties can mark transaction complete
+    - Seller can cancel with reason
+    - Transaction history tracking
+  - **Mobile Features:**
+    - Camera capture modal for listing photos
+    - Direct camera access via `getUserMedia`
+    - Live preview with retake option
+    - Auto-processing to WebP format
+    - Permission handling with fallbacks
+  - **New Pages:**
+    - `/marketplace/[id]/chat` - Listing chat interface
+    - `/marketplace/reservations` - Buyer's active reservations
+
+- **Database Changes (Sprint 13):**
+  - Extended `trade_listings.status` to include 'reserved' and 'completed'
+  - New `listing_transactions` table with RLS policies
+  - Updated listing chat RPCs for bidirectional conversation
+  - New transaction management RPCs (reserve, complete, cancel)
+
 - **Sprint 12: Polish & Testing (COMPLETE)**
   - **UX Improvements:**
     - Loading skeletons for listing cards

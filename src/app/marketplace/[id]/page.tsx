@@ -226,10 +226,20 @@ export default function ListingDetailPage() {
               )}
 
               {isOwner && (
-                <div className="text-center">
-                  <p className="text-gray-400 text-sm mb-4">
+                <div className="text-center space-y-4">
+                  <p className="text-gray-400 text-sm">
                     Este es tu anuncio
                   </p>
+                  <Button
+                    size="lg"
+                    className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                    asChild
+                  >
+                    <Link href={`/marketplace/${listing.id}/chat`}>
+                      <MessageCircle className="mr-2 h-5 w-5" />
+                      Ver Conversaciones
+                    </Link>
+                  </Button>
                   <div className="flex gap-4 justify-center">
                     <Button variant="outline" asChild>
                       <Link href={`/marketplace/${listing.id}/edit`}>
