@@ -91,21 +91,22 @@ BEGIN
     RETURN QUERY
     SELECT
         p.id AS user_id,
-        p.email,
-        p.nickname,
+        COALESCE(au.email, '')::TEXT AS email,  -- Get email from auth.users (cast to TEXT)
+        COALESCE(p.nickname, 'Unknown')::TEXT AS nickname,
         p.avatar_url,
         p.is_admin,
         p.is_suspended,
         COALESCE(p.rating_avg, 0) AS rating_avg,
-        COALESCE(p.rating_count, 0) AS rating_count,
-        (SELECT COUNT(*)::BIGINT FROM trade_listings WHERE user_id = p.id AND status = 'active') AS active_listings_count,
-        (SELECT COUNT(*)::BIGINT FROM reports WHERE target_type = 'user' AND target_id = p.id::TEXT) AS reports_received_count,
+        COALESCE(p.rating_count, 0)::BIGINT AS rating_count,
+        (SELECT COUNT(*)::BIGINT FROM trade_listings tl WHERE tl.user_id = p.id AND tl.status = 'active') AS active_listings_count,
+        (SELECT COUNT(*)::BIGINT FROM reports r WHERE r.target_type = 'user' AND r.target_id::TEXT = p.id::TEXT) AS reports_received_count,
         p.created_at
     FROM profiles p
+    LEFT JOIN auth.users au ON au.id = p.id  -- Join with auth.users to get email
     WHERE
         (p_query IS NULL OR p_query = '' OR
          p.nickname ILIKE '%' || p_query || '%' OR
-         p.email ILIKE '%' || p_query || '%')
+         au.email ILIKE '%' || p_query || '%')
         AND (p_status = 'all' OR
              (p_status = 'active' AND NOT p.is_suspended) OR
              (p_status = 'suspended' AND p.is_suspended))
