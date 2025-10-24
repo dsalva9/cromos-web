@@ -3,13 +3,13 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface AdminStats {
   total_users: number;
-  active_users_last_30_days: number;
-  suspended_users: number;
+  total_listings: number;
+  total_templates: number;
+  total_reports: number;
   pending_reports: number;
   active_listings: number;
   public_templates: number;
-  completed_trades_last_30_days: number;
-  total_admin_actions_last_30_days: number;
+  suspended_users: number;
 }
 
 export function useAdminStats() {
@@ -27,11 +27,14 @@ export function useAdminStats() {
     try {
       setLoading(true);
 
-      const { data, error: rpcError } = await supabase.rpc('get_admin_stats');
+      const { data, error: rpcError } = await supabase.rpc('get_admin_dashboard_stats');
 
       if (rpcError) throw rpcError;
 
-      setStats(data);
+      // The RPC returns an array with one row, get the first item
+      if (data && data.length > 0) {
+        setStats(data[0]);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {

@@ -64,17 +64,17 @@ function AdminDashboardContent() {
             </ModernCardContent>
           </ModernCard>
 
-          {/* Active Users (30d) */}
+          {/* Total Listings */}
           <ModernCard>
             <ModernCardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Active Users (30d)</p>
+                  <p className="text-gray-400 text-sm mb-1">Total Listings</p>
                   <p className="text-3xl font-black text-white">
-                    {stats.active_users_last_30_days}
+                    {stats.total_listings}
                   </p>
                 </div>
-                <TrendingUp className="h-12 w-12 text-green-500" />
+                <Package className="h-12 w-12 text-blue-500" />
               </div>
             </ModernCardContent>
           </ModernCard>
@@ -94,17 +94,17 @@ function AdminDashboardContent() {
             </ModernCardContent>
           </ModernCard>
 
-          {/* Active Listings */}
+          {/* Total Reports */}
           <ModernCard>
             <ModernCardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm mb-1">Active Listings</p>
+                  <p className="text-gray-400 text-sm mb-1">Total Reports</p>
                   <p className="text-3xl font-black text-white">
-                    {stats.active_listings}
+                    {stats.total_reports}
                   </p>
                 </div>
-                <Package className="h-12 w-12 text-blue-500" />
+                <AlertTriangle className="h-12 w-12 text-orange-500" />
               </div>
             </ModernCardContent>
           </ModernCard>
@@ -127,30 +127,30 @@ function AdminDashboardContent() {
             </ModernCardContent>
           </ModernCard>
 
-          {/* Completed Trades (30d) */}
+          {/* Active Listings */}
           <ModernCard>
             <ModernCardContent className="p-6">
               <div className="flex items-center gap-4">
                 <CheckCircle className="h-10 w-10 text-green-500" />
                 <div>
-                  <p className="text-gray-400 text-sm">Completed Trades (30d)</p>
+                  <p className="text-gray-400 text-sm">Active Listings</p>
                   <p className="text-2xl font-black text-white">
-                    {stats.completed_trades_last_30_days}
+                    {stats.active_listings}
                   </p>
                 </div>
               </div>
             </ModernCardContent>
           </ModernCard>
 
-          {/* Admin Actions (30d) */}
+          {/* Total Templates */}
           <ModernCard>
             <ModernCardContent className="p-6">
               <div className="flex items-center gap-4">
-                <AlertTriangle className="h-10 w-10 text-orange-500" />
+                <FileText className="h-10 w-10 text-blue-400" />
                 <div>
-                  <p className="text-gray-400 text-sm">Admin Actions (30d)</p>
+                  <p className="text-gray-400 text-sm">Total Templates</p>
                   <p className="text-2xl font-black text-white">
-                    {stats.total_admin_actions_last_30_days}
+                    {stats.total_templates}
                   </p>
                 </div>
               </div>
