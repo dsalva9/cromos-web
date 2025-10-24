@@ -7,8 +7,7 @@ import {
   Package,
   FileText,
   AlertTriangle,
-  CheckCircle,
-  TrendingUp
+  CheckCircle
 } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 

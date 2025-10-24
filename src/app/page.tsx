@@ -3,7 +3,8 @@
 import { useUser } from '@/components/providers/SupabaseProvider';
 import Hero from '@/components/home/Hero';
 import HowItWorks from '@/components/home/HowItWorks';
-import StickerTeaser from '@/components/home/StickerTeaser';
+import MarketplaceShowcase from '@/components/home/MarketplaceShowcase';
+import FeatureHighlights from '@/components/home/FeatureHighlights';
 import SiteFooter from '@/components/site-footer';
 
 export default function Home() {
@@ -19,14 +20,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#1F2937] flex flex-col">
-      {/* Main content */}
       <main className="flex-1">
         <Hero isAuthenticated={!!user} />
         <HowItWorks />
-        <StickerTeaser />
+        <MarketplaceShowcase />
+        <FeatureHighlights />
       </main>
 
-      {/* Footer */}
       <SiteFooter />
     </div>
   );

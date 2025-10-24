@@ -1,26 +1,26 @@
 'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { UserPlus, Search, ArrowLeftRight } from 'lucide-react';
+import { LayoutTemplate, Store, MessageSquare } from 'lucide-react';
 
 const steps = [
   {
-    icon: UserPlus,
-    title: 'Crea tu Cuenta',
+    icon: LayoutTemplate,
+    title: 'Activa una Plantilla',
     description:
-      'Regístrate gratis y empieza a añadir cromos a tu colección personal.',
+      'Explora plantillas públicas o crea la tuya. Marca tus cromos como HAVE, NEED o DUPES en segundos.',
   },
   {
-    icon: Search,
-    title: 'Busca Intercambios',
+    icon: Store,
+    title: 'Publica tus Duplicados',
     description:
-      'Encuentra coleccionistas que tengan los cromos que necesitas y que quieran tus duplicados.',
+      'Sincroniza duplicados con el marketplace, añade fotos y automatiza la visibilidad de tus anuncios.',
   },
   {
-    icon: ArrowLeftRight,
-    title: 'Intercambia',
+    icon: MessageSquare,
+    title: 'Negocia y Finaliza',
     description:
-      'Propón intercambios justos y completa tu álbum más rápido que nunca.',
+      'Usa chats privados, reputación y auditoría para cerrar intercambios seguros y documentados.',
   },
 ];
 
@@ -28,39 +28,31 @@ export default function HowItWorks() {
   return (
     <section className="container mx-auto px-4 py-16 border-t-4 border-black">
       <div className="max-w-6xl mx-auto">
-        {/* Section header */}
         <h2 className="text-3xl md:text-4xl font-extrabold uppercase text-white text-center mb-12">
-          ¿Cómo Funciona?
+          Tu flujo de intercambio en tres pasos
         </h2>
 
-        {/* Steps grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
               <ModernCard
-                key={index}
+                key={step.title}
                 className="bg-gray-800 border-2 border-black shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
               >
-                <ModernCardContent className="p-6 text-center">
-                  {/* Step number badge */}
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFC000] text-gray-900 font-extrabold text-xl border-2 border-black rounded-lg mb-4 shadow-lg">
+                <ModernCardContent className="p-6 text-center space-y-5">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFC000] text-gray-900 font-extrabold text-xl border-2 border-black rounded-lg shadow-lg">
                     {index + 1}
                   </div>
 
-                  {/* Icon */}
-                  <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 bg-gray-900 border-2 border-black rounded-lg flex items-center justify-center shadow-lg">
-                      <Icon className="w-8 h-8 text-[#FFC000]" />
-                    </div>
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg border-2 border-black bg-gray-900 shadow-lg">
+                    <Icon className="h-8 w-8 text-[#FFC000]" />
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-white mb-3 uppercase">
+                  <h3 className="text-xl font-bold text-white uppercase">
                     {step.title}
                   </h3>
 
-                  {/* Description */}
                   <p className="text-gray-300 leading-relaxed">
                     {step.description}
                   </p>

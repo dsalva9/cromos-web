@@ -118,7 +118,7 @@ function ReportsQueueContent() {
                     <div className="pt-2">
                       <Button
                         size="sm"
-                        onClick={() => setSelectedReportId(report.report_id)}
+                        onClick={() => setSelectedReportId(String(report.report_id))}
                         className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
                       >
                         <Eye className="mr-2 h-4 w-4" />
