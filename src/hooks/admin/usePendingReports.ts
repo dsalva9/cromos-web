@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface PendingReport {
-  report_id: string;
+  report_id: number;
   reporter_nickname: string;
   entity_type: string;
-  entity_id: string;
+  entity_id: number;
   reason: string;
   description: string | null;
   created_at: string;
