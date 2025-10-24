@@ -1,0 +1,68 @@
+Subtask 13.1: Avatar experience and header refresh
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+We need to finish the avatar/profile visual experience and update navigation to use the avatar chip instead of the old "Perfil" link.
+
+CONTEXT:
+- `profiles` already exposes `avatar_url`; editing dialog in `src/app/users/[userId]/page.tsx` allows uploading but lacks preset avatars or cropping.
+- We reuse Supabase storage buckets `avatars` (for user headshots) and `sticker-images` (for marketplace photos). Confirm bucket policies in `supabase/storage-policies.md` (storage already public-read).
+- `src/components/site-header.tsx` still renders a text link ("Perfil") and uses stale notifications implementation.
+- `ProfilePage` (`src/app/profile/page.tsx` + `src/components/ProfilePage.tsx`) must stay functional for legacy routes.
+
+TASK:
+Deliver a polished avatar system plus header mini-profile entry point.
+
+CHANGES TO MAKE:
+- Todas las nuevas cadenas que aparezcan en la interfaz deben estar en español (es-ES) y seguir el tono retro-comic existente.
+
+1. Avatar library & client utilities
+   - Create `src/constants/avatars.ts` exporting an array of preset avatar descriptors (id, label, storagePath). Use 8–10 stylised SVG/PNG assets stored under `public/avatars/default-*.png` (add real files; 256x256, <80KB). Document naming pattern in file header comment.
+   - Add `src/lib/images/ensureSquare.ts` helper that:
+        * Accepts a `File`
+        * Uses `HTMLCanvasElement` to crop/letterbox to square
+        * Returns `{ blob, width, height }` with 512x512 max dimension and preserved transparency.
+   - Update `src/components/marketplace/ImageUpload.tsx` (and new avatar picker) to reuse a shared `processImageBeforeUpload(file: File, options)` utility for compression (use browser-image-compression or canvas resizing); place helper in `src/lib/images/processImageBeforeUpload.ts`.
+
+2. Profile edit dialog (`src/app/users/[userId]/page.tsx`)
+   - Replace the simple file input with a two-tab picker:
+     * Tab “Galería” renders preset avatars from `avatars.ts` using `next/image`, and when selected sets `formAvatarPath` to the storage path (do NOT upload again).
+     * Tab “Subir foto” retains upload, but:
+        - Enforce square preview using `ensureSquare`.
+        - Upload to Supabase bucket `avatars` under `avatars/{userId}/{timestamp}.webp`.
+        - Convert to WebP before upload (quality 0.85).
+        - Surface upload progress indicator + error handling (toast).
+   - Persist chosen avatar via existing profile update RPC (`profiles` update). Make sure removing avatar clears storage path and uses fallback silhouette.
+   - Update optimistic UI: `previewAvatarUrl` should prioritise selected preset, then uploaded, then fallback.
+   - Ensure validation: max size 3MB, only `image/*`.
+
+3. Reusable avatar picker component
+   - Add `src/components/profile/AvatarPicker.tsx` encapsulating the tab UI and emitting `{ type: 'preset' | 'upload' | 'remove', value?: string }`.
+   - Replace inline dialog UI in both `UserProfilePage` and `ProfilePage` (legacy) with the new component to avoid duplication.
+
+4. Site header mini profile (`src/components/site-header.tsx`)
+   - Remove the “Perfil” nav item for authenticated users. Instead render a right-aligned avatar button:
+        * Shows current avatar (use `useUser()` + `useUserProfile` minimal hook for avatar + nickname) or fallback circle with initials.
+        * Clicking opens a dropdown (Radix or custom) with:
+            - Link “Mi Perfil” → `/users/${user.id}`
+            - Link “Mis Anuncios” → `/marketplace/my-listings`
+            - Link “Favoritos” → `/favorites`
+            - Divider
+            - “Cerrar sesión” button (reuse existing handler)
+        * On mobile, include this avatar entry inside the slide-out menu header.
+   - Keep admin link visible (badge/pill within dropdown or alongside nav items) when `isAdmin` true.
+   - Ensure focus states and keyboard navigation comply with `theme-guide.md`.
+
+5. Consumptions & fallbacks
+   - Update `ListingCard`, `ListingDetailPage`, and any user chip components to use new helper `resolveAvatarUrl` (extract existing logic into `src/lib/profile/resolveAvatarUrl.ts`).
+   - When avatar fails to load, show fallback gradient background with first initial.
+
+6. Tests & docs
+   - Add unit test for `ensureSquare` (Jest + JSDOM canvas mock) under `tests/unit/lib/images/ensureSquare.test.ts`.
+   - Update documentation:
+        * `docs/components-guide.md` → add “Avatar Picker” section with usage.
+        * `docs/theme-guide.md` → note avatar sizing + border treatment.
+        * `CHANGELOG.md` (Unreleased) → “Added avatar library and header mini-profile”.
+        * `TODO.md` → mark avatar UX item complete.
+   - QA checklist (append to sprint completion doc later): desktop/mobile avatar change, preset selection, upload failure, sign-out from dropdown.
+```

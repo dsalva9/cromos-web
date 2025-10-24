@@ -1,0 +1,45 @@
+Subtask 15.5: Docs, QA & release readiness
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Complete Sprint 15 with documentation, QA plan, and release summary.
+
+CONTEXT:
+- Notifications revamp touches database, hooks, UI.
+- Must maintain documentation discipline & provide testing guidance.
+
+TASK:
+Produce closing artefacts for the notifications sprint.
+
+CHECKLIST:
+- Siempre documenta los textos de interfaz en español (es-ES) dentro de planes, guías y notas de release.
+
+1. Sprint docs
+   - `docs/sprints/SPRINT 15 NOTIFICATIONS SYSTEM/SPRINT-15-PLAN.md` capturing objectives, key decisions, blockers, and dependency notes (e.g., requires Sprint 13/14 completions).
+   - Add architecture diagram or sequence chart (draw.io) showing notification flow (user action → trigger → notification → UI).
+
+2. Global docs
+   - Update `CHANGELOG.md` with Sprint 15 entry summarising notification types, UI, and integration.
+   - `TODO.md` → mark notifications items complete; add follow-ups (push notifications, email digests).
+   - `docs/current-features.md` → refresh “Notifications System” section.
+   - `docs/api-endpoints.md` → update RPC definitions + REST endpoints for mark read.
+   - `README.md`/`deployment-guide.md` with notes on enabling realtime + supabase config (listeners, service role).
+
+3. Manual testing guide
+   - Create `docs/sprints/SPRINT 15 NOTIFICATIONS SYSTEM/MANUAL-TESTING.md` covering:
+        * Chat notification scenario.
+        * Reservation/completion notifications.
+        * Template + user rating notifications.
+        * Mark read behaviours (dropdown vs center).
+        * Edge cases (deleted listing/template should show fallback message).
+
+4. Automated tests
+   - Ensure Playwright suites for notifications tagged (e.g., `@notifications`).
+   - Add jest/vitest tests for formatting helpers.
+
+5. Release note draft
+   - Provide copy emphasising “Notifications are back” with bullet points for PM.
+
+6. Handoff
+   - Update `SPRINT-15-PLAN.md` with verification checklist, outstanding risks, and metrics (e.g., expected Supabase realtime channels).
+```

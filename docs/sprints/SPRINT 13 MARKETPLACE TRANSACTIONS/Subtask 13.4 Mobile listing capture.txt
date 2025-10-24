@@ -1,0 +1,54 @@
+Subtask 13.4: Mobile listing capture
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+We want sellers to snap photos directly from their phones when creating/editing marketplace listings.
+
+CONTEXT:
+- Listing form uses `ImageUpload` component with `<input type="file">`.
+- No dedicated camera capture or compression beyond basic checks.
+- Need to preserve desktop flow (upload from disk) while enabling mobile camera.
+
+TASK:
+Enhance the listing image workflow with direct capture, better compression, and accessibility.
+
+CHANGES TO MAKE:
+- Todas las cadenas visibles (botones, mensajes, avisos) deben escribirse en español (es-ES) siguiendo el estilo actual.
+
+1. Component upgrades (`src/components/marketplace/ImageUpload.tsx`)
+   - Update file input to include `capture="environment"` and `accept="image/*"`.
+   - Add visible button “Tomar foto” that, on supported browsers, triggers `navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })`.
+   - Create overlay modal `CameraCaptureSheet` (use Radix Dialog) showing live video preview and “Capturar” button:
+        * On capture, draw frame to canvas, call `processImageBeforeUpload` (from Subtask 13.1 helper), convert to WebP < 1.5MB, then upload.
+        * Offer retake option.
+        * Display device permission errors with actionable copy.
+   - Provide fallback when `mediaDevices` unsupported — gracefully hide camera button.
+   - Show image metadata (resolution + file size) under preview; warn if below 600x600.
+
+2. Upload pipeline
+   - Reuse `processImageBeforeUpload(file, { maxSizeMB: 2, maxWidthOrHeight: 1600 })` before hitting Supabase storage.
+   - Move upload logic into shared helper `uploadListingImage` in `src/lib/marketplace/uploadListingImage.ts` (handles storage path, retries, error translations).
+   - Ensure we revoke object URLs after preview to avoid memory leaks.
+
+3. Listing form integration (`src/components/marketplace/ListingForm.tsx`)
+   - Replace inline `ImageUpload` usage with new props: `mode`, `onStartCapture`, `onUploadComplete`.
+   - Show context tip explaining that captured photos improve trust (localized Spanish copy).
+   - Add optional second photo slot (maximum 3). Schema changes:
+        * Update form state to support `images: string[]`.
+        * Update Supabase `trade_listings` to store array? (For now store primary image only; but add TODO comment for multi-image extension). Keep UI limited to 1 but architecture ready.
+
+4. Accessibility
+   - Ensure capture modal meets a11y: focus trap, Esc closes, transcripts for permission error.
+   - Provide alt text field tied to image (default `${listingTitle} - foto principal`).
+
+5. Testing
+   - Add unit tests mocking `mediaDevices` to ensure capture flow calls helper (Jest + jsdom canvas).
+   - Add Playwright mobile emulation test (iPhone 12) verifying:
+        * Camera button hidden when permissions denied (simulate via `--use-fake-device-for-media-stream` in CI).
+        * Upload fallback still works.
+
+6. Documentation
+   - Update `docs/components-guide.md` marketplace forms section with new capture flow screenshot/description.
+   - `CHANGELOG.md` Unreleased: “Mobile listing photo capture (camera)”.
+   - `README.md` -> Setup instructions: mention browser prompt + HTTPS requirement.
+```

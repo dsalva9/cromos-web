@@ -1,0 +1,100 @@
+Subtask 13.3: Marketplace transaction workflow
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+We must deliver the negotiated marketplace flow: reserve → complete → mutual ratings.
+
+CONTEXT:
+- `trade_listings.status` currently supports only `active`, `sold`, `removed`.
+- Backend already has `user_ratings` + RPCs (`rate_user`, etc.) tailored for post-trade feedback but unused on frontend.
+- No structure exists to bind a listing to a specific buyer during reservation/completion.
+- `MyListingCard` only toggles `sold` via `mark_listing_sold_and_decrement`.
+
+TASK:
+Introduce reservation/completion state machine, track counterpart, and surface rating UI for both seller & buyer.
+
+CHANGES TO MAKE:
+- Garantiza que todo el texto que se muestre al usuario esté en español (es-ES) y mantenga el tono consistente del proyecto.
+
+1. Database schema (new migration `supabase/migrations/<timestamp>_listing_transaction_workflow.sql`)
+   - Update `trade_listings.status` check constraint to include `'reserved'` and `'completed'`.
+   - Create table `listing_transactions`:
+        ```sql
+        CREATE TABLE listing_transactions (
+          id BIGSERIAL PRIMARY KEY,
+          listing_id BIGINT NOT NULL REFERENCES trade_listings(id) ON DELETE CASCADE,
+          seller_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+          buyer_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+          status TEXT NOT NULL CHECK (status IN ('reserved','completed','cancelled')),
+          reserved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          completed_at TIMESTAMPTZ,
+          cancelled_at TIMESTAMPTZ,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+        ```
+   - Add unique constraint: one active transaction (status <> 'cancelled') per listing.
+   - Enable RLS:
+        * Sellers (listing owner) and buyers can select/update their own row.
+        * Admins bypass via `auth.jwt().is_admin`.
+   - RPCs:
+        1. `reserve_listing(p_listing_id BIGINT, p_buyer_id UUID, p_note TEXT DEFAULT NULL)`:
+             - Validate caller is listing owner, listing status `active`.
+             - Insert transaction row with `status = 'reserved'`.
+             - Update `trade_listings.status` → `reserved`.
+             - Optionally log note to audit (insert into `audit_log` with metadata).
+        2. `complete_listing_transaction(p_transaction_id BIGINT)`:
+             - Allow seller OR buyer to call.
+             - Flip status to `completed`, set `completed_at = NOW()`, update listing status `completed`.
+        3. `cancel_listing_transaction(p_transaction_id BIGINT, p_reason TEXT)`:
+             - Seller only. Set status `cancelled`, revert listing to `active`.
+        4. `get_listing_transaction(p_listing_id BIGINT)` returning combined info (seller/buyer nicknames, rating status, etc.).
+        5. `get_my_listing_transactions()` for buyer dashboard (so buyers can rate).
+   - Extend `user_ratings` helpers with `rate_user_for_listing(p_transaction_id BIGINT, p_rating INTEGER, p_comment TEXT DEFAULT NULL)`:
+        * Validations: rating 1–5, comment <= 300 chars, cannot rate yourself, one rating per transaction per user (upsert).
+        * Update aggregate columns `profiles.rating_avg` & `rating_count`.
+
+2. Hooks & data layer
+   - New hook `src/hooks/marketplace/useListingWorkflow.ts`:
+        * Fetch transaction info (RPC).
+        * Expose actions `reserveListing(buyerId)`, `completeTransaction()`, `cancelReservation(reason)`, `submitRating(rating, comment)`.
+        * Handle optimistic UI + toast messaging (reuse `toast` helper).
+   - Update `src/hooks/integration/useMyListings.ts` to include new fields: `transaction_status`, `buyer_nickname`, `awaiting_my_rating`, `awaiting_counterparty_rating`.
+   - Create `src/hooks/marketplace/useMyReservations.ts` for buyers (pull from `get_my_listing_transactions`).
+
+3. UI updates
+   - `src/components/integration/MyListingCard.tsx`:
+        * Show status badges for Reserved/Completed with distinct colors (consult theme-guide).
+        * For `active`: add button “Reservar” opening new modal `ReserveListingDialog` where seller selects buyer from chat participants (hook into Subtask 13.2 via `get_listing_chat_participants`).
+        * When `reserved`: display buyer nickname + action buttons:
+             - “Marcar como Completado” (both parties).
+             - “Cancelar Reserva” (seller only; confirm modal to capture reason).
+             - “Abrir chat” quick link.
+        * When `completed`: show rating status chips (e.g., “Esperando tu valoración”).
+   - New component `src/components/marketplace/ListingTransactionBadge.tsx` renders timeline/reservation info for listing detail page.
+   - Rating experience:
+        * Create `src/components/marketplace/RateCounterpartyDialog.tsx` used by both seller (within My Listings) and buyer (new page).
+        * Capture 1–5 star rating (Radix `Slider` or custom star icons) + optional comment.
+        * After submit, show success toast; disable repeated submissions but allow editing (call RPC again).
+   - Buyer dashboard:
+        * Add `src/app/marketplace/reservations/page.tsx` listing transactions where current user is buyer.
+        * Include actions: view listing, open chat, submit rating.
+
+4. Listing detail integration (`src/app/marketplace/[id]/page.tsx`)
+   - Display current transaction status (badge + text).
+   - If `reserved` and current user is not buyer, hide “Contactar” button.
+   - If current user is reserved buyer, show CTA “Confirmar finalización” and rating prompt once completed.
+
+5. Notifications placeholder (integration with Sprint 15)
+   - Emit events via `supabase` when status changes (e.g., call `insert into notifications` will be handled later). For now add comment `-- TODO notifications (Sprint 15)` inside migrations where future trigger will live.
+
+6. Documentation & tests
+   - Update `docs/database-schema.md` with new table + RPCs.
+   - Update `docs/current-features.md` marketplace section describing reservation/completion workflow.
+   - Add e2e Playwright flow covering:
+        1. Seller reserves listing selecting buyer.
+        2. Buyer sees reserved status and marks completed.
+        3. Both users submit/edit ratings; profile ratings update.
+   - Extend unit tests for `rate_user_for_listing` happy-path and validation in `tests/supabase/rpc/rate_user_for_listing.test.sql`.
+   - Update `CHANGELOG.md` Unreleased with “Marketplace reservation/completion with mutual ratings”.
+```

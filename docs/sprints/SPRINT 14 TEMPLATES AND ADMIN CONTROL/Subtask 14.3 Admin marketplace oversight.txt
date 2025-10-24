@@ -1,0 +1,60 @@
+Subtask 14.3: Admin marketplace & templates oversight
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Expand the admin dashboard so admins can monitor and moderate marketplace listings and templates in one place.
+
+CONTEXT:
+- Admin layout exists under `src/app/admin`.
+- Reports, users, audit pages already implemented.
+- Need dedicated grids for marketplace listings + templates with moderation actions (suspend, delete, restore) feeding audit log.
+- Backend RPC `admin_delete_content_v2` handles deletion with audit metadata; no equivalent for suspension/resume of listings/templates yet.
+
+TASK:
+Deliver admin list pages for marketplace and templates with action controls.
+
+CHANGES TO MAKE:
+- Asegura que cualquier texto nuevo para el panel admin se muestre en español (es-ES) siguiendo la terminología actual.
+
+1. Backend RPCs (new migration `supabase/migrations/<timestamp>_admin_marketplace_templates.sql`)
+   - `admin_list_marketplace_listings(p_status TEXT DEFAULT NULL, p_query TEXT DEFAULT NULL, p_page INTEGER DEFAULT 1, p_page_size INTEGER DEFAULT 20)`:
+        * Return listing info (id, title, collection, status, created_at, seller nickname/id, views_count, transaction status).
+   - `admin_update_listing_status(p_listing_id BIGINT, p_status TEXT, p_reason TEXT)`:
+        * Allow statuses: active, suspended, removed.
+        * When suspending, set `suspended_at` (add column) and record `audit_log` entry.
+   - `admin_list_templates(p_status TEXT DEFAULT NULL, ...)` returning template metadata + rating stats.
+   - `admin_update_template_status(p_template_id BIGINT, p_status TEXT, p_reason TEXT)` (introduce `templates.status` column if needed: active, suspended, deleted).
+   - Ensure all RPCs call `require_admin()` helper and log to audit (action types: `listing_suspend`, `listing_restore`, `template_suspend`, etc.).
+
+2. Data hooks
+   - `src/hooks/admin/useAdminListings.ts` and `useAdminTemplates.ts` fetching data via new RPCs with pagination/filtering.
+   - Provide actions `suspendListing`, `restoreListing`, `deleteListing`, `suspendTemplate`, `restoreTemplate`, `deleteTemplate` (delete uses `admin_delete_content_v2`).
+   - Share table column definitions via `src/components/admin/tableColumns.ts`.
+
+3. UI
+   - Add routes:
+        * `/admin/marketplace/page.tsx`
+        * `/admin/templates/page.tsx`
+   - Layout:
+        * Filter bar: search input, status filter (All, Active, Reserved, Completed, Suspended, Deleted).
+        * Table view using responsive cards on mobile.
+        * Actions column with dropdown (“Suspender”, “Reactivar”, “Eliminar”).
+        * Show badges for reservation/completion counts.
+   - Include quick links to open listing/template in public view + audit entry (open in new tab).
+   - Display audit trail snippet: fetch last 3 actions via `useAuditLog` (extend hook to accept filters).
+
+4. Confirmation flows
+   - Use modal to capture reason when suspending/deleting (required).
+   - After action, refresh list and show toast.
+   - Deleting should confirm that it is irreversible (per audit log).
+
+5. Navigation & badges
+   - Update admin nav layout to include new tabs (“Marketplace”, “Plantillas”).
+   - Show counters (e.g., number of suspended items) if RPC returns aggregated summary.
+
+6. Tests & docs
+   - Add Cypress/Playwright admin spec verifying filter + suspend/restore flows.
+   - Unit test `admin_update_listing_status` for audit log insertion.
+   - Update `docs/ARCHITECTURE.md` admin section with new screens.
+   - `CHANGELOG.md` (Sprint 14) + `TODO.md`.
+```

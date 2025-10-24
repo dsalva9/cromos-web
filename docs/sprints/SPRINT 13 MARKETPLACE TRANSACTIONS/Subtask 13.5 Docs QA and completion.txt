@@ -1,0 +1,52 @@
+Subtask 13.5: Docs, QA & release checklist
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Close Sprint 13 with coherent documentation, release notes, and QA coverage.
+
+CONTEXT:
+- Subtasks 13.1–13.4 add avatars, chat, reservation workflow, and camera capture.
+- Documentation set (CHANGELOG, TODO, current-features, api-endpoints) must stay in sync per AGENTS.md guardrails.
+- Need manual regression coverage for marketplace + profile flows.
+
+TASK:
+Produce the wrap-up assets and verification steps for Sprint 13.
+
+CHECKLIST:
+- Cuando documentes textos de interfaz o ejemplos, asegúrate de que estén en español (es-ES) alineado con el vocabulario existente.
+
+1. Documentation updates
+   - `docs/sprints/SPRINT 13 MARKETPLACE TRANSACTIONS/SPRINT-13-PLAN.md`
+        * Create new markdown summarising goals, scope, dependencies, risks, and acceptance criteria.
+        * Include table mapping features ↔ subtasks.
+   - `CHANGELOG.md` (Unreleased)
+        * Add subsection “Sprint 13 – Marketplace Transactions (In Progress)” with bullet points for each shipped feature.
+   - `TODO.md`
+        * Move any Sprint 13 related backlog items to completed; add new follow-ups (e.g., multi-image support).
+   - `docs/current-features.md`
+        * Update marketplace + social sections to describe reservation/completion + avatar changes.
+   - `docs/api-endpoints.md`
+        * Document new/updated RPCs (`reserve_listing`, `complete_listing_transaction`, chat updates).
+   - `docs/ARCHITECTURE.md`
+        * Append subsection “Listing Transactions & Ratings” with diagram references (update `docs/diagrams/listing-workflow.drawio` if existing; otherwise create).
+
+2. Manual testing guide
+   - Add `docs/sprints/SPRINT 13 MARKETPLACE TRANSACTIONS/MANUAL-TESTING.md`:
+        * Scenario matrix covering desktop/mobile, seller/buyer flows, avatar switching, camera capture.
+        * Check integration with admin features (no regressions).
+        * Note dependency on notifications (placeholder for Sprint 15).
+
+3. QA automation
+   - Ensure new Playwright specs (from subtasks) are registered in `package.json` test groups if needed.
+   - Update CI docs if additional environment variables required (camera tests may need `PLAYWRIGHT_SKIP_CAMERA` flag for headless).
+
+4. Communication
+   - Draft release notes snippet for PM (section in plan doc): focus on buyer trust improvements, identity polish, and next sprint linkage.
+   - Capture known issues/backlog items (e.g., multiple simultaneous buyers, need for new push notifications).
+
+5. Verification sign-off
+   - Provide checklist in `SPRINT-13-PLAN.md` to be ticked by PM after testing (link to deployed app).
+   - Ensure all new migrations are appended to `supabase/config.toml` if necessary (document order).
+
+Deliverables: `SPRINT-13-PLAN.md`, `MANUAL-TESTING.md`, updated docs per above, playbook for QA.
+```

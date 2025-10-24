@@ -1,0 +1,50 @@
+Subtask 15.2: Notification hooks & services
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Update the frontend data layer to consume the new notifications schema and expose typed helpers.
+
+CONTEXT:
+- `src/hooks/trades/useNotifications.ts` still references trade proposal-specific structure.
+- Need to support new kinds and provide derived labels for UI.
+- Header badge (site header) expects unread count.
+
+TASK:
+Refactor notification hooks/service utilities to support new data model.
+
+CHANGES TO MAKE:
+- Asegura que cualquier mensaje o etiqueta derivada en la UI esté en español (es-ES) y respete la terminología existente.
+
+1. Type definitions
+   - Create `src/types/notifications.ts` describing:
+        ```ts
+        export type NotificationKind = 'listing_chat' | 'listing_reserved' | 'listing_completed' | 'user_rated' | 'template_rated' | 'proposal_accepted' | ...;
+        export interface AppNotification { id: number; kind: NotificationKind; createdAt: string; readAt: string | null; actor: { id: string; nickname: string; avatarUrl: string | null }; listingId?: number; templateId?: number; transactionId?: number; ratingValue?: number; payload: Record<string, unknown>; }
+        ```
+   - Include helper `isListingNotification(kind)` etc.
+
+2. Supabase client wrapper
+   - Move RPC calls to `src/lib/supabase/notifications.ts`.
+   - Provide functions `fetchNotifications()`, `fetchUnreadCount()`, `markAllRead()`, `markRead(id)`.
+   - Parse response using `zod` to guarantee shape.
+
+3. Hook refactor
+   - Replace `src/hooks/trades/useNotifications.ts` with `src/hooks/notifications/useNotifications.ts` (update imports).
+   - Features:
+        * Manage caching via React Query or SWR? (Prefer SWR for consistency; choose pattern used elsewhere).
+        * Derive grouped data: `groupedByKind`, `byListing`, `byTemplate`.
+        * Expose `registerRealtime()` to subscribe to Supabase channel `notifications`.
+        * Provide selectors: `getPendingRatings()` etc for easy UI integration.
+
+4. Header integration
+   - Update `src/components/site-header.tsx` to import new hook (Subtask 13.1 adjustments). Badge should aggregate counts across all kinds.
+   - Ensure unsubscribing on unmount to prevent leaks.
+
+5. Tests
+   - Unit tests for parser + hook (mock Supabase) verifying mapping of `listing_reserved` to derived label, mark read updates state.
+   - Integration test verifying realtime event increments unread count.
+
+6. Docs
+   - Document new types + service in `docs/ARCHITECTURE.md` notifications section.
+   - Update `docs/api-endpoints.md` with sample payload.
+```

@@ -1,0 +1,52 @@
+Subtask 14.1: Template ratings UX
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Expose the backend template ratings system in the UI so users can rate others' templates and revise their feedback.
+
+CONTEXT:
+- Backend migration `20251020140000_create_template_ratings_system.sql` provides table + RPCs (`rate_template`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`).
+- Frontend currently only displays average/count (static) on `src/app/templates/[id]/page.tsx` and card list.
+- Need to forbid authors from rating their own templates and allow users to update existing rating.
+
+TASK:
+Design and implement the complete rating experience on template detail and list pages.
+
+CHANGES TO MAKE:
+- Mantén todas las cadenas nuevas en español (es-ES) con el tono friendly-profesional del producto.
+
+1. Data layer
+   - Create hook `src/hooks/templates/useTemplateRatings.ts`:
+        * Fetch aggregate (`rating_avg`, `rating_count`, distribution) via RPC (extend SQL to expose histogram; update migration accordingly).
+        * Provide `rateTemplate(templateId, rating, comment?)`, `deleteRating`, `refresh`.
+        * Track current user's rating (`myRating`).
+   - Ensure braking on self rating: if current user id equals template author id, throw friendly error.
+
+2. UI components
+   - `src/components/templates/TemplateRatingSummary.tsx`:
+        * Display average, count, 5-star bar breakdown (use horizontal bars).
+        * Show CTA button (“Valorar plantilla”).
+   - `src/components/templates/TemplateRatingDialog.tsx`:
+        * Modal with star selector (1–5), optional 280-char text area.
+        * If user already rated, pre-fill value and show “Actualizar valoración” copy.
+        * Provide delete option with confirmation.
+        * Validate rating required; comment optional.
+   - Add `TemplateReviewList` component to render paginated list from `get_template_ratings` (show reviewer nickname, rating, comment).
+        * Infinite scroll (fetch 10 per page).
+
+3. Page integration
+   - Update `src/app/templates/[id]/page.tsx` to include summary + reviews below details.
+   - Show toast feedback on submit/update/delete (Spanish copy).
+   - If user not authenticated, CTA should prompt to log in (link to `/login?redirect=...`).
+   - Hide rating button for template author (show info alert “No puedes valorar tus propias plantillas”).
+
+4. List view enhancements (`src/components/templates/TemplateCard.tsx`)
+   - Add quick action icon (star) that opens dialog if user authenticated.
+   - Update card to reflect live average from hook (optimistic update after rating).
+
+5. Tests + docs
+   - Unit tests for hook (mock Supabase) verifying prevention of self-rating and update path.
+   - Playwright scenario: user rates template, updates rating, deletes rating.
+   - Update `docs/current-features.md` templates section with rating workflow.
+   - Add entry to `CHANGELOG.md` (Sprint 14) and `docs/api-endpoints.md` (document `rate_template` usage).
+```

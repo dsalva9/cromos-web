@@ -1,0 +1,46 @@
+Subtask 14.5: Docs, QA & release readiness
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Wrap Sprint 14 with documentation, QA plans, and hand-off notes.
+
+CONTEXT:
+- Features delivered: template ratings, editing/deletion, admin marketplace/templates, admin account controls.
+- Must comply with documentation discipline (CHANGELOG, TODO, README updates).
+
+TASK:
+Prepare sprint summary artifacts and verification materials.
+
+CHECKLIST:
+- Siempre que cites texto de interfaz en la documentación o en los planes de pruebas, usa la versión en español (es-ES).
+
+1. Sprint summary
+   - Create `docs/sprints/SPRINT 14 TEMPLATES AND ADMIN CONTROL/SPRINT-14-PLAN.md`:
+        * Overview, scope, new dependencies, risk log.
+        * Include RACI note (Architect vs Dev vs PM).
+   - Add `SPRINT-14-MIGRATIONS.md` enumerating new SQL files with execution order and rollback notes.
+
+2. Documentation refresh
+   - `CHANGELOG.md` → add “Sprint 14 – Templates & Admin Control” entry summarizing user-facing changes + admin tooling.
+   - `TODO.md` → mark template editing/admin items complete; add follow-ups (e.g., template versioning, bulk moderation).
+   - `docs/current-features.md` → update templates + admin sections.
+   - `docs/api-endpoints.md` → reflect new admin + template RPCs & REST routes.
+   - `README.md` (or separate doc) → mention service-role env var + admin capabilities.
+
+3. Manual testing checklist
+   - Add `docs/sprints/SPRINT 14 TEMPLATES AND ADMIN CONTROL/MANUAL-TESTING.md` covering:
+        * Template rating submission/update/delete.
+        * Editing template pages & slots (with saved changes).
+        * Admin suspend/delete flows (including audit log entry verification).
+        * Force password reset email (confirm email arrives in Supabase logs).
+   - Provide device/browser matrix.
+
+4. Automated tests & CI
+   - Ensure new Playwright specs are tagged (e.g., `@admin`, `@templates`).
+   - Update CI instructions if additional env var (service role) needed for integration tests (document fallbacks).
+
+5. Release notes draft
+   - Compose short release note snippet emphasising improved moderation + template management for PM to publish.
+
+Deliverables: Sprint plan markdown, manual test guide, updated global docs, and release note draft.
+```

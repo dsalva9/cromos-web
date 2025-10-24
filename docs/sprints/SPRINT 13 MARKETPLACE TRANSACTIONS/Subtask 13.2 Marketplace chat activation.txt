@@ -1,0 +1,76 @@
+Subtask 13.2: Marketplace chat activation
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+We must enable real chat flows for marketplace listings using the existing `trade_chats` infrastructure.
+
+CONTEXT:
+- `trade_chats` already has `listing_id`, `sender_id`, `receiver_id`, `message`, `is_read`.
+- RPCs defined in `supabase/migrations/20251020030000_extend_trade_chats_for_listings.sql` (`get_listing_chats`, `send_listing_message`) only support the initial buyer → seller message and block seller responses.
+- Listing detail page links to `/marketplace/[id]/chat` but the route does not exist.
+- `useTradeChat` hook handles proposal chats; we can reuse patterns (pagination, realtime) to build listing chat.
+
+TASK:
+Ship a complete listing chat experience covering Supabase RPCs, hooks, and UI.
+
+CHANGES TO MAKE:
+- Todas las cadenas nuevas de la UI deben estar redactadas en español (es-ES) respetando el lenguaje ya utilizado en el marketplace.
+
+1. Database updates (new migration `supabase/migrations/<timestamp>_listing_chat_conversations.sql`)
+   - Extend `send_listing_message` signature to `(p_listing_id BIGINT, p_receiver_id UUID, p_message TEXT)`:
+        * Validate `p_receiver_id` exists and is either listing owner or an allowed buyer.
+        * Allow seller (listing owner) to reply by ensuring `(auth.uid() = listing.user_id AND p_receiver_id <> auth.uid())`.
+        * Allow buyers who have previously messaged to continue conversation; prevent random users from injecting if seller has already marked listing reserved/completed (hook into new workflow once available).
+        * Maintain 500 char max, trim whitespace, store `receiver_id`.
+   - Update `get_listing_chats` to accept an optional `p_participant_id UUID DEFAULT NULL` filter:
+        * Default behaviour: return chat between current user and listing owner.
+        * If provided (seller view) fetch messages between seller and that participant.
+        * Ensure access control: sellers can view all participants; buyers only see their own.
+   - Create helper RPC `get_listing_chat_participants(p_listing_id)` returning distinct `{ user_id, nickname, is_owner BOOLEAN, last_message TIMESTAMPTZ, unread_count INTEGER }`.
+   - Add realtime trigger `notify_listing_chat_message` similar to trade chat but targeting listing owner / buyer (include `listing_id` + `sender_id` in metadata for future notifications).
+
+2. Supabase client helpers
+   - Add `src/lib/supabase/listings/chat.ts` exporting functions that call new RPCs (typed with zod schemas for runtime validation).
+   - Ensure errors bubble with descriptive messages in Spanish.
+
+3. Hook: `useListingChat`
+   - Location: `src/hooks/marketplace/useListingChat.ts`.
+   - API signature: `useListingChat({ listingId: number, participantId?: string })`.
+   - Features:
+        * Fetch initial messages via RPC and keep pagination (limit 50) similar to `useTradeChat`.
+        * Subscribe to realtime `trade_chats` changes filtered by listing_id.
+        * Provide `sendMessage(text: string, receiverId?: string)`; seller must supply receiver (choose from participants list).
+        * Auto-mark messages as read (update `trade_chats` set is_read = TRUE where receiver = current user).
+        * Expose `participants` list (wrap RPC).
+
+4. Page & components
+   - Create route `src/app/marketplace/[id]/chat/page.tsx` with `AuthGuard`.
+        * Layout: two-column on desktop (participants list + chat), stacked on mobile.
+        * For listing owner:
+             - Left column shows participants with latest message preview + unread badge.
+             - Selecting participant loads chat (`participantId` state).
+             - Display banner if no conversations yet.
+        * For buyers:
+             - Auto-select conversation with seller; hide participant list.
+        * Chat panel uses new component `src/components/marketplace/ListingChat.tsx` (split into messages list + composer).
+             - Messages bubble style following theme-guide (comic speech bubble, distinct colors per role).
+             - Composer should include textarea (auto-grow, 500 char max) and send button.
+             - Disable send when seller hasn't chosen participant (show helper text).
+             - Show timestamps relative (use date-fns `formatDistanceToNow` es locale).
+   - Reuse `ModernCard` wrappers and skeleton states consistent with marketplace UI.
+
+5. Integrations
+   - Update `src/app/marketplace/[id]/page.tsx` contact button:
+        * If user is owner, change CTA to “Ver conversaciones”.
+        * If buyer already has reserved/completed transaction, disable send (hook ties with Subtask 13.3).
+        * Ensure unauthenticated users are redirected to `/login?redirect=...`.
+   - Add entry point on `MyListingCard` to open chat in new tab (button “Conversaciones” when status active/reserved).
+
+6. Testing & docs
+   - Add integration test with Playwright scenario:
+        1. Buyer sends first message, seller replies, verify both see conversation.
+        2. Second buyer message appears as separate conversation for seller.
+   - Update `docs/api-endpoints.md` with new/changed RPC signatures.
+   - Append chat architecture summary to `docs/ARCHITECTURE.md` under Marketplace/Chats.
+   - Update `CHANGELOG.md` Unreleased + `TODO.md` to reflect marketplace chat completion.
+```

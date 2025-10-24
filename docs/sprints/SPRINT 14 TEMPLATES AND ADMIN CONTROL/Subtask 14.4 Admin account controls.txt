@@ -1,0 +1,59 @@
+Subtask 14.4: Admin account controls
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Enable admins to trigger password reset emails, delete users, and see resulting audit entries.
+
+CONTEXT:
+- Admin users page (`/admin/users`) currently supports search, suspend/unsuspend.
+- Need additional actions: force password reset email, permanently delete account (auth + profile), view audit log entry.
+- Supabase Admin API requires `SUPABASE_SERVICE_ROLE_KEY`; currently not used in frontend.
+
+TASK:
+Implement secure admin account controls with server-side API routes.
+
+CHANGES TO MAKE:
+- Todos los mensajes, labels y respuestas JSON expuestos a la interfaz deben escribirse en español (es-ES) y mantener consistencia con el resto del admin.
+
+1. Environment & config
+   - Update `.env.example` / `.env.local.example` with `SUPABASE_SERVICE_ROLE_KEY`.
+   - Create util `src/lib/supabase/serverClient.ts` exposing `createAdminClient()` (service-role) using `@supabase/supabase-js`.
+   - Ensure key only used server-side (Next.js route handlers / server actions).
+
+2. API routes
+   - Add `src/app/api/admin/force-reset/route.ts`:
+        * POST expects `{ userId: string }`.
+        * Validate request: only allow when `request` user is admin (check session via `createRouteHandlerClient`).
+        * Use Admin client to call `auth.admin.generateLink({ type: 'recovery', user_id })`; send email via Supabase (auto).
+        * Log to `audit_log` with action `force_password_reset`.
+        * Return success JSON.
+   - Add `src/app/api/admin/delete-user/route.ts`:
+        * POST `{ userId: string, reason: string }`.
+        * Steps:
+             1. Remove user via `auth.admin.deleteUser`.
+             2. Delete related profile row, listings, templates (call new Supabase RPC `admin_purge_user` to cascade & log).
+             3. Insert audit record (`admin_action` table).
+        * Handle errors gracefully; respond 400/500 accordingly.
+
+3. Admin UI integration (`src/app/admin/users/page.tsx`)
+   - Extend actions column with dropdown items:
+        * “Enviar correo de restablecimiento”
+        * “Eliminar usuario”
+   - Force reset: call API, show toast, disable button while pending.
+   - Delete user:
+        * Show confirmation dialog requiring reason input.
+        * On success remove row from table, show success toast.
+   - Add info badge indicating last password reset request (store timestamp in audit log; fetch via `useAuditLog` with filter).
+
+4. Audit log visibility
+   - Update audit page to include new action types (icons/colors).
+   - When admin performs action from users table, show inline link “Ver en bitácora” opening audit page filtered to that user (`?target=...`).
+
+5. Tests & docs
+   - Unit tests for API handlers (use Vitest or Jest with request mocks) verifying permission checks.
+   - Integration test (Playwright) performing force reset and delete flows (mock service role call via MSW).
+   - Update documentation:
+        * `docs/ARCHITECTURE.md` admin section with new flows.
+        * `docs/api-endpoints.md` admin section documenting new routes.
+        * `CHANGELOG.md` Sprint 14, `TODO.md`, `docs/deployment-guide.md` (mention new env var requirement).
+```

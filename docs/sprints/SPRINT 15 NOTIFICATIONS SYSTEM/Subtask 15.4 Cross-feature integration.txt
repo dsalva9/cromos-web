@@ -1,0 +1,51 @@
+Subtask 15.4: Cross-feature integration
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Wire notifications into the new marketplace/template workflows and ensure they trigger at the right time.
+
+CONTEXT:
+- Sprints 13 & 14 introduced avatars, chats, reservation workflow, ratings, and admin actions.
+- Notifications data model now supports these events; need to emit events from application logic.
+
+TASK:
+Ensure every relevant interaction creates/updates notifications and that consuming views react accordingly.
+
+CHANGES TO MAKE:
+- Garantiza que todos los mensajes generados por estas integraciones continúen en español (es-ES) y mantengan coherencia con cada módulo.
+
+1. Marketplace chat
+   - After Subtask 13.2 refactor, confirm realtime events call new trigger (already in DB). Frontend should:
+        * On opening chat route, call `markListingChatNotificationsRead(listingId, participantId)` (new RPC).
+        * Update `useListingChat` to trigger mark-read when conversation tab active.
+
+2. Reservation/completion workflow
+   - On seller reserving listing:
+        * Insert notification for buyer (`listing_reserved`, payload contains listing title, seller nickname).
+   - On completion:
+        * Notify both participants (`listing_completed`).
+        * When counterpart rating submitted, mark corresponding notification (same listing) as read automatically.
+   - Update front-end actions to call new RPCs (expose from `useListingWorkflow`).
+
+3. Ratings
+   - When `rate_user_for_listing` invoked, ensure DB trigger sends `user_rated` to target.
+   - When `rate_template` invoked, send `template_rated` to author.
+   - Update UI to mark notifications as read when user visits rating detail (e.g., `UserProfilePage` or template detail) by calling `markRead`.
+
+4. Admin actions
+   - (Optional) Determine requirement for notifying users when admin suspends listing/template; if yes, add `admin_action` notifications with payload (reason). Confirm with PM before implementation (flag in plan doc).
+
+5. State synchronisation
+   - Provide central `useNotificationBus` (context) to broadcast updates to other components (e.g., `MyListings` to refresh if new notifications relevant).
+   - Ensure background fetch interval (e.g., every 60s) doesn't thrash Supabase (debounce real-time triggers).
+
+6. Tests
+   - Integration tests covering end-to-end flows:
+        * Reserve listing -> buyer receives notification -> opens notifications center -> mark as read.
+        * Submit template rating -> author sees notification -> clicking opens template page and marks read.
+   - Write SQL assertion tests verifying triggers not firing when action performed by same user (e.g., rating yourself blocked).
+
+7. Documentation
+   - Update `docs/ARCHITECTURE.md` notifications section with event table mapping (Trigger → Notification kind → Target → Deep link).
+   - Add matrix to `SPRINT-15-PLAN.md` summarising coverage.
+```

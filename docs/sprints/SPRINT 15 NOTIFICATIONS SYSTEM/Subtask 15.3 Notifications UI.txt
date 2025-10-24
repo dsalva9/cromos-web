@@ -1,0 +1,64 @@
+Subtask 15.3: Notifications UI
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Surface the refreshed notifications in the UI with list views, badges, and mark-as-read controls.
+
+CONTEXT:
+- Requirements from PM:
+     * Notify when someone opens a chat (all messages from that user count as one notification until viewed).
+     * Notify when user receives a rating OR their template is rated.
+     * Show notifications list in profile page; once seen, pending count resets.
+- We now have richer hook/service from Subtask 15.2.
+
+TASK:
+Build the notifications center UI and integrate badges.
+
+CHANGES TO MAKE:
+- Todos los textos visibles (títulos, descripciones, botones, mensajes vacíos) deben escribirse en español (es-ES) manteniendo el tono retro-comic.
+
+1. Notification center page
+   - Add route `src/app/profile/notifications/page.tsx` (guarded by `AuthGuard`).
+   - Layout:
+        * Hero section with title + description.
+        * Tabs: “Nuevas” (unread), “Historial” (read).
+        * Group notifications by kind using sections (Marketplace, Plantillas, Comunidad, Sistema).
+        * For chat notifications include quick action “Ir al chat” (link to `/marketplace/[listingId]/chat?participant=...`).
+        * For ratings include star display + link to counterpart/template.
+        * Provide “Marcar todas como leídas” button and per-item “Marcar como leída”.
+     - When list empty show themed empty state (icon, CTA).
+
+2. Notification card component
+   - Create `src/components/notifications/NotificationCard.tsx` handling different kinds:
+        * Icon mapping (e.g., Bell, MessageSquare, Star, BadgeCheck).
+        * Compose message using new helper `formatNotification(notification, t)` returning `{ title, body, href }`.
+        * Display timestamp relative (use date-fns locale).
+        * Show small badge if associated entity is suspended/deleted (get from payload if available).
+
+3. Notification dropdown
+   - Add mini panel triggered from avatar dropdown / header:
+        * Show top 5 newest notifications, with “Ver todas” link.
+        * Auto close on navigation.
+        * Show skeleton when loading.
+
+4. State sync
+   - When user visits notifications center, automatically mark visible notifications as read (call API on mount and after switching tabs).
+   - Provide `requestAnimationFrame` to avoid blocking UI (batch mark read).
+   - Ensure header badge updates immediately (hook should be shared context or use global store).
+
+5. Accessibility & localization
+   - All actionable items accessible via keyboard (enter/space).
+   - Provide aria-live announcements when new notifications arrive.
+   - Strings in Spanish (update i18n/strings if centralised).
+
+6. Tests
+   - Component tests (React Testing Library) for NotificationCard per kind.
+   - Playwright flow:
+        * Trigger new chat notification (simulate message), open dropdown, click through to chat, verify it is marked as read.
+        * Template rating notification links to template detail.
+
+7. Docs
+   - Update `docs/components-guide.md` with “Notifications Center” section.
+   - Add screenshots/wireframes as needed (store under `docs/images/notifications`).
+   - `CHANGELOG.md` (Sprint 15) entry summarising new notification UX.
+```

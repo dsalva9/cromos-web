@@ -1,0 +1,59 @@
+Subtask 15.1: Notifications data model reboot
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Modernise the notifications schema to support marketplace chats, reservations, ratings, and template activity.
+
+CONTEXT:
+- Existing migration `20251008_notifications.sql` handles trade proposal notifications only.
+- Need new notification kinds:
+     * `listing_chat`
+     * `listing_reserved`
+     * `listing_completed`
+     * `user_rated`
+     * `template_rated`
+     * (future) `admin_action`
+- Must tie notifications to listings, templates, ratings, and include metadata for deep linking.
+
+TASK:
+Refactor the notifications table, triggers, and RPCs to support the new scenarios.
+
+CHANGES TO MAKE:
+- Cuando incluyas ejemplos de mensajes o strings generados por triggers/RPCs, definelos en español (es-ES) alineados con el tono existente.
+
+1. Schema migration (`supabase/migrations/<timestamp>_notifications_reboot.sql`)
+   - Alter table:
+        * Expand `kind` CHECK constraint to include new types.
+        * Add nullable foreign keys: `listing_id BIGINT`, `template_id BIGINT`, `rating_id BIGINT`, `actor_id UUID`.
+        * Add `payload JSONB DEFAULT '{}'::jsonb` (structured metadata).
+        * Add composite unique index preventing duplicate unread notifications per entity (`user_id, kind, listing_id, template_id, rating_id` where `read_at IS NULL`).
+   - Update indexes to cover new columns (btree gin on payload if necessary).
+   - Ensure RLS policies still valid.
+
+2. RPC refresh
+   - Replace `get_notifications` and `get_notification_count` with versions returning enriched data:
+        * Include actor nickname & avatar (join `profiles`).
+        * Provide translated title/body strings? (Better: return raw metadata; UI will format).
+   - Add `mark_notification_read(p_notification_id BIGINT)` for single item updates (keep `mark_all_notifications_read`).
+
+3. Trigger functions
+   - Listing chat:
+        * Modify/replace `notify_chat_message` to handle `trade_chats` rows with `listing_id`.
+        * Insert/merge notifications for counterpart with kind `listing_chat`, set `listing_id`, `actor_id`.
+   - Reservation/completion:
+        * Hook into `reserve_listing`, `complete_listing_transaction` (Subtask 13.3) to insert notifications for buyer+seller.
+   - Ratings:
+        * Add trigger on `user_ratings` insert/update to notify target user (`user_rated`, include rating + transaction info).
+        * Trigger on `template_ratings` for authors (`template_rated`).
+   - Template editing? Not needed here.
+
+4. Backfill script
+   - Provide SQL to migrate existing trade notifications to generic schema (if any). For now, mark old ones as read or convert to new shape.
+
+5. Testing
+   - Write SQL unit tests verifying:
+        * Prevent duplicate unread notifications for same chat.
+        * RLS denies other users.
+        * Triggers fire for listing reservation/completion.
+   - Add docs in migration comment summarising relationships.
+```

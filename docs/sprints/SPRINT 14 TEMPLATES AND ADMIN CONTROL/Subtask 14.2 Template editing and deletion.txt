@@ -1,0 +1,64 @@
+Subtask 14.2: Template editing & deletion
+
+### Prompt for IDE Dev Agent (Codex/Gemini)
+```
+Allow creators to edit and delete their own templates directly from the web app.
+
+CONTEXT:
+- Template creation wizard lives at `src/components/templates/TemplateCreationWizard.tsx`.
+- No edit route exists; author currently cannot modify published templates.
+- Backend exposes management RPCs (`update_template`, `delete_template`, `update_template_page`, `update_template_slot`) per docs but verify actual implementations (add if missing).
+- Need optimistic UX and audit logging.
+
+TASK:
+Implement the authoring experience for editing and deleting templates.
+
+CHANGES TO MAKE:
+- Todas las cadenas mostradas en la UI deben redactarse en español (es-ES) y seguir la guía de estilo existente.
+
+1. Backend audit
+   - Confirm RPC availability; if absent create new migration `supabase/migrations/<timestamp>_template_editing.sql`:
+        * `update_template_metadata(p_template_id BIGINT, p_title TEXT, p_description TEXT, p_image_url TEXT, p_is_public BOOLEAN)`.
+        * `replace_template_structure(p_template_id BIGINT, p_pages JSONB)` to rewrite pages/slots (validate author).
+        * `delete_template(p_template_id BIGINT, p_reason TEXT DEFAULT NULL)` marking template as soft-deleted? (Decide: either soft delete column or full delete; align with moderation audit).
+        * Ensure audit log entries appended via `log_admin_action` equivalent (for user actions log in `user_activity`? If none, add simple log entry to `template_activity` table).
+   - Enforce author-only access (check `auth.uid()` = template.author_id).
+
+2. Routing & data fetching
+   - Add `src/app/templates/[id]/edit/page.tsx` guarded by `AuthGuard`.
+   - New hook `src/hooks/templates/useTemplateEditor.ts`:
+        * Fetch template details (including pages/slots) via existing RPCs (`get_template_details`).
+        * Provide `updateTemplate(metadata, pages)` and `deleteTemplate(reason?)`.
+        * Manage loading/error state, track unsaved changes.
+
+3. Wizard reuse
+   - Refactor `TemplateCreationWizard` to accept props:
+        * `initialData`
+        * `mode` (`'create' | 'edit'`)
+        * `submitLabel`
+   - Support editing slots/pages (add ability to remove existing page/slot).
+   - Warn about destructive operations (confirmation when deleting page with slots).
+   - When switching public/private toggle, show note about discoverability.
+
+4. Entry points
+   - Update `src/app/templates/[id]/page.tsx` (owner view) to show buttons:
+        * “Editar plantilla” (link to edit page).
+        * “Eliminar plantilla” (opens confirmation dialog with summary + reason input optional).
+   - Update `src/app/mis-plantillas/page.tsx` (if exists) or create “Mis Plantillas” management page with table/list and actions.
+
+5. Deletion flow
+   - Confirmation dialog `TemplateDeleteDialog`:
+        * Explain template removal from public listing.
+        * Offer optional reason field (persist via RPC if supported).
+        * On success redirect to `/mis-plantillas?deleted=1` and show toast.
+
+6. Optimistic updates & state
+   - After edit, refresh `useTemplates` caches (SW caches or React Query? currently using custom useState; ensure we mutate local state to reflect new metadata).
+   - Handle race conditions when template has copies: disallow deletion if copies exist? (Check backend; if logic missing, add validation returning meaningful error).
+
+7. Tests & docs
+   - Unit tests covering `useTemplateEditor` happy path + unauthorized attempt.
+   - Playwright flow: edit template title, verify change on detail + listing; delete template, ensure card removed.
+   - Documentation updates: `docs/current-features.md` template section, `CHANGELOG.md`, `TODO.md`.
+   - Update `docs/components-guide.md` with “Template Management” best practices.
+```
