@@ -46,36 +46,11 @@ export function useUserProfile(userId: string) {
 
       if (favCountError) throw favCountError;
 
-      let locationLabel: string | null = null;
-
-      if (profileData?.postcode) {
-        try {
-          const { data: postalData, error: postalError } = await supabase
-            .from('postal_codes')
-            .select('municipality, city, locality, name, province, state')
-            .eq('postcode', profileData.postcode)
-            .eq('country', 'ES')
-            .limit(1);
-
-          if (!postalError && postalData && postalData.length > 0) {
-            const record = postalData[0] as Record<string, unknown>;
-            const cityLike =
-              (record.municipality as string | undefined) ||
-              (record.city as string | undefined) ||
-              (record.locality as string | undefined) ||
-              (record.name as string | undefined);
-            const provinceLike =
-              (record.province as string | undefined) ||
-              (record.state as string | undefined);
-            const segments = [cityLike, provinceLike].filter(
-              (segment): segment is string => Boolean(segment && segment.length)
-            );
-            locationLabel = segments.length > 0 ? segments.join(', ') : null;
-          }
-        } catch (postalLookupError) {
-          console.warn('Failed to resolve postcode location', postalLookupError);
-        }
-      }
+      const locationLabel =
+        typeof profileData?.location_label === 'string' &&
+        profileData.location_label.trim().length > 0
+          ? profileData.location_label.trim()
+          : null;
 
       const normalizedProfile: UserProfile = {
         id: profileData.id,

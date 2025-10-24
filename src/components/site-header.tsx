@@ -39,7 +39,6 @@ export default function SiteHeader() {
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/templates', label: 'Plantillas' },
     { href: '/mis-plantillas', label: 'Mis Colecciones' },
-    { href: '/marketplace/my-listings', label: 'Mis Anuncios' },
     { href: '/favorites', label: 'Favoritos' },
     // Sprint 10: Updated to use new public user profile
     { href: user ? `/users/${user.id}` : '/profile', label: 'Perfil' },
