@@ -113,7 +113,7 @@ function AuditLogContent() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <Badge className={`${getActionColor(log.action_type)} text-white uppercase text-xs mb-2`}>
-                          {log.action_type.replace(/_/g, ' ')}
+                          {log.action_type ? log.action_type.replace(/_/g, ' ') : 'Unknown'}
                         </Badge>
                         <p className="text-white font-bold">
                           By {log.admin_nickname || 'System'}
