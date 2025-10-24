@@ -4,9 +4,11 @@ import { useMyListings } from '@/hooks/integration/useMyListings';
 import { MyListingCard } from '@/components/integration/MyListingCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Package } from 'lucide-react';
 import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
+import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
+import { EmptyState } from '@/components/ui/empty-state';
 
 function MyListingsContent() {
   const { listings, loading, error, refetch } = useMyListings();
@@ -61,20 +63,19 @@ function MyListingsContent() {
           {/* Active Listings */}
           <TabsContent value="active" className="space-y-4">
             {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <ListingCardSkeleton key={i} />
+                ))}
               </div>
             ) : activeListings.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-gray-400 text-lg mb-4">
-                  No tienes anuncios activos
-                </p>
-                <Link href="/marketplace/create">
-                  <Button className="bg-[#FFC000] text-black">
-                    Crear Tu Primer Anuncio
-                  </Button>
-                </Link>
-              </div>
+              <EmptyState
+                icon={Package}
+                title="No tienes anuncios activos"
+                description="Crea tu primer anuncio para compartir tus cromos con la comunidad"
+                actionLabel="Crear Tu Primer Anuncio"
+                actionHref="/marketplace/create"
+              />
             ) : (
               activeListings.map(listing => (
                 <MyListingCard

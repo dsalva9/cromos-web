@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, FolderOpen } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { TemplateCardSkeleton } from '@/components/skeletons/TemplateCardSkeleton';
 
 type SortOption = 'recent' | 'rating' | 'popular';
 
@@ -64,13 +65,15 @@ export default function TemplatesPage() {
 
         {/* Initial Loading */}
         {loading && templates.length === 0 && (
-          <div className="h-1 w-full bg-slate-700/50 overflow-hidden rounded mt-6">
-            <div className="h-full w-1/3 bg-[#FFC000] animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <TemplateCardSkeleton key={i} />
+            ))}
           </div>
         )}
 
         {/* Templates Grid */}
-        {!loading && (
+        {!loading && templates.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {templates.map((template, index) => (
               <div
