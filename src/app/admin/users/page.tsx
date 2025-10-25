@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, Search, Ban, CheckCircle, AlertTriangle } from 'lucide-react';
+import { User, Search, Ban, CheckCircle, AlertTriangle, Mail, Trash2 } from 'lucide-react';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
 import AdminGuard from '@/components/AdminGuard';
@@ -47,6 +47,52 @@ function UserSearchContent() {
       refetch();
     } catch {
       toast.error('Failed to unsuspend user');
+    }
+  };
+
+  const handleForceReset = async (userId: string, nickname: string) => {
+    if (!confirm(`Send password reset email to ${nickname}?`)) return;
+
+    try {
+      const response = await fetch('/api/admin/force-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to send reset email');
+      }
+
+      toast.success('Password reset email sent');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to send reset email');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, nickname: string) => {
+    const reason = prompt(`DANGER: Enter reason for deleting user ${nickname}. This action CANNOT be undone:`);
+    if (!reason) return;
+
+    if (!confirm(`Are you ABSOLUTELY SURE you want to permanently delete ${nickname}? This will delete all their data and CANNOT be undone.`)) return;
+
+    try {
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, reason })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete user');
+      }
+
+      toast.success('User deleted successfully');
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete user');
     }
   };
 
@@ -222,6 +268,26 @@ function UserSearchContent() {
                               Suspend
                             </Button>
                           )}
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleForceReset(user.user_id, user.nickname)}
+                            className="border-blue-600 text-blue-500 hover:bg-blue-600/10"
+                          >
+                            <Mail className="mr-2 h-4 w-4" />
+                            Reset Password
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteUser(user.user_id, user.nickname)}
+                            className="border-red-600 text-red-500 hover:bg-red-600/10"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete User
+                          </Button>
                         </>
                       )}
                     </div>

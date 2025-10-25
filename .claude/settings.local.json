@@ -16,7 +16,8 @@
       "Bash(del /F nul)",
       "Bash(cat:*)",
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\apply_admin_functions.sql\" \"C:\\Users\\David\\projects\\cromos-web\\refresh_schema.sql\" \"C:\\Users\\David\\projects\\cromos-web\\diagnose_functions.sql\" \"C:\\Users\\David\\projects\\cromos-web\\fix_function_permissions.sql\" \"C:\\Users\\David\\projects\\cromos-web\\full_diagnostics.sql\" \"C:\\Users\\David\\projects\\cromos-web\\apply_corrected_admin_functions.sql\" \"C:\\Users\\David\\projects\\cromos-web\\debug_admin_functions.sql\" \"C:\\Users\\David\\projects\\cromos-web\\fix_admin_functions_final.sql\" \"C:\\Users\\David\\projects\\cromos-web\\check_profiles_schema.sql\" \"C:\\Users\\David\\projects\\cromos-web\\fix_search_users_with_email.sql\" \"C:\\Users\\David\\projects\\cromos-web\\final_admin_functions.sql\")",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(powershell -Command \"Get-Date -Format ''yyyyMMddHHmmss''\")"
     ],
     "deny": [],
     "ask": []

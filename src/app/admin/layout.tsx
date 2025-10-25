@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +13,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/reports')) return 'reports';
     if (pathname.includes('/admin/users')) return 'users';
     if (pathname.includes('/admin/audit')) return 'audit';
+    if (pathname.includes('/admin/marketplace')) return 'marketplace';
+    if (pathname.includes('/admin/templates')) return 'templates';
     return 'dashboard';
   };
 
@@ -35,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navigation Tabs */}
             <Tabs value={getActiveTab()} className="w-full">
-              <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-[#1F2937]">
+              <TabsList className="grid w-full max-w-4xl grid-cols-6 bg-[#1F2937]">
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
@@ -63,6 +65,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Users
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/marketplace">
+                  <TabsTrigger
+                    value="marketplace"
+                    className="w-full data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Marketplace
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/templates">
+                  <TabsTrigger
+                    value="templates"
+                    className="w-full data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                  >
+                    <BookTemplate className="h-4 w-4 mr-2" />
+                    Plantillas
                   </TabsTrigger>
                 </Link>
 

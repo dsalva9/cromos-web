@@ -1,0 +1,191 @@
+'use client';
+
+import { useState, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/components/providers/SupabaseProvider';
+
+export interface TemplateMetadata {
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  is_public: boolean;
+}
+
+export function useTemplateEditor(templateId: string) {
+  const supabase = createClient();
+  const { user } = useUser();
+  const [loading, setLoading] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Update template metadata
+  const updateMetadata = useCallback(
+    async (metadata: Partial<TemplateMetadata>) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para editar plantillas');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('update_template_metadata', {
+          p_template_id: parseInt(templateId),
+          p_title: metadata.title || null,
+          p_description: metadata.description || null,
+          p_image_url: metadata.image_url || null,
+          p_is_public: metadata.is_public !== undefined ? metadata.is_public : null
+        });
+
+        if (error) {
+          if (error.message.includes('do not have permission')) {
+            throw new Error('No tienes permiso para editar esta plantilla');
+          }
+          throw error;
+        }
+
+        setHasUnsavedChanges(false);
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al actualizar plantilla');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase, templateId]
+  );
+
+  // Update a page
+  const updatePage = useCallback(
+    async (pageId: string, data: { title?: string; type?: string; page_number?: number }) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para editar páginas');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('update_template_page', {
+          p_page_id: parseInt(pageId),
+          p_title: data.title || null,
+          p_type: data.type || null,
+          p_page_number: data.page_number || null
+        });
+
+        if (error) throw error;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al actualizar página');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase]
+  );
+
+  // Delete a page
+  const deletePage = useCallback(
+    async (pageId: string) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para eliminar páginas');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('delete_template_page', {
+          p_page_id: parseInt(pageId)
+        });
+
+        if (error) throw error;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al eliminar página');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase]
+  );
+
+  // Update a slot
+  const updateSlot = useCallback(
+    async (slotId: string, data: { label?: string; is_special?: boolean }) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para editar cromos');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('update_template_slot', {
+          p_slot_id: parseInt(slotId),
+          p_label: data.label || null,
+          p_is_special: data.is_special !== undefined ? data.is_special : null
+        });
+
+        if (error) throw error;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al actualizar cromo');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase]
+  );
+
+  // Delete a slot
+  const deleteSlot = useCallback(
+    async (slotId: string) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para eliminar cromos');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('delete_template_slot', {
+          p_slot_id: parseInt(slotId)
+        });
+
+        if (error) throw error;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al eliminar cromo');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase]
+  );
+
+  // Delete entire template
+  const deleteTemplate = useCallback(
+    async (reason?: string) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para eliminar plantillas');
+      }
+
+      setLoading(true);
+      try {
+        const { error } = await supabase.rpc('delete_template', {
+          p_template_id: parseInt(templateId),
+          p_reason: reason || null
+        });
+
+        if (error) {
+          if (error.message.includes('do not have permission')) {
+            throw new Error('No tienes permiso para eliminar esta plantilla');
+          }
+          throw error;
+        }
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al eliminar plantilla');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase, templateId]
+  );
+
+  return {
+    loading,
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+    updateMetadata,
+    updatePage,
+    deletePage,
+    updateSlot,
+    deleteSlot,
+    deleteTemplate
+  };
+}

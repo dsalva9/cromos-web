@@ -3,6 +3,8 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useTemplateDetails } from '@/hooks/templates/useTemplateDetails';
 import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
+import { useTemplateRatings } from '@/hooks/templates/useTemplateRatings';
+import { useTemplateEditor } from '@/hooks/templates/useTemplateEditor';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -16,11 +18,25 @@ import {
   FileText,
   Layout,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Edit,
+  Trash2
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';
+import { TemplateRatingSummary } from '@/components/templates/TemplateRatingSummary';
+import { TemplateRatingDialog } from '@/components/templates/TemplateRatingDialog';
+import { TemplateReviewList } from '@/components/templates/TemplateReviewList';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function TemplateDetailsPage() {
   const params = useParams();
@@ -30,7 +46,35 @@ export default function TemplateDetailsPage() {
 
   const { data, loading, error } = useTemplateDetails(templateId);
   const { copyTemplate, loading: copying } = useCopyTemplate();
+  const {
+    summary,
+    ratings,
+    loading: ratingsLoading,
+    hasMore,
+    myRating,
+    rateTemplate,
+    updateRating,
+    deleteRating,
+    loadMore,
+    getIsAuthor
+  } = useTemplateRatings(templateId);
+  const { deleteTemplate } = useTemplateEditor(templateId);
+
   const [copied, setCopied] = useState(false);
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [isAuthor, setIsAuthor] = useState(false);
+
+  // Check if user is author
+  useEffect(() => {
+    const checkAuthor = async () => {
+      const author = await getIsAuthor();
+      setIsAuthor(author);
+    };
+    checkAuthor();
+  }, [getIsAuthor]);
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -52,6 +96,47 @@ export default function TemplateDetailsPage() {
       toast.error(
         err instanceof Error ? err.message : 'Error al copiar plantilla'
       );
+    }
+  };
+
+  const handleRateClick = () => {
+    if (!user) {
+      router.push(`/login?redirect=/templates/${templateId}`);
+      return;
+    }
+    setRatingDialogOpen(true);
+  };
+
+  const handleRatingSubmit = async (rating: number, comment?: string) => {
+    if (myRating) {
+      // Get the rating ID from the ratings list
+      const userRatingObj = ratings.find((r) => r.user_id === user?.id);
+      if (userRatingObj) {
+        await updateRating(userRatingObj.id, rating, comment);
+      }
+    } else {
+      await rateTemplate(rating, comment);
+    }
+  };
+
+  const handleRatingDelete = async () => {
+    const userRatingObj = ratings.find((r) => r.user_id === user?.id);
+    if (userRatingObj) {
+      await deleteRating(userRatingObj.id);
+    }
+  };
+
+  const handleDeleteTemplate = async () => {
+    setDeleting(true);
+    try {
+      await deleteTemplate(deleteReason || undefined);
+      toast.success('Plantilla eliminada con éxito');
+      router.push('/templates');
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Error al eliminar plantilla'
+      );
+      setDeleting(false);
     }
   };
 
@@ -172,37 +257,69 @@ export default function TemplateDetailsPage() {
           {/* Action Card */}
           <ModernCard>
             <ModernCardContent className="p-6 space-y-4">
-              <div className="text-center space-y-2">
-                <h3 className="text-lg font-bold text-white">
-                  ¿Quieres esta plantilla?
-                </h3>
-                <p className="text-sm text-slate-400">
-                  Copia esta plantilla a tu colección y comienza a completarla
-                </p>
-              </div>
+              {isAuthor ? (
+                <>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-bold text-white">
+                      Gestionar Plantilla
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Esta es tu plantilla. Puedes editarla o eliminarla.
+                    </p>
+                  </div>
 
-              <Button
-                onClick={handleCopy}
-                disabled={copying || copied}
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium py-6 text-lg"
-              >
-                {copied ? (
-                  <>
-                    <Copy className="mr-2 h-5 w-5" />
-                    ¡Copiada!
-                  </>
-                ) : copying ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Copiando...
-                  </>
-                ) : (
-                  <>
-                    <Copy className="mr-2 h-5 w-5" />
-                    Copiar Plantilla
-                  </>
-                )}
-              </Button>
+                  <div className="space-y-2">
+                    <Link href={`/templates/${templateId}/edit`} className="block">
+                      <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
+                        <Edit className="mr-2 h-4 w-4" />
+                        Editar Plantilla
+                      </Button>
+                    </Link>
+                    <Button
+                      onClick={() => setDeleteDialogOpen(true)}
+                      variant="outline"
+                      className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Eliminar Plantilla
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-bold text-white">
+                      ¿Quieres esta plantilla?
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Copia esta plantilla a tu colección y comienza a completarla
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={handleCopy}
+                    disabled={copying || copied}
+                    className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium py-6 text-lg"
+                  >
+                    {copied ? (
+                      <>
+                        <Copy className="mr-2 h-5 w-5" />
+                        ¡Copiada!
+                      </>
+                    ) : copying ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Copiando...
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-2 h-5 w-5" />
+                        Copiar Plantilla
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
 
               <div className="pt-4 border-t border-slate-700 space-y-2 text-sm text-slate-400">
                 <div className="flex justify-between">
@@ -217,6 +334,36 @@ export default function TemplateDetailsPage() {
             </ModernCardContent>
           </ModernCard>
         </div>
+
+        {/* Ratings Section */}
+        {summary && (
+          <div className="space-y-6 mb-8">
+            <h2 className="text-2xl font-bold text-white">Valoraciones</h2>
+            <ModernCard>
+              <ModernCardContent className="p-6">
+                <TemplateRatingSummary
+                  summary={summary}
+                  onRateClick={handleRateClick}
+                  isAuthor={isAuthor}
+                  hasUserRated={!!myRating}
+                />
+              </ModernCardContent>
+            </ModernCard>
+
+            {/* Reviews List */}
+            {!ratingsLoading && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold text-white">Comentarios</h3>
+                <TemplateReviewList
+                  ratings={ratings}
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
+                  loading={ratingsLoading}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Pages Outline */}
         <div className="space-y-4">
@@ -284,6 +431,78 @@ export default function TemplateDetailsPage() {
             </ModernCard>
           )}
         </div>
+
+        {/* Rating Dialog */}
+        <TemplateRatingDialog
+          open={ratingDialogOpen}
+          onOpenChange={setRatingDialogOpen}
+          templateTitle={template.title}
+          currentRating={myRating}
+          currentComment={
+            ratings.find((r) => r.user_id === user?.id)?.comment || null
+          }
+          currentRatingId={
+            ratings.find((r) => r.user_id === user?.id)?.id || null
+          }
+          onSubmit={handleRatingSubmit}
+          onDelete={myRating ? handleRatingDelete : undefined}
+        />
+
+        {/* Delete Template Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="bg-slate-800 text-white border-slate-700">
+            <DialogHeader>
+              <DialogTitle>Eliminar Plantilla</DialogTitle>
+              <DialogDescription className="text-slate-400">
+                ¿Estás seguro de que quieres eliminar esta plantilla? Se marcará como
+                eliminada y ya no será visible públicamente.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">
+                  Motivo (opcional)
+                </label>
+                <Textarea
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  placeholder="¿Por qué eliminas esta plantilla?"
+                  rows={3}
+                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 resize-none"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+                disabled={deleting}
+                className="border-slate-600 text-white hover:bg-slate-700"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleDeleteTemplate}
+                disabled={deleting}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Eliminando...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
