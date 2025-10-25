@@ -56,12 +56,11 @@ export function NotificationCard({
     }
   };
 
-  const cardContent = (
+  return (
     <Card
       className={`
         transition-all duration-200
         ${isUnread ? 'border-l-4 border-l-comic-accent bg-comic-accent/5' : 'border-l-4 border-l-transparent'}
-        ${notification.href ? 'hover:shadow-md cursor-pointer' : ''}
         ${compact ? 'py-2' : 'py-3'}
       `}
       onClick={handleClick}
@@ -146,17 +145,5 @@ export function NotificationCard({
         </div>
       </CardContent>
     </Card>
-  );
-
-  // If compact or no href, just show the card
-  if (compact || !notification.href) {
-    return cardContent;
-  }
-
-  // Otherwise, wrap in Link for full clickability
-  return (
-    <Link href={notification.href} className="block">
-      {cardContent}
-    </Link>
   );
 }
