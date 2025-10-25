@@ -20,14 +20,12 @@ export default function SiteHeader() {
   const closeMenu = () => setIsMenuOpen(false);
 
   const baseLinks = [
-    { href: '/', label: 'Home' },
     { href: '/marketplace', label: 'Marketplace' },
     { href: '/mis-plantillas', label: 'Mis Colecciones' },
     { href: '/templates', label: 'Plantillas' },
   ];
 
   const unauthenticatedLinks = [
-    { href: '/', label: 'Home' },
     { href: '/login', label: 'Iniciar Sesión' },
     { href: '/signup', label: 'Registrarse' },
   ];
