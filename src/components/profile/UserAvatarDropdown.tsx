@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { User, Package, Heart, LogOut, ChevronDown } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
@@ -18,11 +19,13 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
   const { user } = useUser();
   const { profile, loading } = useCurrentUserProfile();
   const supabase = useSupabaseClient();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
+      router.push('/login');
     } catch (error) {
       logger.error('Sign out error:', error);
     }
