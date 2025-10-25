@@ -1763,6 +1763,152 @@ await markSold(listingId); // Auto-decrements if linked to template
 
 ---
 
+## Sprint 13: Listing Chat System
+
+### Listing Chat RPCs
+
+#### `get_listing_chats(p_listing_id, p_participant_id)`
+
+Retrieves chat messages for a specific listing, supporting bidirectional conversations between buyers and sellers.
+
+**Function Signature:**
+
+```sql
+get_listing_chats(
+  p_listing_id BIGINT,
+  p_participant_id UUID DEFAULT NULL
+) RETURNS TABLE (
+  id BIGINT,
+  sender_id UUID,
+  receiver_id UUID,
+  sender_nickname TEXT,
+  message TEXT,
+  is_read BOOLEAN,
+  created_at TIMESTAMPTZ
+)
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+- `p_participant_id`: (Optional) For sellers, filters conversation to specific buyer
+
+**Access Control:**
+- Sellers can view all conversations or filter by participant
+- Buyers can only view their own conversation with the seller
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('get_listing_chats', {
+  p_listing_id: listingId,
+  p_participant_id: buyerId // Optional - seller only
+});
+```
+
+---
+
+#### `send_listing_message(p_listing_id, p_receiver_id, p_message)`
+
+Sends a message in a listing chat conversation.
+
+**Function Signature:**
+
+```sql
+send_listing_message(
+  p_listing_id BIGINT,
+  p_receiver_id UUID,
+  p_message TEXT
+) RETURNS BIGINT -- Returns message ID
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+- `p_receiver_id`: The user ID receiving the message
+- `p_message`: Message text (max 500 characters)
+
+**Validation:**
+- Message must not be empty
+- Message max length: 500 characters
+- Receiver must exist
+- Cannot send messages to yourself
+- Buyers can only message listing owner
+- Sellers can only reply to buyers who messaged first
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('send_listing_message', {
+  p_listing_id: listingId,
+  p_receiver_id: receiverId,
+  p_message: message.trim()
+});
+```
+
+---
+
+#### `get_listing_chat_participants(p_listing_id)`
+
+Gets all participants (buyers) who have messaged about a listing. Seller-only function.
+
+**Function Signature:**
+
+```sql
+get_listing_chat_participants(
+  p_listing_id BIGINT
+) RETURNS TABLE (
+  user_id UUID,
+  nickname TEXT,
+  avatar_url TEXT,
+  is_owner BOOLEAN,
+  last_message TEXT,
+  last_message_at TIMESTAMPTZ,
+  unread_count INTEGER
+)
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+
+**Access Control:**
+- Only listing owner can call this function
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('get_listing_chat_participants', {
+  p_listing_id: listingId
+});
+```
+
+---
+
+#### `mark_listing_messages_read(p_listing_id, p_sender_id)`
+
+Marks all messages from a specific sender as read.
+
+**Function Signature:**
+
+```sql
+mark_listing_messages_read(
+  p_listing_id BIGINT,
+  p_sender_id UUID
+) RETURNS INTEGER -- Returns count of messages marked as read
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+- `p_sender_id`: The user ID who sent the messages
+
+**Side Effects:**
+- Also marks listing chat notifications as read via `mark_listing_chat_notifications_read`
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('mark_listing_messages_read', {
+  p_listing_id: listingId,
+  p_sender_id: senderId
+});
+```
+
+---
+
 ## Sprint 15: Notifications System
 
 ### Notification RPCs

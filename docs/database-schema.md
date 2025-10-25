@@ -613,28 +613,29 @@ Items included in trade proposals.
 
 ### trade_chats
 
-Chat messages within trades and listings.
+Chat messages within trades and listings. Supports bidirectional conversations for both trade proposals and marketplace listings.
 
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
-- `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE
-- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE
+- `trade_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE (nullable - for trade chats)
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE SET NULL (nullable - for listing chats)
 - `sender_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
 - `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `message` TEXT NOT NULL
-- `is_read` BOOLEAN DEFAULT FALSE
+- `message` TEXT NOT NULL (max 500 characters)
+- `is_read` BOOLEAN DEFAULT FALSE NOT NULL
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 
 **Constraints:**
 
-- CHECK: (proposal_id IS NOT NULL) OR (listing_id IS NOT NULL)
+- CHECK `trade_chats_either_trade_or_listing`: Each message belongs to EITHER a trade OR a listing (mutually exclusive)
 
 **Indices:**
 
-- `idx_chats_proposal` ON (proposal_id, created_at)
-- `idx_chats_listing` ON (listing_id, created_at) WHERE listing_id IS NOT NULL
-- `idx_chats_receiver` ON (receiver_id, is_read) WHERE is_read = FALSE
+- `idx_chats_trade` ON (trade_id, created_at)
+- `idx_trade_chats_listing` ON (listing_id) WHERE listing_id IS NOT NULL
+- `idx_trade_chats_receiver_id` ON (receiver_id)
+- `idx_trade_chats_is_read` ON (receiver_id, is_read) WHERE is_read = FALSE
 
 **RLS Policies:**
 
