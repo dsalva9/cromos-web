@@ -3,23 +3,18 @@
 import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Menu, X, Bell } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import NavLink from '@/components/nav-link';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
-import { useNotifications } from '@/hooks/trades/useNotifications';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
-  const router = useRouter();
-
-  const { unreadCount } = useNotifications();
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
@@ -93,53 +88,24 @@ export default function SiteHeader() {
             <ul className="flex items-center space-x-2">
               {navigationLinks.map(link => (
                 <li key={link.href} className="relative">
-                  {link.href === '/trades/proposals' && unreadCount > 0 ? (
-                    <div className="flex items-center gap-1">
-                      <NavLink
-                        href={link.href}
-                        className={cn(
-                          'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
-                          'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900',
-                          'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                          'text-white hover:bg-gray-800 border-2 border-transparent'
-                        )}
-                      >
-                        {link.label}
-                      </NavLink>
-                      <button
-                        onClick={e => {
-                          e.preventDefault();
-                          router.push('/trades/notifications');
-                        }}
-                        className="flex items-center justify-center rounded-md p-1 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
-                        aria-label={`${unreadCount} notificaciones no leídas`}
-                        title="Ver notificaciones"
-                      >
-                        <Badge className="bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-1.5 py-0.5 cursor-pointer hover:bg-red-600 transition-colors">
-                          <Bell className="h-3 w-3 mr-1 inline-block" />
-                          {unreadCount > 9 ? '9+' : unreadCount}
-                        </Badge>
-                      </button>
-                    </div>
-                  ) : (
-                    <NavLink
-                      href={link.href}
-                      className={cn(
-                        'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
-                        'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900',
-                        'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                        'text-white hover:bg-gray-800 border-2 border-transparent'
-                      )}
-                      onClick={closeMenu}
-                    >
-                      {link.label}
-                    </NavLink>
-                  )}
+                  <NavLink
+                    href={link.href}
+                    className={cn(
+                      'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
+                      'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900',
+                      'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
+                      'text-white hover:bg-gray-800 border-2 border-transparent'
+                    )}
+                    onClick={closeMenu}
+                  >
+                    {link.label}
+                  </NavLink>
                 </li>
               ))}
             </ul>
             {!loading && user && (
-              <div className="ml-4">
+              <div className="ml-4 flex items-center gap-2">
+                <NotificationDropdown />
                 <UserAvatarDropdown isAdmin={isAdmin} />
               </div>
             )}
@@ -173,49 +139,18 @@ export default function SiteHeader() {
           <ul className="py-4 space-y-2">
             {navigationLinks.map(link => (
               <li key={link.href}>
-                {link.href === '/trades/proposals' && unreadCount > 0 ? (
-                  <div className="flex items-center justify-between gap-2 mx-2">
-                    <NavLink
-                      href={link.href}
-                      className={cn(
-                        'flex-1 block px-4 py-3 rounded-md font-bold uppercase text-base transition-all duration-200',
-                        'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
-                        'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                        'text-white hover:bg-gray-700 border-2 border-transparent'
-                      )}
-                      onClick={closeMenu}
-                    >
-                      {link.label}
-                    </NavLink>
-                    <button
-                      onClick={e => {
-                        e.preventDefault();
-                        router.push('/trades/notifications');
-                        closeMenu();
-                      }}
-                      className="flex items-center justify-center rounded-md p-2 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800 transition-all"
-                      aria-label={`${unreadCount} notificaciones no leídas`}
-                    >
-                      <Badge className="bg-[#E84D4D] text-white border-2 border-black font-bold text-xs px-2 py-1 cursor-pointer hover:bg-red-600 transition-colors">
-                        <Bell className="h-3 w-3 mr-1 inline-block" />
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </Badge>
-                    </button>
-                  </div>
-                ) : (
-                  <NavLink
-                    href={link.href}
-                    className={cn(
-                      'block px-4 py-3 mx-2 rounded-md font-bold uppercase text-base transition-all duration-200',
-                      'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
-                      'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                      'text-white hover:bg-gray-700 border-2 border-transparent'
-                    )}
-                    onClick={closeMenu}
-                  >
-                    {link.label}
-                  </NavLink>
-                )}
+                <NavLink
+                  href={link.href}
+                  className={cn(
+                    'block px-4 py-3 mx-2 rounded-md font-bold uppercase text-base transition-all duration-200',
+                    'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
+                    'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
+                    'text-white hover:bg-gray-700 border-2 border-transparent'
+                  )}
+                  onClick={closeMenu}
+                >
+                  {link.label}
+                </NavLink>
               </li>
             ))}
           </ul>

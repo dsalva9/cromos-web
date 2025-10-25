@@ -671,27 +671,57 @@ Completed trade history.
 
 ### notifications
 
-User notifications system.
+User notifications system (Sprint 15: Modernized for marketplace, templates, and ratings).
 
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
 - `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `kind` TEXT NOT NULL CHECK (kind IN ('chat_unread', 'proposal_accepted', 'proposal_rejected', 'finalization_requested'))
-- `trade_id` BIGINT REFERENCES trades_history(id) ON DELETE CASCADE
+- `kind` TEXT NOT NULL CHECK (kind IN ('chat_unread', 'proposal_accepted', 'proposal_rejected', 'finalization_requested', 'listing_chat', 'listing_reserved', 'listing_completed', 'user_rated', 'template_rated', 'admin_action'))
+- `trade_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE
+- `rating_id` BIGINT
+- `actor_id` UUID REFERENCES profiles(id) ON DELETE SET NULL
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `read_at` TIMESTAMPTZ
-- `metadata` JSONB
+- `payload` JSONB DEFAULT '{}'::jsonb
+
+**Notification Kinds:**
+
+- **Legacy Trades:** `chat_unread`, `proposal_accepted`, `proposal_rejected`, `finalization_requested`
+- **Marketplace:** `listing_chat`, `listing_reserved`, `listing_completed`
+- **Ratings:** `user_rated`, `template_rated`
+- **Admin:** `admin_action`
 
 **Indices:**
 
-- `idx_notifications_user_unread` ON (user_id, read_at) WHERE read_at IS NULL
-- `idx_notifications_trade` ON (trade_id)
+- `idx_notifications_user_read` ON (user_id, read_at)
+- `idx_notifications_user_kind_read` ON (user_id, kind, read_at)
+- `idx_notifications_user_trade_kind_read` ON (user_id, trade_id, kind, read_at)
+- `idx_notifications_trade_id` ON (trade_id)
+- `idx_notifications_listing_id` ON (listing_id)
+- `idx_notifications_template_id` ON (template_id)
+- `idx_notifications_rating_id` ON (rating_id)
+- `idx_notifications_actor_id` ON (actor_id)
+- `idx_notifications_payload_gin` GIN (payload)
+- `idx_notifications_unique_unread` UNIQUE (user_id, kind, listing_id, template_id, rating_id, trade_id) WHERE read_at IS NULL
+
+**Triggers:**
+
+- `trigger_notify_chat_message` - Creates/updates notification on trade_chats INSERT (handles both trade and listing chats)
+- `trigger_notify_user_rating` - Creates notification on user_ratings INSERT
+- `trigger_notify_template_rating` - Creates notification on template_ratings INSERT
+- `trigger_notify_listing_status_change` - Creates notifications on trade_listings status change (reserved, completed)
+- `trigger_notify_proposal_status_change` - Creates notification on trade_proposals UPDATE
+- `trigger_notify_finalization_requested` - Creates notification on trade_finalizations INSERT
 
 **RLS Policies:**
 
-- Users can read their own notifications
-- System can insert (via triggers)
+- Users can SELECT their own notifications (user_id = auth.uid())
+- Users can INSERT their own notifications (user_id = auth.uid())
+- Users can UPDATE their own notifications (user_id = auth.uid())
+- Users can DELETE their own notifications (user_id = auth.uid())
 
 ### trade_finalizations
 

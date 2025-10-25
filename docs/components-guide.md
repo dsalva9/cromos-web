@@ -2479,3 +2479,300 @@ await submitReport(
 ```
 
 **Backend RPC:** `create_report`
+
+---
+
+## Notifications Components (Sprint 15)
+
+### NotificationCard
+
+**File:** `src/components/notifications/NotificationCard.tsx`
+
+Displays individual notifications with rich context and actions.
+
+**Usage:**
+```tsx
+<NotificationCard
+  notification={formattedNotification}
+  onMarkAsRead={handleMarkAsRead}
+  compact={false}
+/>
+```
+
+**Props:**
+- `notification: FormattedNotification` - Formatted notification object
+- `onMarkAsRead?: (id: number) => void` - Callback when notification is clicked
+- `compact?: boolean` - Compact mode for dropdowns (default: false)
+
+**Features:**
+- Shows actor avatar or notification icon
+- Unread indicator (blue dot + accent border)
+- Relative timestamps ("hace 5 minutos")
+- Quick action buttons (e.g., "Ir al chat")
+- Suspended/deleted entity badges
+- Responsive layout
+
+**Notification Types Supported:**
+- Listing chat messages
+- Listing reservations
+- Listing completions
+- User ratings (with star display)
+- Template ratings
+- Trade notifications
+- Admin actions
+
+---
+
+### NotificationDropdown
+
+**File:** `src/components/notifications/NotificationDropdown.tsx`
+
+Header bell icon with dropdown preview of latest notifications.
+
+**Usage:**
+```tsx
+<NotificationDropdown maxItems={5} />
+```
+
+**Props:**
+- `maxItems?: number` - Max notifications to show (default: 5)
+
+**Features:**
+- Bell icon with unread badge count
+- Shows top N most recent unread notifications
+- "Ver todas las notificaciones" link
+- Auto-closes on navigation
+- Empty state when no notifications
+- Compact notification cards
+
+**Behavior:**
+- Updates badge count in realtime
+- Marks notifications as read when clicked
+- Shows "y N más..." when there are more notifications
+
+---
+
+### Notifications Center Page
+
+**File:** `src/app/profile/notifications/page.tsx`
+
+Full-page notifications management interface.
+
+**Route:** `/profile/notifications`
+
+**Features:**
+- **Two Tabs:**
+  - "Nuevas" - Unread notifications
+  - "Historial" - Read notifications
+- **Categorization:**
+  - Marketplace (listing_chat, listing_reserved, listing_completed)
+  - Plantillas (template_rated)
+  - Comunidad (user_rated)
+  - Intercambios (trade notifications)
+  - Sistema (admin_action)
+- **Actions:**
+  - "Marcar todas como leídas" button
+  - Individual mark as read on click
+  - Navigate to linked content
+- **Empty States:**
+  - "No hay notificaciones nuevas" with icon
+  - "No hay notificaciones leídas" with explanation
+
+**Auth:** Protected with `AuthGuard`
+
+---
+
+## Notifications Hooks (Sprint 15)
+
+### useNotifications
+
+**File:** `src/hooks/notifications/useNotifications.ts`
+
+Main hook for notifications with realtime updates.
+
+**Usage:**
+```tsx
+const {
+  notifications,          // All formatted notifications
+  unreadNotifications,    // Unread only
+  readNotifications,      // Read only
+  unreadCount,            // Number of unread
+  groupedByCategory,      // Grouped by category
+  loading,                // Loading state
+  error,                  // Error message
+  refresh,                // Refresh data
+  markAllAsRead,          // Mark all as read
+  markAsRead,             // Mark single as read
+  markListingChatAsRead,  // Mark listing chat as read
+  clearError,             // Clear error
+} = useNotifications();
+```
+
+**Returns:**
+
+**Data:**
+- `notifications: FormattedNotification[]` - All notifications with title, body, href
+- `unreadNotifications: FormattedNotification[]` - Filtered unread
+- `readNotifications: FormattedNotification[]` - Filtered read
+- `unreadCount: number` - Count of unread
+- `groupedByCategory: GroupedNotifications` - Grouped by category
+
+**State:**
+- `loading: boolean` - Loading state
+- `error: string | null` - Error message in Spanish
+
+**Actions:**
+- `refresh: () => Promise<void>` - Refresh all notifications
+- `markAllAsRead: () => Promise<void>` - Mark all as read
+- `markAsRead: (id: number) => Promise<void>` - Mark single as read
+- `markListingChatAsRead: (listingId: number, participantId: string) => Promise<void>` - Mark chat notifications
+- `clearError: () => void` - Clear error state
+
+**Features:**
+- Automatic fetch on mount and user change
+- Realtime Supabase subscriptions
+- Optimistic updates for instant feedback
+- Computed properties (filtered, grouped)
+- Error handling with Spanish messages
+- Auto-refresh on notification changes
+
+**Backend RPCs:**
+- `get_notifications()`
+- `get_notification_count()`
+- `mark_all_notifications_read()`
+- `mark_notification_read(id)`
+- `mark_listing_chat_notifications_read(listing_id, participant_id)`
+
+---
+
+## Notification Type System (Sprint 15)
+
+### NotificationKind
+
+**File:** `src/types/notifications.ts`
+
+TypeScript union type for all notification kinds.
+
+```typescript
+type NotificationKind =
+  | 'chat_unread'
+  | 'proposal_accepted'
+  | 'proposal_rejected'
+  | 'finalization_requested'
+  | 'listing_chat'
+  | 'listing_reserved'
+  | 'listing_completed'
+  | 'user_rated'
+  | 'template_rated'
+  | 'admin_action';
+```
+
+### AppNotification
+
+Core notification interface with all data.
+
+```typescript
+interface AppNotification {
+  id: number;
+  kind: NotificationKind;
+  createdAt: string;
+  readAt: string | null;
+  
+  // Related entities
+  tradeId?: number | null;
+  listingId?: number | null;
+  templateId?: number | null;
+  ratingId?: number | null;
+  
+  // Actor
+  actor: NotificationActor | null;
+  
+  // Additional data
+  payload: Record<string, unknown>;
+  
+  // Enriched fields from joins
+  listingTitle?: string | null;
+  templateName?: string | null;
+  // ... more fields
+}
+```
+
+### FormattedNotification
+
+Display-ready notification with title, body, href.
+
+```typescript
+interface FormattedNotification extends AppNotification {
+  title: string;        // e.g., "Nuevo mensaje"
+  body: string;         // e.g., "Juan te ha enviado un mensaje..."
+  href: string | null;  // Link to relevant page
+  icon: string;         // Icon name (e.g., "MessageSquare")
+  category: NotificationCategory;
+}
+```
+
+### Helper Functions
+
+```typescript
+// Type guards
+isListingNotification(kind: NotificationKind): boolean
+isTemplateNotification(kind: NotificationKind): boolean
+isTradeNotification(kind: NotificationKind): boolean
+isRatingNotification(kind: NotificationKind): boolean
+isChatNotification(kind: NotificationKind): boolean
+
+// Categorization
+getNotificationCategory(kind: NotificationKind): NotificationCategory
+getNotificationIcon(kind: NotificationKind): string
+
+// Formatting
+formatNotification(notification: AppNotification): FormattedNotification
+groupNotificationsByCategory(notifications: FormattedNotification[]): GroupedNotifications
+getRelativeTimeString(dateString: string): string  // "hace 5 minutos"
+```
+
+---
+
+## Notification Formatter (Sprint 15)
+
+**File:** `src/lib/notifications/formatter.ts`
+
+Converts raw notifications into Spanish user-friendly messages.
+
+**Example Outputs:**
+
+```typescript
+// Listing chat
+"Juan te ha enviado un mensaje sobre 'Cromo Messi'"
+
+// Listing reserved
+"María ha reservado 'Pack Completo' para ti"
+
+// Listing completed
+"Tu compra de 'Album Vintage' se ha completado"
+
+// User rated
+"Pedro te ha valorado con ⭐⭐⭐⭐⭐ (5/5)"
+
+// Template rated
+"Ana ha valorado tu plantilla 'La Liga' con ⭐⭐⭐⭐"
+```
+
+**Functions:**
+
+- `formatNotification(notification)` - Main formatter
+- `getNotificationFormat(notification)` - Returns {title, body, href}
+- `groupNotificationsByCategory(notifications)` - Groups by category
+- `getRelativeTimeString(dateString)` - Spanish relative time
+
+**Spanish Time Strings:**
+- "hace unos segundos"
+- "hace 5 minutos"
+- "hace 2 horas"
+- "hace 3 días"
+- "hace 2 semanas"
+- "hace 1 mes"
+
+---
+
+**Last Updated:** 2025-10-25 (Sprint 15 - Notifications System Complete)

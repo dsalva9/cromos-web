@@ -9,7 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Sprint 13: Marketplace Transactions (IN PROGRESS)**
+- **Sprint 15: Notifications System (COMPLETE)**
+  - **Notifications Data Model:**
+    - Extended notifications schema with listing_id, template_id, rating_id, actor_id
+    - Added 6 new notification kinds: listing_chat, listing_reserved, listing_completed, user_rated, template_rated, admin_action
+    - Composite unique index prevents duplicate unread notifications
+    - GIN index on payload for efficient JSONB queries
+    - Database triggers for automatic notification creation
+  - **Notification Types:**
+    - Listing chat notifications (with deduplication per conversation)
+    - Listing reservation notifications (buyer + seller)
+    - Listing completion notifications (buyer + seller)
+    - User rating notifications (with star count)
+    - Template rating notifications (for authors)
+    - Admin action notifications (future use)
+  - **Backend Infrastructure:**
+    - Enriched RPC `get_notifications()` with actor, listing, template data
+    - New RPC `mark_notification_read(id)` for single items
+    - New RPC `mark_listing_chat_notifications_read(listing_id, participant_id)`
+    - Trigger functions for chats, ratings, and listing workflows
+    - Realtime notification delivery via Supabase subscriptions
+  - **Frontend Implementation:**
+    - Complete TypeScript type system with helper functions
+    - Supabase client wrapper with Zod validation
+    - Notification formatter with Spanish messages
+    - `useNotifications` hook with realtime updates and optimistic UI
+    - NotificationCard component with all notification types
+    - NotificationDropdown in header with badge
+    - Notifications Center page at `/profile/notifications`
+    - Categorized view (Marketplace, Plantillas, Comunidad, Intercambios, Sistema)
+    - Unread/Read tabs with empty states
+  - **Integration:**
+    - Auto-mark chat notifications as read when conversation opened
+    - Listing reservation/completion workflow integration
+    - Rating submission creates notifications
+    - Cross-feature state synchronization
+
+- **Sprint 14: Templates and Admin Control (COMPLETE)**
+  - Template editing functionality
+  - Admin marketplace oversight
+  - Admin template moderation
+  - Admin user purge functionality
+
+- **Sprint 13: Marketplace Transactions (COMPLETE)**
   - **Avatar System:**
     - 8 preset retro-comic avatars (SVG)
     - Custom avatar upload with auto-processing (square crop, WebP conversion, compression)

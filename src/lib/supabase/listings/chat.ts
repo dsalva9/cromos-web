@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { markListingChatNotificationsRead } from '@/lib/supabase/notifications';
 
 // Schemas for runtime validation
 const listingChatMessageSchema = z.object({
@@ -126,6 +127,7 @@ export async function getListingChatParticipants(
 
 /**
  * Mark messages from a sender as read
+ * Also marks listing chat notifications as read
  */
 export async function markListingMessagesRead(
   supabase: SupabaseClient,
@@ -139,6 +141,14 @@ export async function markListingMessagesRead(
     });
 
     if (error) throw error;
+
+    // Also mark listing chat notifications as read
+    try {
+      await markListingChatNotificationsRead(listingId, senderId);
+    } catch (notifError) {
+      // Log but don't fail if notification marking fails
+      console.warn('Failed to mark chat notifications as read:', notifError);
+    }
 
     return { count: (data as number) || 0, error: null };
   } catch (error) {

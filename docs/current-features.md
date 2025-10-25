@@ -387,20 +387,111 @@ user_template_progress (count - 1)
 - **RPC Function**: `mark_trade_finalized(p_trade_id)` returns finalization status
 - **UI in ProposalDetailModal**: Progress indicator, "Marcar como finalizado" button
 
-#### Notifications System (MVP)
-
-- **Database Table**: `notifications` with 4 notification types
-- **Auto-notification Triggers**: Database triggers create notifications
-- **RPC Functions**: `get_notifications()`, `get_notification_count()`, `mark_all_notifications_read()`
-- **Notifications Page** (`/trades/notifications`): Groups into "Nuevas" and "Anteriores"
-- **Navbar Badge**: Clickable bell icon with unread count
-
 #### Historial Tab & Rejected View
 
 - **Historial Tab**: New 3rd tab showing completed/cancelled trades
 - **Ver Rechazadas Toggle**: View rejected proposals in inbox/outbox tabs
 
-**Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`, `src/app/trades/notifications/page.tsx`
+**Files**: `src/hooks/trades/useTradeHistory.ts`, `src/hooks/trades/useTradeFinalization.ts`
+
+### 10. Notifications System ✅ **COMPLETE (Sprint 15 - v1.5.0)**
+
+#### Unified Notification System
+
+Sprint 15 completely modernized the notifications system to support all major platform features with realtime updates and intelligent deduplication.
+
+**Backend:** ✅ Complete
+**Frontend:** ✅ Complete
+
+#### Database Schema
+
+- **Extended notifications table** with new columns:
+  - `listing_id` - Foreign key to trade_listings
+  - `template_id` - Foreign key to collection_templates
+  - `rating_id` - Reference to ratings
+  - `actor_id` - User who triggered the notification
+  - `payload` - JSONB structured metadata
+- **6 new notification kinds**: listing_chat, listing_reserved, listing_completed, user_rated, template_rated, admin_action
+- **Composite unique index** prevents duplicate unread notifications
+- **Database triggers** automatically create notifications for all events
+
+#### Notification Types
+
+**Marketplace Notifications:**
+- `listing_chat` - New chat message on listing
+- `listing_reserved` - Listing reserved for buyer
+- `listing_completed` - Transaction completed
+
+**Social Notifications:**
+- `user_rated` - Received user rating with star count
+- `template_rated` - Template received rating
+
+**Legacy Trade Notifications:**
+- `chat_unread` - Trade proposal chat messages
+- `proposal_accepted` - Trade proposal accepted
+- `proposal_rejected` - Trade proposal rejected
+- `finalization_requested` - Trade finalization requested
+
+**Admin Notifications:**
+- `admin_action` - Admin moderation actions (future)
+
+#### Frontend Implementation
+
+**Type System:**
+- Complete TypeScript definitions in `src/types/notifications.ts`
+- Helper functions for categorization and filtering
+- Zod validation for runtime type safety
+
+**Data Layer:**
+- Supabase client wrapper (`src/lib/supabase/notifications.ts`)
+- Notification formatter with Spanish messages (`src/lib/notifications/formatter.ts`)
+- `useNotifications` hook with realtime subscriptions
+- Optimistic updates for instant UI feedback
+
+**UI Components:**
+- **NotificationCard** - Displays individual notifications with actor avatar, timestamp, quick actions
+- **NotificationDropdown** - Header bell icon with badge, shows top 5 notifications
+- **Notifications Center** - Full page at `/profile/notifications`
+  - Tabs: Nuevas (unread) and Historial (read)
+  - Categorized sections: Marketplace, Plantillas, Comunidad, Intercambios, Sistema
+  - "Marcar todas como leídas" button
+  - Empty states with themed illustrations
+
+#### Features
+
+- **Realtime Updates**: Notifications appear within 2-3 seconds via Supabase subscriptions
+- **Smart Deduplication**: Prevents notification spam (e.g., one notification per chat conversation)
+- **Auto Mark as Read**: Chat notifications marked read when conversation opened
+- **Spanish Messages**: All notifications in Spanish with retro-comic tone
+- **Rich Context**: Shows actor name, avatar, entity titles, ratings with stars
+- **Deep Linking**: Notifications link to relevant pages (chat, listing, template)
+- **Categorization**: Groups notifications by feature area
+- **Relative Timestamps**: "hace 5 minutos", "hace 2 horas", etc.
+
+#### Integration Points
+
+- **Listing Chat**: Auto-creates notifications on message send
+- **Reservations**: Notifies both buyer and seller on reservation
+- **Completions**: Notifies both parties on transaction completion
+- **Ratings**: Notifies rated user or template author
+- **Cross-feature Sync**: Notifications update across all tabs/windows
+
+#### RPCs
+
+- `get_notifications()` - Returns enriched notifications with all context
+- `get_notification_count()` - Returns unread count
+- `mark_all_notifications_read()` - Marks all as read
+- `mark_notification_read(id)` - Marks single notification as read
+- `mark_listing_chat_notifications_read(listing_id, participant_id)` - Marks chat notifications as read
+
+**Files**:
+- Types: `src/types/notifications.ts`
+- Client: `src/lib/supabase/notifications.ts`
+- Formatter: `src/lib/notifications/formatter.ts`
+- Hook: `src/hooks/notifications/useNotifications.ts`
+- Components: `src/components/notifications/*`
+- Page: `src/app/profile/notifications/page.tsx`
+- Migrations: `supabase/migrations/20251025194614_notifications_reboot.sql`, `supabase/migrations/20251025194615_notifications_listing_workflow.sql`
 
 ### 10. Admin Backoffice ✅ **COMPLETE (v1.5.0)**
 
@@ -659,6 +750,6 @@ user_template_progress (count - 1)
 
 ---
 
-**Last Updated**: 2025-10-24 (Sprint 12 Complete - PRODUCTION READY)
-**Current Version**: v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprint 1 Complete ✅ | Sprint 2 Complete ✅ | Sprint 3 Complete ✅ | Sprint 4 Complete ✅ | Sprint 5 Complete ✅ | Sprint 6.5 Complete ✅ | Sprint 7 Complete ✅ | Sprint 8 Complete ✅ | Sprint 8.5 Complete ✅ | Sprint 8.6 Complete ✅ | Sprint 9 Complete ✅ | Sprint 10 Complete ✅ | Sprint 11 Complete ✅ | Sprint 12 Complete ✅ | **PRODUCTION READY** 🚀
+**Last Updated**: 2025-10-25 (Sprint 15 Complete - PRODUCTION READY)
+**Current Version**: v1.5.0
+**Status**: Phase 0 Complete ✅ | Sprints 1-15 Complete ✅ | **PRODUCTION READY** 🚀

@@ -1760,3 +1760,221 @@ await markSold(listingId); // Auto-decrements if linked to template
 ```
 
 **Backend RPC:** `mark_listing_sold_and_decrement`
+
+---
+
+## Sprint 15: Notifications System
+
+### Notification RPCs
+
+#### `get_notifications()`
+
+Returns enriched notifications for the current user with actor, listing, template, and trade details.
+
+**Function Signature:**
+
+```sql
+get_notifications() RETURNS TABLE (
+  id BIGINT,
+  kind TEXT,
+  trade_id BIGINT,
+  listing_id BIGINT,
+  template_id BIGINT,
+  rating_id BIGINT,
+  created_at TIMESTAMPTZ,
+  read_at TIMESTAMPTZ,
+  payload JSONB,
+  actor_id UUID,
+  actor_nickname TEXT,
+  actor_avatar_url TEXT,
+  -- Plus additional enriched fields from joins
+)
+```
+
+**Returns:**
+
+```json
+[
+  {
+    "id": 123,
+    "kind": "listing_chat",
+    "listing_id": 456,
+    "actor_id": "user-uuid",
+    "actor_nickname": "Juan",
+    "actor_avatar_url": "/avatars/...",
+    "listing_title": "Cromo Messi",
+    "created_at": "2025-10-25T10:30:00Z",
+    "read_at": null,
+    "payload": { "sender_id": "user-uuid", "message_preview": "Hola..." }
+  }
+]
+```
+
+**Security:** SECURITY DEFINER, returns only auth.uid() notifications
+
+---
+
+#### `get_notification_count()`
+
+Returns count of unread notifications for current user.
+
+**Function Signature:**
+
+```sql
+get_notification_count() RETURNS INTEGER
+```
+
+**Returns:** Integer count (e.g., 5)
+
+**Security:** SECURITY DEFINER
+
+---
+
+#### `mark_all_notifications_read()`
+
+Marks all unread notifications as read for current user.
+
+**Function Signature:**
+
+```sql
+mark_all_notifications_read() RETURNS VOID
+```
+
+**Security:** SECURITY DEFINER
+
+---
+
+#### `mark_notification_read(p_notification_id)`
+
+Marks a single notification as read.
+
+**Function Signature:**
+
+```sql
+mark_notification_read(p_notification_id BIGINT) RETURNS VOID
+```
+
+**Parameters:**
+- `p_notification_id` - ID of notification to mark as read
+
+**Security:** SECURITY DEFINER, validates ownership
+
+---
+
+#### `mark_listing_chat_notifications_read(p_listing_id, p_participant_id)`
+
+Marks all chat notifications for a specific listing and participant as read.
+
+**Function Signature:**
+
+```sql
+mark_listing_chat_notifications_read(
+  p_listing_id BIGINT,
+  p_participant_id UUID
+) RETURNS VOID
+```
+
+**Parameters:**
+- `p_listing_id` - Listing ID
+- `p_participant_id` - User ID of chat participant
+
+**Use Case:** Called when user opens a listing chat conversation
+
+**Security:** SECURITY DEFINER, validates ownership
+
+---
+
+### Notification Triggers
+
+Sprint 15 added database triggers that automatically create notifications:
+
+#### `trigger_notify_chat_message`
+
+- **Fires:** AFTER INSERT on `trade_chats`
+- **Creates:** `listing_chat` or `chat_unread` notification
+- **Logic:** Determines counterparty, upserts notification (prevents duplicates)
+
+#### `trigger_notify_user_rating`
+
+- **Fires:** AFTER INSERT on `user_ratings`
+- **Creates:** `user_rated` notification
+- **Recipient:** Rated user
+- **Payload:** rating_value, context_type, context_id, has_comment
+
+#### `trigger_notify_template_rating`
+
+- **Fires:** AFTER INSERT on `template_ratings`
+- **Creates:** `template_rated` notification
+- **Recipient:** Template author
+- **Payload:** rating_value, has_comment
+
+#### `trigger_notify_listing_status_change`
+
+- **Fires:** AFTER UPDATE on `trade_listings` (status change)
+- **Creates:** `listing_reserved` or `listing_completed` notifications
+- **Recipients:** Both buyer and seller
+- **Payload:** listing_title, reservation details, completion timestamp
+
+---
+
+### Frontend Hooks
+
+#### `useNotifications()`
+
+**File:** `src/hooks/notifications/useNotifications.ts`
+
+Main hook for notifications with realtime subscriptions.
+
+**Usage:**
+
+```typescript
+const {
+  notifications,          // FormattedNotification[] - All formatted notifications
+  unreadNotifications,    // FormattedNotification[] - Unread only
+  readNotifications,      // FormattedNotification[] - Read only
+  unreadCount,            // number - Unread count
+  groupedByCategory,      // GroupedNotifications - By category
+  loading,                // boolean - Loading state
+  error,                  // string | null - Error message
+  refresh,                // () => Promise<void> - Refresh data
+  markAllAsRead,          // () => Promise<void> - Mark all as read
+  markAsRead,             // (id: number) => Promise<void> - Mark single as read
+  markListingChatAsRead,  // (listingId, participantId) => Promise<void>
+  clearError,             // () => void - Clear error state
+} = useNotifications();
+```
+
+**Features:**
+- Automatic fetch on mount and user change
+- Realtime Supabase subscriptions
+- Optimistic updates
+- Computed properties (grouped, filtered)
+- Spanish error messages
+
+---
+
+### Notification Types
+
+| Kind | Trigger Event | Category | Example Message |
+|------|--------------|----------|----------------|
+| `listing_chat` | Chat message sent | Marketplace | "Juan te ha enviado un mensaje sobre 'Cromo Messi'" |
+| `listing_reserved` | Listing reserved | Marketplace | "María ha reservado 'Pack Completo' para ti" |
+| `listing_completed` | Transaction completed | Marketplace | "Tu compra de 'Album Vintage' se ha completado" |
+| `user_rated` | User receives rating | Community | "Pedro te ha valorado con ⭐⭐⭐⭐⭐ (5/5)" |
+| `template_rated` | Template receives rating | Templates | "Ana ha valorado tu plantilla 'La Liga' con ⭐⭐⭐⭐" |
+| `chat_unread` | Trade chat message | Trades | "Mensaje en intercambio" |
+| `proposal_accepted` | Trade proposal accepted | Trades | "Tu propuesta fue aceptada" |
+| `proposal_rejected` | Trade proposal rejected | Trades | "Tu propuesta fue rechazada" |
+| `finalization_requested` | Trade finalization | Trades | "Solicitud de finalización" |
+| `admin_action` | Admin moderation | System | "Acción administrativa" |
+
+---
+
+### Migration Files
+
+- **`20251025194614_notifications_reboot.sql`** - Core notifications schema updates
+- **`20251025194615_notifications_listing_workflow.sql`** - Listing workflow notifications
+
+---
+
+**Last Updated:** 2025-10-25 (Sprint 15 Complete)
