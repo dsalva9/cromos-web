@@ -1,0 +1,112 @@
+Nombre del conjunto: CP-F07-02 Moderación de listados y plantillas (panel admin)
+Fase: 07 - Administración
+Objetivo: Asegurar que las nuevas vistas administrativas para marketplace y plantillas permitan buscar, filtrar y aplicar acciones (suspender, restaurar, eliminar) con registro en auditoría y avisos a los autores.
+
+Pre-requisitos generales:
+- Usuario admin `qa.admin@cromos.test`.
+- Contenido de prueba:
+  * Listado activo `listing_QA_001`.
+  * Plantilla pública “Colección QA Liga 2025”.
+  * Listado previamente suspendido para verificar filtros.
+- Acceso a tablas `trade_listings`, `collection_templates`, `audit_log`, `notifications`.
+- Herramientas: Chrome desktop, móvil (para revisar responsive), hoja de SQL de apoyo.
+
+Configuración previa:
+- Registrar estado actual de cada contenido (activo, suspendido, eliminado).
+- Verificar que `SUPABASE_SERVICE_ROLE_KEY` está configurada en entorno (para acciones destructivas).
+
+Casos de prueba:
+
+Caso CP-F07-02A: Acceso a pestaña Marketplace admin
+  Cobertura: Navegación; carga inicial.
+  Pasos:
+    1. Desde `/admin`, abrir tab “Marketplace”.
+    2. Observar filtros disponibles (estado, autor, rango de fechas) y tabla.
+  Criterios de éxito:
+    - Tabla lista paginada (20 ítems) con columnas: título, autor, estado, fecha, acciones.
+    - Indicador de estado en color (verde activo, amarillo reservado, rojo suspendido).
+
+Caso CP-F07-02B: Búsqueda y filtros en marketplace admin
+  Cobertura: Funcionalidades de filtro.
+  Pasos:
+    1. Buscar por título parcial (“QA Liga”).
+    2. Filtrar por estado “Reservado” y luego “Suspendido”.
+  Criterios de éxito:
+    - Filtros combinados funcionan (búsqueda + estado).
+    - Contador total se actualiza (ej. “3 resultados”).
+    - Los filtros se reflejan en la URL para compartir (si implementado).
+
+Caso CP-F07-02C: Suspender listado desde admin
+  Cobertura: Acción crítica; confirmación.
+  Pasos:
+    1. Elegir listado activo.
+    2. Pulsar “Suspender” → escribir motivo (≥30 caracteres).
+    3. Confirmar.
+  Criterios de éxito:
+    - Listado cambia a estado “Suspendido” en la tabla.
+    - `trade_listings.suspended_at` y `suspension_reason` actualizados.
+    - `audit_log` registra `admin_update_listing_status` con metadata.
+    - Autor recibe notificación.
+
+Caso CP-F07-02D: Restaurar listado
+  Cobertura: Flujo inverso.
+  Pasos:
+    1. Filtrar por estado “Suspendido”.
+    2. Pulsar “Restaurar”.
+  Criterios de éxito:
+    - Estado vuelve a “Activo”.
+    - Se limpia `suspension_reason` o se mueve a historial.
+    - Auditoría registra `admin_restore_listing`.
+
+Caso CP-F07-02E: Eliminar definitivamente listado
+  Cobertura: Acción destructiva.
+  Pasos:
+    1. Seleccionar listado problemático.
+    2. Pulsar “Eliminar” → confirmar (doble confirmación).
+  Criterios de éxito:
+    - Listado se marca como `status='removed'` o se elimina según política.
+    - Audit log `admin_delete_listing`.
+    - En el front público, acceso al listado muestra 404 o mensaje “Removido por moderación”.
+
+Caso CP-F07-02F: Moderación de plantillas
+  Cobertura: Tab Plantillas; similar a marketplace.
+  Pasos:
+    1. Abrir tab “Plantillas”.
+    2. Buscar “Colección QA Liga 2025”.
+    3. Aplicar acción “Suspender”.
+  Criterios de éxito:
+    - Plantilla cambia a estado `suspended` (badge naranja/rojo).
+    - `collection_templates.suspended_at` actualizado y plantilla deja de ser pública.
+    - Notificación enviada al autor con motivo.
+
+Caso CP-F07-02G: Eliminar plantilla
+  Cobertura: Soft delete desde admin.
+  Pasos:
+    1. Elegir plantilla problemática.
+    2. Pulsar “Eliminar definitivamente”.
+  Criterios de éxito:
+    - `is_deleted = true`, título prefijado `[ELIMINADA]`.
+    - Todas las copias muestran advertencia “Plantilla eliminada por moderación”.
+    - `audit_log` registra acción con `target_id=template_id`.
+
+Caso CP-F07-02H: Responsive y accesibilidad
+  Cobertura: Vista móvil.
+  Pasos:
+    1. Ver tabs admin en 375px.
+    2. Comprobar que las tablas usan vistas condensadas o listas apiladas.
+  Criterios de éxito:
+    - Acciones accesibles (menú contextual o botones visibles).
+    - No hay scroll horizontal.
+
+Caso CP-F07-02I: Seguridad
+  Cobertura: RLS; API.
+  Pasos:
+    1. Capturar request a `/api/admin/...`.
+    2. Intentar replicar como usuario no admin (usando token normal).
+  Criterios de éxito:
+    - Respuesta 403 con mensaje “Only admins can perform this action”.
+    - No se modifican datos.
+
+Notas generales:
+- Registrar todos los IDs afectados para restaurar estados al finalizar (si corresponde).
+- Verificar que cada acción admin produce entrada en `audit_log` con `performed_by` correcto.

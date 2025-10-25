@@ -1,0 +1,100 @@
+Nombre del conjunto: CP-F07-01 Dashboard administrativo y gestión de reportes
+Fase: 07 - Administración
+Objetivo: Comprobar que el panel admin muestra métricas correctas, la cola de reportes funciona end-to-end y que las acciones de moderación se registran adecuadamente.
+
+Pre-requisitos generales:
+- Usuario admin: `qa.admin@cromos.test` con `profiles.is_admin = true`.
+- Reportes generados en CP-F06-02D/E (IDs conocidos).
+- Datos contables: número de usuarios, listados, plantillas, reportes pendientes (registrar en planilla antes de iniciar).
+- Acceso a tablas `audit_log`, `reports`, `trade_listings`, `collection_templates`.
+- Herramientas: Chrome desktop, Firefox, monitor de red.
+
+Configuración previa:
+- Limpiar caché para evitar lecturas antiguas.
+- Preparar script SQL (solo lectura) para validar contadores manualmente.
+
+Casos de prueba:
+
+Caso CP-F07-01A: Acceso al dashboard
+  Cobertura: Autenticación admin; UI.
+  Pasos:
+    1. Iniciar sesión como admin.
+    2. Navegar a `/admin`.
+  Criterios de éxito:
+    - Layout muestra tabs: Dashboard, Reportes, Usuarios, Audit, Marketplace, Plantillas.
+    - Si usuario no admin intenta acceder, se redirige a home con mensaje “Necesitas privilegios de administrador”.
+
+Caso CP-F07-01B: Estadísticas principales
+  Cobertura: Consistencia de métricas.
+  Pasos:
+    1. Revisar cards (Usuarios activos, Listados activos, Reportes pendientes, Plantillas públicas, etc.).
+    2. Comparar con datos obtenidos vía SQL manual.
+  Criterios de éxito:
+    - Diferencia máxima permitida: 0 (deben coincidir).
+    - Banners de alerta (usuarios suspendidos) aparecen si hay datos.
+    - Hover muestra tooltips con descripción de métrica.
+
+Caso CP-F07-01C: Cola de reportes (pendientes)
+  Cobertura: Visualización; filtros.
+  Pasos:
+    1. Abrir tab “Reportes”.
+    2. Aplicar filtros por tipo (Listado, Usuario, Plantilla).
+    3. Abrir reporte reciente (generado por QA).
+  Criterios de éxito:
+    - Listado paginado (20 ítems) con badges por tipo.
+    - Filtros actualizan contenido sin recargar página completa.
+    - Reporte muestra pestañas: Detalle, Historial del usuario, Evidencias.
+
+Caso CP-F07-01D: Resolver reporte con acción “Descartar”
+  Cobertura: Acción no destructiva.
+  Pasos:
+    1. Seleccionar reporte leve.
+    2. Pulsar “Descartar” → agregar nota.
+  Criterios de éxito:
+    - Estado cambia a `dismissed`, se oculta de la cola.
+    - Registro en `audit_log` con `action_type='report_dismissed'`.
+    - Reportante recibe notificación “Tu reporte ha sido revisado”.
+
+Caso CP-F07-01E: Suspender contenido reportado
+  Cobertura: Acción destructiva (listado).
+  Pasos:
+    1. Elegir reporte de listado fraudulento.
+    2. Pulsar “Suspender listado” e ingresar motivo.
+    3. Confirmar y verificar.
+  Criterios de éxito:
+    - `trade_listings.status` pasa a `suspended`, `suspension_reason` guardada.
+    - Listado desaparece del marketplace público.
+    - Auditoría registra `admin_suspend_listing`.
+    - Usuario recibe notificación detallando motivo y pasos siguientes.
+
+Caso CP-F07-01F: Suspender usuario desde reporte
+  Cobertura: Acciones cruzadas.
+  Pasos:
+    1. En reporte de usuario, pulsar “Suspender cuenta”.
+    2. Elegir duración (si aplica) y motivo.
+  Criterios de éxito:
+    - `profiles.is_suspended = true`, `suspension_reason` guardado.
+    - Usuario pierde acceso inmediatamente (intentar login en ventana alterna).
+    - Audit log registra acción `suspend_user` con metadata.
+
+Caso CP-F07-01G: Reapertura o revisión posterior
+  Cobertura: Workflow.
+  Pasos:
+    1. Filtrar reportes resueltos.
+    2. Intentar reabrir o cambiar estado.
+  Criterios de éxito:
+    - Si el sistema lo permite, se registra `reopen_report`.
+    - Si no, UI indica que no se puede modificar y se muestran alternativas.
+
+Caso CP-F07-01H: Rendimiento
+  Cobertura: Carga bajo 50 reportes.
+  Pasos:
+    1. Simular (o cargar) 50 reportes.
+    2. Medir tiempos de carga con Lighthouse/perf.
+  Criterios de éxito:
+    - Primera carga <2 s; transiciones <1 s.
+    - Ningún error 500 en consola.
+
+Notas generales:
+- Guardar export de `audit_log` posterior para anexar al informe de QA.
+- Registrar IDs de reportes resueltos para seguimiento y pruebas de usuarios afectados.

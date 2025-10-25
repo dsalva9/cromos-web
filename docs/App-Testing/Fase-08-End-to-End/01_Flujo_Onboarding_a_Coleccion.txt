@@ -1,0 +1,63 @@
+Nombre del conjunto: CP-F08-01 Flujo E2E nuevo coleccionista (onboarding → primera colección)
+Fase: 08 - End-to-End
+Objetivo: Validar el recorrido completo de un usuario nuevo desde el registro hasta gestionar su primera colección, asegurando coherencia entre módulos de autenticación, plantillas, progreso y favoritos.
+
+Pre-requisitos generales:
+- Limpiar datos previos del correo `e2e.nuevo@cromos.test`.
+- Acceso a correo temporal (Mailhog/Resend).
+- Dispositivos: Desktop (Chrome) y móvil (Safari/Chrome).
+- Planilla para registrar tiempos y bloqueos.
+
+Casos de prueba secuenciales:
+
+Caso CP-F08-01A: Registro y verificación
+  Pasos:
+    1. Registrar nuevo usuario en escritorio (ver CP-F01-01).
+    2. Completar onboarding inicial (selección de avatar básico si aparece).
+  Criterios de éxito:
+    - Sesión iniciada y redirección a dashboard “Mi colección”.
+
+Caso CP-F08-01B: Exploración de plantillas destacadas
+  Pasos:
+    1. Desde home, navegar a sección “Plantillas destacadas”.
+    2. Abrir 2 plantillas distintas, revisar detalles.
+  Criterios de éxito:
+    - Cards muestran rating, autor y CTA “Copiar plantilla”.
+    - No se detectan errores 404.
+
+Caso CP-F08-01C: Copiar plantilla y personalizar
+  Pasos:
+    1. Copiar “Colección QA Liga 2025”.
+    2. Renombrar copia a “Mi liga favorita”.
+    3. Volver a `/mi-coleccion`.
+  Criterios de éxito:
+    - Copia aparece en dashboard con progreso inicial 0%.
+    - Card muestra fecha de copia y botón “Actualizar progreso”.
+
+Caso CP-F08-01D: Registrar progreso inicial
+  Pasos:
+    1. Marcar 5 cromos como “Tengo” y 2 como “Necesito”.
+    2. Añadir 3 duplicados en distintos slots.
+  Criterios de éxito:
+    - Dashboard actualiza barras de progreso y totales.
+    - Vista móvil mantiene layout en cards.
+
+Caso CP-F08-01E: Guardar favoritos básicos
+  Pasos:
+    1. Favoritar la plantilla base.
+    2. Navegar a `/favoritos` y confirmar que aparece.
+  Criterios de éxito:
+    - Favorito persiste tras recarga y en móvil.
+
+Caso CP-F08-01F: Registrar salida y reingreso
+  Pasos:
+    1. Cerrar sesión.
+    2. Reingresar desde móvil.
+    3. Verificar que progreso y favoritos se mantienen.
+  Criterios de éxito:
+    - Datos sincronizados entre dispositivos.
+    - Sin errores de formato ni traducciones.
+
+Notas generales:
+- Registrar duración total del flujo y cualquier punto de fricción.
+- Adjuntar capturas clave (dashboard inicial, progreso actualizado, favoritos).

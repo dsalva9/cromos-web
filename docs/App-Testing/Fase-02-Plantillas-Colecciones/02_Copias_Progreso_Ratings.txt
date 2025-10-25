@@ -1,0 +1,112 @@
+Nombre del conjunto: CP-F02-02 Copias, progreso y valoraciones de plantillas
+Fase: 02 - Plantillas y Colecciones
+Objetivo: Asegurar que los usuarios puedan copiar plantillas públicas, gestionar el progreso de cada slot, mantener el conteo de duplicados y emitir valoraciones sin violar restricciones de autoría.
+
+Pre-requisitos generales:
+- Plantilla pública “Colección QA Liga 2025” creada en CP-F02-01C.
+- Usuario coleccionista: `qa.coleccionista@cromos.test` (sin copias previas).
+- Usuario autor original para verificar restricciones.
+- Acceso a tablas `user_template_copies`, `user_template_progress`, `template_ratings`.
+- Herramientas: Chrome desktop, Safari/Chrome móvil, planilla para seguimiento de conteos.
+
+Configuración previa:
+- Borrar registros previos en `user_template_copies` del usuario coleccionista si existen.
+- Verificar que la plantilla esté visible públicamente (`is_public = true`, `is_deleted = false`).
+- Preparar datos de ejemplo para duplicados (p.ej. 3 cromos repetidos).
+
+Casos de prueba:
+
+Caso CP-F02-02A: Copiar plantilla pública
+  Cobertura: Happy path; inicialización de progreso.
+  Pasos:
+    1. Iniciar sesión con `qa.coleccionista`.
+    2. Abrir `/templates/{id}` y pulsar “Copiar plantilla”.
+    3. Asignar nombre a la copia y confirmar.
+    4. Navegar a `/mi-coleccion`.
+  Criterios de éxito:
+    - Se crea registro en `user_template_copies` con `title` personalizado y `copied_at`.
+    - Página de colección muestra pestañas por páginas con totales Have/Need/Dupes = 0.
+    - Toast confirma creación y redirige a vista de progreso.
+
+Caso CP-F02-02B: Actualizar progreso de slots (HAVE/NEED/DUPES)
+  Cobertura: Interacciones; cálculos agregados.
+  Pasos:
+    1. En la copia, marcar slots 1-3 como “Tengo”.
+    2. Marcar slot 4 como “Repetido” con cantidad 2.
+    3. Marcar slot 5 como “Necesito”.
+    4. Revisar contador global y barra de progreso.
+  Criterios de éxito:
+    - `user_template_progress` almacena registros con `status` correcto y `count`.
+    - Panel resumen actualiza porcentajes en tiempo real (sin recarga).
+    - Slots marcados muestran iconografía adecuada (color verde, dorado, rojo).
+    - Valores persisten tras recargar y en móvil.
+
+Caso CP-F02-02C: Gestión de duplicados y decrementos
+  Cobertura: Edge; límites 0; sincronización con marketplace (pre-integration).
+  Pasos:
+    1. Incrementar duplicados hasta 5 y decrementar hasta 0.
+    2. Validar que el botón “Publicar duplicado” aparece solo con count > 0.
+    3. Intentar poner valores negativos (teclado manual).
+  Criterios de éxito:
+    - Botón “-” deshabilitado cuando count = 0.
+    - Intento de introducir valor negativo se corrige a 0.
+    - Contador global de duplicados se actualiza con badges correspondientes.
+
+Caso CP-F02-02D: Filtrado y búsqueda dentro de la copia
+  Cobertura: Herramientas de navegación; UX.
+  Pasos:
+    1. Usar campo de búsqueda para encontrar slot “3”.
+    2. Aplicar filtro “Mostrar solo Necesito”.
+    3. Verificar funcionamiento en móvil (375px) y tablet (768px).
+  Criterios de éxito:
+    - Lista se filtra correctamente, mostrando mensajes de “sin resultados” cuando corresponde.
+    - Filtros combinados (búsqueda + estado) funcionan sin recargar.
+    - En móvil, los filtros se muestran en sheet/modal sin cortar texto.
+
+Caso CP-F02-02E: Restricciones de visibilidad y borrado de plantilla origen
+  Cobertura: Edge; resiliencia.
+  Pasos:
+    1. Con el autor, marcar la plantilla original como privada o eliminarla (ver CP-F02-01F).
+    2. Desde la copia, recargar la página.
+  Criterios de éxito:
+    - Se muestra aviso en la copia “Plantilla original no disponible”, pero progreso sigue accesible.
+    - No se borran registros de progreso.
+    - Botón “Ver plantilla original” desaparece o muestra mensaje predecible.
+
+Caso CP-F02-02F: Valoraciones de plantilla (usuario no autor)
+  Cobertura: Flujo completo rating; límites; localización.
+  Pasos:
+    1. Con `qa.coleccionista`, en la página pública de la plantilla, pulsar “Valorar plantilla”.
+    2. Asignar 4 estrellas y comentario de 120 caracteres.
+    3. Guardar y verificar actualización del promedio.
+    4. Editar la valoración a 5 estrellas con comentario distinto.
+    5. Eliminar valoración.
+  Criterios de éxito:
+    - Modal obliga a seleccionar al menos 1 estrella; contador de caracteres en vivo.
+    - Tras guardar, `template_ratings` contiene registro con `rating = 4` y `comment`.
+    - `TemplateRatingSummary` actualiza distribución y resalta la valoración del usuario.
+    - Botón “Eliminar valoración” solicita confirmación y limpia el registro.
+
+Caso CP-F02-02G: Restricciones de valoración
+  Cobertura: Edge; autor y usuarios no autenticados.
+  Pasos:
+    1. Autor intenta abrir modal de valoración en su propia plantilla.
+    2. Usuario no autenticado hace clic en “Valorar”.
+    3. Usuario autenticaso intenta escribir comentario >280 caracteres.
+  Criterios de éxito:
+    - Autor ve mensaje “No puedes valorar tu propia plantilla”.
+    - Usuario sin sesión es redirigido a login con redirect guardado.
+    - Comentarios >280 se bloquean con contador rojo y botón deshabilitado.
+
+Caso CP-F02-02H: Efectos en listados de plantillas
+  Cobertura: Refresco de métricas.
+  Pasos:
+    1. Tras varias valoraciones de diferentes usuarios, revisar `/templates`.
+    2. Confirmar que la tarjeta muestra rating promedio y cantidad de reseñas.
+  Criterios de éxito:
+    - Los datos concuerdan con agregados `rating_avg` y `rating_count`.
+    - En mobile, la tarjeta proyecta estrellas legibles.
+
+Notas generales:
+- Registrar IDs de copias (`copy_id`) para usarlos en pruebas de integración (Fase 04).
+- Si se usan usuarios adicionales para valoraciones, anotar credenciales empleadas.

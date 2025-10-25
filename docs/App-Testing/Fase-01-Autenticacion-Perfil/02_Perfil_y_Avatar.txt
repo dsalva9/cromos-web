@@ -1,0 +1,106 @@
+Nombre del conjunto: CP-F01-02 Gestión de Perfil y Avatar
+Fase: 01 - Autenticación y Perfil
+Objetivo: Garantizar que los usuarios activos puedan visualizar y actualizar su perfil, avatar y preferencias sin romper reglas de seguridad o estilo Retro-Comic en Web y Mobile.
+
+Pre-requisitos generales:
+- Cuenta base `qa.registrado@cromos.test` con datos incompletos para edición.
+- Cuenta secundaria `qa.observador@cromos.test` para revisar perfiles de terceros.
+- Repositorio de imágenes de prueba:
+  * `avatar_preset_01.png` (exacto 512x512, <300 KB).
+  * `avatar_rectangular.jpg` (1200x800, 1.8 MB).
+  * `avatar_grande.png` (2048x2048, 6 MB) para forzar validación.
+- Acceso a consola de red para monitorear llamadas a `/storage/v1/object`.
+- Herramientas: Chrome (desktop), Safari iOS o Chrome DevTools en modo 375x812, lector de pantalla (NVDA) para validar etiquetas alt.
+
+Configuración previa:
+- Iniciar sesión con `qa.registrado@cromos.test`.
+- Confirmar que la cuenta tiene rol user (no admin) y no está suspendida.
+- Limpiar supabase storage `avatars/qa.registrado` si existen restos de pruebas.
+
+Casos de prueba:
+
+Caso CP-F01-02A: Visualización de perfil propio en escritorio
+  Cobertura: Layout; datos estadísticos; accesibilidad.
+  Pasos:
+    1. Navegar a `/perfil` o acceder desde el menú del avatar.
+    2. Revisar secciones: avatar, nickname, métricas (listados activos, favoritos, calificación media).
+    3. Abrir pestañas internas si existen (p.ej. “Actividad reciente”).
+  Criterios de éxito:
+    - Títulos y labels en español, tipografía retro.
+    - Métricas muestran valores coherentes con la base (consultar `profiles` y `trade_listings`).
+    - Botones de acción (“Editar perfil”, “Cambiar avatar”) visibles y habilitados.
+    - No hay scroll horizontal, componentes cumplen spacing del theme guide.
+
+Caso CP-F01-02B: Edición de nickname y bio
+  Cobertura: Formularios; validaciones; guardado optimista.
+  Pasos:
+    1. Pulsar “Editar perfil”.
+    2. Cambiar nickname a `Coleccionista QA {timestamp}` y escribir bio <140 caracteres.
+    3. Guardar y observar notificaciones.
+    4. Recargar página para confirmar persistencia.
+  Criterios de éxito:
+    - Validación evita nickname vacío o >40 caracteres.
+    - Toast “Perfil actualizado” en español.
+    - Valores nuevos visibles tras recarga y en header (menú avatar).
+    - Registro en `profiles.updated_at` actualizado (<1 min).
+
+Caso CP-F01-02C: Selección de avatar predefinido
+  Cobertura: Flujo galería; permisos Storage; caches.
+  Pasos:
+    1. Abrir modal “Cambiar avatar”.
+    2. Seleccionar pestaña “Galería” y elegir una opción.
+    3. Confirmar.
+    4. Abrir perfil desde otro navegador con `qa.observador@cromos.test`.
+  Criterios de éxito:
+    - Avatar se actualiza instantáneamente en header y página de perfil.
+    - Petición a `avatars/retro-XX.svg` devuelve 200 y el URL se guarda en `profiles.avatar_url`.
+    - Otro usuario ve el mismo avatar sin requerir refresh forzado.
+    - El fallback inicial desaparece (no letras solas).
+
+Caso CP-F01-02D: Subida de avatar personalizado con recorte
+  Cobertura: Procesamiento de imagen; conversión WebP; subida móvil.
+  Pasos:
+    1. Desde escritorio, subir `avatar_rectangular.jpg`.
+    2. Utilizar la herramienta de recorte para centrar rostro y guardar.
+    3. Verificar en DevTools que la petición POST usa `Content-Type: image/webp`.
+    4. Repetir subida desde móvil con otra imagen pequeña.
+  Criterios de éxito:
+    - Modal obliga a seleccionar área cuadrada y muestra preview.
+    - Archivo final comprimido ≤300 KB y extensión `.webp`.
+    - Header y perfil actualizan avatar tras guardado; no requiere recarga.
+    - En móvil, UI mantiene botones accesibles y no se superponen.
+
+Caso CP-F01-02E: Validaciones de tamaño y formato
+  Cobertura: Edge cases; mensajes de error.
+  Pasos:
+    1. Intentar subir `avatar_grande.png`.
+    2. Intentar subir archivo `.gif` animado.
+  Criterios de éxito:
+    - Se bloquea subida con mensaje “El archivo supera 3 MB” sin llamar a Supabase.
+    - Para formato no soportado, se muestra mensaje claro y botón “Volver a intentar”.
+    - No se crean archivos en Storage (verificar en Supabase → Storage → avatars).
+
+Caso CP-F01-02F: Visualización de perfil público de otro usuario
+  Cobertura: Permisos RLS; estadísticas públicas; botón favorito.
+  Pasos:
+    1. Con `qa.observador@cromos.test`, abrir `/usuarios/{id}` de `qa.registrado`.
+    2. Revisar secciones (información, listados activos, calificaciones recibidas).
+    3. Comprobar estado de componente “Seguir/Favorito”.
+  Criterios de éxito:
+    - Datos sensibles (email, botones de edición) no visibles.
+    - Conteo de favoritos y calificación concuerda con base.
+    - Botón “Agregar a favoritos” aparece solo si no es el mismo usuario.
+    - Layout responde correctamente en desktop y móvil.
+
+Caso CP-F01-02G: Protección para usuarios sin sesión
+  Cobertura: Acceso restringido.
+  Pasos:
+    1. Abrir URL `/perfil` en ventana privada sin sesión.
+    2. Abrir `/usuarios/{id}` de perfil privado o suspendido.
+  Criterios de éxito:
+    - Se redirige a login con mensaje “Inicia sesión para ver tu perfil”.
+    - Perfiles suspendidos muestran badge “Suspendido” y contenido limitado.
+
+Notas generales:
+- Registrar en planilla QA los IDs de storage generados para su posterior limpieza.
+- Si se detecta rescate incorrecto de avatar (URL temporal caduca), adjuntar HAR del request a `storage/v1/object/sign`.

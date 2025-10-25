@@ -1,0 +1,60 @@
+Nombre del conjunto: CP-F08-03 Flujo E2E intercambio → reputación → moderación
+Fase: 08 - End-to-End
+Objetivo: Ejecutar un escenario completo que combine propuesta de intercambio, chat, finalización, valoraciones y escalamiento a moderación para validar la interacción entre módulos sociales y administrativos.
+
+Pre-requisitos generales:
+- Usuarios: `e2e.traderA@cromos.test` y `e2e.traderB@cromos.test` con copias de plantilla y duplicados complementarios.
+- Admin `qa.admin@cromos.test`.
+- Notificaciones habilitadas.
+
+Casos de prueba secuenciales:
+
+Caso CP-F08-03A: Propuesta y negociación
+  Pasos:
+    1. Trader A localiza a Trader B en `/trades/find`.
+    2. Envía propuesta con 3 cromos por lado.
+    3. Se inicia chat para aclarar detalles (≥5 mensajes).
+  Criterios de éxito:
+    - Propuesta pendiente visible para ambos.
+    - Chat registra mensajes y badges de no leído.
+
+Caso CP-F08-03B: Aceptación y finalización
+  Pasos:
+    1. Trader B acepta.
+    2. Ambos marcan como finalizado (ver CP-F05-02C).
+  Criterios de éxito:
+    - Estado `completed` y notificaciones generadas.
+
+Caso CP-F08-03C: Valoración mutua
+  Pasos:
+    1. Cada usuario califica al otro con comentarios distintos.
+  Criterios de éxito:
+    - Promedios en perfiles actualizados.
+    - Distribución refleja nuevas valoraciones.
+
+Caso CP-F08-03D: Reporte de incidencia
+  Pasos:
+    1. Trader B detecta problema post-intercambio y reporta a Trader A desde historial.
+    2. Selecciona motivo “Incumplimiento de acuerdo”.
+  Criterios de éxito:
+    - Reporte creado con `target_type='user'`, `context_id=trade_id`.
+    - Notificación para Trader A indicando que fue reportado.
+
+Caso CP-F08-03E: Acción administrativa
+  Pasos:
+    1. Admin revisa reporte en `/admin/reports`.
+    2. Solicita información adicional vía chat (si la feature existe) o resuelve con decisión (ej. suspender preventivamente).
+  Criterios de éxito:
+    - Resolución registrada en `reports.status`.
+    - Audit log con `performed_by` admin y motivo.
+    - Trader B recibe notificación con resultado.
+
+Caso CP-F08-03F: Efectos colaterales
+  Pasos:
+    1. Trader A intenta crear nuevo intercambio tras suspensión (si fue suspendido).
+  Criterios de éxito:
+    - Sistema bloquea acción con mensaje.
+
+Notas generales:
+- Documentar la secuencia temporal y cualquier punto donde falte retroalimentación al usuario.
+- Adjuntar capturas para cada rol (Trader A, Trader B, Admin).

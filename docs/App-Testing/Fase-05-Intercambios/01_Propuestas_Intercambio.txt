@@ -1,0 +1,98 @@
+Nombre del conjunto: CP-F05-01 Ciclo completo de propuestas de intercambio
+Fase: 05 - Intercambios
+Objetivo: Validar que los usuarios puedan crear, enviar, recibir y gestionar propuestas de intercambio desde el compositor hasta la resolución (aceptar, rechazar, cancelar) manteniendo integridad de datos y UX consistente.
+
+Pre-requisitos generales:
+- Usuario A (emisor): `qa.traderA@cromos.test` con duplicados y necesidades configuradas.
+- Usuario B (receptor): `qa.traderB@cromos.test` con duplicados complementarios.
+- Datos semilla: 
+  * Copia “Colección QA Liga 2025” para ambos con progreso cargado (ver Fase 02).
+  * Discordancias predefinidas (A necesita slots 10-12, B necesita 5-7).
+- Acceso a tablas `trade_proposals`, `trade_proposal_items`, `user_template_progress`.
+- Herramientas: Chrome desktop, Safari móvil, planilla de seguimiento.
+
+Configuración previa:
+- Verificar que ambos usuarios no tengan propuestas pendientes entre ellos (limpiar si necesario).
+- Confirmar que ambos tienen habilitado chat y notificaciones.
+
+Casos de prueba:
+
+Caso CP-F05-01A: Creación de propuesta desde “Encontrar intercambio”
+  Cobertura: Happy path; sugerencias de duplicados.
+  Pasos:
+    1. Iniciar sesión como Usuario A.
+    2. Ir a `/trades/find`, ubicar Usuario B mediante búsqueda.
+    3. Pulsar “Proponer intercambio”.
+    4. En el compositor, seleccionar duplicados propios que interesen al receptor y slots que necesita.
+    5. Enviar.
+  Criterios de éxito:
+    - Compositor sugiere automáticamente coincidencias (panel “Ellos necesitan”).
+    - Validación evita enviar sin al menos un ítem por lado.
+    - Tras enviar, aparece toast “Propuesta enviada” y se crea registro en `trade_proposals` (`status='pending'`).
+    - Usuario B recibe notificación (campana + email si configurado).
+
+Caso CP-F05-01B: Revisión de propuesta recibida
+  Cobertura: Vista detalle; información de contexto.
+  Pasos:
+    1. Usuario B accede a `/trades/proposals`.
+    2. Revisar pestaña “Recibidas”.
+    3. Abrir modal de detalle; verificar listado de cromos ofrecidos/solicitados, notas y métricas.
+  Criterios de éxito:
+    - Modal muestra información de cada ítem (colección, número, estado).
+    - Existe CTA para abrir chat asociado.
+    - Si hay duplicados insuficientes, se muestra advertencia.
+
+Caso CP-F05-01C: Aceptar propuesta
+  Cobertura: Cambio de estado; impacto en inventario.
+  Pasos:
+    1. Usuario B pulsa “Aceptar”.
+    2. Confirmar en modal.
+    3. Revisar `trade_proposals.status` y las barras de progreso en ambas copias.
+  Criterios de éxito:
+    - Estado cambia a `accepted`.
+    - Se envía notificación a Usuario A.
+    - Progreso de plantillas refleja intercambios pendientes (si el sistema descuenta al aceptar o al finalizar).
+    - Aparece opción “Marcar como finalizado” (ver Fase 05-02).
+
+Caso CP-F05-01D: Rechazar propuesta
+  Cobertura: Edge; motivo opcional.
+  Pasos:
+    1. Usuario B rechaza una segunda propuesta.
+    2. Añadir comentario opcional (máximo 250 caracteres).
+  Criterios de éxito:
+    - Estado cambia a `rejected`.
+    - Usuario A ve en su bandeja “Rechazada” con comentario.
+    - Registro guardado en `trade_proposals.rejection_reason`.
+
+Caso CP-F05-01E: Cancelar propuesta enviada
+  Cobertura: Retiro antes de respuesta.
+  Pasos:
+    1. Usuario A cancela una propuesta pendiente.
+  Criterios de éxito:
+    - Estado `cancelled` y se oculta de bandeja principal (aparece en Historial).
+    - Usuario B recibe notificación.
+
+Caso CP-F05-01F: Validaciones y límites
+  Cobertura: Edge cases.
+  Pasos:
+    1. Intentar enviar propuesta con más de 30 ítems totales.
+    2. Intentar reenviar propuesta idéntica antes de que la anterior tenga resolución.
+    3. Usuario suspendido intenta crear propuesta.
+  Criterios de éxito:
+    - Sistema bloquea >30 con mensaje “Máximo 30 cromos por intercambio”.
+    - Detección de duplicado muestra aviso y bloquea envío.
+    - Usuario suspendido recibe mensaje “No puedes intercambiar mientras tu cuenta esté suspendida”.
+
+Caso CP-F05-01G: Accesibilidad y móvil
+  Cobertura: Responsive compositor.
+  Pasos:
+    1. Abrir compositor en móvil 375px.
+    2. Verificar tabs y listas scrollables.
+  Criterios de éxito:
+    - Layout se reorganiza verticalmente sin perder funcionalidades.
+    - Botones grandes y accesibles.
+    - No hay overflow horizontal.
+
+Notas generales:
+- Registrar IDs de propuestas (`proposal_id`) para usarlos en pruebas de chat/finalización.
+- Conservar evidencias (capturas) de estados `pending`, `accepted`, `rejected`, `cancelled`.

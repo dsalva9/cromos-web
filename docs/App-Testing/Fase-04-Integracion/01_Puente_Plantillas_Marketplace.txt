@@ -1,0 +1,105 @@
+Nombre del conjunto: CP-F04-01 Integración Plantillas ↔ Marketplace
+Fase: 04 - Integración colecciones/marketplace
+Objetivo: Verificar que el puente bidireccional entre duplicados de plantillas y listados del marketplace mantenga sincronizados los conteos, estados y alertas, incluyendo decrementos automáticos y bloqueos preventivos.
+
+Pre-requisitos generales:
+- Copia activa de la plantilla “Colección QA Liga 2025” con duplicados configurados (ver CP-F02-02B).
+- Usuario `qa.vendedor@cromos.test` con duplicados >0 en al menos dos slots.
+- Listados previos creados desde el módulo marketplace (IDs `listing_QA_001`, etc.).
+- Acceso a tablas `user_template_progress`, `trade_listings`, `listing_transactions`.
+- Herramientas: Chrome desktop, mobile responsive, consola network.
+
+Configuración previa:
+- Asegurar que el contador de duplicados para slot X es 3 y slot Y es 1 (registrarlo).
+- Limpiar listados antiguos que ya no estén vinculados (para no confundir en “Mis listados”).
+
+Casos de prueba:
+
+Caso CP-F04-01A: Publicar duplicado desde la copia de plantilla
+  Cobertura: Happy path; prellenado de formulario; vínculo copy/slot.
+  Pasos:
+    1. En `/mi-coleccion`, localizar slot con duplicados.
+    2. Pulsar acción “Publicar duplicado”.
+    3. Completar campos adicionales si se requieren (precio, estado).
+    4. Confirmar publicación.
+  Criterios de éxito:
+    - Formulario se abre con título, número y colección prellenados desde el slot.
+    - En `trade_listings`, se crea registro con `copy_id` y `slot_id` asociados.
+    - Duplicados del slot se mantienen (no decrementan hasta la venta).
+    - Toast informa “Duplicado publicado en el marketplace”.
+
+Caso CP-F04-01B: Sincronización en panel “Mis listados”
+  Cobertura: Vista integrada; badges de sincronización.
+  Pasos:
+    1. Abrir `/marketplace/my-listings`.
+    2. Verificar que el listado muestra badge “Sincronizado con {plantilla}”.
+    3. Revisar columna de duplicados restantes.
+  Criterios de éxito:
+    - Columna indica count actual (ej. “Duplicados restantes: 3”).
+    - Botón “Actualizar duplicados” disponible.
+    - Tooltip explica la relación con la copia.
+
+Caso CP-F04-01C: Decremento automático al marcar como vendido
+  Cobertura: Flujo de venta → sincronización.
+  Pasos:
+    1. Desde “Mis listados”, pulsar “Marcar como vendido”.
+    2. Confirmar modal.
+    3. Revisar `user_template_progress` del slot asociado.
+  Criterios de éxito:
+    - Conteo de duplicados del slot decrementa en 1.
+    - Listado cambia a estado `inactive` o `completed` según corresponda.
+    - Registro de auditoría `listing_marked_sold` creado.
+    - Badge de sincronización se actualiza (“Duplicados restantes: 2”).
+
+Caso CP-F04-01D: Revertir venta / reactivar listado
+  Cobertura: Edge; corrección de errores.
+  Pasos:
+    1. Reabrir el listado (acción “Reactivar”).
+    2. Confirmar.
+    3. Revisar duplicados vuelven a incrementar si aplica.
+  Criterios de éxito:
+    - Sistema pregunta si se desea devolver el duplicado al inventario.
+    - Si se confirma, contador vuelve al valor anterior.
+    - Listado reaparece como `active`.
+
+Caso CP-F04-01E: Alertas cuando duplicados = 0
+  Cobertura: Advertencias; bloqueo de disponibilidad.
+  Pasos:
+    1. Forzar duplicados = 0 (marcando ventas sucesivas).
+    2. Intentar mantener listado activo.
+  Criterios de éxito:
+    - UI muestra badge rojo “Sin duplicados disponibles”.
+    - Botón “Marcar como vendido” se deshabilita.
+    - Banner sugiere desactivar o actualizar duplicados.
+
+Caso CP-F04-01F: Bloqueo de publicación sin duplicados
+  Cobertura: Edge; validación previa.
+  Pasos:
+    1. En slot sin duplicados (count=0), intentar “Publicar duplicado”.
+  Criterios de éxito:
+    - Acción no se muestra o se bloquea con mensaje “No tienes duplicados disponibles”.
+    - No se crea borrador ni listado.
+
+Caso CP-F04-01G: Consistencia multi-dispositivo
+  Cobertura: Tiempo real; sincronización en paralelo.
+  Pasos:
+    1. Abrir `/mi-coleccion` en escritorio y “Mis listados” en móvil simultáneamente.
+    2. Marcar duplicado como vendido desde móvil.
+    3. Verificar actualización inmediata en escritorio (sin recargar).
+  Criterios de éxito:
+    - Los contadores se actualizan vía realtime (suscripción).
+    - No se generan conteos inconsistentes.
+
+Caso CP-F04-01H: Integridad de datos en BD
+  Cobertura: Verificación posterior.
+  Pasos:
+    1. Revisar tabla `trade_listings`: columnas `copy_id`, `slot_id`, `sync_status`.
+    2. Revisar `user_template_progress` y `listing_transactions`.
+  Criterios de éxito:
+    - No hay registros huérfanos (listing sin copy/slot después de delete).
+    - `sync_status` refleja estados correctos (`'in_sync'`, `'warning'`).
+    - `listing_transactions` conserva referencia al listing vendido.
+
+Notas generales:
+- Documentar cualquier desfase (>2 s) entre acciones y actualización de UI.
+- Añadir a la planilla QA referencia cruzada de `listing_id` ↔ `copy_id` ↔ `slot_id`.

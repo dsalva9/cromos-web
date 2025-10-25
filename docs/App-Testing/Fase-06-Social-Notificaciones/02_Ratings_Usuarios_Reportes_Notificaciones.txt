@@ -1,0 +1,108 @@
+Nombre del conjunto: CP-F06-02 Valoraciones de usuarios, reportes y notificaciones sociales
+Fase: 06 - Social y Notificaciones
+Objetivo: Probar el flujo completo de reputación (valoraciones posteriores a transacciones), generación de reportes sobre contenido/usuarios y la correcta propagación de notificaciones sociales.
+
+Pre-requisitos generales:
+- Transacción completada en CP-F03-02F para el par `qa.vendedor` ↔ `qa.comprador`.
+- Intercambio finalizado en CP-F05-02C entre `qa.traderA` y `qa.traderB`.
+- Contenido susceptible de reporte: listado `listing_QA_001`, plantilla `[ELIMINADA]` u otro contenido con ID conocido.
+- Acceso a tablas `user_ratings`, `template_ratings`, `reports`, `notifications`.
+- Herramientas: Chrome desktop, móvil, acceso a correo de soporte (para verificar copia de reportes si se envía).
+
+Configuración previa:
+- Asegurar que los usuarios no tienen valoraciones mutuas previas (borrar en DB si necesario).
+- Limpiar reportes antiguos relacionados con los recursos de prueba.
+
+Casos de prueba:
+
+Caso CP-F06-02A: Valorar a un usuario tras completar venta
+  Cobertura: Happy path; rating 1-5 estrellas.
+  Pasos:
+    1. Iniciar sesión como `qa.comprador`.
+    2. Navegar a `/marketplace/reservations` o notificación correspondiente.
+    3. Abrir modal “Valorar vendedor”.
+    4. Asignar 5 estrellas + comentario 150 caracteres.
+  Criterios de éxito:
+    - Modal muestra datos del vendedor y contexto de la transacción.
+    - Tras guardar, `user_ratings` crea registro con `context_type='listing_transaction'`.
+    - Perfil del vendedor actualiza promedio y distribución.
+    - Notificación “Has recibido una nueva valoración” se genera para vendedor.
+
+Caso CP-F06-02B: Editar y eliminar valoración
+  Cobertura: Edge; límites de longitud.
+  Pasos:
+    1. Volver a abrir resumen de la valoración.
+    2. Reducir a 3 estrellas y comentario corto (50 caracteres).
+    3. Eliminar valoración.
+  Criterios de éxito:
+    - Actualización se refleja inmediatamente en promedio del perfil.
+    - Comentario respeta límite 280 caracteres.
+    - Al eliminar, promedio recalcula sin ese registro.
+
+Caso CP-F06-02C: Valoraciones post-intercambio
+  Cobertura: Reputación tras trades.
+  Pasos:
+    1. `qa.traderA` abre notificación “Intercambio finalizado”.
+    2. Valorar a `qa.traderB` con 2 estrellas y comentario de incidente.
+    3. Verificar que `context_type='trade'`.
+  Criterios de éxito:
+    - Modal indica qué trade se está valorando.
+    - Registro se liga a `trade_id`.
+    - Usuario receptor ve badge de “Última valoración” en perfil.
+
+Caso CP-F06-02D: Reporte de contenido (listado)
+  Cobertura: Flujo completo; categorías; duplicados.
+  Pasos:
+    1. `qa.comprador` abre detalle del listado activo.
+    2. Pulsar “Reportar” → seleccionar motivo “Contenido fraudulento”.
+    3. Añadir comentario descriptivo y enviar.
+    4. Intentar reportar el mismo listado nuevamente.
+  Criterios de éxito:
+    - Modal requiere motivo y descripción ≥30 caracteres.
+    - Registro en `reports` con `target_type='listing'`, `status='pending'`.
+    - Si se intenta repetir, mensaje “Ya has reportado este contenido”.
+    - Notificación para administradores (ver Fase 07) se genera.
+
+Caso CP-F06-02E: Reporte de usuario (abusos en chat)
+  Cobertura: Reportes de usuarios.
+  Pasos:
+    1. En chat de trade, abrir menú “Reportar usuario”.
+    2. Seleccionar motivo “Conducta inapropiada”.
+    3. Adjuntar evidencia (texto).
+  Criterios de éxito:
+    - Reporte se guarda con `target_type='user'`, `context_id=trade_id`.
+    - Usuario reportado recibe notificación “Se ha creado un reporte en tu contra” (si la política lo permite).
+    - QA puede ver registro en `/admin/reports` (valida en Fase 07).
+
+Caso CP-F06-02F: Notificaciones sociales (favoritos, ratings, reportes)
+  Cobertura: Campana general.
+  Pasos:
+    1. Activar eventos: nuevo favorito sobre un listado propio, comentario de rating, reporte recibido.
+    2. Revisar `/notificaciones` (si existe) o campana global.
+  Criterios de éxito:
+    - Notificaciones diferenciadas por icono y copy (“A {usuario} le gustó tu listado”).
+    - Agrupadas por tipo con timestamp correcto.
+    - Marcar como leídas actualiza `notifications.read_at`.
+
+Caso CP-F06-02G: Resumen en perfil público
+  Cobertura: Visualización de reputación.
+  Pasos:
+    1. Visitar perfil del vendedor tras recibir valoraciones.
+    2. Revisar secciones: promedio, distribución, comentarios recientes.
+  Criterios de éxito:
+    - Gráfico de distribución coincide con datos reales (ej. 5⭐:1, 3⭐:1).
+    - Comentarios se muestran con nombre del autor y fecha.
+    - Botón “Ver todas las reseñas” paginado o con infinite scroll.
+
+Caso CP-F06-02H: Localización y accesibilidad
+  Cobertura: Copy en español; navegación teclado.
+  Pasos:
+    1. Abrir modales de rating y reporte con lector de pantalla.
+    2. Navegar solo con teclado (Tab/Enter).
+  Criterios de éxito:
+    - Etiquetas aria-label descriptivas (“Cerrar modal de valoración”).
+    - Elementos reciban focus visible según theme-guide.
+
+Notas generales:
+- Guardar IDs de reportes para seguimiento en Fase 07.
+- Limpiar valoraciones de prueba al finalizar (para no distorsionar métricas reales).

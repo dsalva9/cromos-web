@@ -1,0 +1,111 @@
+Nombre del conjunto: CP-F02-01 Creación y edición de plantillas
+Fase: 02 - Plantillas y Colecciones
+Objetivo: Validar que los autores puedan crear, estructurar, publicar y modificar plantillas de colecciones respetando reglas de negocio, RLS y UI Retro-Comic.
+
+Pre-requisitos generales:
+- Usuario autor: `qa.creador@cromos.test` (sin plantillas previas).
+- Usuario observador: `qa.observador@cromos.test` para verificar visibilidad.
+- Plantilla de referencia: “Album Mundial 2022 QA” semilla (ID `tmpl_ref_001`) para contrastar.
+- Herramientas: Chrome desktop, Chrome DevTools 768px (tablet) y 375px (móvil); planilla para registrar IDs generados.
+- Acceso a Supabase → Tables → `collection_templates`, `template_pages`, `template_slots` para verificación post-ejecución.
+
+Configuración previa:
+- Limpiar drafts existentes del usuario QA si los hay (`is_published = false`).
+- Cerrar sesiones en otros dispositivos para evitar conflictos de locking.
+- Preparar assets opcionales (URL de portada válida y URL inválida).
+
+Casos de prueba:
+
+Caso CP-F02-01A: Crear plantilla privada con páginas y slots
+  Cobertura: Happy path; validaciones mínimas; guardado incremental.
+  Pasos:
+    1. Iniciar sesión con `qa.creador`.
+    2. Ir a `/templates/new` o CTA “Crear plantilla”.
+    3. Completar título “Colección QA Liga 2025”, descripción (>120 caracteres), subir portada opcional.
+    4. Añadir 2 páginas:
+       - Página 1: “Equipo A”, 9 slots numerados 1-9.
+       - Página 2: “Equipo B”, 6 slots + marcar slot 6 como especial.
+    5. Guardar como borrador (no publicar).
+  Criterios de éxito:
+    - Botón “Guardar borrador” habilitado solo tras completar campos obligatorios.
+    - Toast “Plantilla guardada como borrador”.
+    - Entradas creadas en `collection_templates` (`is_public = false`, `is_deleted = false`), `template_pages` y `template_slots`.
+    - UI muestra resumen con conteo de páginas y slots.
+
+Caso CP-F02-01B: Validaciones de formulario
+  Cobertura: Edge; límites de longitud; duplicados.
+  Pasos:
+    1. Intentar guardar con título vacío y descripción <30 caracteres.
+    2. Duplicar número de slot dentro de la misma página.
+    3. Intentar crear >30 slots en una página.
+  Criterios de éxito:
+    - Mensajes inline claros (“El título es obligatorio”, “Debes escribir al menos 30 caracteres”).
+    - Sistema evita duplicados y muestra mensaje “El número ya existe en esta página”.
+    - Límite de slots bloquea la acción con aviso y sin crear registros parciales.
+
+Caso CP-F02-01C: Publicar plantilla y visibilidad pública
+  Cobertura: Flujo feliz; cambio de estado; indexación.
+  Pasos:
+    1. Abrir borrador creado y pulsar “Publicar”.
+    2. Confirmar modal.
+    3. Iniciar sesión con `qa.observador` y visitar `/templates`.
+    4. Buscar por “Colección QA Liga 2025”.
+  Criterios de éxito:
+    - Estado cambia a “Publicada” con badge verde.
+    - Registro actualiza `is_public = true`, `published_at` no nulo.
+    - Observador ve la plantilla en listado público y puede abrir detalle.
+    - URL pública muestra autor, número de copias = 0 y botón “Copiar”.
+
+Caso CP-F02-01D: Edición de metadatos publicados
+  Cobertura: Actualizar título, descripción, visibilidad; no romper copias existentes.
+  Pasos:
+    1. Con autor, editar título y descripción (añadir “v2”).
+    2. Cambiar visibilidad a “Privada”.
+    3. Guardar y revisar efecto en listado público.
+    4. Restaurar visibilidad pública.
+  Criterios de éxito:
+    - Modal de confirmación explica impacto en usuarios.
+    - Al poner privada, desaparece de `/templates` públicos pero se conserva para el autor.
+    - Al re-publicar, resumen de copias existentes se mantiene.
+    - `audit_log` registra `template_visibility_change`.
+
+Caso CP-F02-01E: Gestión de páginas y slots existentes
+  Cobertura: Edición; reordenamiento; eliminación con cascada.
+  Pasos:
+    1. Editar página “Equipo A”: renombrar a “Equipo A1” y cambiar orden (drag & drop si disponible).
+    2. Modificar slot 3 → etiqueta “Delantero”.
+    3. Eliminar slot especial en página 2.
+    4. Borrar página 2 por completo.
+  Criterios de éxito:
+    - Cambios se reflejan en UI inmediatamente (optimistic update).
+    - Supabase `template_slots` actualiza `label` y `is_special`.
+    - Al eliminar slot, cualquier progreso asociado se marca como borrado (ver `user_template_progress`).
+    - Al eliminar la página, slots se eliminan en cascada (`ON DELETE CASCADE`), sin orphans.
+
+Caso CP-F02-01F: Eliminación total de plantilla
+  Cobertura: Soft delete; confirmaciones; notificación a usuarios.
+  Pasos:
+    1. Desde página de detalle, pulsar “Eliminar plantilla”.
+    2. Confirmar motivo en textarea obligatorio (>20 caracteres).
+    3. Verificar redirección a `/templates`.
+    4. Revisar base de datos.
+  Criterios de éxito:
+    - Modal indica impacto en copias existentes.
+    - Tras confirmar, se redirige con toast “Plantilla eliminada”.
+    - En DB: `is_deleted = true`, título prefijado con `[ELIMINADA]`.
+    - Copias existentes siguen activas pero marcadas como huérfanas (ver `user_template_copies.template_deleted = true` si existe).
+
+Caso CP-F02-01G: Restricciones de autoría
+  Cobertura: Intentar editar con usuario ajeno.
+  Pasos:
+    1. Iniciar sesión con `qa.observador`.
+    2. Acceder a `/templates/{id}` de la plantilla creada y buscar botones de edición.
+    3. Intentar forzar URL `/templates/{id}/edit`.
+  Criterios de éxito:
+    - Botones de editar/eliminar no se muestran.
+    - Si se fuerza ruta, aparece mensaje “No tienes permiso para editar esta plantilla” y redirección.
+    - No se registran intentos fallidos de RLS en Supabase.
+
+Notas generales:
+- Registrar IDs de plantilla generados en la hoja de seguimiento para reutilizarlos en pruebas de copias.
+- Documentar tiempos de respuesta y cualquier problema de rendimiento al guardar (>2 s).

@@ -1,0 +1,77 @@
+Nombre del conjunto: CP-F09-03 Compatibilidad multi-dispositivo y navegadores
+Fase: 09 - Calidad transversal
+Objetivo: Garantizar que la aplicación funcione correctamente en los navegadores y dispositivos soportados, considerando diferentes resoluciones, densidades y orientación.
+
+Pre-requisitos generales:
+- Dispositivos/Navegadores objetivo:
+  * Chrome 128 (Windows/Mac).
+  * Firefox 128 (Windows).
+  * Safari 17 (macOS / iOS).
+  * Edge 128 (Windows).
+  * Android Chrome (Pixel 6, 412x915).
+- Herramientas: BrowserStack/real devices, planilla de matrices de compatibilidad.
+- Páginas representativas: Home, `/marketplace`, `/templates`, `/trades/proposals`, `/admin`, `/perfil`, `/marketplace/[id]/chat`.
+
+Casos de prueba:
+
+Caso CP-F09-03A: Smoke en navegadores desktop
+  Pasos:
+    1. Ejecutar flujo básico (login → marketplace → detalle → logout) en Chrome, Firefox, Edge.
+  Criterios de éxito:
+    - UI consistente, sin errores de layout.
+    - No aparecen errores de consola específicos del navegador.
+
+Caso CP-F09-03B: Safari desktop
+  Pasos:
+    1. Repetir flujo anterior.
+    2. Verificar funcionalidades con drag & drop (si existen).
+  Criterios de éxito:
+    - Elementos específicos (scroll snap, sticky) funcionan sin glitches.
+    - Formularios cargan correctamente (sin autofill errático).
+
+Caso CP-F09-03C: Responsive breakpoints
+  Pasos:
+    1. Probar en resoluciones: 320x568, 375x812, 768x1024, 1024x1366, 1440x900, 1920x1080.
+    2. Revisar componentes clave (cards, nav, tablas admin).
+  Criterios de éxito:
+    - Navegación móvil utiliza menú hamburguesa.
+    - Tablas admin se adaptan (scroll horizontal controlado o vista comprimida).
+
+Caso CP-F09-03D: Orientación móvil y gestos
+  Pasos:
+    1. En iOS/Android, rotar entre portrait y landscape en `/marketplace` y `/marketplace/[id]/chat`.
+    2. Probar gestos nativos (scroll, swipe back).
+  Criterios de éxito:
+    - La UI reajusta el layout sin perder contenido.
+    - Chat mantiene foco y scroll tras rotación.
+
+Caso CP-F09-03E: Teclado virtual y formularios
+  Pasos:
+    1. En mobile, abrir formularios de login, crear listado y chat.
+    2. Verificar que teclado no tapa campos críticos.
+  Criterios de éxito:
+    - Layout usa `safe-area` en iOS.
+    - Botones primarios siguen accesibles.
+
+Caso CP-F09-03F: Soporte de archivos en mobile
+  Pasos:
+    1. Subir foto desde cámara en Android/iOS para listado/plantilla.
+  Criterios de éxito:
+    - Permisos solicitados correctamente.
+    - Al recapturar, imagen se previsualiza.
+
+Caso CP-F09-03G: Modo oscuro / prefijos de sistema
+  Pasos:
+    1. Cambiar modo del SO (oscuro/claro).
+  Criterios de éxito:
+    - Theme Retro-Comic se mantiene (diseño oscuro por defecto), sin texto ilegible.
+
+Caso CP-F09-03H: Compatibilidad con navegadores no soportados
+  Pasos:
+    1. Abrir en Internet Explorer o versión desactualizada mediante emulador.
+  Criterios de éxito:
+    - Mensaje “Navegador no soportado” aparece o se bloquea acceso con copy adecuado.
+
+Notas generales:
+- Completar matriz de compatibilidad indicando “OK / Bloqueante / Observación”.
+- Documentar issues con capturas y datos de navegador (UA string, versión).

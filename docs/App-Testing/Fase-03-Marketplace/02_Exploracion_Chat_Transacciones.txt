@@ -1,0 +1,139 @@
+Nombre del conjunto: CP-F03-02 Exploración, chat y flujo de transacciones
+Fase: 03 - Marketplace
+Objetivo: Validar la experiencia de discovery, mensajería y reservas dentro del marketplace, asegurando sincronización de estados, notificaciones y protección de datos.
+
+Pre-requisitos generales:
+- Listado activo creado en CP-F03-01 (ID `listing_QA_001`).
+- Usuario vendedor: `qa.vendedor@cromos.test`.
+- Usuario comprador: `qa.comprador@cromos.test`.
+- Usuario tercero: `qa.tercero@cromos.test` para pruebas de permisos.
+- Configuración de Supabase Realtime habilitada.
+- Dispositivos: Chrome desktop, dispositivo móvil real (Android/iOS) o simulador.
+
+Configuración previa:
+- Asegurar que comprador no tenga conversaciones previas con el listado (limpiar `listing_messages` si aplica).
+- Habilitar en navegador notificaciones del sitio (para badge en header).
+- Preparar motivos de cancelación (texto) para prueba de edge.
+
+Casos de prueba:
+
+Caso CP-F03-02A: Búsqueda y filtros avanzados
+  Cobertura: Happy path; rendimiento; sincronización con URL.
+  Pasos:
+    1. Desde `/marketplace`, usar búsqueda por nombre de colección, número de cromo y autor.
+    2. Aplicar filtros combinados (estado, rango de precio, con foto).
+    3. Guardar filtro como URL y refrescar.
+  Criterios de éxito:
+    - Resultados se actualizan en <1 s tras aplicar filtros (sin reload completo).
+    - Se muestra mensaje “No encontramos resultados” cuando aplica.
+    - Parámetros de filtro reflejados en la URL (`?q=`, `?estado=`).
+    - Al refrescar, los filtros se mantienen activos.
+
+Caso CP-F03-02B: Vista de detalle y acciones contextuales
+  Cobertura: Información; CTA dinámicos según rol.
+  Pasos:
+    1. Abrir `/marketplace/{listing}` como comprador.
+    2. Revisar galerías, datos de vendedor, resumen de template si está vinculado.
+    3. Verificar botones “Contactar vendedor”, “Favorito”.
+    4. Abrir mismo detalle como vendedor y como usuario no autenticado.
+  Criterios de éxito:
+    - Comprador ve CTA “Contactar vendedor” y enlace al chat; vendedor ve “Ver conversaciones”.
+    - Usuario sin sesión obtiene banner “Inicia sesión para contactar”.
+    - Estatus del listado (activo/reservado) visible con badges consistentes.
+    - Conteo de vistas aumenta al recargar (ver `views_count`).
+
+Caso CP-F03-02C: Inicio de chat marketplace (comprador → vendedor)
+  Cobertura: Realtime; permisos; UX.
+  Pasos:
+    1. Como comprador, pulsar “Contactar vendedor”.
+    2. Enviar mensaje inicial (>20 caracteres).
+    3. Verificar que aparece en el hilo y que se marca como leído automáticamente.
+    4. Abrir la vista del vendedor `/marketplace/{id}/chat` y responder.
+  Criterios de éxito:
+    - Mensajes aparecen con alineación correcta (sistema de globos).
+    - Vendedor visualiza listado de compradores en panel izquierdo.
+    - Indicador de cantidad de caracteres se actualiza y bloquea >500.
+    - Badge de “Nuevos mensajes” aparece en header y en pestañas relevantes.
+
+Caso CP-F03-02D: Chat en mobile
+  Cobertura: Responsive; navegabilidad.
+  Pasos:
+    1. Abrir chat en móvil como comprador.
+    2. Enviar mensajes largos (multilínea con Shift+Enter).
+    3. Validar scroll y auto-focus.
+  Criterios de éxito:
+    - Layout se adapta (lista de participantes en slide-over).
+    - Botón enviar accesible con teclado abierto.
+    - No se producen dobles envíos ni bloqueos.
+
+Caso CP-F03-02E: Reservar listado para comprador específico
+  Cobertura: Workflow de reservas; estados `reserved`.
+  Pasos:
+    1. Desde “Mis listados”, vendedor selecciona conversación con comprador.
+    2. Pulsar “Reservar para este comprador” e ingresar nota opcional.
+    3. Verificar que el listado cambia a estado “Reservado” tanto para vendedor como para otros usuarios.
+  Criterios de éxito:
+    - Registro en `listing_transactions` creado con `status = 'reserved'`, `buyer_id`.
+    - UI del detalle muestra badge “Reservado para {nickname}`.
+    - Usuarios terceros ven listado como reservado y sin CTA de compra.
+    - Notificación se envía al comprador (ver campana en header).
+
+Caso CP-F03-02F: Completar transacción
+  Cobertura: Cambio a `completed`; rating posterior.
+  Pasos:
+    1. Tras reserva, vendedor pulsa “Marcar como completado”.
+    2. Comprador recibe indicación para confirmar; confirmar desde su panel `/marketplace/reservations`.
+    3. Verificar que el listado pasa a estado `completed` y se oculta del catálogo.
+  Criterios de éxito:
+    - Transacción actualiza `status = 'completed'`, `completed_at`.
+    - Ambos usuarios reciben prompt para calificar al contrario (si no existe calificación previa).
+    - Badge en “Mis listados” cambia a “Vendida”.
+    - Notificación de éxito aparece en la campana y se puede marcar como leída.
+
+Caso CP-F03-02G: Cancelar reserva
+  Cobertura: Edge; justificación obligatoria; liberación de listado.
+  Pasos:
+    1. Vendedor cancela desde modal indicando motivo (>30 caracteres).
+    2. Confirmar que el listado vuelve a “Activo”.
+    3. Comprador recibe notificación “Reserva cancelada”.
+  Criterios de éxito:
+    - Registro de transacción marca `status = 'cancelled'`, `cancellation_reason`.
+    - Audit log registra `listing_transaction_cancelled`.
+    - Chat conserva historial y nota de sistema con el motivo.
+
+Caso CP-F03-02H: Restricciones y seguridad del chat
+  Cobertura: Permisos; bloqueo de mensajes ofensivos (si se aplica).
+  Pasos:
+    1. Usuario tercero intenta acceder a `/marketplace/{id}/chat`.
+    2. Vendedor intenta enviar mensaje vacío o con >500 caracteres.
+    3. Probar que usuario bloqueado por vendedor (si existe) no puede enviar mensajes.
+  Criterios de éxito:
+    - Tercero recibe 403 con mensaje “No tienes acceso a esta conversación”.
+    - Mensajes vacíos o demasiado largos se bloquean con validación local.
+    - Si hay bloqueo, sistema muestra aviso pertinente.
+
+Caso CP-F03-02I: Favoritos y seguimiento de listados
+  Cobertura: Social integration; contadores.
+  Pasos:
+    1. Como comprador, marcar listado como favorito desde la tarjeta y desde el detalle.
+    2. Verificar en `/favoritos/listados`.
+    3. Quitar favorito y validar conteo.
+  Criterios de éxito:
+    - Acción es optimista (UI actualiza inmediatamente).
+    - `favourites` registra entrada con `target_type = 'listing'`.
+    - Contador de favoritos en tarjeta se incrementa/decrementa.
+
+Caso CP-F03-02J: Rendimiento y estabilidad
+  Cobertura: Stress; 50+ mensajes; throttle.
+  Pasos:
+    1. Enviar 50 mensajes alternados entre vendedor y comprador.
+    2. Verificar paginación (botón “Ver mensajes anteriores”).
+    3. Throttle “Slow 3G” y observar reconexiones realtime.
+  Criterios de éxito:
+    - Chat mantiene fluidez sin duplicar mensajes.
+    - Paginación carga mensajes previos correctamente.
+    - Realtime reconecta automáticamente tras pérdida de red.
+
+Notas generales:
+- Registrar IDs de transacciones generadas para pruebas de reputación (Fase 06).
+- Guardar capturas de las vistas de comprador, vendedor y terceros para documentar diferencias de permisos.

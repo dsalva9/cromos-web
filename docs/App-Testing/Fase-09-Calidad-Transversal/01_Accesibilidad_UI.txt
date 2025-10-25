@@ -1,0 +1,72 @@
+Nombre del conjunto: CP-F09-01 Accesibilidad y consistencia UI
+Fase: 09 - Calidad transversal
+Objetivo: Evaluar cumplimiento de criterios WCAG AA, accesibilidad por teclado/lector de pantalla y coherencia con la guía Retro-Comic en vistas principales.
+
+Pre-requisitos generales:
+- Herramientas:
+  * NVDA (Windows) o VoiceOver (macOS).
+  * Extensión axe DevTools o Lighthouse Accessibility.
+  * Chrome DevTools para simular contraste y visión reducida.
+- Páginas listadas: Home, `/marketplace`, `/templates`, `/trades/proposals`, `/admin`, `/perfil`.
+
+Casos de prueba:
+
+Caso CP-F09-01A: Navegación por teclado
+  Pasos:
+    1. Abrir cada página en modo incognito.
+    2. Navegar usando Tab/Shift+Tab, Enter y Space.
+  Criterios de éxito:
+    - Órdenes de foco lógicos (header → contenido → footer).
+    - Focus visible (outline grueso negro/dorado según theme).
+    - Componentes desplegables (menus, modales) accesibles con Enter/Espacio y se pueden cerrar con Esc.
+
+Caso CP-F09-01B: Textos alternativos y labels
+  Pasos:
+    1. Con NVDA/VoiceOver, recorrer tarjetas de listados, botones principales, iconos.
+  Criterios de éxito:
+    - Imágenes tienen `alt` descriptivo o `aria-hidden` si decorativas.
+    - Iconos con tooltip poseen `aria-label`.
+    - Inputs tienen `label` asociado (ej. `for`/`id`).
+
+Caso CP-F09-01C: Contraste de color
+  Pasos:
+    1. Usar herramienta DevTools → “Capture node screenshot” y `css overview`.
+    2. Verificar botones primarios, textos secundarios, etiquetas en tarjetas.
+  Criterios de éxito:
+    - Contraste ≥4.5:1 para texto normal, ≥3:1 para títulos grandes.
+    - Elementos deshabilitados claramente distinguibles.
+
+Caso CP-F09-01D: Saltar al contenido
+  Pasos:
+    1. Presionar Tab en home y otras vistas.
+  Criterios de éxito:
+    - Aparece enlace “Saltar al contenido principal”.
+    - Al usarlo, foco se mueve a `main` y se omite navegación.
+
+Caso CP-F09-01E: Modales y diálogos
+  Pasos:
+    1. Abrir modales clave (crear listado, valorar plantilla, reportar).
+    2. Verificar foco inicial y “trap” de foco.
+  Criterios de éxito:
+    - Foco inicial en el primer campo.
+    - Tabulaciones no escapan del modal.
+    - Esc cierra modal y foco vuelve al trigger.
+
+Caso CP-F09-01F: Resultados con Axe/Lighthouse
+  Pasos:
+    1. Ejecutar auditoría Lighthouse (Accesibilidad) en home y `/admin`.
+  Criterios de éxito:
+    - Puntaje ≥90.
+    - No se detectan errores críticos (solo warnings menores aceptables).
+
+Caso CP-F09-01G: Idioma y localización
+  Pasos:
+    1. Revisar `lang="es"` en HTML y texto de los componentes.
+    2. Confirmar que no quedan strings en inglés.
+  Criterios de éxito:
+    - `lang` configurado.
+    - Textos clave totalmente en español.
+
+Notas generales:
+- Registrar issues detectados con captura y ruta del componente (`src/...`).
+- Priorizar correcciones antes de cierre de sprint si afectan a usuarios asistivos.

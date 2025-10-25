@@ -1,0 +1,57 @@
+Nombre del conjunto: CP-F08-02 Flujo E2E duplicados → publicación → venta completada
+Fase: 08 - End-to-End
+Objetivo: Validar el recorrido completo desde la detección de duplicados en una copia de plantilla hasta cerrar una transacción de marketplace con reserva, chat y valoración posterior.
+
+Pre-requisitos generales:
+- Usuario vendedor `e2e.vendedor@cromos.test` con copia de plantilla y duplicados configurados.
+- Usuario comprador `e2e.comprador@cromos.test` sin listados activos.
+- Correo de ambos usuarios accesible.
+- Chat y notificaciones habilitados.
+
+Casos de prueba secuenciales:
+
+Caso CP-F08-02A: Publicar duplicado desde la copia
+  Pasos:
+    1. Vendedor identifica slot con duplicados (count ≥2).
+    2. Usa “Publicar duplicado” (ver CP-F04-01A).
+  Criterios de éxito:
+    - Listado creado con link al slot.
+
+Caso CP-F08-02B: Descubrimiento por comprador
+  Pasos:
+    1. Comprador busca el listado por colección/número.
+    2. Marca favorito para seguimiento.
+  Criterios de éxito:
+    - Listado visible en catálogo y detalle con badge “Sincronizado”.
+
+Caso CP-F08-02C: Conversación y reserva
+  Pasos:
+    1. Comprador inicia chat y negocia.
+    2. Vendedor reserva para ese comprador (ver CP-F03-02E).
+  Criterios de éxito:
+    - Estado “Reservado” visible para ambos y oculto al resto.
+
+Caso CP-F08-02D: Cierre de transacción
+  Pasos:
+    1. Vendedor marca como completado.
+    2. Comprador confirma desde su panel.
+  Criterios de éxito:
+    - Listado cambia a `completed` y ya no aparece en catálogo.
+    - Duplicados decrementan automáticamente.
+
+Caso CP-F08-02E: Valoración post-venta
+  Pasos:
+    1. Comprador califica al vendedor.
+    2. Vendedor responde con valoración recíproca.
+  Criterios de éxito:
+    - Promedios en perfiles actualizados.
+
+Caso CP-F08-02F: Revisión de auditoría
+  Pasos:
+    1. Admin revisa `audit_log` filtrando por `listing_transaction`.
+  Criterios de éxito:
+    - Acciones `reserve_listing`, `complete_listing_transaction` registradas.
+
+Notas generales:
+- Registrar timestamps de cada etapa para medir SLAs internos.
+- Documentar comportamientos en caso de conexiones lentas.

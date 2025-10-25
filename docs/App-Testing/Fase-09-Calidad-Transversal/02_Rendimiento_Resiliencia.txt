@@ -1,0 +1,81 @@
+Nombre del conjunto: CP-F09-02 Rendimiento, resiliencia y manejo de errores
+Fase: 09 - Calidad transversal
+Objetivo: Evaluar tiempos de carga, comportamiento bajo condiciones adversas (red lenta, offline, errores del servidor) y manejo adecuado de estados vacíos/error.
+
+Pre-requisitos generales:
+- Herramientas:
+  * Chrome DevTools (Network throttling, CPU throttling).
+  * Lighthouse (Performance).
+  * Extensión para simular offline.
+  * Proxy o herramienta para forzar errores 500 (p.ej. modificar responses vía devtools).
+- Páginas objetivo: `/marketplace`, `/templates`, `/trades/proposals`, `/admin/dashboard`, `/admin/reports`, `/perfil`.
+
+Casos de prueba:
+
+Caso CP-F09-02A: Métricas de rendimiento inicial (Lighthouse)
+  Pasos:
+    1. Ejecutar Lighthouse (Performance) en `/` y `/marketplace`.
+    2. Registrar FCP, LCP, TTI.
+  Criterios de éxito:
+    - Puntaje ≥85 en desktop y ≥75 en mobile.
+    - LCP <3.5 s en red rápida, <5 s en Slow 4G.
+
+Caso CP-F09-02B: Skeletons y estados de carga
+  Pasos:
+    1. Throttle “Slow 3G”.
+    2. Cargar `/marketplace`, `/templates`, `/marketplace/my-listings`.
+  Criterios de éxito:
+    - Skeletons aparecen inmediatamente (<200 ms).
+    - Transición suave sin layout shifts (>0.1 CLS).
+
+Caso CP-F09-02C: Manejo de errores backend (500/timeout)
+  Pasos:
+    1. Interceptar una request a `list_trade_listings` y devolver 500.
+    2. Repetir con `/api/admin/...`.
+  Criterios de éxito:
+    - UI muestra mensaje de error contextual (“No pudimos cargar los listados. Reintenta”).
+    - Botones de reintento visibles.
+    - Error se registra en consola con logger (no stack trace bruto).
+
+Caso CP-F09-02D: Estados vacíos
+  Pasos:
+    1. Usar cuenta sin datos para visitar `/marketplace/my-listings`, `/templates/mis-copias`, `/favoritos`.
+  Criterios de éxito:
+    - Se muestran mensajes de vacío con CTA relevantes.
+    - Ilustraciones o iconos se cargan correctamente.
+
+Caso CP-F09-02E: Resiliencia offline
+  Pasos:
+    1. Activar modo offline.
+    2. Intentar navegar en `/marketplace` y `/trades/proposals`.
+  Criterios de éxito:
+    - Se muestra mensaje “Sin conexión” o similar.
+    - UI evita crash (no pantalla en blanco).
+
+Caso CP-F09-02F: Recuperación tras reconexión
+  Pasos:
+    1. Tras modo offline, reactivar red.
+    2. Verificar que la página se recarga o ofrece botón “Reintentar”.
+  Criterios de éxito:
+    - Peticiones se relanzan automáticamente o vía botón.
+    - Estado vuelve a normal sin recargar manualmente.
+
+Caso CP-F09-02G: Rendimiento en panel admin
+  Pasos:
+    1. Cargar `/admin/dashboard` y `/admin/reports` con 100 registros.
+    2. Medir tiempos y consumo de memoria en DevTools → Performance.
+  Criterios de éxito:
+    - Tiempos <2.5 s (dashboard) y <3 s (reports).
+    - Sin warnings de memoria.
+
+Caso CP-F09-02H: Timeouts controlados
+  Pasos:
+    1. Forzar latencia 2 s + 20% packet loss.
+    2. Enviar formulario (crear listado o reporte).
+  Criterios de éxito:
+    - Loading indicator visible.
+    - Tras timeout, mensaje claro y posibilidad de reintentar sin duplicar la acción.
+
+Notas generales:
+- Registrar métricas en hoja de seguimiento con fecha/hora.
+- Adjuntar capturas o export de Lighthouse en carpeta QA.

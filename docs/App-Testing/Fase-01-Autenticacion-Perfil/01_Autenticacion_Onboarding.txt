@@ -1,0 +1,124 @@
+Nombre del conjunto: CP-F01-01 Autenticación y Onboarding
+Fase: 01 - Autenticación y Perfil
+Objetivo: Validar que el ciclo completo de registro, acceso y recuperación de cuentas funcione con datos válidos e inválidos, manteniendo la seguridad y la localización en español.
+
+Pre-requisitos generales:
+- Entorno listo con base de datos limpia o sandbox: https://cambio-cromos.vercel.app (staging) o instancia local sincronizada con las migraciones más recientes.
+- Acceso a la consola de Supabase con permisos para revisar correos transaccionales (Auth → Users → “Send magic link” history) o bandeja de correo de test (`correo+qa@cromos.test`).
+- Dataset base:
+  * `qa.admin@cromos.test` (rol admin, contraseña `Admin#12345`).
+  * `qa.suspendido@cromos.test` (estado suspendido, contraseña `Suspendido#123`).
+  * `qa.registrado@cromos.test` (usuario activo con colecciones).
+- Herramientas de apoyo: navegador Chrome 128+, Safari iOS 17 (modo responsive 375x812), capturador de pantalla, gestor de contraseñas para generar claves fuertes.
+
+Configuración previa:
+- Vaciar cookies y almacenamiento local antes de cada caso en el mismo navegador.
+- Asegurar que los correos de verificación y recuperación son redirigidos al visor de correos simulado (Mailhog/Resend sandbox) accesible para el equipo QA.
+- Tener a mano la URL de deep link de verificación (`https://cambio-cromos.vercel.app/auth/verify`) para abrir manualmente si el correo no redirige automáticamente.
+
+Casos de prueba:
+
+Caso CP-F01-01: Registro exitoso en escritorio
+  Cobertura: Feliz; validación de formularios; localización en español; sesión inicial.
+  Pre-requisitos específicos: Navegador Chrome en resolución 1920x1080; email libre `nuevo+{timestamp}@cromos.test`.
+  Pasos:
+    1. Abrir la página principal y pulsar “Crear cuenta”.
+    2. Completar email válido, contraseña fuerte (>10 caracteres, mayúscula, minúscula, número, símbolo) y confirmar términos.
+    3. Enviar formulario y seguir enlace de verificación recibido.
+    4. Continuar con el wizard de onboarding si se muestra.
+  Criterios de éxito:
+    - El formulario valida en vivo requisitos de contraseña y formato de email.
+    - Se muestra toast “Revisa tu correo” y se envía email con copy en español.
+    - El enlace de verificación inicia sesión automáticamente y lleva al dashboard “Mi colección”.
+    - Se crea registro en `profiles` con nickname inicial y se genera sesión persistente (comprobar `supabase.auth.token` en Storage).
+  Validaciones adicionales:
+    - No hay errores en consola.
+    - Registro visible en Supabase Auth con metadata correcta (rol user).
+
+Caso CP-F01-02: Registro móvil (vista 375px)
+  Cobertura: Responsive; accesibilidad; hint de teclado en campos.
+  Pre-requisitos específicos: Modo dispositivo iPhone 13 en DevTools Safari/Chrome; email libre.
+  Pasos:
+    1. Repetir flujo de registro desde menú hamburguesa.
+    2. Validar que teclado muestra tipo email/password adecuado.
+    3. Completar verificación.
+  Criterios de éxito:
+    - Layout no desborda; botones visibles sin scroll horizontal.
+    - Mensajes de validación se muestran centrados y legibles.
+    - Al finalizar, menú móvil refleja estado logueado (avatar en header).
+
+Caso CP-F01-03: Registro bloqueado por contraseña débil y email duplicado
+  Cobertura: Casos negativos; mensajes de error; prevención de duplicados.
+  Pre-requisitos específicos: Email existente `qa.registrado@cromos.test`.
+  Pasos:
+    1. Intentar registrarse con contraseña “123456”.
+    2. Ajustar contraseña fuerte pero reutilizar email existente.
+  Criterios de éxito:
+    - Mensaje claro “La contraseña debe incluir…” y botón deshabilitado.
+    - Mensaje “Este correo ya está registrado” sin crear nueva cuenta.
+    - No se envía email de verificación.
+    - Logs del frontend no contienen stack traces.
+
+Caso CP-F01-04: Inicio de sesión válido + persistencia
+  Cobertura: Feliz; refresco de token; recordatorio de sesión.
+  Pre-requisitos específicos: Usuario `qa.registrado@cromos.test`.
+  Pasos:
+    1. Iniciar sesión desde `/auth/login`.
+    2. Marcar “Recordarme”.
+    3. Cerrar pestaña, reabrir URL base tras 5 minutos.
+  Criterios de éxito:
+    - Redirección a “Mi colección” tras login con toast de bienvenida.
+    - Al volver a abrir, usuario sigue autenticado sin reingresar credenciales.
+    - `auth.session()` en consola devuelve expiración > 50 minutos.
+
+Caso CP-F01-05: Manejo de credenciales inválidas
+  Cobertura: Error handling; bloqueo tras intentos fallidos.
+  Pre-requisitos específicos: Usuario `qa.registrado@cromos.test`.
+  Pasos:
+    1. Intentar inicio con contraseña incorrecta tres veces.
+    2. Intentar con email inexistente `fantasma@cromos.test`.
+  Criterios de éxito:
+    - Mensaje “Correo o contraseña incorrectos” en español, sin revelar cuál dato falla.
+    - Después de 3 intentos, mostrar sugerencia de recuperar contraseña.
+    - No se bloquea la cuenta real en Supabase.
+
+Caso CP-F01-06: Recuperación de contraseña
+  Cobertura: Email transaccional; expiración de link; flujo móvil/escritorio.
+  Pre-requisitos específicos: Usuario activo.
+  Pasos:
+    1. Pulsar “¿Olvidaste tu contraseña?” y enviar email.
+    2. Abrir enlace en escritorio y resetear a nueva contraseña fuerte.
+    3. Repetir flujo y abrir enlace desde móvil (comprobar responsividad).
+  Criterios de éxito:
+    - Email llega en <1 min, copy sin placeholders.
+    - Link permite establecer nueva contraseña y redirige al dashboard con sesión iniciada.
+    - Intento de reutilizar link muestra mensaje “Enlace expirado”.
+    - Cambios reflejados en Supabase Auth (último login actualizado).
+
+Caso CP-F01-07: Acceso bloqueado para usuario suspendido
+  Cobertura: Edge; seguridad; mensajes de suspensión.
+  Pre-requisitos específicos: Usuario `qa.suspendido@cromos.test` con `profiles.is_suspended = true`.
+  Pasos:
+    1. Intentar iniciar sesión con credenciales correctas.
+    2. Intentar usar enlace de recuperación recibido previamente.
+  Criterios de éxito:
+    - Pantalla muestra mensaje específico “Tu cuenta está suspendida. Contacta soporte.”
+    - No se establece sesión ni cookies.
+    - Evento registrado en `audit_log` con acción `suspension_blocked_login`.
+
+Caso CP-F01-08: Refresco automático de sesión y logout
+  Cobertura: Tokens; limpieza de storage; deslogueo global.
+  Pre-requisitos específicos: Usuario recién autenticado en Chrome.
+  Pasos:
+    1. Abrir dos pestañas autenticadas.
+    2. En pestaña A, pulsar avatar → “Cerrar sesión”.
+    3. Verificar pestaña B refresh/restringir acceso al navegar.
+  Criterios de éxito:
+    - Logout cierra sesión en todas pestañas (al navegar, se redirige a login).
+    - Storage local y session quedan sin tokens (ver DevTools → Application).
+    - Navegación directa a `/marketplace/my-listings` redirige a login con mensaje “Inicia sesión para continuar”.
+
+Notas generales:
+- Documentar capturas de cada caso en la carpeta compartida QA.
+- Registrar tiempo aproximado de ejecución por caso para estimar esfuerzos futuros.
+- Reportar cualquier discrepancia en localización a través de Jira etiqueta `i18n`.

@@ -1,0 +1,101 @@
+Nombre del conjunto: CP-F05-02 Chat de intercambio, finalización y notificaciones
+Fase: 05 - Intercambios
+Objetivo: Validar la mensajería en torno a las propuestas, el flujo de finalización en dos pasos, la gestión de historiales y la generación de notificaciones asociadas.
+
+Pre-requisitos generales:
+- Propuesta aceptada generada en CP-F05-01C (ID `trade_QA_001`).
+- Usuarios A y B con sesiones activas en navegadores distintos.
+- Acceso a tablas `trade_chats`, `trade_reads`, `trade_finalizations`, `notifications`.
+- Realtime habilitado y sin bloqueos de firewall.
+- Herramientas: Chrome desktop (usuario A), Firefox desktop (usuario B), móvil para validar badges.
+
+Configuración previa:
+- Asegurarse de que no existan mensajes previos sin leer para aislar badges.
+- Abrir consola de red para monitorear llamadas a `/rest/v1/trade_chats`.
+
+Casos de prueba:
+
+Caso CP-F05-02A: Chat en propuestas aceptadas
+  Cobertura: Mensajería en tiempo real; formato; límites.
+  Pasos:
+    1. Usuario A abre detalle de la propuesta aceptada y abre panel de chat.
+    2. Enviar mensaje >50 caracteres.
+    3. Usuario B recibe en vivo y responde con adjuntos de texto multilínea (Shift+Enter).
+  Criterios de éxito:
+    - Mensajes se muestran en orden cronológico, con timestamps HH:mm.
+    - Auto-scroll a último mensaje.
+    - Límite de 500 caracteres respetado (contador).
+    - Registro en `trade_chats` con `sender_id` correcto.
+
+Caso CP-F05-02B: Indicadores de mensajes no leídos
+  Cobertura: Badges en tarjetas y tabs.
+  Pasos:
+    1. Usuario A envía 3 mensajes consecutivos.
+    2. Usuario B mantiene pestaña cerrada y revisa `/trades/proposals`.
+  Criterios de éxito:
+    - Tarjeta en bandeja “Recibidas” muestra badge con número de mensajes no leídos.
+    - Tab “Mensajes” en header muestra indicador agregado.
+    - Al abrir el chat, los badges desaparecen y `trade_reads` registra `last_read_at`.
+
+Caso CP-F05-02C: Finalización en dos pasos
+  Cobertura: Flujo handshake.
+  Pasos:
+    1. Usuario A pulsa “Marcar como finalizado”.
+    2. Usuario B recibe notificación y también marca como finalizado.
+  Criterios de éxito:
+    - Tras primera marca, UI indica “Esperando confirmación de {usuario}”.
+    - `trade_finalizations` contiene registro para usuario A al primer paso y para B tras confirmar.
+    - Una vez ambos confirman, `trade_proposals.status` cambia a `completed`.
+    - Se genera notificación “Intercambio finalizado” para ambos.
+
+Caso CP-F05-02D: Reversión de finalización
+  Cobertura: Edge; errores humanos.
+  Pasos:
+    1. Tras completar, Usuario B intenta revertir (si existe acción “Deshacer” dentro de X minutos).
+    2. Si la función no existe, documentar.
+  Criterios de éxito:
+    - Si hay reversión, estado vuelve a `accepted` y se elimina registro correspondiente en `trade_finalizations`.
+    - Si no hay reversión, confirmar que UI comunica la imposibilidad.
+
+Caso CP-F05-02E: Historial y propuestas rechazadas
+  Cobertura: Tab “Historial” y “Ver rechazadas”.
+  Pasos:
+    1. Navegar a tab “Historial”.
+    2. Validar paginación y filtros (fechas, estado).
+    3. Activar toggle “Ver rechazadas” en bandeja principal.
+  Criterios de éxito:
+    - Entradas muestran resumen (avatar, cromos, resultado).
+    - Filtros funcionan sin recarga.
+    - Rechazadas se muestran con etiqueta roja y notas.
+
+Caso CP-F05-02F: Notificaciones globales
+  Cobertura: Integración con campana.
+  Pasos:
+    1. Provocar eventos: mensaje nuevo, aceptación, finalización.
+    2. Revisar `/trades/notifications`.
+    3. Marcar todas como leídas.
+  Criterios de éxito:
+    - Cada evento genera notificación con icono y copy correcto.
+    - Las nuevas aparecen en sección “Nuevas”, el resto en “Anteriores”.
+    - Botón “Marcar todas como leídas” limpia badges y actualiza `notifications.read_at`.
+
+Caso CP-F05-02G: Acceso no autorizado
+  Cobertura: Permisos.
+  Pasos:
+    1. Usuario tercero intenta abrir URL directa `/trades/proposals/{id}`.
+  Criterios de éxito:
+    - Recibe 403 o redirección con mensaje “No tienes acceso”.
+    - No se registran lecturas en `trade_reads`.
+
+Caso CP-F05-02H: Pruebas en móvil
+  Cobertura: Responsive en panel de notificaciones y chat.
+  Pasos:
+    1. Abrir `/trades/notifications` en 375px.
+    2. Revisar accesibilidad del botón “Marcar como leídas”.
+  Criterios de éxito:
+    - Cards adaptadas verticalmente, sin cortes de texto.
+    - Acciones accesibles con el pulgar.
+
+Notas generales:
+- Guardar ID de notificaciones generadas para rastrear en base.
+- Registrar cualquier retraso en realtime (>2 s) para análisis de Supabase.

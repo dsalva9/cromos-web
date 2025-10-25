@@ -1,0 +1,96 @@
+Nombre del conjunto: CP-F06-01 Favoritos y perfiles públicos
+Fase: 06 - Social y Notificaciones
+Objetivo: Confirmar que los usuarios puedan seguir/favoritar listados, plantillas y otros usuarios, y que los perfiles públicos reflejen correctamente la actividad social en diferentes dispositivos.
+
+Pre-requisitos generales:
+- Usuarios:
+  * `qa.coleccionista@cromos.test` (actor principal).
+  * `qa.vendedor@cromos.test` (propietario de listados).
+  * `qa.creador@cromos.test` (autor de plantillas públicas).
+- Contenido disponible:
+  * Listado activo `listing_QA_001`.
+  * Plantilla pública “Colección QA Liga 2025”.
+  * Perfil público del vendedor con rating.
+- Acceso a tablas `favourites`, `profiles`.
+- Herramientas: Chrome desktop, dispositivo móvil, lector de pantalla opcional.
+
+Configuración previa:
+- Asegurar que los contadores de favoritos estén en 0 para el contenido seleccionado (eliminar registros previos).
+- Iniciar sesión como `qa.coleccionista`.
+
+Casos de prueba:
+
+Caso CP-F06-01A: Favoritos de listados desde el grid
+  Cobertura: Happy path; optimismo UI.
+  Pasos:
+    1. Navegar a `/marketplace`.
+    2. Pulsar icono de corazón en tarjeta del listado.
+    3. Actualizar la página.
+  Criterios de éxito:
+    - Icono cambia a estado “favorito” inmediatamente (sin flash).
+    - Contador de favoritos de la tarjeta incrementa.
+    - Registro creado en `favourites` con `target_type='listing'`.
+
+Caso CP-F06-01B: Favorito desde detalle y retiro
+  Cobertura: Sincronización.
+  Pasos:
+    1. Abrir detalle del mismo listado.
+    2. Verificar estado del botón (activo).
+    3. Pulsar nuevamente para quitar favorito.
+  Criterios de éxito:
+    - Botón refleja estado actualizado en tiempo real.
+    - Contador decrementa a valor inicial.
+    - Registro en `favourites` se elimina.
+
+Caso CP-F06-01C: Favoritos de plantillas
+  Cobertura: Diversos tipos.
+  Pasos:
+    1. Entrar a `/templates` y marcar favorita “Colección QA Liga 2025”.
+    2. Revisar en `/favoritos/plantillas`.
+  Criterios de éxito:
+    - Plantilla aparece en lista con datos correctos (autor, rating).
+    - Contadores se actualizan en tarjeta pública.
+
+Caso CP-F06-01D: Seguir a un usuario
+  Cobertura: Favoritos sobre perfiles.
+  Pasos:
+    1. Abrir `/usuarios/{id}` del vendedor.
+    2. Pulsar “Agregar a favoritos”.
+    3. Revisar `/favoritos/usuarios`.
+  Criterios de éxito:
+    - Perfil aparece en lista con métricas (listados activos, calificación).
+    - En el perfil público, contador de seguidores incrementa.
+    - Botón cambia a “Eliminar de favoritos”.
+
+Caso CP-F06-01E: Página de favoritos consolidada
+  Cobertura: UX; tabulación.
+  Pasos:
+    1. Visitar `/favoritos`.
+    2. Revisar pestañas (Listados, Plantillas, Usuarios).
+    3. Cambiar entre ellas en desktop y mobile.
+  Criterios de éxito:
+    - Cada tab muestra datos correctos y ordenados recientemente.
+    - En mobile, tabs se convierten en un menú deslizante accesible.
+    - Mensaje “Aún no tienes favoritos” aparece cuando aplica.
+
+Caso CP-F06-01F: Sincronización multi-dispositivo
+  Cobertura: Realtime; consistencia.
+  Pasos:
+    1. Marcar favorito en desktop.
+    2. Abrir el mismo recurso en móvil (sin refrescar).
+  Criterios de éxito:
+    - Estado se sincroniza automáticamente (o tras refresh, sin inconsistencias).
+    - No se crean registros duplicados.
+
+Caso CP-F06-01G: Restricciones y seguridad
+  Cobertura: Edge.
+  Pasos:
+    1. Usuario sin sesión intenta marcar favorito → debe ser redirigido a login.
+    2. Autor de plantilla intenta auto-favoritarse (si el sistema lo permite).
+  Criterios de éxito:
+    - Se muestra mensaje “Inicia sesión para guardar favoritos”.
+    - Si se permite auto-favorito, registro se crea; si no, se muestra mensaje “No puedes seguir tu propio perfil”.
+
+Notas generales:
+- Registrar cambios en `favourites` para revertir tras las pruebas.
+- Documentar diferencias de copy/tooltip si se detectan inconsistencias en localización.
