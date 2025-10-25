@@ -107,8 +107,8 @@ export function NotificationDropdown({ maxItems = 5 }: NotificationDropdownProps
           </div>
         )}
 
-        {/* View All Link */}
-        {!loading && displayNotifications.length > 0 && (
+        {/* View All Link - Always visible */}
+        {!loading && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
