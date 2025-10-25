@@ -173,8 +173,8 @@ BEGIN
         tl.title AS listing_title,
         tl.status AS listing_status,
         -- Template data
-        ct.name AS template_name,
-        ct.status AS template_status
+        ct.title AS template_name,
+        NULL::TEXT AS template_status
     FROM notifications n
     -- Join actor profile
     LEFT JOIN profiles p_actor ON p_actor.id = n.actor_id
