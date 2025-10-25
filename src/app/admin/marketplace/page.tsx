@@ -144,7 +144,6 @@ export default function AdminMarketplacePage() {
                       <div className="text-sm text-gray-400 space-y-1">
                         <p>Colección: {listing.collection_name}</p>
                         <p>Vendedor: {listing.seller_nickname}</p>
-                        <p>Precio: ${listing.price.toFixed(2)}</p>
                         <p>
                           Creado: {format(new Date(listing.created_at), 'PPP', { locale: es })}
                         </p>

@@ -11,10 +11,8 @@ export interface AdminListing {
   created_at: string;
   seller_id: string;
   seller_nickname: string;
-  price: number;
   views_count: number;
   transaction_count: number;
-  is_public: boolean;
 }
 
 export function useAdminListings(

@@ -15,8 +15,8 @@ BEGIN
     -- Validate admin permission
     PERFORM require_admin();
 
-    -- Delete user's marketplace listings
-    DELETE FROM marketplace_listings WHERE seller_id = p_user_id;
+    -- Delete user's trade listings
+    DELETE FROM trade_listings WHERE user_id = p_user_id;
 
     -- Delete user's templates (this will cascade to pages and slots)
     DELETE FROM collection_templates WHERE author_id = p_user_id;
@@ -30,8 +30,8 @@ BEGIN
     -- Delete user's favourites
     DELETE FROM favourites WHERE user_id = p_user_id;
 
-    -- Delete user's marketplace transactions
-    DELETE FROM marketplace_transactions WHERE buyer_id = p_user_id OR seller_id = p_user_id;
+    -- Delete user's listing transactions
+    DELETE FROM listing_transactions WHERE buyer_id = p_user_id OR seller_id = p_user_id;
 
     -- Delete user's trade offers
     DELETE FROM trade_offers WHERE sender_id = p_user_id OR receiver_id = p_user_id;

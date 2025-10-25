@@ -4,20 +4,38 @@
 -- Purpose: Admin functions for managing marketplace listings and templates
 -- =====================================================
 
--- Add status column to marketplace listings if it doesn't exist
+-- Add status column to trade_listings if it doesn't exist (already has status, but we need to extend it)
 DO $$
 BEGIN
+    -- Check if status column exists
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'trade_listings' AND column_name = 'status'
+    ) THEN
+        -- Drop existing check constraint
+        ALTER TABLE trade_listings DROP CONSTRAINT IF EXISTS trade_listings_status_check;
+
+        -- Add new check constraint with extended statuses
+        ALTER TABLE trade_listings ADD CONSTRAINT trade_listings_status_check
+            CHECK (status IN ('active', 'sold', 'removed', 'reserved', 'completed', 'suspended'));
+    END IF;
+
+    -- Add suspended_at column if it doesn't exist
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'marketplace_listings' AND column_name = 'status'
+        WHERE table_name = 'trade_listings' AND column_name = 'suspended_at'
     ) THEN
-        ALTER TABLE marketplace_listings ADD COLUMN status TEXT DEFAULT 'active' CHECK (status IN ('active', 'reserved', 'completed', 'suspended', 'removed'));
-        ALTER TABLE marketplace_listings ADD COLUMN suspended_at TIMESTAMPTZ;
-        ALTER TABLE marketplace_listings ADD COLUMN suspension_reason TEXT;
+        ALTER TABLE trade_listings ADD COLUMN suspended_at TIMESTAMPTZ;
+        COMMENT ON COLUMN trade_listings.suspended_at IS 'Timestamp when listing was suspended';
+    END IF;
 
-        COMMENT ON COLUMN marketplace_listings.status IS 'Listing status: active, reserved, completed, suspended, removed';
-        COMMENT ON COLUMN marketplace_listings.suspended_at IS 'Timestamp when listing was suspended';
-        COMMENT ON COLUMN marketplace_listings.suspension_reason IS 'Reason for suspension';
+    -- Add suspension_reason column if it doesn't exist
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'trade_listings' AND column_name = 'suspension_reason'
+    ) THEN
+        ALTER TABLE trade_listings ADD COLUMN suspension_reason TEXT;
+        COMMENT ON COLUMN trade_listings.suspension_reason IS 'Reason for suspension';
     END IF;
 END $$;
 
@@ -54,10 +72,8 @@ RETURNS TABLE (
     created_at TIMESTAMPTZ,
     seller_id UUID,
     seller_nickname TEXT,
-    price DECIMAL,
     views_count INTEGER,
-    transaction_count INTEGER,
-    is_public BOOLEAN
+    transaction_count INTEGER
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -72,28 +88,25 @@ BEGIN
 
     RETURN QUERY
     SELECT
-        ml.id,
-        ml.title,
-        c.name AS collection_name,
-        COALESCE(ml.status, 'active') AS status,
-        ml.created_at,
-        ml.seller_id,
+        tl.id,
+        tl.title,
+        tl.collection_name,
+        COALESCE(tl.status, 'active') AS status,
+        tl.created_at,
+        tl.user_id AS seller_id,
         p.nickname AS seller_nickname,
-        ml.price,
-        COALESCE(ml.views_count, 0)::INTEGER AS views_count,
+        COALESCE(tl.views_count, 0)::INTEGER AS views_count,
         (
             SELECT COUNT(*)::INTEGER
-            FROM marketplace_transactions mt
-            WHERE mt.listing_id = ml.id
-        ) AS transaction_count,
-        ml.is_public
-    FROM marketplace_listings ml
-    JOIN profiles p ON ml.seller_id = p.id
-    JOIN collections c ON ml.collection_id = c.id
+            FROM listing_transactions lt
+            WHERE lt.listing_id = tl.id
+        ) AS transaction_count
+    FROM trade_listings tl
+    JOIN profiles p ON tl.user_id = p.id
     WHERE
-        (p_status IS NULL OR COALESCE(ml.status, 'active') = p_status)
-        AND (p_query IS NULL OR ml.title ILIKE '%' || p_query || '%')
-    ORDER BY ml.created_at DESC
+        (p_status IS NULL OR COALESCE(tl.status, 'active') = p_status)
+        AND (p_query IS NULL OR tl.title ILIKE '%' || p_query || '%')
+    ORDER BY tl.created_at DESC
     LIMIT p_page_size
     OFFSET v_offset;
 END;
@@ -115,12 +128,12 @@ BEGIN
     PERFORM require_admin();
 
     -- Validate status
-    IF p_status NOT IN ('active', 'suspended', 'removed') THEN
-        RAISE EXCEPTION 'Invalid status. Must be: active, suspended, removed';
+    IF p_status NOT IN ('active', 'suspended', 'removed', 'sold', 'reserved', 'completed') THEN
+        RAISE EXCEPTION 'Invalid status. Must be: active, suspended, removed, sold, reserved, completed';
     END IF;
 
     -- Update listing
-    UPDATE marketplace_listings
+    UPDATE trade_listings
     SET
         status = p_status,
         suspended_at = CASE WHEN p_status = 'suspended' THEN NOW() ELSE NULL END,
@@ -141,7 +154,7 @@ BEGIN
     ) VALUES (
         'listing_' || p_status,
         auth.uid(),
-        'marketplace_listing',
+        'trade_listing',
         p_listing_id,
         jsonb_build_object('reason', p_reason)
     );
