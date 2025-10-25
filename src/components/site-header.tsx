@@ -22,8 +22,8 @@ export default function SiteHeader() {
   const baseLinks = [
     { href: '/', label: 'Home' },
     { href: '/marketplace', label: 'Marketplace' },
-    { href: '/templates', label: 'Plantillas' },
     { href: '/mis-plantillas', label: 'Mis Colecciones' },
+    { href: '/templates', label: 'Plantillas' },
   ];
 
   const unauthenticatedLinks = [
