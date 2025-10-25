@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
-import { User, MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -17,6 +18,7 @@ export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useUser();
+  const supabase = useSupabaseClient();
   const listingId = params.id as string;
 
   const { listing, loading, error, incrementViews, deleteListing } =
@@ -187,19 +189,24 @@ export default function ListingDetailPage() {
                   <h3 className="font-bold text-white mb-3">Vendedor</h3>
                   <Link href={`/users/${listing.user_id}`}>
                     <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                      {listing.author_avatar_url ? (
-                        <Image
-                          src={listing.author_avatar_url}
-                          alt={listing.author_nickname}
-                          width={48}
-                          height={48}
-                          className="rounded-full border-2 border-black"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center">
-                          <User className="h-6 w-6 text-black" />
-                        </div>
-                      )}
+                      {(() => {
+                        const avatarUrl = resolveAvatarUrl(listing.author_avatar_url, supabase);
+                        const fallback = getAvatarFallback(listing.author_nickname);
+
+                        return avatarUrl ? (
+                          <Image
+                            src={avatarUrl}
+                            alt={listing.author_nickname}
+                            width={48}
+                            height={48}
+                            className="rounded-full border-2 border-black"
+                          />
+                        ) : (
+                          <div className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center text-black font-black text-lg ${fallback.gradientClass}`}>
+                            {fallback.initial}
+                          </div>
+                        );
+                      })()}
                       <div>
                         <p className="font-bold text-white">
                           {listing.author_nickname}
