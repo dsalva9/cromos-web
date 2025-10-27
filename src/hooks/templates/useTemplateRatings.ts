@@ -110,14 +110,20 @@ export function useTemplateRatings(templateId: string) {
       }
 
       try {
-        const { error: rateError } = await supabase.rpc('create_template_rating', {
+        console.log('Creating rating with params:', {
+          p_template_id: parseInt(templateId),
+          p_rating: rating,
+          p_comment: comment ?? null
+        });
+
+        const { data: ratingData, error: rateError } = await supabase.rpc('create_template_rating', {
           p_template_id: parseInt(templateId),
           p_rating: rating,
           p_comment: comment ?? null
         });
 
         if (rateError) {
-          console.error('Rating error:', rateError);
+          console.error('Rating creation error:', rateError);
           if (rateError.message.includes('cannot rate their own')) {
             throw new Error('No puedes valorar tus propias plantillas');
           }
@@ -127,8 +133,25 @@ export function useTemplateRatings(templateId: string) {
           throw rateError;
         }
 
+        console.log('Rating created successfully with ID:', ratingData);
+        console.log('Refreshing data...');
+
         // Refresh data
-        await Promise.all([fetchSummary(), fetchRatings(0)]);
+        try {
+          await fetchSummary();
+          console.log('Summary refreshed');
+        } catch (summaryErr) {
+          console.error('Error refreshing summary:', summaryErr);
+          throw summaryErr;
+        }
+
+        try {
+          await fetchRatings(0);
+          console.log('Ratings refreshed');
+        } catch (ratingsErr) {
+          console.error('Error refreshing ratings:', ratingsErr);
+          throw ratingsErr;
+        }
       } catch (err) {
         throw err instanceof Error ? err : new Error('Error al crear valoración');
       }
