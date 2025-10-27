@@ -5,6 +5,9 @@
 -- so system messages can be rendered differently
 -- =====================================================
 
+-- Drop existing function first (needed because return type changed)
+DROP FUNCTION IF EXISTS get_listing_chats(BIGINT, UUID);
+
 CREATE OR REPLACE FUNCTION get_listing_chats(
     p_listing_id BIGINT,
     p_participant_id UUID DEFAULT NULL

@@ -9,6 +9,12 @@
 ALTER TABLE trade_chats
 ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT FALSE NOT NULL;
 
+-- Update any existing rows that might have NULL sender_id or receiver_id
+-- Set is_system = TRUE for rows with NULL sender_id or receiver_id
+UPDATE trade_chats
+SET is_system = TRUE
+WHERE sender_id IS NULL OR receiver_id IS NULL;
+
 -- For system messages, sender_id and receiver_id can be NULL
 -- Update the existing constraints to allow this
 ALTER TABLE trade_chats
