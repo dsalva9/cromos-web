@@ -6,6 +6,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { TemplateRating } from '@/hooks/templates/useTemplateRatings';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Image from 'next/image';
 
 interface TemplateReviewListProps {
   ratings: TemplateRating[];
@@ -40,12 +41,13 @@ export function TemplateReviewList({
           <ModernCardContent className="p-4">
             <div className="flex items-start gap-3">
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                 {rating.user_avatar_url ? (
-                  <img
+                  <Image
                     src={rating.user_avatar_url}
                     alt={rating.user_nickname}
-                    className="w-full h-full rounded-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <User className="h-5 w-5 text-slate-400" />

@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Build Warnings (2025-10-27)**
+  - Removed unused imports: `ReportButton` from templates/[id]/page.tsx, `Flag` and `ReportButton` from TradeChatPanel
+  - Removed unused variables: `counterpartyId` from TradeChatPanel and ProposalDetailModal
+  - Replaced `<img>` tags with Next.js `<Image>` component for better performance and automatic optimization:
+    - marketplace/[id]/chat/page.tsx - listing image in chat header
+    - TemplateReviewList.tsx - user avatar images in reviews
+  - Build now completes with no ESLint warnings
 - **Admin Reports (2025-10-27)**
   - Added accessible dialog titles and descriptions to all report review modal states to satisfy Radix Dialog requirements and clear console warnings
   - Hardened `get_report_details_with_context` Supabase function to return query results, raise explicit `Report not found` errors, normalize `target_id` handling across numeric and text identifiers, and surface user emails via `auth.users` for admin reviews

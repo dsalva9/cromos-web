@@ -22,7 +22,6 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
-import { ReportButton } from '@/components/social/ReportButton';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';

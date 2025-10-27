@@ -259,10 +259,6 @@ export function ProposalDetailModal({
     ? detail?.proposal.to_user_nickname || 'Usuario'
     : detail?.proposal.from_user_nickname || 'Usuario';
 
-  const counterpartyId = isSender
-    ? detail?.proposal.to_user_id
-    : detail?.proposal.from_user_id;
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-gray-900 text-white border-2 border-black shadow-xl flex flex-col">
@@ -395,7 +391,6 @@ export function ProposalDetailModal({
                 <TradeChatPanel
                   tradeId={proposalId}
                   counterpartyNickname={counterpartyNickname}
-                  counterpartyId={counterpartyId}
                   isProposalActive={isProposalActive}
                 />
               )}

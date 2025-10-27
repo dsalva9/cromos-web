@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
 import Link from 'next/link';
+import Image from 'next/image';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -202,11 +203,14 @@ function ListingChatPageContent() {
             <ModernCardContent className="p-4">
               <div className="flex gap-4">
                 {listing.image_url && (
-                  <img
-                    src={listing.image_url}
-                    alt={listing.title}
-                    className="w-20 h-20 object-cover rounded-md border-2 border-gray-700"
-                  />
+                  <div className="relative w-20 h-20 flex-shrink-0">
+                    <Image
+                      src={listing.image_url}
+                      alt={listing.title}
+                      fill
+                      className="object-cover rounded-md border-2 border-gray-700"
+                    />
+                  </div>
                 )}
                 <div className="flex-1">
                   <Link href={`/marketplace/${listingId}`}>
