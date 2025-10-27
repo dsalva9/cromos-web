@@ -19,6 +19,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Removed "Ver Mis Anuncios" and "Crear Anuncio Manual" buttons
     - Buttons were redundant as they're already accessible elsewhere
     - Cleaner UI focused on collection progress tracking
+  - **Listing Chat Database:**
+    - Fixed ambiguous 'user_id' column reference error in `get_listing_chat_participants` RPC
+    - Renamed variable from `v_listing_user_id` to `v_listing_owner_id` for clarity
+    - Fully qualified all table references in queries to avoid ambiguity
+
+### Added
+
+- **Marketplace Chat Enhancements (2025-10-27)**
+  - **Terms of Service Requirement:**
+    - Buyers must accept ToS before sending first message in listing chat
+    - Checkbox with terms link appears for buyers with no previous messages
+    - Prevents message sending if ToS not accepted
+  - **Listing Info Display:**
+    - Added listing information card at top of chat page
+    - Shows listing image, title, collection name, and sticker number
+    - Displays listing status (Disponible/Reservado)
+    - Clickable title links back to listing detail page
+    - Visible to both seller and buyer participants
+  - **Reserve Functionality:**
+    - Sellers can mark listings as "Reservado" directly from chat
+    - Reserve button appears in listing info card for sellers
+    - Updates listing status to 'sold' in database
+    - Provides visual feedback during reservation process
+    - Button only visible when listing is still active
 
 ### Added
 

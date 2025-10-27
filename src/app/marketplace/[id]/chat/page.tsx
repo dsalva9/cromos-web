@@ -7,8 +7,12 @@ import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvi
 import { useListingChat } from '@/hooks/marketplace/useListingChat';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Send } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Send, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from '@/lib/toast';
+import { Listing } from '@/types/v1.6.0';
+import Link from 'next/link';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -21,6 +25,9 @@ function ListingChatPageContent() {
   const [listingOwner, setListingOwner] = useState<string | null>(null);
   const [isOwner, setIsOwner] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
+  const [tosAccepted, setTosAccepted] = useState(false);
+  const [reserving, setReserving] = useState(false);
 
   const {
     messages,
@@ -35,19 +42,26 @@ function ListingChatPageContent() {
     participantId: selectedParticipant || undefined,
   });
 
-  // Fetch listing owner
+  // Fetch listing details
   useEffect(() => {
     async function fetchListing() {
-      const { data } = await supabase
-        .from('trade_listings')
-        .select('user_id')
+      const { data, error } = await supabase
+        .rpc('get_marketplace_listings', {
+          p_search_query: null,
+          p_limit: 1,
+          p_offset: 0
+        })
         .eq('id', listingId)
         .single();
 
-      if (data) {
-        setListingOwner(data.user_id);
-        setIsOwner(user?.id === data.user_id);
+      if (error || !data) {
+        toast.error('Error al cargar el anuncio');
+        return;
       }
+
+      setListing(data);
+      setListingOwner(data.user_id);
+      setIsOwner(user?.id === data.user_id);
     }
 
     void fetchListing();
@@ -63,12 +77,41 @@ function ListingChatPageContent() {
   const handleSend = async () => {
     if (!messageText.trim() || sending) return;
 
+    // Check ToS acceptance for buyers sending first message
+    if (!isOwner && messages.length === 0 && !tosAccepted) {
+      toast.error('Debes aceptar los términos y condiciones antes de enviar un mensaje');
+      return;
+    }
+
     const receiverId = isOwner
       ? selectedParticipant || undefined
       : listingOwner || undefined;
 
     await sendMessage(messageText, receiverId);
     setMessageText('');
+  };
+
+  const handleReserve = async () => {
+    if (!listing || !isOwner) return;
+
+    setReserving(true);
+    try {
+      const { error } = await supabase
+        .from('trade_listings')
+        .update({ status: 'sold' })
+        .eq('id', listingId);
+
+      if (error) throw error;
+
+      toast.success('Anuncio marcado como reservado');
+      // Update local state
+      setListing({ ...listing, status: 'sold' });
+    } catch (error) {
+      console.error('Error reserving listing:', error);
+      toast.error('Error al reservar el anuncio');
+    } finally {
+      setReserving(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -101,6 +144,52 @@ function ListingChatPageContent() {
             Volver al anuncio
           </Button>
         </div>
+
+        {/* Listing Info Card */}
+        {listing && (
+          <ModernCard className="mb-6">
+            <ModernCardContent className="p-4">
+              <div className="flex gap-4">
+                {listing.image_url && (
+                  <img
+                    src={listing.image_url}
+                    alt={listing.title}
+                    className="w-20 h-20 object-cover rounded-md border-2 border-gray-700"
+                  />
+                )}
+                <div className="flex-1">
+                  <Link href={`/marketplace/${listingId}`}>
+                    <h3 className="text-lg font-bold text-white hover:text-[#FFC000] transition-colors">
+                      {listing.title}
+                    </h3>
+                  </Link>
+                  <p className="text-sm text-gray-400">
+                    {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className={cn(
+                      'px-2 py-1 rounded text-xs font-bold uppercase',
+                      listing.status === 'active' ? 'bg-green-900/30 text-green-400' : 'bg-gray-700 text-gray-300'
+                    )}>
+                      {listing.status === 'active' ? 'Disponible' : 'Reservado'}
+                    </span>
+                  </div>
+                </div>
+                {isOwner && listing.status === 'active' && (
+                  <Button
+                    onClick={handleReserve}
+                    disabled={reserving}
+                    variant="outline"
+                    className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                  >
+                    <Package className="h-4 w-4 mr-2" />
+                    {reserving ? 'Marcando...' : 'Marcar Reservado'}
+                  </Button>
+                )}
+              </div>
+            </ModernCardContent>
+          </ModernCard>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Participants sidebar (seller only) */}
@@ -208,25 +297,54 @@ function ListingChatPageContent() {
                       Selecciona una conversación para responder
                     </p>
                   ) : (
-                    <div className="flex gap-2">
-                      <textarea
-                        value={messageText}
-                        onChange={e => setMessageText(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Escribe un mensaje..."
-                        maxLength={500}
-                        rows={2}
-                        className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none"
-                        disabled={sending}
-                      />
-                      <Button
-                        onClick={handleSend}
-                        disabled={!messageText.trim() || sending}
-                        className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <>
+                      {/* ToS acceptance for buyers with no messages */}
+                      {!isOwner && messages.length === 0 && (
+                        <div className="mb-4 p-3 bg-gray-800 rounded-md border border-gray-700">
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="tos-chat"
+                              checked={tosAccepted}
+                              onCheckedChange={(checked) => setTosAccepted(checked === true)}
+                            />
+                            <label
+                              htmlFor="tos-chat"
+                              className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                            >
+                              Acepto los{' '}
+                              <Link
+                                href="/terms"
+                                target="_blank"
+                                className="text-[#FFC000] hover:underline"
+                              >
+                                términos y condiciones
+                              </Link>{' '}
+                              y me comprometo a realizar intercambios de manera honesta y respetuosa.
+                            </label>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <textarea
+                          value={messageText}
+                          onChange={e => setMessageText(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Escribe un mensaje..."
+                          maxLength={500}
+                          rows={2}
+                          className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none"
+                          disabled={sending}
+                        />
+                        <Button
+                          onClick={handleSend}
+                          disabled={!messageText.trim() || sending}
+                          className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </>
                   )}
                   <p className="text-xs text-gray-500 mt-2">
                     {messageText.length}/500 caracteres
