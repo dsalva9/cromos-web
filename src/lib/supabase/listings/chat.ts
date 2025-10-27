@@ -5,11 +5,12 @@ import { markListingChatNotificationsRead } from '@/lib/supabase/notifications';
 // Schemas for runtime validation
 const listingChatMessageSchema = z.object({
   id: z.number(),
-  sender_id: z.string().uuid(),
-  receiver_id: z.string().uuid(),
-  sender_nickname: z.string(),
+  sender_id: z.string().uuid().nullable(),
+  receiver_id: z.string().uuid().nullable(),
+  sender_nickname: z.string().nullable(),
   message: z.string(),
   is_read: z.boolean(),
+  is_system: z.boolean().default(false),
   created_at: z.string(),
 });
 

@@ -124,20 +124,39 @@ function ListingChatPageContent() {
   };
 
   const handleReserve = async () => {
-    if (!listing || !isOwner) return;
+    if (!listing || !isOwner || !user) return;
 
     setReserving(true);
     try {
-      const { error } = await supabase
+      // Update listing status
+      const { error: updateError } = await supabase
         .from('trade_listings')
         .update({ status: 'sold' })
         .eq('id', listingId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Add system message to chat
+      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha marcado '${listing.title}' como reservado`;
+      const { error: messageError } = await supabase
+        .rpc('add_system_message_to_listing_chat', {
+          p_listing_id: listingId,
+          p_message: systemMessage
+        });
+
+      if (messageError) {
+        console.error('Error adding system message:', messageError);
+        // Don't throw - reservation succeeded even if message failed
+      }
 
       toast.success('Anuncio marcado como reservado');
       // Update local state
       setListing({ ...listing, status: 'sold' });
+
+      // Refresh messages to show system message
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error('Error reserving listing:', error);
       toast.error('Error al reservar el anuncio');
@@ -282,6 +301,27 @@ function ListingChatPageContent() {
                   ) : (
                     <>
                       {messages.map(message => {
+                        // System messages render differently
+                        if (message.is_system) {
+                          return (
+                            <div
+                              key={message.id}
+                              className="flex justify-center my-4"
+                            >
+                              <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                                <p className="italic">{message.message}</p>
+                                <p className="text-xs mt-1 opacity-60">
+                                  {new Date(message.created_at).toLocaleTimeString('es-ES', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Regular user messages
                         const isOwnMessage = message.sender_id === user?.id;
                         return (
                           <div
@@ -299,7 +339,7 @@ function ListingChatPageContent() {
                                   : 'bg-gray-800 text-white'
                               )}
                             >
-                              {!isOwnMessage && (
+                              {!isOwnMessage && message.sender_nickname && (
                                 <p className="text-xs font-bold mb-1 opacity-70">
                                   {message.sender_nickname}
                                 </p>

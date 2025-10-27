@@ -43,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Updates listing status to 'sold' in database
     - Provides visual feedback during reservation process
     - Button only visible when listing is still active
+  - **System Messages in Chat:**
+    - Added support for system-generated messages in chat
+    - New `is_system` column in `trade_chats` table
+    - System messages displayed centered with distinct styling (gray background, italic text)
+    - Automatic system message when seller marks listing as reserved
+    - Message format: "[Seller] ha marcado '[Listing Title]' como reservado"
+    - System messages visible to all participants in the conversation
 
 ### Added
 
