@@ -113,12 +113,16 @@ export function useTemplateRatings(templateId: string) {
         const { error: rateError } = await supabase.rpc('create_template_rating', {
           p_template_id: parseInt(templateId),
           p_rating: rating,
-          p_comment: comment || null
+          p_comment: comment ?? null
         });
 
         if (rateError) {
+          console.error('Rating error:', rateError);
           if (rateError.message.includes('cannot rate their own')) {
             throw new Error('No puedes valorar tus propias plantillas');
+          }
+          if (rateError.message.includes('violates unique constraint')) {
+            throw new Error('Ya has valorado esta plantilla. Edita tu valoración existente.');
           }
           throw rateError;
         }
