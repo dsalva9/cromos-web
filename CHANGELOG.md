@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **UI/UX Fixes (2025-10-27)**
+  - **Mis Colecciones Page:**
+    - Fixed React hydration error caused by nested `<a>` tags (Link within Link)
+    - Removed redundant inner Link from "Ver Progreso" button
+    - Updated button text: "Explorar Colecciones" → "Explorar Plantillas de Colecciones"
+    - Updated button text: "Crear Colección" → "Crear Plantilla"
+  - **Colección Detail Page:**
+    - Removed "Ver Mis Anuncios" and "Crear Anuncio Manual" buttons
+    - Buttons were redundant as they're already accessible elsewhere
+    - Cleaner UI focused on collection progress tracking
+
 ### Added
 
 - **Templates System Enhancements (2025-01-27)**

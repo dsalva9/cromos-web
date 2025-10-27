@@ -132,13 +132,13 @@ function MyTemplatesContent() {
                 className="text-white border-gray-600 hover:bg-gray-800"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Explorar Colecciones
+                Explorar Plantillas de Colecciones
               </Button>
             </Link>
             <Link href="/templates/create">
               <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
                 <Plus className="mr-2 h-4 w-4" />
-                {'Crear Colecci\u00f3n'}
+                Crear Plantilla
               </Button>
             </Link>
           </div>
@@ -228,11 +228,9 @@ function MyTemplatesContent() {
                       </div>
 
                       {/* Action Button */}
-                      <Link href={`/mis-plantillas/${copy.copy_id}`}>
-                        <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
-                          Ver Progreso
-                        </Button>
-                      </Link>
+                      <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+                        Ver Progreso
+                      </Button>
                     </div>
                   </ModernCardContent>
                 </ModernCard>

@@ -6,7 +6,7 @@ import { TemplateProgressGrid } from '@/components/templates/TemplateProgressGri
 import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHeader';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, List, Plus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 function TemplateProgressContent() {
@@ -53,23 +53,6 @@ function TemplateProgressContent() {
 
         {/* Summary Header */}
         <TemplateSummaryHeader copy={copy} progress={progress} />
-
-        {/* Quick Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <Link href="/marketplace/my-listings">
-            <Button variant="outline" className="border-2 border-black text-white hover:bg-[#374151]">
-              <List className="mr-2 h-4 w-4" />
-              Ver Mis Anuncios
-            </Button>
-          </Link>
-
-          <Link href="/marketplace/create">
-            <Button variant="outline" className="border-2 border-black text-white hover:bg-[#374151]">
-              <Plus className="mr-2 h-4 w-4" />
-              Crear Anuncio Manual
-            </Button>
-          </Link>
-        </div>
 
         {/* Progress Grid */}
         <TemplateProgressGrid
