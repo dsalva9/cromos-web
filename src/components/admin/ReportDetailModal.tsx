@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -55,6 +56,12 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
     return (
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="bg-[#1F2937] border-2 border-black max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">Loading report</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              Fetching report details. This dialog will update once the report is ready.
+            </DialogDescription>
+          </DialogHeader>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
           </div>
@@ -67,6 +74,12 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
     return (
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="bg-[#1F2937] border-2 border-black">
+          <DialogHeader>
+            <DialogTitle className="text-white">Unable to load report</DialogTitle>
+            <DialogDescription className="text-gray-300">
+              We could not fetch the details for this report. Please try again or refresh the page.
+            </DialogDescription>
+          </DialogHeader>
           <div className="text-center py-8">
             <p className="text-red-500">Failed to load report details</p>
             {error && <p className="text-gray-400 text-sm mt-2">{error}</p>}
@@ -88,6 +101,9 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
             <AlertTriangle className="h-5 w-5 text-red-500" />
             Report Details
           </DialogTitle>
+          <DialogDescription className="text-gray-300">
+            Review the reported content, add administration notes, and choose the appropriate action.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">

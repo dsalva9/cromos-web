@@ -241,6 +241,7 @@
 - [x] Create reports queue page (`/admin/reports`)
   - [x] usePendingReports hook
   - [x] ReportDetailModal component
+  - [x] Accessible dialog title and description for report review modal (2025-10-27)
   - [x] useReportDetails hook
   - [x] useResolveReport hook
   - [x] Color-coded entity badges

@@ -39,7 +39,11 @@ export function useReportDetails(reportId: string) {
 
       if (rpcError) throw rpcError;
 
-      setDetails(data);
+      if (Array.isArray(data)) {
+        setDetails((data[0] as ReportDetails) ?? null);
+      } else {
+        setDetails((data as ReportDetails) ?? null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
