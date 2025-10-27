@@ -336,34 +336,61 @@ export default function TemplateDetailsPage() {
         </div>
 
         {/* Ratings Section */}
-        {summary && (
-          <div className="space-y-6 mb-8">
-            <h2 className="text-2xl font-bold text-white">Valoraciones</h2>
-            <ModernCard>
-              <ModernCardContent className="p-6">
+        <div className="space-y-6 mb-8">
+          <h2 className="text-2xl font-bold text-white">Valoraciones</h2>
+          <ModernCard>
+            <ModernCardContent className="p-6">
+              {summary ? (
                 <TemplateRatingSummary
                   summary={summary}
                   onRateClick={handleRateClick}
                   isAuthor={isAuthor}
                   hasUserRated={!!myRating}
                 />
-              </ModernCardContent>
-            </ModernCard>
+              ) : (
+                <div className="space-y-6">
+                  {/* No ratings yet - show call to action */}
+                  <div className="text-center py-8">
+                    <Star className="h-16 w-16 text-slate-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      Esta plantilla aún no tiene valoraciones
+                    </h3>
+                    <p className="text-slate-400 mb-6">
+                      ¡Sé el primero en valorar esta plantilla!
+                    </p>
+                    {!isAuthor && (
+                      <Button
+                        onClick={handleRateClick}
+                        className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium px-6"
+                      >
+                        <Star className="mr-2 h-4 w-4" />
+                        Valorar plantilla
+                      </Button>
+                    )}
+                    {isAuthor && (
+                      <div className="text-sm text-slate-400 bg-slate-800 px-4 py-3 rounded-lg border border-slate-700 inline-block">
+                        No puedes valorar tus propias plantillas
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </ModernCardContent>
+          </ModernCard>
 
-            {/* Reviews List */}
-            {!ratingsLoading && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-white">Comentarios</h3>
-                <TemplateReviewList
-                  ratings={ratings}
-                  hasMore={hasMore}
-                  onLoadMore={loadMore}
-                  loading={ratingsLoading}
-                />
-              </div>
-            )}
-          </div>
-        )}
+          {/* Reviews List */}
+          {!ratingsLoading && ratings.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-white">Comentarios</h3>
+              <TemplateReviewList
+                ratings={ratings}
+                hasMore={hasMore}
+                onLoadMore={loadMore}
+                loading={ratingsLoading}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Pages Outline */}
         <div className="space-y-4">
