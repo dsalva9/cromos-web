@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
+import {
+  useSupabaseClient,
+  useUser,
+} from '@/components/providers/SupabaseProvider';
 import {
   getListingChats,
   sendListingMessage,
@@ -83,7 +86,7 @@ export function useListingChat({
       if (!targetReceiverId) {
         // Buyer sending to seller - need to extract from messages
         const sellerMessage = messages.find(m => m.sender_id !== user.id);
-        if (sellerMessage) {
+        if (sellerMessage && sellerMessage.sender_id) {
           targetReceiverId = sellerMessage.sender_id;
         } else if (participantId) {
           targetReceiverId = participantId;
@@ -113,6 +116,7 @@ export function useListingChat({
           sender_nickname: 'Tú',
           message: text.trim(),
           is_read: false,
+          is_system: false,
           created_at: new Date().toISOString(),
         };
         setMessages(prev => [...prev, optimisticMessage]);
