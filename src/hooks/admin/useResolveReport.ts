@@ -13,14 +13,32 @@ export function useResolveReport() {
     try {
       setLoading(true);
 
-      const { error } = await supabase.rpc('resolve_report', {
-        p_report_id: parseInt(reportId),
+      const parsedId = parseInt(reportId, 10);
+
+      if (isNaN(parsedId)) {
+        throw new Error(`Invalid report ID: ${reportId}`);
+      }
+
+      console.log('Resolving report with params:', {
+        p_report_id: parsedId,
         p_action: action,
         p_admin_notes: adminNotes
       });
 
-      if (error) throw error;
+      const { error, data } = await supabase.rpc('resolve_report', {
+        p_report_id: parsedId,
+        p_action: action,
+        p_admin_notes: adminNotes
+      });
+
+      if (error) {
+        console.error('RPC Error:', error);
+        throw error;
+      }
+
+      console.log('Report resolved successfully:', data);
     } catch (error) {
+      console.error('Failed to resolve report:', error);
       throw error;
     } finally {
       setLoading(false);

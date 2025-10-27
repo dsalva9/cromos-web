@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added accessible dialog titles and descriptions to all report review modal states to satisfy Radix Dialog requirements and clear console warnings
   - Hardened `get_report_details_with_context` Supabase function to return query results, raise explicit `Report not found` errors, normalize `target_id` handling across numeric and text identifiers, and surface user emails via `auth.users` for admin reviews
   - Recreated `resolve_report` Supabase RPC with full moderation actions and audit logging and refreshed `log_moderation_action`/`audit_log` constraints so admin resolve/dismiss flows succeed
+  - Fixed 400 Bad Request error when resolving reports by making `p_moderated_entity_id` nullable in `log_moderation_action` function (allows NULL for suspend_user actions where entity ID is UUID)
+  - Fixed CHECK constraint violation in `audit_log` table by adding 'moderation' to allowed actions (previously only allowed: create, update, delete, bulk_upsert, remove_image)
+  - Enhanced error handling in report resolution flow with detailed logging and user-friendly error messages
 - **UI/UX Fixes (2025-10-27)**
   - **Mis Colecciones Page:**
     - Fixed React hydration error caused by nested `<a>` tags (Link within Link)

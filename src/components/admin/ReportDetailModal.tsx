@@ -45,8 +45,10 @@ export function ReportDetailModal({ reportId, onClose, onResolved }: ReportDetai
       toast.success('Report resolved successfully');
       onResolved();
       onClose();
-    } catch {
-      toast.error('Failed to resolve report');
+    } catch (error) {
+      console.error('Error resolving report:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to resolve report: ${errorMessage}`);
     } finally {
       setConfirming(null);
     }
