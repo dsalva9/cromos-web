@@ -32,6 +32,12 @@ export const listingSchema = z.object({
     .url('La URL de la imagen no es válida')
     .optional()
     .or(z.literal('')),
+
+  terms_accepted: z
+    .boolean()
+    .refine((val) => val === true, {
+      message: 'Debes aceptar los términos de uso',
+    }),
 });
 
 /**

@@ -101,12 +101,15 @@
 #### **Trade Listings**
 
 - `trade_listings` table for physical card listings
-- Publish with optional real photo
+- Publish with optional real photo (camera capture on desktop/mobile)
 - Free-form fields: title, description, number, collection
 - Search and filtering
 - View listings by user profile
 - Direct chat from listing
 - Template linking (copy_id, slot_id)
+- **NEW:** Terms of Service acceptance required for listing creation
+- **NEW:** Back navigation to marketplace from creation page
+- **FIXED:** Camera flickering issue resolved (desktop and mobile)
 
 #### **RPCs:**
 
@@ -123,7 +126,14 @@
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
 
-### 3. Collection Templates System ✅ **BACKEND COMPLETE (v1.6.0)**
+#### **Marketplace UI Enhancements (2025-01-27):**
+
+- Camera capture with proper stream management
+- ToS modal and validation before submission
+- Improved navigation with back links
+- Enhanced error handling
+
+### 3. Collection Templates System ✅ **COMPLETE (v1.6.0)**
 
 #### **Community Templates**
 
@@ -132,6 +142,9 @@
 - Other users copy templates
 - Track progress: HAVE/NEED/DUPES
 - Integrated rating system (tables ready, functions pending)
+- **NEW:** View personal templates in "Mis Plantillas" page
+- **NEW:** Visual indicators for public/private status
+- **NEW:** Full template editing with CRUD operations
 
 #### **Tables:**
 
@@ -143,9 +156,35 @@
 
 #### **RPCs:**
 
-- `create_template`, `add_template_page`, `publish_template`
+- `create_template`, `add_template_page_v2`, `publish_template`
 - `list_public_templates`, `copy_template`, `get_my_template_copies`
 - `get_template_progress`, `update_template_progress`
+- `update_template_metadata`, `update_template_page`, `update_template_slot`
+- `delete_template_page`, `delete_template_slot`
+
+#### **Template Management Features (NEW - 2025-01-27):**
+
+- **My Templates Page** (`/templates/my-templates`)
+  - View all templates created by logged-in user
+  - Shows both public and private templates
+  - Visual badges indicating visibility status
+  - Green "Pública" badge with Eye icon for public templates
+  - Gray "Privada" badge with EyeOff icon for private templates
+
+- **Enhanced Template Editing** (`/templates/[id]/edit`)
+  - Two-tab interface: Info and Pages/Cromos
+  - Update template metadata (title, description, image, visibility)
+  - **Add new pages** with multiple slots at once
+  - **Add individual slots** to existing pages
+  - Edit page titles inline
+  - Edit slot labels inline
+  - Delete pages and slots
+  - Terms of Service acceptance when making template public
+
+- **Terms of Service Integration:**
+  - ToS checkbox required when publishing public templates
+  - ToS validation in both creation and editing flows
+  - Modal with terms content (placeholder)
 
 ### 4. Collection-Marketplace Integration ✅ **COMPLETE (v1.6.0)**
 

@@ -148,6 +148,82 @@ export function useTemplateEditor(templateId: string) {
     [user, supabase]
   );
 
+  // Add a new page with slots
+  const addPage = useCallback(
+    async (data: { title: string; type: 'team' | 'special'; slots: Array<{ label: string; is_special: boolean }> }) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para añadir páginas');
+      }
+
+      setLoading(true);
+      try {
+        const { data: result, error } = await supabase.rpc('add_template_page_v2', {
+          p_template_id: parseInt(templateId),
+          p_title: data.title,
+          p_type: data.type,
+          p_slots: data.slots
+        });
+
+        if (error) throw error;
+        return result;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al añadir página');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase, templateId]
+  );
+
+  // Add a slot to an existing page
+  const addSlot = useCallback(
+    async (pageId: string, data: { label: string; is_special: boolean }) => {
+      if (!user) {
+        throw new Error('Debes iniciar sesión para añadir cromos');
+      }
+
+      setLoading(true);
+      try {
+        // Get the current max slot number for the page
+        const { data: slots, error: fetchError } = await supabase
+          .from('template_slots')
+          .select('slot_number')
+          .eq('page_id', parseInt(pageId))
+          .order('slot_number', { ascending: false })
+          .limit(1);
+
+        if (fetchError) throw fetchError;
+
+        const nextSlotNumber = (slots && slots.length > 0) ? slots[0].slot_number + 1 : 1;
+
+        // Insert the new slot
+        const { error } = await supabase
+          .from('template_slots')
+          .insert({
+            page_id: parseInt(pageId),
+            slot_number: nextSlotNumber,
+            label: data.label,
+            is_special: data.is_special
+          });
+
+        if (error) throw error;
+
+        // Update the page's slots_count
+        const { error: updateError } = await supabase
+          .from('template_pages')
+          .update({ slots_count: nextSlotNumber })
+          .eq('id', parseInt(pageId));
+
+        if (updateError) throw updateError;
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al añadir cromo');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user, supabase]
+  );
+
   // Delete entire template
   const deleteTemplate = useCallback(
     async (reason?: string) => {
@@ -184,8 +260,10 @@ export function useTemplateEditor(templateId: string) {
     updateMetadata,
     updatePage,
     deletePage,
+    addPage,
     updateSlot,
     deleteSlot,
+    addSlot,
     deleteTemplate
   };
 }

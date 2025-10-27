@@ -38,6 +38,13 @@ export function CameraCaptureModal({
       return;
     }
 
+    // Don't start camera if already running
+    if (stream) {
+      return;
+    }
+
+    let isMounted = true;
+
     async function startCamera() {
       try {
         const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -45,18 +52,30 @@ export function CameraCaptureModal({
           audio: false,
         });
 
+        if (!isMounted) {
+          // Component unmounted, stop tracks
+          mediaStream.getTracks().forEach(track => track.stop());
+          return;
+        }
+
         setStream(mediaStream);
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
         }
       } catch (error) {
         console.error('Camera error:', error);
-        setPermissionDenied(true);
-        toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
+        if (isMounted) {
+          setPermissionDenied(true);
+          toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
+        }
       }
     }
 
     void startCamera();
+
+    return () => {
+      isMounted = false;
+    };
   }, [open, stream]);
 
   // Capture photo

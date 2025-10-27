@@ -5,7 +5,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Star, Copy, FileText, Layout } from 'lucide-react';
+import { User, Star, Copy, FileText, Layout, Eye, EyeOff } from 'lucide-react';
 import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
@@ -25,13 +25,15 @@ interface Template {
   pages_count: number;
   total_slots: number;
   created_at: string;
+  is_public?: boolean;
 }
 
 interface TemplateCardProps {
   template: Template;
+  showVisibility?: boolean;
 }
 
-export function TemplateCard({ template }: TemplateCardProps) {
+export function TemplateCard({ template, showVisibility = false }: TemplateCardProps) {
   const { user } = useUser();
   const router = useRouter();
   const { copyTemplate, loading } = useCopyTemplate();
@@ -77,6 +79,31 @@ export function TemplateCard({ template }: TemplateCardProps) {
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Layout className="w-16 h-16 text-slate-400/50" />
+              </div>
+            )}
+
+            {/* Visibility Badge */}
+            {showVisibility && template.is_public !== undefined && (
+              <div className="absolute top-2 right-2">
+                <div
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+                    template.is_public
+                      ? 'bg-green-500/90 text-white'
+                      : 'bg-slate-700/90 text-slate-300'
+                  }`}
+                >
+                  {template.is_public ? (
+                    <>
+                      <Eye className="h-3 w-3" />
+                      Pública
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3 w-3" />
+                      Privada
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>

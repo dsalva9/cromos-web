@@ -39,12 +39,20 @@ export default function TemplatesPage() {
           </div>
 
           {user && (
-            <Link href="/templates/create">
-              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
-                <Plus className="mr-2 h-4 w-4" />
-                Crear Plantilla
-              </Button>
-            </Link>
+            <div className="flex gap-3">
+              <Link href="/templates/my-templates">
+                <Button variant="outline" className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black font-medium">
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Mis Plantillas
+                </Button>
+              </Link>
+              <Link href="/templates/create">
+                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Crear Plantilla
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
 

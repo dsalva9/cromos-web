@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, EyeOff, FileText, Star } from 'lucide-react';
@@ -29,6 +36,7 @@ interface TemplateReviewFormProps {
     image_url: string;
     is_public: boolean;
     pages: TemplatePageData[];
+    terms_accepted?: boolean;
   };
   onChange: (
     data: Partial<{
@@ -37,6 +45,7 @@ interface TemplateReviewFormProps {
       image_url: string;
       is_public: boolean;
       pages: TemplatePageData[];
+      terms_accepted?: boolean;
     }>
   ) => void;
 }
@@ -50,6 +59,7 @@ export function TemplateReviewForm({
     description: false,
     is_public: false,
   });
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
 
   const toggleEdit = (field: keyof typeof isEditing) => {
     setIsEditing(prev => ({ ...prev, [field]: !prev[field] }));
@@ -239,6 +249,43 @@ export function TemplateReviewForm({
         </CardContent>
       </Card>
 
+      {/* Terms of Use for Public Templates */}
+      {data.is_public && (
+        <Card className="bg-[#1F2937] border-gray-700">
+          <CardHeader>
+            <CardTitle className="text-white">Términos de Uso</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="template-terms"
+                checked={data.terms_accepted || false}
+                onCheckedChange={(checked) =>
+                  onChange({ terms_accepted: checked === true })
+                }
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <Label
+                  htmlFor="template-terms"
+                  className="text-sm text-gray-300 cursor-pointer"
+                >
+                  Al crear esta plantilla pública acepto los{' '}
+                  <button
+                    type="button"
+                    onClick={() => setTermsDialogOpen(true)}
+                    className="text-[#FFC000] hover:text-[#FFD700] underline"
+                  >
+                    términos de uso
+                  </button>
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Final Confirmation */}
       <Card className="bg-[#1F2937] border-gray-700">
         <CardHeader>
@@ -263,6 +310,67 @@ export function TemplateReviewForm({
           </div>
         </CardContent>
       </Card>
+
+      {/* Terms Dialog */}
+      <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              Términos de Uso
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-gray-300">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit
+              anim id est laborum.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              1. Aceptación de los Términos
+            </h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              2. Uso del Servicio
+            </h3>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              3. Contenido del Usuario
+            </h3>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              4. Privacidad y Protección de Datos
+            </h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <div className="pt-4">
+              <Button
+                onClick={() => setTermsDialogOpen(false)}
+                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

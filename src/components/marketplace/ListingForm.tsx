@@ -1,10 +1,18 @@
 ﻿'use client';
 
+import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/marketplace/ImageUpload';
 import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
@@ -21,6 +29,8 @@ interface ListingFormProps {
 }
 
 export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps) {
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -35,11 +45,13 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       sticker_number: initialData?.sticker_number || '',
       collection_name: initialData?.collection_name || '',
       image_url: initialData?.image_url || '',
+      terms_accepted: false,
     },
     mode: 'onChange',
   });
 
   const imageUrl = watch('image_url');
+  const termsAccepted = watch('terms_accepted');
 
   const submitHandler = async (data: ListingFormData) => {
     const payload: CreateListingForm = {
@@ -157,6 +169,43 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             )}
           </div>
 
+          {/* Terms of Use */}
+          <div className="space-y-2 pt-2">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="terms"
+                checked={termsAccepted}
+                onCheckedChange={(checked) =>
+                  setValue('terms_accepted', checked === true, {
+                    shouldValidate: true,
+                  })
+                }
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <Label
+                  htmlFor="terms"
+                  className="text-sm text-gray-300 cursor-pointer"
+                >
+                  He leído y estoy de acuerdo con los{' '}
+                  <button
+                    type="button"
+                    onClick={() => setTermsDialogOpen(true)}
+                    className="text-[#FFC000] hover:text-[#FFD700] underline"
+                  >
+                    términos de uso
+                  </button>
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
+                {errors.terms_accepted && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.terms_accepted.message as string}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="pt-2 flex justify-end">
             <Button
@@ -170,6 +219,67 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
           </div>
         </ModernCardContent>
       </ModernCard>
+
+      {/* Terms Dialog */}
+      <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              Términos de Uso
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-gray-300">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+              cupidatat non proident, sunt in culpa qui officia deserunt mollit
+              anim id est laborum.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              1. Aceptación de los Términos
+            </h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              2. Uso del Servicio
+            </h3>
+            <p>
+              Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              3. Contenido del Usuario
+            </h3>
+            <p>
+              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
+              officia deserunt mollit anim id est laborum.
+            </p>
+            <h3 className="text-lg font-semibold text-white">
+              4. Privacidad y Protección de Datos
+            </h3>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <div className="pt-4">
+              <Button
+                onClick={() => setTermsDialogOpen(false)}
+                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }

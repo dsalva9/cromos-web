@@ -9,6 +9,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Templates System Enhancements (2025-01-27)**
+  - **My Templates Page:**
+    - New `/templates/my-templates` page showing user's created templates (public and private)
+    - Visual badges indicating template visibility status (Pública/Privada)
+    - Green badge with Eye icon for public templates
+    - Gray badge with EyeOff icon for private templates
+    - Link from main templates page to access personal templates
+  - **Template Editing Enhancements:**
+    - Added ability to create new pages in existing templates
+    - Added ability to add new slots/cromos to existing pages
+    - New page creation form with title, type, and multiple slots
+    - Inline slot addition within each page
+    - Enhanced UI with "Añadir Nueva Página" button
+    - "Añadir Cromo" button for each page with inline editing
+  - **Terms of Service Integration:**
+    - ToS acceptance checkbox for marketplace listing creation
+    - ToS acceptance checkbox when making templates public (creation and editing)
+    - Modal with placeholder terms text (lorem ipsum)
+    - Validation prevents submission without ToS acceptance
+  - **Navigation Improvements:**
+    - Added "Volver al Marketplace" back link in listing creation page
+    - "Mis Plantillas" button in templates page (for authenticated users)
+
+### Fixed
+
+- **Camera Issues:**
+  - Fixed camera flickering in marketplace listing creation (desktop and mobile)
+  - Prevented multiple camera stream initializations
+  - Added proper cleanup with mounted flag
+- **Database Query Issues:**
+  - Fixed foreign key relationship error in my-templates query
+  - Changed from PostgREST foreign key syntax to direct queries
+  - Correctly using `collection_templates` table with `author_id` column
+- **Footer Cleanup:**
+  - Removed navigation links from site footer (kept only branding and copyright)
+  - Navigation now exclusively in top navbar
+
+### Changed
+
+- **TemplateCard Component:**
+  - Added optional `showVisibility` prop to display public/private badges
+  - Enhanced Template interface with `is_public` field
+  - Conditional rendering of visibility badge on template images
+- **useTemplateEditor Hook:**
+  - Added `addPage()` function using `add_template_page_v2` RPC
+  - Added `addSlot()` function for adding individual slots to pages
+  - Proper slot numbering and page slot_count updates
+
 - **Sprint 15: Notifications System (COMPLETE)**
   - **Notifications Data Model:**
     - Extended notifications schema with listing_id, template_id, rating_id, actor_id

@@ -18,6 +18,7 @@ interface TemplateData {
   description: string;
   image_url: string;
   is_public: boolean;
+  terms_accepted?: boolean;
   pages: Array<{
     title: string;
     type: 'team' | 'special';
@@ -46,6 +47,7 @@ export function TemplateCreationWizard({
     description: '',
     image_url: '',
     is_public: false,
+    terms_accepted: false,
     pages: [],
   });
 
@@ -107,6 +109,10 @@ export function TemplateCreationWizard({
       case 1:
         return pagesStepValid;
       case 2:
+        // If template is public, terms must be accepted
+        if (templateData.is_public) {
+          return templateData.terms_accepted === true;
+        }
         return true;
       default:
         return false;
@@ -212,6 +218,11 @@ export function TemplateCreationWizard({
               <p className="font-semibold">Revisa las páginas:</p>
               <p>• Cada página necesita título válido y al menos un cromo con etiqueta.</p>
               <p>• Un máximo de 50 cromos por página.</p>
+            </div>
+          )}
+          {currentStep === 2 && templateData.is_public && !templateData.terms_accepted && (
+            <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
+              <p className="font-semibold">Debes aceptar los términos de uso para publicar una plantilla pública.</p>
             </div>
           )}
           {currentStep === 0 && (
