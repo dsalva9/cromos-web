@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/components/providers/SupabaseProvider';
 
@@ -32,6 +32,34 @@ export interface RatingSummary {
   favourite_count: number;
 }
 
+const EMPTY_DISTRIBUTION: RatingDistribution = {
+  '5_star': 0,
+  '4_star': 0,
+  '3_star': 0,
+  '2_star': 0,
+  '1_star': 0
+};
+
+const buildDistributionFromRatings = (list: TemplateRating[]): RatingDistribution => {
+  const distribution: RatingDistribution = { ...EMPTY_DISTRIBUTION };
+
+  for (const rating of list) {
+    const key = `${rating.rating}_star` as keyof RatingDistribution;
+    if (distribution[key] !== undefined) {
+      distribution[key] += 1;
+    }
+  }
+
+  return distribution;
+};
+
+const calculateAverageFromRatings = (list: TemplateRating[]): number => {
+  if (list.length === 0) return 0;
+
+  const total = list.reduce((sum, item) => sum + item.rating, 0);
+  return total / list.length;
+};
+
 export function useTemplateRatings(templateId: string) {
   const supabase = createClient();
   const { user } = useUser();
@@ -51,8 +79,38 @@ export function useTemplateRatings(templateId: string) {
 
       if (summaryError) throw summaryError;
 
-      if (data && data.length > 0) {
-        setSummary(data[0]);
+      if (data && data.length > 0 && data[0]) {
+        const rawSummary = data[0] as Partial<RatingSummary> & {
+          rating_distribution?: Partial<RatingDistribution> | null;
+        };
+
+        const rawDistribution = {
+          ...EMPTY_DISTRIBUTION,
+          ...(rawSummary.rating_distribution ?? {})
+        };
+
+        const normalizedDistribution: RatingDistribution = {
+          '5_star': Number(rawDistribution['5_star'] ?? 0),
+          '4_star': Number(rawDistribution['4_star'] ?? 0),
+          '3_star': Number(rawDistribution['3_star'] ?? 0),
+          '2_star': Number(rawDistribution['2_star'] ?? 0),
+          '1_star': Number(rawDistribution['1_star'] ?? 0)
+        };
+
+        setSummary({
+          template_id: String(rawSummary.template_id ?? templateId),
+          rating_avg: Number(rawSummary.rating_avg ?? 0),
+          rating_count: Number(rawSummary.rating_count ?? 0),
+          rating_distribution: normalizedDistribution,
+          user_rating:
+            rawSummary.user_rating === null || rawSummary.user_rating === undefined
+              ? null
+              : Number(rawSummary.user_rating),
+          user_favourited: Boolean(rawSummary.user_favourited),
+          favourite_count: Number(rawSummary.favourite_count ?? 0)
+        });
+      } else {
+        setSummary(null);
       }
     } catch (err) {
       console.error('Error fetching rating summary:', err);
@@ -221,8 +279,84 @@ export function useTemplateRatings(templateId: string) {
     setLoading(false);
   }, [fetchSummary, fetchRatings]);
 
+  const distributionFromRatings = useMemo(
+    () => buildDistributionFromRatings(ratings),
+    [ratings]
+  );
+
+  const totalRatingsFromList = useMemo(() => ratings.length, [ratings]);
+
+  const averageFromRatings = useMemo(
+    () => calculateAverageFromRatings(ratings),
+    [ratings]
+  );
+
+  const userRatingFromRatings = useMemo(() => {
+    if (!user) return null;
+    const entry = ratings.find((rating) => rating.user_id === user.id);
+    return entry ? entry.rating : null;
+  }, [ratings, user]);
+
+  const summaryForDisplay: RatingSummary | null = useMemo(() => {
+    if (summary) {
+      const needsDistributionOverride =
+        totalRatingsFromList > 0 &&
+        Object.keys(EMPTY_DISTRIBUTION).some((key) => {
+          const typedKey = key as keyof RatingDistribution;
+          return (
+            summary.rating_distribution[typedKey] !==
+            distributionFromRatings[typedKey]
+          );
+        });
+
+      const needsCountOverride =
+        totalRatingsFromList > 0 && summary.rating_count !== totalRatingsFromList;
+
+      if (needsDistributionOverride || needsCountOverride) {
+        return {
+          ...summary,
+          rating_count: totalRatingsFromList,
+          rating_avg: averageFromRatings,
+          rating_distribution: distributionFromRatings,
+          user_rating: summary.user_rating ?? userRatingFromRatings
+        };
+      }
+
+      if (summary.user_rating === null && userRatingFromRatings !== null) {
+        return {
+          ...summary,
+          user_rating: userRatingFromRatings
+        };
+      }
+
+      return summary;
+    }
+
+    if (totalRatingsFromList > 0) {
+      return {
+        template_id: String(templateId),
+        rating_avg: averageFromRatings,
+        rating_count: totalRatingsFromList,
+        rating_distribution: distributionFromRatings,
+        user_rating: userRatingFromRatings,
+        user_favourited: false,
+        favourite_count: 0
+      };
+    }
+
+    return null;
+  }, [
+    summary,
+    totalRatingsFromList,
+    distributionFromRatings,
+    averageFromRatings,
+    userRatingFromRatings,
+    templateId
+  ]);
+
   // Get user's own rating
-  const myRating = summary?.user_rating || null;
+  const myRating =
+    summaryForDisplay?.user_rating ?? userRatingFromRatings ?? null;
 
   // Check if user is author
   const getIsAuthor = useCallback(async () => {
@@ -242,7 +376,7 @@ export function useTemplateRatings(templateId: string) {
   }, [user, supabase, templateId]);
 
   return {
-    summary,
+    summary: summaryForDisplay,
     ratings,
     loading,
     error,

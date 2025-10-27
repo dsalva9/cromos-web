@@ -20,9 +20,10 @@ import {
   Loader2,
   AlertCircle,
   Edit,
-  Trash2
+  Trash2,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ReportButton } from '@/components/social/ReportButton';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';
 import { TemplateRatingSummary } from '@/components/templates/TemplateRatingSummary';
@@ -34,7 +35,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -56,7 +57,7 @@ export default function TemplateDetailsPage() {
     updateRating,
     deleteRating,
     loadMore,
-    getIsAuthor
+    getIsAuthor,
   } = useTemplateRatings(templateId);
   const { deleteTemplate } = useTemplateEditor(templateId);
 
@@ -66,6 +67,7 @@ export default function TemplateDetailsPage() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
+  const ratingSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Check if user is author
   useEffect(() => {
@@ -75,6 +77,12 @@ export default function TemplateDetailsPage() {
     };
     checkAuthor();
   }, [getIsAuthor]);
+
+  const scrollToRatings = () => {
+    if (ratingSectionRef.current) {
+      ratingSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -110,7 +118,7 @@ export default function TemplateDetailsPage() {
   const handleRatingSubmit = async (rating: number, comment?: string) => {
     if (myRating) {
       // Get the rating ID from the ratings list
-      const userRatingObj = ratings.find((r) => r.user_id === user?.id);
+      const userRatingObj = ratings.find(r => r.user_id === user?.id);
       if (userRatingObj) {
         await updateRating(userRatingObj.id, rating, comment);
       }
@@ -120,7 +128,7 @@ export default function TemplateDetailsPage() {
   };
 
   const handleRatingDelete = async () => {
-    const userRatingObj = ratings.find((r) => r.user_id === user?.id);
+    const userRatingObj = ratings.find(r => r.user_id === user?.id);
     if (userRatingObj) {
       await deleteRating(userRatingObj.id);
     }
@@ -224,13 +232,18 @@ export default function TemplateDetailsPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-4 text-sm">
-                    <div className="flex items-center gap-1.5 text-slate-400">
+                    <button
+                      type="button"
+                      onClick={scrollToRatings}
+                      aria-label="Ir a la sección de valoraciones"
+                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] rounded"
+                    >
                       <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
                       <span className="font-bold text-white text-base">
                         {template.rating_avg.toFixed(1)}
                       </span>
                       <span>({template.rating_count})</span>
-                    </div>
+                    </button>
 
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <Copy className="h-5 w-5" />
@@ -239,7 +252,9 @@ export default function TemplateDetailsPage() {
 
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <FileText className="h-5 w-5" />
-                      <span>{pages.length} páginas - {totalSlots} cromos</span>
+                      <span>
+                        {pages.length} páginas - {totalSlots} cromos
+                      </span>
                     </div>
                   </div>
 
@@ -269,7 +284,10 @@ export default function TemplateDetailsPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Link href={`/templates/${templateId}/edit`} className="block">
+                    <Link
+                      href={`/templates/${templateId}/edit`}
+                      className="block"
+                    >
                       <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
                         <Edit className="mr-2 h-4 w-4" />
                         Editar Plantilla
@@ -292,7 +310,8 @@ export default function TemplateDetailsPage() {
                       ¿Quieres esta plantilla?
                     </h3>
                     <p className="text-sm text-slate-400">
-                      Copia esta plantilla a tu colección y comienza a completarla
+                      Copia esta plantilla a tu colección y comienza a
+                      completarla
                     </p>
                   </div>
 
@@ -335,8 +354,74 @@ export default function TemplateDetailsPage() {
           </ModernCard>
         </div>
 
+        {/* Pages Outline */}
+        <div className="space-y-4 mb-12">
+          <h2 className="text-2xl font-bold text-white">Contenido de la Plantilla</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {pages.map(page => (
+              <ModernCard key={page.id} className="hover:border-[#FFC000]/50 transition-colors">
+                <ModernCardContent className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-bold text-[#FFC000] bg-[#FFC000]/10 px-2 py-0.5 rounded">
+                            Pagina {page.page_number}
+                          </span>
+                          <span className="text-xs font-medium text-slate-500 bg-slate-700 px-2 py-0.5 rounded capitalize">
+                            {page.type}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-white">{page.title}</h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-400">Cromos:</span>
+                      <span className="font-medium text-white">{page.slots_count}</span>
+                    </div>
+
+                    {/* Slots list */}
+                    <div className="pt-2 border-t border-slate-700 max-h-32 overflow-y-auto">
+                      <div className="space-y-1">
+                        {page.slots.map(slot => (
+                          <div key={slot.id} className="flex items-center gap-2 text-xs">
+                            <span className="text-slate-500 font-mono w-6">{slot.slot_number}.</span>
+                            <span
+                              className={
+                                slot.is_special ? 'text-yellow-500 font-medium' : 'text-slate-400'
+                              }
+                            >
+                              {slot.label || `Cromo ${slot.slot_number}`}
+                            </span>
+                            {slot.is_special && (
+                              <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded">
+                                ESPECIAL
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </ModernCardContent>
+              </ModernCard>
+            ))}
+          </div>
+
+          {pages.length === 0 && (
+            <ModernCard>
+              <ModernCardContent className="p-8 text-center">
+                <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-400">Esta plantilla aun no tiene paginas</p>
+              </ModernCardContent>
+            </ModernCard>
+          )}
+        </div>
+
         {/* Ratings Section */}
-        <div className="space-y-6 mb-8">
+        <div ref={ratingSectionRef} id="valoraciones" className="space-y-6 mb-8">
           <h2 className="text-2xl font-bold text-white">Valoraciones</h2>
           <ModernCard>
             <ModernCardContent className="p-6">
@@ -392,73 +477,6 @@ export default function TemplateDetailsPage() {
           )}
         </div>
 
-        {/* Pages Outline */}
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Contenido de la Plantilla</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pages.map((page) => (
-              <ModernCard key={page.id} className="hover:border-[#FFC000]/50 transition-colors">
-                <ModernCardContent className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold text-[#FFC000] bg-[#FFC000]/10 px-2 py-0.5 rounded">
-                            Página {page.page_number}
-                          </span>
-                          <span className="text-xs font-medium text-slate-500 bg-slate-700 px-2 py-0.5 rounded capitalize">
-                            {page.type}
-                          </span>
-                        </div>
-                        <h3 className="font-bold text-white">{page.title}</h3>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400">Cromos:</span>
-                      <span className="font-medium text-white">{page.slots_count}</span>
-                    </div>
-
-                    {/* Slots list */}
-                    <div className="pt-2 border-t border-slate-700 max-h-32 overflow-y-auto">
-                      <div className="space-y-1">
-                        {page.slots.map((slot) => (
-                          <div
-                            key={slot.id}
-                            className="flex items-center gap-2 text-xs"
-                          >
-                            <span className="text-slate-500 font-mono w-6">
-                              {slot.slot_number}.
-                            </span>
-                            <span className={slot.is_special ? 'text-yellow-500 font-medium' : 'text-slate-400'}>
-                              {slot.label || `Cromo ${slot.slot_number}`}
-                            </span>
-                            {slot.is_special && (
-                              <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded">
-                                ESPECIAL
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </ModernCardContent>
-              </ModernCard>
-            ))}
-          </div>
-
-          {pages.length === 0 && (
-            <ModernCard>
-              <ModernCardContent className="p-8 text-center">
-                <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400">Esta plantilla aún no tiene páginas</p>
-              </ModernCardContent>
-            </ModernCard>
-          )}
-        </div>
-
         {/* Rating Dialog */}
         <TemplateRatingDialog
           open={ratingDialogOpen}
@@ -466,10 +484,10 @@ export default function TemplateDetailsPage() {
           templateTitle={template.title}
           currentRating={myRating}
           currentComment={
-            ratings.find((r) => r.user_id === user?.id)?.comment || null
+            ratings.find(r => r.user_id === user?.id)?.comment || null
           }
           currentRatingId={
-            ratings.find((r) => r.user_id === user?.id)?.id || null
+            ratings.find(r => r.user_id === user?.id)?.id || null
           }
           onSubmit={handleRatingSubmit}
           onDelete={myRating ? handleRatingDelete : undefined}
@@ -481,8 +499,8 @@ export default function TemplateDetailsPage() {
             <DialogHeader>
               <DialogTitle>Eliminar Plantilla</DialogTitle>
               <DialogDescription className="text-slate-400">
-                ¿Estás seguro de que quieres eliminar esta plantilla? Se marcará como
-                eliminada y ya no será visible públicamente.
+                ¿Estás seguro de que quieres eliminar esta plantilla? Se marcará
+                como eliminada y ya no será visible públicamente.
               </DialogDescription>
             </DialogHeader>
 
@@ -493,7 +511,7 @@ export default function TemplateDetailsPage() {
                 </label>
                 <Textarea
                   value={deleteReason}
-                  onChange={(e) => setDeleteReason(e.target.value)}
+                  onChange={e => setDeleteReason(e.target.value)}
                   placeholder="¿Por qué eliminas esta plantilla?"
                   rows={3}
                   className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 resize-none"

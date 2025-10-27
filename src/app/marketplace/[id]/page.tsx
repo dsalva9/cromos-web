@@ -9,8 +9,15 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
-import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
+import {
+  useUser,
+  useSupabaseClient,
+} from '@/components/providers/SupabaseProvider';
+import { ReportButton } from '@/components/social/ReportButton';
+import {
+  resolveAvatarUrl,
+  getAvatarFallback,
+} from '@/lib/profile/resolveAvatarUrl';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
@@ -190,8 +197,13 @@ export default function ListingDetailPage() {
                   <Link href={`/users/${listing.user_id}`}>
                     <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                       {(() => {
-                        const avatarUrl = resolveAvatarUrl(listing.author_avatar_url, supabase);
-                        const fallback = getAvatarFallback(listing.author_nickname);
+                        const avatarUrl = resolveAvatarUrl(
+                          listing.author_avatar_url,
+                          supabase
+                        );
+                        const fallback = getAvatarFallback(
+                          listing.author_nickname
+                        );
 
                         return avatarUrl ? (
                           <Image
@@ -202,7 +214,9 @@ export default function ListingDetailPage() {
                             className="rounded-full border-2 border-black"
                           />
                         ) : (
-                          <div className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center text-black font-black text-lg ${fallback.gradientClass}`}>
+                          <div
+                            className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center text-black font-black text-lg ${fallback.gradientClass}`}
+                          >
                             {fallback.initial}
                           </div>
                         );
@@ -234,9 +248,7 @@ export default function ListingDetailPage() {
 
               {isOwner && (
                 <div className="text-center space-y-4">
-                  <p className="text-gray-400 text-sm">
-                    Este es tu anuncio
-                  </p>
+                  <p className="text-gray-400 text-sm">Este es tu anuncio</p>
                   <Button
                     size="lg"
                     className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
@@ -277,6 +289,18 @@ export default function ListingDetailPage() {
                     </Link>{' '}
                     para contactar al vendedor
                   </p>
+                </div>
+              )}
+
+              {/* Report Button */}
+              {user && !isOwner && (
+                <div className="pt-4 border-t border-gray-700">
+                  <ReportButton
+                    entityType="listing"
+                    entityId={listing.id}
+                    variant="outline"
+                    size="sm"
+                  />
                 </div>
               )}
             </div>

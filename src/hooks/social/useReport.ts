@@ -15,10 +15,10 @@ export function useReport() {
       setLoading(true);
 
       const { error } = await supabase.rpc('create_report', {
-        p_entity_type: entityType,
-        p_entity_id: parseInt(entityId),
+        p_target_type: entityType,
+        p_target_id: parseInt(entityId),
         p_reason: reason,
-        p_description: description || null
+        p_description: description || null,
       });
 
       if (error) throw error;

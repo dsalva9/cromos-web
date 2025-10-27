@@ -23,15 +23,22 @@ interface ReportModalProps {
 }
 
 const REPORT_REASONS = [
-  { value: 'spam', label: 'Spam or misleading' },
-  { value: 'inappropriate', label: 'Inappropriate content' },
-  { value: 'scam', label: 'Scam or fraud' },
-  { value: 'harassment', label: 'Harassment or abuse' },
-  { value: 'fake', label: 'Fake or counterfeit items' },
-  { value: 'other', label: 'Other' },
+  { value: 'spam', label: 'Spam o engañoso' },
+  { value: 'inappropriate_content', label: 'Contenido inapropiado' },
+  { value: 'harassment', label: 'Acoso o abuso' },
+  { value: 'copyright_violation', label: 'Violación de derechos de autor' },
+  { value: 'misleading_information', label: 'Información engañosa' },
+  { value: 'fake_listing', label: 'Anuncio falso' },
+  { value: 'offensive_language', label: 'Lenguaje ofensivo' },
+  { value: 'other', label: 'Otro' },
 ];
 
-export function ReportModal({ open, onClose, entityType, entityId }: ReportModalProps) {
+export function ReportModal({
+  open,
+  onClose,
+  entityType,
+  entityId,
+}: ReportModalProps) {
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
   const { submitReport, loading } = useReport();
@@ -40,24 +47,28 @@ export function ReportModal({ open, onClose, entityType, entityId }: ReportModal
     e.preventDefault();
 
     if (!reason) {
-      toast.error('Please select a reason');
+      toast.error('Por favor selecciona un motivo');
       return;
     }
 
     if (description.length > 500) {
-      toast.error('Description must be 500 characters or less');
+      toast.error('La descripción debe tener 500 caracteres o menos');
       return;
     }
 
     try {
       await submitReport(entityType, entityId, reason, description);
-      toast.success('Report submitted successfully. Our team will review it.');
+      toast.success(
+        'Denuncia enviada correctamente. Nuestro equipo la revisará.'
+      );
       onClose();
       // Reset form
       setReason('');
       setDescription('');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to submit report');
+      toast.error(
+        error instanceof Error ? error.message : 'Error al enviar la denuncia'
+      );
     }
   };
 
@@ -65,18 +76,21 @@ export function ReportModal({ open, onClose, entityType, entityId }: ReportModal
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-[#1F2937] border-2 border-black">
         <DialogHeader>
-          <DialogTitle className="text-white">Report Content</DialogTitle>
+          <DialogTitle className="text-white">Denunciar Contenido</DialogTitle>
           <DialogDescription className="text-gray-400">
-            Help us maintain a safe community by reporting inappropriate content.
+            Ayúdanos a mantener una comunidad segura denunciando contenido
+            inapropiado.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Reason */}
           <div className="space-y-3">
-            <Label className="text-white">Why are you reporting this?</Label>
+            <Label className="text-white">
+              ¿Por qué estás denunciando esto?
+            </Label>
             <RadioGroup value={reason} onValueChange={setReason}>
-              {REPORT_REASONS.map((option) => (
+              {REPORT_REASONS.map(option => (
                 <div key={option.value} className="flex items-center space-x-2">
                   <RadioGroupItem value={option.value} id={option.value} />
                   <Label
@@ -93,19 +107,19 @@ export function ReportModal({ open, onClose, entityType, entityId }: ReportModal
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description" className="text-white">
-              Additional details (optional)
+              Detalles adicionales (opcional)
             </Label>
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide any additional information..."
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Proporciona cualquier información adicional..."
               rows={4}
               maxLength={500}
               className="bg-[#374151] border-2 border-black text-white"
             />
             <p className="text-sm text-gray-400">
-              {description.length} / 500 characters
+              {description.length} / 500 caracteres
             </p>
           </div>
 
@@ -117,14 +131,14 @@ export function ReportModal({ open, onClose, entityType, entityId }: ReportModal
               onClick={onClose}
               className="flex-1"
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               type="submit"
               disabled={loading || !reason}
               className="flex-1 bg-red-600 hover:bg-red-700 text-white"
             >
-              {loading ? 'Submitting...' : 'Submit Report'}
+              {loading ? 'Enviando...' : 'Enviar Denuncia'}
             </Button>
           </div>
         </form>

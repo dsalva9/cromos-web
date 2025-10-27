@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  useMemo,
-  useState,
-  useEffect,
-} from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -25,20 +21,17 @@ import {
 } from '@/components/ui/dialog';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { FavoriteButton } from '@/components/social/FavoriteButton';
+import { ReportButton } from '@/components/social/ReportButton';
 import {
   useUser,
   useSupabaseClient,
 } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
+import { User, Star, Heart, Package, MapPin, Pencil } from 'lucide-react';
 import {
-  User,
-  Star,
-  Heart,
-  Package,
-  MapPin,
-  Pencil,
-} from 'lucide-react';
-import { AvatarPicker, AvatarSelection } from '@/components/profile/AvatarPicker';
+  AvatarPicker,
+  AvatarSelection,
+} from '@/components/profile/AvatarPicker';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 const STATUS_LABELS = {
@@ -63,22 +56,18 @@ export default function UserProfilePage() {
   const supabase = useSupabaseClient();
   const userId = params.userId as string;
 
-  const {
-    profile,
-    listings,
-    loading,
-    error,
-    refetch,
-    adjustFavoritesCount,
-  } = useUserProfile(userId);
+  const { profile, listings, loading, error, refetch, adjustFavoritesCount } =
+    useUserProfile(userId);
 
-  const [listingFilter, setListingFilter] =
-    useState<ListingFilter>('active');
+  const [listingFilter, setListingFilter] = useState<ListingFilter>('active');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
   const [formAvatarPath, setFormAvatarPath] = useState<string | null>(null);
-  const [avatarBlob, setAvatarBlob] = useState<{ blob: Blob; fileName: string } | null>(null);
+  const [avatarBlob, setAvatarBlob] = useState<{
+    blob: Blob;
+    fileName: string;
+  } | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
@@ -161,7 +150,7 @@ export default function UserProfilePage() {
     );
   }
 
-  const emailDisplay = isOwnProfile ? currentUser?.email ?? null : null;
+  const emailDisplay = isOwnProfile ? (currentUser?.email ?? null) : null;
 
   const locationDisplay = profile.location_label
     ? profile.postcode
@@ -367,10 +356,18 @@ export default function UserProfilePage() {
 
                     <div className="flex items-center gap-3">
                       {!isOwnProfile && currentUser && (
-                        <FavoriteButton
-                          userId={userId}
-                          onFavoriteDelta={adjustFavoritesCount}
-                        />
+                        <div className="flex items-center gap-3">
+                          <FavoriteButton
+                            userId={userId}
+                            onFavoriteDelta={adjustFavoritesCount}
+                          />
+                          <ReportButton
+                            entityType="user"
+                            entityId={userId}
+                            variant="outline"
+                            size="sm"
+                          />
+                        </div>
                       )}
 
                       {isOwnProfile && (
@@ -392,7 +389,8 @@ export default function UserProfilePage() {
                             <DialogHeader>
                               <DialogTitle>Editar perfil</DialogTitle>
                               <DialogDescription>
-                                Actualiza tu avatar, nombre y ubicación aproximada.
+                                Actualiza tu avatar, nombre y ubicación
+                                aproximada.
                               </DialogDescription>
                             </DialogHeader>
 
@@ -411,7 +409,9 @@ export default function UserProfilePage() {
                                 <Input
                                   id="nickname"
                                   value={formNickname}
-                                  onChange={event => setFormNickname(event.target.value)}
+                                  onChange={event =>
+                                    setFormNickname(event.target.value)
+                                  }
                                   maxLength={50}
                                   placeholder="Tu nombre de usuario"
                                 />
@@ -422,13 +422,16 @@ export default function UserProfilePage() {
                                 <Input
                                   id="postcode"
                                   value={formPostcode}
-                                  onChange={event => setFormPostcode(event.target.value)}
+                                  onChange={event =>
+                                    setFormPostcode(event.target.value)
+                                  }
                                   maxLength={5}
                                   placeholder="28001"
                                   inputMode="numeric"
                                 />
                                 <p className="text-xs text-gray-400">
-                                  Mostramos tu ubicación aproximada en base al código postal.
+                                  Mostramos tu ubicación aproximada en base al
+                                  código postal.
                                 </p>
                               </div>
                             </div>
@@ -449,7 +452,9 @@ export default function UserProfilePage() {
                                 type="button"
                                 disabled={savingProfile || uploadingAvatar}
                               >
-                                {savingProfile ? 'Guardando...' : 'Guardar cambios'}
+                                {savingProfile
+                                  ? 'Guardando...'
+                                  : 'Guardar cambios'}
                               </Button>
                             </DialogFooter>
                           </DialogContent>
@@ -483,16 +488,13 @@ export default function UserProfilePage() {
                 </div>
               </div>
             </div>
-            </div>
           </div>
-
+        </div>
 
         {/* Listings */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <h2 className="text-2xl font-black text-white">
-              Anuncios
-            </h2>
+            <h2 className="text-2xl font-black text-white">Anuncios</h2>
             <SegmentedTabs
               tabs={listingTabs}
               value={listingFilter}

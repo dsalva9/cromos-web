@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Fixed ambiguous 'user_id' column reference error in `get_listing_chat_participants` RPC
     - Renamed variable from `v_listing_user_id` to `v_listing_owner_id` for clarity
     - Fully qualified all table references in queries to avoid ambiguity
+- **Template Ratings (2025-10-27)**
+  - Recreated Supabase RPCs (`create_template_rating`, `update_template_rating`, `delete_template_rating`) to recalculate aggregates directly from `template_ratings` and backfill existing data
+  - Added migration `20251027161000_fix_template_rating_aggregates.sql` to refresh schema, recompute averages/counts, and eliminate duplicate key errors on updates
+  - Normalized `useTemplateRatings` hook to coerce numeric fields, hydrate missing distributions, and surface accurate counts in the UI
+  - Updated template detail layout to show template content before reviews and made the header rating badge scroll smoothly to the valoraciones section
 
 ### Added
 

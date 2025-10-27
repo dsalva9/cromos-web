@@ -16,7 +16,7 @@ export function ReportButton({
   entityType,
   entityId,
   variant = 'outline',
-  size = 'sm'
+  size = 'sm',
 }: ReportButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export function ReportButton({
         className="text-gray-400 hover:text-red-500"
       >
         <Flag className="h-4 w-4 mr-2" />
-        Report
+        Denunciar
       </Button>
 
       <ReportModal

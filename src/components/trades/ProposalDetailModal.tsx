@@ -19,7 +19,16 @@ import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { TradeProposalDetailItem } from '@/types';
 import { useUser, useSupabase } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
-import { ArrowDown, ArrowUp, Check, X, Ban, MessageSquare, FileText, CheckCircle } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  X,
+  Ban,
+  MessageSquare,
+  FileText,
+  CheckCircle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -96,11 +105,19 @@ export function ProposalDetailModal({
     error: respondError,
     respond,
   } = useRespondToProposal();
-  const { requestFinalization, rejectFinalization, loading: finalizingLoading } = useTradeFinalization();
+  const {
+    requestFinalization,
+    rejectFinalization,
+    loading: finalizingLoading,
+  } = useTradeFinalization();
 
   // Finalization state
-  const [finalizationStatus, setFinalizationStatus] = useState<'none' | 'pending' | 'accepted' | 'rejected'>('none');
-  const [finalizationRequesterId, setFinalizationRequesterId] = useState<string | null>(null);
+  const [finalizationStatus, setFinalizationStatus] = useState<
+    'none' | 'pending' | 'accepted' | 'rejected'
+  >('none');
+  const [finalizationRequesterId, setFinalizationRequesterId] = useState<
+    string | null
+  >(null);
 
   // Get saved tab state or default to 'resumen'
   const [activeTab, setActiveTab] = useState<string>('resumen');
@@ -115,31 +132,34 @@ export function ProposalDetailModal({
   const unreadCount = proposalId ? getCountForTrade(proposalId) : 0;
 
   // Fetch finalization status
-  const fetchFinalizationStatus = useCallback(async (tradeId: number) => {
-    if (!user) return;
+  const fetchFinalizationStatus = useCallback(
+    async (tradeId: number) => {
+      if (!user) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('trade_finalizations')
-        .select('user_id, status')
-        .eq('trade_id', tradeId)
-        .in('status', ['pending', 'accepted']);
+      try {
+        const { data, error } = await supabase
+          .from('trade_finalizations')
+          .select('user_id, status')
+          .eq('trade_id', tradeId)
+          .in('status', ['pending', 'accepted']);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      const finalizations = data || [];
-      if (finalizations.length > 0) {
-        const finalization = finalizations[0];
-        setFinalizationStatus(finalization.status as 'pending' | 'accepted');
-        setFinalizationRequesterId(finalization.user_id);
-      } else {
-        setFinalizationStatus('none');
-        setFinalizationRequesterId(null);
+        const finalizations = data || [];
+        if (finalizations.length > 0) {
+          const finalization = finalizations[0];
+          setFinalizationStatus(finalization.status as 'pending' | 'accepted');
+          setFinalizationRequesterId(finalization.user_id);
+        } else {
+          setFinalizationStatus('none');
+          setFinalizationRequesterId(null);
+        }
+      } catch (err) {
+        logger.error('Error fetching finalization status:', err);
       }
-    } catch (err) {
-      logger.error('Error fetching finalization status:', err);
-    }
-  }, [user, supabase]);
+    },
+    [user, supabase]
+  );
 
   useEffect(() => {
     if (isOpen && proposalId) {
@@ -216,12 +236,14 @@ export function ProposalDetailModal({
 
   // Check if current user requested finalization
   const userRequestedFinalization = finalizationRequesterId === user?.id;
-  const otherUserRequestedFinalization = finalizationRequesterId && finalizationRequesterId !== user?.id;
+  const otherUserRequestedFinalization =
+    finalizationRequesterId && finalizationRequesterId !== user?.id;
   const hasPendingFinalization = finalizationStatus === 'pending';
 
   // Proposal is active if pending or accepted AND no pending finalization
   const isProposalActive =
-    (detail?.proposal.status === 'pending' || detail?.proposal.status === 'accepted') &&
+    (detail?.proposal.status === 'pending' ||
+      detail?.proposal.status === 'accepted') &&
     !hasPendingFinalization;
 
   const offeredItems =
@@ -236,6 +258,10 @@ export function ProposalDetailModal({
   const counterpartyNickname = isSender
     ? detail?.proposal.to_user_nickname || 'Usuario'
     : detail?.proposal.from_user_nickname || 'Usuario';
+
+  const counterpartyId = isSender
+    ? detail?.proposal.to_user_id
+    : detail?.proposal.from_user_id;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -288,7 +314,12 @@ export function ProposalDetailModal({
               aria-label="Detalle de propuesta"
             />
 
-            <div className={cn("mt-4 flex-1 min-h-0", activeTab === 'resumen' ? 'overflow-y-auto' : 'overflow-hidden')}>
+            <div
+              className={cn(
+                'mt-4 flex-1 min-h-0',
+                activeTab === 'resumen' ? 'overflow-y-auto' : 'overflow-hidden'
+              )}
+            >
               {activeTab === 'resumen' && (
                 <div className="grid gap-6 pr-2">
                   <ItemList
@@ -324,7 +355,9 @@ export function ProposalDetailModal({
                       <div className="space-y-3">
                         {!hasPendingFinalization && (
                           <p className="text-sm text-gray-300">
-                            El intercambio ha sido aceptado. Cuando ambos confirmen que completaron el intercambio, se marcará como finalizado.
+                            El intercambio ha sido aceptado. Cuando ambos
+                            confirmen que completaron el intercambio, se marcará
+                            como finalizado.
                           </p>
                         )}
 
@@ -334,7 +367,8 @@ export function ProposalDetailModal({
                               ⏳ Has solicitado la finalización
                             </p>
                             <p className="text-xs text-gray-900 mt-1">
-                              Esperando que la otra persona acepte o rechace tu solicitud.
+                              Esperando que la otra persona acepte o rechace tu
+                              solicitud.
                             </p>
                           </div>
                         )}
@@ -342,10 +376,12 @@ export function ProposalDetailModal({
                         {otherUserRequestedFinalization && (
                           <div className="bg-blue-500 bg-opacity-20 border-2 border-blue-400 rounded-md p-3">
                             <p className="text-sm font-bold text-blue-400">
-                              ⚠ La otra persona solicitó finalizar el intercambio
+                              ⚠ La otra persona solicitó finalizar el
+                              intercambio
                             </p>
                             <p className="text-xs text-white mt-1">
-                              Si ya completaste el intercambio, acepta la finalización. Si no, puedes rechazarla.
+                              Si ya completaste el intercambio, acepta la
+                              finalización. Si no, puedes rechazarla.
                             </p>
                           </div>
                         )}
@@ -359,6 +395,7 @@ export function ProposalDetailModal({
                 <TradeChatPanel
                   tradeId={proposalId}
                   counterpartyNickname={counterpartyNickname}
+                  counterpartyId={counterpartyId}
                   isProposalActive={isProposalActive}
                 />
               )}

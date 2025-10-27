@@ -5,19 +5,22 @@ import { useTradeChat } from '@/hooks/trades/useTradeChat';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, ChevronDown, Loader2 } from 'lucide-react';
+import { Send, ChevronDown, Loader2, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { ReportButton } from '@/components/social/ReportButton';
 
 interface TradeChatPanelProps {
   tradeId: number | null;
   counterpartyNickname: string;
+  counterpartyId?: string;
   isProposalActive: boolean; // true if proposal is pending/accepted, false if cancelled/rejected
 }
 
 export function TradeChatPanel({
   tradeId,
   counterpartyNickname,
+  counterpartyId,
   isProposalActive,
 }: TradeChatPanelProps) {
   const { user } = useUser();
@@ -264,9 +267,7 @@ export function TradeChatPanel({
             </span>
             <Button
               onClick={handleSendMessage}
-              disabled={
-                !messageText.trim() || sending || !isProposalActive
-              }
+              disabled={!messageText.trim() || sending || !isProposalActive}
               className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900 border-2 border-black font-bold uppercase disabled:opacity-50"
               size="sm"
             >
