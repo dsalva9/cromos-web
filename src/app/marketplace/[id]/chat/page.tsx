@@ -45,23 +45,55 @@ function ListingChatPageContent() {
   // Fetch listing details
   useEffect(() => {
     async function fetchListing() {
-      const { data, error } = await supabase
-        .rpc('get_marketplace_listings', {
-          p_search_query: null,
-          p_limit: 1,
-          p_offset: 0
-        })
+      // First get basic listing data from trade_listings table
+      const { data: listingData, error: listingError } = await supabase
+        .from('trade_listings')
+        .select(`
+          id,
+          user_id,
+          title,
+          description,
+          sticker_number,
+          collection_name,
+          image_url,
+          status,
+          created_at
+        `)
         .eq('id', listingId)
         .single();
 
-      if (error || !data) {
+      if (listingError || !listingData) {
         toast.error('Error al cargar el anuncio');
+        console.error('Error fetching listing:', listingError);
         return;
       }
 
-      setListing(data);
-      setListingOwner(data.user_id);
-      setIsOwner(user?.id === data.user_id);
+      // Get author info
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('nickname, avatar_url')
+        .eq('id', listingData.user_id)
+        .single();
+
+      // Combine data to match Listing interface
+      const fullListing: Listing = {
+        id: listingData.id.toString(),
+        user_id: listingData.user_id,
+        author_nickname: profileData?.nickname || 'Usuario',
+        author_avatar_url: profileData?.avatar_url || null,
+        title: listingData.title,
+        description: listingData.description,
+        sticker_number: listingData.sticker_number,
+        collection_name: listingData.collection_name,
+        image_url: listingData.image_url,
+        status: listingData.status as 'active' | 'sold' | 'removed',
+        views_count: 0, // Not needed for chat view
+        created_at: listingData.created_at,
+      };
+
+      setListing(fullListing);
+      setListingOwner(listingData.user_id);
+      setIsOwner(user?.id === listingData.user_id);
     }
 
     void fetchListing();
