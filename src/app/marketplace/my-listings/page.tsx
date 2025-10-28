@@ -14,7 +14,8 @@ function MyListingsContent() {
   const { listings, loading, error, refetch } = useMyListings();
 
   const activeListings = listings.filter(l => l.status === 'active');
-  const soldListings = listings.filter(l => l.status === 'sold');
+  const reservedListings = listings.filter(l => l.status === 'reserved');
+  const completedListings = listings.filter(l => l.status === 'completed' || l.status === 'sold');
   const removedListings = listings.filter(l => l.status === 'removed');
 
   return (
@@ -48,12 +49,15 @@ function MyListingsContent() {
 
         {/* Tabs */}
         <Tabs defaultValue="active" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="active">
               Activos ({activeListings.length})
             </TabsTrigger>
-            <TabsTrigger value="sold">
-              Vendidos ({soldListings.length})
+            <TabsTrigger value="reserved">
+              Reservados ({reservedListings.length})
+            </TabsTrigger>
+            <TabsTrigger value="completed">
+              Completados ({completedListings.length})
             </TabsTrigger>
             <TabsTrigger value="removed">
               Eliminados ({removedListings.length})
@@ -87,14 +91,31 @@ function MyListingsContent() {
             )}
           </TabsContent>
 
-          {/* Sold Listings */}
-          <TabsContent value="sold" className="space-y-4">
-            {soldListings.length === 0 ? (
+          {/* Reserved Listings */}
+          <TabsContent value="reserved" className="space-y-4">
+            {reservedListings.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-gray-400">No tienes anuncios vendidos</p>
+                <p className="text-gray-400">No tienes anuncios reservados</p>
               </div>
             ) : (
-              soldListings.map(listing => (
+              reservedListings.map(listing => (
+                <MyListingCard
+                  key={listing.id || listing.listing_id}
+                  listing={listing}
+                  onUpdate={refetch}
+                />
+              ))
+            )}
+          </TabsContent>
+
+          {/* Completed Listings */}
+          <TabsContent value="completed" className="space-y-4">
+            {completedListings.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-gray-400">No tienes anuncios completados</p>
+              </div>
+            ) : (
+              completedListings.map(listing => (
                 <MyListingCard
                   key={listing.id || listing.listing_id}
                   listing={listing}

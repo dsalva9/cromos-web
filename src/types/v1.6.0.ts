@@ -24,7 +24,7 @@ export interface Listing {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
-  status: 'active' | 'sold' | 'removed';
+  status: 'active' | 'reserved' | 'completed' | 'sold' | 'removed';
   views_count: number;
   created_at: string;
   copy_id?: string | null;

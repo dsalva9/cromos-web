@@ -172,7 +172,7 @@ User-created marketplace listings for physical cards.
 - `sticker_number` TEXT
 - `collection_name` TEXT
 - `image_url` TEXT
-- `status` TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'removed'))
+- `status` TEXT DEFAULT 'active' CHECK (status IN ('active', 'reserved', 'completed', 'sold', 'removed')) ✅ **v1.6.0 UPDATED**
 - `views_count` INTEGER DEFAULT 0
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
@@ -190,23 +190,81 @@ User-created marketplace listings for physical cards.
 
 **RLS Policies:**
 
-- Public read WHERE status = 'active'
+- Public read WHERE status = 'active' OR auth.uid() = user_id ✅ **v1.6.0 FIXED** (allows users to view own listings regardless of status)
 - Users can insert their own listings
-- Users can update/delete their own listings
+- Users can update their own listings (WITH CHECK added) ✅ **v1.6.0 FIXED**
+- Users can delete their own listings
 - Admins can update/delete any listing
 
 **Related RPCs:**
 
 - `create_trade_listing(title, description, sticker_number, collection_name, image_url)`
 - `list_trade_listings(limit, offset, search)`
+- `list_trade_listings_with_distance(limit, offset, search, viewer_postcode, sort_by_distance)` ✅ **v1.6.0 NEW**
 - `get_user_listings(user_id, limit, offset)`
 - `update_listing_status(listing_id, new_status)`
+- `reserve_listing(listing_id, buyer_id, note)` ✅ **v1.6.0 USED** - Creates transaction, updates status to 'reserved'
+- `complete_listing_transaction(transaction_id)` ✅ **v1.6.0 UPDATED** - Completes transaction, sends notification
+- `cancel_listing_transaction(transaction_id, reason)` - Cancels reservation
+- `get_listing_transaction(listing_id)` ✅ **v1.6.0 USED** - Gets transaction details
 - `get_listing_chats(listing_id)`
 - `send_listing_message(listing_id, message)`
+- `add_system_message_to_listing_chat(listing_id, message)` ✅ **v1.6.0 USED** - Adds system messages
 - `publish_duplicate_to_marketplace(copy_id, slot_id, title, description, image_url)`
 - `mark_listing_sold_and_decrement(listing_id)`
 - `get_my_listings_with_progress(status)`
 - `admin_delete_content(content_type, content_id, reason)`
+
+---
+
+### listing_transactions ✅ **v1.6.0 NEW**
+
+Tracks reservation and completion workflow for marketplace listings.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE NOT NULL
+- `seller_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `buyer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `status` TEXT CHECK (status IN ('reserved', 'completed', 'cancelled')) NOT NULL
+- `reserved_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `completed_at` TIMESTAMPTZ
+- `cancelled_at` TIMESTAMPTZ
+- `cancellation_reason` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `updated_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Indices:**
+
+- `idx_listing_transactions_active` UNIQUE ON (listing_id) WHERE status IN ('reserved', 'completed') - Ensures one active transaction per listing
+- `idx_listing_transactions_listing` ON (listing_id)
+- `idx_listing_transactions_seller` ON (seller_id)
+- `idx_listing_transactions_buyer` ON (buyer_id)
+- `idx_listing_transactions_status` ON (status)
+
+**RLS Policies:**
+
+- Users can view transactions where they are seller or buyer
+- Sellers can create reservations for their own listings
+- Sellers or buyers can update their transactions
+- Admins have full access
+
+**Related RPCs:**
+
+- `reserve_listing(listing_id, buyer_id, note)` - Creates transaction with status 'reserved'
+- `complete_listing_transaction(transaction_id)` - Updates to 'completed', sends notifications
+- `cancel_listing_transaction(transaction_id, reason)` - Updates to 'cancelled', reverts listing
+- `get_listing_transaction(listing_id)` - Retrieves transaction details
+
+**Workflow:**
+
+1. **Reserve**: Seller uses `reserve_listing` → creates transaction (status: 'reserved'), listing status → 'reserved'
+2. **Complete**: Seller marks completed → buyer receives notification with "confirm" action
+3. **Confirm**: Buyer confirms → transaction fully completed, both can rate each other
+4. **Cancel**: Seller can cancel → transaction status → 'cancelled', listing → 'active'
+
+---
 
 ## Collection Templates System
 

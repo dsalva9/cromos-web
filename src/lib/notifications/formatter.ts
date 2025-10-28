@@ -60,9 +60,12 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
 
     case 'listing_completed':
       const isSellerCompleted = notification.payload?.is_seller === true;
+      const needsConfirmation = notification.payload?.needs_confirmation === true;
       return {
-        title: 'Transacción completada',
-        body: isSellerCompleted
+        title: needsConfirmation ? 'Confirma la transacción' : 'Transacción completada',
+        body: needsConfirmation
+          ? `${actorName} ha marcado "${notification.listingTitle || 'el artículo'}" como completado. Confirma que todo está correcto.`
+          : isSellerCompleted
           ? `La transacción de "${notification.listingTitle || 'tu artículo'}" se ha completado`
           : `Tu compra de "${notification.listingTitle || 'el artículo'}" se ha completado`,
         href: notification.listingId ? `/marketplace/${notification.listingId}` : null,

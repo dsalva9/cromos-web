@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Package, Heart, LogOut, ChevronDown } from 'lucide-react';
+import { User, Package, Heart, MessageCircle, LogOut, ChevronDown } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -136,6 +136,15 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
               >
                 <Package className="h-4 w-4" />
                 <span>Mis Anuncios</span>
+              </Link>
+
+              <Link
+                href="/chats"
+                onClick={handleProtectedClick('/chats', true)}
+                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>Chats</span>
               </Link>
 
               <Link

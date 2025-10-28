@@ -9,6 +9,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Chats Page (2025-10-28)**
+  - New centralized `/chats` page to view all marketplace conversations
+  - Added "Chats" menu entry in profile dropdown (between "Mis Anuncios" and "Favoritos")
+  - Shows all conversations as both buyer and seller
+  - Displays listing info, counterparty details, last message, and unread count
+  - Conversations sorted by most recent activity
+  - Status badges show current listing state (Activo, Reservado, Completado)
+  - Clickable cards navigate directly to the conversation
+  - For sellers: includes participant query parameter to pre-select buyer
+  - Empty state with call-to-action to explore marketplace
+  - New RPC: `get_user_conversations()` - Returns all user's listing conversations with details
+- **Listing Transaction Workflow (2025-10-28)**
+  - Implemented complete reservation and completion workflow for marketplace listings
+  - **Workflow States:**
+    - `active`: Listing is publicly visible and available
+    - `reserved`: Seller has reserved listing for specific buyer via `reserve_listing` RPC
+    - `completed`: Transaction completed and confirmed by both parties
+  - **Seller Features:**
+    - "Marcar Reservado" button in chat (requires selecting a buyer conversation)
+    - Creates `listing_transaction` record linking seller and buyer
+    - "Marcar Completado" button after meeting/exchange
+    - Sends notification to buyer requesting confirmation
+  - **Buyer Features:**
+    - Receives notification when listing reserved for them
+    - "Confirmar Recepción" button appears when seller marks as completed
+    - Confirmation triggers mutual rating capability
+  - **Mis Anuncios Updates:**
+    - Added "Reservados" and "Completados" tabs
+    - Replaced single "Vendidos" tab with granular state tracking
+    - Users can view all listings: Activos, Reservados, Completados, Eliminados
+  - **Notifications:**
+    - `listing_completed` notification sent to buyer with `needs_confirmation: true`
+    - Updated `complete_listing_transaction` RPC to use `notify_listing_event`
+    - Notification formatter shows actionable "Confirma la transacción" message
+  - **Database Changes:**
+    - Fixed RLS policies on `trade_listings` to allow status updates
+    - Updated SELECT policy: users can view own listings regardless of status
+    - Updated UPDATE policy: added WITH CHECK clause for proper validation
+    - Modified `complete_listing_transaction` to send buyer notifications
+  - **Type Updates:**
+    - Extended Listing status type: `'active' | 'reserved' | 'completed' | 'sold' | 'removed'`
 - **Marketplace Distance Sorting (2025-10-28)**
   - Added optional distance-based sorting for marketplace listings
   - Users can toggle between "Más reciente" (most recent) and "Distancia" (distance) sort modes
@@ -28,11 +69,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Listing Chat Button Logic (2025-10-28)**
+  - Fixed button visibility based on transaction status (not just listing status)
+  - Seller "Marcar Completado" button only shows when transaction status is 'reserved'
+  - Buyer "Confirmar Recepción" button shows when listing is 'reserved' but transaction is 'completed'
+  - Prevents seller from seeing button after marking as completed (waiting for buyer)
+  - System message updated: "[Seller Name] ha reservado '[Listing Title]'" (removed "para ti")
 - **Perfiles (2025-10-28)**
   - Migraci�n `20251028093000_enforce_profile_completion.sql` a�ade validaciones NOT VALID y un �ndice �nico (case-insensitive) para asegurar usuario obligatorio y c�digos postales no vac�os.
 
 ### Fixed
 
+- **Listing Transaction Workflow (2025-10-28)**
+  - Fixed `trade_listings` status CHECK constraint to include 'reserved' and 'completed' statuses
+  - Fixed RLS SELECT policy to allow users to view own listings regardless of status
+  - Fixed RLS UPDATE policy by adding WITH CHECK clause
+  - Fixed `reserve_listing` RPC to not reference non-existent `reserved_by` column
+  - Fixed `notify_listing_status_change` trigger to use `listing_transactions` table for buyer info
+  - Fixed `complete_listing_transaction` to implement proper two-step workflow:
+    - Step 1 (Seller): Updates transaction to 'completed', listing stays 'reserved', notifies buyer
+    - Step 2 (Buyer): Updates listing to 'completed' (finalizes transaction)
 - **Build Warnings (2025-10-27)**
   - Removed unused imports: `ReportButton` from templates/[id]/page.tsx, `Flag` and `ReportButton` from TradeChatPanel
   - Removed unused variables: `counterpartyId` from TradeChatPanel and ProposalDetailModal
@@ -80,12 +136,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Displays listing status (Disponible/Reservado)
     - Clickable title links back to listing detail page
     - Visible to both seller and buyer participants
-  - **Reserve Functionality:**
+  - **Reserve Functionality:** (UPDATED 2025-10-28)
     - Sellers can mark listings as "Reservado" directly from chat
     - Reserve button appears in listing info card for sellers
-    - Updates listing status to 'sold' in database
+    - Now uses `reserve_listing` RPC to create proper transaction records
+    - Updates listing status to 'reserved' (previously 'sold')
+    - Creates entry in `listing_transactions` table
     - Provides visual feedback during reservation process
-    - Button only visible when listing is still active
+    - Button only visible when listing is still active and seller has selected a buyer conversation
   - **System Messages in Chat:**
     - Added support for system-generated messages in chat
     - New `is_system` column in `trade_chats` table

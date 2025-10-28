@@ -107,9 +107,15 @@
 - View listings by user profile
 - Direct chat from listing
 - Template linking (copy_id, slot_id)
+- **NEW (2025-10-28):** Complete transaction workflow with states: `active`, `reserved`, `completed`, `sold`, `removed`
+- **NEW (2025-10-28):** Seller can mark listing as "Reservado" for specific buyer from chat
+- **NEW (2025-10-28):** Seller can mark as "Completado" after exchange
+- **NEW (2025-10-28):** Buyer confirmation required to finalize transaction
+- **NEW (2025-10-28):** "Mis Anuncios" page shows all listing states in separate tabs
 - **NEW:** Terms of Service acceptance required for listing creation
 - **NEW:** Back navigation to marketplace from creation page
 - **FIXED:** Camera flickering issue resolved (desktop and mobile)
+- **FIXED (2025-10-28):** RLS policies now allow listing owners to update status
 
 #### **RPCs:**
 
@@ -118,7 +124,13 @@
 - `list_trade_listings_with_distance` ✅ **NEW (v1.6.0)** - List with optional distance sorting
 - `get_user_listings` - View user's listings
 - `update_listing_status` - Mark sold/removed
+- `reserve_listing` ✅ **USED (v1.6.0)** - Reserve listing for specific buyer, creates transaction record
+- `complete_listing_transaction` ✅ **UPDATED (v1.6.0)** - Mark transaction as completed, sends buyer notification
+- `cancel_listing_transaction` - Cancel reservation and revert to active
+- `get_listing_transaction` ✅ **USED (v1.6.0)** - Get transaction details for a listing
 - `get_listing_chats`, `send_listing_message` - Chat from listing
+- `add_system_message_to_listing_chat` ✅ **USED (v1.6.0)** - Add system messages to chat
+- `get_user_conversations` ✅ **NEW (v1.6.0)** - Get all user's listing conversations
 - `haversine_distance` ✅ **NEW (v1.6.0)** - Calculate distance between coordinates
 
 #### **Chat from Listings**
@@ -127,10 +139,29 @@
 - Separate chat flows for proposals and listings
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
+- **NEW (2025-10-28):** Terms of Service acceptance required for buyers before first message
+- **NEW (2025-10-28):** Listing info card displayed at top of chat with status badge
+- **NEW (2025-10-28):** Seller action buttons in chat: "Marcar Reservado", "Marcar Completado"
+- **NEW (2025-10-28):** Buyer confirmation button: "Confirmar Recepción" for completed transactions
+- **NEW (2025-10-27):** System messages support with `is_system` column
+- **NEW (2025-10-27):** System messages for reservation and completion events
+
+#### **Chats Page** ✅ **NEW (v1.6.0)**
+
+- Centralized `/chats` page accessible from profile dropdown
+- Shows all marketplace conversations (as buyer and seller)
+- Listing preview with image and status badge
+- Counterparty information (nickname, avatar)
+- Last message preview with timestamp
+- Unread message count badges
+- Sorted by most recent activity
+- Direct navigation to conversation with proper context
+- Empty state with call-to-action
 
 #### **Marketplace UI Enhancements:**
 
 **2025-10-28:**
+- ✅ Centralized chats page for all conversations
 - ✅ Distance-based sorting for listings
 - ✅ Toggle between "Más reciente" and "Distancia" sort modes
 - ✅ Distance shown on listing cards when available (~XX km format)
@@ -138,6 +169,8 @@
 - ✅ Link to profile page for postcode configuration
 - ✅ Spanish postcode support with centroid-based distance calculation
 - ✅ Listings without valid postcodes pushed to end when sorting by distance
+- ✅ Transaction-aware button logic in chat (seller/buyer specific actions)
+- ✅ Proper two-step completion workflow (seller initiates, buyer confirms)
 
 **2025-01-27:**
 - Camera capture with proper stream management

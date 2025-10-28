@@ -1878,6 +1878,164 @@ haversine_distance(
 
 ---
 
+## Sprint 13: Listing Transactions & Reservations ✅ **v1.6.0 UPDATED**
+
+### Transaction Workflow RPCs
+
+#### `reserve_listing` ✅ **v1.6.0 USED**
+
+Reserves a listing for a specific buyer. Creates a transaction record and updates listing status to 'reserved'.
+
+**Function Signature:**
+
+```sql
+reserve_listing(
+  p_listing_id BIGINT,
+  p_buyer_id UUID,
+  p_note TEXT DEFAULT NULL
+) RETURNS BIGINT
+```
+
+**Parameters:**
+- `p_listing_id`: The listing to reserve
+- `p_buyer_id`: The buyer to reserve for
+- `p_note`: Optional note about the reservation
+
+**Returns**: Transaction ID
+
+**Security**: SECURITY DEFINER, seller only
+
+**Validations:**
+- Caller must be the listing owner
+- Listing must be active
+- Buyer must exist and not be the seller
+
+**Usage:**
+```typescript
+const { data: transactionId, error } = await supabase.rpc('reserve_listing', {
+  p_listing_id: listingId,
+  p_buyer_id: buyerId,
+  p_note: null
+});
+```
+
+---
+
+#### `complete_listing_transaction` ✅ **v1.6.0 UPDATED**
+
+Marks a transaction as completed. When seller initiates, sends notification to buyer for confirmation.
+
+**Function Signature:**
+
+```sql
+complete_listing_transaction(
+  p_transaction_id BIGINT
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_transaction_id`: The transaction to complete
+
+**Returns**: TRUE on success
+
+**Security**: SECURITY DEFINER, seller or buyer
+
+**Behavior:**
+- Updates transaction status to 'completed'
+- Updates listing status to 'completed'
+- If caller is seller: sends `listing_completed` notification to buyer with `needs_confirmation: true`
+- If caller is buyer: confirms the transaction (no notification sent)
+
+**Usage:**
+```typescript
+// Seller marks as completed
+const { data, error } = await supabase.rpc('complete_listing_transaction', {
+  p_transaction_id: transactionId
+});
+
+// Buyer confirms (same function)
+const { data, error } = await supabase.rpc('complete_listing_transaction', {
+  p_transaction_id: transactionId
+});
+```
+
+---
+
+#### `cancel_listing_transaction`
+
+Cancels a reservation and reverts listing to active status.
+
+**Function Signature:**
+
+```sql
+cancel_listing_transaction(
+  p_transaction_id BIGINT,
+  p_reason TEXT
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_transaction_id`: The transaction to cancel
+- `p_reason`: Reason for cancellation
+
+**Returns**: TRUE on success
+
+**Security**: SECURITY DEFINER, seller only
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('cancel_listing_transaction', {
+  p_transaction_id: transactionId,
+  p_reason: 'Buyer no longer interested'
+});
+```
+
+---
+
+#### `get_listing_transaction` ✅ **v1.6.0 USED**
+
+Retrieves transaction details for a listing.
+
+**Function Signature:**
+
+```sql
+get_listing_transaction(
+  p_listing_id BIGINT
+) RETURNS TABLE (
+  id BIGINT,
+  listing_id BIGINT,
+  seller_id UUID,
+  buyer_id UUID,
+  seller_nickname TEXT,
+  buyer_nickname TEXT,
+  status TEXT,
+  reserved_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  cancelled_at TIMESTAMPTZ
+)
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+
+**Returns**: Most recent transaction for the listing
+
+**Security**: SECURITY DEFINER, seller or buyer only
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('get_listing_transaction', {
+  p_listing_id: listingId
+});
+
+if (data && data.length > 0) {
+  const transaction = data[0];
+  console.log('Transaction status:', transaction.status);
+}
+```
+
+---
+
 ## Sprint 13: Listing Chat System
 
 ### Listing Chat RPCs
@@ -1918,6 +2076,54 @@ const { data, error } = await supabase.rpc('get_listing_chats', {
   p_participant_id: buyerId // Optional - seller only
 });
 ```
+
+---
+
+#### `get_user_conversations()` ✅ **v1.6.0 NEW**
+
+Retrieves all listing conversations for the current authenticated user, showing both conversations where they are the seller and where they are the buyer.
+
+**Function Signature:**
+
+```sql
+get_user_conversations() RETURNS TABLE (
+  listing_id BIGINT,
+  listing_title TEXT,
+  listing_image_url TEXT,
+  listing_status TEXT,
+  counterparty_id UUID,
+  counterparty_nickname TEXT,
+  counterparty_avatar_url TEXT,
+  last_message TEXT,
+  last_message_at TIMESTAMPTZ,
+  unread_count BIGINT,
+  is_seller BOOLEAN
+)
+```
+
+**Returns:**
+- All conversations sorted by most recent activity
+- Includes listing details, counterparty info, last message, and unread count
+- `is_seller` indicates if the user is the listing owner in this conversation
+
+**Security**: SECURITY DEFINER, authenticated only
+
+**Usage:**
+```typescript
+const { data: conversations, error } = await supabase.rpc('get_user_conversations');
+
+// conversations contains all chats
+conversations.forEach(conv => {
+  console.log(`${conv.listing_title} - ${conv.counterparty_nickname}`);
+  console.log(`Unread: ${conv.unread_count}`);
+  console.log(`Role: ${conv.is_seller ? 'Seller' : 'Buyer'}`);
+});
+```
+
+**Use Cases:**
+- Display centralized chats page showing all conversations
+- Track unread messages across all listings
+- Navigate to specific conversation with proper context
 
 ---
 

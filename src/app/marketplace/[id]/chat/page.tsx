@@ -29,6 +29,11 @@ function ListingChatPageContent() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [reserving, setReserving] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [transactionId, setTransactionId] = useState<number | null>(null);
+  const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
+  const [isBuyer, setIsBuyer] = useState(false);
 
   const {
     messages,
@@ -107,6 +112,24 @@ function ListingChatPageContent() {
     }
   }, [isOwner, fetchParticipants]);
 
+  // Fetch transaction if listing is reserved or completed
+  useEffect(() => {
+    async function fetchTransaction() {
+      if (!listing || !user || (listing.status !== 'reserved' && listing.status !== 'completed')) return;
+
+      const { data } = await supabase
+        .rpc('get_listing_transaction', { p_listing_id: listingId });
+
+      if (data && Array.isArray(data) && data.length > 0) {
+        setTransactionId(data[0].id);
+        setTransactionStatus(data[0].status);
+        setIsBuyer(data[0].buyer_id === user.id);
+      }
+    }
+
+    void fetchTransaction();
+  }, [listing, listingId, supabase, user]);
+
   const handleSend = async () => {
     if (!messageText.trim() || sending) return;
 
@@ -125,20 +148,24 @@ function ListingChatPageContent() {
   };
 
   const handleReserve = async () => {
-    if (!listing || !isOwner || !user) return;
+    if (!listing || !isOwner || !user || !selectedParticipant) {
+      toast.error('Debes seleccionar una conversación para reservar');
+      return;
+    }
 
     setReserving(true);
     try {
-      // Update listing status
-      const { error: updateError } = await supabase
-        .from('trade_listings')
-        .update({ status: 'sold' })
-        .eq('id', listingId);
+      // Use reserve_listing RPC to create transaction and update status
+      const { data, error: reserveError } = await supabase.rpc('reserve_listing', {
+        p_listing_id: listingId,
+        p_buyer_id: selectedParticipant,
+        p_note: null
+      });
 
-      if (updateError) throw updateError;
+      if (reserveError) throw reserveError;
 
       // Add system message to chat
-      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha marcado '${listing.title}' como reservado`;
+      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha reservado '${listing.title}'`;
       const { error: messageError } = await supabase
         .rpc('add_system_message_to_listing_chat', {
           p_listing_id: listingId,
@@ -152,7 +179,7 @@ function ListingChatPageContent() {
 
       toast.success('Anuncio marcado como reservado');
       // Update local state
-      setListing({ ...listing, status: 'sold' });
+      setListing({ ...listing, status: 'reserved' });
 
       // Refresh messages to show system message
       setTimeout(() => {
@@ -163,6 +190,84 @@ function ListingChatPageContent() {
       toast.error('Error al reservar el anuncio');
     } finally {
       setReserving(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!listing || !isOwner || !user || !transactionId) return;
+
+    setCompleting(true);
+    try {
+      // Mark transaction as completed (seller initiates)
+      const { error: completeError } = await supabase.rpc('complete_listing_transaction', {
+        p_transaction_id: transactionId
+      });
+
+      if (completeError) throw completeError;
+
+      // Add system message to chat
+      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha marcado el intercambio como completado. Esperando confirmación del comprador.`;
+      const { error: messageError } = await supabase
+        .rpc('add_system_message_to_listing_chat', {
+          p_listing_id: listingId,
+          p_message: systemMessage
+        });
+
+      if (messageError) {
+        console.error('Error adding system message:', messageError);
+      }
+
+      toast.success('Intercambio marcado como completado. Esperando confirmación del comprador.');
+      // Update local state
+      setListing({ ...listing, status: 'completed' });
+
+      // Refresh to show updated state
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error('Error completing transaction:', error);
+      toast.error('Error al completar el intercambio');
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (!listing || !isBuyer || !user || !transactionId) return;
+
+    setConfirming(true);
+    try {
+      // Buyer confirms completion - calls the same RPC
+      const { error: confirmError } = await supabase.rpc('complete_listing_transaction', {
+        p_transaction_id: transactionId
+      });
+
+      if (confirmError) throw confirmError;
+
+      // Add system message to chat
+      const systemMessage = `${user.user_metadata?.nickname || 'El comprador'} ha confirmado la transacción. ¡Intercambio completado! Ahora podéis valoraros mutuamente.`;
+      const { error: messageError } = await supabase
+        .rpc('add_system_message_to_listing_chat', {
+          p_listing_id: listingId,
+          p_message: systemMessage
+        });
+
+      if (messageError) {
+        console.error('Error adding system message:', messageError);
+      }
+
+      toast.success('Transacción confirmada. ¡Ahora podéis valoraros!');
+
+      // Refresh to show rating interface
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error('Error confirming transaction:', error);
+      toast.error('Error al confirmar la transacción');
+    } finally {
+      setConfirming(false);
     }
   };
 
@@ -224,23 +329,55 @@ function ListingChatPageContent() {
                   <div className="flex items-center gap-2 mt-2">
                     <span className={cn(
                       'px-2 py-1 rounded text-xs font-bold uppercase',
-                      listing.status === 'active' ? 'bg-green-900/30 text-green-400' : 'bg-gray-700 text-gray-300'
+                      listing.status === 'active' && 'bg-green-900/30 text-green-400',
+                      listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
+                      listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
+                      listing.status === 'sold' && 'bg-gray-700 text-gray-300'
                     )}>
-                      {listing.status === 'active' ? 'Disponible' : 'Reservado'}
+                      {listing.status === 'active' && 'Disponible'}
+                      {listing.status === 'reserved' && 'Reservado'}
+                      {listing.status === 'completed' && 'Completado'}
+                      {listing.status === 'sold' && 'Vendido'}
                     </span>
                   </div>
                 </div>
-                {isOwner && listing.status === 'active' && (
-                  <Button
-                    onClick={handleReserve}
-                    disabled={reserving}
-                    variant="outline"
-                    className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
-                  >
-                    <Package className="h-4 w-4 mr-2" />
-                    {reserving ? 'Marcando...' : 'Marcar Reservado'}
-                  </Button>
-                )}
+                <div className="flex flex-col gap-2">
+                  {/* Seller actions */}
+                  {isOwner && listing.status === 'active' && !transactionStatus && (
+                    <Button
+                      onClick={handleReserve}
+                      disabled={reserving || !selectedParticipant}
+                      variant="outline"
+                      className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      {reserving ? 'Marcando...' : 'Marcar Reservado'}
+                    </Button>
+                  )}
+                  {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
+                    <Button
+                      onClick={handleComplete}
+                      disabled={completing}
+                      variant="outline"
+                      className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      {completing ? 'Completando...' : 'Marcar Completado'}
+                    </Button>
+                  )}
+
+                  {/* Buyer confirmation - shows when transaction is completed but listing is still reserved */}
+                  {isBuyer && listing.status === 'reserved' && transactionStatus === 'completed' && (
+                    <Button
+                      onClick={handleConfirm}
+                      disabled={confirming}
+                      className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
+                    >
+                      <Package className="h-4 w-4 mr-2" />
+                      {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
+                    </Button>
+                  )}
+                </div>
               </div>
             </ModernCardContent>
           </ModernCard>
