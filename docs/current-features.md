@@ -112,6 +112,13 @@
 - **NEW (2025-10-28):** Seller can mark as "Completado" after exchange
 - **NEW (2025-10-28):** Buyer confirmation required to finalize transaction
 - **NEW (2025-10-28):** "Mis Anuncios" page shows all listing states in separate tabs
+- **NEW (2025-10-28):** User rating system after transaction completion
+  - Buyer rating modal opens automatically after confirming completion
+  - Seller rates via notification button or chat link
+  - Rating link persists in chat until submitted
+  - Ratings become permanent system messages in chat
+  - Mutual rating notifications when both users complete ratings
+  - Chat disabled after transaction completion
 - **NEW:** Terms of Service acceptance required for listing creation
 - **NEW:** Back navigation to marketplace from creation page
 - **FIXED:** Camera flickering issue resolved (desktop and mobile)
@@ -143,6 +150,11 @@
 - **NEW (2025-10-28):** Listing info card displayed at top of chat with status badge
 - **NEW (2025-10-28):** Seller action buttons in chat: "Marcar Reservado", "Marcar Completado"
 - **NEW (2025-10-28):** Buyer confirmation button: "Confirmar Recepción" for completed transactions
+- **NEW (2025-10-28):** Rating UI in completed chats:
+  - Clickable link to rate counterparty appears after completion
+  - After rating: shows system message with rating and comment
+  - Counterparty's rating visible after both users rate
+  - Chat input disabled with "Chat cerrado" message
 - **NEW (2025-10-27):** System messages support with `is_system` column
 - **NEW (2025-10-27):** System messages for reservation and completion events
 

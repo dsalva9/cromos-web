@@ -2368,6 +2368,17 @@ Sprint 15 added database triggers that automatically create notifications:
 - **Recipient:** Rated user
 - **Payload:** rating_value, context_type, context_id, has_comment
 
+#### `trigger_check_mutual_ratings` ✅ **NEW (v1.6.0 - 2025-10-28)**
+
+- **Fires:** AFTER INSERT on `user_ratings`
+- **Function:** `check_mutual_ratings_and_notify()`
+- **Purpose:** Detects when both users have rated each other for a listing transaction
+- **Actions when mutual ratings complete:**
+  - Sends `user_rated` notification to both users with counterparty's rating details
+  - Adds system message to listing chat with both ratings
+  - Payload includes: rating_value, has_comment, comment (if present), listing_title
+- **Context:** Only processes ratings with `context_type = 'listing'`
+
 #### `trigger_notify_template_rating`
 
 - **Fires:** AFTER INSERT on `template_ratings`

@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **User Rating System for Marketplace Transactions (2025-10-28)**
+  - Complete rating workflow after transaction completion
+  - **Buyer Flow:**
+    - Rating modal opens automatically after confirming transaction completion
+    - Modal can be dismissed - rating link persists in chat
+    - After rating: link becomes system message showing rating given
+    - Rating is final and cannot be changed
+  - **Seller Flow:**
+    - "Valorar usuario" button in `listing_completed` notification
+    - Rating link also available in completed chat conversation
+    - After rating: link becomes system message showing rating given
+    - Rating is final and cannot be changed
+  - **Mutual Rating Notification:**
+    - When both users rate each other, both receive `user_rated` notifications
+    - System message added to chat showing both ratings
+    - Each user sees counterparty's rating in the conversation
+  - **Chat Behavior:**
+    - Chat input disabled when transaction status is 'completed'
+    - Message: "Chat cerrado - La transacción ha sido completada"
+    - Users can still view messages and rating UI
+  - **UI Components:**
+    - New `UserRatingDialog` component for rating users
+    - 5-star rating system with optional comment (max 280 chars)
+    - Rating link in chat: "⭐ Haz clic aquí para valorar a [nickname]"
+    - Rating message: "Has valorado a [nickname] con ⭐⭐⭐⭐ (4/5) y has comentado: 'xyz'"
+    - Counterparty rating message when both rated
+  - **Database:**
+    - New migration: `20251028202552_add_mutual_rating_notification.sql`
+    - Trigger `trigger_check_mutual_ratings` on `user_ratings` table
+    - Function `check_mutual_ratings_and_notify()` handles mutual rating completion
+    - Sends notifications and adds system message when both users have rated
+  - **Integration:**
+    - Rating modal accessible from notification dropdown, notifications page, and chat
+    - Uses existing `create_user_rating` RPC with context type 'listing'
+    - One rating per user per transaction (enforced by unique constraint)
 - **Chats Page (2025-10-28)**
   - New centralized `/chats` page to view all marketplace conversations
   - Added "Chats" menu entry in profile dropdown (between "Mis Anuncios" and "Favoritos")

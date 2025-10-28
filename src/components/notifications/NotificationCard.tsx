@@ -28,6 +28,7 @@ import {
 interface NotificationCardProps {
   notification: FormattedNotification;
   onMarkAsRead?: (id: number) => void;
+  onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void;
   compact?: boolean;
 }
 
@@ -45,6 +46,7 @@ const iconMap = {
 export function NotificationCard({
   notification,
   onMarkAsRead,
+  onOpenRatingModal,
   compact = false,
 }: NotificationCardProps) {
   const isUnread = !notification.readAt;
@@ -55,6 +57,24 @@ export function NotificationCard({
       onMarkAsRead(notification.id);
     }
   };
+
+  const handleRateUser = () => {
+    if (onOpenRatingModal && notification.actor && notification.listingId && notification.listingTitle) {
+      onOpenRatingModal(
+        notification.actor.id,
+        notification.actor.nickname,
+        notification.listingId,
+        notification.listingTitle
+      );
+      if (isUnread && onMarkAsRead) {
+        onMarkAsRead(notification.id);
+      }
+    }
+  };
+
+  // Check if this is a listing_completed notification that needs rating
+  const needsRating = notification.kind === 'listing_completed' &&
+    !notification.payload?.needs_confirmation; // Seller sees this (buyer already confirmed)
 
   return (
     <Card
@@ -123,22 +143,40 @@ export function NotificationCard({
             </div>
 
             {/* Actions */}
-            {!compact && notification.href && (
-              <div className="mt-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  asChild
-                >
-                  <Link href={notification.href}>
-                    {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
-                      ? 'Ir al chat'
-                      : notification.kind.includes('rating')
-                      ? 'Ver valoración'
-                      : 'Ver detalles'}
-                  </Link>
-                </Button>
+            {!compact && (
+              <div className="mt-3 flex gap-2">
+                {/* Rating button for completed transactions */}
+                {needsRating && onOpenRatingModal && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="text-xs bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                    onClick={handleRateUser}
+                  >
+                    <Star className="h-3 w-3 mr-1" />
+                    Valorar usuario
+                  </Button>
+                )}
+
+                {/* Default link button */}
+                {notification.href && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    asChild
+                  >
+                    <Link href={notification.href}>
+                      {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
+                        ? 'Ir al chat'
+                        : notification.kind === 'listing_completed' && notification.payload?.needs_confirmation
+                        ? 'Confirmar transacción'
+                        : notification.kind.includes('rating')
+                        ? 'Ver valoración'
+                        : 'Ver detalles'}
+                    </Link>
+                  </Button>
+                )}
               </div>
             )}
           </div>

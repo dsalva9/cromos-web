@@ -13,6 +13,8 @@ import { NotificationCard } from '@/components/notifications/NotificationCard';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { Bell, CheckCheck, Inbox } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 function NotificationsCenterContent() {
   const {
@@ -24,8 +26,16 @@ function NotificationsCenterContent() {
     markAllAsRead,
     markAsRead,
   } = useNotifications();
+  const supabase = useSupabaseClient();
 
   const [activeTab, setActiveTab] = useState<'unread' | 'history'>('unread');
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratingModalData, setRatingModalData] = useState<{
+    userId: string;
+    nickname: string;
+    listingId: number;
+    listingTitle: string;
+  } | null>(null);
 
   // Mark visible notifications as read when switching to "unread" tab
   useEffect(() => {
@@ -52,6 +62,27 @@ function NotificationsCenterContent() {
       await markAsRead(id);
     } catch (err) {
       logger.error('Error marking notification as read:', err);
+    }
+  };
+
+  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
+    setRatingModalData({ userId, nickname, listingId, listingTitle });
+    setShowRatingModal(true);
+  };
+
+  const handleSubmitRating = async (rating: number, comment?: string) => {
+    if (!ratingModalData) return;
+
+    const { error } = await supabase.rpc('create_user_rating', {
+      p_rated_id: ratingModalData.userId,
+      p_rating: rating,
+      p_comment: comment || null,
+      p_context_type: 'listing',
+      p_context_id: ratingModalData.listingId
+    });
+
+    if (error) {
+      throw new Error(error.message);
     }
   };
 
@@ -162,6 +193,7 @@ function NotificationsCenterContent() {
                           key={notification.id}
                           notification={notification}
                           onMarkAsRead={handleMarkAsRead}
+                          onOpenRatingModal={handleOpenRatingModal}
                         />
                       ))}
                     </div>
@@ -207,6 +239,7 @@ function NotificationsCenterContent() {
                         <NotificationCard
                           key={notification.id}
                           notification={notification}
+                          onOpenRatingModal={handleOpenRatingModal}
                         />
                       ))}
                     </div>
@@ -217,6 +250,21 @@ function NotificationsCenterContent() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Rating Modal */}
+      {ratingModalData && (
+        <UserRatingDialog
+          open={showRatingModal}
+          onOpenChange={setShowRatingModal}
+          userToRate={{
+            id: ratingModalData.userId,
+            nickname: ratingModalData.nickname
+          }}
+          listingTitle={ratingModalData.listingTitle}
+          listingId={ratingModalData.listingId}
+          onSubmit={handleSubmitRating}
+        />
+      )}
     </div>
   );
 }

@@ -25,9 +25,11 @@ import { Bell, ExternalLink } from 'lucide-react';
 interface NotificationDropdownProps {
   /** Maximum number of notifications to show in dropdown */
   maxItems?: number;
+  /** Callback to open rating modal from notification */
+  onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void;
 }
 
-export function NotificationDropdown({ maxItems = 5 }: NotificationDropdownProps) {
+export function NotificationDropdown({ maxItems = 5, onOpenRatingModal }: NotificationDropdownProps) {
   const { unreadNotifications, unreadCount, markAsRead, loading } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,6 +38,11 @@ export function NotificationDropdown({ maxItems = 5 }: NotificationDropdownProps
 
   const handleMarkAsRead = (id: number) => {
     markAsRead(id);
+  };
+
+  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
+    setIsOpen(false); // Close dropdown
+    onOpenRatingModal?.(userId, nickname, listingId, listingTitle);
   };
 
   return (
@@ -100,6 +107,7 @@ export function NotificationDropdown({ maxItems = 5 }: NotificationDropdownProps
                 <NotificationCard
                   notification={notification}
                   onMarkAsRead={handleMarkAsRead}
+                  onOpenRatingModal={handleOpenRatingModal}
                   compact
                 />
               </div>

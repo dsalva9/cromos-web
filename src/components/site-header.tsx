@@ -15,6 +15,7 @@ import { NotificationDropdown } from '@/components/notifications/NotificationDro
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
+import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 
 type NavigationLink = {
   href: string;
@@ -29,6 +30,13 @@ export default function SiteHeader() {
   const [isAdmin, setIsAdmin] = useState(false);
   const { isComplete, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratingModalData, setRatingModalData] = useState<{
+    userId: string;
+    nickname: string;
+    listingId: number;
+    listingTitle: string;
+  } | null>(null);
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
@@ -100,6 +108,27 @@ export default function SiteHeader() {
       closeMenu();
     };
 
+  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
+    setRatingModalData({ userId, nickname, listingId, listingTitle });
+    setShowRatingModal(true);
+  };
+
+  const handleSubmitRating = async (rating: number, comment?: string) => {
+    if (!ratingModalData) return;
+
+    const { error } = await supabase.rpc('create_user_rating', {
+      p_rated_id: ratingModalData.userId,
+      p_rating: rating,
+      p_comment: comment || null,
+      p_context_type: 'listing',
+      p_context_id: ratingModalData.listingId
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-gray-900 border-b-2 border-black shadow-xl">
       <div className="container mx-auto px-4">
@@ -137,7 +166,7 @@ export default function SiteHeader() {
             </ul>
             {!loading && user && (
               <div className="ml-4 flex items-center gap-2">
-                <NotificationDropdown />
+                <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
                 <UserAvatarDropdown isAdmin={isAdmin} />
               </div>
             )}
@@ -188,6 +217,21 @@ export default function SiteHeader() {
           </ul>
         </nav>
       </div>
+
+      {/* Rating Modal */}
+      {ratingModalData && (
+        <UserRatingDialog
+          open={showRatingModal}
+          onOpenChange={setShowRatingModal}
+          userToRate={{
+            id: ratingModalData.userId,
+            nickname: ratingModalData.nickname
+          }}
+          listingTitle={ratingModalData.listingTitle}
+          listingId={ratingModalData.listingId}
+          onSubmit={handleSubmitRating}
+        />
+      )}
     </header>
   );
 }

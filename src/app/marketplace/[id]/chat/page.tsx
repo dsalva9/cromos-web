@@ -14,6 +14,7 @@ import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
 import Link from 'next/link';
 import Image from 'next/image';
+import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -34,6 +35,11 @@ function ListingChatPageContent() {
   const [transactionId, setTransactionId] = useState<number | null>(null);
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
   const [isBuyer, setIsBuyer] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [counterpartyToRate, setCounterpartyToRate] = useState<{ id: string; nickname: string } | null>(null);
+  const [myRating, setMyRating] = useState<{ rating: number; comment: string | null } | null>(null);
+  const [counterpartyRating, setCounterpartyRating] = useState<{ rating: number; comment: string | null } | null>(null);
+  const [bothRated, setBothRated] = useState(false);
 
   const {
     messages,
@@ -123,11 +129,77 @@ function ListingChatPageContent() {
       if (data && Array.isArray(data) && data.length > 0) {
         setTransactionId(data[0].id);
         setTransactionStatus(data[0].status);
-        setIsBuyer(data[0].buyer_id === user.id);
+        const isUserBuyer = data[0].buyer_id === user.id;
+        setIsBuyer(isUserBuyer);
+
+        // Set counterparty info for rating
+        if (listing.status === 'completed') {
+          if (isUserBuyer) {
+            // Buyer rates seller
+            setCounterpartyToRate({
+              id: listing.user_id,
+              nickname: listing.author_nickname
+            });
+          } else {
+            // Seller rates buyer - need to get buyer info
+            const { data: buyerProfile } = await supabase
+              .from('profiles')
+              .select('nickname')
+              .eq('id', data[0].buyer_id)
+              .single();
+
+            if (buyerProfile) {
+              setCounterpartyToRate({
+                id: data[0].buyer_id,
+                nickname: buyerProfile.nickname
+              });
+            }
+          }
+        }
       }
     }
 
     void fetchTransaction();
+  }, [listing, listingId, supabase, user]);
+
+  // Fetch ratings when transaction is completed
+  useEffect(() => {
+    async function fetchRatings() {
+      if (!listing || !user || listing.status !== 'completed') return;
+
+      // Fetch my rating (if I've rated the other user)
+      const { data: myRatingData } = await supabase
+        .from('user_ratings')
+        .select('rating, comment')
+        .eq('rater_id', user.id)
+        .eq('context_type', 'listing')
+        .eq('context_id', listingId)
+        .maybeSingle();
+
+      if (myRatingData) {
+        setMyRating(myRatingData);
+      }
+
+      // Fetch counterparty's rating (if they've rated me)
+      const { data: counterpartyRatingData } = await supabase
+        .from('user_ratings')
+        .select('rating, comment')
+        .eq('rated_id', user.id)
+        .eq('context_type', 'listing')
+        .eq('context_id', listingId)
+        .maybeSingle();
+
+      if (counterpartyRatingData) {
+        setCounterpartyRating(counterpartyRatingData);
+      }
+
+      // Check if both have rated
+      if (myRatingData && counterpartyRatingData) {
+        setBothRated(true);
+      }
+    }
+
+    void fetchRatings();
   }, [listing, listingId, supabase, user]);
 
   const handleSend = async () => {
@@ -156,7 +228,7 @@ function ListingChatPageContent() {
     setReserving(true);
     try {
       // Use reserve_listing RPC to create transaction and update status
-      const { data, error: reserveError } = await supabase.rpc('reserve_listing', {
+      const { error: reserveError } = await supabase.rpc('reserve_listing', {
         p_listing_id: listingId,
         p_buyer_id: selectedParticipant,
         p_note: null
@@ -257,18 +329,50 @@ function ListingChatPageContent() {
         console.error('Error adding system message:', messageError);
       }
 
-      toast.success('Transacción confirmada. ¡Ahora podéis valoraros!');
+      toast.success('Transacción confirmada. ¡Ahora puedes valorar al vendedor!');
 
-      // Refresh to show rating interface
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // Set seller info for rating
+      setCounterpartyToRate({
+        id: listing.user_id,
+        nickname: listing.author_nickname
+      });
+
+      // Update local state
+      setListing({ ...listing, status: 'completed' });
+      setTransactionStatus('completed');
+
+      // Show rating modal immediately
+      setShowRatingModal(true);
     } catch (error) {
       console.error('Error confirming transaction:', error);
       toast.error('Error al confirmar la transacción');
     } finally {
       setConfirming(false);
     }
+  };
+
+  const handleSubmitRating = async (rating: number, comment?: string) => {
+    if (!counterpartyToRate || !listing) return;
+
+    const { error } = await supabase.rpc('create_user_rating', {
+      p_rated_id: counterpartyToRate.id,
+      p_rating: rating,
+      p_comment: comment || null,
+      p_context_type: 'listing',
+      p_context_id: listingId
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Update local state with new rating
+    setMyRating({ rating, comment: comment || null });
+
+    // Refresh the page to show updated ratings and check if both have rated
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -498,6 +602,44 @@ function ListingChatPageContent() {
                           </div>
                         );
                       })}
+
+                      {/* Rating UI - shown when transaction is completed */}
+                      {listing?.status === 'completed' && counterpartyToRate && (
+                        <div className="flex justify-center my-4">
+                          {!myRating ? (
+                            // Show rating link if user hasn't rated yet
+                            <button
+                              onClick={() => setShowRatingModal(true)}
+                              className="bg-gray-700/50 text-white rounded-lg px-6 py-3 text-sm border border-[#FFC000] hover:bg-gray-700 transition-colors"
+                            >
+                              ⭐ Haz clic aquí para valorar a {counterpartyToRate.nickname}
+                            </button>
+                          ) : (
+                            // Show system message with user's rating
+                            <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                              <p>
+                                Has valorado a {counterpartyToRate.nickname} con{' '}
+                                {'⭐'.repeat(myRating.rating)} ({myRating.rating}/5)
+                                {myRating.comment && ` y has comentado: "${myRating.comment}"`}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Show counterparty's rating when both have rated */}
+                      {listing?.status === 'completed' && bothRated && counterpartyRating && (
+                        <div className="flex justify-center my-4">
+                          <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                            <p>
+                              {isOwner ? 'El comprador' : 'El vendedor'} te ha valorado con{' '}
+                              {'⭐'.repeat(counterpartyRating.rating)} ({counterpartyRating.rating}/5)
+                              {counterpartyRating.comment && ` y ha comentado: "${counterpartyRating.comment}"`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                       <div ref={messagesEndRef} />
                     </>
                   )}
@@ -505,7 +647,12 @@ function ListingChatPageContent() {
 
                 {/* Composer */}
                 <div className="border-t-2 border-gray-700 p-4">
-                  {isOwner && !selectedParticipant && participants.length > 0 ? (
+                  {/* Disable chat when transaction is completed */}
+                  {listing?.status === 'completed' ? (
+                    <p className="text-gray-400 text-center italic">
+                      Chat cerrado - La transacción ha sido completada
+                    </p>
+                  ) : isOwner && !selectedParticipant && participants.length > 0 ? (
                     <p className="text-gray-400 text-center">
                       Selecciona una conversación para responder
                     </p>
@@ -567,6 +714,18 @@ function ListingChatPageContent() {
             </ModernCard>
           </div>
         </div>
+
+        {/* Rating Modal */}
+        {counterpartyToRate && listing && (
+          <UserRatingDialog
+            open={showRatingModal}
+            onOpenChange={setShowRatingModal}
+            userToRate={counterpartyToRate}
+            listingTitle={listing.title}
+            listingId={listingId}
+            onSubmit={handleSubmitRating}
+          />
+        )}
       </div>
     </div>
   );
