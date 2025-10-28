@@ -6,6 +6,15 @@ import { siteConfig } from '@/config/site';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 
@@ -16,10 +25,27 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const termsErrorMessage =
+    'Debes aceptar los terminos del servicio para crear tu cuenta';
   const { supabase } = useSupabase();
+
+  const handleTermsToggle = (value: boolean | 'indeterminate') => {
+    const nextValue = value === true;
+    setTermsAccepted(nextValue);
+    if (nextValue && error === termsErrorMessage) {
+      setError('');
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!termsAccepted) {
+      setError(termsErrorMessage);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
@@ -187,6 +213,36 @@ export default function SignupPage() {
               />
             </div>
 
+            <div className="rounded-md border-2 border-black bg-gray-900 px-4 py-3">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={handleTermsToggle}
+                  className="mt-1"
+                  aria-describedby="terms-helper"
+                />
+                <div className="text-sm text-gray-300 leading-relaxed">
+                  <label
+                    htmlFor="terms"
+                    className="font-medium text-white cursor-pointer select-none"
+                  >
+                    Acepto los terminos del servicio
+                  </label>
+                  <p id="terms-helper" className="mt-1 text-xs text-gray-400">
+                    <button
+                      type="button"
+                      onClick={() => setTermsDialogOpen(true)}
+                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-sm"
+                    >
+                      Leer terminos completos
+                    </button>{' '}
+                    antes de continuar.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
                 <p className="text-sm text-white font-bold">{error}</p>
@@ -201,6 +257,47 @@ export default function SignupPage() {
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </Button>
           </form>
+
+          <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+            <DialogContent className="bg-gray-900 text-gray-200 border-2 border-black">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black uppercase text-white">
+                  Terminos del servicio
+                </DialogTitle>
+                <DialogDescription className="text-sm text-gray-300">
+                  Este contenido es temporal y sera reemplazado por la version definitiva.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 text-sm leading-relaxed text-gray-200">
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ac mi
+                  sed nulla bibendum efficitur. Donec vitae nisl ac massa tincidunt tempus.
+                  Morbi non lorem vitae est porta maximus in sit amet justo.
+                </p>
+                <p>
+                  Suspendisse potenti. Sed tristique ligula at luctus molestie. Proin
+                  finibus, ipsum vitae facilisis convallis, lectus massa suscipit mauris,
+                  in tristique orci urna et urna. Curabitur nec felis sed nulla viverra
+                  scelerisque quis et justo.
+                </p>
+                <p>
+                  Nulla facilisi. Etiam consequat mi nec vulputate sollicitudin. Etiam
+                  pharetra, leo sed gravida maximus, nisi velit lobortis ante, vel
+                  convallis lectus neque sed erat. Donec ut eros id arcu finibus viverra.
+                </p>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="bg-gray-800 text-white border-2 border-black hover:bg-gray-700"
+                  onClick={() => setTermsDialogOpen(false)}
+                >
+                  Cerrar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <div className="mt-8 text-center">
             <div className="border-t-2 border-gray-700 pt-6">

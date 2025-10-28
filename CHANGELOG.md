@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Signup (2025-10-28)**
+  - Requiere aceptar los terminos del servicio antes de crear una cuenta e incluye modal con texto temporal para consulta.
+
 ### Fixed
 
 - **Build Warnings (2025-10-27)**
