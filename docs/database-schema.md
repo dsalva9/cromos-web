@@ -124,6 +124,12 @@ User profiles with ratings and admin status.
 - `idx_profiles_rating_avg` ON (rating_avg DESC) WHERE rating_count > 0
 - `idx_profiles_rating_count` ON (rating_count DESC)
 
+**Constraints:**
+
+- `profiles_nickname_present` CHECK (trim(coalesce(nickname, '')) <> '' AND lower(trim(nickname)) <> 'sin nombre') NOT VALID
+- `profiles_postcode_present` CHECK (trim(coalesce(postcode, '')) <> '') NOT VALID
+- `idx_profiles_nickname_ci` UNIQUE INDEX ON (lower(trim(nickname))) WHERE trim(coalesce(nickname, '')) <> '' AND lower(trim(nickname)) <> 'sin nombre'
+
 **RLS Policies:**
 
 - Public read access

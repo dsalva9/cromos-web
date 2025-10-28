@@ -5,6 +5,23 @@ import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
+const PROFILE_COMPLETION_ROUTE = '/profile/completar';
+
+function isProfileComplete(nickname: string | null, postcode: string | null) {
+  const safeNickname = nickname?.trim() ?? '';
+  const safePostcode = postcode?.trim() ?? '';
+
+  if (!safeNickname || safeNickname.toLowerCase() === 'sin nombre') {
+    return false;
+  }
+
+  if (!safePostcode) {
+    return false;
+  }
+
+  return true;
+}
+
 export default function AuthCallback() {
   const { supabase } = useSupabase();
   const router = useRouter();
@@ -12,7 +29,8 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
 
       if (sessionError) {
         logger.error('Error during auth callback:', sessionError);
@@ -20,26 +38,39 @@ export default function AuthCallback() {
         return;
       }
 
-      // Check if user is suspended
-      if (sessionData.session?.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('is_suspended')
-          .eq('id', sessionData.session.user.id)
-          .single();
+      const sessionUser = sessionData.session?.user;
 
-        if (profileError) {
-          logger.error('Error checking user suspension status:', profileError);
-        } else if (profile?.is_suspended) {
-          // Sign out suspended user
-          await supabase.auth.signOut();
-          setError('Tu cuenta ha sido suspendida. Por favor, contacta al administrador.');
-          return;
-        }
+      if (!sessionUser) {
+        router.push('/login');
+        return;
       }
 
-      // Redirect to home page after successful auth
-      router.push('/');
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_suspended, nickname, postcode')
+        .eq('id', sessionUser.id)
+        .single();
+
+      if (profileError) {
+        logger.error('Error checking user suspension status:', profileError);
+        router.push(PROFILE_COMPLETION_ROUTE);
+        return;
+      }
+
+      if (profile?.is_suspended) {
+        await supabase.auth.signOut();
+        setError(
+          'Tu cuenta ha sido suspendida. Por favor, contacta al administrador.'
+        );
+        return;
+      }
+
+      const complete = isProfileComplete(
+        profile?.nickname ?? null,
+        profile?.postcode ?? null
+      );
+
+      router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);
     };
 
     handleAuthCallback();

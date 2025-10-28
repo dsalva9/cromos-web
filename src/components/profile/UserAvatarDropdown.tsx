@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -10,6 +10,8 @@ import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { toast } from '@/lib/toast';
 
 interface UserAvatarDropdownProps {
   isAdmin?: boolean;
@@ -21,6 +23,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
   const supabase = useSupabaseClient();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { isComplete, loading: completionLoading } = useProfileCompletion();
 
   const handleSignOut = async () => {
     try {
@@ -31,6 +34,22 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
     }
     setIsOpen(false);
   };
+
+  const handleProtectedClick =
+    (href: string, requiresCompletion = false) =>
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (requiresCompletion && (!isComplete || completionLoading)) {
+        event.preventDefault();
+        toast.info(
+          'Necesitas completar tu perfil para empezar a cambiar cromos!'
+        );
+        setIsOpen(false);
+        router.push('/profile/completar');
+        return;
+      }
+
+      setIsOpen(false);
+    };
 
   if (!user || loading) {
     return null;
@@ -103,7 +122,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
             <div className="py-2">
               <Link
                 href={`/users/${user.id}`}
-                onClick={() => setIsOpen(false)}
+                onClick={handleProtectedClick(`/users/${user.id}`)}
                 className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
               >
                 <User className="h-4 w-4" />
@@ -112,7 +131,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
 
               <Link
                 href="/marketplace/my-listings"
-                onClick={() => setIsOpen(false)}
+                onClick={handleProtectedClick('/marketplace/my-listings', true)}
                 className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
               >
                 <Package className="h-4 w-4" />
@@ -121,7 +140,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
 
               <Link
                 href="/favorites"
-                onClick={() => setIsOpen(false)}
+                onClick={handleProtectedClick('/favorites')}
                 className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
               >
                 <Heart className="h-4 w-4" />
@@ -133,7 +152,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
                   <div className="my-2 border-t border-gray-700" />
                   <Link
                     href="/admin/dashboard"
-                    onClick={() => setIsOpen(false)}
+                    onClick={handleProtectedClick('/admin/dashboard')}
                     className="flex items-center gap-3 px-4 py-2 text-[#FFC000] hover:bg-gray-700 transition-colors font-bold"
                   >
                     <span>Admin Panel</span>

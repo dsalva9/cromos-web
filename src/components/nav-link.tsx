@@ -2,13 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ReactNode, MouseEventHandler } from 'react';
 
 interface NavLinkProps {
   href: string;
   children: ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
 export default function NavLink({ href, children, className, onClick }: NavLinkProps) {

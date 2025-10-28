@@ -6,6 +6,7 @@ import SiteHeader from '@/components/site-header';
 import { Toaster } from 'sonner';
 import 'sonner/dist/styles.css';
 import { SupabaseProvider } from '@/components/providers/SupabaseProvider';
+import { ProfileCompletionProvider } from '@/components/providers/ProfileCompletionProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { siteConfig } from '@/config/site';
 
@@ -43,39 +44,41 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-[#1F2937] text-foreground antialiased overflow-x-hidden`}
       >
         <SupabaseProvider>
-          <ErrorBoundary>
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-[#1F2937]"
-            >
-              Saltar al contenido principal
-            </a>
-            <header role="banner">
-              <SiteHeader />
-            </header>
-            <main id="main-content" role="main" className="min-h-screen pt-16">
-              {children}
-            </main>
-            <footer role="contentinfo" className="border-t">
-              <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-                Ac {new Date().getFullYear()} {siteConfig.name}
-              </div>
-            </footer>
-          </ErrorBoundary>
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            expand={false}
-            duration={3000}
-            toastOptions={{
-              className: 'border-2 border-black',
-              style: {
-                background: '#374151',
-                color: 'white',
-              },
-            }}
-          />
+          <ProfileCompletionProvider>
+            <ErrorBoundary>
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-[#1F2937]"
+              >
+                Saltar al contenido principal
+              </a>
+              <header role="banner">
+                <SiteHeader />
+              </header>
+              <main id="main-content" role="main" className="min-h-screen pt-16">
+                {children}
+              </main>
+              <footer role="contentinfo" className="border-t">
+                <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
+                  Ac {new Date().getFullYear()} {siteConfig.name}
+                </div>
+              </footer>
+            </ErrorBoundary>
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              expand={false}
+              duration={3000}
+              toastOptions={{
+                className: 'border-2 border-black',
+                style: {
+                  background: '#374151',
+                  color: 'white',
+                },
+              }}
+            />
+          </ProfileCompletionProvider>
         </SupabaseProvider>
       </body>
     </html>

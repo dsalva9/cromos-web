@@ -1415,6 +1415,17 @@ Example: `/trades/compose?userId=123e4567-e89b-12d3-a456-426614174000&collection
 
 ---
 
+### Profile Routes
+
+#### `/profile/completar`
+
+- **Purpose**: Página forzada tras el primer login para completar avatar, usuario y código postal.
+- **Access**: Requiere sesión iniciada. Usuarios con perfil completo son redirigidos automáticamente a `/`.
+- **Guards**: Bloquea Marketplace, Mis Colecciones y Plantillas hasta que se completen los datos obligatorios.
+- **Query params**: N/A
+
+---
+
 #### `/mi-coleccion/[id]` (Album Pages - Planned)
 
 URL parameters:

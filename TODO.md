@@ -1,5 +1,11 @@
 # TODO - CambioCromos v1.6.0
 
+## ?? Sprint 16 - Profile Completion Gate
+- [x] Redirigir el primer inicio de sesión a `profile/completar` hasta completar usuario y código postal.
+- [x] Añadir guardas de navegación para Marketplace, Mis Colecciones y Plantillas cuando el perfil esté incompleto.
+- [ ] Validar la migración `20251028093000_enforce_profile_completion.sql` en Supabase y confirmar datos existentes.
+
+
 ## âœ… Completed - Phase 0: Cleanup
 
 - [x] Remove official collections system

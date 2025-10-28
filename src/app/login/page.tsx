@@ -24,7 +24,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -32,7 +32,33 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       } else {
-        router.push('/');
+        const userId = data?.user?.id;
+
+        if (!userId) {
+          router.push('/');
+          return;
+        }
+
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('nickname, postcode')
+          .eq('id', userId)
+          .maybeSingle();
+
+        const nickname = profileData?.nickname?.trim() ?? '';
+        const postcode = profileData?.postcode?.trim() ?? '';
+
+        const isProfileComplete =
+          !!nickname &&
+          nickname.toLowerCase() !== 'sin nombre' &&
+          !!postcode;
+
+        if (profileError) {
+          router.push('/profile/completar');
+          return;
+        }
+
+        router.push(isProfileComplete ? '/' : '/profile/completar');
       }
     } catch {
       setError('An unexpected error occurred');
@@ -152,5 +178,6 @@ export default function LoginPage() {
     </div>
   );
 }
+
 
 

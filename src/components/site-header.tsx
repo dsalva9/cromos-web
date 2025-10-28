@@ -1,31 +1,45 @@
 'use client';
 
 import { siteConfig } from '@/config/site';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, MouseEvent } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import NavLink from '@/components/nav-link';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import {
+  useSupabase,
+  useUser,
+} from '@/components/providers/SupabaseProvider';
 import { cn } from '@/lib/utils';
 import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useRouter } from 'next/navigation';
+import { toast } from '@/lib/toast';
+
+type NavigationLink = {
+  href: string;
+  label: string;
+  requiresCompletion?: boolean;
+};
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
+  const { isComplete, loading: profileLoading } = useProfileCompletion();
+  const router = useRouter();
 
   const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
 
-  const baseLinks = [
-    { href: '/marketplace', label: 'Marketplace' },
-    { href: '/mis-plantillas', label: 'Mis Colecciones' },
-    { href: '/templates', label: 'Plantillas' },
+  const baseLinks: NavigationLink[] = [
+    { href: '/marketplace', label: 'Marketplace', requiresCompletion: true },
+    { href: '/mis-plantillas', label: 'Mis Colecciones', requiresCompletion: true },
+    { href: '/templates', label: 'Plantillas', requiresCompletion: true },
   ];
 
-  const unauthenticatedLinks = [
+  const unauthenticatedLinks: NavigationLink[] = [
     { href: '/login', label: 'Iniciar Sesión' },
     { href: '/signup', label: 'Registrarse' },
   ];
@@ -66,6 +80,26 @@ export default function SiteHeader() {
     };
   }, [user, supabase]);
 
+  const handleProtectedNavigation =
+    (requiresCompletion?: boolean) =>
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (
+        requiresCompletion &&
+        user &&
+        (!isComplete || profileLoading)
+      ) {
+        event.preventDefault();
+        closeMenu();
+        toast.info(
+          'Necesitas completar tu perfil para empezar a cambiar cromos!'
+        );
+        router.push('/profile/completar');
+        return;
+      }
+
+      closeMenu();
+    };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-gray-900 border-b-2 border-black shadow-xl">
       <div className="container mx-auto px-4">
@@ -94,7 +128,7 @@ export default function SiteHeader() {
                       'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
                       'text-white hover:bg-gray-800 border-2 border-transparent'
                     )}
-                    onClick={closeMenu}
+                    onClick={handleProtectedNavigation(link.requiresCompletion)}
                   >
                     {link.label}
                   </NavLink>
@@ -145,7 +179,7 @@ export default function SiteHeader() {
                     'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
                     'text-white hover:bg-gray-700 border-2 border-transparent'
                   )}
-                  onClick={closeMenu}
+                  onClick={handleProtectedNavigation(link.requiresCompletion)}
                 >
                   {link.label}
                 </NavLink>

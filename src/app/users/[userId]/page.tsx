@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -27,12 +27,14 @@ import {
   useSupabaseClient,
 } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
+import { logger } from '@/lib/logger';
 import { User, Star, Heart, Package, MapPin, Pencil } from 'lucide-react';
 import {
   AvatarPicker,
   AvatarSelection,
 } from '@/components/profile/AvatarPicker';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
 const STATUS_LABELS = {
   active: 'Activos',
@@ -54,6 +56,8 @@ export default function UserProfilePage() {
   const params = useParams();
   const { user: currentUser } = useUser();
   const supabase = useSupabaseClient();
+  const { updateProfile: updateCompletionProfile, refresh: refreshCompletion } =
+    useProfileCompletion();
   const userId = params.userId as string;
 
   const { profile, listings, loading, error, refetch, adjustFavoritesCount } =
@@ -192,16 +196,45 @@ export default function UserProfilePage() {
 
     const trimmedNickname = formNickname.trim();
     const trimmedPostcode = formPostcode.trim();
-    const normalizedPostcode =
-      trimmedPostcode.length === 0 ? null : trimmedPostcode;
 
-    if (normalizedPostcode && !postcodeRegex.test(normalizedPostcode)) {
+    if (!trimmedNickname) {
+      toast.error('El usuario es obligatorio');
+      return;
+    }
+
+    if (trimmedNickname.toLowerCase() === 'sin nombre') {
+      toast.error('Elige un usuario distinto a "Sin nombre"');
+      return;
+    }
+
+    if (!trimmedPostcode) {
+      toast.error('El código postal es obligatorio');
+      return;
+    }
+
+    if (!postcodeRegex.test(trimmedPostcode)) {
       toast.error('Introduce un código postal válido');
       return;
     }
 
     try {
       setSavingProfile(true);
+
+      const { data: existingNickname, error: nicknameError } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('nickname', trimmedNickname)
+        .neq('id', currentUser.id)
+        .maybeSingle();
+
+      if (nicknameError) {
+        throw nicknameError;
+      }
+
+      if (existingNickname) {
+        toast.error('Ese usuario ya está en uso. Prueba con otro.');
+        return;
+      }
 
       let finalAvatarPath = formAvatarPath;
 
@@ -227,19 +260,32 @@ export default function UserProfilePage() {
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
-          nickname: trimmedNickname || null,
-          postcode: normalizedPostcode,
+          nickname: trimmedNickname,
+          postcode: trimmedPostcode,
           avatar_url: finalAvatarPath,
         })
         .eq('id', currentUser.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        if ('code' in updateError && updateError.code === '23505') {
+          toast.error('Ese usuario ya está en uso. Prueba con otro.');
+          return;
+        }
+        throw updateError;
+      }
 
       toast.success('Perfil actualizado');
       setEditDialogOpen(false);
+      if (isOwnProfile) {
+        updateCompletionProfile({
+          nickname: trimmedNickname,
+          postcode: trimmedPostcode,
+        });
+        void refreshCompletion();
+      }
       await refetch();
     } catch (updateErr) {
-      console.error('Profile update failed', updateErr);
+      logger.error('Profile update failed', updateErr);
       toast.error('No se pudo actualizar el perfil');
     } finally {
       setSavingProfile(false);
@@ -317,8 +363,8 @@ export default function UserProfilePage() {
                         <span>
                           {locationDisplay ??
                             (isOwnProfile
-                              ? 'Añade tu código postal para mostrar tu ubicación aproximada'
-                              : 'Ubicación no disponible')}
+                              ? 'A├▒ade tu c├│digo postal para mostrar tu ubicaci├│n aproximada'
+                              : 'Ubicaci├│n no disponible')}
                         </span>
                       </div>
 
@@ -333,7 +379,7 @@ export default function UserProfilePage() {
                         <span className="text-gray-400">
                           ({profile.rating_count}{' '}
                           {profile.rating_count === 1
-                            ? 'valoración'
+                            ? 'valoraci├│n'
                             : 'valoraciones'}
                           )
                         </span>
@@ -389,7 +435,7 @@ export default function UserProfilePage() {
                             <DialogHeader>
                               <DialogTitle>Editar perfil</DialogTitle>
                               <DialogDescription>
-                                Actualiza tu avatar, nombre y ubicación
+                                Actualiza tu avatar, usuario y ubicaci├│n
                                 aproximada.
                               </DialogDescription>
                             </DialogHeader>
@@ -405,7 +451,7 @@ export default function UserProfilePage() {
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="nickname">Nombre</Label>
+                                <Label htmlFor="nickname">Usuario</Label>
                                 <Input
                                   id="nickname"
                                   value={formNickname}
@@ -413,12 +459,13 @@ export default function UserProfilePage() {
                                     setFormNickname(event.target.value)
                                   }
                                   maxLength={50}
-                                  placeholder="Tu nombre de usuario"
+                                  placeholder="Tu usuario"
+                                  required
                                 />
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="postcode">Código postal</Label>
+                                <Label htmlFor="postcode">C├│digo postal</Label>
                                 <Input
                                   id="postcode"
                                   value={formPostcode}
@@ -427,11 +474,12 @@ export default function UserProfilePage() {
                                   }
                                   maxLength={5}
                                   placeholder="28001"
+                                  required
                                   inputMode="numeric"
                                 />
                                 <p className="text-xs text-gray-400">
-                                  Mostramos tu ubicación aproximada en base al
-                                  código postal.
+                                  Mostramos tu ubicaci├│n aproximada en base al
+                                  c├│digo postal.
                                 </p>
                               </div>
                             </div>
