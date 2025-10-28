@@ -50,3 +50,11 @@ node_modules/
 
 # fixtures (test data, uploaded images)
 /fixtures/
+
+# Supabase temp files
+supabase/.temp/
+
+# Helper SQL scripts (one-time manual fixes, not migrations)
+apply_*.sql
+fix_*.sql
+create_*_rpc.sql
