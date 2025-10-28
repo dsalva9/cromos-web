@@ -286,6 +286,18 @@ export default function UserProfilePage() {
       await refetch();
     } catch (updateErr) {
       logger.error('Profile update failed', updateErr);
+
+      // Handle specific postcode validation errors
+      if (updateErr && typeof updateErr === 'object' && 'message' in updateErr) {
+        const errorMessage = String(updateErr.message);
+
+        // Check if it's a postcode validation error from the database
+        if (errorMessage.includes('codigo postal') || errorMessage.includes('postcode')) {
+          toast.error(errorMessage);
+          return;
+        }
+      }
+
       toast.error('No se pudo actualizar el perfil');
     } finally {
       setSavingProfile(false);
@@ -435,7 +447,7 @@ export default function UserProfilePage() {
                             <DialogHeader>
                               <DialogTitle>Editar perfil</DialogTitle>
                               <DialogDescription>
-                                Actualiza tu avatar, usuario y ubicaci├│n
+                                Actualiza tu avatar, usuario y ubicación
                                 aproximada.
                               </DialogDescription>
                             </DialogHeader>
@@ -465,7 +477,7 @@ export default function UserProfilePage() {
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="postcode">C├│digo postal</Label>
+                                <Label htmlFor="postcode">Código postal</Label>
                                 <Input
                                   id="postcode"
                                   value={formPostcode}
@@ -478,8 +490,8 @@ export default function UserProfilePage() {
                                   inputMode="numeric"
                                 />
                                 <p className="text-xs text-gray-400">
-                                  Mostramos tu ubicaci├│n aproximada en base al
-                                  c├│digo postal.
+                                  Mostramos tu ubicación aproximada en base al
+                                  código postal.
                                 </p>
                               </div>
                             </div>
