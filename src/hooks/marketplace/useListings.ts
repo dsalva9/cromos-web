@@ -8,6 +8,7 @@ interface RpcListingResponse {
   user_id: string;
   author_nickname: string;
   author_avatar_url: string | null;
+  author_postcode?: string | null;
   title: string;
   description: string | null;
   sticker_number: string | null;
@@ -18,11 +19,14 @@ interface RpcListingResponse {
   created_at: string;
   copy_id: number | null;
   slot_id: number | null;
+  distance_km?: number | null;
 }
 
 interface UseListingsParams {
   search?: string;
   limit?: number;
+  sortByDistance?: boolean;
+  viewerPostcode?: string | null;
 }
 
 /**
@@ -58,6 +62,8 @@ interface UseListingsParams {
 export function useListings({
   search = '',
   limit = 20,
+  sortByDistance = false,
+  viewerPostcode = null,
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -73,14 +79,24 @@ export function useListings({
         setLoading(true);
         const currentOffset = isLoadMore ? fetchOffset : 0;
 
-        const { data, error: rpcError } = await supabase.rpc(
-          'list_trade_listings',
-          {
-            p_limit: limit,
-            p_offset: currentOffset,
-            p_search: search || null,
-          }
-        );
+        // Use distance-aware RPC if sorting by distance
+        const rpcName = sortByDistance
+          ? 'list_trade_listings_with_distance'
+          : 'list_trade_listings';
+
+        const rpcParams: Record<string, unknown> = {
+          p_limit: limit,
+          p_offset: currentOffset,
+          p_search: search || null,
+        };
+
+        // Add distance params if needed
+        if (sortByDistance) {
+          rpcParams.p_viewer_postcode = viewerPostcode;
+          rpcParams.p_sort_by_distance = true;
+        }
+
+        const { data, error: rpcError } = await supabase.rpc(rpcName, rpcParams);
 
         if (rpcError) throw rpcError;
 
@@ -91,6 +107,7 @@ export function useListings({
             user_id: item.user_id,
             author_nickname: item.author_nickname,
             author_avatar_url: item.author_avatar_url,
+            author_postcode: item.author_postcode,
             title: item.title,
             description: item.description,
             sticker_number: item.sticker_number,
@@ -101,6 +118,7 @@ export function useListings({
             created_at: item.created_at,
             copy_id: item.copy_id?.toString(),
             slot_id: item.slot_id?.toString(),
+            distance_km: item.distance_km,
           })
         );
 
@@ -122,11 +140,11 @@ export function useListings({
         setLoading(false);
       }
     },
-    [supabase, search, limit]
+    [supabase, search, limit, sortByDistance, viewerPostcode]
   );
 
   useEffect(() => {
-    // Debounce initial fetch on search change
+    // Debounce initial fetch on search change or sort change
     setOffset(0);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -135,7 +153,7 @@ export function useListings({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search, limit, fetchListings]);
+  }, [search, limit, sortByDistance, viewerPostcode, fetchListings]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

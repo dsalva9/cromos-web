@@ -1774,6 +1774,110 @@ await markSold(listingId); // Auto-decrements if linked to template
 
 ---
 
+## Marketplace Listing RPCs (v1.6.0)
+
+### `list_trade_listings`
+
+Lists active marketplace listings with pagination and search.
+
+**Function Signature:**
+
+```sql
+list_trade_listings(
+  p_limit INTEGER DEFAULT 20,
+  p_offset INTEGER DEFAULT 0,
+  p_search TEXT DEFAULT NULL
+) RETURNS TABLE (
+  id BIGINT,
+  user_id UUID,
+  author_nickname TEXT,
+  author_avatar_url TEXT,
+  title TEXT,
+  description TEXT,
+  sticker_number TEXT,
+  collection_name TEXT,
+  image_url TEXT,
+  status TEXT,
+  views_count INTEGER,
+  created_at TIMESTAMPTZ
+)
+```
+
+**Security**: SECURITY DEFINER, accessible to anon and authenticated
+
+---
+
+### `list_trade_listings_with_distance` ✅ **v1.6.0 NEW**
+
+Lists active marketplace listings with optional distance-based sorting. Uses Spanish postal code centroids and Haversine formula to calculate distances.
+
+**Function Signature:**
+
+```sql
+list_trade_listings_with_distance(
+  p_limit INTEGER DEFAULT 20,
+  p_offset INTEGER DEFAULT 0,
+  p_search TEXT DEFAULT NULL,
+  p_viewer_postcode TEXT DEFAULT NULL,
+  p_sort_by_distance BOOLEAN DEFAULT FALSE
+) RETURNS TABLE (
+  id BIGINT,
+  user_id UUID,
+  author_nickname TEXT,
+  author_avatar_url TEXT,
+  author_postcode TEXT,
+  title TEXT,
+  description TEXT,
+  sticker_number TEXT,
+  collection_name TEXT,
+  image_url TEXT,
+  status TEXT,
+  views_count INTEGER,
+  created_at TIMESTAMPTZ,
+  distance_km NUMERIC
+)
+```
+
+**Parameters:**
+- `p_viewer_postcode` - Viewer's postcode for distance calculation (optional)
+- `p_sort_by_distance` - When TRUE, sorts by distance ascending, pushing NULL distances to end
+
+**Returns:**
+- `distance_km` - Approximate distance in kilometers (NULL if postcodes missing or invalid)
+- Listings without valid postcodes are pushed to end when sorting by distance
+
+**Security**: SECURITY DEFINER, accessible to anon and authenticated
+
+**Notes:**
+- Requires `postal_codes` table and `haversine_distance` function
+- Distance calculated using postcode centroids, not exact addresses
+- Only supports Spanish postcodes (ES) in v1.6.0
+
+---
+
+### Helper Functions
+
+#### `haversine_distance` ✅ **v1.6.0 NEW**
+
+Calculates distance between two geographic coordinates using the Haversine formula.
+
+**Function Signature:**
+
+```sql
+haversine_distance(
+  lat1 DOUBLE PRECISION,
+  lon1 DOUBLE PRECISION,
+  lat2 DOUBLE PRECISION,
+  lon2 DOUBLE PRECISION
+) RETURNS DOUBLE PRECISION
+```
+
+**Returns**: Distance in kilometers
+
+**Security**: IMMUTABLE PARALLEL SAFE
+
+---
+
 ## Sprint 13: Listing Chat System
 
 ### Listing Chat RPCs

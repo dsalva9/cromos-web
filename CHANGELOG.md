@@ -9,19 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Marketplace Distance Sorting (2025-10-28)**
+  - Added optional distance-based sorting for marketplace listings
+  - Users can toggle between "MÃ¡s reciente" (most recent) and "Distancia" (distance) sort modes
+  - Distance sorting requires user to have a postcode configured in their profile
+  - Distance calculations use Spanish postcode centroids and Haversine formula
+  - Listings show approximate distance (in km) when sorting by distance
+  - New RPC: `list_trade_listings_with_distance` for distance-aware listing retrieval
+  - Database migrations: postal_codes table, haversine_distance function
 - **Signup (2025-10-28)**
   - Requiere aceptar los terminos del servicio antes de crear una cuenta e incluye modal con texto temporal para consulta.
 - **Perfil obligatorio (2025-10-28)**
-  - Añadida página `profile/completar` para que nuevos usuarios completen avatar, usuario y código postal antes de navegar por la aplicación.
-  - Cabecera, menús y layouts bloquean Marketplace, Mis Colecciones y Plantillas hasta finalizar el perfil mostrando aviso contextual.
-  - Login y callback redirigen automáticamente al flujo de perfil cuando faltan datos obligatorios.
+  - Aï¿½adida pï¿½gina `profile/completar` para que nuevos usuarios completen avatar, usuario y cï¿½digo postal antes de navegar por la aplicaciï¿½n.
+  - Cabecera, menï¿½s y layouts bloquean Marketplace, Mis Colecciones y Plantillas hasta finalizar el perfil mostrando aviso contextual.
+  - Login y callback redirigen automï¿½ticamente al flujo de perfil cuando faltan datos obligatorios.
 
 
 
 ### Changed
 
 - **Perfiles (2025-10-28)**
-  - Migración `20251028093000_enforce_profile_completion.sql` añade validaciones NOT VALID y un índice único (case-insensitive) para asegurar usuario obligatorio y códigos postales no vacíos.
+  - Migraciï¿½n `20251028093000_enforce_profile_completion.sql` aï¿½ade validaciones NOT VALID y un ï¿½ndice ï¿½nico (case-insensitive) para asegurar usuario obligatorio y cï¿½digos postales no vacï¿½os.
 
 ### Fixed
 
@@ -43,9 +51,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Mis Colecciones Page:**
     - Fixed React hydration error caused by nested `<a>` tags (Link within Link)
     - Removed redundant inner Link from "Ver Progreso" button
-    - Updated button text: "Explorar Colecciones" GåÆ "Explorar Plantillas de Colecciones"
-    - Updated button text: "Crear Colecci+¦n" GåÆ "Crear Plantilla"
-  - **Colecci+¦n Detail Page:**
+    - Updated button text: "Explorar Colecciones" Gï¿½ï¿½ "Explorar Plantillas de Colecciones"
+    - Updated button text: "Crear Colecci+ï¿½n" Gï¿½ï¿½ "Crear Plantilla"
+  - **Colecci+ï¿½n Detail Page:**
     - Removed "Ver Mis Anuncios" and "Crear Anuncio Manual" buttons
     - Buttons were redundant as they're already accessible elsewhere
     - Cleaner UI focused on collection progress tracking
@@ -91,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Templates System Enhancements (2025-01-27)**
   - **My Templates Page:**
     - New `/templates/my-templates` page showing user's created templates (public and private)
-    - Visual badges indicating template visibility status (P+¦blica/Privada)
+    - Visual badges indicating template visibility status (P+ï¿½blica/Privada)
     - Green badge with Eye icon for public templates
     - Gray badge with EyeOff icon for private templates
     - Link from main templates page to access personal templates
@@ -100,8 +108,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added ability to add new slots/cromos to existing pages
     - New page creation form with title, type, and multiple slots
     - Inline slot addition within each page
-    - Enhanced UI with "A+¦adir Nueva P+ígina" button
-    - "A+¦adir Cromo" button for each page with inline editing
+    - Enhanced UI with "A+ï¿½adir Nueva P+ï¿½gina" button
+    - "A+ï¿½adir Cromo" button for each page with inline editing
   - **Terms of Service Integration:**
     - ToS acceptance checkbox for marketplace listing creation
     - ToS acceptance checkbox when making templates public (creation and editing)
@@ -200,7 +208,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Chat page at `/marketplace/[id]/chat`
   - **Transaction Workflow (Database):**
     - Listing reservation system
-    - Transaction states: reserved GåÆ completed/cancelled
+    - Transaction states: reserved Gï¿½ï¿½ completed/cancelled
     - Seller can reserve listing for specific buyer
     - Both parties can mark transaction complete
     - Seller can cancel with reason
@@ -499,22 +507,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added explanatory comments documenting the change
 - **Re-enabled Playwright test suite**: Changed test script from disabled placeholder to functional `playwright test` command
 
-## [1.6.1] GÇô 2025-10-22 - Template Creation and Collection Management Fixes
+## [1.6.1] Gï¿½ï¿½ 2025-10-22 - Template Creation and Collection Management Fixes
 
-### G£¿ Added
+### Gï¿½ï¿½ Added
 
 - Switch UI component for toggle functionality
 - Sticker count display in templates and collections
 - Clickable collection cards in "Mis Colecciones" page
 
-### =ƒöä Changed
+### =ï¿½ï¿½ï¿½ Changed
 
 - Updated "Mis Plantillas" to "Mis Colecciones" throughout the application
 - Updated status labels: "Tenidas" to "Lo Tengo", "Duplicadas" to "Repes"/"Repe", "Faltantes" to "Faltan"
 - Improved sticker status logic: Falta (0), Lo Tengo (1), Repe (2+)
 - Added +/- buttons for "Lo Tengo" and "Repe" status
 
-### =ƒÉ¢ Fixed
+### =ï¿½É¢ Fixed
 
 - Fixed scalar array error in add_template_page RPC
 - Fixed progress calculation for collections
@@ -522,9 +530,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed empty slot validation in template creation
 - Fixed counts showing as 0/0 in "Mis Colecciones" page
 
-## [1.6.0] GÇô 2025-10-22 - Integration UI (Frontend)
+## [1.6.0] Gï¿½ï¿½ 2025-10-22 - Integration UI (Frontend)
 
-### G£¿ Added - Integration UI (Frontend) **Sprint 9 Complete**
+### Gï¿½ï¿½ Added - Integration UI (Frontend) **Sprint 9 Complete**
 
 **Pages:**
 - `/mis-plantillas/[copyId]/publicar/[slotId]` - Publish duplicate modal
@@ -553,9 +561,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quick action buttons in collection view
 - Ownership validation on edit
 
-## [1.6.0] GÇô 2025-10-22 - Templates Creation UI (Frontend)
+## [1.6.0] Gï¿½ï¿½ 2025-10-22 - Templates Creation UI (Frontend)
 
-### G£¿ Added - Templates Creation UI (Frontend) **Sprint 8.5 Complete**
+### Gï¿½ï¿½ Added - Templates Creation UI (Frontend) **Sprint 8.5 Complete**
 
 **Pages:**
 
@@ -597,9 +605,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript errors in template forms with proper type definitions
 - ESLint warnings for unused imports and variables
 
-## [1.6.0] GÇô 2025-10-21 - Templates UI (Frontend)
+## [1.6.0] Gï¿½ï¿½ 2025-10-21 - Templates UI (Frontend)
 
-### G£¿ Added - Templates UI (Frontend) **Sprint 8 Complete**
+### Gï¿½ï¿½ Added - Templates UI (Frontend) **Sprint 8 Complete**
 
 **Pages:**
 
@@ -648,9 +656,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ESLint warnings for unused imports and variables
 - Mobile responsiveness issues with grid layouts
 
-## [1.6.0] GÇô 2025-10-21 - Marketplace UI (Frontend)
+## [1.6.0] Gï¿½ï¿½ 2025-10-21 - Marketplace UI (Frontend)
 
-### G£¿ Added - Marketplace UI (Frontend) **Sprint 7 Complete**
+### Gï¿½ï¿½ Added - Marketplace UI (Frontend) **Sprint 7 Complete**
 
 **Pages:**
 
@@ -694,9 +702,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image upload handling with proper error states
 - Form validation with character counters
 
-## [1.6.0-alpha] GÇô 2025-10-20 - PIVOT: Marketplace + Templates
+## [1.6.0-alpha] Gï¿½ï¿½ 2025-10-20 - PIVOT: Marketplace + Templates
 
-### =ƒöä Breaking Changes
+### =ï¿½ï¿½ï¿½ Breaking Changes
 
 **Official Collections System REMOVED**
 
@@ -711,7 +719,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - From official albums to community templates
 - Legal model: neutral hosting (LSSI/DSA)
 
-### G£¿ Added - Marketplace System (Sprint 1)
+### Gï¿½ï¿½ Added - Marketplace System (Sprint 1)
 
 **Trade Listings**
 
@@ -735,7 +743,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RPCs: `get_listing_chats`, `send_listing_message`
 - Separate chat flows for proposals and listings
 
-### G£¿ Added - Collection Templates System (Sprint 2)
+### Gï¿½ï¿½ Added - Collection Templates System (Sprint 2)
 
 **Community Templates**
 
@@ -759,7 +767,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `list_public_templates`, `copy_template`, `get_my_template_copies`
 - `get_template_progress`, `update_template_progress`
 
-### G£¿ Added - Marketplace-Template Integration (Sprint 3)
+### Gï¿½ï¿½ Added - Marketplace-Template Integration (Sprint 3)
 
 **Bidirectional Bridge**
 
@@ -778,13 +786,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ```
 user_template_progress (count > 0)
-    Gåô [publish_duplicate_to_marketplace]
+    Gï¿½ï¿½ [publish_duplicate_to_marketplace]
 trade_listings (copy_id, slot_id)
-    Gåô [mark_listing_sold_and_decrement]
+    Gï¿½ï¿½ [mark_listing_sold_and_decrement]
 user_template_progress (count + 1)
 ```
 
-### G£¿ Added - Social and Reputation System (Sprint 4)
+### Gï¿½ï¿½ Added - Social and Reputation System (Sprint 4)
 
 **Favourites System**
 
@@ -821,7 +829,7 @@ user_template_progress (count + 1)
 - `create_template_rating`, `update_template_rating`, `delete_template_rating`, `get_template_ratings`, `get_template_rating_summary`
 - `create_report`, `get_reports`, `update_report_status`, `get_user_reports`, `check_entity_reported`
 
-### G£¿ Added - Admin Moderation System (Sprint 5)
+### Gï¿½ï¿½ Added - Admin Moderation System (Sprint 5)
 
 **Audit Log Extensions**
 
@@ -879,18 +887,18 @@ user_template_progress (count + 1)
 
 ---
 
-## [1.5.0] GÇô 2025-10-12
+## [1.5.0] Gï¿½ï¿½ 2025-10-12
 
-### Critical Fixes G£à **COMPLETE**
+### Critical Fixes Gï¿½ï¿½ **COMPLETE**
 
 - **Removed duplicate Supabase client instance**: Deleted `src/lib/supabase/client.ts` (unused duplicate), using only SupabaseProvider globally
 - **Added batch RPC `get_multiple_user_collection_stats`**: Replaces N+1 queries with single batch call, 5-10x faster for users with multiple collections
-- **Implemented ErrorBoundary component**: React Error Boundary with Spanish fallback UI ("Algo sali+¦ mal") and "Volver al inicio" button, integrated in root layout
+- **Implemented ErrorBoundary component**: React Error Boundary with Spanish fallback UI ("Algo sali+ï¿½ mal") and "Volver al inicio" button, integrated in root layout
 - **Added logger utility**: Created `src/lib/logger.ts` with environment-aware logging (debug/info dev-only, warn/error always)
 - **Updated ESLint configuration**: Stricter rules enforced
 - **Performance optimizations ready**: Profile load verified <1s (batch RPC eliminates N+1 queries)
 
-### Added - Admin Backoffice (MVP) G£à **COMPLETE**
+### Added - Admin Backoffice (MVP) Gï¿½ï¿½ **COMPLETE**
 
 #### **Admin Panel UI** (`/admin`)
 
@@ -902,7 +910,7 @@ user_template_progress (count + 1)
 - **TeamsTab**: Manage collection teams with flag URLs
 - **AuditTab**: View admin action history
 
-#### **Admin Database RPCs** G£à **NEW**
+#### **Admin Database RPCs** Gï¿½ï¿½ **NEW**
 
 - **User Management**: `admin_list_users`, `admin_update_user_role`, `admin_suspend_user`, `admin_delete_user`
 - **Content Management**: `admin_upsert_collection`, `admin_delete_collection`, `admin_upsert_page`, `admin_delete_page`, `admin_upsert_sticker`, `admin_delete_sticker`
@@ -913,30 +921,30 @@ user_template_progress (count + 1)
 - **AdminGuard component**: Protects `/admin` route
 - **Suspended user checks**: Auth callback checks suspension status
 
-### Added - Badges UI (Read-only) =ƒÜº In Progress
+### Added - Badges UI (Read-only) =ï¿½Üº In Progress
 
 - **useUserBadges hook**: Read-only hook for fetching user badges
 - **BadgeCard component**: Grid display in `/profile` with empty state
 - **Retro-Comic styling**: Matches existing dark theme with gold accents
 
-### Added - Quick Entry ("Abrir un sobre") =ƒÜº In Progress
+### Added - Quick Entry ("Abrir un sobre") =ï¿½Üº In Progress
 
 - **Pack opener route**: `/mi-coleccion/[id]/pack` (authenticated)
-- **Multi-number input**: 5 inputs with paste support (CSV/space/semicolon GåÆ auto-split; dedupe; auto-advance)
-- **Bulk add RPC**: Calls `bulk_add_stickers_by_numbers` and shows summary (a+¦adidos, repes, inv+ílidos)
+- **Multi-number input**: 5 inputs with paste support (CSV/space/semicolon Gï¿½ï¿½ auto-split; dedupe; auto-advance)
+- **Bulk add RPC**: Calls `bulk_add_stickers_by_numbers` and shows summary (a+ï¿½adidos, repes, inv+ï¿½lidos)
 - **Optimistic updates**: Progress updates + clear/"Abrir otro sobre" flow
 
-### Added - Location-Based Matching (Centroid + Haversine) =ƒÜº In Progress G£à **NEW**
+### Added - Location-Based Matching (Centroid + Haversine) =ï¿½Üº In Progress Gï¿½ï¿½ **NEW**
 
 - **Postcode field**: Optional `profiles.postcode` for location-based matching
 - **Postal codes table**: Centroid data (lat/lon) for Spanish postcodes
 - **Haversine distance**: Calculate distance between users' postcodes
 - **Mixed scoring**: Weighted score (0.6 overlap + 0.4 distance_decay)
-- **Radius filter**: 10GÇô100 km radius for finding nearby traders
+- **Radius filter**: 10Gï¿½ï¿½100 km radius for finding nearby traders
 - **Sort modes**: "distance" | "overlap" | "mixed"
 - **Privacy preserved**: Show distance (~12 km) but not exact addresses
 
-### Added - Profile Avatars (Seed Phase) =ƒÜº In Progress
+### Added - Profile Avatars (Seed Phase) =ï¿½Üº In Progress
 
 - **Seed avatar pack**: 12 avatar images under `avatars/seed/...`
 - **AvatarPicker component**: In `/profile` to select a seed avatar (writes `profiles.avatar_url`)
@@ -1010,8 +1018,8 @@ user_template_progress (count + 1)
 #### **Backend Infrastructure**
 
 - New table: `trade_reads` (user_id, trade_id, last_read_at)
-- RPC: `mark_trade_read(p_trade_id)` GåÆ upserts last_read_at
-- RPC: `get_unread_counts(p_box, p_trade_ids)` GåÆ returns per-trade unread_count
+- RPC: `mark_trade_read(p_trade_id)` Gï¿½ï¿½ upserts last_read_at
+- RPC: `get_unread_counts(p_box, p_trade_ids)` Gï¿½ï¿½ returns per-trade unread_count
 
 ---
 
@@ -1097,42 +1105,42 @@ user_template_progress (count + 1)
 
 ---
 
-## =ƒÄë Major Milestones
+## =ï¿½ï¿½ï¿½ Major Milestones
 
-### Phase 0 Complete (v1.6.0-alpha) G£à **100%**
+### Phase 0 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Complete System Cleanup**: Removed old collections system
 - **Clean Foundation**: Ready for marketplace + templates implementation
 - **Documentation Updated**: Reflects new direction and current state
 
-### Sprint 1 Complete (v1.6.0-alpha) G£à **100%**
+### Sprint 1 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Marketplace Backend**: Complete listings system with RPCs
 - **Chat from Listings**: Extended trade_chats for marketplace
 - **Documentation Updated**: All docs reflect marketplace system
 
-### Sprint 2 Complete (v1.6.0-alpha) G£à **100%**
+### Sprint 2 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Templates Backend**: Complete template system with RPCs
 - **5 Template Tables**: Full template structure with pages and slots
 - **8 Template RPCs**: Management, discovery, and progress tracking
 - **Documentation Updated**: All docs reflect templates system
 
-### Sprint 3 Complete (v1.6.0-alpha) G£à **100%**
+### Sprint 3 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Integration Backend**: Complete marketplace-template bridge
-- **Bidirectional Sync**: Template Gåö marketplace with count management
+- **Bidirectional Sync**: Template Gï¿½ï¿½ marketplace with count management
 - **3 Integration RPCs**: Publish, sell, and sync tracking
 - **Documentation Updated**: All docs reflect integration system
 
-### Sprint 4 Complete (v1.6.0-alpha) G£à **100%**
+### Sprint 4 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Social Backend**: Complete social and reputation system
 - **4 Social Tables**: Favourites, user_ratings, template_ratings, reports
 - **17 Social RPCs**: Favourites, ratings, reports management
 - **Documentation Updated**: All docs reflect social system
 
-### Sprint 5 Complete (v1.6.0-alpha) G£à **100%**
+### Sprint 5 Complete (v1.6.0-alpha) Gï¿½ï¿½ **100%**
 
 - **Admin Moderation Backend**: Complete admin moderation system
 - **Audit Log Extensions**: Enhanced audit log with moderation-specific fields
@@ -1141,7 +1149,7 @@ user_template_progress (count + 1)
 
 ### Phase 2.5 Complete (v1.4.1)
 
-- **Complete UI/UX Redesign** G£à **100% ROLLOUT**
+- **Complete UI/UX Redesign** Gï¿½ï¿½ **100% ROLLOUT**
 - Modern, high-contrast "Retro-Comic" theme fully implemented
 - Consistent styling across **all** pages and components
 
@@ -1164,7 +1172,7 @@ user_template_progress (count + 1)
 - Complete UI for page-based navigation
 - Enhanced sticker management with WebP optimization
 
-**Current Status**: Database at v1.6.0 G£à | Frontend at v1.6.0
+**Current Status**: Database at v1.6.0 Gï¿½ï¿½ | Frontend at v1.6.0
 **Next Focus**: Sprint 9: Integration UI
 
 ---
@@ -1180,5 +1188,5 @@ When making changes:
 
 ---
 
-**Phase 0 Status**: Cleanup Complete G£à | Sprint 1 Complete G£à | Sprint 2 Complete G£à | Sprint 3 Complete G£à | Sprint 4 Complete G£à | Sprint 5 Complete G£à | Sprint 6.5 Complete G£à | Sprint 7 Complete G£à | Sprint 8 Complete G£à | Sprint 8.5 Complete G£à | Ready for Sprint 9: Integration UI =ƒÜº
+**Phase 0 Status**: Cleanup Complete Gï¿½ï¿½ | Sprint 1 Complete Gï¿½ï¿½ | Sprint 2 Complete Gï¿½ï¿½ | Sprint 3 Complete Gï¿½ï¿½ | Sprint 4 Complete Gï¿½ï¿½ | Sprint 5 Complete Gï¿½ï¿½ | Sprint 6.5 Complete Gï¿½ï¿½ | Sprint 7 Complete Gï¿½ï¿½ | Sprint 8 Complete Gï¿½ï¿½ | Sprint 8.5 Complete Gï¿½ï¿½ | Ready for Sprint 9: Integration UI =ï¿½Üº
 **Next**: Begin Sprint 9 implementation (Integration UI)

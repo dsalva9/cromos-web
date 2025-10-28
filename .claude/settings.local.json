@@ -20,7 +20,12 @@
       "Bash(powershell -Command \"Get-Date -Format ''yyyyMMddHHmmss''\")",
       "WebSearch",
       "Bash(rm:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(npx supabase:*)",
+      "Bash(where:*)",
+      "WebFetch(domain:supabase.com)",
+      "Bash(git checkout:*)",
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\profile\\LocationSettings.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\trades\\MatchCardWithDistance.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\trades\\TraderListSortControls.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\hooks\\trades\\useLocationMatching.ts\")"
     ],
     "deny": [],
     "ask": []

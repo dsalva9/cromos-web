@@ -115,9 +115,11 @@
 
 - `create_trade_listing` - Create listing
 - `list_trade_listings` - List with search
+- `list_trade_listings_with_distance` ✅ **NEW (v1.6.0)** - List with optional distance sorting
 - `get_user_listings` - View user's listings
 - `update_listing_status` - Mark sold/removed
 - `get_listing_chats`, `send_listing_message` - Chat from listing
+- `haversine_distance` ✅ **NEW (v1.6.0)** - Calculate distance between coordinates
 
 #### **Chat from Listings**
 
@@ -126,8 +128,18 @@
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
 
-#### **Marketplace UI Enhancements (2025-01-27):**
+#### **Marketplace UI Enhancements:**
 
+**2025-10-28:**
+- ✅ Distance-based sorting for listings
+- ✅ Toggle between "Más reciente" and "Distancia" sort modes
+- ✅ Distance shown on listing cards when available (~XX km format)
+- ✅ Disabled distance sort when user lacks postcode
+- ✅ Link to profile page for postcode configuration
+- ✅ Spanish postcode support with centroid-based distance calculation
+- ✅ Listings without valid postcodes pushed to end when sorting by distance
+
+**2025-01-27:**
 - Camera capture with proper stream management
 - ToS modal and validation before submission
 - Improved navigation with back links

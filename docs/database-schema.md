@@ -108,7 +108,7 @@ User profiles with ratings and admin status.
 - `id` UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE
 - `nickname` TEXT NOT NULL UNIQUE
 - `avatar_url` TEXT
-- `postcode` TEXT
+- `postcode` TEXT (Optional - used for distance-based marketplace sorting)
 - `rating_avg` DECIMAL(3,2) DEFAULT 0.0
 - `rating_count` INTEGER DEFAULT 0
 - `is_admin` BOOLEAN DEFAULT FALSE
@@ -127,8 +127,29 @@ User profiles with ratings and admin status.
 **Constraints:**
 
 - `profiles_nickname_present` CHECK (trim(coalesce(nickname, '')) <> '' AND lower(trim(nickname)) <> 'sin nombre') NOT VALID
-- `profiles_postcode_present` CHECK (trim(coalesce(postcode, '')) <> '') NOT VALID
 - `idx_profiles_nickname_ci` UNIQUE INDEX ON (lower(trim(nickname))) WHERE trim(coalesce(nickname, '')) <> '' AND lower(trim(nickname)) <> 'sin nombre'
+
+### postal_codes
+
+Spanish postal code centroids for distance calculations (v1.6.0).
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `country` TEXT NOT NULL (currently only 'ES')
+- `postcode` TEXT NOT NULL
+- `lat` DOUBLE PRECISION NOT NULL (latitude of postcode centroid)
+- `lon` DOUBLE PRECISION NOT NULL (longitude of postcode centroid)
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+
+- `idx_postal_codes_lookup` ON (country, postcode) - For fast distance lookups
+- `idx_postal_codes_country` ON (country)
+
+**Unique Constraints:**
+
+- `unique_country_postcode` ON (country, postcode)
 
 **RLS Policies:**
 

@@ -1,23 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { Button } from '@/components/ui/button';
-import { Plus, List } from 'lucide-react';
+import { Plus, List, MapPin, Clock } from 'lucide-react';
 import Link from 'next/link';
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Package } from 'lucide-react';
 
 export default function MarketplacePage() {
   const { user } = useUser();
+  const { supabase } = useSupabase();
+  const [userPostcode, setUserPostcode] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortByDistance, setSortByDistance] = useState(false);
+
+  // Fetch user's postcode only
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchPostcode = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('postcode')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        setUserPostcode(data.postcode);
+      }
+    };
+
+    fetchPostcode();
+  }, [user, supabase]);
+
+  const hasPostcode = Boolean(userPostcode);
+
   const { listings, loading, error, hasMore, loadMore } = useListings({
     search: searchQuery,
     limit: 20,
+    sortByDistance: sortByDistance && hasPostcode,
+    viewerPostcode: userPostcode,
   });
 
   return (
@@ -51,12 +78,62 @@ export default function MarketplacePage() {
         </div>
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-6">
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Buscar por título, colección..."
           />
+        </div>
+
+        {/* Sort Controls */}
+        <div className="mb-8 flex items-center gap-4">
+          <span className="text-sm text-gray-400 font-semibold uppercase">
+            Ordenar por:
+          </span>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setSortByDistance(false)}
+              variant={!sortByDistance ? 'default' : 'outline'}
+              className={
+                !sortByDistance
+                  ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
+                  : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+              }
+              size="sm"
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              Más reciente
+            </Button>
+            <Button
+              onClick={() => hasPostcode && setSortByDistance(true)}
+              variant={sortByDistance ? 'default' : 'outline'}
+              className={
+                sortByDistance
+                  ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
+                  : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+              }
+              size="sm"
+              disabled={!hasPostcode}
+              title={
+                !hasPostcode
+                  ? 'Añade tu código postal en el perfil para ordenar por distancia'
+                  : undefined
+              }
+            >
+              <MapPin className="mr-2 h-4 w-4" />
+              Distancia
+            </Button>
+          </div>
+          {!hasPostcode && (
+            <span className="text-xs text-gray-500">
+              (Añade tu código postal en{' '}
+              <Link href="/profile" className="text-[#FFC000] hover:underline">
+                tu perfil
+              </Link>{' '}
+              para ordenar por distancia)
+            </span>
+          )}
         </div>
 
         {/* Listings Grid */}

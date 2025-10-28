@@ -18,6 +18,7 @@ export interface Listing {
   user_id: string;
   author_nickname: string;
   author_avatar_url: string | null;
+  author_postcode?: string | null;
   title: string;
   description: string | null;
   sticker_number: string | null;
@@ -28,6 +29,7 @@ export interface Listing {
   created_at: string;
   copy_id?: string | null;
   slot_id?: string | null;
+  distance_km?: number | null;
 }
 
 export interface Template {

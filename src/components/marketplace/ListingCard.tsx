@@ -3,7 +3,7 @@
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Eye } from 'lucide-react';
+import { User, Eye, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Listing } from '@/types/v1.6.0';
 
@@ -124,10 +124,20 @@ export function ListingCard({ listing }: ListingCardProps) {
               </div>
             </div>
 
-            {/* Date */}
-            <p className="text-xs text-gray-500">
-              {formatDate(listing.created_at)}
-            </p>
+            {/* Distance & Date */}
+            <div className="flex items-center justify-between text-xs">
+              {listing.distance_km !== undefined && listing.distance_km !== null ? (
+                <div className="flex items-center gap-1 text-[#FFC000] font-semibold">
+                  <MapPin className="h-3 w-3" />
+                  <span>~{listing.distance_km} km</span>
+                </div>
+              ) : (
+                <div />
+              )}
+              <p className="text-gray-500">
+                {formatDate(listing.created_at)}
+              </p>
+            </div>
           </div>
         </ModernCardContent>
       </ModernCard>
