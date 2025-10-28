@@ -2536,19 +2536,23 @@ Header bell icon with dropdown preview of latest notifications.
 
 **Props:**
 - `maxItems?: number` - Max notifications to show (default: 5)
+- `onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void` - Callback to open rating modal from notification
 
 **Features:**
 - Bell icon with unread badge count
 - Shows top N most recent unread notifications
-- "Ver todas las notificaciones" link
+- Clickable action buttons within dropdown (no need to go to "Ver todas")
+- Actions include: "Ir al chat", "Confirmar transacción", "Valorar usuario", "Ver valoración"
+- "Ver todas las notificaciones" link for full page view
 - Auto-closes on navigation
 - Empty state when no notifications
-- Compact notification cards
+- Full notification cards with action buttons
 
 **Behavior:**
 - Updates badge count in realtime
 - Marks notifications as read when clicked
 - Shows "y N más..." when there are more notifications
+- Dropdown closes automatically when action button is clicked
 
 ---
 

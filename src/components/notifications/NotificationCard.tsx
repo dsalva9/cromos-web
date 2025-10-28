@@ -30,6 +30,7 @@ interface NotificationCardProps {
   onMarkAsRead?: (id: number) => void;
   onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void;
   compact?: boolean;
+  onNavigate?: () => void;
 }
 
 const iconMap = {
@@ -48,6 +49,7 @@ export function NotificationCard({
   onMarkAsRead,
   onOpenRatingModal,
   compact = false,
+  onNavigate,
 }: NotificationCardProps) {
   const isUnread = !notification.readAt;
   const IconComponent = iconMap[notification.icon as keyof typeof iconMap] || Bell;
@@ -143,42 +145,40 @@ export function NotificationCard({
             </div>
 
             {/* Actions */}
-            {!compact && (
-              <div className="mt-3 flex gap-2">
-                {/* Rating button for completed transactions */}
-                {needsRating && onOpenRatingModal && (
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="text-xs bg-[#FFC000] text-black hover:bg-[#FFD700]"
-                    onClick={handleRateUser}
-                  >
-                    <Star className="h-3 w-3 mr-1" />
-                    Valorar usuario
-                  </Button>
-                )}
+            <div className="mt-3 flex gap-2">
+              {/* Rating button for completed transactions */}
+              {needsRating && onOpenRatingModal && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="text-xs bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                  onClick={handleRateUser}
+                >
+                  <Star className="h-3 w-3 mr-1" />
+                  Valorar usuario
+                </Button>
+              )}
 
-                {/* Default link button */}
-                {notification.href && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                    asChild
-                  >
-                    <Link href={notification.href}>
-                      {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
-                        ? 'Ir al chat'
-                        : notification.kind === 'listing_completed' && notification.payload?.needs_confirmation
-                        ? 'Confirmar transacción'
-                        : notification.kind.includes('rating')
-                        ? 'Ver valoración'
-                        : 'Ver detalles'}
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            )}
+              {/* Default link button */}
+              {notification.href && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  asChild
+                >
+                  <Link href={notification.href} onClick={onNavigate}>
+                    {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
+                      ? 'Ir al chat'
+                      : notification.kind === 'listing_completed' && notification.payload?.needs_confirmation
+                      ? 'Confirmar transacción'
+                      : notification.kind.includes('rating')
+                      ? 'Ver valoración'
+                      : 'Ver detalles'}
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

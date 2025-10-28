@@ -138,7 +138,9 @@ Documentation:
 **Header Bell Icon:**
 - Shows unread count as badge
 - Dropdown with 5 most recent notifications
-- "Ver todas" link to full notifications center
+- Action buttons directly in dropdown (e.g., "Ir al chat", "Confirmar transacción", "Valorar usuario")
+- No need to navigate to full page to interact with notifications
+- "Ver todas" link to full notifications center for viewing all notifications
 
 **Notifications Center** (`/profile/notifications`):
 - Two tabs: "Nuevas" (unread) and "Historial" (read)

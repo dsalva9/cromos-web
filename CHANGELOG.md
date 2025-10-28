@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Clickable Notifications in Bell Dropdown (2025-10-28)**
+  - Notification cards in the bell dropdown now show action buttons directly
+  - Users can click "Ir al chat", "Confirmar transacción", "Valorar usuario", or "Ver valoración" without navigating to the full notifications page
+  - Dropdown closes automatically when action button is clicked
+  - Removed requirement to go to "Ver todas las notificaciones" for notification actions
+  - Updated `NotificationCard` component to always show action buttons
+  - Updated `NotificationDropdown` to pass navigation callback
+
 - **User Rating System for Marketplace Transactions (2025-10-28)**
   - Complete rating workflow after transaction completion
   - **Buyer Flow:**

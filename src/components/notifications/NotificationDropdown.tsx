@@ -102,13 +102,13 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal }: Notifi
               <div
                 key={notification.id}
                 className="border-b last:border-b-0"
-                onClick={() => setIsOpen(false)}
               >
                 <NotificationCard
                   notification={notification}
                   onMarkAsRead={handleMarkAsRead}
                   onOpenRatingModal={handleOpenRatingModal}
-                  compact
+                  onNavigate={() => setIsOpen(false)}
+                  compact={false}
                 />
               </div>
             ))}
