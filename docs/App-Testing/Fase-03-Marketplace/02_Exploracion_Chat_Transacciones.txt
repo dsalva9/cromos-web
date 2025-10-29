@@ -18,16 +18,21 @@ Configuración previa:
 Casos de prueba:
 
 Caso CP-F03-02A: Búsqueda y filtros avanzados
-  Cobertura: Happy path; rendimiento; sincronización con URL.
+  Cobertura: Happy path; rendimiento; sincronización con URL; ordenamiento por distancia.
   Pasos:
     1. Desde `/marketplace`, usar búsqueda por nombre de colección, número de cromo y autor.
     2. Aplicar filtros combinados (estado, rango de precio, con foto).
-    3. Guardar filtro como URL y refrescar.
+    3. Probar toggle de ordenamiento: "Más reciente" / "Distancia".
+    4. Verificar que ordenar por distancia muestra la distancia en las tarjetas (~XX km).
+    5. Guardar filtro como URL y refrescar.
   Criterios de éxito:
     - Resultados se actualizan en <1 s tras aplicar filtros (sin reload completo).
-    - Se muestra mensaje “No encontramos resultados” cuando aplica.
+    - Se muestra mensaje "No encontramos resultados" cuando aplica.
     - Parámetros de filtro reflejados en la URL (`?q=`, `?estado=`).
     - Al refrescar, los filtros se mantienen activos.
+    - Si el usuario no tiene código postal configurado, el botón de distancia está deshabilitado con enlace a configuración.
+    - Listados sin código postal válido aparecen al final cuando se ordena por distancia.
+    - La distancia se calcula correctamente usando centroides de código postal español.
 
 Caso CP-F03-02B: Vista de detalle y acciones contextuales
   Cobertura: Información; CTA dinámicos según rol.
@@ -42,18 +47,25 @@ Caso CP-F03-02B: Vista de detalle y acciones contextuales
     - Estatus del listado (activo/reservado) visible con badges consistentes.
     - Conteo de vistas aumenta al recargar (ver `views_count`).
 
-Caso CP-F03-02C: Inicio de chat marketplace (comprador → vendedor)
-  Cobertura: Realtime; permisos; UX.
+Caso CP-F03-02C: Inicio de chat marketplace (comprador → vendedor) y página de chats centralizada
+  Cobertura: Realtime; permisos; UX; navegación centralizada.
   Pasos:
-    1. Como comprador, pulsar “Contactar vendedor”.
+    1. Como comprador, pulsar "Contactar vendedor" (debe aceptar Términos de Servicio en primer mensaje).
     2. Enviar mensaje inicial (>20 caracteres).
     3. Verificar que aparece en el hilo y que se marca como leído automáticamente.
     4. Abrir la vista del vendedor `/marketplace/{id}/chat` y responder.
+    5. **NUEVO**: Navegar a `/chats` desde el menú desplegable del avatar para ver todas las conversaciones.
+    6. Verificar que la página muestra todas las conversaciones de marketplace con preview de último mensaje.
   Criterios de éxito:
+    - Compradores deben aceptar ToS antes de enviar el primer mensaje.
     - Mensajes aparecen con alineación correcta (sistema de globos).
     - Vendedor visualiza listado de compradores en panel izquierdo.
     - Indicador de cantidad de caracteres se actualiza y bloquea >500.
-    - Badge de “Nuevos mensajes” aparece en header y en pestañas relevantes.
+    - Badge de "Nuevos mensajes" aparece en header y en pestañas relevantes.
+    - **NUEVO**: Página `/chats` muestra todas las conversaciones con imagen del listado, estado, contraparte, último mensaje y timestamp.
+    - **NUEVO**: Badges de mensajes no leídos aparecen en cada conversación.
+    - **NUEVO**: Conversaciones ordenadas por actividad más reciente.
+    - **NUEVO**: Tarjeta de información del listado aparece en la parte superior del chat con badge de estado.
 
 Caso CP-F03-02D: Chat en mobile
   Cobertura: Responsive; navegabilidad.
@@ -78,17 +90,25 @@ Caso CP-F03-02E: Reservar listado para comprador específico
     - Usuarios terceros ven listado como reservado y sin CTA de compra.
     - Notificación se envía al comprador (ver campana en header).
 
-Caso CP-F03-02F: Completar transacción
-  Cobertura: Cambio a `completed`; rating posterior.
+Caso CP-F03-02F: Completar transacción con flujo bidireccional
+  Cobertura: Cambio a `completed`; confirmación del comprador; rating automático.
   Pasos:
-    1. Tras reserva, vendedor pulsa “Marcar como completado”.
-    2. Comprador recibe indicación para confirmar; confirmar desde su panel `/marketplace/reservations`.
-    3. Verificar que el listado pasa a estado `completed` y se oculta del catálogo.
+    1. Tras reserva, vendedor pulsa "Marcar como completado" desde el chat o panel "Mis Anuncios".
+    2. Sistema envía notificación al comprador con botón "Confirmar Recepción".
+    3. Comprador confirma desde notificación o desde botón en el chat.
+    4. **NUEVO**: Al confirmar, se abre automáticamente modal de valoración para que el comprador califique al vendedor.
+    5. Vendedor recibe notificación con enlace persistente para calificar al comprador (visible en el chat hasta completar).
+    6. Verificar que tras ambas valoraciones, aparecen como mensajes del sistema en el chat.
+    7. Verificar que el chat se cierra después de completar (input deshabilitado con mensaje "Chat cerrado").
   Criterios de éxito:
-    - Transacción actualiza `status = 'completed'`, `completed_at`.
-    - Ambos usuarios reciben prompt para calificar al contrario (si no existe calificación previa).
-    - Badge en “Mis listados” cambia a “Vendida”.
-    - Notificación de éxito aparece en la campana y se puede marcar como leída.
+    - Transacción actualiza `status = 'completed'`, `completed_at` tras confirmación del comprador.
+    - Modal de valoración del comprador se abre automáticamente al confirmar recepción.
+    - Enlace de valoración del vendedor persiste en el chat hasta que califique.
+    - Ambas valoraciones aparecen como mensajes permanentes del sistema en el chat con estrellas y comentarios.
+    - Notificación de "Ambos habéis completado la valoración" se envía a ambas partes cuando los dos califican.
+    - Badge en "Mis listados" cambia a "Completado".
+    - El chat se deshabilita tras completar la transacción (input muestra "Chat cerrado").
+    - Notificaciones clickables desde la campana llevan directamente al chat o página relevante.
 
 Caso CP-F03-02G: Cancelar reserva
   Cobertura: Edge; justificación obligatoria; liberación de listado.

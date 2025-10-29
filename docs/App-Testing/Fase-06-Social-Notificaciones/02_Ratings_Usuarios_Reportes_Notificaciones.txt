@@ -74,15 +74,30 @@ Caso CP-F06-02E: Reporte de usuario (abusos en chat)
     - Usuario reportado recibe notificación “Se ha creado un reporte en tu contra” (si la política lo permite).
     - QA puede ver registro en `/admin/reports` (valida en Fase 07).
 
-Caso CP-F06-02F: Notificaciones sociales (favoritos, ratings, reportes)
-  Cobertura: Campana general.
+Caso CP-F06-02F: Sistema de notificaciones unificado (Sprint 15 - Reboot completo)
+  Cobertura: Campana general; centro de notificaciones; notificaciones clickables; realtime.
   Pasos:
-    1. Activar eventos: nuevo favorito sobre un listado propio, comentario de rating, reporte recibido.
-    2. Revisar `/notificaciones` (si existe) o campana global.
+    1. **NUEVO**: Abrir dropdown de notificaciones desde el icono de campana en el header.
+    2. **NUEVO**: Verificar que muestra las 5 notificaciones más recientes con badge de contador.
+    3. **NUEVO**: Navegar a `/profile/notifications` desde el dropdown (botón "Ver todas las notificaciones").
+    4. **NUEVO**: Verificar pestañas "Nuevas" (no leídas) e "Historial" (leídas).
+    5. Activar eventos: nuevo favorito sobre un listado propio, comentario de rating, mensaje de chat, reserva de listado, completar transacción.
+    6. **NUEVO**: Verificar que las notificaciones aparecen en tiempo real (2-3 segundos) sin recargar.
+    7. **NUEVO**: Hacer clic en una notificación y verificar navegación directa al contexto (chat, listado, plantilla).
+    8. **NUEVO**: Probar botón "Marcar todas como leídas" en el centro de notificaciones.
+    9. **NUEVO**: Verificar que las notificaciones de chat se marcan automáticamente como leídas al abrir la conversación.
   Criterios de éxito:
-    - Notificaciones diferenciadas por icono y copy (“A {usuario} le gustó tu listado”).
-    - Agrupadas por tipo con timestamp correcto.
-    - Marcar como leídas actualiza `notifications.read_at`.
+    - **NUEVO**: Dropdown muestra top 5 con avatares, iconos contextuales y timestamps relativos ("hace 5 minutos").
+    - **NUEVO**: Centro de notificaciones agrupa por categorías: Marketplace, Plantillas, Comunidad, Intercambios, Sistema.
+    - Notificaciones diferenciadas por icono y copy en español ("Nuevo mensaje: {usuario} te ha enviado un mensaje sobre '{listado}'").
+    - **NUEVO**: Notificaciones clickables redirigen al contexto correcto con navegación automática.
+    - **NUEVO**: Badge de contador en campana actualiza en tiempo real.
+    - **NUEVO**: Notificaciones incluyen información del actor (avatar, nombre) y metadata enriquecida.
+    - **NUEVO**: Sistema de deduplicación previene spam (una notificación por conversación de chat).
+    - Marcar como leídas actualiza `notifications.read_at` instantáneamente (optimistic update).
+    - **NUEVO**: Estados vacíos con ilustraciones temáticas cuando no hay notificaciones.
+    - **NUEVO**: Notificaciones para: chat de listados, reservas, completar transacción, valoraciones de usuario, valoraciones de plantilla.
+    - **NUEVO**: Mensajes de sistema aparecen en el chat para reservas y finalizaciones de transacciones.
 
 Caso CP-F06-02G: Resumen en perfil público
   Cobertura: Visualización de reputación.

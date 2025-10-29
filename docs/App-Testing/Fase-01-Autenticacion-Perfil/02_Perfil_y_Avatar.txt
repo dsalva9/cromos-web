@@ -44,31 +44,36 @@ Caso CP-F01-02B: Edición de nickname y bio
     - Valores nuevos visibles tras recarga y en header (menú avatar).
     - Registro en `profiles.updated_at` actualizado (<1 min).
 
-Caso CP-F01-02C: Selección de avatar predefinido
-  Cobertura: Flujo galería; permisos Storage; caches.
+Caso CP-F01-02C: Selección de avatar predefinido (Sprint 13 - Sistema actualizado)
+  Cobertura: Flujo galería; permisos Storage; caches; preset SVG.
   Pasos:
-    1. Abrir modal “Cambiar avatar”.
-    2. Seleccionar pestaña “Galería” y elegir una opción.
+    1. Abrir modal "Cambiar avatar".
+    2. **ACTUALIZADO**: Seleccionar pestaña "Galería" y elegir uno de los 8 avatares predefinidos retro-comic.
     3. Confirmar.
-    4. Abrir perfil desde otro navegador con `qa.observador@cromos.test`.
+    4. **NUEVO**: Verificar que el avatar aparece en el dropdown del header (menú mini-perfil).
+    5. Abrir perfil desde otro navegador con `qa.observador@cromos.test`.
   Criterios de éxito:
     - Avatar se actualiza instantáneamente en header y página de perfil.
+    - **ACTUALIZADO**: Sistema usa 8 avatares SVG predefinidos con diseño retro-comic.
     - Petición a `avatars/retro-XX.svg` devuelve 200 y el URL se guarda en `profiles.avatar_url`.
     - Otro usuario ve el mismo avatar sin requerir refresh forzado.
     - El fallback inicial desaparece (no letras solas).
+    - **NUEVO**: Avatar se muestra correctamente en el menú desplegable del usuario en el header.
 
-Caso CP-F01-02D: Subida de avatar personalizado con recorte
-  Cobertura: Procesamiento de imagen; conversión WebP; subida móvil.
+Caso CP-F01-02D: Subida de avatar personalizado con recorte (Sprint 13 - Mejoras de procesamiento)
+  Cobertura: Procesamiento de imagen; conversión WebP; subida móvil; recorte cuadrado automático.
   Pasos:
     1. Desde escritorio, subir `avatar_rectangular.jpg`.
-    2. Utilizar la herramienta de recorte para centrar rostro y guardar.
+    2. **ACTUALIZADO**: Sistema aplica recorte cuadrado automático por canvas (512x512).
     3. Verificar en DevTools que la petición POST usa `Content-Type: image/webp`.
     4. Repetir subida desde móvil con otra imagen pequeña.
+    5. **NUEVO**: Verificar que la imagen se comprime automáticamente a <3MB.
   Criterios de éxito:
-    - Modal obliga a seleccionar área cuadrada y muestra preview.
-    - Archivo final comprimido ≤300 KB y extensión `.webp`.
+    - **ACTUALIZADO**: Sistema aplica recorte cuadrado automático sin intervención manual del usuario.
+    - Archivo final comprimido ≤3 MB (actualizado desde 300KB) con dimensiones máximas 512x512 y extensión `.webp`.
     - Header y perfil actualizan avatar tras guardado; no requiere recarga.
     - En móvil, UI mantiene botones accesibles y no se superponen.
+    - **NUEVO**: Canvas-based processing asegura dimensiones cuadradas antes de subir.
 
 Caso CP-F01-02E: Validaciones de tamaño y formato
   Cobertura: Edge cases; mensajes de error.
@@ -98,8 +103,27 @@ Caso CP-F01-02G: Protección para usuarios sin sesión
     1. Abrir URL `/perfil` en ventana privada sin sesión.
     2. Abrir `/usuarios/{id}` de perfil privado o suspendido.
   Criterios de éxito:
-    - Se redirige a login con mensaje “Inicia sesión para ver tu perfil”.
-    - Perfiles suspendidos muestran badge “Suspendido” y contenido limitado.
+    - Se redirige a login con mensaje "Inicia sesión para ver tu perfil".
+    - Perfiles suspendidos muestran badge "Suspendido" y contenido limitado.
+
+Caso CP-F01-02H: Menú desplegable del usuario en header (Sprint 13 - Nueva funcionalidad)
+  Cobertura: Navegación rápida; UX; accesibilidad.
+  Pasos:
+    1. Con usuario autenticado, hacer clic en el avatar en el header.
+    2. **NUEVO**: Verificar que se abre un dropdown con mini-perfil del usuario.
+    3. **NUEVO**: Revisar opciones del menú: "Mi Perfil", "Mis Anuncios", "Chats", "Favoritos", "Notificaciones".
+    4. **NUEVO**: Si el usuario es admin, verificar opción "Panel Admin".
+    5. **NUEVO**: Verificar botón "Cerrar sesión" al final del menú.
+    6. **NUEVO**: Hacer clic en cada opción y verificar navegación correcta.
+    7. Probar en móvil (375px) y verificar responsividad.
+  Criterios de éxito:
+    - **NUEVO**: Dropdown muestra avatar, nickname del usuario y opciones de navegación.
+    - **NUEVO**: Opciones del menú: "Mi Perfil" (`/profile`), "Mis Anuncios" (`/marketplace/my-listings`), "Chats" (`/chats`), "Favoritos" (`/favorites`), "Notificaciones" (`/profile/notifications`).
+    - **NUEVO**: Opción "Panel Admin" (`/admin`) visible solo para usuarios con `is_admin = true`.
+    - **NUEVO**: "Cerrar sesión" ejecuta logout correctamente y redirige a home.
+    - **NUEVO**: Dropdown se cierra al hacer clic fuera o al navegar.
+    - **NUEVO**: En móvil, dropdown se ajusta correctamente sin desbordar pantalla.
+    - **NUEVO**: Accesibilidad: navegación con teclado (Tab/Enter) funciona correctamente.
 
 Notas generales:
 - Registrar en planilla QA los IDs de storage generados para su posterior limpieza.

@@ -103,8 +103,31 @@ Caso CP-F02-01G: Restricciones de autoría
     3. Intentar forzar URL `/templates/{id}/edit`.
   Criterios de éxito:
     - Botones de editar/eliminar no se muestran.
-    - Si se fuerza ruta, aparece mensaje “No tienes permiso para editar esta plantilla” y redirección.
+    - Si se fuerza ruta, aparece mensaje "No tienes permiso para editar esta plantilla" y redirección.
     - No se registran intentos fallidos de RLS en Supabase.
+
+Caso CP-F02-01H: Sistema de valoraciones de plantillas (Sprint 14)
+  Cobertura: Ratings de plantillas; UX de valoraciones; restricciones de autor.
+  Pasos:
+    1. Con `qa.observador`, abrir detalle de plantilla pública `/templates/{id}`.
+    2. **NUEVO**: Verificar sección de valoraciones con resumen (promedio, distribución de estrellas, total de valoraciones).
+    3. **NUEVO**: Pulsar "Valorar plantilla" y abrir modal de valoración.
+    4. **NUEVO**: Asignar 4 estrellas y comentario opcional (máx 280 caracteres).
+    5. **NUEVO**: Guardar valoración y verificar que aparece en la lista de reseñas.
+    6. **NUEVO**: Editar valoración propia (cambiar estrellas o comentario).
+    7. **NUEVO**: Eliminar valoración propia.
+    8. **NUEVO**: Intentar valorar como autor de la plantilla.
+  Criterios de éxito:
+    - **NUEVO**: Sección de valoraciones muestra promedio en estrellas con gráfico de distribución (1⭐-5⭐).
+    - **NUEVO**: Modal permite seleccionar 1-5 estrellas con comentario opcional.
+    - **NUEVO**: Registro se crea en `template_ratings` con `rating`, `comment`, `user_id`, `template_id`.
+    - **NUEVO**: Lista de reseñas muestra valoraciones con paginación (infinite scroll).
+    - **NUEVO**: Usuario puede editar/eliminar solo su propia valoración.
+    - **NUEVO**: Autor de plantilla no puede valorar su propia plantilla (botón deshabilitado con mensaje explicativo).
+    - **NUEVO**: Toast "Valoración guardada" / "Valoración actualizada" / "Valoración eliminada" en español.
+    - **NUEVO**: Promedio se actualiza automáticamente tras cada valoración.
+    - **NUEVO**: Notificación se envía al autor de la plantilla cuando recibe valoración.
+    - **NUEVO**: Usuarios sin sesión ven "Inicia sesión para valorar".
 
 Notas generales:
 - Registrar IDs de plantilla generados en la hoja de seguimiento para reutilizarlos en pruebas de copias.

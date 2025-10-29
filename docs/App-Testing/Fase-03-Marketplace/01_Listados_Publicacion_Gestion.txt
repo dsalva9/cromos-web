@@ -32,15 +32,27 @@ Caso CP-F03-01A: Crear listado desde formulario manual
     - Toast “Listado publicado” y redirección a detalle `/marketplace/{id}`.
     - Registro en `trade_listings` con `status = 'active'`, `image_url` no nulo.
 
-Caso CP-F03-01B: Creación en móvil
-  Cobertura: Responsive; flows en pantalla pequeña.
+Caso CP-F03-01B: Creación en móvil con captura de cámara (Sprint 13 - Nueva funcionalidad)
+  Cobertura: Responsive; flows en pantalla pequeña; captura de cámara nativa.
   Pasos:
-    1. Repetir flujo en viewport 375px.
-    2. Usar cámara (si se prueba en dispositivo físico) o subir archivo desde galería.
+    1. Repetir flujo en viewport 375px o dispositivo físico.
+    2. **NUEVO**: En el formulario de creación, verificar botón "Cámara" junto a "Subir imagen".
+    3. **NUEVO**: Hacer clic en "Cámara" y otorgar permisos de cámara al navegador.
+    4. **NUEVO**: Verificar preview en vivo de la cámara en modal.
+    5. **NUEVO**: Capturar foto usando el botón de captura.
+    6. **NUEVO**: Verificar preview de la foto capturada con opción "Usar esta foto" / "Volver a tomar".
+    7. **NUEVO**: Confirmar uso de la foto y verificar que se procesa automáticamente (WebP, compresión).
+    8. Alternativamente, usar archivo desde galería.
   Criterios de éxito:
     - Formulario utiliza acordeones o steps para facilitar navegación.
-    - Botón “Publicar” siempre visible (sticky footer o similar).
+    - Botón "Publicar" siempre visible (sticky footer o similar).
     - Validaciones se muestran legibles sin recortes.
+    - **NUEVO**: Botón "Cámara" visible solo en dispositivos con soporte de `getUserMedia`.
+    - **NUEVO**: Modal de cámara muestra preview en vivo del feed.
+    - **NUEVO**: Captura funciona correctamente sin flickering (corregido en Sprint 13).
+    - **NUEVO**: Foto capturada se procesa a WebP con compresión <2MB y dimensiones máx 1600x1600.
+    - **NUEVO**: Manejo correcto de errores de permisos con mensajes claros en español.
+    - **NUEVO**: Stream de cámara se cierra correctamente al cancelar o completar captura.
 
 Caso CP-F03-01C: Validaciones de archivo e inputs
   Cobertura: Errores en imagen y campos.

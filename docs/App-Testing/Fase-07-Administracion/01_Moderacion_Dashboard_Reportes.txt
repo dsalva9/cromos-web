@@ -16,13 +16,15 @@ Configuración previa:
 Casos de prueba:
 
 Caso CP-F07-01A: Acceso al dashboard
-  Cobertura: Autenticación admin; UI.
+  Cobertura: Autenticación admin; UI; navegación.
   Pasos:
     1. Iniciar sesión como admin.
     2. Navegar a `/admin`.
+    3. **NUEVO**: Verificar todas las pestañas disponibles en el layout de administración.
   Criterios de éxito:
-    - Layout muestra tabs: Dashboard, Reportes, Usuarios, Audit, Marketplace, Plantillas.
-    - Si usuario no admin intenta acceder, se redirige a home con mensaje “Necesitas privilegios de administrador”.
+    - **ACTUALIZADO**: Layout muestra 6 tabs: Dashboard, Reportes, Usuarios, Audit, **Marketplace** (nuevo Sprint 14), **Plantillas** (nuevo Sprint 14).
+    - Si usuario no admin intenta acceder, se redirige a home con mensaje "Necesitas privilegios de administrador".
+    - **NUEVO**: Enlace "Admin" visible en el header solo para usuarios admin.
 
 Caso CP-F07-01B: Estadísticas principales
   Cobertura: Consistencia de métricas.
