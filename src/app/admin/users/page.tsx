@@ -15,11 +15,14 @@ import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
 import AdminGuard from '@/components/AdminGuard';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 function UserSearchContent() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<'all' | 'active' | 'suspended'>('all');
   const debouncedQuery = useDebounce(query, 500);
+  const { supabase } = useSupabase();
 
   const { users, loading, error, refetch } = useUserSearch(debouncedQuery, status);
   const { suspendUser, unsuspendUser, loading: actionLoading } = useSuspendUser();
@@ -176,19 +179,22 @@ function UserSearchContent() {
                 <div className="flex items-start gap-4">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    {user.avatar_url ? (
-                      <Image
-                        src={user.avatar_url}
-                        alt={user.nickname}
-                        width={64}
-                        height={64}
-                        className="rounded-full border-2 border-black"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center">
-                        <User className="h-8 w-8 text-black" />
-                      </div>
-                    )}
+                    {(() => {
+                      const avatarUrl = resolveAvatarUrl(user.avatar_url, supabase);
+                      return avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={user.nickname}
+                          width={64}
+                          height={64}
+                          className="rounded-full border-2 border-black"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center">
+                          <User className="h-8 w-8 text-black" />
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Info */}

@@ -7,6 +7,8 @@ import { TemplateRating } from '@/hooks/templates/useTemplateRatings';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Image from 'next/image';
+import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 interface TemplateReviewListProps {
   ratings: TemplateRating[];
@@ -21,6 +23,8 @@ export function TemplateReviewList({
   onLoadMore,
   loading
 }: TemplateReviewListProps) {
+  const { supabase } = useSupabase();
+
   if (ratings.length === 0) {
     return (
       <ModernCard>
@@ -36,15 +40,17 @@ export function TemplateReviewList({
 
   return (
     <div className="space-y-4">
-      {ratings.map((rating) => (
+      {ratings.map((rating) => {
+        const avatarUrl = resolveAvatarUrl(rating.user_avatar_url, supabase);
+        return (
         <ModernCard key={rating.id}>
           <ModernCardContent className="p-4">
             <div className="flex items-start gap-3">
               {/* Avatar */}
               <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                {rating.user_avatar_url ? (
+                {avatarUrl ? (
                   <Image
-                    src={rating.user_avatar_url}
+                    src={avatarUrl}
                     alt={rating.user_nickname}
                     fill
                     className="object-cover"
@@ -92,7 +98,8 @@ export function TemplateReviewList({
             </div>
           </ModernCardContent>
         </ModernCard>
-      ))}
+        );
+      })}
 
       {hasMore && (
         <div className="text-center pt-2">

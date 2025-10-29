@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Avatar URL Resolution (2025-10-29)**
+  - Fixed "Invalid URL" errors when displaying user avatars across the application
+  - Properly resolve avatar URLs from Supabase storage paths to public URLs
+  - Updated `FavoritesPage` to resolve avatar URLs using `resolveAvatarUrl`
+  - Updated `AdminUsersPage` to resolve avatar URLs for user listings
+  - Updated `TemplateReviewList` to resolve avatar URLs for review authors
+  - All avatar displays now use consistent URL resolution logic
+  - Prevents Next.js Image component errors with relative paths
+
 ### Added
 
 - **Comprehensive Mobile Hamburger Menu (2025-10-29)**

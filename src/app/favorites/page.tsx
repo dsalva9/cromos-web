@@ -9,10 +9,13 @@ import { User, Star, Package, Heart } from 'lucide-react';
 import { useFavorites } from '@/hooks/social/useFavorites';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/AuthGuard';
+import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 function FavoritesContent() {
   const { favorites, loading, refetch } = useMyFavorites();
   const { toggleFavorite } = useFavorites();
+  const { supabase } = useSupabase();
 
   const handleRemove = async (userId: string) => {
     try {
@@ -65,15 +68,17 @@ function FavoritesContent() {
 
         {/* Favorites Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {favorites.map((favorite) => (
+          {favorites.map((favorite) => {
+            const avatarUrl = resolveAvatarUrl(favorite.avatar_url, supabase);
+            return (
             <ModernCard key={favorite.favorite_user_id}>
               <ModernCardContent className="p-6">
                 <div className="flex flex-col items-center text-center space-y-4">
                   {/* Avatar */}
                   <Link href={`/users/${favorite.favorite_user_id}`}>
-                    {favorite.avatar_url ? (
+                    {avatarUrl ? (
                       <Image
-                        src={favorite.avatar_url}
+                        src={avatarUrl}
                         alt={favorite.nickname}
                         width={80}
                         height={80}
@@ -130,7 +135,8 @@ function FavoritesContent() {
                 </div>
               </ModernCardContent>
             </ModernCard>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
