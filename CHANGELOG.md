@@ -9,15 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Mobile Navigation Improvements (2025-10-29)**
-  - Fixed mobile navigation menu to show all items with scrolling support
-  - Added coordinated dropdown behavior for mobile: only one dropdown (hamburger menu, notifications, or user avatar) can be open at a time
-  - Notifications bell and user avatar now visible in mobile header alongside hamburger menu
-  - Hamburger menu now scrollable with max-height constraint for smaller screens
-  - Enhanced mobile UX by preventing dropdown overlaps and z-index conflicts
-  - Updated `SiteHeader` component with coordinated state management
-  - Made `NotificationDropdown` and `UserAvatarDropdown` components controllable with optional `open` and `onOpenChange` props
-  - Components maintain backward compatibility with internal state when not controlled
+- **Comprehensive Mobile Hamburger Menu (2025-10-29)**
+  - Redesigned mobile navigation to use single hamburger menu for all functions
+  - **Menu Structure:**
+    - **Navigation Section**: Marketplace, Mis Colecciones, Plantillas
+    - **Notifications Section**: Link to notifications page with unread count badge
+    - **Profile Section**: Mi Perfil, Mis Anuncios, Chats, Favoritos, Admin Panel (if admin), Cerrar sesión
+  - Removed separate notification bell and avatar dropdowns from mobile header for cleaner layout
+  - Fixed layout issues on smaller devices (Samsung Galaxy S24 and similar)
+  - Hamburger menu is scrollable with max-height constraint for smaller screens
+  - All menu items properly spaced with hover states and icons
+  - Maintains desktop layout with separate notification dropdown and avatar dropdown
+  - Updated `SiteHeader` component to integrate `useNotifications` hook for unread count
 
 - **Clickable Notifications in Bell Dropdown (2025-10-28)**
   - Notification cards in the bell dropdown now show action buttons directly

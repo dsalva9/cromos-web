@@ -88,9 +88,11 @@ CambioCromos is pivoting from a traditional sticker collection app to a Spanish-
 ### User Interface
 
 - **Responsive Design**: Mobile-first design with optimized navigation
-- **Coordinated Dropdowns**: Mobile menu, notifications, and user avatar work seamlessly together
+- **Comprehensive Mobile Menu**: Single hamburger menu with all navigation, notifications, and profile options
+- **Desktop Dropdowns**: Separate notification bell and user avatar dropdowns on larger screens
 - **Accessible Navigation**: Scrollable menus ensure all items are reachable on any screen size
 - **Real-time Updates**: Live notification badges and unread counts
+- **Clean Mobile Layout**: Optimized for small devices like Samsung Galaxy S24
 
 ### Trading System (Legacy)
 
