@@ -237,7 +237,7 @@ export default function SiteHeader() {
                 <div className="border-t-2 border-gray-700" />
                 <div className="py-4">
                   <Link
-                    href="/notifications"
+                    href="/profile/notifications"
                     onClick={closeMenu}
                     className="flex items-center justify-between px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
                   >
