@@ -27,11 +27,19 @@ interface NotificationDropdownProps {
   maxItems?: number;
   /** Callback to open rating modal from notification */
   onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void;
+  /** Controlled open state (optional, for coordination with other dropdowns) */
+  open?: boolean;
+  /** Controlled open change handler (optional, for coordination with other dropdowns) */
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function NotificationDropdown({ maxItems = 5, onOpenRatingModal }: NotificationDropdownProps) {
+export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: controlledOpen, onOpenChange }: NotificationDropdownProps) {
   const { unreadNotifications, unreadCount, markAsRead, loading } = useNotifications();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setIsOpen = onOpenChange || setInternalOpen;
 
   const displayNotifications = unreadNotifications.slice(0, maxItems);
   const hasMore = unreadNotifications.length > maxItems;

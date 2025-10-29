@@ -49,8 +49,12 @@ CambioCromos is pivoting from a traditional sticker collection app to a Spanish-
 - **Physical Card Listings**: Free-form marketplace listings
 - **Direct Chat**: Real-time messaging between buyers and sellers
 - **Search & Filtering**: Full-text search on title and collection name
-- **Status Management**: Active, sold, and removed listing states
+- **Status Management**: Active, reserved, completed, and removed listing states
 - **Photo Uploads**: Optional real photos for listings
+- **Transaction Workflow**: Complete reservation and completion workflow with buyer confirmation
+- **User Ratings**: Post-transaction rating system with 5-star ratings and comments
+- **Notifications**: Integrated notification system with clickable actions in header dropdown
+- **Chats Page**: Centralized view of all marketplace conversations
 
 ### Collection Templates System
 
@@ -80,6 +84,13 @@ CambioCromos is pivoting from a traditional sticker collection app to a Spanish-
 - **Dashboard Statistics**: Overview of platform metrics
 - **Bulk Actions**: Efficient handling of multiple items
 - **Performance Metrics**: Admin activity tracking
+
+### User Interface
+
+- **Responsive Design**: Mobile-first design with optimized navigation
+- **Coordinated Dropdowns**: Mobile menu, notifications, and user avatar work seamlessly together
+- **Accessible Navigation**: Scrollable menus ensure all items are reachable on any screen size
+- **Real-time Updates**: Live notification badges and unread counts
 
 ### Trading System (Legacy)
 

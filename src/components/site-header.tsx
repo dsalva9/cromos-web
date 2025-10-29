@@ -25,6 +25,8 @@ type NavigationLink = {
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -38,8 +40,33 @@ export default function SiteHeader() {
     listingTitle: string;
   } | null>(null);
 
-  const toggleMenu = () => setIsMenuOpen(v => !v);
+  const toggleMenu = () => {
+    setIsMenuOpen(v => !v);
+    // Close other dropdowns when opening menu on mobile
+    if (!isMenuOpen) {
+      setIsNotificationsOpen(false);
+      setIsAvatarOpen(false);
+    }
+  };
   const closeMenu = () => setIsMenuOpen(false);
+
+  const handleNotificationsOpenChange = (open: boolean) => {
+    setIsNotificationsOpen(open);
+    // Close other dropdowns when opening notifications on mobile
+    if (open) {
+      setIsMenuOpen(false);
+      setIsAvatarOpen(false);
+    }
+  };
+
+  const handleAvatarOpenChange = (open: boolean) => {
+    setIsAvatarOpen(open);
+    // Close other dropdowns when opening avatar on mobile
+    if (open) {
+      setIsMenuOpen(false);
+      setIsNotificationsOpen(false);
+    }
+  };
 
   const baseLinks: NavigationLink[] = [
     { href: '/marketplace', label: 'Marketplace', requiresCompletion: true },
@@ -172,20 +199,36 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          <button
-            type="button"
-            className="md:hidden p-2 text-white hover:text-[#FFC000] hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md border-2 border-transparent hover:border-black transition-all duration-200"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label="Toggle navigation menu"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
+          <div className="md:hidden flex items-center gap-2">
+            {!loading && user && (
+              <>
+                <NotificationDropdown
+                  onOpenRatingModal={handleOpenRatingModal}
+                  open={isNotificationsOpen}
+                  onOpenChange={handleNotificationsOpenChange}
+                />
+                <UserAvatarDropdown
+                  isAdmin={isAdmin}
+                  open={isAvatarOpen}
+                  onOpenChange={handleAvatarOpenChange}
+                />
+              </>
             )}
-          </button>
+            <button
+              type="button"
+              className="p-2 text-white hover:text-[#FFC000] hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md border-2 border-transparent hover:border-black transition-all duration-200"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label="Toggle navigation menu"
+              onClick={toggleMenu}
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
 
         <nav
@@ -197,24 +240,26 @@ export default function SiteHeader() {
             isMenuOpen ? 'block' : 'hidden'
           )}
         >
-          <ul className="py-4 space-y-2">
-            {navigationLinks.map(link => (
-              <li key={link.href}>
-                <NavLink
-                  href={link.href}
-                  className={cn(
-                    'block px-4 py-3 mx-2 rounded-md font-bold uppercase text-base transition-all duration-200',
-                    'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
-                    'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                    'text-white hover:bg-gray-700 border-2 border-transparent'
-                  )}
-                  onClick={handleProtectedNavigation(link.requiresCompletion)}
-                >
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
+          <div className="max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <ul className="py-4 space-y-2">
+              {navigationLinks.map(link => (
+                <li key={link.href}>
+                  <NavLink
+                    href={link.href}
+                    className={cn(
+                      'block px-4 py-3 mx-2 rounded-md font-bold uppercase text-base transition-all duration-200',
+                      'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
+                      'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
+                      'text-white hover:bg-gray-700 border-2 border-transparent'
+                    )}
+                    onClick={handleProtectedNavigation(link.requiresCompletion)}
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
       </div>
 

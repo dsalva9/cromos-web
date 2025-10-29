@@ -15,15 +15,29 @@ import { toast } from '@/lib/toast';
 
 interface UserAvatarDropdownProps {
   isAdmin?: boolean;
+  /** Controlled open state (optional, for coordination with other dropdowns) */
+  open?: boolean;
+  /** Controlled open change handler (optional, for coordination with other dropdowns) */
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps) {
+export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOpenChange }: UserAvatarDropdownProps) {
   const { user } = useUser();
   const { profile, loading } = useCurrentUserProfile();
   const supabase = useSupabaseClient();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const { isComplete, loading: completionLoading } = useProfileCompletion();
+
+  // Use controlled state if provided, otherwise use internal state
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const handleSetIsOpen = (value: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -32,7 +46,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
     } catch (error) {
       logger.error('Sign out error:', error);
     }
-    setIsOpen(false);
+    handleSetIsOpen(false);
   };
 
   const handleProtectedClick =
@@ -43,12 +57,12 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
         toast.info(
           'Necesitas completar tu perfil para empezar a cambiar cromos!'
         );
-        setIsOpen(false);
+        handleSetIsOpen(false);
         router.push('/profile/completar');
         return;
       }
 
-      setIsOpen(false);
+      handleSetIsOpen(false);
     };
 
   if (!user || loading) {
@@ -63,7 +77,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
       {/* Avatar Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => handleSetIsOpen(!isOpen)}
         className={cn(
           'flex items-center gap-2 rounded-full border-2 border-black transition-all',
           'hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900',
@@ -106,7 +120,7 @@ export function UserAvatarDropdown({ isAdmin = false }: UserAvatarDropdownProps)
           {/* Overlay */}
           <div
             className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
+            onClick={() => handleSetIsOpen(false)}
             aria-hidden="true"
           />
 
