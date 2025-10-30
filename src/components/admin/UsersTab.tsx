@@ -4,9 +4,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { UserLink } from '@/components/ui/user-link';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type User = {
   user_id: string;
@@ -92,7 +99,12 @@ export default function UsersTab() {
           p_is_admin: value,
         });
         if (error) throw error;
-        toast(value ? 'Privilegios de administrador otorgados' : 'Privilegios de administrador revocados', 'success');
+        toast(
+          value
+            ? 'Privilegios de administrador otorgados'
+            : 'Privilegios de administrador revocados',
+          'success'
+        );
       } else if (type === 'suspend') {
         const { error } = await supabase.rpc('admin_suspend_user', {
           p_user_id: user.user_id,
@@ -113,7 +125,8 @@ export default function UsersTab() {
       await fetchUsers();
     } catch (e: unknown) {
       logger.error('User action error', e);
-      const msg = e instanceof Error ? e.message : 'Error al realizar la acción';
+      const msg =
+        e instanceof Error ? e.message : 'Error al realizar la acción';
       toast(msg, 'error');
     }
   }
@@ -125,7 +138,9 @@ export default function UsersTab() {
 
     if (type === 'admin') {
       return {
-        title: value ? 'Otorgar privilegios de administrador' : 'Revocar privilegios de administrador',
+        title: value
+          ? 'Otorgar privilegios de administrador'
+          : 'Revocar privilegios de administrador',
         message: value
           ? `¿Otorgar privilegios de administrador a ${user.nickname} (${user.email})?`
           : `¿Revocar privilegios de administrador a ${user.nickname} (${user.email})?`,
@@ -199,10 +214,16 @@ export default function UsersTab() {
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={() => setPageIndex(Math.max(0, pageIndex - 1))} disabled={pageIndex === 0}>
+        <Button
+          onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
+          disabled={pageIndex === 0}
+        >
           Anterior
         </Button>
-        <Button onClick={() => setPageIndex(pageIndex + 1)} disabled={users.length < pageSize}>
+        <Button
+          onClick={() => setPageIndex(pageIndex + 1)}
+          disabled={users.length < pageSize}
+        >
           Siguiente
         </Button>
         <span className="text-white text-sm self-center ml-2">
@@ -214,14 +235,30 @@ export default function UsersTab() {
         <table className="min-w-full text-sm bg-[#2D3748] text-white border-4 border-black rounded-md">
           <thead>
             <tr className="bg-gray-700">
-              <th className="px-3 py-2 text-left border-b border-black">Email</th>
-              <th className="px-3 py-2 text-left border-b border-black">Nickname</th>
-              <th className="px-3 py-2 text-left border-b border-black">Estado</th>
-              <th className="px-3 py-2 text-left border-b border-black">Cromos</th>
-              <th className="px-3 py-2 text-left border-b border-black">Intercambios</th>
-              <th className="px-3 py-2 text-left border-b border-black">Creado</th>
-              <th className="px-3 py-2 text-left border-b border-black">Último acceso</th>
-              <th className="px-3 py-2 text-left border-b border-black">Acciones</th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Email
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Nickname
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Estado
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Cromos
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Intercambios
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Creado
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Último acceso
+              </th>
+              <th className="px-3 py-2 text-left border-b border-black">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -239,9 +276,18 @@ export default function UsersTab() {
               </tr>
             ) : (
               users.map(u => (
-                <tr key={u.user_id} className="odd:bg-[#2D3748] even:bg-[#253044]">
+                <tr
+                  key={u.user_id}
+                  className="odd:bg-[#2D3748] even:bg-[#253044]"
+                >
                   <td className="px-3 py-2 border-b border-black">{u.email}</td>
-                  <td className="px-3 py-2 border-b border-black">{u.nickname}</td>
+                  <td className="px-3 py-2 border-b border-black">
+                    <UserLink
+                      userId={u.user_id}
+                      nickname={u.nickname}
+                      variant="default"
+                    />
+                  </td>
                   <td className="px-3 py-2 border-b border-black">
                     <div className="flex gap-1 flex-wrap">
                       {u.is_admin && (
@@ -259,35 +305,59 @@ export default function UsersTab() {
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-2 border-b border-black">{u.sticker_count}</td>
-                  <td className="px-3 py-2 border-b border-black">{u.trade_count}</td>
+                  <td className="px-3 py-2 border-b border-black">
+                    {u.sticker_count}
+                  </td>
+                  <td className="px-3 py-2 border-b border-black">
+                    {u.trade_count}
+                  </td>
                   <td className="px-3 py-2 border-b border-black whitespace-nowrap">
                     {new Date(u.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-3 py-2 border-b border-black whitespace-nowrap">
-                    {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString() : '-'}
+                    {u.last_sign_in_at
+                      ? new Date(u.last_sign_in_at).toLocaleDateString()
+                      : '-'}
                   </td>
                   <td className="px-3 py-2 border-b border-black">
                     <div className="flex gap-1 flex-wrap">
                       {!u.is_admin ? (
-                        <Button size="sm" onClick={() => openAdminDialog(u, true)}>
+                        <Button
+                          size="sm"
+                          onClick={() => openAdminDialog(u, true)}
+                        >
                           Hacer admin
                         </Button>
                       ) : (
-                        <Button size="sm" variant="secondary" onClick={() => openAdminDialog(u, false)}>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => openAdminDialog(u, false)}
+                        >
                           Quitar admin
                         </Button>
                       )}
                       {!u.is_suspended ? (
-                        <Button size="sm" variant="destructive" onClick={() => openSuspendDialog(u, true)}>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => openSuspendDialog(u, true)}
+                        >
                           Suspender
                         </Button>
                       ) : (
-                        <Button size="sm" onClick={() => openSuspendDialog(u, false)}>
+                        <Button
+                          size="sm"
+                          onClick={() => openSuspendDialog(u, false)}
+                        >
                           Reactivar
                         </Button>
                       )}
-                      <Button size="sm" variant="destructive" onClick={() => openDeleteDialog(u)}>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => openDeleteDialog(u)}
+                      >
                         Eliminar
                       </Button>
                     </div>
@@ -320,7 +390,12 @@ export default function UsersTab() {
               <p>{dialogContent.message}</p>
               <DialogFooter className="mt-4">
                 <Button
-                  variant={dialogContent.variant as 'default' | 'destructive' | 'secondary'}
+                  variant={
+                    dialogContent.variant as
+                      | 'default'
+                      | 'destructive'
+                      | 'secondary'
+                  }
                   onClick={performAction}
                 >
                   {dialogContent.confirmLabel}

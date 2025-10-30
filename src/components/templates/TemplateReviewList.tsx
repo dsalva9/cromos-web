@@ -2,6 +2,7 @@
 
 import { User, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { TemplateRating } from '@/hooks/templates/useTemplateRatings';
 import { format } from 'date-fns';
@@ -21,7 +22,7 @@ export function TemplateReviewList({
   ratings,
   hasMore,
   onLoadMore,
-  loading
+  loading,
 }: TemplateReviewListProps) {
   const { supabase } = useSupabase();
 
@@ -40,64 +41,66 @@ export function TemplateReviewList({
 
   return (
     <div className="space-y-4">
-      {ratings.map((rating) => {
+      {ratings.map(rating => {
         const avatarUrl = resolveAvatarUrl(rating.user_avatar_url, supabase);
         return (
-        <ModernCard key={rating.id}>
-          <ModernCardContent className="p-4">
-            <div className="flex items-start gap-3">
-              {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                {avatarUrl ? (
-                  <Image
-                    src={avatarUrl}
-                    alt={rating.user_nickname}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <User className="h-5 w-5 text-slate-400" />
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="flex-grow min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <p className="font-medium text-white">
-                      {rating.user_nickname}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`h-4 w-4 ${
-                              star <= rating.rating
-                                ? 'fill-[#FFC000] text-[#FFC000]'
-                                : 'text-slate-600'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-slate-400">
-                        {format(new Date(rating.created_at), 'PPP', {
-                          locale: es
-                        })}
-                      </span>
-                    </div>
-                  </div>
+          <ModernCard key={rating.id}>
+            <ModernCardContent className="p-4">
+              <div className="flex items-start gap-3">
+                {/* Avatar */}
+                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={rating.user_nickname}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <User className="h-5 w-5 text-slate-400" />
+                  )}
                 </div>
 
-                {rating.comment && (
-                  <p className="text-slate-300 text-sm mt-2 whitespace-pre-wrap">
-                    {rating.comment}
-                  </p>
-                )}
+                {/* Content */}
+                <div className="flex-grow min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div>
+                      <UserLink
+                        userId={rating.user_id}
+                        nickname={rating.user_nickname}
+                        variant="bold"
+                      />
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star
+                              key={star}
+                              className={`h-4 w-4 ${
+                                star <= rating.rating
+                                  ? 'fill-[#FFC000] text-[#FFC000]'
+                                  : 'text-slate-600'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-slate-400">
+                          {format(new Date(rating.created_at), 'PPP', {
+                            locale: es,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {rating.comment && (
+                    <p className="text-slate-300 text-sm mt-2 whitespace-pre-wrap">
+                      {rating.comment}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </ModernCardContent>
-        </ModernCard>
+            </ModernCardContent>
+          </ModernCard>
         );
       })}
 

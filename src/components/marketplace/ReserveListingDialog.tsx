@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { getListingChatParticipants, ChatParticipant } from '@/lib/supabase/listings/chat';
+import {
+  getListingChatParticipants,
+  ChatParticipant,
+} from '@/lib/supabase/listings/chat';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { UserLink } from '@/components/ui/user-link';
 
 interface ReserveListingDialogProps {
   listingId: number;
@@ -60,7 +64,8 @@ export function ReserveListingDialog({
         <DialogHeader>
           <DialogTitle>Reservar Anuncio</DialogTitle>
           <DialogDescription>
-            Selecciona el comprador que ha contactado contigo para reservar este anuncio.
+            Selecciona el comprador que ha contactado contigo para reservar este
+            anuncio.
           </DialogDescription>
         </DialogHeader>
 
@@ -92,9 +97,12 @@ export function ReserveListingDialog({
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">
-                        {participant.nickname}
-                      </span>
+                      <UserLink
+                        userId={participant.user_id}
+                        nickname={participant.nickname}
+                        variant="bold"
+                        disabled={true} // Keep as text since this is inside a button
+                      />
                       {participant.unread_count > 0 && (
                         <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
                           {participant.unread_count} mensajes

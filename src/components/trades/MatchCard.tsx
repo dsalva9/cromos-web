@@ -1,6 +1,13 @@
 import Link from 'next/link';
+import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { User, ArrowRightLeft, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
+import {
+  User,
+  ArrowRightLeft,
+  TrendingUp,
+  ArrowDown,
+  ArrowUp,
+} from 'lucide-react';
 
 interface TradeMatch {
   match_user_id: string;
@@ -33,8 +40,17 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
               <User className="w-5 h-5 text-gray-900" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold uppercase text-white truncate">{displayName}</h3>
-              <p className="text-xs text-gray-400 font-medium">Intercambio disponible</p>
+              <h3 className="font-bold uppercase text-white truncate">
+                <UserLink
+                  userId={match.match_user_id}
+                  nickname={match.nickname}
+                  variant="bold"
+                  disabled={true} // Keep as text since this is already a link card
+                />
+              </h3>
+              <p className="text-xs text-gray-400 font-medium">
+                Intercambio disponible
+              </p>
             </div>
           </div>
 
@@ -44,7 +60,10 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
             <div className="flex items-center justify-between p-3 bg-gray-900 border-2 border-black rounded-md">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-green-500 border border-black rounded-md flex items-center justify-center">
-                  <ArrowDown className="h-3 w-3 text-white" aria-hidden="true" />
+                  <ArrowDown
+                    className="h-3 w-3 text-white"
+                    aria-hidden="true"
+                  />
                 </div>
                 <span className="text-sm font-bold uppercase text-green-400">
                   Te ofrecen
@@ -88,4 +107,3 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
     </Link>
   );
 }
-

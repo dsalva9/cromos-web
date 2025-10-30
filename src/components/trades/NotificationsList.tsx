@@ -1,11 +1,22 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useNotifications, type Notification } from '@/hooks/trades/useNotifications';
+import {
+  useNotifications,
+  type Notification,
+} from '@/hooks/trades/useNotifications';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
-import { Bell, MessageSquare, CheckCircle, XCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { UserLink } from '@/components/ui/user-link';
+import {
+  Bell,
+  MessageSquare,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  ArrowRight,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -44,32 +55,52 @@ function getNotificationTitle(notification: Notification): string {
   }
 }
 
-function getNotificationDescription(notification: Notification): string {
+function getCounterpartyInfo(notification: Notification) {
   const counterpartyNickname =
     notification.proposal_from_user === notification.metadata.sender_id ||
     notification.proposal_from_user === notification.metadata.requester_id
       ? notification.from_user_nickname || 'Usuario'
       : notification.to_user_nickname || 'Usuario';
 
+  const counterpartyUserId =
+    notification.proposal_from_user === notification.metadata.sender_id ||
+    notification.proposal_from_user === notification.metadata.requester_id
+      ? notification.proposal_from_user
+      : notification.proposal_to_user;
+
+  return { counterpartyNickname, counterpartyUserId };
+}
+
+function getNotificationDescriptionText(notification: Notification): string {
+  const { counterpartyNickname } = getCounterpartyInfo(notification);
+
   switch (notification.kind) {
     case 'chat_unread':
-      return `${counterpartyNickname} te ha enviado un mensaje`;
+      return 'te ha enviado un mensaje';
     case 'proposal_accepted':
-      return `${counterpartyNickname} ha aceptado tu propuesta`;
+      return 'ha aceptado tu propuesta';
     case 'proposal_rejected':
-      return `${counterpartyNickname} ha rechazado tu propuesta`;
+      return 'ha rechazado tu propuesta';
     case 'finalization_requested':
-      return `${counterpartyNickname} ha marcado el intercambio como finalizado`;
+      return 'ha marcado el intercambio como finalizado';
     default:
       return 'Nueva actividad en tus intercambios';
   }
 }
 
-export function NotificationsList({ onNotificationClick }: NotificationsListProps) {
+export function NotificationsList({
+  onNotificationClick,
+}: NotificationsListProps) {
   const router = useRouter();
   const { user } = useUser();
-  const { notifications, loading, error, fetchNotifications, markAllAsRead, markAsRead } =
-    useNotifications();
+  const {
+    notifications,
+    loading,
+    error,
+    fetchNotifications,
+    markAllAsRead,
+    markAsRead,
+  } = useNotifications();
 
   useEffect(() => {
     fetchNotifications();
@@ -142,7 +173,9 @@ export function NotificationsList({ onNotificationClick }: NotificationsListProp
         <ModernCardContent className="p-8 text-center text-gray-400">
           <Bell className="mx-auto h-12 w-12 mb-4" />
           <p className="font-bold">No tienes notificaciones.</p>
-          <p className="text-sm mt-2">Aquí aparecerán las actualizaciones de tus intercambios.</p>
+          <p className="text-sm mt-2">
+            Aquí aparecerán las actualizaciones de tus intercambios.
+          </p>
         </ModernCardContent>
       </ModernCard>
     );
@@ -187,13 +220,31 @@ export function NotificationsList({ onNotificationClick }: NotificationsListProp
                             {getNotificationTitle(notification)}
                           </h3>
                           <p className="text-sm text-gray-300 mt-1">
-                            {getNotificationDescription(notification)}
+                            <UserLink
+                              userId={
+                                getCounterpartyInfo(notification)
+                                  .counterpartyUserId || ''
+                              }
+                              nickname={
+                                getCounterpartyInfo(notification)
+                                  .counterpartyNickname
+                              }
+                              variant="subtle"
+                              disabled={
+                                !getCounterpartyInfo(notification)
+                                  .counterpartyUserId
+                              }
+                            />{' '}
+                            {getNotificationDescriptionText(notification)}
                           </p>
                           <p className="text-xs text-gray-400 mt-2">
-                            {formatDistanceToNow(new Date(notification.created_at), {
-                              addSuffix: true,
-                              locale: es,
-                            })}
+                            {formatDistanceToNow(
+                              new Date(notification.created_at),
+                              {
+                                addSuffix: true,
+                                locale: es,
+                              }
+                            )}
                           </p>
                         </div>
                         <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
@@ -210,7 +261,9 @@ export function NotificationsList({ onNotificationClick }: NotificationsListProp
       {/* Read notifications */}
       {readNotifications.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold uppercase text-gray-400">Anteriores</h2>
+          <h2 className="text-xl font-bold uppercase text-gray-400">
+            Anteriores
+          </h2>
           <div className="grid gap-4">
             {readNotifications.map(notification => (
               <ModernCard
@@ -230,13 +283,31 @@ export function NotificationsList({ onNotificationClick }: NotificationsListProp
                             {getNotificationTitle(notification)}
                           </h3>
                           <p className="text-sm text-gray-400 mt-1">
-                            {getNotificationDescription(notification)}
+                            <UserLink
+                              userId={
+                                getCounterpartyInfo(notification)
+                                  .counterpartyUserId || ''
+                              }
+                              nickname={
+                                getCounterpartyInfo(notification)
+                                  .counterpartyNickname
+                              }
+                              variant="subtle"
+                              disabled={
+                                !getCounterpartyInfo(notification)
+                                  .counterpartyUserId
+                              }
+                            />{' '}
+                            {getNotificationDescriptionText(notification)}
                           </p>
                           <p className="text-xs text-gray-500 mt-2">
-                            {formatDistanceToNow(new Date(notification.created_at), {
-                              addSuffix: true,
-                              locale: es,
-                            })}
+                            {formatDistanceToNow(
+                              new Date(notification.created_at),
+                              {
+                                addSuffix: true,
+                                locale: es,
+                              }
+                            )}
                           </p>
                         </div>
                         <ArrowRight className="h-4 w-4 text-gray-500 flex-shrink-0" />

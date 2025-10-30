@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UserLink } from '@/components/ui/user-link';
 import {
   Dialog,
   DialogContent,
@@ -102,7 +103,9 @@ export default function UserProfilePage() {
   const [savingProfile, setSavingProfile] = useState(false);
 
   // Ratings state
-  const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(null);
+  const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(
+    null
+  );
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [loadingRatings, setLoadingRatings] = useState(false);
   const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
@@ -383,11 +386,18 @@ export default function UserProfilePage() {
       logger.error('Profile update failed', updateErr);
 
       // Handle specific postcode validation errors
-      if (updateErr && typeof updateErr === 'object' && 'message' in updateErr) {
+      if (
+        updateErr &&
+        typeof updateErr === 'object' &&
+        'message' in updateErr
+      ) {
         const errorMessage = String(updateErr.message);
 
         // Check if it's a postcode validation error from the database
-        if (errorMessage.includes('codigo postal') || errorMessage.includes('postcode')) {
+        if (
+          errorMessage.includes('codigo postal') ||
+          errorMessage.includes('postcode')
+        ) {
           toast.error(errorMessage);
           return;
         }
@@ -433,9 +443,7 @@ export default function UserProfilePage() {
           <Star
             key={star}
             className={`h-5 w-5 ${
-              star <= rating
-                ? 'fill-[#FFC000] text-[#FFC000]'
-                : 'text-gray-600'
+              star <= rating ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-600'
             }`}
           />
         ))}
@@ -514,9 +522,11 @@ export default function UserProfilePage() {
                         <a
                           href="#valoraciones"
                           className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.preventDefault();
-                            document.getElementById('valoraciones')?.scrollIntoView({ behavior: 'smooth' });
+                            document
+                              .getElementById('valoraciones')
+                              ?.scrollIntoView({ behavior: 'smooth' });
                           }}
                         >
                           <div className="flex items-center gap-1">
@@ -679,15 +689,19 @@ export default function UserProfilePage() {
 
                     <a
                       href="#valoraciones"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault();
-                        document.getElementById('valoraciones')?.scrollIntoView({ behavior: 'smooth' });
+                        document
+                          .getElementById('valoraciones')
+                          ?.scrollIntoView({ behavior: 'smooth' });
                       }}
                       className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 transition-transform hover:scale-[1.02]"
                     >
                       <div className="text-center">
                         <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                        <p className="text-2xl font-black text-white">{profile.rating_count}</p>
+                        <p className="text-2xl font-black text-white">
+                          {profile.rating_count}
+                        </p>
                         <p className="text-sm text-gray-400">Valoraciones</p>
                       </div>
                     </a>
@@ -768,7 +782,9 @@ export default function UserProfilePage() {
                     </div>
                     <p className="text-gray-400">
                       Basado en {ratingSummary.rating_count}{' '}
-                      {ratingSummary.rating_count === 1 ? 'valoración' : 'valoraciones'}
+                      {ratingSummary.rating_count === 1
+                        ? 'valoración'
+                        : 'valoraciones'}
                     </p>
                   </div>
 
@@ -826,7 +842,10 @@ export default function UserProfilePage() {
               {/* Ratings List */}
               <div className="space-y-4">
                 {ratings.map(rating => {
-                  const avatarUrl = resolveAvatarUrl(rating.rater_avatar_url, supabase);
+                  const avatarUrl = resolveAvatarUrl(
+                    rating.rater_avatar_url,
+                    supabase
+                  );
                   return (
                     <div
                       key={rating.id}
@@ -857,12 +876,11 @@ export default function UserProfilePage() {
                         <div className="flex-1">
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <Link
-                                href={`/users/${rating.rater_id}`}
-                                className="font-bold text-white hover:text-[#FFC000] transition-colors"
-                              >
-                                {rating.rater_nickname}
-                              </Link>
+                              <UserLink
+                                userId={rating.rater_id}
+                                nickname={rating.rater_nickname}
+                                variant="bold"
+                              />
                               <div className="flex items-center gap-2 mt-1">
                                 {renderStars(rating.rating)}
                                 <Badge

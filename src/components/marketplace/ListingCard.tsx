@@ -1,6 +1,7 @@
 'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User, Eye, MapPin } from 'lucide-react';
@@ -46,7 +47,8 @@ export function ListingCard({ listing }: ListingCardProps) {
 
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'ayer';
-    if (diffDays < 7) return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+    if (diffDays < 7)
+      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
       return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
@@ -56,7 +58,10 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <Link href={`/marketplace/${listing.id}`} aria-label={`Ver anuncio: ${listing.title}`}>
+    <Link
+      href={`/marketplace/${listing.id}`}
+      aria-label={`Ver anuncio: ${listing.title}`}
+    >
       <ModernCard className="hover:scale-105 transition-transform cursor-pointer h-full">
         <ModernCardContent className="p-0">
           {/* Image */}
@@ -114,7 +119,12 @@ export function ListingCard({ listing }: ListingCardProps) {
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-gray-400">
                 <User className="h-4 w-4" />
-                <span className="line-clamp-1">{listing.author_nickname}</span>
+                <UserLink
+                  userId={listing.user_id}
+                  nickname={listing.author_nickname}
+                  variant="subtle"
+                  className="line-clamp-1"
+                />
               </div>
 
               {/* Views */}
@@ -126,7 +136,8 @@ export function ListingCard({ listing }: ListingCardProps) {
 
             {/* Distance & Date */}
             <div className="flex items-center justify-between text-xs">
-              {listing.distance_km !== undefined && listing.distance_km !== null ? (
+              {listing.distance_km !== undefined &&
+              listing.distance_km !== null ? (
                 <div className="flex items-center gap-1 text-[#FFC000] font-semibold">
                   <MapPin className="h-3 w-3" />
                   <span>~{listing.distance_km} km</span>
@@ -134,9 +145,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               ) : (
                 <div />
               )}
-              <p className="text-gray-500">
-                {formatDate(listing.created_at)}
-              </p>
+              <p className="text-gray-500">{formatDate(listing.created_at)}</p>
             </div>
           </div>
         </ModernCardContent>

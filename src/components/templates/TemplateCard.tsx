@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
+import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User, Star, Copy, FileText, Layout, Eye, EyeOff } from 'lucide-react';
@@ -33,7 +34,10 @@ interface TemplateCardProps {
   showVisibility?: boolean;
 }
 
-export function TemplateCard({ template, showVisibility = false }: TemplateCardProps) {
+export function TemplateCard({
+  template,
+  showVisibility = false,
+}: TemplateCardProps) {
   const { user } = useUser();
   const router = useRouter();
   const { copyTemplate, loading } = useCopyTemplate();
@@ -63,7 +67,10 @@ export function TemplateCard({ template, showVisibility = false }: TemplateCardP
   };
 
   return (
-    <Link href={`/templates/${template.id}`} aria-label={`Ver plantilla: ${template.title}`}>
+    <Link
+      href={`/templates/${template.id}`}
+      aria-label={`Ver plantilla: ${template.title}`}
+    >
       <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
         <ModernCardContent className="p-0 flex flex-col h-full">
           {/* Image */}
@@ -115,67 +122,73 @@ export function TemplateCard({ template, showVisibility = false }: TemplateCardP
                 {template.title}
               </h3>
 
-            {template.description && (
-              <p className="text-sm text-slate-400 line-clamp-2">
-                {template.description}
-              </p>
-            )}
+              {template.description && (
+                <p className="text-sm text-slate-400 line-clamp-2">
+                  {template.description}
+                </p>
+              )}
 
-            <div className="flex items-center gap-4 text-sm text-slate-400">
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
-                <span className="font-bold text-white">
-                  {template.rating_avg.toFixed(1)}
-                </span>
-                <span>({template.rating_count})</span>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <Copy className="h-4 w-4" />
-                <span>{template.copies_count}</span>
-              </div>
-
-              <div className="flex items-center gap-1">
-                <FileText className="h-4 w-4" />
-                <span>
-                  {template.pages_count} páginas - {template.total_slots} cromos
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
-                  <User className="h-3 w-3 text-slate-400" />
+              <div className="flex items-center gap-4 text-sm text-slate-400">
+                <div className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                  <span className="font-bold text-white">
+                    {template.rating_avg.toFixed(1)}
+                  </span>
+                  <span>({template.rating_count})</span>
                 </div>
-                <span className="line-clamp-1">
-                  por {template.author_nickname}
-                </span>
+
+                <div className="flex items-center gap-1">
+                  <Copy className="h-4 w-4" />
+                  <span>{template.copies_count}</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <FileText className="h-4 w-4" />
+                  <span>
+                    {template.pages_count} páginas - {template.total_slots}{' '}
+                    cromos
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
+                    <User className="h-3 w-3 text-slate-400" />
+                  </div>
+                  <span className="line-clamp-1">
+                    por{' '}
+                    <UserLink
+                      userId={template.author_id}
+                      nickname={template.author_nickname}
+                      variant="subtle"
+                    />
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <Button
-            onClick={handleCopy}
-            disabled={loading || copied}
-            className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
-            size="sm"
-          >
-            {copied ? (
-              <>
-                <Copy className="mr-2 h-4 w-4" />
-                ¡Copiada!
-              </>
-            ) : loading ? (
-              'Copiando...'
-            ) : (
-              <>
-                <Copy className="mr-2 h-4 w-4" />
-                Copiar Plantilla
-              </>
-            )}
-          </Button>
-            </div>
+            <Button
+              onClick={handleCopy}
+              disabled={loading || copied}
+              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+              size="sm"
+            >
+              {copied ? (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  ¡Copiada!
+                </>
+              ) : loading ? (
+                'Copiando...'
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copiar Plantilla
+                </>
+              )}
+            </Button>
+          </div>
         </ModernCardContent>
       </ModernCard>
     </Link>

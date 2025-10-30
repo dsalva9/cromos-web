@@ -1,6 +1,7 @@
 import { TradeProposalListItem } from '@/types';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
+import { UserLink } from '@/components/ui/user-link';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
 
 const UNREAD_BADGE_CAP = 9;
@@ -42,13 +43,25 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-export function ProposalCard({ proposal, box, onClick, unreadCount = 0, isHighlighted = false }: ProposalCardProps) {
+export function ProposalCard({
+  proposal,
+  box,
+  onClick,
+  unreadCount = 0,
+  isHighlighted = false,
+}: ProposalCardProps) {
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
     ? proposal.from_user_nickname
     : proposal.to_user_nickname;
+  const counterpartUserId = isInbox
+    ? proposal.from_user_id
+    : proposal.to_user_id;
 
-  const displayUnreadCount = unreadCount > UNREAD_BADGE_CAP ? `${UNREAD_BADGE_CAP}+` : unreadCount.toString();
+  const displayUnreadCount =
+    unreadCount > UNREAD_BADGE_CAP
+      ? `${UNREAD_BADGE_CAP}+`
+      : unreadCount.toString();
 
   return (
     <div className="relative">
@@ -68,53 +81,61 @@ export function ProposalCard({ proposal, box, onClick, unreadCount = 0, isHighli
             ? 'border-[#FFC000] animate-pulse-border'
             : 'border-black'
         }`}
-        style={isHighlighted ? {
-          animation: 'pulse-border 1.5s ease-in-out 3'
-        } : undefined}
+        style={
+          isHighlighted
+            ? {
+                animation: 'pulse-border 1.5s ease-in-out 3',
+              }
+            : undefined
+        }
       >
         <ModernCardContent className="p-4">
-
-        <div className="flex justify-between items-start">
-          <p className="font-bold text-lg text-white uppercase">
-            {isInbox ? (
-              <ArrowRight className="inline h-4 w-4 mr-2 text-green-400" />
-            ) : (
-              <ArrowLeft className="inline h-4 w-4 mr-2 text-blue-400" />
-            )}
-            {isInbox ? 'De:' : 'Para:'} {counterpartNickname}
+          <div className="flex justify-between items-start">
+            <p className="font-bold text-lg text-white uppercase">
+              {isInbox ? (
+                <ArrowRight className="inline h-4 w-4 mr-2 text-green-400" />
+              ) : (
+                <ArrowLeft className="inline h-4 w-4 mr-2 text-blue-400" />
+              )}
+              {isInbox ? 'De:' : 'Para:'}{' '}
+              <UserLink
+                userId={counterpartUserId || ''}
+                nickname={counterpartNickname}
+                variant="bold"
+                disabled={!counterpartUserId}
+              />
+            </p>
+            <Badge className={getStatusBadgeVariant(proposal.status)}>
+              {getStatusLabel(proposal.status)}
+            </Badge>
+          </div>
+          <p className="text-xs text-gray-400 mt-1 mb-4">
+            {new Date(proposal.created_at).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
           </p>
-          <Badge className={getStatusBadgeVariant(proposal.status)}>
-            {getStatusLabel(proposal.status)}
-          </Badge>
-        </div>
-        <p className="text-xs text-gray-400 mt-1 mb-4">
-          {new Date(proposal.created_at).toLocaleDateString('es-ES', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-          })}
-        </p>
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
-            <span className="text-green-400 flex items-center font-bold">
-              <ArrowDown className="h-4 w-4 mr-1" /> Ofreces
-            </span>
-            <span className="font-bold text-white">
-              {proposal.offer_item_count} cromos
-            </span>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+              <span className="text-green-400 flex items-center font-bold">
+                <ArrowDown className="h-4 w-4 mr-1" /> Ofreces
+              </span>
+              <span className="font-bold text-white">
+                {proposal.offer_item_count} cromos
+              </span>
+            </div>
+            <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+              <span className="text-blue-400 flex items-center font-bold">
+                <ArrowUp className="h-4 w-4 mr-1" /> Pides
+              </span>
+              <span className="font-bold text-white">
+                {proposal.request_item_count} cromos
+              </span>
+            </div>
           </div>
-          <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
-            <span className="text-blue-400 flex items-center font-bold">
-              <ArrowUp className="h-4 w-4 mr-1" /> Pides
-            </span>
-            <span className="font-bold text-white">
-              {proposal.request_item_count} cromos
-            </span>
-          </div>
-        </div>
-      </ModernCardContent>
-    </ModernCard>
+        </ModernCardContent>
+      </ModernCard>
     </div>
   );
 }
-

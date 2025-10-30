@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
 import { useTradeChat } from '@/hooks/trades/useTradeChat';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { UserLink } from '@/components/ui/user-link';
 import { Send, ChevronDown, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -134,17 +134,15 @@ export function TradeChatPanel({
       <div className="bg-gray-800 border-b-2 border-black px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 text-sm font-bold">Conversación con:</span>
-            {counterpartyUserId ? (
-              <Link
-                href={`/users/${counterpartyUserId}`}
-                className="text-white font-bold hover:text-[#FFC000] transition-colors"
-              >
-                {counterpartyNickname}
-              </Link>
-            ) : (
-              <span className="text-white font-bold">{counterpartyNickname}</span>
-            )}
+            <span className="text-gray-400 text-sm font-bold">
+              Conversación con:
+            </span>
+            <UserLink
+              userId={counterpartyUserId || ''}
+              nickname={counterpartyNickname}
+              variant="bold"
+              disabled={!counterpartyUserId}
+            />
           </div>
           {!isProposalActive && (
             <span className="text-xs text-gray-500 font-bold uppercase">
@@ -223,16 +221,12 @@ export function TradeChatPanel({
               >
                 {!isMine && (
                   <p className="text-xs font-bold text-gray-400 mb-1">
-                    {counterpartyUserId ? (
-                      <Link
-                        href={`/users/${counterpartyUserId}`}
-                        className="hover:text-[#FFC000] hover:underline transition-colors"
-                      >
-                        {message.sender_nickname}
-                      </Link>
-                    ) : (
-                      message.sender_nickname
-                    )}
+                    <UserLink
+                      userId={message.sender_id}
+                      nickname={message.sender_nickname}
+                      variant="subtle"
+                      disabled={!message.sender_id}
+                    />
                   </p>
                 )}
                 <p className="text-sm font-medium whitespace-pre-wrap break-words">
