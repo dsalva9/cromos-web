@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw } from 'lucide-react';
 import { toast } from '@/lib/toast';
@@ -138,7 +139,10 @@ export function CameraCaptureModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl p-0">
+      <DialogContent className="max-w-2xl p-0" aria-describedby={undefined}>
+        <VisuallyHidden>
+          <DialogTitle>Capturar foto con cámara</DialogTitle>
+        </VisuallyHidden>
         <div className="relative bg-black">
           {permissionDenied ? (
             <div className="p-8 text-center">
