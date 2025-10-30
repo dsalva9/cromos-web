@@ -188,9 +188,12 @@ User-created marketplace listings for physical cards.
 - `idx_listings_copy` ON (copy_id) WHERE copy_id IS NOT NULL
 - `idx_listings_slot` ON (slot_id) WHERE slot_id IS NOT NULL
 
-**RLS Policies:**
+**RLS Policies:** ✅ **UPDATED (2025-10-30)**
 
-- Public read WHERE status = 'active' OR auth.uid() = user_id ✅ **v1.6.0 FIXED** (allows users to view own listings regardless of status)
+- Public read WHERE status = 'active' OR auth.uid() = user_id OR user has chat participation ✅ **v1.6.0 FIXED**
+  - Active listings: public access
+  - Own listings: sellers always have access
+  - Chat participants: users who have sent/received messages retain access even after listing is reserved/completed
 - Users can insert their own listings
 - Users can update their own listings (WITH CHECK added) ✅ **v1.6.0 FIXED**
 - Users can delete their own listings
@@ -696,19 +699,21 @@ Items included in trade proposals.
 
 - Follows trade_proposals policies
 
-### trade_chats
+### trade_chats ✅ **UPDATED (2025-10-30)**
 
-Chat messages within trades and listings. Supports bidirectional conversations for both trade proposals and marketplace listings.
+Chat messages within trades and listings. Supports bidirectional conversations for both trade proposals and marketplace listings with context-aware system messages.
 
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
 - `trade_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE (nullable - for trade chats)
 - `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE SET NULL (nullable - for listing chats)
-- `sender_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `sender_id` UUID REFERENCES profiles(id) ON DELETE CASCADE (nullable for system messages)
+- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE (nullable for system messages)
 - `message` TEXT NOT NULL (max 500 characters)
 - `is_read` BOOLEAN DEFAULT FALSE NOT NULL
+- `is_system` BOOLEAN DEFAULT FALSE NOT NULL ✅ **NEW (2025-10-28)** - Identifies system-generated messages
+- `visible_to_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE ✅ **NEW (2025-10-28)** - Restricts visibility to specific user (NULL = visible to all)
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 
 **Constraints:**
@@ -721,16 +726,22 @@ Chat messages within trades and listings. Supports bidirectional conversations f
 - `idx_trade_chats_listing` ON (listing_id) WHERE listing_id IS NOT NULL
 - `idx_trade_chats_receiver_id` ON (receiver_id)
 - `idx_trade_chats_is_read` ON (receiver_id, is_read) WHERE is_read = FALSE
+- `idx_trade_chats_is_system` ON (listing_id, is_system) WHERE is_system = TRUE ✅ **NEW**
+- `idx_trade_chats_visible_to_user` ON (listing_id, visible_to_user_id) WHERE visible_to_user_id IS NOT NULL ✅ **NEW**
 
 **RLS Policies:**
 
 - Users can read chats where they are sender or receiver
+- Users can read system messages targeted to them or with NULL visibility
 - Users can insert chats
 - Users can update is_read on received messages
+- Chat participants can access listing even after reserved/completed (via listing RLS exception) ✅ **NEW (2025-10-30)**
 
 **Related RPCs:**
 
-- `get_listing_chats(listing_id)`
+- `get_listing_chats(listing_id, participant_id)` - Returns regular + system messages filtered by visibility
+- `add_system_message_to_listing_chat(listing_id, message, visible_to_user_id)` - Creates system messages
+- `add_listing_status_messages(listing_id, reserved_buyer_id, message_type)` - Sends context-aware notifications
 - `send_listing_message(listing_id, message)`
 
 ### trades_history
@@ -793,10 +804,11 @@ User notifications system (Sprint 15: Modernized for marketplace, templates, and
 - `idx_notifications_payload_gin` GIN (payload)
 - `idx_notifications_unique_unread` UNIQUE (user_id, kind, listing_id, template_id, rating_id, trade_id) WHERE read_at IS NULL
 
-**Triggers:**
+**Triggers:** ✅ **UPDATED (2025-10-30)**
 
 - `trigger_notify_chat_message` - Creates/updates notification on trade_chats INSERT (handles both trade and listing chats)
-- `trigger_notify_user_rating` - Creates notification on user_ratings INSERT
+- ~~`trigger_notify_user_rating`~~ - **REMOVED (2025-10-30)** - Was creating premature notifications
+- `trigger_check_mutual_ratings` ✅ **ONLY RATING TRIGGER** - Creates notifications ONLY after BOTH users have rated (prevents premature notifications)
 - `trigger_notify_template_rating` - Creates notification on template_ratings INSERT
 - `trigger_notify_listing_status_change` - Creates notifications on trade_listings status change (reserved, completed)
 - `trigger_notify_proposal_status_change` - Creates notification on trade_proposals UPDATE

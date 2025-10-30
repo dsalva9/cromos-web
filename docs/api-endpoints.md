@@ -1882,9 +1882,9 @@ haversine_distance(
 
 ### Transaction Workflow RPCs
 
-#### `reserve_listing` ✅ **v1.6.0 USED**
+#### `reserve_listing` ✅ **v1.6.0 UPDATED (2025-10-30)**
 
-Reserves a listing for a specific buyer. Creates a transaction record and updates listing status to 'reserved'.
+Reserves a listing for a specific buyer. Creates a transaction record, updates listing status to 'reserved', and sends context-aware system messages to all chat participants.
 
 **Function Signature:**
 
@@ -1910,6 +1910,14 @@ reserve_listing(
 - Listing must be active
 - Buyer must exist and not be the seller
 
+**Behavior:**
+- Creates `listing_transaction` record with status='reserved'
+- Updates listing status to 'reserved'
+- Calls `add_listing_status_messages()` to send role-specific messages:
+  - Reserved buyer: "Seller has reserved this listing for you"
+  - Other buyers: "This listing has been reserved for another user"
+  - Seller: "You have reserved this listing for [buyer]"
+
 **Usage:**
 ```typescript
 const { data: transactionId, error } = await supabase.rpc('reserve_listing', {
@@ -1921,9 +1929,49 @@ const { data: transactionId, error } = await supabase.rpc('reserve_listing', {
 
 ---
 
-#### `complete_listing_transaction` ✅ **v1.6.0 UPDATED**
+#### `unreserve_listing` ✅ **NEW (2025-10-30)**
 
-Marks a transaction as completed. When seller initiates, sends notification to buyer for confirmation.
+Unreserves a listing and returns it to 'active' status. Sends context-aware notifications to all participants.
+
+**Function Signature:**
+
+```sql
+unreserve_listing(
+  p_listing_id BIGINT
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_listing_id`: The listing to unreserve
+
+**Returns**: TRUE on success
+
+**Security**: SECURITY DEFINER, seller only
+
+**Validations:**
+- Must have an active reservation (transaction status='reserved')
+- Caller must be the listing owner
+
+**Behavior:**
+- Updates transaction status to 'cancelled'
+- Reverts listing status to 'active'
+- Calls `add_listing_status_messages()` to send:
+  - All buyers: "The listing is now available again"
+  - Seller: "You have unreserved this listing"
+- Re-enables chat for all buyers
+
+**Usage:**
+```typescript
+const { data, error } = await supabase.rpc('unreserve_listing', {
+  p_listing_id: listingId
+});
+```
+
+---
+
+#### `complete_listing_transaction` ✅ **v1.6.0 UPDATED (2025-10-30)**
+
+Marks a transaction as completed with role-specific system messages and two-step workflow (seller initiates, buyer confirms).
 
 **Function Signature:**
 
@@ -1941,10 +1989,17 @@ complete_listing_transaction(
 **Security**: SECURITY DEFINER, seller or buyer
 
 **Behavior:**
-- Updates transaction status to 'completed'
-- Updates listing status to 'completed'
-- If caller is seller: sends `listing_completed` notification to buyer with `needs_confirmation: true`
-- If caller is buyer: confirms the transaction (no notification sent)
+- **If seller initiates:**
+  - Sends targeted message to buyer: "Seller marked as completed. Awaiting your confirmation"
+  - Sends message to seller: "You marked as completed. Waiting for [buyer] confirmation"
+  - Transaction remains 'reserved' until buyer confirms
+- **If buyer confirms:**
+  - Updates transaction status to 'completed'
+  - Updates listing status to 'completed'
+  - Calls `add_listing_status_messages()`:
+    - Reserved buyer: "Transaction completed! Rate [seller]"
+    - Other buyers: "This listing is no longer available"
+    - Seller: "Transaction with [buyer] completed! Rate them"
 
 **Usage:**
 ```typescript
@@ -2040,9 +2095,9 @@ if (data && data.length > 0) {
 
 ### Listing Chat RPCs
 
-#### `get_listing_chats(p_listing_id, p_participant_id)`
+#### `get_listing_chats(p_listing_id, p_participant_id)` ✅ **UPDATED (2025-10-30)**
 
-Retrieves chat messages for a specific listing, supporting bidirectional conversations between buyers and sellers.
+Retrieves chat messages for a specific listing with context-aware system message filtering based on user role. Allows buyers to open chats even before sending first message.
 
 **Function Signature:**
 
@@ -2057,6 +2112,7 @@ get_listing_chats(
   sender_nickname TEXT,
   message TEXT,
   is_read BOOLEAN,
+  is_system BOOLEAN,
   created_at TIMESTAMPTZ
 )
 ```
@@ -2067,7 +2123,23 @@ get_listing_chats(
 
 **Access Control:**
 - Sellers can view all conversations or filter by participant
-- Buyers can only view their own conversation with the seller
+- Buyers can view their own conversation with seller (even if no messages sent yet)
+- **NEW:** System messages filtered by `visible_to_user_id` - users only see system messages targeted to them or messages with NULL visibility (visible to all)
+- **NEW:** Buyers can access chat for active listings even with no prior messages (enables first contact)
+- **NEW:** Works with RLS - chat participants retain access to listings even after reserved/completed
+
+**Behavior:**
+- Returns regular messages between buyer and seller
+- Returns system messages relevant to the authenticated user
+- Filters out system messages targeted to other users
+- Returns empty result set for first-time buyers (allows them to start conversation)
+
+**RLS Integration:**
+- Function uses `SECURITY DEFINER` but still respects RLS
+- Buyers can access listing chats for:
+  - Active listings (RLS allows public access)
+  - Listings where they have chat participation (via chat participant RLS exception)
+  - Own listings (as seller)
 
 **Usage:**
 ```typescript
@@ -2161,6 +2233,93 @@ const { data, error } = await supabase.rpc('send_listing_message', {
   p_receiver_id: receiverId,
   p_message: message.trim()
 });
+```
+
+---
+
+#### `add_system_message_to_listing_chat(p_listing_id, p_message, p_visible_to_user_id)` ✅ **UPDATED (2025-10-30)**
+
+Adds a system-generated message to a listing chat with optional user-specific visibility.
+
+**Function Signature:**
+
+```sql
+add_system_message_to_listing_chat(
+  p_listing_id BIGINT,
+  p_message TEXT,
+  p_visible_to_user_id UUID DEFAULT NULL
+) RETURNS BIGINT -- Returns message ID
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+- `p_message`: System message text
+- `p_visible_to_user_id`: (Optional) If provided, only this user can see the message. NULL = visible to all
+
+**Behavior:**
+- Creates system message with `is_system = TRUE`
+- System messages are auto-marked as read
+- `sender_id` and `receiver_id` are NULL for system messages
+- Messages with `visible_to_user_id` are filtered by `get_listing_chats()` based on viewer
+
+**Usage:**
+```typescript
+// Message visible to all
+const { data, error } = await supabase.rpc('add_system_message_to_listing_chat', {
+  p_listing_id: listingId,
+  p_message: 'Listing status updated',
+  p_visible_to_user_id: null
+});
+
+// Message visible only to specific user
+const { data, error } = await supabase.rpc('add_system_message_to_listing_chat', {
+  p_listing_id: listingId,
+  p_message: 'This listing has been reserved for you',
+  p_visible_to_user_id: buyerId
+});
+```
+
+---
+
+#### `add_listing_status_messages(p_listing_id, p_reserved_buyer_id, p_message_type)` ✅ **NEW (2025-10-30)**
+
+Sends context-aware system messages to all participants in a listing's chats based on status change.
+
+**Function Signature:**
+
+```sql
+add_listing_status_messages(
+  p_listing_id BIGINT,
+  p_reserved_buyer_id UUID DEFAULT NULL,
+  p_message_type TEXT DEFAULT 'reserved'
+) RETURNS VOID
+```
+
+**Parameters:**
+- `p_listing_id`: The listing ID
+- `p_reserved_buyer_id`: The buyer involved in the transaction (for reserved/completed messages)
+- `p_message_type`: Type of status change - 'reserved', 'unreserved', or 'completed'
+
+**Behavior:**
+
+**For 'reserved' type:**
+- Reserved buyer gets: "[Seller] has reserved this listing for you"
+- Other buyers get: "This listing has been reserved for another user"
+- Seller gets: "You have reserved this listing for [buyer]"
+
+**For 'unreserved' type:**
+- All buyers get: "The listing is now available again"
+- Seller gets: "You have unreserved this listing"
+
+**For 'completed' type:**
+- Reserved buyer gets: "Transaction completed! Rate [seller]"
+- Other buyers get: "This listing is no longer available"
+- Seller gets: "Transaction with [buyer] completed! Rate them"
+
+**Usage:**
+```typescript
+// Called internally by reserve_listing, unreserve_listing, complete_listing_transaction
+// Not typically called directly from frontend
 ```
 
 ---
@@ -2368,16 +2527,22 @@ Sprint 15 added database triggers that automatically create notifications:
 - **Recipient:** Rated user
 - **Payload:** rating_value, context_type, context_id, has_comment
 
-#### `trigger_check_mutual_ratings` ✅ **NEW (v1.6.0 - 2025-10-28)**
+#### `trigger_check_mutual_ratings` ✅ **UPDATED (v1.6.0 - 2025-10-30)**
 
 - **Fires:** AFTER INSERT on `user_ratings`
 - **Function:** `check_mutual_ratings_and_notify()`
 - **Purpose:** Detects when both users have rated each other for a listing transaction
 - **Actions when mutual ratings complete:**
   - Sends `user_rated` notification to both users with counterparty's rating details
-  - Adds system message to listing chat with both ratings
+  - Adds targeted system messages to listing chat (visible only to transaction participants)
   - Payload includes: rating_value, has_comment, comment (if present), listing_title
 - **Context:** Only processes ratings with `context_type = 'listing'`
+- **Fixed (2025-10-30):** Removed conflicting `trigger_notify_user_rating` that was creating premature notifications
+- **Behavior:**
+  - NO notifications when first person rates
+  - Both users get notifications ONLY after both have rated
+  - System messages are participant-specific (buyer sees their rating, seller sees theirs)
+  - Each user only sees the counterparty's rating of them, not their own rating
 
 #### `trigger_notify_template_rating`
 

@@ -9,7 +9,7 @@ const listingTransactionSchema = z.object({
   buyer_id: z.string().uuid(),
   seller_nickname: z.string(),
   buyer_nickname: z.string(),
-  status: z.enum(['reserved', 'completed', 'cancelled']),
+  status: z.enum(['reserved', 'pending_completion', 'completed', 'cancelled']),
   reserved_at: z.string(),
   completed_at: z.string().nullable(),
   cancelled_at: z.string().nullable(),
@@ -100,6 +100,33 @@ export async function cancelListingTransaction(
         error instanceof Error
           ? error
           : new Error('No se pudo cancelar la reserva'),
+    };
+  }
+}
+
+/**
+ * Unreserve a listing (return to active status)
+ */
+export async function unreserveListing(
+  supabase: SupabaseClient,
+  listingId: number
+): Promise<{ success: boolean; error: Error | null }> {
+  try {
+    const { data, error } = await supabase.rpc('unreserve_listing', {
+      p_listing_id: listingId,
+    });
+
+    if (error) throw error;
+
+    return { success: !!data, error: null };
+  } catch (error) {
+    console.error('Error unreserving listing:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error
+          : new Error('No se pudo liberar la reserva'),
     };
   }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import {
   reserveListing,
+  unreserveListing,
   completeListingTransaction,
   cancelListingTransaction,
   getListingTransaction,
@@ -80,7 +81,26 @@ export function useListingWorkflow(listingId: number) {
     setProcessing(false);
   }, [supabase, transaction, user, processing, fetchTransaction]);
 
-  // Cancel reservation
+  // Unreserve listing (return to active)
+  const handleUnreserve = useCallback(async () => {
+    if (!user || processing) return;
+
+    if (!confirm('¿Seguro que quieres liberar la reserva? El anuncio volverá a estar disponible para todos.')) return;
+
+    setProcessing(true);
+    const { success, error } = await unreserveListing(supabase, listingId);
+
+    if (error) {
+      toast.error(error.message);
+    } else if (success) {
+      toast.success('Reserva liberada correctamente');
+      await fetchTransaction();
+    }
+
+    setProcessing(false);
+  }, [supabase, listingId, user, processing, fetchTransaction]);
+
+  // Cancel reservation (deprecated - use unreserve instead)
   const handleCancel = useCallback(
     async (reason: string) => {
       if (!user || !transaction || processing) return;
@@ -110,6 +130,7 @@ export function useListingWorkflow(listingId: number) {
     processing,
     refetch: fetchTransaction,
     reserveListing: handleReserve,
+    unreserveListing: handleUnreserve,
     completeTransaction: handleComplete,
     cancelReservation: handleCancel,
   };

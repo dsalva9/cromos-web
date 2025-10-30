@@ -131,12 +131,15 @@
 - `list_trade_listings_with_distance` ✅ **NEW (v1.6.0)** - List with optional distance sorting
 - `get_user_listings` - View user's listings
 - `update_listing_status` - Mark sold/removed
-- `reserve_listing` ✅ **USED (v1.6.0)** - Reserve listing for specific buyer, creates transaction record
-- `complete_listing_transaction` ✅ **UPDATED (v1.6.0)** - Mark transaction as completed, sends buyer notification
+- `reserve_listing` ✅ **UPDATED (2025-10-30)** - Reserve listing for specific buyer, sends context-aware system messages to all participants
+- `unreserve_listing` ✅ **NEW (2025-10-30)** - Unreserve listing and return to active status, notifies all participants
+- `complete_listing_transaction` ✅ **UPDATED (2025-10-30)** - Mark transaction as completed with role-specific messages
 - `cancel_listing_transaction` - Cancel reservation and revert to active
 - `get_listing_transaction` ✅ **USED (v1.6.0)** - Get transaction details for a listing
-- `get_listing_chats`, `send_listing_message` - Chat from listing
-- `add_system_message_to_listing_chat` ✅ **USED (v1.6.0)** - Add system messages to chat
+- `get_listing_chats` ✅ **UPDATED (2025-10-30)** - Get chats with context-aware system message filtering
+- `send_listing_message` - Send message in listing chat
+- `add_system_message_to_listing_chat` ✅ **UPDATED (2025-10-30)** - Add system messages with optional user visibility targeting
+- `add_listing_status_messages` ✅ **NEW (2025-10-30)** - Send role-specific messages to all chat participants
 - `get_user_conversations` ✅ **NEW (v1.6.0)** - Get all user's listing conversations
 - `haversine_distance` ✅ **NEW (v1.6.0)** - Calculate distance between coordinates
 
@@ -146,6 +149,22 @@
 - Separate chat flows for proposals and listings
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
+- **NEW (2025-10-30):** Context-aware system messages with role-specific visibility
+  - Reserved buyer sees personalized confirmation message
+  - Other buyers see generic "reserved for another user" message
+  - Seller sees full transaction details with buyer name
+  - System messages filtered by `visible_to_user_id` field
+- **NEW (2025-10-30):** "Liberar Reserva" button for sellers in reserved state
+  - Returns listing to active status
+  - Re-enables chat for all buyers
+  - Sends unreservation notifications to all participants
+- **NEW (2025-10-30):** Chat composer behavior based on user role:
+  - Reserved buyer: chat remains enabled during reservation
+  - Non-reserved buyers: chat disabled with "reserved for another user" message
+  - On completion: participants see "Chat closed", others see "no longer available"
+- **NEW (2025-10-30):** Status badges in conversations:
+  - Overall listing status in header
+  - "Reservado" badge next to reserved buyer in seller's participants list
 - **NEW (2025-10-28):** Terms of Service acceptance required for buyers before first message
 - **NEW (2025-10-28):** Listing info card displayed at top of chat with status badge
 - **NEW (2025-10-28):** Seller action buttons in chat: "Marcar Reservado", "Marcar Completado"
@@ -846,6 +865,34 @@ Sprint 15 completely modernized the notifications system to support all major pl
 
 ---
 
-**Last Updated**: 2025-10-25 (Sprint 15 Complete - PRODUCTION READY)
-**Current Version**: v1.5.0
-**Status**: Phase 0 Complete ✅ | Sprints 1-15 Complete ✅ | **PRODUCTION READY** 🚀
+### Sprint 16: Marketplace Fixes & Enhancements ✅ **COMPLETE (2025-10-30)**
+
+**Chat Access & RLS Improvements:**
+- ✅ Fixed buyer access to listing chats for first contact (no prior messages required)
+- ✅ Chat participants retain listing access even after reserved/completed
+- ✅ Updated RLS policy: active listings OR listing owner OR chat participants
+- ✅ Fixed `get_listing_chats` to handle first-time buyers gracefully
+
+**Rating System Fixes:**
+- ✅ Removed premature rating notifications (was notifying immediately when first person rated)
+- ✅ Fixed duplicate notifications (trigger conflict resolved)
+- ✅ Notifications now ONLY appear after BOTH users have rated
+- ✅ Dropped conflicting `trigger_notify_user_rating` trigger
+- ✅ Kept only `trigger_check_mutual_ratings` for proper mutual rating behavior
+
+**System Message Improvements:**
+- ✅ Context-aware system messages per user role
+- ✅ Targeted visibility with `visible_to_user_id` field
+- ✅ Reserved buyer sees different message than other buyers
+- ✅ Seller sees personalized messages with buyer name
+
+**Database Updates:**
+- ✅ Migration `20251030140000_fix_listing_visibility_for_chat_participants.sql`
+- ✅ Migration `20251030145000_fix_get_listing_chats_rls.sql`
+- ✅ Migration `20251030150000_drop_immediate_rating_notification.sql`
+
+---
+
+**Last Updated**: 2025-10-30 (Sprint 16 Complete)
+**Current Version**: v1.6.0
+**Status**: Phase 0 Complete ✅ | Sprints 1-16 Complete ✅ | **PRODUCTION READY** 🚀

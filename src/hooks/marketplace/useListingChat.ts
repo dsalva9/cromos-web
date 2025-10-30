@@ -52,7 +52,8 @@ export function useListingChat({
 
     if (fetchError) {
       setError(fetchError.message);
-      toast.error(fetchError.message);
+      // Don't show toast - error handling is done in the UI component
+      console.error('Error fetching messages:', fetchError.message);
     } else {
       setMessages(data);
 

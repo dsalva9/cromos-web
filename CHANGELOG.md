@@ -9,6 +9,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Rating Notification System (2025-10-30)**
+  - Fixed premature rating notifications being sent immediately when first person rated
+  - Fixed duplicate notifications (4 instead of 2) caused by conflicting triggers
+  - **Solution:** Dropped conflicting `trigger_notify_user_rating` trigger
+  - **Behavior:** Notifications now ONLY sent after BOTH users have rated each other
+  - Each user gets exactly 1 notification showing counterparty's rating
+  - System messages in chat are now participant-specific with `visible_to_user_id`
+  - Migration: `20251030150000_drop_immediate_rating_notification.sql`
+
+- **Chat Access for First-Time Buyers (2025-10-30)**
+  - Fixed "You do not have access to this chat" error when buyer opens chat before sending first message
+  - Fixed "Listing not found or access denied" error for buyers trying to start conversations
+  - **Solution:** Updated `get_listing_chats()` to allow buyers to access active listings even with no prior messages
+  - Returns empty message array for first-time buyers (enables conversation start)
+  - Migration: `20251030145000_fix_get_listing_chats_rls.sql`
+
+- **Chat Participant Listing Access (2025-10-30)**
+  - Fixed issue where users lost access to listing after it was reserved/completed
+  - **Solution:** Updated RLS policy to grant listing access to chat participants
+  - Chat participants can now view listing even after status changes
+  - Policy: `status = 'active' OR auth.uid() = user_id OR EXISTS (chat participation)`
+  - Migration: `20251030140000_fix_listing_visibility_for_chat_participants.sql`
+
+- **SQL Ambiguous Column References (2025-10-30)**
+  - Fixed "column reference 'sender_id' is ambiguous" error in `get_listing_chats()`
+  - Fixed "column reference 'id' is ambiguous" error in listing owner queries
+  - **Solution:** Added table prefixes to all column references in function
+  - Migration: `20251030145000_fix_get_listing_chats_rls.sql`
+
+### Changed
+
+- **Context-Aware System Messages in Marketplace Chats (2025-10-30)**
+  - Implemented role-specific visibility for marketplace listing actions
+  - **System Message Visibility:**
+    - Reserved buyer sees: "Seller has reserved this listing for you"
+    - Other buyers see: "This listing has been reserved for another user"
+    - Seller sees: "You have reserved this listing for [buyer]"
+    - When unreserved, all buyers see: "The listing is now available again"
+    - When completed, reserved buyer sees: "Transaction completed! Rate [seller]"
+    - Other buyers see: "This listing is no longer available"
+  - **Chat Composer Behavior:**
+    - Reserved buyers can continue messaging during reservation
+    - Non-reserved buyers see: "This listing is reserved for another user" (chat disabled)
+    - All non-participants see: "This listing is no longer available" when completed
+    - Participants see: "Chat closed - Transaction completed"
+  - **Unreserve Action:**
+    - New "Liberar Reserva" button for sellers in reserved state
+    - Returns listing to 'active' status
+    - Sends context-aware system messages to all participants
+    - Re-enables chat for all buyers
+  - **UI Improvements:**
+    - Participants list shows "Reservado" badge next to reserved buyer (seller view)
+    - Overall listing status badge in conversations header
+    - Removed manual system message handling (now automated by RPC functions)
+  - **Database Changes:**
+    - New migration: `20251030105040_add_context_aware_system_messages.sql`
+    - Added `visible_to_user_id` column to `trade_chats` for targeted messages
+    - New function: `add_listing_status_messages()` sends role-specific messages
+    - New RPC: `unreserve_listing()` handles unreservation workflow
+    - Updated `reserve_listing()`, `complete_listing_transaction()` to use context-aware messages
+    - Updated `get_listing_chats()` to filter system messages by user
+  - **Frontend Updates:**
+    - Updated `src/app/marketplace/[id]/chat/page.tsx` with unreserve handler and role-based UI
+    - Added `unreserveListing()` function to `src/lib/supabase/listings/transactions.ts`
+    - Updated `useListingWorkflow` hook with unreserve action
+
+### Fixed
+
 - **Avatar URL Resolution (2025-10-29)**
   - Fixed "Invalid URL" errors when displaying user avatars across the application
   - Properly resolve avatar URLs from Supabase storage paths to public URLs

@@ -30,16 +30,20 @@ function ListingChatPageContent() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [reserving, setReserving] = useState(false);
+  const [unreserving, setUnreserving] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [transactionId, setTransactionId] = useState<number | null>(null);
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
+  const [transaction, setTransaction] = useState<{ buyer_id: string } | null>(null);
   const [isBuyer, setIsBuyer] = useState(false);
+  const [isReservedBuyer, setIsReservedBuyer] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [counterpartyToRate, setCounterpartyToRate] = useState<{ id: string; nickname: string } | null>(null);
   const [myRating, setMyRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const [counterpartyRating, setCounterpartyRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const [bothRated, setBothRated] = useState(false);
+  const [listingAccessDenied, setListingAccessDenied] = useState(false);
 
   const {
     messages,
@@ -72,11 +76,20 @@ function ListingChatPageContent() {
           created_at
         `)
         .eq('id', listingId)
-        .single();
+        .maybeSingle();
 
-      if (listingError || !listingData) {
-        toast.error('Error al cargar el anuncio');
+      if (listingError) {
         console.error('Error fetching listing:', listingError);
+        setListingAccessDenied(true);
+        // Don't return - we can still show chat even if listing fetch fails
+        return;
+      }
+
+      if (!listingData) {
+        console.warn('Listing not found or access denied - continuing with chat only');
+        setListingAccessDenied(true);
+        // Don't return or show error - user may still have chat access
+        // The chat will work, but listing card won't show
         return;
       }
 
@@ -129,8 +142,10 @@ function ListingChatPageContent() {
       if (data && Array.isArray(data) && data.length > 0) {
         setTransactionId(data[0].id);
         setTransactionStatus(data[0].status);
+        setTransaction({ buyer_id: data[0].buyer_id });
         const isUserBuyer = data[0].buyer_id === user.id;
         setIsBuyer(isUserBuyer);
+        setIsReservedBuyer(isUserBuyer);
 
         // Set counterparty info for rating
         if (listing.status === 'completed') {
@@ -225,9 +240,20 @@ function ListingChatPageContent() {
       return;
     }
 
+    // Get selected participant's nickname
+    const selectedParticipantData = participants.find(p => p.user_id === selectedParticipant);
+    if (!selectedParticipantData) {
+      toast.error('Error: no se encontró el comprador seleccionado');
+      return;
+    }
+
+    if (!confirm(`¿Seguro que quieres reservar este anuncio para ${selectedParticipantData.nickname}?`)) {
+      return;
+    }
+
     setReserving(true);
     try {
-      // Use reserve_listing RPC to create transaction and update status
+      // Use reserve_listing RPC - it handles transaction creation, status update, and system messages
       const { error: reserveError } = await supabase.rpc('reserve_listing', {
         p_listing_id: listingId,
         p_buyer_id: selectedParticipant,
@@ -236,24 +262,11 @@ function ListingChatPageContent() {
 
       if (reserveError) throw reserveError;
 
-      // Add system message to chat
-      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha reservado '${listing.title}'`;
-      const { error: messageError } = await supabase
-        .rpc('add_system_message_to_listing_chat', {
-          p_listing_id: listingId,
-          p_message: systemMessage
-        });
-
-      if (messageError) {
-        console.error('Error adding system message:', messageError);
-        // Don't throw - reservation succeeded even if message failed
-      }
-
-      toast.success('Anuncio marcado como reservado');
+      toast.success(`Anuncio reservado para ${selectedParticipantData.nickname}`);
       // Update local state
       setListing({ ...listing, status: 'reserved' });
 
-      // Refresh messages to show system message
+      // Refresh to show system messages
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -265,35 +278,71 @@ function ListingChatPageContent() {
     }
   };
 
+  const handleUnreserve = async () => {
+    if (!listing || !isOwner || !user || !transaction) return;
+
+    // Get reserved buyer's nickname
+    const reservedBuyerNickname = participants.find(p => p.user_id === transaction.buyer_id)?.nickname;
+    if (!reservedBuyerNickname) {
+      toast.error('Error: no se encontró el comprador reservado');
+      return;
+    }
+
+    if (!confirm(`¿Seguro que quieres liberar la reserva con ${reservedBuyerNickname}? El anuncio volverá a estar disponible para todos.`)) {
+      return;
+    }
+
+    setUnreserving(true);
+    try {
+      // Use unreserve_listing RPC - it handles status update and system messages
+      const { error: unreserveError } = await supabase.rpc('unreserve_listing', {
+        p_listing_id: listingId
+      });
+
+      if (unreserveError) throw unreserveError;
+
+      toast.success('Reserva liberada. El anuncio está disponible nuevamente.');
+      // Update local state
+      setListing({ ...listing, status: 'active' });
+
+      // Refresh to show system messages
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (error) {
+      console.error('Error unreserving listing:', error);
+      toast.error('Error al liberar la reserva');
+    } finally {
+      setUnreserving(false);
+    }
+  };
+
   const handleComplete = async () => {
-    if (!listing || !isOwner || !user || !transactionId) return;
+    if (!listing || !isOwner || !user || !transactionId || !transaction) return;
+
+    // Get reserved buyer's nickname
+    const reservedBuyerNickname = participants.find(p => p.user_id === transaction.buyer_id)?.nickname;
+    if (!reservedBuyerNickname) {
+      toast.error('Error: no se encontró el comprador reservado');
+      return;
+    }
+
+    if (!confirm(`¿Confirmas que has completado el intercambio con ${reservedBuyerNickname}? Esto enviará una notificación al comprador para que confirme.`)) {
+      return;
+    }
 
     setCompleting(true);
     try {
-      // Mark transaction as completed (seller initiates)
+      // Mark transaction as completed (seller initiates) - RPC handles system messages
       const { error: completeError } = await supabase.rpc('complete_listing_transaction', {
         p_transaction_id: transactionId
       });
 
       if (completeError) throw completeError;
 
-      // Add system message to chat
-      const systemMessage = `${user.user_metadata?.nickname || 'El vendedor'} ha marcado el intercambio como completado. Esperando confirmación del comprador.`;
-      const { error: messageError } = await supabase
-        .rpc('add_system_message_to_listing_chat', {
-          p_listing_id: listingId,
-          p_message: systemMessage
-        });
+      toast.success(`Intercambio marcado como completado. Esperando confirmación de ${reservedBuyerNickname}.`);
 
-      if (messageError) {
-        console.error('Error adding system message:', messageError);
-      }
-
-      toast.success('Intercambio marcado como completado. Esperando confirmación del comprador.');
-      // Update local state
-      setListing({ ...listing, status: 'completed' });
-
-      // Refresh to show updated state
+      // Refresh to show system messages
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -310,24 +359,12 @@ function ListingChatPageContent() {
 
     setConfirming(true);
     try {
-      // Buyer confirms completion - calls the same RPC
+      // Buyer confirms completion - RPC handles system messages
       const { error: confirmError } = await supabase.rpc('complete_listing_transaction', {
         p_transaction_id: transactionId
       });
 
       if (confirmError) throw confirmError;
-
-      // Add system message to chat
-      const systemMessage = `${user.user_metadata?.nickname || 'El comprador'} ha confirmado la transacción. ¡Intercambio completado! Ahora podéis valoraros mutuamente.`;
-      const { error: messageError } = await supabase
-        .rpc('add_system_message_to_listing_chat', {
-          p_listing_id: listingId,
-          p_message: systemMessage
-        });
-
-      if (messageError) {
-        console.error('Error adding system message:', messageError);
-      }
 
       toast.success('Transacción confirmada. ¡Ahora puedes valorar al vendedor!');
 
@@ -459,19 +496,30 @@ function ListingChatPageContent() {
                     </Button>
                   )}
                   {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
-                    <Button
-                      onClick={handleComplete}
-                      disabled={completing}
-                      variant="outline"
-                      className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      {completing ? 'Completando...' : 'Marcar Completado'}
-                    </Button>
+                    <>
+                      <Button
+                        onClick={handleComplete}
+                        disabled={completing}
+                        variant="outline"
+                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                      >
+                        <Package className="h-4 w-4 mr-2" />
+                        {completing ? 'Completando...' : 'Marcar Completado'}
+                      </Button>
+                      <Button
+                        onClick={handleUnreserve}
+                        disabled={unreserving}
+                        variant="outline"
+                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                      >
+                        <Package className="h-4 w-4 mr-2" />
+                        {unreserving ? 'Liberando...' : 'Liberar Reserva'}
+                      </Button>
+                    </>
                   )}
 
-                  {/* Buyer confirmation - shows when transaction is completed but listing is still reserved */}
-                  {isBuyer && listing.status === 'reserved' && transactionStatus === 'completed' && (
+                  {/* Buyer confirmation - shows when transaction is pending_completion */}
+                  {isBuyer && listing.status === 'reserved' && transactionStatus === 'pending_completion' && (
                     <Button
                       onClick={handleConfirm}
                       disabled={confirming}
@@ -493,36 +541,52 @@ function ListingChatPageContent() {
             <div className="md:col-span-1">
               <ModernCard>
                 <ModernCardContent className="p-4">
-                  <h3 className="font-bold text-white mb-3">Conversaciones</h3>
+                  <h3 className="font-bold text-white mb-3">
+                    Conversaciones
+                  </h3>
                   <div className="space-y-2">
-                    {participants.map(participant => (
-                      <button
-                        key={participant.user_id}
-                        onClick={() => setSelectedParticipant(participant.user_id)}
-                        className={cn(
-                          'w-full text-left p-3 rounded-md transition-colors',
-                          selectedParticipant === participant.user_id
-                            ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
-                            : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
-                        )}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-bold text-white">
-                            {participant.nickname}
-                          </span>
-                          {participant.unread_count > 0 && (
-                            <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                              {participant.unread_count}
-                            </span>
+                    {participants.map(participant => {
+                      const isReservedForThisParticipant =
+                        listing?.status === 'reserved' &&
+                        transactionId &&
+                        transaction?.buyer_id === participant.user_id;
+
+                      return (
+                        <button
+                          key={participant.user_id}
+                          onClick={() => setSelectedParticipant(participant.user_id)}
+                          className={cn(
+                            'w-full text-left p-3 rounded-md transition-colors',
+                            selectedParticipant === participant.user_id
+                              ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
+                              : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
                           )}
-                        </div>
-                        {participant.last_message && (
-                          <p className="text-sm text-gray-400 truncate mt-1">
-                            {participant.last_message}
-                          </p>
-                        )}
-                      </button>
-                    ))}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-white">
+                                {participant.nickname}
+                              </span>
+                              {isReservedForThisParticipant && (
+                                <span className="bg-yellow-900/30 text-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded">
+                                  Reservado
+                                </span>
+                              )}
+                            </div>
+                            {participant.unread_count > 0 && (
+                              <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                                {participant.unread_count}
+                              </span>
+                            )}
+                          </div>
+                          {participant.last_message && (
+                            <p className="text-sm text-gray-400 truncate mt-1">
+                              {participant.last_message}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </ModernCardContent>
               </ModernCard>
@@ -535,11 +599,17 @@ function ListingChatPageContent() {
               <ModernCardContent className="p-0">
                 {/* Messages */}
                 <div className="h-[500px] overflow-y-auto p-4 space-y-3">
-                  {messages.length === 0 ? (
+                  {isOwner && !selectedParticipant && participants.length > 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-gray-400">
+                        Selecciona una conversación para ver los mensajes
+                      </p>
+                    </div>
+                  ) : messages.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-gray-400">
                         {isOwner
-                          ? 'No hay conversaciones aún'
+                          ? 'No hay mensajes en esta conversación'
                           : 'Envía un mensaje para iniciar la conversación'}
                       </p>
                     </div>
@@ -647,10 +717,22 @@ function ListingChatPageContent() {
 
                 {/* Composer */}
                 <div className="border-t-2 border-gray-700 p-4">
-                  {/* Disable chat when transaction is completed */}
-                  {listing?.status === 'completed' ? (
+                  {/* Check if listing access was denied (RLS blocked non-participant) */}
+                  {listingAccessDenied && !isOwner ? (
+                    <p className="text-gray-400 text-center italic">
+                      Este anuncio está reservado para otro usuario
+                    </p>
+                  ) : listing?.status === 'completed' && !isReservedBuyer && !isOwner ? (
+                    <p className="text-gray-400 text-center italic">
+                      Este anuncio ya no está disponible
+                    </p>
+                  ) : listing?.status === 'completed' && (isReservedBuyer || isOwner) ? (
                     <p className="text-gray-400 text-center italic">
                       Chat cerrado - La transacción ha sido completada
+                    </p>
+                  ) : listing?.status === 'reserved' && !isReservedBuyer && !isOwner ? (
+                    <p className="text-gray-400 text-center italic">
+                      Este anuncio está reservado para otro usuario
                     </p>
                   ) : isOwner && !selectedParticipant && participants.length > 0 ? (
                     <p className="text-gray-400 text-center">
@@ -693,7 +775,7 @@ function ListingChatPageContent() {
                           placeholder="Escribe un mensaje..."
                           maxLength={500}
                           rows={2}
-                          className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none"
+                          className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={sending}
                         />
                         <Button
