@@ -23,6 +23,7 @@ import {
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { FavoriteButton } from '@/components/social/FavoriteButton';
 import { ReportButton } from '@/components/social/ReportButton';
+import { IgnoreButton } from '@/components/social/IgnoreButton';
 import {
   useUser,
   useSupabaseClient,
@@ -562,10 +563,15 @@ export default function UserProfilePage() {
 
                     <div className="flex items-center gap-3">
                       {!isOwnProfile && currentUser && (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <FavoriteButton
                             userId={userId}
                             onFavoriteDelta={adjustFavoritesCount}
+                          />
+                          <IgnoreButton
+                            userId={userId}
+                            variant="outline"
+                            size="sm"
                           />
                           <ReportButton
                             entityType="user"

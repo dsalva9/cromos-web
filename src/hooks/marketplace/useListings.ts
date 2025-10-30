@@ -79,10 +79,8 @@ export function useListings({
         setLoading(true);
         const currentOffset = isLoadMore ? fetchOffset : 0;
 
-        // Use distance-aware RPC if sorting by distance
-        const rpcName = sortByDistance
-          ? 'list_trade_listings_with_distance'
-          : 'list_trade_listings';
+        // Use updated RPC that filters out ignored users
+        const rpcName = 'list_trade_listings_filtered';
 
         const rpcParams: Record<string, unknown> = {
           p_limit: limit,
@@ -90,13 +88,10 @@ export function useListings({
           p_search: search || null,
         };
 
-        // Add distance params if needed
-        if (sortByDistance) {
-          rpcParams.p_viewer_postcode = viewerPostcode;
-          rpcParams.p_sort_by_distance = true;
-        }
-
-        const { data, error: rpcError } = await supabase.rpc(rpcName, rpcParams);
+        const { data, error: rpcError } = await supabase.rpc(
+          rpcName,
+          rpcParams
+        );
 
         if (rpcError) throw rpcError;
 

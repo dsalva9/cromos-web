@@ -27,6 +27,7 @@ import {
   CheckCircle,
   XCircle,
   AlertTriangle,
+  EyeOff,
 } from 'lucide-react';
 
 function ProfileContent() {
@@ -406,6 +407,19 @@ function ProfileContent() {
             Mi Perfil
           </h1>
           <p className="text-white/80">Gestiona tu información y colecciones</p>
+
+          {/* Quick Actions */}
+          <div className="flex justify-center gap-4 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push('/profile/ignored')}
+              className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
+            >
+              <EyeOff className="w-4 h-4 mr-2" />
+              Usuarios Ignorados
+            </Button>
+          </div>
         </div>
 
         {/* Profile Card */}
