@@ -1,0 +1,338 @@
+Nombre del conjunto: CP-F06-03 Sistema de Ignorar Usuarios
+Fase: 06 - Social y Notificaciones
+Objetivo: Confirmar que los usuarios puedan ignorar/desbloquear otros usuarios, que el filtrado de marketplace funcione correctamente, que el chat esté protegido, y que la gestión de ignorados sea accesible desde múltiples puntos de entrada.
+
+Pre-requisitos generales:
+- Usuarios:
+  * `qa.comprador@cromos.test` (actor principal).
+  * `qa.vendedor1@cromos.test` (usuario a ignorar, tiene listings activos).
+  * `qa.vendedor2@cromos.test` (usuario de control, tiene listings activos).
+  * `qa.vendedor3@cromos.test` (usuario para probar chat).
+- Contenido disponible:
+  * Listado activo "Sticker QA 001" de vendedor1.
+  * Listado activo "Sticker QA 002" de vendedor2.
+  * Ambos vendedores tienen código postal configurado.
+  * Conversación de chat previa entre comprador y vendedor3.
+- Acceso a tablas `ignored_users`, `trade_listings`, `trade_chats`, `profiles`.
+- Herramientas: Chrome desktop, dispositivo móvil, Supabase Studio.
+
+Configuración previa:
+- Asegurar que no existan registros previos en `ignored_users` para qa.comprador.
+- Verificar que vendedor1 tenga al menos 2 listings activos en marketplace.
+- Iniciar sesión como `qa.comprador`.
+- Configurar código postal en perfil de qa.comprador para probar ordenamiento por distancia.
+
+Casos de prueba:
+
+Caso CP-F06-03A: Ignorar usuario desde perfil público
+  Cobertura: Happy path; acción principal.
+  Pasos:
+    1. Navegar a `/users/{vendedor1_id}`.
+    2. Verificar que el botón "Ignorar" esté visible junto a "Favoritos" y "Reportar".
+    3. Pulsar el botón "Ignorar".
+  Criterios de éxito:
+    - Toast notification aparece: "Usuario ignorado correctamente".
+    - Botón cambia inmediatamente a "Dejar de ignorar" sin recargar página.
+    - Registro creado en tabla `ignored_users` con user_id=comprador, ignored_user_id=vendedor1.
+    - Campo `created_at` se registra correctamente.
+
+Caso CP-F06-03B: Desbloquear usuario desde perfil público
+  Cobertura: Reversibilidad; UX.
+  Pasos:
+    1. En el mismo perfil de vendedor1, pulsar "Dejar de ignorar".
+  Criterios de éxito:
+    - Toast notification: "Usuario dejado de ignorar correctamente".
+    - Botón vuelve a estado "Ignorar" inmediatamente.
+    - Registro eliminado de tabla `ignored_users`.
+    - No quedan artefactos en la base de datos.
+
+Caso CP-F06-03C: Filtrado automático en marketplace - Ordenamiento cronológico
+  Cobertura: Filtrado; ordenamiento por fecha.
+  Pasos:
+    1. Ignorar nuevamente a vendedor1 desde su perfil.
+    2. Navegar a `/marketplace`.
+    3. Verificar que el ordenamiento esté en "Más reciente" (botón activo).
+    4. Buscar listings de vendedor1 y vendedor2.
+  Criterios de éxito:
+    - Listings de vendedor1 NO aparecen en el marketplace.
+    - Listings de vendedor2 SÍ aparecen normalmente.
+    - No hay indicación visual de que se está filtrando contenido (filtrado transparente).
+    - Contador total de listings no refleja los listings ocultos.
+    - RPC `list_trade_listings_filtered` se usa correctamente.
+
+Caso CP-F06-03D: Filtrado automático en marketplace - Ordenamiento por distancia
+  Cobertura: Filtrado; ordenamiento por distancia.
+  Pasos:
+    1. En `/marketplace`, cambiar a ordenamiento "Distancia".
+    2. Verificar que el botón "Distancia" esté activo.
+    3. Buscar listings con distancia visible.
+  Criterios de éxito:
+    - Listings de vendedor1 NO aparecen incluso con ordenamiento por distancia.
+    - Listings con distancia válida aparecen ordenados correctamente (más cercanos primero).
+    - Listings sin código postal aparecen al final.
+    - RPC `list_trade_listings_filtered_with_distance` se usa correctamente.
+    - Distancia en km se muestra correctamente (ej: "2.5 km").
+
+Caso CP-F06-03E: Validación de ordenamiento por distancia sin código postal
+  Cobertura: Edge case; validación.
+  Pasos:
+    1. Eliminar código postal del perfil de qa.comprador.
+    2. Navegar a `/marketplace`.
+    3. Intentar cambiar a "Distancia".
+  Criterios de éxito:
+    - Botón "Distancia" aparece deshabilitado.
+    - Tooltip aparece al hacer hover: "Añade tu código postal en el perfil para ordenar por distancia".
+    - Mensaje de ayuda visible: "(Añade tu código postal en tu perfil para ordenar por distancia)".
+    - Link "tu perfil" navega correctamente a `/profile`.
+
+Caso CP-F06-03F: Protección de chat - Prevenir mensajes de usuario ignorado
+  Cobertura: Chat; seguridad bidireccional.
+  Pasos:
+    1. Ignorar a vendedor3 (quien tiene conversación previa con comprador).
+    2. Cerrar sesión y entrar como vendedor3.
+    3. Intentar enviar mensaje a comprador en chat existente.
+  Criterios de éxito:
+    - Mensaje NO se envía.
+    - Error mostrado: "No puedes enviar mensajes a este usuario".
+    - Trigger `prevent_messaging_ignored_users` bloquea la inserción.
+    - Chat existente permanece visible pero no se pueden enviar nuevos mensajes.
+
+Caso CP-F06-03G: Protección de chat - Prevenir acceso a conversaciones
+  Cobertura: Chat; RLS.
+  Pasos:
+    1. Como comprador (quien ignoró a vendedor3), intentar abrir chat con vendedor3.
+    2. Llamar RPC `get_listing_chats` con listing_id de vendedor3.
+  Criterios de éxito:
+    - RPC retorna resultado vacío (sin mensajes).
+    - No se muestra error, simplemente no hay acceso.
+    - Bloqueo funciona en ambas direcciones (comprador ignora vendedor, vendedor ignora comprador).
+
+Caso CP-F06-03H: Acceso a lista de usuarios ignorados desde perfil
+  Cobertura: UX; punto de entrada.
+  Pasos:
+    1. Como comprador, navegar a `/profile`.
+    2. Buscar botón "Usuarios Ignorados" en Quick Actions (debajo del título).
+    3. Pulsar el botón.
+  Criterios de éxito:
+    - Botón visible con icono EyeOff.
+    - Navegación correcta a `/profile/ignored`.
+    - Estilo consistente con tema de la app (border, hover effects).
+
+Caso CP-F06-03I: Acceso desde menú desktop (UserAvatarDropdown)
+  Cobertura: UX; navegación desktop.
+  Pasos:
+    1. En desktop, abrir dropdown del avatar (esquina superior derecha).
+    2. Verificar que "Usuarios Ignorados" aparece después de "Favoritos".
+    3. Pulsar en "Usuarios Ignorados".
+  Criterios de éxito:
+    - Link visible con icono EyeOff.
+    - Posición correcta en el menú (después de Favoritos, antes de Admin Panel si aplica).
+    - Navegación correcta a `/profile/ignored`.
+    - Dropdown se cierra al hacer clic.
+
+Caso CP-F06-03J: Acceso desde menú móvil (hamburger menu)
+  Cobertura: UX; navegación mobile.
+  Pasos:
+    1. En dispositivo móvil, abrir menú hamburguesa.
+    2. Buscar "Usuarios Ignorados" en sección de perfil.
+    3. Pulsar en la opción.
+  Criterios de éxito:
+    - Link visible con icono EyeOff en sección de perfil.
+    - Posición después de "Favoritos".
+    - Navegación correcta a `/profile/ignored`.
+    - Menú se cierra tras navegación.
+
+Caso CP-F06-03K: Página de gestión de ignorados - Con usuarios
+  Cobertura: CRUD; visualización.
+  Pasos:
+    1. Asegurar que comprador tiene ignorados a vendedor1 y vendedor3.
+    2. Navegar a `/profile/ignored`.
+    3. Revisar contenido de la página.
+  Criterios de éxito:
+    - Título: "Usuarios Ignorados" con icono EyeOff.
+    - Lista muestra ambos usuarios con:
+      * Avatar (o fallback con inicial).
+      * Nickname como enlace clickeable a su perfil.
+      * Fecha relativa: "hace X días/horas".
+      * Botón "Quitar de ignorados" para cada usuario.
+    - Usuarios ordenados por fecha de ignorado (más reciente primero).
+    - Botón "Volver a mi perfil" funciona correctamente.
+
+Caso CP-F06-03L: Desbloquear usuario desde página de gestión
+  Cobertura: CRUD; acción desde lista.
+  Pasos:
+    1. En `/profile/ignored`, pulsar "Quitar de ignorados" en vendedor1.
+  Criterios de éxito:
+    - Toast notification: "Usuario desbloqueado correctamente".
+    - Usuario desaparece inmediatamente de la lista (optimistic UI).
+    - Registro eliminado de tabla `ignored_users`.
+    - Si era el último usuario, aparece empty state.
+
+Caso CP-F06-03M: Empty state en página de gestión
+  Cobertura: UX; estado vacío.
+  Pasos:
+    1. Desbloquear todos los usuarios ignorados.
+    2. Permanecer en `/profile/ignored`.
+  Criterios de éxito:
+    - Mensaje: "No has ignorado a ningún usuario".
+    - Texto adicional: "Cuando ignores a alguien, aparecerá aquí y podrás desbloquearlo en cualquier momento."
+    - Icono EyeOff visible en estado vacío.
+    - Botón "Volver a mi perfil" sigue funcionando.
+
+Caso CP-F06-03N: Validación de seguridad - No ignorarse a sí mismo
+  Cobertura: Seguridad; validación backend.
+  Pasos:
+    1. Obtener user_id de comprador.
+    2. Intentar llamar directamente RPC `ignore_user` con p_ignored_user_id = propio user_id.
+  Criterios de éxito:
+    - RPC retorna error: "No puedes ignorarte a ti mismo".
+    - No se crea registro en tabla `ignored_users`.
+    - En UI, botón de ignorar NO aparece en el propio perfil del usuario.
+
+Caso CP-F06-03O: Validación de seguridad - Usuario no existente
+  Cobertura: Seguridad; validación.
+  Pasos:
+    1. Intentar llamar RPC `ignore_user` con UUID que no existe en profiles.
+  Criterios de éxito:
+    - RPC retorna error: "Usuario no encontrado".
+    - No se crea registro en ignored_users.
+
+Caso CP-F06-03P: Prevención de duplicados
+  Cobertura: Integridad de datos.
+  Pasos:
+    1. Ignorar a vendedor1.
+    2. Intentar ignorar nuevamente a vendedor1 (llamada directa al RPC).
+  Criterios de éxito:
+    - Constraint UNIQUE(user_id, ignored_user_id) previene duplicado.
+    - RPC maneja el caso con UPSERT (ON CONFLICT DO NOTHING).
+    - Solo existe un registro en tabla.
+
+Caso CP-F06-03Q: RLS - Usuario solo ve sus propios ignorados
+  Cobertura: Seguridad; RLS.
+  Pasos:
+    1. Como comprador, consultar tabla `ignored_users` directamente.
+    2. Verificar que solo aparecen registros donde user_id = comprador_id.
+    3. Cerrar sesión e iniciar como vendedor1.
+    4. Consultar `ignored_users` como vendedor1.
+  Criterios de éxito:
+    - Comprador solo ve sus propios registros.
+    - Vendedor1 NO puede ver que comprador lo ignoró.
+    - RLS policy "Users can view their own ignored users" funciona correctamente.
+    - No hay filtración de información entre usuarios.
+
+Caso CP-F06-03R: Cascade delete - Eliminación de usuario
+  Cobertura: Integridad referencial.
+  Pasos:
+    1. Crear usuario temporal y que comprador lo ignore.
+    2. Eliminar usuario temporal de tabla profiles.
+    3. Verificar tabla `ignored_users`.
+  Criterios de éxito:
+    - Registro en `ignored_users` se elimina automáticamente (CASCADE).
+    - No quedan registros huérfanos.
+    - Foreign key constraints funcionan correctamente.
+
+Caso CP-F06-03S: Verificación de índices - Performance
+  Cobertura: Performance.
+  Pasos:
+    1. En Supabase Studio, verificar existencia de índices.
+    2. Revisar planes de ejecución de queries con EXPLAIN ANALYZE.
+  Criterios de éxito:
+    - Índice `idx_ignored_users_user_id` existe.
+    - Índice `idx_ignored_users_ignored_user_id` existe.
+    - Query plan usa índices para lookups (Index Scan, no Seq Scan).
+    - Queries de filtrado en marketplace son eficientes (<100ms para 1000 listings).
+
+Caso CP-F06-03T: Contador de usuarios ignorados
+  Cobertura: UX; información.
+  Pasos:
+    1. Ignorar 3 usuarios diferentes.
+    2. Llamar RPC `get_ignored_users_count()`.
+    3. Verificar en página `/profile/ignored`.
+  Criterios de éxito:
+    - RPC retorna 3.
+    - Página muestra el conteo correcto (si está implementado en UI).
+    - Conteo actualizado tras ignorar/desbloquear.
+
+Caso CP-F06-03U: Paginación de lista de ignorados
+  Cobertura: UX; escalabilidad.
+  Pasos:
+    1. Ignorar 15 usuarios diferentes.
+    2. Llamar RPC `get_ignored_users(p_limit=10, p_offset=0)`.
+    3. Llamar RPC con p_offset=10.
+  Criterios de éxito:
+    - Primera llamada retorna 10 usuarios.
+    - Segunda llamada retorna 5 usuarios restantes.
+    - Ordenados por `created_at DESC`.
+    - No hay duplicados entre páginas.
+
+Caso CP-F06-03V: Sincronización en tiempo real
+  Cobertura: UX; multi-dispositivo.
+  Pasos:
+    1. Abrir `/profile/ignored` en desktop.
+    2. En móvil, desbloquear a un usuario desde su perfil.
+    3. Volver a desktop (sin refrescar).
+  Criterios de éxito:
+    - Lista en desktop se actualiza automáticamente (si hay subscripción realtime).
+    - Si no hay realtime, refrescar página muestra estado correcto.
+    - No hay inconsistencias entre dispositivos.
+
+Caso CP-F06-03W: Navegación a perfil desde lista de ignorados
+  Cobertura: UX; navegación.
+  Pasos:
+    1. En `/profile/ignored`, hacer clic en nickname de usuario ignorado.
+  Criterios de éxito:
+    - Navega correctamente a `/users/{ignored_user_id}`.
+    - Botón muestra "Dejar de ignorar" (estado correcto).
+    - Toda la información del perfil se carga correctamente.
+    - Se puede desbloquear desde allí.
+
+Caso CP-F06-03X: Ignorar usuario sin código postal configurado
+  Cobertura: Edge case; datos incompletos.
+  Pasos:
+    1. Ignorar usuario que NO tiene código postal en su perfil.
+    2. Verificar marketplace con ordenamiento por distancia.
+  Criterios de éxito:
+    - Usuario se ignora correctamente.
+    - Filtrado funciona independientemente del código postal.
+    - En ordenamiento por distancia, listings de ese usuario NO aparecen.
+    - Campo distance_km es NULL pero el filtrado sigue funcionando.
+
+Caso CP-F06-03Y: Búsqueda en marketplace con usuarios ignorados
+  Cobertura: Búsqueda; filtrado.
+  Pasos:
+    1. Vendedor1 (ignorado) tiene listing con título "Panini 2025 Sticker 123".
+    2. En marketplace, buscar "Panini 2025".
+  Criterios de éxito:
+    - Listings de vendedor1 NO aparecen en resultados.
+    - Otros listings que coincidan con búsqueda SÍ aparecen.
+    - Búsqueda full-text respeta el filtrado de ignorados.
+
+Caso CP-F06-03Z: Verificación de logs y auditoría
+  Cobertura: Auditoría; trazabilidad.
+  Pasos:
+    1. Revisar que todas las acciones de ignorar/desbloquear tengan timestamps correctos.
+    2. Verificar campo `created_at` en tabla `ignored_users`.
+  Criterios de éxito:
+    - Timestamp se registra en UTC correctamente.
+    - Fecha relativa se muestra correctamente en UI ("hace 2 días").
+    - No hay discrepancias entre servidor y cliente.
+
+Notas generales:
+- Ejecutar pruebas en orden para maximizar eficiencia (casos A-B pueden reutilizar el mismo estado).
+- Documentar cualquier inconsistencia en tooltips o mensajes de error.
+- Revertir todos los registros en `ignored_users` tras las pruebas.
+- Verificar que el botón "Ignorar" NO aparezca en el perfil del usuario actual.
+- Si se detectan problemas de performance con >1000 usuarios ignorados, reportar.
+- Validar que la funcionalidad es accesible con teclado (tab navigation, enter para confirmar).
+
+Herramientas de verificación:
+- Supabase Studio para consultas SQL directas.
+- Chrome DevTools Network tab para verificar llamadas RPC correctas.
+- React DevTools para verificar estado optimista (optimistic updates).
+- Postman/Insomnia para llamadas RPC directas.
+
+Criterios de regresión:
+- Favoritos siguen funcionando correctamente (no afectados por ignorar).
+- Reportes siguen funcionando (no afectados por ignorar).
+- Notificaciones de usuarios ignorados no deben aparecer.
+- Búsqueda global no debe mostrar usuarios ignorados en resultados.
