@@ -261,7 +261,15 @@ export default function TemplateDetailsPage() {
                     <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center">
                       <User className="h-4 w-4" />
                     </div>
-                    <span>por {template.author_nickname}</span>
+                    <span>
+                      por{' '}
+                      <Link
+                        href={`/users/${template.author_id}`}
+                        className="text-[#FFC000] hover:text-[#FFD700] transition-colors underline"
+                      >
+                        {template.author_nickname}
+                      </Link>
+                    </span>
                   </div>
                 </div>
               </div>
