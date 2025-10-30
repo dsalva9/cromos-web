@@ -90,21 +90,55 @@ export default function MarketplacePage() {
         </div>
 
         {/* Sort Controls */}
-        <div className="mb-8 flex items-center gap-4">
-          <span className="text-sm text-gray-400 font-semibold uppercase">
-            Ordenar por:
-          </span>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setSortByDistance(false)}
-              variant="default"
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black"
-              size="sm"
-            >
-              <Clock className="mr-2 h-4 w-4" />
-              Más reciente
-            </Button>
+        <div className="mb-8 flex flex-col gap-2">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-400 font-semibold uppercase">
+              Ordenar por:
+            </span>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setSortByDistance(false)}
+                variant={!sortByDistance ? 'default' : 'outline'}
+                className={
+                  !sortByDistance
+                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
+                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+                }
+                size="sm"
+              >
+                <Clock className="mr-2 h-4 w-4" />
+                Más reciente
+              </Button>
+              <Button
+                onClick={() => hasPostcode && setSortByDistance(true)}
+                variant={sortByDistance ? 'default' : 'outline'}
+                className={
+                  sortByDistance
+                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
+                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+                }
+                size="sm"
+                disabled={!hasPostcode}
+                title={
+                  !hasPostcode
+                    ? 'Añade tu código postal en el perfil para ordenar por distancia'
+                    : undefined
+                }
+              >
+                <MapPin className="mr-2 h-4 w-4" />
+                Distancia
+              </Button>
+            </div>
           </div>
+          {!hasPostcode && (
+            <span className="text-xs text-gray-500">
+              (Añade tu código postal en{' '}
+              <Link href="/profile" className="text-[#FFC000] hover:underline">
+                tu perfil
+              </Link>{' '}
+              para ordenar por distancia)
+            </span>
+          )}
         </div>
 
         {/* Listings Grid */}

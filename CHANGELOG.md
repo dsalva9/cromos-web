@@ -9,6 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **User Ignore System (2025-10-30)**
+  - Users can ignore other users from their profile pages
+  - Ignore button on user profiles (`/users/[userId]`)
+  - Toggle between "Ignorar" and "Dejar de ignorar" states
+  - Toast notifications for all operations
+  - **Ignored Users Management Page** at `/profile/ignored`:
+    - View list of all ignored users with avatars and nicknames
+    - See when each user was ignored (relative time: "hace 2 días")
+    - One-click unignore functionality ("Quitar de ignorados")
+    - Empty state when no users are ignored
+    - Quick access button from profile page ("Usuarios Ignorados")
+  - **Automatic Marketplace Filtering**:
+    - Listings from ignored users automatically hidden
+    - Works seamlessly with both chronological and distance-based sorting
+    - Transparent filtering (no indication to user that content is filtered)
+  - **Chat Protection**:
+    - Prevents ignored users from sending messages
+    - Blocks ability to initiate conversations with ignored users
+    - Bidirectional blocking (either party can block)
+    - Existing chat history preserved but no new messages allowed
+  - **Database Schema**:
+    - New `ignored_users` table with proper indexing
+    - RLS policies for security (users can only manage their own ignore list)
+    - Cascade deletion when users are removed
+    - Unique constraint prevents duplicate ignores
+  - **RPC Functions**:
+    - `ignore_user(p_ignored_user_id)` - Add user to ignore list
+    - `unignore_user(p_ignored_user_id)` - Remove user from ignore list
+    - `is_user_ignored(p_user_id, p_target_user_id)` - Check ignore status
+    - `get_ignored_users(p_limit, p_offset)` - Get paginated list
+    - `get_ignored_users_count()` - Get total count
+    - `list_trade_listings_filtered(...)` - Listings with ignore filtering
+    - `list_trade_listings_filtered_with_distance(...)` - Listings with ignore filtering + distance sorting
+  - **React Components**:
+    - `<IgnoreButton />` - Reusable button with auto-detection of ignore status
+    - Integration on user profile pages
+  - **Custom Hooks**:
+    - `useIgnore()` - Handle ignore/unignore operations with toast notifications
+    - `useIgnoredUsers()` - Manage ignored users list with pagination
+  - **Navigation Integration**:
+    - Added "Usuarios Ignorados" link in desktop profile dropdown menu (after Favoritos)
+    - Added "Usuarios Ignorados" link in mobile hamburger menu (after Favoritos)
+    - Link appears in both navigation menus for easy access
+  - **Migrations**:
+    - `20251030_add_ignored_users.sql` - Comprehensive migration
+    - `20251030_add_ignored_users_simple.sql` - Simplified version
+    - `20251030_add_distance_sort_with_ignore_filter.sql` - Distance + filtering
+  - **Documentation**:
+    - `docs/features/IGNORE_FUNCTIONALITY.md` - Complete feature guide
+    - `docs/MANUAL_TESTING_IGNORE_FUNCTIONALITY.md` - Testing guide
+    - Updated `docs/ARCHITECTURE.md` - Added User Ignore System section
+    - Updated `docs/api-endpoints.md` - All ignore-related RPC functions
+
 - **User Profile Enhancements (2025-10-30)**
   - Added comprehensive ratings section at bottom of user profile pages
   - Shows rating average, distribution chart, and detailed list of received ratings
@@ -29,6 +82,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Shows loading state while checking for conversations
 
 ### Fixed
+
+- **Distance Sorting in Marketplace (2025-10-30)**
+  - Restored distance-based sorting functionality that was broken by ignore implementation
+  - Re-added distance sorting UI controls in marketplace page
+  - New `list_trade_listings_filtered_with_distance` RPC function combines both features
+  - Updated `useListings` hook to conditionally use appropriate RPC function
+  - Proper handling of postcode requirements for distance sorting
+  - Listings without distance data properly sorted after those with valid distances
+  - Distance button shows tooltip when postcode not configured
+  - Helper text guides users to add postcode in profile settings
 
 - **Rating Notification System (2025-10-30)**
   - Fixed premature rating notifications being sent immediately when first person rated

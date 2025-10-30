@@ -383,6 +383,34 @@ USING (auth.uid() = user_id);
 - No dangerouslySetInnerHTML
 - Sanitize user inputs
 
+### 5. User Ignore System (v1.6.0)
+
+The ignore functionality provides content filtering and interaction control:
+
+**Database Level:**
+- `ignored_users` table with RLS policies
+- Cascade deletion when users are deleted
+- Unique constraint prevents duplicates
+- Indexed for performance
+
+**Marketplace Filtering:**
+- RPC functions filter ignored users automatically
+- `list_trade_listings_filtered` - Basic filtering
+- `list_trade_listings_filtered_with_distance` - Filtering + distance sorting
+- Uses `NOT EXISTS` subquery for efficient filtering
+
+**Chat Protection:**
+- Trigger prevents messages to/from ignored users
+- `get_listing_chats` blocks access bidirectionally
+- Existing messages preserved but new ones blocked
+
+**Security:**
+- Cannot ignore yourself (validated server-side)
+- RLS ensures users only manage their own ignore list
+- All operations require authentication
+
+See: `docs/features/IGNORE_FUNCTIONALITY.md` for complete documentation.
+
 ## Performance
 
 ### 1. Code Splitting

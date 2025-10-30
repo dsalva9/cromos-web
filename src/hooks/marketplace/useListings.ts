@@ -79,14 +79,22 @@ export function useListings({
         setLoading(true);
         const currentOffset = isLoadMore ? fetchOffset : 0;
 
-        // Use updated RPC that filters out ignored users
-        const rpcName = 'list_trade_listings_filtered';
+        // Use distance-aware RPC if sorting by distance, otherwise use basic filtered RPC
+        const rpcName = sortByDistance
+          ? 'list_trade_listings_filtered_with_distance'
+          : 'list_trade_listings_filtered';
 
         const rpcParams: Record<string, unknown> = {
           p_limit: limit,
           p_offset: currentOffset,
           p_search: search || null,
         };
+
+        // Add distance params if needed
+        if (sortByDistance) {
+          rpcParams.p_viewer_postcode = viewerPostcode;
+          rpcParams.p_sort_by_distance = true;
+        }
 
         const { data, error: rpcError } = await supabase.rpc(
           rpcName,

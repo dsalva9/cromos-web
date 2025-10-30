@@ -3,7 +3,7 @@
 import { siteConfig } from '@/config/site';
 import { useState, useEffect, MouseEvent } from 'react';
 import Link from 'next/link';
-import { Menu, X, Bell, User, Package, Heart, MessageCircle, LogOut } from 'lucide-react';
+import { Menu, X, Bell, User, Package, Heart, MessageCircle, LogOut, EyeOff } from 'lucide-react';
 import NavLink from '@/components/nav-link';
 import {
   useSupabase,
@@ -290,6 +290,15 @@ export default function SiteHeader() {
                   >
                     <Heart className="h-5 w-5" />
                     <span className="font-bold">Favoritos</span>
+                  </Link>
+
+                  <Link
+                    href="/profile/ignored"
+                    onClick={handleProtectedNavigation()}
+                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
+                  >
+                    <EyeOff className="h-5 w-5" />
+                    <span className="font-bold">Usuarios Ignorados</span>
                   </Link>
 
                   {isAdmin && (

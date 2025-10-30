@@ -2621,3 +2621,526 @@ const {
 ---
 
 **Last Updated:** 2025-10-25 (Sprint 15 Complete)
+
+---
+
+## Social Features - User Ignore ✅ **v1.6.0 NEW**
+
+### Overview
+
+The User Ignore system allows users to block other users from seeing their marketplace listings and prevent chat interactions. All operations are secured with RLS policies.
+
+### `ignore_user`
+
+Add a user to the current user's ignore list.
+
+**Function Signature:**
+
+```sql
+ignore_user(
+  p_ignored_user_id UUID
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_ignored_user_id`: UUID of the user to ignore (required)
+
+**Returns:** `BOOLEAN` - Always `true` on success
+
+**Validation:**
+- User must be authenticated
+- Cannot ignore yourself
+- Target user must exist in profiles table
+- Duplicate ignores handled gracefully (UPSERT behavior)
+
+**Usage Example:**
+
+```typescript
+try {
+  const { data, error } = await supabase.rpc('ignore_user', {
+    p_ignored_user_id: userId,
+  });
+
+  if (error) throw error;
+
+  toast.success('Usuario ignorado correctamente');
+} catch (err) {
+  console.error('Error ignoring user:', err);
+  toast.error('Error al ignorar usuario');
+}
+```
+
+**Security:** SECURITY DEFINER
+**Side Effects:**
+- Inserts row into `ignored_users` table
+- Immediately filters ignored user from marketplace
+- Blocks chat communication
+
+**Errors:**
+- `"Usuario no autenticado"` - No authenticated user
+- `"No puedes ignorarte a ti mismo"` - Self-ignore attempt
+- `"Usuario no encontrado"` - Target user doesn't exist
+
+---
+
+### `unignore_user`
+
+Remove a user from the current user's ignore list.
+
+**Function Signature:**
+
+```sql
+unignore_user(
+  p_ignored_user_id UUID
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_ignored_user_id`: UUID of the user to unignore (required)
+
+**Returns:** `BOOLEAN` - Always `true` on success
+
+**Usage Example:**
+
+```typescript
+try {
+  const { data, error } = await supabase.rpc('unignore_user', {
+    p_ignored_user_id: userId,
+  });
+
+  if (error) throw error;
+
+  toast.success('Usuario dejado de ignorar correctamente');
+} catch (err) {
+  console.error('Error unignoring user:', err);
+  toast.error('Error al dejar de ignorar usuario');
+}
+```
+
+**Security:** SECURITY DEFINER
+**Side Effects:**
+- Deletes row from `ignored_users` table
+- Immediately restores ignored user in marketplace
+- Re-enables chat communication
+
+**Errors:**
+- `"Usuario no autenticado"` - No authenticated user
+
+---
+
+### `is_user_ignored`
+
+Check if a specific user is ignored by another user.
+
+**Function Signature:**
+
+```sql
+is_user_ignored(
+  p_user_id UUID,
+  p_target_user_id UUID
+) RETURNS BOOLEAN
+```
+
+**Parameters:**
+- `p_user_id`: UUID of the checking user
+- `p_target_user_id`: UUID of the target user to check
+
+**Returns:** `BOOLEAN` - `true` if ignored, `false` otherwise
+
+**Usage Example:**
+
+```typescript
+const { data: isIgnored, error } = await supabase.rpc('is_user_ignored', {
+  p_user_id: currentUserId,
+  p_target_user_id: targetUserId,
+});
+
+if (isIgnored) {
+  console.log('User is ignored');
+}
+```
+
+**Security:** SECURITY DEFINER
+**Note:** In current implementation, both parameters are typically the same value when checking from current user context.
+
+---
+
+### `get_ignored_users`
+
+Retrieve paginated list of ignored users with their profile information.
+
+**Function Signature:**
+
+```sql
+get_ignored_users(
+  p_limit INTEGER DEFAULT 50,
+  p_offset INTEGER DEFAULT 0
+) RETURNS TABLE (
+  ignored_user_id UUID,
+  nickname TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ
+)
+```
+
+**Parameters:**
+- `p_limit`: Number of results to return (default: 50)
+- `p_offset`: Number of results to skip (default: 0)
+
+**Returns:** Array of ignored user objects
+
+**Usage Example:**
+
+```typescript
+const { data: ignoredUsers, error } = await supabase.rpc('get_ignored_users', {
+  p_limit: 20,
+  p_offset: 0,
+});
+
+// ignoredUsers = [
+//   {
+//     ignored_user_id: 'uuid-123',
+//     nickname: 'Juan',
+//     avatar_url: 'https://...',
+//     created_at: '2025-10-30T10:00:00Z'
+//   },
+//   ...
+// ]
+```
+
+**Security:** SECURITY DEFINER - Returns only current user's ignored users
+**Use Case:** Powers the `/profile/ignored` management page
+
+---
+
+### `get_ignored_users_count`
+
+Get total count of ignored users for current user.
+
+**Function Signature:**
+
+```sql
+get_ignored_users_count() RETURNS INTEGER
+```
+
+**Returns:** `INTEGER` - Total count of ignored users
+
+**Usage Example:**
+
+```typescript
+const { data: count, error } = await supabase.rpc('get_ignored_users_count');
+
+console.log(`You have ignored ${count} users`);
+```
+
+**Security:** SECURITY DEFINER
+**Use Case:** Display total count, pagination calculations
+
+---
+
+### `list_trade_listings_filtered`
+
+List marketplace listings with ignored users automatically filtered out.
+
+**Function Signature:**
+
+```sql
+list_trade_listings_filtered(
+  p_limit INTEGER DEFAULT 50,
+  p_offset INTEGER DEFAULT 0,
+  p_search TEXT DEFAULT NULL
+) RETURNS TABLE (
+  id BIGINT,
+  user_id UUID,
+  author_nickname TEXT,
+  author_avatar_url TEXT,
+  author_postcode TEXT,
+  title TEXT,
+  description TEXT,
+  sticker_number TEXT,
+  collection_name TEXT,
+  image_url TEXT,
+  status TEXT,
+  views_count INTEGER,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ,
+  copy_id BIGINT,
+  slot_id BIGINT
+)
+```
+
+**Parameters:**
+- `p_limit`: Number of listings to return (default: 50)
+- `p_offset`: Number of listings to skip (default: 0)
+- `p_search`: Search query for title/collection (optional)
+
+**Filtering:**
+- Only returns `status = 'active'` listings
+- Automatically excludes listings from ignored users
+- Uses full-text search in Spanish for search queries
+- Ordered by `created_at DESC` (newest first)
+
+**Usage Example:**
+
+```typescript
+const { data: listings, error } = await supabase.rpc('list_trade_listings_filtered', {
+  p_limit: 20,
+  p_offset: 0,
+  p_search: 'Panini',
+});
+```
+
+**Security:** SECURITY DEFINER - Uses `auth.uid()` for filtering
+
+---
+
+### `list_trade_listings_filtered_with_distance`
+
+List marketplace listings with ignored users filtered AND distance-based sorting.
+
+**Function Signature:**
+
+```sql
+list_trade_listings_filtered_with_distance(
+  p_limit INTEGER DEFAULT 20,
+  p_offset INTEGER DEFAULT 0,
+  p_search TEXT DEFAULT NULL,
+  p_viewer_postcode TEXT DEFAULT NULL,
+  p_sort_by_distance BOOLEAN DEFAULT FALSE
+) RETURNS TABLE (
+  id BIGINT,
+  user_id UUID,
+  author_nickname TEXT,
+  author_avatar_url TEXT,
+  author_postcode TEXT,
+  title TEXT,
+  description TEXT,
+  sticker_number TEXT,
+  collection_name TEXT,
+  image_url TEXT,
+  status TEXT,
+  views_count INTEGER,
+  created_at TIMESTAMPTZ,
+  copy_id BIGINT,
+  slot_id BIGINT,
+  distance_km NUMERIC
+)
+```
+
+**Parameters:**
+- `p_limit`: Number of listings to return (default: 20)
+- `p_offset`: Number of listings to skip (default: 0)
+- `p_search`: Search query for title/collection (optional)
+- `p_viewer_postcode`: Viewer's postal code for distance calculation (optional)
+- `p_sort_by_distance`: Enable distance-based sorting (default: false)
+
+**Features:**
+- All filtering from `list_trade_listings_filtered`
+- Distance calculation using Haversine formula
+- Returns distance in kilometers (rounded to 1 decimal)
+- `distance_km` is `NULL` if postcodes unavailable
+
+**Sorting Behavior:**
+- When `p_sort_by_distance = true`:
+  1. Listings with valid distances (closest first)
+  2. Listings without distance data (by `created_at DESC`)
+- When `p_sort_by_distance = false`:
+  - All listings by `created_at DESC`
+
+**Usage Example:**
+
+```typescript
+// Sort by distance
+const { data: listings, error } = await supabase.rpc(
+  'list_trade_listings_filtered_with_distance',
+  {
+    p_limit: 20,
+    p_offset: 0,
+    p_search: null,
+    p_viewer_postcode: '28001',
+    p_sort_by_distance: true,
+  }
+);
+
+// listings[0].distance_km = 2.5 (2.5 km away)
+```
+
+**Security:** SECURITY DEFINER - Uses `auth.uid()` for filtering
+**Performance:** Uses `haversine_distance` function + indexed lookups on `postal_codes` table
+
+---
+
+### Chat Protection
+
+The ignore system automatically integrates with chat functionality:
+
+#### `get_listing_chats` (Updated)
+
+Chat retrieval now respects ignore relationships:
+
+**Blocking Logic:**
+```sql
+-- Returns empty if either user has ignored the other
+IF EXISTS (
+  SELECT 1 FROM ignored_users
+  WHERE (user_id = listing_owner AND ignored_user_id = current_user)
+     OR (user_id = current_user AND ignored_user_id = listing_owner)
+) THEN
+  RETURN; -- Empty result
+END IF;
+```
+
+**Behavior:**
+- Bidirectional blocking (either party can block)
+- Existing messages remain in database
+- New messages prevented by trigger (see below)
+
+#### Trigger: `prevent_messaging_ignored_users`
+
+Database trigger that blocks chat message insertion:
+
+**Trigger Definition:**
+```sql
+CREATE TRIGGER trigger_prevent_messaging_ignored_users
+  BEFORE INSERT ON trade_chats
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_messaging_ignored_users();
+```
+
+**Validation:**
+- Checks if sender is ignored by receiver
+- Raises exception: `"No puedes enviar mensajes a este usuario"`
+- Prevents message from being inserted
+
+---
+
+### Database Schema
+
+#### Table: `ignored_users`
+
+```sql
+CREATE TABLE ignored_users (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  ignored_user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  UNIQUE(user_id, ignored_user_id)
+);
+
+CREATE INDEX idx_ignored_users_user_id ON ignored_users(user_id);
+CREATE INDEX idx_ignored_users_ignored_user_id ON ignored_users(ignored_user_id);
+```
+
+**RLS Policies:**
+- SELECT: `auth.uid() = user_id`
+- INSERT: `auth.uid() = user_id`
+- DELETE: `auth.uid() = user_id`
+
+---
+
+### Frontend Hooks
+
+#### `useIgnore()`
+
+React hook for ignore operations.
+
+**Location:** `src/hooks/social/useIgnore.ts`
+
+**API:**
+```typescript
+const {
+  ignoreUser,        // (userId: string) => Promise<boolean>
+  unignoreUser,      // (userId: string) => Promise<boolean>
+  isUserIgnored,     // (userId: string) => Promise<boolean>
+  loading,           // boolean
+} = useIgnore();
+```
+
+**Features:**
+- Automatic toast notifications
+- Error handling
+- Loading states
+- Returns success boolean
+
+---
+
+#### `useIgnoredUsers()`
+
+React hook for managing ignored users list.
+
+**Location:** `src/hooks/social/useIgnore.ts`
+
+**API:**
+```typescript
+const {
+  ignoredUsers,           // Array of ignored user objects
+  loading,                // boolean
+  error,                  // string | null
+  fetchIgnoredUsers,      // (limit?, offset?) => Promise<void>
+  getIgnoredUsersCount,   // () => Promise<number>
+  removeFromIgnoredList,  // (userId: string) => void - Local state update
+} = useIgnoredUsers();
+```
+
+**Usage:**
+```typescript
+// Fetch on mount
+useEffect(() => {
+  fetchIgnoredUsers();
+}, []);
+
+// Display count
+const count = await getIgnoredUsersCount();
+```
+
+---
+
+### Components
+
+#### `<IgnoreButton />`
+
+Pre-built button component for ignore/unignore functionality.
+
+**Location:** `src/components/social/IgnoreButton.tsx`
+
+**Props:**
+```typescript
+{
+  userId: string;                              // Required
+  variant?: 'default' | 'outline' | 'ghost';   // Optional
+  size?: 'default' | 'sm' | 'lg';              // Optional
+  className?: string;                          // Optional
+}
+```
+
+**Features:**
+- Auto-detects ignore status on mount
+- Toggle between "Ignorar" / "Dejar de ignorar"
+- Loading states
+- Toast notifications
+- Hidden for own profile
+
+**Usage:**
+```typescript
+<IgnoreButton userId={profileUserId} variant="outline" size="sm" />
+```
+
+---
+
+### Migration Files
+
+- **`20251030_add_ignored_users.sql`** - Comprehensive migration with chat integration
+- **`20251030_add_ignored_users_simple.sql`** - Simplified version with core functionality
+- **`20251030_add_distance_sort_with_ignore_filter.sql`** - Distance sorting + filtering
+
+---
+
+### Related Documentation
+
+- **Feature Guide:** `docs/features/IGNORE_FUNCTIONALITY.md`
+- **Architecture:** `docs/ARCHITECTURE.md#user-ignore-system`
+- **Manual Testing:** `docs/MANUAL_TESTING_IGNORE_FUNCTIONALITY.md`
+
+---
+
+**Last Updated:** 2025-10-30 (v1.6.0 - User Ignore System)
