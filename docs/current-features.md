@@ -149,6 +149,11 @@
 - Separate chat flows for proposals and listings
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
+- **NEW (2025-10-30):** Clickable usernames in all chat messages (link to user profiles)
+- **NEW (2025-10-30):** "Ver Conversaciones" button disabled when no conversations exist
+  - Shows "Sin Conversaciones" instead of active button
+  - Prevents navigation to empty chat pages
+  - Loading state while checking for conversations
 - **NEW (2025-10-30):** Context-aware system messages with role-specific visibility
   - Reserved buyer sees personalized confirmation message
   - Other buyers see generic "reserved for another user" message
@@ -346,11 +351,16 @@ user_template_progress (count - 1)
 #### **Public User Profiles**
 
 - ✅ Avatar with fallback
-- ✅ Rating display with stars
+- ✅ Rating display with stars (clickable, scrolls to ratings section)
 - ✅ Active listings count and grid
 - ✅ Favorites count
 - ✅ Admin/suspended badges
 - ✅ Favorite button for other users
+- ✅ Comprehensive ratings section at bottom of profile
+  - Rating average and star distribution chart
+  - Detailed list of received ratings with comments
+  - All rater names/avatars are clickable links to profiles
+  - Context badges (Anuncio/Intercambio)
 
 #### **Social RPCs:**
 
@@ -469,7 +479,7 @@ user_template_progress (count - 1)
 
 - Pre-populated chat context: Opening a proposal loads the last 50 messages automatically
 - Trade-scoped messaging: Composer bound to current trade ID
-- Counterparty nickname in placeholder
+- Counterparty nickname in placeholder and chat header (clickable link to profile)
 - Realtime message updates via Supabase subscriptions (no refresh required)
 - Message bubbles: right-aligned for sender, left-aligned for counterparty
 - Timestamps in HH:mm format for each message
@@ -477,6 +487,8 @@ user_template_progress (count - 1)
 - "Nuevos mensajes" jump pill when new messages arrive while scrolled up
 - Composer features: Enter=send, Shift+Enter=newline, 500 character limit
 - Pagination: "Ver mensajes anteriores" button for loading older messages
+- **Clickable usernames**: All sender names in messages link to their profile pages
+- **Chat header**: Shows "Conversación con: [Username]" with clickable profile link
 
 #### Unread Message Badges
 

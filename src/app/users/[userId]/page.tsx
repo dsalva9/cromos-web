@@ -52,6 +52,32 @@ const emptyStateCopy: Record<ListingFilter, string> = {
 
 const postcodeRegex = /^\d{4,5}$/;
 
+interface Rating {
+  id: number;
+  rater_id: string;
+  rater_nickname: string;
+  rater_avatar_url: string | null;
+  rating: number;
+  comment: string | null;
+  context_type: string;
+  context_id: number;
+  created_at: string;
+}
+
+interface RatingDistribution {
+  '5_star': number;
+  '4_star': number;
+  '3_star': number;
+  '2_star': number;
+  '1_star': number;
+}
+
+interface RatingSummary {
+  rating_avg: number;
+  rating_count: number;
+  rating_distribution: RatingDistribution;
+}
+
 export default function UserProfilePage() {
   const params = useParams();
   const { user: currentUser } = useUser();
@@ -75,6 +101,11 @@ export default function UserProfilePage() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
+  // Ratings state
+  const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(null);
+  const [ratings, setRatings] = useState<Rating[]>([]);
+  const [loadingRatings, setLoadingRatings] = useState(false);
+
   useEffect(() => {
     if (!profile) return;
     setFormNickname(
@@ -86,6 +117,42 @@ export default function UserProfilePage() {
     setFormAvatarPath(profile.avatar_url ?? null);
     setAvatarBlob(null);
   }, [profile, editDialogOpen]);
+
+  // Fetch ratings
+  useEffect(() => {
+    async function fetchRatings() {
+      if (!userId) return;
+
+      setLoadingRatings(true);
+      try {
+        // Fetch rating summary
+        const { data: summaryData, error: summaryError } = await supabase.rpc(
+          'get_user_rating_summary',
+          { p_user_id: userId }
+        );
+
+        if (summaryError) throw summaryError;
+        if (summaryData && summaryData.length > 0) {
+          setRatingSummary(summaryData[0]);
+        }
+
+        // Fetch ratings (limit to 50 most recent)
+        const { data: ratingsData, error: ratingsError } = await supabase.rpc(
+          'get_user_ratings',
+          { p_user_id: userId, p_limit: 50, p_offset: 0 }
+        );
+
+        if (ratingsError) throw ratingsError;
+        setRatings(ratingsData || []);
+      } catch (err) {
+        logger.error('Error fetching ratings:', err);
+      } finally {
+        setLoadingRatings(false);
+      }
+    }
+
+    void fetchRatings();
+  }, [userId, supabase]);
 
   const displayAvatarUrl = useMemo(
     () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
@@ -331,6 +398,40 @@ export default function UserProfilePage() {
     );
   };
 
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map(star => (
+          <Star
+            key={star}
+            className={`h-5 w-5 ${
+              star <= rating
+                ? 'fill-[#FFC000] text-[#FFC000]'
+                : 'text-gray-600'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const renderRatingBar = (count: number, total: number) => {
+    const percentage = total > 0 ? (count / total) * 100 : 0;
+    return (
+      <div className="flex items-center gap-3 w-full">
+        <div className="flex-1 h-3 bg-gray-700 rounded-full overflow-hidden border border-black">
+          <div
+            className="h-full bg-[#FFC000] transition-all"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+        <span className="text-sm text-gray-400 font-bold min-w-[3rem] text-right">
+          {count}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
@@ -382,19 +483,28 @@ export default function UserProfilePage() {
 
                       {/* Rating */}
                       <div className="flex items-center gap-2 mt-3">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
-                          <span className="text-white font-bold text-lg">
-                            {profile.rating_avg.toFixed(1)}
+                        <a
+                          href="#valoraciones"
+                          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            document.getElementById('valoraciones')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                        >
+                          <div className="flex items-center gap-1">
+                            <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
+                            <span className="text-white font-bold text-lg">
+                              {profile.rating_avg.toFixed(1)}
+                            </span>
+                          </div>
+                          <span className="text-gray-400 hover:text-[#FFC000] transition-colors">
+                            ({profile.rating_count}{' '}
+                            {profile.rating_count === 1
+                              ? 'valoraci├│n'
+                              : 'valoraciones'}
+                            )
                           </span>
-                        </div>
-                        <span className="text-gray-400">
-                          ({profile.rating_count}{' '}
-                          {profile.rating_count === 1
-                            ? 'valoraci├│n'
-                            : 'valoraciones'}
-                          )
-                        </span>
+                        </a>
                       </div>
 
                       {/* Badges */}
@@ -539,11 +649,20 @@ export default function UserProfilePage() {
                       isOwnProfile ? '/favorites' : undefined
                     )}
 
-                    {renderStatCard(
-                      <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />,
-                      profile.rating_count,
-                      'Valoraciones'
-                    )}
+                    <a
+                      href="#valoraciones"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        document.getElementById('valoraciones')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 transition-transform hover:scale-[1.02]"
+                    >
+                      <div className="text-center">
+                        <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                        <p className="text-2xl font-black text-white">{profile.rating_count}</p>
+                        <p className="text-sm text-gray-400">Valoraciones</p>
+                      </div>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -594,6 +713,170 @@ export default function UserProfilePage() {
               {filteredListings.map(listing => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Ratings Section */}
+        <div id="valoraciones" className="space-y-6 mt-12 scroll-mt-8">
+          <h2 className="text-2xl font-black text-white">Valoraciones</h2>
+
+          {loadingRatings ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            </div>
+          ) : ratingSummary && ratingSummary.rating_count > 0 ? (
+            <>
+              {/* Summary Card */}
+              <div className="rounded-lg border-2 border-black bg-[#374151] shadow-lg p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Overall Rating */}
+                  <div className="text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                      <span className="text-5xl font-black text-white">
+                        {ratingSummary.rating_avg.toFixed(1)}
+                      </span>
+                      <Star className="h-8 w-8 fill-[#FFC000] text-[#FFC000]" />
+                    </div>
+                    <p className="text-gray-400">
+                      Basado en {ratingSummary.rating_count}{' '}
+                      {ratingSummary.rating_count === 1 ? 'valoración' : 'valoraciones'}
+                    </p>
+                  </div>
+
+                  {/* Rating Distribution */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white min-w-[4rem]">
+                        5 estrellas
+                      </span>
+                      {renderRatingBar(
+                        ratingSummary.rating_distribution['5_star'],
+                        ratingSummary.rating_count
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white min-w-[4rem]">
+                        4 estrellas
+                      </span>
+                      {renderRatingBar(
+                        ratingSummary.rating_distribution['4_star'],
+                        ratingSummary.rating_count
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white min-w-[4rem]">
+                        3 estrellas
+                      </span>
+                      {renderRatingBar(
+                        ratingSummary.rating_distribution['3_star'],
+                        ratingSummary.rating_count
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white min-w-[4rem]">
+                        2 estrellas
+                      </span>
+                      {renderRatingBar(
+                        ratingSummary.rating_distribution['2_star'],
+                        ratingSummary.rating_count
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-white min-w-[4rem]">
+                        1 estrella
+                      </span>
+                      {renderRatingBar(
+                        ratingSummary.rating_distribution['1_star'],
+                        ratingSummary.rating_count
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ratings List */}
+              <div className="space-y-4">
+                {ratings.map(rating => {
+                  const avatarUrl = resolveAvatarUrl(rating.rater_avatar_url, supabase);
+                  return (
+                    <div
+                      key={rating.id}
+                      className="rounded-lg border-2 border-black bg-[#374151] shadow-lg p-4"
+                    >
+                      <div className="flex gap-4">
+                        {/* Rater Avatar */}
+                        <Link
+                          href={`/users/${rating.rater_id}`}
+                          className="flex-shrink-0"
+                        >
+                          {avatarUrl ? (
+                            <Image
+                              src={avatarUrl}
+                              alt={rating.rater_nickname}
+                              width={48}
+                              height={48}
+                              className="rounded-full border-2 border-black hover:opacity-80 transition-opacity"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center hover:opacity-80 transition-opacity">
+                              <User className="h-6 w-6 text-black" />
+                            </div>
+                          )}
+                        </Link>
+
+                        {/* Rating Content */}
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <Link
+                                href={`/users/${rating.rater_id}`}
+                                className="font-bold text-white hover:text-[#FFC000] transition-colors"
+                              >
+                                {rating.rater_nickname}
+                              </Link>
+                              <div className="flex items-center gap-2 mt-1">
+                                {renderStars(rating.rating)}
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs border-black"
+                                >
+                                  {rating.context_type === 'listing'
+                                    ? 'Anuncio'
+                                    : 'Intercambio'}
+                                </Badge>
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {new Date(rating.created_at).toLocaleDateString(
+                                'es-ES',
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                }
+                              )}
+                            </span>
+                          </div>
+
+                          {/* Comment */}
+                          {rating.comment && (
+                            <p className="text-gray-300 text-sm mt-2 bg-gray-800 p-3 rounded-md border-2 border-black">
+                              {rating.comment}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-16 border-2 border-dashed border-gray-700 rounded-md">
+              <p className="text-gray-400 text-lg">
+                Este usuario aún no ha recibido valoraciones
+              </p>
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useListing } from '@/hooks/marketplace/useListing';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -31,12 +31,46 @@ export default function ListingDetailPage() {
   const { listing, loading, error, incrementViews, deleteListing } =
     useListing(listingId);
 
+  const [hasConversations, setHasConversations] = useState(false);
+  const [checkingConversations, setCheckingConversations] = useState(true);
+
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id) {
       incrementViews();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listing?.id, user?.id]); // Only run when listing or user ID changes, incrementViews is stable
+
+  // Check if listing has conversations
+  useEffect(() => {
+    async function checkConversations() {
+      if (!listing || !user?.id || user.id !== listing.user_id) {
+        setCheckingConversations(false);
+        return;
+      }
+
+      try {
+        const { data, error: participantsError } = await supabase.rpc(
+          'get_listing_chat_participants',
+          { p_listing_id: parseInt(listingId, 10) }
+        );
+
+        if (participantsError) {
+          logger.error('Error checking conversations:', participantsError);
+          setHasConversations(false);
+        } else {
+          setHasConversations(data && data.length > 0);
+        }
+      } catch (err) {
+        logger.error('Error checking conversations:', err);
+        setHasConversations(false);
+      } finally {
+        setCheckingConversations(false);
+      }
+    }
+
+    void checkConversations();
+  }, [listing, user, listingId, supabase]);
 
   const handleDelete = async () => {
     if (!confirm('¿Estás seguro de que quieres eliminar este anuncio?')) return;
@@ -249,16 +283,27 @@ export default function ListingDetailPage() {
               {isOwner && (
                 <div className="text-center space-y-4">
                   <p className="text-gray-400 text-sm">Este es tu anuncio</p>
-                  <Button
-                    size="lg"
-                    className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
-                    asChild
-                  >
-                    <Link href={`/marketplace/${listing.id}/chat`}>
+                  {hasConversations ? (
+                    <Button
+                      size="lg"
+                      className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                      asChild
+                    >
+                      <Link href={`/marketplace/${listing.id}/chat`}>
+                        <MessageCircle className="mr-2 h-5 w-5" />
+                        Ver Conversaciones
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="lg"
+                      className="w-full bg-gray-600 text-gray-400 font-bold cursor-not-allowed"
+                      disabled
+                    >
                       <MessageCircle className="mr-2 h-5 w-5" />
-                      Ver Conversaciones
-                    </Link>
-                  </Button>
+                      {checkingConversations ? 'Cargando...' : 'Sin Conversaciones'}
+                    </Button>
+                  )}
                   <div className="flex gap-4 justify-center">
                     <Button variant="outline" asChild>
                       <Link href={`/marketplace/${listing.id}/edit`}>

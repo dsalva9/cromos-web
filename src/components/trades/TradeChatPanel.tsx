@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useTradeChat } from '@/hooks/trades/useTradeChat';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,14 @@ import { logger } from '@/lib/logger';
 interface TradeChatPanelProps {
   tradeId: number | null;
   counterpartyNickname: string;
+  counterpartyUserId?: string; // User ID for linking to profile
   isProposalActive: boolean; // true if proposal is pending/accepted, false if cancelled/rejected
 }
 
 export function TradeChatPanel({
   tradeId,
   counterpartyNickname,
+  counterpartyUserId,
   isProposalActive,
 }: TradeChatPanelProps) {
   const { user } = useUser();
@@ -127,6 +130,30 @@ export function TradeChatPanel({
 
   return (
     <div className="flex flex-col h-[600px] bg-gray-900 rounded-lg border-2 border-black shadow-xl">
+      {/* Chat Header */}
+      <div className="bg-gray-800 border-b-2 border-black px-4 py-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm font-bold">Conversación con:</span>
+            {counterpartyUserId ? (
+              <Link
+                href={`/users/${counterpartyUserId}`}
+                className="text-white font-bold hover:text-[#FFC000] transition-colors"
+              >
+                {counterpartyNickname}
+              </Link>
+            ) : (
+              <span className="text-white font-bold">{counterpartyNickname}</span>
+            )}
+          </div>
+          {!isProposalActive && (
+            <span className="text-xs text-gray-500 font-bold uppercase">
+              Propuesta cerrada
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* Messages area with fixed height and scroll */}
       <div
         ref={messagesContainerRef}
@@ -196,7 +223,16 @@ export function TradeChatPanel({
               >
                 {!isMine && (
                   <p className="text-xs font-bold text-gray-400 mb-1">
-                    {message.sender_nickname}
+                    {counterpartyUserId ? (
+                      <Link
+                        href={`/users/${counterpartyUserId}`}
+                        className="hover:text-[#FFC000] hover:underline transition-colors"
+                      >
+                        {message.sender_nickname}
+                      </Link>
+                    ) : (
+                      message.sender_nickname
+                    )}
                   </p>
                 )}
                 <p className="text-sm font-medium whitespace-pre-wrap break-words">

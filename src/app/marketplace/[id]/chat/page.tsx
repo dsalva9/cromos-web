@@ -656,7 +656,16 @@ function ListingChatPageContent() {
                             >
                               {!isOwnMessage && message.sender_nickname && (
                                 <p className="text-xs font-bold mb-1 opacity-70">
-                                  {message.sender_nickname}
+                                  {message.sender_id ? (
+                                    <Link
+                                      href={`/users/${message.sender_id}`}
+                                      className="hover:text-[#FFC000] hover:underline transition-colors"
+                                    >
+                                      {message.sender_nickname}
+                                    </Link>
+                                  ) : (
+                                    message.sender_nickname
+                                  )}
                                 </p>
                               )}
                               <p className="whitespace-pre-wrap break-words">

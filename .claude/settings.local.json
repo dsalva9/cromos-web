@@ -28,7 +28,8 @@
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\profile\\LocationSettings.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\trades\\MatchCardWithDistance.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\components\\trades\\TraderListSortControls.tsx\" \"C:\\Users\\David\\projects\\cromos-web\\src\\hooks\\trades\\useLocationMatching.ts\")",
       "Read(//c/Users/David/Downloads/**)",
       "Bash(xargs basename:*)",
-      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\diagnose_user_c_chat.sql\" \"C:\\Users\\David\\projects\\cromos-web\\verify_rls_policy.sql\" \"C:\\Users\\David\\projects\\cromos-web\\run_fix_get_listing_chats.bat\")"
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\diagnose_user_c_chat.sql\" \"C:\\Users\\David\\projects\\cromos-web\\verify_rls_policy.sql\" \"C:\\Users\\David\\projects\\cromos-web\\run_fix_get_listing_chats.bat\")",
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\app\\users\\[userId]\\ratings\\page.tsx\")"
     ],
     "deny": [],
     "ask": []

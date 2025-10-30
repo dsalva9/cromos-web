@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **User Profile Enhancements (2025-10-30)**
+  - Added comprehensive ratings section at bottom of user profile pages
+  - Shows rating average, distribution chart, and detailed list of received ratings
+  - All rater names and avatars are clickable links to their profiles
+  - Rating average and count in profile header now scroll to ratings section (smooth scroll)
+  - Ratings display includes star ratings, comments, and context badges (Anuncio/Intercambio)
+
+- **Chat Interface Improvements (2025-10-30)**
+  - Added chat header showing counterparty username in trade proposal chats
+  - Made all sender usernames in chat messages clickable links to user profiles
+  - Implemented clickable usernames in both trade chats and listing chats
+  - Added visual feedback (hover states) for clickable usernames
+
+- **Listing Chat Enhancements (2025-10-30)**
+  - Disabled "Ver Conversaciones" button when listing has no conversations
+  - Button shows "Sin Conversaciones" instead when no chats exist
+  - Prevents unnecessary navigation to empty chat pages
+  - Shows loading state while checking for conversations
+
 ### Fixed
 
 - **Rating Notification System (2025-10-30)**
