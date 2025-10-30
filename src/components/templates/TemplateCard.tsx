@@ -162,6 +162,7 @@ export function TemplateCard({
                       userId={template.author_id}
                       nickname={template.author_nickname}
                       variant="subtle"
+                      forceSpan={true}
                     />
                   </span>
                 </div>

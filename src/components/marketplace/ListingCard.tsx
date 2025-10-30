@@ -124,6 +124,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                   nickname={listing.author_nickname}
                   variant="subtle"
                   className="line-clamp-1"
+                  forceSpan={true}
                 />
               </div>
 

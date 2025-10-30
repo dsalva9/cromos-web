@@ -45,7 +45,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
                   userId={match.match_user_id}
                   nickname={match.nickname}
                   variant="bold"
-                  disabled={true} // Keep as text since this is already a link card
+                  forceSpan={true} // Keep as text since this is already a link card
                 />
               </h3>
               <p className="text-xs text-gray-400 font-medium">

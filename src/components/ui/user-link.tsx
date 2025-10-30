@@ -16,6 +16,8 @@ interface UserLinkProps {
   variant?: 'default' | 'subtle' | 'bold' | 'muted';
   /** Optional click handler for additional functionality */
   onClick?: () => void;
+  /** Whether to render as a span instead of a link (to avoid nested anchors) */
+  forceSpan?: boolean;
 }
 
 export function UserLink({
@@ -25,6 +27,7 @@ export function UserLink({
   disabled = false,
   variant = 'default',
   onClick,
+  forceSpan = false,
 }: UserLinkProps) {
   // Fallback to "Usuario" if nickname is null, undefined, or empty
   const displayName = nickname && nickname.trim() ? nickname : 'Usuario';
@@ -42,9 +45,14 @@ export function UserLink({
 
   const combinedClassName = cn(baseStyles, variantStyles[variant], className);
 
-  if (disabled) {
+  if (disabled || forceSpan) {
     return (
-      <span className={cn(combinedClassName, 'cursor-default')}>
+      <span
+        className={cn(
+          combinedClassName,
+          forceSpan ? 'cursor-pointer' : 'cursor-default'
+        )}
+      >
         {displayName}
       </span>
     );
