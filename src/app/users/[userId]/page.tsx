@@ -105,6 +105,7 @@ export default function UserProfilePage() {
   const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(null);
   const [ratings, setRatings] = useState<Rating[]>([]);
   const [loadingRatings, setLoadingRatings] = useState(false);
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -117,6 +118,33 @@ export default function UserProfilePage() {
     setFormAvatarPath(profile.avatar_url ?? null);
     setAvatarBlob(null);
   }, [profile, editDialogOpen]);
+
+  // Check if current user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      if (!currentUser) {
+        setIsCurrentUserAdmin(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (!error && data) {
+          setIsCurrentUserAdmin(data.is_admin);
+        }
+      } catch (err) {
+        logger.error('Error checking admin status:', err);
+        setIsCurrentUserAdmin(false);
+      }
+    }
+
+    void checkAdmin();
+  }, [currentUser, supabase]);
 
   // Fetch ratings
   useEffect(() => {
@@ -507,9 +535,9 @@ export default function UserProfilePage() {
                         </a>
                       </div>
 
-                      {/* Badges */}
+                      {/* Badges - Admin badge only visible to admins */}
                       <div className="flex gap-2 mt-3">
-                        {profile.is_admin && (
+                        {profile.is_admin && isCurrentUserAdmin && (
                           <Badge className="bg-red-600 text-white">
                             Administrador
                           </Badge>
