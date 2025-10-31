@@ -71,16 +71,21 @@ Caso CP-F07-03D: Purga completa de usuario
     - Notificación interna (si existe) para equipo de soporte generada.
 
 Caso CP-F07-03E: Visor de auditoría
-  Cobertura: Paginación; filtros.
+  Cobertura: Paginación; filtros; corrección de valores de filtro (Sprint 14).
   Pasos:
     1. Abrir `/admin/audit`.
     2. Filtrar por acción `suspend_user`.
     3. Expandir un registro y revisar metadata JSON.
+    4. **NUEVO (Sprint 14)**: Filtrar por acción "Resolve Report" y verificar que muestra reportes resueltos.
+    5. **NUEVO (Sprint 14)**: Confirmar que el filtro usa el valor correcto `resolve_report` (no `dismiss_report`).
   Criterios de éxito:
     - Paginación infinita carga 20 registros por solicitud sin duplicados.
     - Filtrado por acción muestra solo coincidencias.
     - Metadata incluye `performed_by`, `target_type`, `reason`.
     - Opciones de exportación o copiado funcionan (si disponibles).
+    - **NUEVO**: Filtro "Resolve Report" filtra correctamente por `moderation_action_type = 'resolve_report'`.
+    - **NUEVO**: Los reportes resueltos aparecen con icono CheckCircle azul y badge "RESOLVE REPORT".
+    - **NUEVO**: El mapeo entre UI y base de datos es consistente (resolve_report en ambos).
 
 Caso CP-F07-03F: Seguridad de endpoints admin
   Cobertura: API sin privilegios.

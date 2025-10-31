@@ -18,13 +18,18 @@ Configuración previa:
 Casos de prueba:
 
 Caso CP-F07-02A: Acceso a pestaña Marketplace admin
-  Cobertura: Navegación; carga inicial.
+  Cobertura: Navegación; carga inicial; corrección de errores RPC (Sprint 14).
   Pasos:
-    1. Desde `/admin`, abrir tab “Marketplace”.
+    1. Desde `/admin`, abrir tab "Marketplace".
     2. Observar filtros disponibles (estado, autor, rango de fechas) y tabla.
+    3. **NUEVO (Sprint 14)**: Verificar que no aparecen errores 404 en consola para `admin_list_marketplace_listings`.
+    4. **NUEVO (Sprint 14)**: Confirmar que la función `require_admin()` existe y funciona correctamente.
   Criterios de éxito:
     - Tabla lista paginada (20 ítems) con columnas: título, autor, estado, fecha, acciones.
     - Indicador de estado en color (verde activo, amarillo reservado, rojo suspendido).
+    - **NUEVO**: No hay errores 404 en consola al cargar la pestaña Marketplace.
+    - **NUEVO**: RPC `admin_list_marketplace_listings` responde correctamente (200 OK).
+    - **NUEVO**: Función `require_admin()` valida correctamente permisos de admin.
 
 Caso CP-F07-02B: Búsqueda y filtros en marketplace admin
   Cobertura: Funcionalidades de filtro.
@@ -69,15 +74,20 @@ Caso CP-F07-02E: Eliminar definitivamente listado
     - En el front público, acceso al listado muestra 404 o mensaje “Removido por moderación”.
 
 Caso CP-F07-02F: Moderación de plantillas
-  Cobertura: Tab Plantillas; similar a marketplace.
+  Cobertura: Tab Plantillas; similar a marketplace; corrección de type mismatch (Sprint 14).
   Pasos:
-    1. Abrir tab “Plantillas”.
-    2. Buscar “Colección QA Liga 2025”.
-    3. Aplicar acción “Suspender”.
+    1. Abrir tab "Plantillas".
+    2. Buscar "Colección QA Liga 2025".
+    3. Aplicar acción "Suspender".
+    4. **NUEVO (Sprint 14)**: Verificar que no aparecen errores 400 "type mismatch" en consola.
+    5. **NUEVO (Sprint 14)**: Confirmar que los campos `rating_count` y `copies_count` se muestran correctamente.
   Criterios de éxito:
     - Plantilla cambia a estado `suspended` (badge naranja/rojo).
     - `collection_templates.suspended_at` actualizado y plantilla deja de ser pública.
     - Notificación enviada al autor con motivo.
+    - **NUEVO**: No hay errores 400 relacionados con type mismatch en columnas 8 o 9.
+    - **NUEVO**: RPC `admin_list_templates` retorna `rating_count` y `copies_count` como INTEGER correctamente.
+    - **NUEVO**: Función funciona correctamente después de reiniciar PostgREST.
 
 Caso CP-F07-02G: Eliminar plantilla
   Cobertura: Soft delete desde admin.

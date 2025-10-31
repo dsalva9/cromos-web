@@ -18,13 +18,15 @@ Configuración previa:
 Casos de prueba:
 
 Caso CP-F03-02A: Búsqueda y filtros avanzados
-  Cobertura: Happy path; rendimiento; sincronización con URL; ordenamiento por distancia.
+  Cobertura: Happy path; rendimiento; sincronización con URL; ordenamiento por distancia; exclusión de anuncios propios.
   Pasos:
     1. Desde `/marketplace`, usar búsqueda por nombre de colección, número de cromo y autor.
     2. Aplicar filtros combinados (estado, rango de precio, con foto).
     3. Probar toggle de ordenamiento: "Más reciente" / "Distancia".
     4. Verificar que ordenar por distancia muestra la distancia en las tarjetas (~XX km).
     5. Guardar filtro como URL y refrescar.
+    6. **NUEVO (Sprint 14)**: Verificar que el usuario NO ve sus propios listados en el marketplace general.
+    7. **NUEVO (Sprint 14)**: Confirmar que los listados propios SÍ aparecen en `/mis-anuncios`.
   Criterios de éxito:
     - Resultados se actualizan en <1 s tras aplicar filtros (sin reload completo).
     - Se muestra mensaje "No encontramos resultados" cuando aplica.
@@ -33,6 +35,8 @@ Caso CP-F03-02A: Búsqueda y filtros avanzados
     - Si el usuario no tiene código postal configurado, el botón de distancia está deshabilitado con enlace a configuración.
     - Listados sin código postal válido aparecen al final cuando se ordena por distancia.
     - La distancia se calcula correctamente usando centroides de código postal español.
+    - **NUEVO**: Los listados propios están excluidos del marketplace general (verificar que `list_trade_listings_with_collection_filter` RPC excluye `user_id = auth.uid()`).
+    - **NUEVO**: Los listados propios aparecen correctamente en la página "Mis Anuncios".
 
 Caso CP-F03-02B: Vista de detalle y acciones contextuales
   Cobertura: Información; CTA dinámicos según rol.
