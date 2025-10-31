@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { SlotTile } from '@/components/templates/SlotTile';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useSlotListings } from '@/hooks/templates/useSlotListings';
 
 interface SlotProgress {
   slot_id: string;
@@ -32,6 +33,7 @@ export function TemplateProgressGrid({
   copyId,
 }: TemplateProgressGridProps) {
   const [selectedPage, setSelectedPage] = useState<number>(1);
+  const { slotListings, loading: listingsLoading } = useSlotListings(copyId);
 
   // Group slots by page
   const pageGroups = useMemo(() => {
@@ -90,6 +92,8 @@ export function TemplateProgressGrid({
             slot={slot}
             onUpdate={onUpdateSlot}
             copyId={copyId}
+            listing={slotListings[slot.slot_id]}
+            listingsLoading={listingsLoading}
           />
         ))}
       </div>

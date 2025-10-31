@@ -9,6 +9,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Marketplace Collection Filter (2025-10-31)**
+  - Users can filter marketplace listings by their own template collections
+  - Multi-select collection filter in marketplace page
+  - Hybrid matching: exact template matches prioritized over fuzzy text matches
+  - Filter badge shows count of active filters
+  - Only visible to logged-in users with collections
+  - **Enhanced Listing Creation Form**:
+    - Collection field now uses combobox (type OR select from user's collections)
+    - Auto-populate sticker number from template slots
+    - Slot selection modal when user selects a collection
+    - Modal only shows duplicate cards available for publishing
+    - Slots grouped by page for easy navigation
+  - **Database Changes**:
+    - New RPC: `get_user_collections()` - Returns user's template copies
+    - New RPC: `list_trade_listings_with_collection_filter(...)` - Enhanced listing filter
+    - New RPC: `get_template_copy_slots(p_copy_id)` - Returns slots with user progress
+    - New GIN index on `collection_name` for fuzzy text matching (pg_trgm)
+    - Enabled `pg_trgm` extension for similarity matching
+  - **React Components**:
+    - `<CollectionFilter />` - Multi-select filter with popover UI
+    - `<CollectionCombobox />` - Type-or-select combobox for collections
+    - `<SlotSelectionModal />` - Modal for selecting specific duplicate card
+    - `<Command />` - Command palette primitive (shadcn)
+    - `<Popover />` - Popover primitive (shadcn)
+  - **Custom Hooks**:
+    - `useUserCollections()` - Fetch user's template copies
+    - `useTemplateSlots()` - Fetch slots for a template copy
+  - **Migrations**:
+    - `20251031092744_add_collection_filter.sql` - Complete migration with all RPC functions
+  - **Dependencies**:
+    - Added `cmdk` for command palette functionality
+    - Added `@radix-ui/react-icons` for icons
+    - Added `@radix-ui/react-popover` for popover primitive
+  - **Documentation**:
+    - `docs/features/COLLECTION_FILTER.md` - Complete feature documentation
+  - **Post-Implementation Fixes**:
+    - Fixed CollectionCombobox click/tap issue (replaced CommandItem with div elements)
+    - Updated slot modal empty state message to be informative instead of restrictive
+    - Added "Todas" button to collection filter for selecting all collections at once
+    - Fixed database table references (postcodes → postal_codes)
+    - Added copy_id/slot_id tracking for listings created via combobox
+    - Added "Publicado" badge in Mis Colecciones for published slots (clickable, navigates to listing)
+    - Created `useSlotListings` hook to fetch active listings for collection slots
+  - **Additional Migrations**:
+    - `20251031095000_fix_collection_filter.sql` - Fix table name references
+    - `20251031120000_add_copy_slot_to_create_listing.sql` - Add copy/slot linking to listings
+
+### Added (Previous)
+
 - **User Ignore System (2025-10-30)**
   - Users can ignore other users from their profile pages
   - Ignore button on user profiles (`/users/[userId]`)

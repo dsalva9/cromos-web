@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
+import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
 import { Plus, List, MapPin, Clock } from 'lucide-react';
 import Link from 'next/link';
@@ -18,6 +19,9 @@ export default function MarketplacePage() {
   const [userPostcode, setUserPostcode] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortByDistance, setSortByDistance] = useState(false);
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>(
+    []
+  );
 
   // Fetch user's postcode only
   useEffect(() => {
@@ -45,6 +49,7 @@ export default function MarketplacePage() {
     limit: 20,
     sortByDistance: sortByDistance && hasPostcode,
     viewerPostcode: userPostcode,
+    collectionIds: selectedCollectionIds,
   });
 
   return (
@@ -89,8 +94,22 @@ export default function MarketplacePage() {
           />
         </div>
 
-        {/* Sort Controls */}
-        <div className="mb-8 flex flex-col gap-2">
+        {/* Sort and Filter Controls */}
+        <div className="mb-8 flex flex-col gap-4">
+          {/* Collection Filter (only show for logged-in users) */}
+          {user && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-400 font-semibold uppercase">
+                Filtrar:
+              </span>
+              <CollectionFilter
+                selectedCollectionIds={selectedCollectionIds}
+                onSelectionChange={setSelectedCollectionIds}
+              />
+            </div>
+          )}
+
+          {/* Sort Controls */}
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-400 font-semibold uppercase">
               Ordenar por:

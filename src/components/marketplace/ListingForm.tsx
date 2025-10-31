@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ImageUpload } from '@/components/marketplace/ImageUpload';
+import { CollectionCombobox } from '@/components/marketplace/CollectionCombobox';
+import { SlotSelectionModal } from '@/components/marketplace/SlotSelectionModal';
 import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,6 +23,7 @@ import {
   listingSchema,
   type ListingFormData,
 } from '@/lib/validations/marketplace.schemas';
+import { useTemplateSlots, TemplateSlot } from '@/hooks/templates/useTemplateSlots';
 
 interface ListingFormProps {
   initialData?: Partial<CreateListingForm>;
@@ -30,6 +33,12 @@ interface ListingFormProps {
 
 export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps) {
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [slotModalOpen, setSlotModalOpen] = useState(false);
+  const [selectedCollectionTitle, setSelectedCollectionTitle] = useState('');
+  const [selectedCopyId, setSelectedCopyId] = useState<number | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+
+  const { slots, loading: slotsLoading, fetchSlots } = useTemplateSlots();
 
   const {
     register,
@@ -52,6 +61,32 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
   const imageUrl = watch('image_url');
   const termsAccepted = watch('terms_accepted');
+  const collectionName = watch('collection_name');
+
+  // Handle collection selection from combobox
+  const handleCollectionSelect = async (copyId: number, title: string) => {
+    setSelectedCollectionTitle(title);
+    setSelectedCopyId(copyId);
+
+    // Fetch slots for this collection
+    await fetchSlots(copyId);
+
+    // Open slot selection modal
+    setSlotModalOpen(true);
+  };
+
+  // Handle slot selection
+  const handleSlotSelect = (slot: TemplateSlot) => {
+    // Auto-populate sticker number from slot
+    const stickerNumber = slot.slot_label
+      ? `#${slot.slot_number} - ${slot.slot_label}`
+      : `#${slot.slot_number}`;
+
+    setValue('sticker_number', stickerNumber, { shouldValidate: true });
+
+    // Store slot_id for template linking
+    setSelectedSlotId(slot.slot_id);
+  };
 
   const submitHandler = async (data: ListingFormData) => {
     const payload: CreateListingForm = {
@@ -60,6 +95,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       sticker_number: data.sticker_number || '',
       collection_name: data.collection_name || '',
       image_url: data.image_url || undefined,
+      copy_id: selectedCopyId || undefined,
+      slot_id: selectedSlotId || undefined,
     };
     await onSubmit(payload);
   };
@@ -102,21 +139,19 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             )}
           </div>
 
-          {/* Collection Name */}
+          {/* Collection Name - Combobox */}
           <div className="space-y-2">
             <Label htmlFor="collection">Colección (Opcional)</Label>
-            <Input
-              id="collection"
-              aria-invalid={!!errors.collection_name}
-              aria-describedby={
-                errors.collection_name ? 'collection-error' : undefined
-              }
-              {...register('collection_name')}
-              placeholder="ej. Panini LaLiga 2024/25"
-              className={`bg-[#374151] border-2 text-white ${
-                errors.collection_name ? 'border-red-500' : 'border-black'
-              }`}
+            <CollectionCombobox
+              value={collectionName || ''}
+              onChange={value => setValue('collection_name', value)}
+              onCollectionSelect={handleCollectionSelect}
+              placeholder="Buscar o seleccionar colección..."
+              className={errors.collection_name ? 'border-red-500' : ''}
             />
+            <p className="text-xs text-gray-400">
+              Selecciona de tus colecciones para auto-completar el número, o escribe libremente
+            </p>
             {errors.collection_name && (
               <p id="collection-error" className="text-sm text-red-500">
                 {errors.collection_name.message as string}
@@ -219,6 +254,16 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
           </div>
         </ModernCardContent>
       </ModernCard>
+
+      {/* Slot Selection Modal */}
+      <SlotSelectionModal
+        open={slotModalOpen}
+        onClose={() => setSlotModalOpen(false)}
+        slots={slots}
+        loading={slotsLoading}
+        onSlotSelect={handleSlotSelect}
+        collectionTitle={selectedCollectionTitle}
+      />
 
       {/* Terms Dialog */}
       <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>

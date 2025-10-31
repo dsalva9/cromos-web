@@ -20,6 +20,7 @@ interface RpcListingResponse {
   copy_id: number | null;
   slot_id: number | null;
   distance_km?: number | null;
+  match_score?: number;
 }
 
 interface UseListingsParams {
@@ -27,6 +28,7 @@ interface UseListingsParams {
   limit?: number;
   sortByDistance?: boolean;
   viewerPostcode?: string | null;
+  collectionIds?: number[];
 }
 
 /**
@@ -35,6 +37,9 @@ interface UseListingsParams {
  * @param params - Configuration options for listings
  * @param params.search - Optional search query to filter listings by title or collection name
  * @param params.limit - Number of listings per page (default: 20)
+ * @param params.sortByDistance - Sort listings by distance (requires postcode)
+ * @param params.viewerPostcode - User's postcode for distance calculation
+ * @param params.collectionIds - Filter by user's collection IDs (template copies)
  *
  * @returns Object containing:
  * - `listings`: Array of listing objects
@@ -64,6 +69,7 @@ export function useListings({
   limit = 20,
   sortByDistance = false,
   viewerPostcode = null,
+  collectionIds = [],
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -79,9 +85,13 @@ export function useListings({
         setLoading(true);
         const currentOffset = isLoadMore ? fetchOffset : 0;
 
-        // Use distance-aware RPC if sorting by distance, otherwise use basic filtered RPC
-        const rpcName = sortByDistance
-          ? 'list_trade_listings_filtered_with_distance'
+        // Determine which RPC to use based on features needed
+        const hasCollectionFilter = collectionIds && collectionIds.length > 0;
+
+        // Use new collection filter RPC if collection filter is active OR distance sorting is needed
+        // Otherwise use legacy basic filtered RPC for backwards compatibility
+        const rpcName = hasCollectionFilter || sortByDistance
+          ? 'list_trade_listings_with_collection_filter'
           : 'list_trade_listings_filtered';
 
         const rpcParams: Record<string, unknown> = {
@@ -90,10 +100,11 @@ export function useListings({
           p_search: search || null,
         };
 
-        // Add distance params if needed
-        if (sortByDistance) {
+        // Add collection filter and distance params if using new RPC
+        if (rpcName === 'list_trade_listings_with_collection_filter') {
           rpcParams.p_viewer_postcode = viewerPostcode;
-          rpcParams.p_sort_by_distance = true;
+          rpcParams.p_sort_by_distance = sortByDistance;
+          rpcParams.p_collection_ids = hasCollectionFilter ? collectionIds : null;
         }
 
         const { data, error: rpcError } = await supabase.rpc(
@@ -143,11 +154,11 @@ export function useListings({
         setLoading(false);
       }
     },
-    [supabase, search, limit, sortByDistance, viewerPostcode]
+    [supabase, search, limit, sortByDistance, viewerPostcode, collectionIds]
   );
 
   useEffect(() => {
-    // Debounce initial fetch on search change or sort change
+    // Debounce initial fetch on search change or sort/filter change
     setOffset(0);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -156,7 +167,7 @@ export function useListings({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search, limit, sortByDistance, viewerPostcode, fetchListings]);
+  }, [search, limit, sortByDistance, viewerPostcode, collectionIds, fetchListings]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

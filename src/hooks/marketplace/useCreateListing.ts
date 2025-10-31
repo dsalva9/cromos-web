@@ -18,6 +18,8 @@ export function useCreateListing() {
           p_sticker_number: data.sticker_number || null,
           p_collection_name: data.collection_name || null,
           p_image_url: data.image_url || null,
+          p_copy_id: data.copy_id || null,
+          p_slot_id: data.slot_id || null,
         }
       );
 

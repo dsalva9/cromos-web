@@ -114,6 +114,8 @@ export interface CreateListingForm {
   sticker_number: string;
   collection_name: string;
   image_url?: string;
+  copy_id?: number;
+  slot_id?: number;
 }
 
 export interface CreateTemplateForm {

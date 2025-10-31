@@ -17,13 +17,21 @@ interface SlotProgress {
   count: number;
 }
 
+interface SlotListing {
+  id: number;
+  title: string;
+  status: 'active' | 'sold' | 'removed';
+}
+
 interface SlotTileProps {
   slot: SlotProgress;
   onUpdate: (slotId: string, status: string, count: number) => Promise<void>;
   copyId: string;
+  listing?: SlotListing;
+  listingsLoading?: boolean;
 }
 
-export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
+export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: SlotTileProps) {
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
 
@@ -195,16 +203,30 @@ export function SlotTile({ slot, onUpdate, copyId }: SlotTileProps) {
               </Button>
             </div>
 
-            {/* Publish Button */}
-            <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`}>
-              <Button
-                size="sm"
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] text-xs h-7"
-              >
-                <Upload className="mr-1 h-3 w-3" />
-                Publicar
-              </Button>
-            </Link>
+            {/* Publish Button or Published Badge */}
+            {listing ? (
+              <Link href={`/marketplace/${listing.id}`}>
+                <Badge
+                  variant="outline"
+                  className="w-full bg-green-700 text-white border-green-600 hover:bg-green-600 cursor-pointer text-xs py-1 flex items-center justify-center gap-1"
+                >
+                  <Upload className="h-3 w-3" />
+                  Publicado
+                </Badge>
+              </Link>
+            ) : listingsLoading ? (
+              <div className="w-full h-7 bg-gray-700 animate-pulse rounded" />
+            ) : (
+              <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`}>
+                <Button
+                  size="sm"
+                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] text-xs h-7"
+                >
+                  <Upload className="mr-1 h-3 w-3" />
+                  Publicar
+                </Button>
+              </Link>
+            )}
           </div>
         )}
 
