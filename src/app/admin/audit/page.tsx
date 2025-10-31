@@ -19,7 +19,7 @@ function AuditLogContent() {
       case 'suspend_user': return <Ban className="h-5 w-5 text-red-500" />;
       case 'unsuspend_user': return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'remove_content': return <Trash className="h-5 w-5 text-orange-500" />;
-      case 'dismiss_report': return <X className="h-5 w-5 text-gray-500" />;
+      case 'resolve_report': return <CheckCircle className="h-5 w-5 text-blue-500" />;
       default: return <FileText className="h-5 w-5 text-blue-500" />;
     }
   };
@@ -29,7 +29,7 @@ function AuditLogContent() {
       case 'suspend_user': return 'bg-red-500';
       case 'unsuspend_user': return 'bg-green-500';
       case 'remove_content': return 'bg-orange-500';
-      case 'dismiss_report': return 'bg-gray-500';
+      case 'resolve_report': return 'bg-blue-500';
       default: return 'bg-blue-500';
     }
   };
@@ -65,7 +65,7 @@ function AuditLogContent() {
                   <SelectItem value="suspend_user">Suspend User</SelectItem>
                   <SelectItem value="unsuspend_user">Unsuspend User</SelectItem>
                   <SelectItem value="remove_content">Remove Content</SelectItem>
-                  <SelectItem value="dismiss_report">Dismiss Report</SelectItem>
+                  <SelectItem value="resolve_report">Resolve Report</SelectItem>
                 </SelectContent>
               </Select>
             </div>
