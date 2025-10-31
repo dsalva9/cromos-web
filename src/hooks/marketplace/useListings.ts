@@ -85,27 +85,19 @@ export function useListings({
         setLoading(true);
         const currentOffset = isLoadMore ? fetchOffset : 0;
 
-        // Determine which RPC to use based on features needed
+        // Always use the new collection filter RPC (it handles all cases including basic filtering)
+        // This ensures own listings are always excluded
         const hasCollectionFilter = collectionIds && collectionIds.length > 0;
-
-        // Use new collection filter RPC if collection filter is active OR distance sorting is needed
-        // Otherwise use legacy basic filtered RPC for backwards compatibility
-        const rpcName = hasCollectionFilter || sortByDistance
-          ? 'list_trade_listings_with_collection_filter'
-          : 'list_trade_listings_filtered';
+        const rpcName = 'list_trade_listings_with_collection_filter';
 
         const rpcParams: Record<string, unknown> = {
           p_limit: limit,
           p_offset: currentOffset,
           p_search: search || null,
+          p_viewer_postcode: viewerPostcode,
+          p_sort_by_distance: sortByDistance,
+          p_collection_ids: hasCollectionFilter ? collectionIds : null,
         };
-
-        // Add collection filter and distance params if using new RPC
-        if (rpcName === 'list_trade_listings_with_collection_filter') {
-          rpcParams.p_viewer_postcode = viewerPostcode;
-          rpcParams.p_sort_by_distance = sortByDistance;
-          rpcParams.p_collection_ids = hasCollectionFilter ? collectionIds : null;
-        }
 
         const { data, error: rpcError } = await supabase.rpc(
           rpcName,
