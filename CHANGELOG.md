@@ -56,6 +56,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `20251031095000_fix_collection_filter.sql` - Fix table name references
     - `20251031120000_add_copy_slot_to_create_listing.sql` - Add copy/slot linking to listings
 
+### Fixed
+
+- **Marketplace and Admin Dashboard Fixes (2025-10-31)**
+  - **Marketplace now excludes user's own listings**:
+    - Users no longer see their own listings in marketplace view
+    - Own listings remain accessible in "Mis Anuncios" page
+    - Updated `list_trade_listings_with_collection_filter` to add exclusion filter
+  - **Admin Dashboard RPC Functions Fixed**:
+    - Fixed 404 errors in Admin Marketplace page
+    - Fixed 404 errors in Admin Templates page
+    - Ensured admin functions are present in database:
+      - `admin_list_marketplace_listings` - List all marketplace listings
+      - `admin_update_listing_status` - Update listing status
+      - `admin_list_templates` - List all templates
+      - `admin_update_template_status` - Update template status
+  - **Admin Audit Log Filter Fixed**:
+    - Fixed 400 Bad Request errors when filtering audit log by action type
+    - Removed invalid foreign key query syntax
+    - Updated to use correct column name (`moderation_action_type`)
+    - Properly mapped database columns to display interface
+    - Updated `src/hooks/admin/useAuditLog.ts`
+  - **Migration**: `20251031125558_exclude_own_listings_and_ensure_admin_functions.sql`
+  - **Documentation**: `docs/fixes/MARKETPLACE_AND_ADMIN_FIXES.md`
+
 ### Added (Previous)
 
 - **User Ignore System (2025-10-30)**
