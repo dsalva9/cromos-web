@@ -48,7 +48,7 @@ export function useAuditLog(actionType: string = 'all') {
       if (fetchError) throw fetchError;
 
       // Map database columns to display-friendly interface
-      const formattedData = (data || []).map((log: any) => ({
+      const formattedData = (data || []).map((log: Record<string, unknown>) => ({
         id: log.id,
         admin_id: log.admin_id,
         admin_nickname: log.admin_nickname,

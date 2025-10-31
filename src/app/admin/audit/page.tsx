@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { FileText, Ban, CheckCircle, X, Trash } from 'lucide-react';
+import { FileText, Ban, CheckCircle, Trash } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 function AuditLogContent() {

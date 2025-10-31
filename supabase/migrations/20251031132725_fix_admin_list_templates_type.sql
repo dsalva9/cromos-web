@@ -3,6 +3,7 @@
 -- =====================================================
 -- Purpose: Fix integer/bigint type mismatch in copies_count column
 -- Error: "Returned type integer does not match expected type bigint in column 8"
+-- Solution: Change return type to INTEGER to match actual column type
 -- =====================================================
 
 DROP FUNCTION IF EXISTS admin_list_templates(TEXT, TEXT, INTEGER, INTEGER);
@@ -22,7 +23,7 @@ RETURNS TABLE (
     author_nickname TEXT,
     rating_avg DECIMAL,
     rating_count BIGINT,
-    copies_count BIGINT,  -- Changed from INTEGER to BIGINT
+    copies_count INTEGER,  -- Changed to INTEGER to match actual column type
     is_public BOOLEAN
 )
 LANGUAGE plpgsql
@@ -46,7 +47,7 @@ BEGIN
         p.nickname AS author_nickname,
         ct.rating_avg,
         ct.rating_count,
-        ct.copies_count::BIGINT,  -- Cast to BIGINT to match return type
+        ct.copies_count,  -- No cast needed, already INTEGER
         ct.is_public
     FROM collection_templates ct
     JOIN profiles p ON ct.author_id = p.id
