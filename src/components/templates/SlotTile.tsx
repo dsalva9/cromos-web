@@ -39,16 +39,8 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
   const [localCount, setLocalCount] = useState(slot.count);
 
   const getStatusColor = () => {
-    switch (slot.status) {
-      case 'missing':
-        return 'bg-gray-700 border-gray-600';
-      case 'owned':
-        return 'bg-green-900 border-green-700';
-      case 'duplicate':
-        return 'bg-[#FFC000] border-[#FFD700]';
-      default:
-        return 'bg-gray-700';
-    }
+    // Use consistent card styling regardless of status
+    return 'bg-gray-800 border-gray-700';
   };
 
   const getStatusLabel = () => {
@@ -176,10 +168,10 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
           <Badge
             variant="outline"
             className={cn(
-              'cursor-pointer uppercase text-xs font-bold',
-              slot.status === 'missing' && 'bg-gray-800 text-gray-300',
-              slot.status === 'owned' && 'bg-green-800 text-green-200',
-              slot.status === 'duplicate' && 'bg-black text-[#FFC000]'
+              'cursor-pointer uppercase text-xs font-bold border-2',
+              slot.status === 'missing' && 'bg-gray-700/50 text-gray-300 border-gray-600',
+              slot.status === 'owned' && 'bg-green-500/20 text-green-400 border-green-500',
+              slot.status === 'duplicate' && 'bg-amber-500/20 text-amber-400 border-amber-500'
             )}
             onClick={handleStatusClick}
           >

@@ -210,15 +210,16 @@ export default function StickerTile({
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
-              className={`hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 ${
-                ownedCount > 0
-                  ? 'bg-[#FFC000] text-gray-900 font-bold border-2 border-black hover:bg-yellow-400 focus:ring-[#FFC000]'
-                  : 'bg-gray-800 text-white font-bold border-2 border-black hover:bg-gray-700 focus:ring-[#FFC000]'
-              }`}
+              className="hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 bg-gray-800 text-white font-bold border-2 border-black hover:bg-gray-700 focus:ring-[#FFC000] relative"
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >
-              {ownedCount > 0 ? `REPE (+${ownedCount})` : 'TENGO'}
+              TENGO
+              {ownedCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-black">
+                  +{ownedCount}
+                </span>
+              )}
             </Button>
 
             {ownedCount > 0 && (
