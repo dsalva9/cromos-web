@@ -86,16 +86,6 @@ function PublishDuplicateContent() {
         return;
       }
 
-      // Debug: Log the slot data to see what we're getting
-      console.log('PublishDuplicatePage - Slot data:', {
-        slot_number: slot.slot_number,
-        slot_variant: slot.slot_variant,
-        global_number: slot.global_number,
-        page_number: slot.page_number,
-        page_title: slot.page_title,
-        label: slot.label,
-      });
-
       if (slot.status !== 'duplicate') {
         toast.error(`Este cromo está marcado como "${slot.status}", no como "repetido"`);
         router.back();
