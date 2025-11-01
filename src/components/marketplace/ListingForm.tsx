@@ -86,9 +86,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       setValue('title', slot.slot_label, { shouldValidate: true });
     }
 
-    // Auto-populate sticker number: just slot number + variant (e.g., "5" or "5A")
-    const stickerNumber = `${slot.slot_number}${slot.slot_variant || ''}`;
-    setValue('sticker_number', stickerNumber, { shouldValidate: true });
+    // Auto-populate sticker number: just the slot number (not variant)
+    setValue('sticker_number', String(slot.slot_number), { shouldValidate: true });
 
     // Auto-populate Panini fields
     if (slot.global_number) {
