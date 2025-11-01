@@ -393,20 +393,32 @@ export default function TemplateDetailsPage() {
                     <div className="pt-2 border-t border-slate-700 max-h-32 overflow-y-auto">
                       <div className="space-y-1">
                         {page.slots.map(slot => (
-                          <div key={slot.id} className="flex items-center gap-2 text-xs">
-                            <span className="text-slate-500 font-mono w-6">{slot.slot_number}.</span>
-                            <span
-                              className={
-                                slot.is_special ? 'text-yellow-500 font-medium' : 'text-slate-400'
-                              }
-                            >
-                              {slot.label || `Cromo ${slot.slot_number}`}
-                            </span>
-                            {slot.is_special && (
-                              <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded">
-                                ESPECIAL
-                              </span>
-                            )}
+                          <div key={slot.id} className="flex items-start gap-2 text-xs">
+                            <span className="text-slate-500 font-mono w-6 flex-shrink-0">{slot.slot_number}.</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span
+                                  className={
+                                    slot.is_special ? 'text-yellow-500 font-medium' : 'text-slate-400'
+                                  }
+                                >
+                                  {slot.label || `Cromo ${slot.slot_number}`}
+                                </span>
+                                {slot.is_special && (
+                                  <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded">
+                                    ESPECIAL
+                                  </span>
+                                )}
+                              </div>
+                              {/* Panini metadata */}
+                              {(slot.slot_variant || slot.global_number) && (
+                                <div className="text-[10px] text-slate-500 mt-0.5">
+                                  {slot.slot_variant && <span>Variante: {slot.slot_variant}</span>}
+                                  {slot.slot_variant && slot.global_number && <span className="mx-1">•</span>}
+                                  {slot.global_number && <span>Global #{slot.global_number}</span>}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
