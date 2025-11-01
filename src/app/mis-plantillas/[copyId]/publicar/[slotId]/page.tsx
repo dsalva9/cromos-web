@@ -28,7 +28,7 @@ function PublishDuplicateContent() {
     slot_variant: string | null;
     global_number: number | null;
     page_number: number;
-    page_title: string;
+    page_title: string | null;
   }
 
   interface TemplateInfo {
@@ -85,6 +85,16 @@ function PublishDuplicateContent() {
         router.back();
         return;
       }
+
+      // Debug: Log the slot data to see what we're getting
+      console.log('PublishDuplicatePage - Slot data:', {
+        slot_number: slot.slot_number,
+        slot_variant: slot.slot_variant,
+        global_number: slot.global_number,
+        page_number: slot.page_number,
+        page_title: slot.page_title,
+        label: slot.label,
+      });
 
       if (slot.status !== 'duplicate') {
         toast.error(`Este cromo está marcado como "${slot.status}", no como "repetido"`);
@@ -184,8 +194,8 @@ function PublishDuplicateContent() {
             image_url: '',
             // Panini metadata fields - use actual values or undefined (not null)
             page_number: slotData?.page_number ?? undefined,
-            page_title: slotData?.page_title ? slotData.page_title : undefined,
-            slot_variant: slotData?.slot_variant ? slotData.slot_variant : undefined,
+            page_title: slotData?.page_title || undefined,
+            slot_variant: slotData?.slot_variant || undefined,
             global_number: slotData?.global_number ?? undefined,
           }}
           onSubmit={handlePublish}
