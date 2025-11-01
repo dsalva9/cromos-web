@@ -103,6 +103,13 @@
 - `trade_listings` table for physical card listings
 - Publish with optional real photo (camera capture on desktop/mobile)
 - Free-form fields: title, description, number, collection
+- **NEW (2025-11-01):** Panini metadata fields for rich sticker classification:
+  - `page_number` - Page number within album (e.g., 12)
+  - `page_title` - Page section title (e.g., "Delanteros")
+  - `slot_variant` - Variant identifier (A, B, C)
+  - `global_number` - Global checklist number (e.g., 1-773)
+  - Auto-populated from templates when publishing duplicates
+  - Displayed in "Detalles del Cromo" card on listing detail page
 - Search and filtering
 - View listings by user profile
 - Direct chat from listing
@@ -126,7 +133,7 @@
 
 #### **RPCs:**
 
-- `create_trade_listing` - Create listing
+- `create_trade_listing` ✅ **UPDATED (2025-11-01)** - Create listing with optional Panini metadata
 - `list_trade_listings` - List with search
 - `list_trade_listings_with_distance` ✅ **NEW (v1.6.0)** - List with optional distance sorting
 - `get_user_listings` - View user's listings
@@ -303,7 +310,7 @@
 
 #### **Integration RPCs:**
 
-- `publish_duplicate_to_marketplace` - Create listing from template slot
+- `publish_duplicate_to_marketplace` ✅ **UPDATED (2025-11-01)** - Create listing from template slot with auto-populated Panini metadata
 - `mark_listing_sold_and_decrement` - Mark sold and update template count
 - `get_my_listings_with_progress` - View listings with sync information
 

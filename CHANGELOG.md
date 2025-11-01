@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Panini Metadata Fields for Marketplace Listings (2025-11-01)**
+  - Added rich metadata fields to `trade_listings` table for Panini-style album classification
+  - **New Database Columns**:
+    - `page_number` (INTEGER) - Page number within album (e.g., 12)
+    - `page_title` (TEXT) - Page section title (e.g., "Delanteros")
+    - `slot_variant` (TEXT) - Variant identifier, single uppercase letter (A, B, C)
+    - `global_number` (INTEGER) - Global checklist number (e.g., 1-773)
+  - **Database Enhancements**:
+    - CHECK constraint on `slot_variant` format (single uppercase letter)
+    - Index on `global_number` for efficient searches
+    - All fields nullable for backward compatibility
+  - **Updated RPCs**:
+    - `create_trade_listing` - Now accepts 4 new Panini metadata parameters
+    - `publish_duplicate_to_marketplace` - Auto-populates Panini fields from template metadata
+  - **UI Improvements**:
+    - "Detalles del Cromo" card on listing detail page showing Panini metadata
+    - Template slot tiles display slot number, variant, and checklist number below label
+    - Conditional rendering: metadata card only shows if at least one field has a value
+  - **Type Updates**:
+    - Added Panini fields to `Listing` interface in `src/types/v1.6.0.ts`
+    - Updated `useListing` hook to fetch Panini fields
+    - Updated `useCreateListing` hook to send Panini fields
+  - **Auto-Population**:
+    - Publishing duplicate from template automatically populates all Panini fields
+    - Combines `slot_number` + `slot_variant` for `sticker_number` (e.g., "5A")
+  - **Migrations**:
+    - `20251101200320_add_panini_fields_to_trade_listings.sql` - Schema changes
+    - `20251101200321_update_create_trade_listing_with_panini_fields.sql` - RPC update
+    - `20251101200322_update_publish_duplicate_with_panini_fields.sql` - Auto-population
+  - **Documentation**:
+    - `docs/PANINI_METADATA_UPDATE.md` - Complete feature documentation
+    - `docs/App-Testing/Fase-03-Marketplace/03_Metadata_Panini.txt` - Test cases
+  - **Backward Compatibility**: All existing listings continue to work without Panini metadata
+
 - **Marketplace Collection Filter (2025-10-31)**
   - Users can filter marketplace listings by their own template collections
   - Multi-select collection filter in marketplace page

@@ -188,18 +188,12 @@ export default function ListingDetailPage() {
                 {listing.title}
               </h1>
 
-              {/* Metadata */}
+              {/* Basic Metadata */}
               <div className="flex flex-wrap gap-4 text-sm text-gray-400 mb-6">
                 {listing.collection_name && (
                   <div>
                     <span className="font-bold">Colección:</span>{' '}
                     {listing.collection_name}
-                  </div>
-                )}
-                {listing.sticker_number && (
-                  <div>
-                    <span className="font-bold">Número:</span> #
-                    {listing.sticker_number}
                   </div>
                 )}
                 <div className="flex items-center gap-1">
@@ -211,6 +205,50 @@ export default function ListingDetailPage() {
                   {new Date(listing.created_at).toLocaleDateString()}
                 </div>
               </div>
+
+              {/* Panini Metadata Card */}
+              {(listing.page_number ||
+                listing.page_title ||
+                listing.sticker_number ||
+                listing.slot_variant ||
+                listing.global_number) && (
+                <ModernCard className="mb-6">
+                  <ModernCardContent className="p-4">
+                    <h3 className="font-bold text-white mb-3">
+                      Detalles del Cromo
+                    </h3>
+                    <div className="space-y-2 text-sm">
+                      {(listing.page_number || listing.page_title) && (
+                        <div className="text-gray-300">
+                          <span className="font-bold text-white">Página:</span>{' '}
+                          {listing.page_number && `${listing.page_number}`}
+                          {listing.page_number &&
+                            listing.page_title &&
+                            ' - '}
+                          {listing.page_title}
+                        </div>
+                      )}
+                      {(listing.sticker_number || listing.slot_variant) && (
+                        <div className="text-gray-300">
+                          <span className="font-bold text-white">
+                            Número de cromo:
+                          </span>{' '}
+                          #{listing.sticker_number}
+                          {listing.slot_variant}
+                        </div>
+                      )}
+                      {listing.global_number && (
+                        <div className="text-gray-300">
+                          <span className="font-bold text-white">
+                            Número global:
+                          </span>{' '}
+                          #{listing.global_number}
+                        </div>
+                      )}
+                    </div>
+                  </ModernCardContent>
+                </ModernCard>
+              )}
 
               {/* Description */}
               {listing.description && (

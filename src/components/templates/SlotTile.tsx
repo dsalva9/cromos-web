@@ -15,6 +15,9 @@ interface SlotProgress {
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
+  slot_number?: number;
+  slot_variant?: string | null;
+  global_number?: number | null;
 }
 
 interface SlotListing {
@@ -153,6 +156,19 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
           <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem]">
             {slot.label || `Cromo ${slot.slot_id.slice(-4)}`}
           </p>
+          {/* Number and Checklist Info */}
+          {(slot.slot_number || slot.global_number) && (
+            <p className="text-xs text-gray-400 mt-1">
+              {slot.slot_number && (
+                <>
+                  #{slot.slot_number}
+                  {slot.slot_variant}
+                </>
+              )}
+              {slot.slot_number && slot.global_number && ' | '}
+              {slot.global_number && <>Checklist #{slot.global_number}</>}
+            </p>
+          )}
         </div>
 
         {/* Status Badge */}

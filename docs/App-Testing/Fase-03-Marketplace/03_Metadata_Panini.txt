@@ -1,0 +1,172 @@
+Nombre del conjunto: CP-F03-03 Metadata Panini en marketplace
+Fase: 03 - Marketplace
+Sprint: 16.5
+Objetivo: Validar la correcta captura, almacenamiento y visualización de campos de metadata Panini en listados de marketplace, tanto en creación manual como en publicación desde plantillas.
+
+Pre-requisitos generales:
+- Usuario vendedor: `qa.vendedor@cromos.test` con duplicados disponibles en plantilla con metadata Panini.
+- Plantilla de prueba: "Mundial Qatar 2022" con slots configurados con:
+  * page_number: 12
+  * page_title: "Delanteros"
+  * slot_number: 5
+  * slot_variant: "A"
+  * global_number: 147
+- Acceso a tablas `trade_listings`, `template_slots`, `template_pages`.
+
+Configuración previa:
+- Verificar que la plantilla de prueba tiene al menos un slot con todos los campos Panini poblados.
+- Verificar que el usuario vendedor tiene duplicados (count >= 2) en ese slot.
+
+Casos de prueba:
+
+Caso CP-F03-03A: Crear listado manual con campos Panini completos
+  Cobertura: Flujo feliz; validación de campos opcionales; visualización en detalle.
+  Pasos:
+    1. Iniciar sesión como `qa.vendedor`.
+    2. Navegar a `/marketplace/create`.
+    3. Completar campos básicos:
+       - Título: "Messi Inter Miami"
+       - Descripción: "Nuevo, sin uso"
+       - Número del cromo: "5"
+       - Colección: "Mundial Qatar 2022"
+    4. Completar campos Panini:
+       - Variante: "A"
+       - Número global: "147"
+       - Número de página: "12"
+       - Título de página: "Delanteros"
+    5. Publicar.
+    6. Abrir detalle del listado `/marketplace/{id}`.
+  Criterios de éxito:
+    - Formulario acepta todos los campos Panini sin errores.
+    - Campos Panini son opcionales (no bloquean publicación si vacíos).
+    - Toast "Anuncio publicado con éxito" aparece.
+    - En detalle del listado, se muestra tarjeta "Detalles del Cromo" con:
+      * Página: 12 - Delanteros
+      * Número en página: #5A
+      * Número de checklist: #147
+    - En BD (`trade_listings`): verificar columnas tienen valores correctos:
+      * page_number = 12
+      * page_title = "Delanteros"
+      * sticker_number = "5"
+      * slot_variant = "A"
+      * global_number = 147
+
+Caso CP-F03-03B: Crear listado con campos Panini parciales
+  Cobertura: Campos opcionales; visualización condicional.
+  Pasos:
+    1. Crear listado similar a CP-F03-03A pero solo completar:
+       - Número del cromo: "7"
+       - Número global: "200"
+       - Dejar vacíos: Variante, Número de página, Título de página
+    2. Publicar y abrir detalle.
+  Criterios de éxito:
+    - Listado se publica correctamente.
+    - Tarjeta "Detalles del Cromo" aparece pero solo muestra campos con valor:
+      * Número en página: #7 (sin variante)
+      * Número de checklist: #200
+    - Campos vacíos no se muestran en la tarjeta.
+    - No se muestra línea "Página:" si page_number y page_title están vacíos.
+
+Caso CP-F03-03C: Crear listado sin ningún campo Panini
+  Cobertura: Backward compatibility; visualización condicional.
+  Pasos:
+    1. Crear listado solo con campos básicos (sin completar ningún campo Panini).
+    2. Publicar y abrir detalle.
+  Criterios de éxito:
+    - Listado se publica normalmente.
+    - Tarjeta "Detalles del Cromo" NO aparece en el detalle.
+    - No hay errores visuales ni espacios vacíos.
+    - Listado funciona exactamente igual que listados legacy sin metadata.
+
+Caso CP-F03-03D: Publicar duplicado desde plantilla con auto-población
+  Cobertura: Integración plantillas-marketplace; auto-población; RPC `publish_duplicate_to_marketplace`.
+  Pasos:
+    1. Como `qa.vendedor`, navegar a `/mis-plantillas/{copyId}`.
+    2. Identificar slot con metadata Panini completa y status "duplicate".
+    3. Hacer clic en botón "Publicar" del slot.
+    4. Verificar valores pre-poblados en el formulario:
+       - Título: (label del slot, ej: "Leo Messi")
+       - Descripción: "Tengo X repetidos disponibles."
+       - Número del cromo: "5" (slot_number sin variante)
+       - Colección: "Mundial Qatar 2022" (título de la plantilla)
+       - Variante: "A" (auto-poblada)
+       - Número global: "147" (auto-poblado)
+       - Título de página: "Delanteros" (auto-poblado)
+    5. Modificar descripción si se desea y publicar.
+    6. Abrir detalle del listado creado.
+    7. Verificar contador de duplicados en plantilla.
+  Criterios de éxito:
+    - Formulario tiene todos los campos Panini pre-poblados desde template_slots.
+    - Formulario permite editar campos antes de publicar.
+    - Al publicar, RPC `publish_duplicate_to_marketplace` ejecuta correctamente.
+    - Detalle del listado muestra tarjeta "Detalles del Cromo" con todos los campos.
+    - En BD:
+      * Verificar `copy_id` y `slot_id` están linkeados correctamente.
+      * Verificar sticker_number combina slot_number (sin variante, solo "5").
+      * Verificar todos los campos Panini coinciden con el slot original.
+    - Contador de duplicados en plantilla decrementa en 1 (de 2 a 1, por ejemplo).
+    - Si era el último duplicado, status cambia de "duplicate" a "owned".
+
+Caso CP-F03-03E: Visualización en template slot tiles
+  Cobertura: UI en mis-plantillas; metadata visible en tiles.
+  Pasos:
+    1. Navegar a `/mis-plantillas/{copyId}` (plantilla con metadata Panini).
+    2. Observar los slot tiles en la vista de cuadrícula.
+  Criterios de éxito:
+    - Cada slot muestra debajo del label (nombre del cromo):
+      * "#5A | Checklist #147" (si tiene número, variante y global)
+      * "#12 | Checklist #233" (si tiene número y global, sin variante)
+      * "#7" (si solo tiene número, sin variante ni global)
+    - Texto es legible (text-xs text-gray-400).
+    - No hay overflow ni recortes en móvil.
+    - Slots sin metadata no muestran línea adicional (solo label).
+
+Caso CP-F03-03F: Validación de formato de variante
+  Cobertura: Validaciones; constraints de BD.
+  Pasos:
+    1. Intentar crear listado con variante inválida:
+       - Variante: "AB" (dos letras)
+    2. Intentar crear listado con variante:
+       - Variante: "1" (número)
+    3. Intentar crear listado con variante:
+       - Variante: "a" (minúscula)
+    4. Crear listado con variante válida:
+       - Variante: "B" (mayúscula, una letra)
+  Criterios de éxito:
+    - Casos 1-3: Error de validación en frontend o backend indicando formato inválido.
+    - Mensaje de error claro: "La variante debe ser una letra mayúscula (A-Z)".
+    - Caso 4: Se publica correctamente con variant = "B".
+    - En BD: CHECK constraint `check_listing_variant_format` previene valores inválidos.
+
+Caso CP-F03-03G: Editar listado y actualizar metadata Panini
+  Cobertura: Actualización de campos; persistencia.
+  Pasos:
+    1. Abrir listado con metadata Panini existente.
+    2. Hacer clic en "Editar".
+    3. Modificar campos Panini:
+       - Cambiar variante de "A" a "B"
+       - Cambiar número global de "147" a "148"
+       - Cambiar título de página de "Delanteros" a "Mediocampistas"
+    4. Guardar.
+    5. Abrir detalle del listado.
+  Criterios de éxito:
+    - Toast "Listado actualizado".
+    - Detalle muestra valores actualizados:
+      * Número en página: #5B
+      * Número de checklist: #148
+      * Página: 12 - Mediocampistas
+    - BD refleja cambios con `updated_at` actualizado.
+
+Notas generales:
+- Mantener registro de IDs de listados para verificación posterior.
+- Todos los test cases mantienen el tono formal y técnico del documento original.
+- Adjuntar evidencia en planilla QA con capturas de pantalla de:
+  * Formulario con campos Panini
+  * Tarjeta "Detalles del Cromo" en detalle de listado
+  * Template slot tiles con metadata visible
+  * Registros de BD mostrando columnas page_number, page_title, slot_variant, global_number
+
+Referencias:
+- Documentación: docs/PANINI_METADATA_UPDATE.md
+- Migraciones: 20251101200320_*.sql, 20251101200321_*.sql, 20251101200322_*.sql
+- Componentes: src/app/marketplace/[id]/page.tsx, src/components/templates/SlotTile.tsx

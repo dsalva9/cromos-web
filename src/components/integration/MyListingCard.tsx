@@ -16,6 +16,7 @@ interface MyListing {
   title: string;
   description: string | null;
   collection_name: string | null;
+  sticker_number: string | null;
   image_url: string | null;
   status: string;
   views_count: number;
@@ -23,6 +24,11 @@ interface MyListing {
   copy_id: string | null;
   current_count: number | null;
   needs_attention: boolean;
+  // Panini metadata
+  page_number?: number | null;
+  page_title?: string | null;
+  slot_variant?: string | null;
+  global_number?: number | null;
 }
 
 interface MyListingCardProps {
@@ -143,6 +149,32 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
                   <span className="text-gray-400">
                     Repetidos actuales: <span className="font-bold text-white">{listing.current_count}</span>
                   </span>
+                )}
+              </div>
+            )}
+
+            {/* Panini Metadata */}
+            {(listing.page_number || listing.page_title || listing.sticker_number || listing.slot_variant || listing.global_number) && (
+              <div className="text-xs text-gray-400 space-y-1">
+                {(listing.page_number || listing.page_title) && (
+                  <div>
+                    <span className="font-bold text-gray-300">Página:</span>{' '}
+                    {listing.page_number && `${listing.page_number}`}
+                    {listing.page_number && listing.page_title && ' - '}
+                    {listing.page_title}
+                  </div>
+                )}
+                {(listing.sticker_number || listing.slot_variant) && (
+                  <div>
+                    <span className="font-bold text-gray-300">Número de cromo:</span>{' '}
+                    #{listing.sticker_number}{listing.slot_variant}
+                  </div>
+                )}
+                {listing.global_number && (
+                  <div>
+                    <span className="font-bold text-gray-300">Número global:</span>{' '}
+                    #{listing.global_number}
+                  </div>
                 )}
               </div>
             )}

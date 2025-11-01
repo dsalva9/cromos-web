@@ -30,6 +30,11 @@ export interface Listing {
   copy_id?: string | null;
   slot_id?: string | null;
   distance_km?: number | null;
+  // Panini-style metadata
+  page_number?: number | null;
+  page_title?: string | null;
+  slot_variant?: string | null;
+  global_number?: number | null;
 }
 
 export interface Template {

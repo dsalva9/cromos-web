@@ -2624,6 +2624,184 @@ const {
 
 ---
 
+## Panini Metadata Fields ✅ **v1.6.0 UPDATED (2025-11-01)**
+
+### Overview
+
+Marketplace listings now support Panini-style album metadata fields for rich sticker classification: page numbers, page titles, slot variants (A, B, C), and global checklist numbers.
+
+### Database Schema Updates
+
+**New columns in `trade_listings` table:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `page_number` | INTEGER | Page number within album (e.g., 12) |
+| `page_title` | TEXT | Title of the page (e.g., "Delanteros") |
+| `slot_variant` | TEXT | Variant identifier - single uppercase letter (A, B, C) |
+| `global_number` | INTEGER | Global checklist number (e.g., 1-773 in Panini albums) |
+
+**Constraints:**
+- All fields are nullable (backward compatible)
+- `slot_variant` must be single uppercase letter: `CHECK (slot_variant ~ '^[A-Z]$')`
+- Index on `global_number` for efficient searches
+
+---
+
+### `create_trade_listing` ✅ **UPDATED**
+
+Creates a marketplace listing with optional Panini metadata.
+
+**Function Signature:**
+
+```sql
+create_trade_listing(
+  p_title TEXT,
+  p_description TEXT DEFAULT NULL,
+  p_sticker_number TEXT DEFAULT NULL,
+  p_collection_name TEXT DEFAULT NULL,
+  p_image_url TEXT DEFAULT NULL,
+  p_copy_id BIGINT DEFAULT NULL,
+  p_slot_id BIGINT DEFAULT NULL,
+  -- NEW Panini fields
+  p_page_number INTEGER DEFAULT NULL,
+  p_page_title TEXT DEFAULT NULL,
+  p_slot_variant TEXT DEFAULT NULL,
+  p_global_number INTEGER DEFAULT NULL
+) RETURNS BIGINT
+```
+
+**New Parameters:**
+- `p_page_number`: Page number in album (optional)
+- `p_page_title`: Page title/section name (optional)
+- `p_slot_variant`: Variant letter A-Z (optional, validated)
+- `p_global_number`: Global checklist number (optional)
+
+**Returns:** Listing ID
+
+**Security:** SECURITY DEFINER, authenticated users only
+
+**Usage Example:**
+
+```typescript
+const { createListing } = useCreateListing();
+
+const listingId = await createListing({
+  title: 'Messi Inter Miami',
+  description: 'Nuevo, sin uso',
+  sticker_number: '5',
+  collection_name: 'Mundial Qatar 2022',
+  image_url: 'https://...',
+  // Panini metadata
+  page_number: 12,
+  page_title: 'Argentina - Delanteros',
+  slot_variant: 'A',
+  global_number: 147,
+});
+```
+
+---
+
+### `publish_duplicate_to_marketplace` ✅ **UPDATED**
+
+Publishes a duplicate from template collection to marketplace, now with automatic Panini metadata population.
+
+**Function Signature:**
+
+```sql
+publish_duplicate_to_marketplace(
+  p_copy_id BIGINT,
+  p_slot_id BIGINT,
+  p_title TEXT,
+  p_description TEXT DEFAULT NULL,
+  p_image_url TEXT DEFAULT NULL
+) RETURNS BIGINT
+```
+
+**New Behavior:**
+- Queries `template_slots` and `template_pages` to auto-populate Panini fields
+- Combines `slot_number` + `slot_variant` into `sticker_number` (e.g., "5A")
+- Auto-fills: `page_number`, `page_title`, `slot_variant`, `global_number`
+
+**Internal Query:**
+
+```sql
+SELECT
+  tp.page_number,      -- Auto-populated as page_number
+  tp.title,            -- Auto-populated as page_title
+  ts.slot_number,      -- Combined with variant for sticker_number
+  ts.slot_variant,     -- Auto-populated
+  ts.global_number     -- Auto-populated
+FROM template_slots ts
+JOIN template_pages tp ON ts.page_id = tp.id
+WHERE ts.id = p_slot_id
+```
+
+**Returns:** Listing ID
+
+**Side Effects:**
+- Decrements duplicate count in `user_template_progress`
+- Changes status from `duplicate` to `owned` if last duplicate
+
+---
+
+### UI Display
+
+**Marketplace Listing Detail Page**
+
+Location: `src/app/marketplace/[id]/page.tsx:209-251`
+
+Displays "Detalles del Cromo" card when Panini metadata exists:
+
+```
+┌─────────────────────────────────┐
+│ Detalles del Cromo              │
+├─────────────────────────────────┤
+│ • Página: 12 - Delanteros       │
+│ • Número en página: #5A         │
+│ • Número de checklist: #147     │
+└─────────────────────────────────┘
+```
+
+Card only renders if at least one Panini field has a value.
+
+**Template Slot Tiles**
+
+Location: `src/components/templates/SlotTile.tsx:160-171`
+
+Shows metadata below slot label:
+- `#5A | Checklist #147` (full metadata)
+- `#12 | Checklist #233` (no variant)
+- `#7` (number only)
+
+---
+
+### Type Definitions
+
+**Listing Interface** (`src/types/v1.6.0.ts`):
+
+```typescript
+export interface Listing {
+  // ... existing fields
+
+  // Panini metadata
+  page_number?: number | null;
+  page_title?: string | null;
+  slot_variant?: string | null;
+  global_number?: number | null;
+}
+```
+
+---
+
+### Migration Files
+
+1. `20251101200320_add_panini_fields_to_trade_listings.sql` - Schema changes
+2. `20251101200321_update_create_trade_listing_with_panini_fields.sql` - RPC update
+3. `20251101200322_update_publish_duplicate_with_panini_fields.sql` - Auto-population
+
+---
+
 ## Social Features - User Ignore ✅ **v1.6.0 NEW**
 
 ### Overview

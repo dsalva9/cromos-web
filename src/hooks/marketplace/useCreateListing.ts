@@ -20,6 +20,10 @@ export function useCreateListing() {
           p_image_url: data.image_url || null,
           p_copy_id: data.copy_id || null,
           p_slot_id: data.slot_id || null,
+          p_page_number: data.page_number || null,
+          p_page_title: data.page_title || null,
+          p_slot_variant: data.slot_variant || null,
+          p_global_number: data.global_number || null,
         }
       );
 

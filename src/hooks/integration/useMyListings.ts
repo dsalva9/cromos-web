@@ -5,6 +5,8 @@ interface MyListing {
   id: string;
   title: string;
   description: string | null;
+  sticker_number: string | null;
+  collection_name: string | null;
   image_url: string | null;
   status: string;
   views_count: number;
@@ -20,11 +22,14 @@ interface MyListing {
   current_status: string | null;
   current_count: number | null;
   sync_status: string | null;
+  // Panini metadata
+  page_title: string | null;
+  slot_variant: string | null;
+  global_number: number | null;
 }
 
 export interface MyListingWithAttention extends MyListing {
   listing_id: string;
-  collection_name: string | null;
   needs_attention: boolean;
 }
 
@@ -49,7 +54,6 @@ export function useMyListings() {
         ...listing,
         id: listing.id?.toString() || '',
         listing_id: listing.id?.toString() || '',
-        collection_name: listing.template_title || listing.copy_title || null,
         needs_attention:
           listing.status === 'active' &&
           listing.copy_id !== null &&

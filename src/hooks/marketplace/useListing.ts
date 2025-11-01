@@ -46,6 +46,11 @@ export function useListing(listingId: string) {
           created_at: data.created_at,
           copy_id: data.copy_id?.toString(),
           slot_id: data.slot_id?.toString(),
+          // Panini metadata
+          page_number: data.page_number,
+          page_title: data.page_title,
+          slot_variant: data.slot_variant,
+          global_number: data.global_number,
         });
       }
     } catch (err) {
