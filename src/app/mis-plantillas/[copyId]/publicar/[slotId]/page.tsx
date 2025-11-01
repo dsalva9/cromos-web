@@ -182,10 +182,10 @@ function PublishDuplicateContent() {
             sticker_number: slotData?.slot_number ? String(slotData.slot_number) : '',
             collection_name: templateInfo?.title || '',
             image_url: '',
-            // Panini metadata fields
-            page_number: slotData?.page_number,
-            page_title: slotData?.page_title ?? undefined,
-            slot_variant: slotData?.slot_variant ?? undefined,
+            // Panini metadata fields - use actual values or undefined (not null)
+            page_number: slotData?.page_number ?? undefined,
+            page_title: slotData?.page_title ? slotData.page_title : undefined,
+            slot_variant: slotData?.slot_variant ? slotData.slot_variant : undefined,
             global_number: slotData?.global_number ?? undefined,
           }}
           onSubmit={handlePublish}
