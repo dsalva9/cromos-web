@@ -31,15 +31,38 @@ Caso CP-F02-02A: Copiar plantilla pública
 Caso CP-F02-02B: Actualizar progreso de slots (HAVE/NEED/DUPES)
   Cobertura: Interacciones; cálculos agregados.
   Pasos:
-    1. En la copia, marcar slots 1-3 como “Tengo”.
-    2. Marcar slot 4 como “Repetido” con cantidad 2.
-    3. Marcar slot 5 como “Necesito”.
+    1. En la copia, marcar slots 1-3 como "Tengo".
+    2. Marcar slot 4 como "Repetido" con cantidad 2.
+    3. Marcar slot 5 como "Necesito".
     4. Revisar contador global y barra de progreso.
   Criterios de éxito:
     - `user_template_progress` almacena registros con `status` correcto y `count`.
     - Panel resumen actualiza porcentajes en tiempo real (sin recarga).
     - Slots marcados muestran iconografía adecuada (color verde, dorado, rojo).
     - Valores persisten tras recargar y en móvil.
+
+Caso CP-F02-02B2: Entrada rápida por número de checklist (Quick Entry)
+  Cobertura: Modalidad de entrada rápida; navegación por teclado; mapeo automático.
+  Pre-requisito: Copia de plantilla con números globales asignados (ver CP-F02-01A2).
+  Pasos:
+    1. En vista de progreso de copia, pulsar botón "Entrada Rápida" o similar.
+    2. En modal, seleccionar pestaña "Por Número".
+    3. Escribir "45" y presionar Enter.
+    4. Escribir "46" y presionar Enter.
+    5. Escribir "999" (número inexistente) y presionar Enter.
+    6. Verificar log de actualizaciones recientes en el modal.
+    7. Cambiar a pestaña "Por Página", seleccionar página "Athletic Club".
+    8. Hacer clic en slot "5A - Gorosabel" para alternar estado.
+  Criterios de éxito:
+    - Modal abre con foco automático en campo de entrada.
+    - Al ingresar "45", sistema localiza slot 5A y lo marca como "Tengo" sin salir del modal.
+    - Mensaje de confirmación muestra: "✓ No. 45 - Gorosabel (Athletic Club, Slot 5A)".
+    - Al ingresar "999", muestra "❌ No. 999 no encontrado".
+    - Campo se limpia automáticamente tras cada entrada.
+    - En modo "Por Página", se listan todos los slots de la página seleccionada.
+    - Clic en slot alterna estados: falta → tengo → repetido → falta.
+    - Badges muestran estado actual de cada slot (falta, tengo, repetido con contador).
+    - Progreso se actualiza en tiempo real en la vista principal sin cerrar modal.
 
 Caso CP-F02-02C: Gestión de duplicados y decrementos
   Cobertura: Edge; límites 0; sincronización con marketplace (pre-integration).

@@ -9,7 +9,24 @@ export const templateSlotSchema = z.object({
     .min(1, 'La etiqueta del cromo es obligatoria')
     .max(50, 'La etiqueta no puede exceder 50 caracteres'),
 
+  slot_number: z
+    .number()
+    .int('El número de slot debe ser un entero')
+    .positive('El número de slot debe ser positivo'),
+
   is_special: z.boolean().default(false),
+
+  slot_variant: z
+    .string()
+    .regex(/^[A-Z]$/, 'La variante debe ser una letra mayúscula (A-Z)')
+    .optional()
+    .or(z.literal('')),
+
+  global_number: z
+    .number()
+    .int('El número de checklist debe ser un entero')
+    .positive('El número de checklist debe ser positivo')
+    .optional(),
 });
 
 /**
@@ -27,7 +44,28 @@ export const templatePageSchema = z.object({
     .array(templateSlotSchema)
     .min(1, 'Debe añadir al menos un cromo a la página')
     .max(50, 'Una página no puede tener más de 50 cromos'),
-});
+}).refine(
+  (page) => {
+    // Check for duplicate (slot_number, slot_variant) combinations
+    const combinations = new Set<string>();
+
+    for (const slot of page.slots) {
+      const variant = slot.slot_variant || 'NULL'; // Treat undefined/empty as NULL
+      const key = `${slot.slot_number}-${variant}`;
+
+      if (combinations.has(key)) {
+        return false; // Duplicate found
+      }
+      combinations.add(key);
+    }
+
+    return true;
+  },
+  {
+    message: 'Cada combinación de número y variante debe ser única en la página. Si hay dos cromos con el mismo número, deben tener variantes diferentes (A, B, etc.)',
+    path: ['slots'],
+  }
+);
 
 /**
  * Validation schema for complete template creation
@@ -56,7 +94,28 @@ export const templateSchema = z.object({
     .array(templatePageSchema)
     .min(1, 'Debe añadir al menos una página')
     .max(20, 'Una plantilla no puede tener más de 20 páginas'),
-});
+}).refine(
+  (data) => {
+    // Collect all global numbers from all pages
+    const globalNumbers: number[] = [];
+
+    for (const page of data.pages) {
+      for (const slot of page.slots) {
+        if (slot.global_number !== undefined) {
+          globalNumbers.push(slot.global_number);
+        }
+      }
+    }
+
+    // Check for duplicates
+    const uniqueGlobalNumbers = new Set(globalNumbers);
+    return globalNumbers.length === uniqueGlobalNumbers.size;
+  },
+  {
+    message: 'Los números de checklist globales deben ser únicos en toda la plantilla',
+    path: ['pages'],
+  }
+);
 
 /**
  * TypeScript types inferred from the schemas

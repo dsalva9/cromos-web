@@ -20,28 +20,84 @@ Caso CP-F02-01A: Crear plantilla privada con páginas y slots
   Cobertura: Happy path; validaciones mínimas; guardado incremental.
   Pasos:
     1. Iniciar sesión con `qa.creador`.
-    2. Ir a `/templates/new` o CTA “Crear plantilla”.
-    3. Completar título “Colección QA Liga 2025”, descripción (>120 caracteres), subir portada opcional.
+    2. Ir a `/templates/new` o CTA "Crear plantilla".
+    3. Completar título "Colección QA Liga 2025", descripción (>120 caracteres), subir portada opcional.
     4. Añadir 2 páginas:
-       - Página 1: “Equipo A”, 9 slots numerados 1-9.
-       - Página 2: “Equipo B”, 6 slots + marcar slot 6 como especial.
+       - Página 1: "Equipo A", 9 slots numerados 1-9.
+       - Página 2: "Equipo B", 6 slots + marcar slot 6 como especial.
     5. Guardar como borrador (no publicar).
   Criterios de éxito:
-    - Botón “Guardar borrador” habilitado solo tras completar campos obligatorios.
-    - Toast “Plantilla guardada como borrador”.
+    - Botón "Guardar borrador" habilitado solo tras completar campos obligatorios.
+    - Toast "Plantilla guardada como borrador".
     - Entradas creadas en `collection_templates` (`is_public = false`, `is_deleted = false`), `template_pages` y `template_slots`.
     - UI muestra resumen con conteo de páginas y slots.
 
-Caso CP-F02-01B: Validaciones de formulario
-  Cobertura: Edge; límites de longitud; duplicados.
+Caso CP-F02-01A2: Crear plantilla con variantes y numeración global (estilo Panini)
+  Cobertura: Happy path; slots con variantes; numeración de checklist; auto-población.
+  Pasos:
+    1. Iniciar sesión con `qa.creador`.
+    2. Ir a `/templates/create` o CTA "Crear plantilla".
+    3. Paso 1 - Información Básica: Completar título "Album LaLiga QA 2025-26", descripción, portada.
+    4. Paso 2 - Páginas y Cromos: Pulsar icono (ℹ️) junto a "Cromos de la Página" para ver ayuda sobre numeración.
+    5. Añadir página "Athletic Club" con slots:
+       - Observar columnas: "No. Global" | "Nombre del Cromo" | "No. Página" | "Variante" | "Especial"
+       - Añadir slot: observar que No. Global se auto-llena con 1, No. Página con 1
+       - Editar: No. Página = 3, sin variante, etiqueta "Sivera" (No. Global queda 1)
+       - Añadir slot: auto-llena No. Global = 2, No. Página = 2
+       - Editar: No. Página = 5, variante "A", No. Global = 1, etiqueta "Gorosabel"
+       - Añadir slot: auto-llena No. Global = 3, No. Página = 3
+       - Editar: No. Página = 5, variante "B", No. Global = 2, etiqueta "Lekue"
+       - Añadir slot: auto-llena No. Global = 4, No. Página = 4
+       - Editar: No. Página = 9, variante "A", etiqueta "Yuri"
+    6. Añadir segunda página "Real Madrid":
+       - Observar que el primer slot auto-llena No. Global = 5 (continúa del anterior)
+    7. Paso 3 - Revisión: Verificar resumen muestra slots como "3. Sivera", "5A. Gorosabel", "5B. Lekue", "9A. Yuri"
+    8. Publicar plantilla.
+  Criterios de éxito:
+    - Popover (ℹ️) muestra explicación clara de los tres conceptos: No. Global, No. Página, Variante.
+    - Campo "Variante" acepta letra única (A-Z) y auto-convierte minúsculas a mayúsculas.
+    - Campo "No. Global" se auto-poblaciona secuencialmente (1, 2, 3, 4...) pero es editable.
+    - Campo "No. Página" se auto-poblaciona incrementando el máximo de la página actual, pero es editable.
+    - No. Global continúa incrementando entre páginas (página 2 empieza donde terminó página 1).
+    - Validación impide duplicar número global: borde rojo + texto "Duplicado" aparece en tiempo real.
+    - En `template_slots`: registros con `slot_number`, `slot_variant` ('A', 'B', NULL), `global_number` y `template_id` correctos.
+    - Vista de detalle muestra slots ordenados: 3, 5A, 5B, 9A (primero por slot_number, luego por slot_variant).
+    - UI lista slots como "3. Sivera", "5A. Gorosabel", "5B. Lekue", "9A. Yuri".
+
+Caso CP-F02-01B: Validaciones de formulario y duplicados
+  Cobertura: Edge; límites de longitud; duplicados en tiempo real; validación cliente/servidor.
   Pasos:
     1. Intentar guardar con título vacío y descripción <30 caracteres.
-    2. Duplicar número de slot dentro de la misma página.
-    3. Intentar crear >30 slots en una página.
+    2. En la misma página, crear dos slots con mismo número y misma variante:
+       - Slot No. Página = 5, variante "A"
+       - Slot No. Página = 5, variante "A" (duplicado)
+       - Observar borde rojo y mensaje "Duplicado" en ambos campos (No. Página y Variante)
+    3. Crear slot 5A y slot 5 sin variante en la misma página (debe permitirse - son diferentes):
+       - Slot No. Página = 5, variante "A"
+       - Slot No. Página = 5, sin variante (dejar campo vacío)
+       - Verificar que NO aparece error de duplicado
+    4. Crear dos slots con mismo número pero diferentes variantes (debe permitirse):
+       - Slot No. Página = 5, variante "A"
+       - Slot No. Página = 5, variante "B"
+       - Verificar que NO aparece error de duplicado
+    5. Ingresar variante minúscula "a" → debe auto-convertirse a "A"
+    6. Ingresar variante con múltiples letras "AB" → debe aceptar solo el primer carácter "A" (maxLength=1)
+    7. Crear dos slots en páginas diferentes con mismo número global:
+       - Página 1, slot con No. Global = 10
+       - Página 2, slot con No. Global = 10 (duplicado)
+       - Observar borde rojo y mensaje "Duplicado" en campo No. Global de ambos slots
+    8. Intentar crear >50 slots en una página.
+    9. Intentar avanzar al paso de revisión con duplicados sin resolver.
   Criterios de éxito:
-    - Mensajes inline claros (“El título es obligatorio”, “Debes escribir al menos 30 caracteres”).
-    - Sistema evita duplicados y muestra mensaje “El número ya existe en esta página”.
-    - Límite de slots bloquea la acción con aviso y sin crear registros parciales.
+    - Mensajes inline claros ("El título es obligatorio").
+    - Sistema detecta duplicados (slot_number, slot_variant) en tiempo real: borde rojo + "Duplicado".
+    - Slot 5A y slot 5 (sin variante) pueden coexistir sin error.
+    - Slot 5A y slot 5B pueden coexistir sin error.
+    - Variantes minúsculas se convierten automáticamente a mayúsculas al escribir.
+    - Variantes multi-carácter están limitadas a 1 letra por el atributo maxLength del input.
+    - Número global duplicado muestra borde rojo + "Duplicado" en tiempo real en campo No. Global.
+    - Al intentar avanzar/guardar con duplicados, aparece error: "Los números de checklist globales deben ser únicos en toda la plantilla" o "Cada combinación de número y variante debe ser única en la página".
+    - Límite de 50 slots bloquea la acción con aviso.
 
 Caso CP-F02-01C: Publicar plantilla y visibilidad pública
   Cobertura: Flujo feliz; cambio de estado; indexación.
@@ -69,18 +125,33 @@ Caso CP-F02-01D: Edición de metadatos publicados
     - Al re-publicar, resumen de copias existentes se mantiene.
     - `audit_log` registra `template_visibility_change`.
 
-Caso CP-F02-01E: Gestión de páginas y slots existentes
-  Cobertura: Edición; reordenamiento; eliminación con cascada.
+Caso CP-F02-01E: Edición completa de plantilla con nuevos campos
+  Cobertura: Editar plantilla existente; wizard pre-poblado; modificar slots con variantes.
   Pasos:
-    1. Editar página “Equipo A”: renombrar a “Equipo A1” y cambiar orden (drag & drop si disponible).
-    2. Modificar slot 3 → etiqueta “Delantero”.
-    3. Eliminar slot especial en página 2.
-    4. Borrar página 2 por completo.
+    1. Desde detalle de plantilla "Album LaLiga QA 2025-26", pulsar "Editar plantilla".
+    2. Verificar que se abre el wizard de creación (3 pasos) con datos pre-poblados:
+       - Paso 1: título, descripción, portada, visibilidad ya completados
+       - Paso 2: todas las páginas y slots existentes visibles con todos sus campos
+    3. En Paso 1, cambiar título a "Album LaLiga QA 2025-26 v2".
+    4. En Paso 2, editar página "Athletic Club":
+       - Cambiar título de página a "Athletic Club de Bilbao"
+       - Modificar slot "3. Sivera": cambiar etiqueta a "Sivera (Portero)"
+       - Modificar slot "5A. Gorosabel": cambiar No. Página a 4, mantener variante "A"
+       - Añadir nuevo slot: No. Global auto-poblado (siguiente disponible), No. Página = 10, variante vacía, etiqueta "Guruzeta"
+       - Eliminar slot "9A. Yuri" (pulsar icono de papelera)
+    5. Añadir nueva página "FC Barcelona" con 3 slots.
+    6. Eliminar página "Real Madrid" completa (si existe).
+    7. Paso 3 - Revisión: Verificar cambios en resumen.
+    8. Guardar cambios.
   Criterios de éxito:
-    - Cambios se reflejan en UI inmediatamente (optimistic update).
-    - Supabase `template_slots` actualiza `label` y `is_special`.
-    - Al eliminar slot, cualquier progreso asociado se marca como borrado (ver `user_template_progress`).
-    - Al eliminar la página, slots se eliminan en cascada (`ON DELETE CASCADE`), sin orphans.
+    - Wizard se abre con todos los datos existentes pre-poblados correctamente.
+    - Todos los campos editables: título, descripción, nombre de página, etiqueta de slot, No. Página, Variante, No. Global.
+    - Auto-población de números funciona al añadir nuevos slots (continúa secuencia existente).
+    - Al guardar, se eliminan todas las páginas/slots antiguos y se recrean con la nueva estructura (delete + insert).
+    - En BD: `collection_templates` actualizado, `template_pages` y `template_slots` reflejan nueva estructura.
+    - Columna `template_id` en `template_slots` se mantiene correcta tras la actualización.
+    - Validaciones de duplicados funcionan durante edición igual que en creación.
+    - Toast "Plantilla actualizada con éxito" y redirección a `/templates/{id}`.
 
 Caso CP-F02-01F: Eliminación total de plantilla
   Cobertura: Soft delete; confirmaciones; notificación a usuarios.
@@ -129,6 +200,24 @@ Caso CP-F02-01H: Sistema de valoraciones de plantillas (Sprint 14)
     - **NUEVO**: Notificación se envía al autor de la plantilla cuando recibe valoración.
     - **NUEVO**: Usuarios sin sesión ven "Inicia sesión para valorar".
 
+Caso CP-F02-01I: Compatibilidad retroactiva con plantillas existentes
+  Cobertura: Edge; migración; funcionalidad legacy.
+  Pasos:
+    1. Acceder a plantilla creada antes de la actualización (sin variantes ni números globales).
+    2. Visualizar detalle de la plantilla.
+    3. Copiar la plantilla y marcar progreso.
+    4. Editar la plantilla antigua (añadir un slot nuevo).
+    5. Publicar duplicado desde slot sin variante al marketplace.
+  Criterios de éxito:
+    - Plantillas antiguas se visualizan correctamente sin mostrar campos de variante/número global.
+    - En BD, columnas `slot_variant` y `global_number` aparecen como NULL para slots antiguos.
+    - Funcionalidad de copia, progreso y publicación a marketplace funciona normalmente.
+    - Al editar plantilla antigua, se puede añadir slots con o sin variantes (campos opcionales).
+    - No hay errores de tipo o validación en plantillas legacy.
+    - Ordenamiento de slots funciona correctamente (NULL se trata como menor que cualquier variante).
+
 Notas generales:
 - Registrar IDs de plantilla generados en la hoja de seguimiento para reutilizarlos en pruebas de copias.
 - Documentar tiempos de respuesta y cualquier problema de rendimiento al guardar (>2 s).
+- **NUEVO**: Anotar si alguna plantilla antigua presenta problemas tras la actualización de esquema.
+- **NUEVO**: Para plantillas con >100 slots y numeración global, medir tiempo de carga y renderizado.

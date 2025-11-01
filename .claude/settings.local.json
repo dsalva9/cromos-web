@@ -30,7 +30,10 @@
       "Bash(xargs basename:*)",
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\diagnose_user_c_chat.sql\" \"C:\\Users\\David\\projects\\cromos-web\\verify_rls_policy.sql\" \"C:\\Users\\David\\projects\\cromos-web\\run_fix_get_listing_chats.bat\")",
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\app\\users\\[userId]\\ratings\\page.tsx\")",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(git restore:*)",
+      "Bash(del /F debug_admin_templates_issue.sql force_drop_and_recreate_admin_templates.sql reload_postgrest_schema.sql verify_admin_templates_function.sql verify_fix.sql)",
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\api-endpoints-panini-addition.md\")"
     ],
     "deny": [],
     "ask": []

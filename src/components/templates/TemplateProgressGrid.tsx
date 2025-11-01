@@ -11,6 +11,8 @@ interface SlotProgress {
   page_id: string;
   page_number: number;
   slot_number: number;
+  slot_variant: string | null;
+  global_number: number | null;
   label: string | null;
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
@@ -48,9 +50,15 @@ export function TemplateProgressGrid({
       {} as Record<number, SlotProgress[]>
     );
 
-    // Sort slots within each page by slot_number
+    // Sort slots within each page by slot_number, then variant
     Object.values(groups).forEach(slots => {
-      slots.sort((a, b) => a.slot_number - b.slot_number);
+      slots.sort((a, b) => {
+        if (a.slot_number !== b.slot_number) {
+          return a.slot_number - b.slot_number;
+        }
+        // Sort variants: null first, then alphabetically
+        return (a.slot_variant || '').localeCompare(b.slot_variant || '');
+      });
     });
 
     return groups;

@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/client';
 export interface TemplateSlot {
   id: string;
   slot_number: number;
+  slot_variant: string | null;
+  global_number: number | null;
   label: string | null;
   is_special: boolean;
 }

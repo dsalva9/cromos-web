@@ -243,7 +243,17 @@
 - `update_template_metadata`, `update_template_page`, `update_template_slot`
 - `delete_template_page`, `delete_template_slot`
 
-#### **Template Management Features (NEW - 2025-01-27):**
+#### **Panini-Style Album Support (NEW - 2025-10-31):**
+
+- **Slot Variants**: Support for sub-slots (5A, 5B, 10A, 10B) within same position
+- **Global Numbering**: Optional checklist numbering (1-773) for official albums
+- **Quick Entry Modal**: Dual-mode entry system
+  - By Checklist Number: Fast keyboard-driven entry (1, 2, 3...)
+  - By Page: Visual page-based slot selection
+- **Enhanced Display**: Variants shown throughout UI (listings, progress, templates)
+- **Backward Compatible**: Existing templates work without modification
+
+#### **Template Management Features (2025-01-27):**
 
 - **My Templates Page** (`/templates/my-templates`)
   - View all templates created by logged-in user

@@ -20,6 +20,9 @@ import Image from 'next/image';
 
 interface TemplateSlotData {
   label: string;
+  slot_number: number;
+  slot_variant?: string;
+  global_number?: number;
   is_special: boolean;
 }
 
@@ -229,18 +232,25 @@ export function TemplateReviewForm({
                     )}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {page.slots.map((slot, slotIndex) => (
-                      <span
-                        key={slotIndex}
-                        className={`inline-block px-2 py-1 text-xs rounded ${
-                          slot.is_special
-                            ? 'bg-[#FFC000] text-black'
-                            : 'bg-gray-600 text-white'
-                        }`}
-                      >
-                        {slot.label || `Cromo ${slotIndex + 1}`}
-                      </span>
-                    ))}
+                    {page.slots.map((slot, slotIndex) => {
+                      const slotDisplay = `${slot.slot_number}${slot.slot_variant || ''}`;
+                      const labelText = slot.label || `Cromo ${slotIndex + 1}`;
+                      const globalNum = slot.global_number ? ` (#${slot.global_number})` : '';
+
+                      return (
+                        <span
+                          key={slotIndex}
+                          className={`inline-block px-2 py-1 text-xs rounded ${
+                            slot.is_special
+                              ? 'bg-[#FFC000] text-black'
+                              : 'bg-gray-600 text-white'
+                          }`}
+                          title={`Slot ${slotDisplay}${globalNum}`}
+                        >
+                          {slotDisplay}. {labelText}
+                        </span>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

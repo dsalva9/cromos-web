@@ -33,6 +33,31 @@ export const listingSchema = z.object({
     .optional()
     .or(z.literal('')),
 
+  // New Panini-style fields - all optional
+  page_number: z
+    .number()
+    .int()
+    .positive()
+    .optional(),
+
+  page_title: z
+    .string()
+    .max(100, 'El título de la página no puede exceder 100 caracteres')
+    .optional()
+    .or(z.literal('')),
+
+  slot_variant: z
+    .string()
+    .max(10, 'La variante no puede exceder 10 caracteres')
+    .optional()
+    .or(z.literal('')),
+
+  global_number: z
+    .number()
+    .int()
+    .positive()
+    .optional(),
+
   terms_accepted: z
     .boolean()
     .refine((val) => val === true, {

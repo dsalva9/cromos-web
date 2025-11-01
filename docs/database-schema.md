@@ -350,17 +350,23 @@ Individual slots within pages.
 - `id` BIGSERIAL PRIMARY KEY
 - `page_id` BIGINT REFERENCES template_pages(id) ON DELETE CASCADE NOT NULL
 - `slot_number` INTEGER NOT NULL
+- `slot_variant` TEXT ✅ **v1.6.1 NEW** - Optional variant (A, B, C) for sub-slots
+- `global_number` INTEGER ✅ **v1.6.1 NEW** - Optional global checklist number
 - `label` TEXT
 - `is_special` BOOLEAN DEFAULT FALSE
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 
 **Constraints:**
 
-- UNIQUE(page_id, slot_number)
+- UNIQUE(page_id, slot_number, slot_variant) ✅ **v1.6.1 UPDATED**
+- CHECK (slot_variant IS NULL OR slot_variant ~ '^[A-Z]$')
+- UNIQUE INDEX on (template_id, global_number) WHERE global_number IS NOT NULL
 
 **Indices:**
 
 - `idx_template_slots_page` ON (page_id, slot_number)
+- `idx_template_slots_global_number` ON (global_number) WHERE global_number IS NOT NULL ✅ **v1.6.1 NEW**
+- `idx_template_slots_unique_global_number` UNIQUE ON (get_template_id_from_page(page_id), global_number) WHERE global_number IS NOT NULL ✅ **v1.6.1 NEW**
 
 **RLS Policies:**
 

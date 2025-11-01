@@ -6,6 +6,8 @@ export interface TemplateSlot {
   page_title: string;
   page_number: number;
   slot_number: number;
+  slot_variant: string | null;
+  global_number: number | null;
   slot_label: string | null;
   is_special: boolean;
   user_status: 'missing' | 'owned' | 'duplicate';

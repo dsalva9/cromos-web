@@ -54,6 +54,10 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       sticker_number: initialData?.sticker_number || '',
       collection_name: initialData?.collection_name || '',
       image_url: initialData?.image_url || '',
+      page_number: undefined,
+      page_title: '',
+      slot_variant: '',
+      global_number: undefined,
       terms_accepted: false,
     },
     mode: 'onChange',
@@ -77,12 +81,28 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
   // Handle slot selection
   const handleSlotSelect = (slot: TemplateSlot) => {
-    // Auto-populate sticker number from slot
-    const stickerNumber = slot.slot_label
-      ? `#${slot.slot_number} - ${slot.slot_label}`
-      : `#${slot.slot_number}`;
+    // Auto-populate title with sticker label (name)
+    if (slot.slot_label) {
+      setValue('title', slot.slot_label, { shouldValidate: true });
+    }
 
+    // Auto-populate sticker number: just slot number + variant (e.g., "5" or "5A")
+    const stickerNumber = `${slot.slot_number}${slot.slot_variant || ''}`;
     setValue('sticker_number', stickerNumber, { shouldValidate: true });
+
+    // Auto-populate Panini fields
+    if (slot.global_number) {
+      setValue('global_number', slot.global_number, { shouldValidate: true });
+    }
+    if (slot.slot_variant) {
+      setValue('slot_variant', slot.slot_variant, { shouldValidate: true });
+    }
+    if (slot.page_number) {
+      setValue('page_number', slot.page_number, { shouldValidate: true });
+    }
+    if (slot.page_title) {
+      setValue('page_title', slot.page_title, { shouldValidate: true });
+    }
 
     // Store slot_id for template linking
     setSelectedSlotId(slot.slot_id);
@@ -97,6 +117,11 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       image_url: data.image_url || undefined,
       copy_id: selectedCopyId || undefined,
       slot_id: selectedSlotId || undefined,
+      // Panini fields
+      page_number: data.page_number || undefined,
+      page_title: data.page_title || undefined,
+      slot_variant: data.slot_variant || undefined,
+      global_number: data.global_number || undefined,
     };
     await onSubmit(payload);
   };
@@ -159,24 +184,83 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             )}
           </div>
 
-          {/* Sticker Number */}
+          {/* Sticker Number + Variant (side by side) */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="sticker">Número del Cromo (Opcional)</Label>
+              <Input
+                id="sticker"
+                aria-invalid={!!errors.sticker_number}
+                aria-describedby={
+                  errors.sticker_number ? 'sticker-error' : undefined
+                }
+                {...register('sticker_number')}
+                placeholder="ej. 10, 5A"
+                className={`bg-[#374151] border-2 text-white ${
+                  errors.sticker_number ? 'border-red-500' : 'border-black'
+                }`}
+              />
+              {errors.sticker_number && (
+                <p id="sticker-error" className="text-sm text-red-500">
+                  {errors.sticker_number.message as string}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="slot_variant">Variante (Opcional)</Label>
+              <Input
+                id="slot_variant"
+                aria-invalid={!!errors.slot_variant}
+                {...register('slot_variant')}
+                placeholder="ej. A, B"
+                className={`bg-[#374151] border-2 text-white ${
+                  errors.slot_variant ? 'border-red-500' : 'border-black'
+                }`}
+              />
+              {errors.slot_variant && (
+                <p className="text-sm text-red-500">
+                  {errors.slot_variant.message as string}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Global Number */}
           <div className="space-y-2">
-            <Label htmlFor="sticker">Número del Cromo (Opcional)</Label>
+            <Label htmlFor="global_number">Número Global (Opcional)</Label>
             <Input
-              id="sticker"
-              aria-invalid={!!errors.sticker_number}
-              aria-describedby={
-                errors.sticker_number ? 'sticker-error' : undefined
-              }
-              {...register('sticker_number')}
-              placeholder="ej. #10"
+              id="global_number"
+              type="number"
+              aria-invalid={!!errors.global_number}
+              {...register('global_number', { valueAsNumber: true })}
+              placeholder="ej. 123"
               className={`bg-[#374151] border-2 text-white ${
-                errors.sticker_number ? 'border-red-500' : 'border-black'
+                errors.global_number ? 'border-red-500' : 'border-black'
               }`}
             />
-            {errors.sticker_number && (
-              <p id="sticker-error" className="text-sm text-red-500">
-                {errors.sticker_number.message as string}
+            {errors.global_number && (
+              <p className="text-sm text-red-500">
+                {errors.global_number.message as string}
+              </p>
+            )}
+          </div>
+
+          {/* Page Title */}
+          <div className="space-y-2">
+            <Label htmlFor="page_title">Título de Página (Opcional)</Label>
+            <Input
+              id="page_title"
+              aria-invalid={!!errors.page_title}
+              {...register('page_title')}
+              placeholder="ej. Delanteros"
+              className={`bg-[#374151] border-2 text-white ${
+                errors.page_title ? 'border-red-500' : 'border-black'
+              }`}
+            />
+            {errors.page_title && (
+              <p className="text-sm text-red-500">
+                {errors.page_title.message as string}
               </p>
             )}
           </div>

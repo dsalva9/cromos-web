@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import type { SlotProgress } from '@/types/v1.6.0';
 
 interface TemplateCopy {
   copy_id: string;
@@ -11,17 +12,6 @@ interface TemplateCopy {
   original_author_nickname: string;
   completed_slots: number;
   total_slots: number;
-}
-
-interface SlotProgress {
-  slot_id: string;
-  page_id: string;
-  page_number: number;
-  slot_number: number;
-  label: string | null;
-  is_special: boolean;
-  status: 'missing' | 'owned' | 'duplicate';
-  count: number;
 }
 
 export function useTemplateProgress(copyId: string) {

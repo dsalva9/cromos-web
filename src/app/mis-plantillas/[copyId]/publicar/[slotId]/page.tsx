@@ -24,6 +24,11 @@ function PublishDuplicateContent() {
     label: string | null;
     status: string;
     count: number;
+    slot_number: number;
+    slot_variant: string | null;
+    global_number: number | null;
+    page_number: number;
+    page_title: string;
   }
 
   interface TemplateInfo {
@@ -174,9 +179,16 @@ function PublishDuplicateContent() {
           initialData={{
             title: slotData?.label || 'Cromo',
             description: `Tengo ${(slotData?.count || 1) - 1} repetidos disponibles.`,
-            sticker_number: '',
+            sticker_number: slotData?.slot_number
+              ? `${slotData.slot_number}${slotData.slot_variant || ''}`
+              : '',
             collection_name: templateInfo?.title || '',
-            image_url: ''
+            image_url: '',
+            // Panini metadata fields
+            page_number: slotData?.page_number,
+            page_title: slotData?.page_title || '',
+            slot_variant: slotData?.slot_variant || '',
+            global_number: slotData?.global_number ?? undefined,
           }}
           onSubmit={handlePublish}
           loading={publishing}

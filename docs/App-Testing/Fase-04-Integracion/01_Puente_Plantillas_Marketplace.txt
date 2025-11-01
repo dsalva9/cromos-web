@@ -19,14 +19,16 @@ Caso CP-F04-01A: Publicar duplicado desde la copia de plantilla
   Cobertura: Happy path; prellenado de formulario; vínculo copy/slot.
   Pasos:
     1. En `/mi-coleccion`, localizar slot con duplicados.
-    2. Pulsar acción “Publicar duplicado”.
+    2. Pulsar acción "Publicar duplicado".
     3. Completar campos adicionales si se requieren (precio, estado).
     4. Confirmar publicación.
   Criterios de éxito:
     - Formulario se abre con título, número y colección prellenados desde el slot.
+    - **ACTUALIZADO**: Si el slot tiene variante, el número prellenado incluye la variante (ej: "#5A - Gorosabel" en lugar de "#5 - Gorosabel").
     - En `trade_listings`, se crea registro con `copy_id` y `slot_id` asociados.
+    - Campo `sticker_number` en la BD refleja variante correctamente.
     - Duplicados del slot se mantienen (no decrementan hasta la venta).
-    - Toast informa “Duplicado publicado en el marketplace”.
+    - Toast informa "Duplicado publicado en el marketplace".
 
 Caso CP-F04-01B: Sincronización en panel “Mis listados”
   Cobertura: Vista integrada; badges de sincronización.

@@ -1,17 +1,20 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { useTemplateProgress } from '@/hooks/templates/useTemplateProgress';
 import { TemplateProgressGrid } from '@/components/templates/TemplateProgressGrid';
 import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHeader';
+import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 function TemplateProgressContent() {
   const params = useParams();
   const copyId = params.copyId as string;
+  const [quickEntryOpen, setQuickEntryOpen] = useState(false);
 
   const { copy, progress, loading, error, updateSlotStatus } =
     useTemplateProgress(copyId);
@@ -37,19 +40,35 @@ function TemplateProgressContent() {
     );
   }
 
+  // Check if template has global numbers
+  const hasGlobalNumbers = progress.some(slot => slot.global_number !== null);
+
   return (
     <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Link href="/mis-plantillas">
-          <Button
-            variant="ghost"
-            className="mb-4 text-gray-400 hover:text-white"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Mis Colecciones
-          </Button>
-        </Link>
+        {/* Header with Back and Quick Entry */}
+        <div className="flex items-center justify-between mb-4">
+          <Link href="/mis-plantillas">
+            <Button
+              variant="ghost"
+              className="text-gray-400 hover:text-white"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver a Mis Colecciones
+            </Button>
+          </Link>
+
+          {/* Quick Entry Button - Only show if template has global numbers */}
+          {hasGlobalNumbers && (
+            <Button
+              onClick={() => setQuickEntryOpen(true)}
+              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+            >
+              <Zap className="mr-2 h-4 w-4" />
+              Entrada Rápida
+            </Button>
+          )}
+        </div>
 
         {/* Summary Header */}
         <TemplateSummaryHeader copy={copy} progress={progress} />
@@ -59,6 +78,17 @@ function TemplateProgressContent() {
           progress={progress}
           onUpdateSlot={updateSlotStatus}
           copyId={copyId}
+        />
+
+        {/* Quick Entry Modal */}
+        <QuickEntryModal
+          open={quickEntryOpen}
+          onOpenChange={setQuickEntryOpen}
+          copyTitle={copy.title}
+          slots={progress}
+          onUpdateProgress={async (slotId, status, count = 0) => {
+            await updateSlotStatus(slotId, status, count);
+          }}
         />
       </div>
     </div>

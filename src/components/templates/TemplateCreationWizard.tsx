@@ -24,6 +24,9 @@ interface TemplateData {
     type: 'team' | 'special';
     slots: Array<{
       label: string;
+      slot_number: number;
+      slot_variant?: string;
+      global_number?: number;
       is_special: boolean;
     }>;
   }>;
@@ -32,24 +35,28 @@ interface TemplateData {
 interface TemplateCreationWizardProps {
   onSubmit: (data: TemplateData) => Promise<void>;
   isSubmitting: boolean;
+  initialData?: TemplateData;
 }
 
 export function TemplateCreationWizard({
   onSubmit,
   isSubmitting,
+  initialData,
 }: TemplateCreationWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [attempted, setAttempted] = useState<{ basic: boolean; pages: boolean }>(
     { basic: false, pages: false }
   );
-  const [templateData, setTemplateData] = useState<TemplateData>({
-    title: '',
-    description: '',
-    image_url: '',
-    is_public: false,
-    terms_accepted: false,
-    pages: [],
-  });
+  const [templateData, setTemplateData] = useState<TemplateData>(
+    initialData || {
+      title: '',
+      description: '',
+      image_url: '',
+      is_public: false,
+      terms_accepted: false,
+      pages: [],
+    }
+  );
 
     const steps = [
     { title: 'Información Básica', description: 'Título y descripción' },

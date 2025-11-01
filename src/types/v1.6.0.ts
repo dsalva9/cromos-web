@@ -62,7 +62,10 @@ export interface SlotProgress {
   slot_id: string;
   page_id: string;
   page_number: number;
+  page_title: string;
   slot_number: number;
+  slot_variant: string | null;
+  global_number: number | null;
   label: string | null;
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
@@ -116,6 +119,11 @@ export interface CreateListingForm {
   image_url?: string;
   copy_id?: number;
   slot_id?: number;
+  // Panini-style fields
+  page_number?: number;
+  page_title?: string;
+  slot_variant?: string;
+  global_number?: number;
 }
 
 export interface CreateTemplateForm {

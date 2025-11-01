@@ -3144,3 +3144,334 @@ Pre-built button component for ignore/unignore functionality.
 ---
 
 **Last Updated:** 2025-10-30 (v1.6.0 - User Ignore System)
+## Sprint 14: Panini-Style Album Support ✅ **v1.6.1 NEW (2025-10-31)**
+
+### Overview
+
+Enhanced template system to support Panini-style album structures with slot variants (5A, 5B) and optional global checklist numbering.
+
+### Updated RPCs
+
+#### `add_template_page_v2` ✅ **UPDATED**
+
+Enhanced to support slot variants and global numbering.
+
+**Function Signature:**
+
+```sql
+add_template_page_v2(
+  p_template_id BIGINT,
+  p_title TEXT,
+  p_type TEXT,
+  p_slots JSONB
+) RETURNS BIGINT
+```
+
+**Slot Schema (JSONB Array):**
+
+```json
+[
+  {
+    "label": "Gorosabel",
+    "is_special": false,
+    "slot_variant": "A",
+    "global_number": 45
+  },
+  {
+    "label": "Lekue",
+    "is_special": false,
+    "slot_variant": "B",
+    "global_number": 46
+  }
+]
+```
+
+**Changes:**
+- Added optional `slot_variant` field (single uppercase letter A-Z)
+- Added optional `global_number` field (unique within template)
+
+---
+
+#### `get_template_copy_slots` ✅ **UPDATED v1.6.0**
+
+Returns slots with variant and global number information for marketplace listing creation.
+
+**Function Signature:**
+
+```sql
+get_template_copy_slots(p_copy_id BIGINT) RETURNS TABLE (
+  slot_id BIGINT,
+  page_id BIGINT,
+  page_number INTEGER,
+  page_title TEXT,
+  page_type TEXT,
+  slot_number INTEGER,
+  slot_variant TEXT,        -- NEW v1.6.0
+  global_number INTEGER,    -- NEW v1.6.0
+  slot_label TEXT,          -- RENAMED from 'label' for clarity
+  is_special BOOLEAN,
+  user_status TEXT,         -- RENAMED from 'status' for clarity
+  user_count INTEGER        -- RENAMED from 'count' for clarity
+)
+```
+
+**Column Naming**: Column names aligned with TypeScript interfaces:
+- `slot_label` (not `label`) - the sticker name
+- `user_status` (not `status`) - user's progress: 'missing', 'owned', or 'duplicate'
+- `user_count` (not `count`) - number of copies user has
+
+**Sorting:** Results ordered by `page_number`, `slot_number`, `slot_variant NULLS FIRST`
+
+---
+
+#### `get_template_progress` ✅ **UPDATED v1.6.0**
+
+Returns user's progress for all slots in a template copy.
+
+**Function Signature:**
+
+```sql
+get_template_progress(p_copy_id BIGINT) RETURNS TABLE (
+  slot_id BIGINT,
+  page_id BIGINT,
+  page_number INTEGER,
+  page_title TEXT,          -- NEW v1.6.0
+  slot_number INTEGER,
+  slot_variant TEXT,        -- NEW v1.6.0
+  global_number INTEGER,    -- NEW v1.6.0
+  label TEXT,
+  is_special BOOLEAN,
+  status TEXT,
+  count INTEGER
+)
+```
+
+**Use Case:** Display collection progress grid, Quick Entry modal
+
+**Security**: SECURITY DEFINER, validates user owns the template copy
+
+---
+
+#### `get_template_details` ✅ **UPDATED v1.6.0**
+
+Fetches complete template information including pages and slots (for viewing/editing templates).
+
+**Function Signature:**
+
+```sql
+get_template_details(p_template_id BIGINT) RETURNS JSON
+```
+
+**Returns:**
+
+```json
+{
+  "template": {
+    "id": 123,
+    "author_id": "uuid...",
+    "author_nickname": "user123",
+    "title": "La Liga 2024",
+    "description": "...",
+    "image_url": "https://...",
+    "is_public": true,
+    "rating_avg": 4.5,
+    "rating_count": 42,
+    "copies_count": 150,
+    "created_at": "2025-01-01T00:00:00Z",
+    "updated_at": "2025-01-15T00:00:00Z"
+  },
+  "pages": [
+    {
+      "id": "456",
+      "page_number": 1,
+      "title": "Porteros",
+      "type": "team",
+      "slots_count": 10,
+      "slots": [
+        {
+          "id": "789",
+          "slot_number": 1,
+          "slot_variant": "A",       // NEW v1.6.0
+          "global_number": 5,        // NEW v1.6.0
+          "label": "Ter Stegen",
+          "is_special": false
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Use Case:** Template detail view, template editing
+
+**Security**: Public function, accessible by anon and authenticated users
+
+---
+
+#### `get_slot_by_global_number` ✅ **NEW**
+
+Fast lookup of slot by global checklist number for quick entry mode.
+
+**Function Signature:**
+
+```sql
+get_slot_by_global_number(
+  p_copy_id BIGINT,
+  p_global_number INTEGER
+) RETURNS TABLE (
+  slot_id BIGINT,
+  page_id BIGINT,
+  page_number INTEGER,
+  page_title TEXT,
+  slot_number INTEGER,
+  slot_variant TEXT,
+  label TEXT,
+  status TEXT,
+  count INTEGER
+)
+```
+
+**Use Case:** Quick entry mode where users enter checklist numbers (1-773)
+
+**Example:**
+
+```typescript
+const { data, error } = await supabase.rpc('get_slot_by_global_number', {
+  p_copy_id: copyId,
+  p_global_number: 123
+});
+
+if (data && data.length > 0) {
+  const slot = data[0];
+  console.log(`Found: ${slot.label} at Page ${slot.page_number}, Slot ${slot.slot_number}${slot.slot_variant || ''}`);
+}
+```
+
+---
+
+### Frontend Components
+
+#### `<QuickEntryModal />`
+
+Dual-mode quick entry system for fast sticker tracking.
+
+**Location:** `src/components/templates/QuickEntryModal.tsx`
+
+**Features:**
+- **Checklist Number Mode**: Type numbers 1-773, press Enter
+- **Page Mode**: Visual page-based slot selection
+- Real-time feedback and recent updates log
+- Keyboard-optimized for rapid entry
+
+**Props:**
+
+```typescript
+{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  copyId: number;
+  copyTitle: string;
+  slots: QuickEntrySlot[];
+  onUpdateProgress: (slotId, status, count?) => Promise<void>;
+}
+```
+
+---
+
+#### `<TemplatePagesForm />` ✅ **UPDATED**
+
+Enhanced template creation form with variant support.
+
+**Location:** `src/components/templates/TemplatePagesForm.tsx`
+
+**New Fields Per Slot:**
+- Variant input (single letter A-Z)
+- Global number input (optional integer)
+- Auto-uppercase variant conversion
+
+---
+
+### Frontend Hooks
+
+#### `useQuickEntryProgress()`
+
+Optimized hook for quick progress updates.
+
+**Location:** `src/hooks/templates/useQuickEntryProgress.ts`
+
+**API:**
+
+```typescript
+const {
+  updateSlot,                    // (copyId, slotId, status, count) => Promise<void>
+  updateSlotByGlobalNumber,      // (copyId, globalNum, status, count) => Promise<QuickEntrySlot | null>
+  batchUpdateSlots,              // (copyId, updates[]) => Promise<void>
+  loading,
+  error,
+} = useQuickEntryProgress();
+```
+
+---
+
+### Database Schema Changes
+
+#### `template_slots` Table
+
+**Added Columns:**
+- `slot_variant TEXT` - Optional variant (A, B, C...)
+- `global_number INTEGER` - Optional global checklist number
+
+**Updated Constraints:**
+- UNIQUE(page_id, slot_number, slot_variant) - allows 5A and 5B
+- CHECK(slot_variant IS NULL OR slot_variant ~ '^[A-Z]$')
+- UNIQUE INDEX on global_number within template
+
+**Migration:** `20251031171256_add_slot_variants_and_global_numbers.sql`
+
+---
+
+### TypeScript Type Updates
+
+**SlotProgress Interface:**
+
+```typescript
+interface SlotProgress {
+  slot_id: string;
+  page_id: string;
+  page_number: number;
+  slot_number: number;
+  slot_variant: string | null;      // NEW
+  global_number: number | null;     // NEW
+  label: string | null;
+  is_special: boolean;
+  status: 'missing' | 'owned' | 'duplicate';
+  count: number;
+}
+```
+
+---
+
+### Validation Schema
+
+**Template Slot Schema:**
+
+```typescript
+export const templateSlotSchema = z.object({
+  label: z.string().min(1).max(50),
+  is_special: z.boolean().default(false),
+  slot_variant: z
+    .string()
+    .regex(/^[A-Z]$/, 'La variante debe ser una letra mayúscula (A-Z)')
+    .optional()
+    .or(z.literal('')),
+  global_number: z
+    .number()
+    .int()
+    .positive()
+    .optional(),
+});
+```
+
+---
+
+**Last Updated:** 2025-10-31 (v1.6.1 - Panini-Style Album Support)
