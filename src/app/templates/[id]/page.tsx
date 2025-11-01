@@ -405,9 +405,9 @@ export default function TemplateDetailsPage() {
                             {/* Panini metadata inline */}
                             {(slot.slot_variant || slot.global_number) && (
                               <span className="text-[10px] text-slate-500">
-                                ({slot.slot_variant && <>{slot.slot_variant}</>}
-                                {slot.slot_variant && slot.global_number && <>, </>}
-                                {slot.global_number && <>#{slot.global_number}</>})
+                                ({slot.slot_variant && <>Var: {slot.slot_variant}</>}
+                                {slot.slot_variant && slot.global_number && <> • </>}
+                                {slot.global_number && <>Global #{slot.global_number}</>})
                               </span>
                             )}
                             {slot.is_special && (
