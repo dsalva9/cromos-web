@@ -109,7 +109,7 @@ function NotificationsCenterContent() {
     <div className="container max-w-4xl mx-auto py-8 px-4">
       {/* Hero Section */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div>
             <h1 className="text-3xl font-display font-bold text-comic-dark mb-2">
               Notificaciones
@@ -123,7 +123,7 @@ function NotificationsCenterContent() {
             <Button
               onClick={handleMarkAllAsRead}
               variant="outline"
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto shrink-0"
             >
               <CheckCheck className="h-4 w-4" />
               Marcar todas como leídas

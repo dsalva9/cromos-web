@@ -131,7 +131,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
         <ModernCardContent className="p-6 space-y-6">
           {/* Image Upload */}
           <div className="space-y-2">
-            <Label>Imagen del Cromo (Opcional)</Label>
+            <Label>Imagen del Cromo</Label>
             <ImageUpload
               value={imageUrl}
               onChange={url => setValue('image_url', url || '')}
@@ -165,7 +165,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
           {/* Collection Name - Combobox */}
           <div className="space-y-2">
-            <Label htmlFor="collection">Colección (Opcional)</Label>
+            <Label htmlFor="collection">Colección</Label>
             <CollectionCombobox
               value={collectionName || ''}
               onChange={value => setValue('collection_name', value)}
@@ -186,7 +186,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
           {/* Sticker Number + Variant (side by side) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="sticker">Número del Cromo (Opcional)</Label>
+              <Label htmlFor="sticker">Número del Cromo</Label>
               <Input
                 id="sticker"
                 aria-invalid={!!errors.sticker_number}
@@ -207,7 +207,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="slot_variant">Variante (Opcional)</Label>
+              <Label htmlFor="slot_variant">Variante</Label>
               <Input
                 id="slot_variant"
                 aria-invalid={!!errors.slot_variant}
@@ -227,7 +227,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
           {/* Global Number */}
           <div className="space-y-2">
-            <Label htmlFor="global_number">Número Global (Opcional)</Label>
+            <Label htmlFor="global_number">Número Global</Label>
             <Input
               id="global_number"
               type="number"
@@ -247,7 +247,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
           {/* Page Title */}
           <div className="space-y-2">
-            <Label htmlFor="page_title">Título de Página (Opcional)</Label>
+            <Label htmlFor="page_title">Título de Página</Label>
             <Input
               id="page_title"
               aria-invalid={!!errors.page_title}
@@ -266,7 +266,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Descripción (Opcional)</Label>
+            <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
               aria-invalid={!!errors.description}
@@ -274,7 +274,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 errors.description ? 'description-error' : undefined
               }
               {...register('description')}
-              placeholder="Describe el estado del cromo, si estA! nuevo, usado, etc."
+              placeholder="Describe el estado del cromo, si está nuevo, usado, etc."
               rows={4}
               className={`bg-[#374151] border-2 text-white resize-none ${
                 errors.description ? 'border-red-500' : 'border-black'

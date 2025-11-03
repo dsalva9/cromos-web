@@ -65,20 +65,22 @@ export default function MarketplacePage() {
           </div>
 
           {user && (
-            <div className="flex gap-2">
-              <Link href="/marketplace/my-listings">
+            <div className="flex gap-2 w-full md:w-auto">
+              <Link href="/marketplace/my-listings" className="flex-1 md:flex-initial">
                 <Button
                   variant="outline"
-                  className="border-2 border-black text-white hover:bg-[#374151]"
+                  className="border-2 border-black text-white hover:bg-[#374151] w-full"
                 >
                   <List className="mr-2 h-4 w-4" />
-                  Mis Anuncios
+                  <span className="hidden sm:inline">Mis Anuncios</span>
+                  <span className="sm:hidden">Mis</span>
                 </Button>
               </Link>
-              <Link href="/marketplace/create">
-                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+              <Link href="/marketplace/create" className="flex-1 md:flex-initial">
+                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold w-full">
                   <Plus className="mr-2 h-4 w-4" />
-                  Publicar Anuncio
+                  <span className="hidden sm:inline">Publicar Anuncio</span>
+                  <span className="sm:hidden">Publicar</span>
                 </Button>
               </Link>
             </div>
@@ -110,18 +112,18 @@ export default function MarketplacePage() {
           )}
 
           {/* Sort Controls */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400 font-semibold uppercase">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <span className="text-sm text-gray-400 font-semibold uppercase shrink-0">
               Ordenar por:
             </span>
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto">
               <Button
                 onClick={() => setSortByDistance(false)}
                 variant={!sortByDistance ? 'default' : 'outline'}
                 className={
                   !sortByDistance
-                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
-                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black shrink-0'
+                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold shrink-0'
                 }
                 size="sm"
               >
@@ -133,8 +135,8 @@ export default function MarketplacePage() {
                 variant={sortByDistance ? 'default' : 'outline'}
                 className={
                   sortByDistance
-                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black'
-                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold'
+                    ? 'bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-2 border-black shrink-0'
+                    : 'border-2 border-black text-white hover:bg-[#374151] font-bold shrink-0'
                 }
                 size="sm"
                 disabled={!hasPostcode}

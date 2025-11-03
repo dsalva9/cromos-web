@@ -159,7 +159,8 @@ export function useListings({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search, limit, sortByDistance, viewerPostcode, collectionIds, fetchListings]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, limit, sortByDistance, viewerPostcode, JSON.stringify(collectionIds)]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

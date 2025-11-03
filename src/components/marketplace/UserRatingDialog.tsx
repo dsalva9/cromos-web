@@ -31,7 +31,7 @@ export function UserRatingDialog({
   onOpenChange,
   userToRate,
   listingTitle,
-  listingId, // Used by parent's onSubmit callback
+  listingId: _listingId, // eslint-disable-line @typescript-eslint/no-unused-vars -- Used by parent's onSubmit callback
   onSubmit
 }: UserRatingDialogProps) {
   const [rating, setRating] = useState<number>(0);

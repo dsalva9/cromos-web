@@ -21,6 +21,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { FavoriteButton } from '@/components/social/FavoriteButton';
 import { ReportButton } from '@/components/social/ReportButton';
 import { IgnoreButton } from '@/components/social/IgnoreButton';
@@ -722,13 +729,33 @@ export default function UserProfilePage() {
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <h2 className="text-2xl font-black text-white">Anuncios</h2>
-            <SegmentedTabs
-              tabs={listingTabs}
-              value={listingFilter}
-              onValueChange={value => setListingFilter(value as ListingFilter)}
-              aria-label="Filtrar anuncios"
-              className="md:max-w-lg"
-            />
+
+            {/* Mobile: Dropdown */}
+            <div className="md:hidden w-full">
+              <Select value={listingFilter} onValueChange={(value) => setListingFilter(value as ListingFilter)}>
+                <SelectTrigger className="w-full bg-[#374151] border-2 border-black text-white h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#374151] border-2 border-black text-white">
+                  {listingTabs.map(tab => (
+                    <SelectItem key={tab.value} value={tab.value} className="text-white">
+                      {tab.label} ({statusCounts[tab.value as ListingFilter]})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Desktop: SegmentedTabs */}
+            <div className="hidden md:block">
+              <SegmentedTabs
+                tabs={listingTabs}
+                value={listingFilter}
+                onValueChange={value => setListingFilter(value as ListingFilter)}
+                aria-label="Filtrar anuncios"
+                className="md:max-w-lg"
+              />
+            </div>
           </div>
 
           {filteredListings.length === 0 ? (

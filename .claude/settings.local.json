@@ -33,7 +33,8 @@
       "Bash(powershell:*)",
       "Bash(git restore:*)",
       "Bash(del /F debug_admin_templates_issue.sql force_drop_and_recreate_admin_templates.sql reload_postgrest_schema.sql verify_admin_templates_function.sql verify_fix.sql)",
-      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\api-endpoints-panini-addition.md\")"
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\api-endpoints-panini-addition.md\")",
+      "Bash(npx next lint:*)"
     ],
     "deny": [],
     "ask": []

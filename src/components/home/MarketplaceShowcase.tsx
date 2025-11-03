@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ListingCard } from '@/components/marketplace/ListingCard';
@@ -9,8 +10,28 @@ import { AlertCircle } from 'lucide-react';
 
 export default function MarketplaceShowcase() {
   const { listings, loading, error } = useListings({ limit: 6 });
+  const [displayListings, setDisplayListings] = useState<typeof listings>([]);
+  const [isReady, setIsReady] = useState(false);
 
-  const hasListings = listings.length > 0;
+  useEffect(() => {
+    console.log('MarketplaceShowcase render:', {
+      loading,
+      listingsCount: listings.length,
+      displayListingsCount: displayListings.length,
+      isReady
+    });
+
+    // Only update display listings when we actually have data and not loading
+    if (!loading && listings.length > 0 && !isReady) {
+      console.log('Setting display listings');
+      setDisplayListings(listings);
+      setIsReady(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, listings.length, isReady]);
+
+  const hasListings = displayListings.length > 0;
+  const showSkeletons = !isReady || loading;
 
   return (
     <section className="border-t-4 border-black bg-[#111827]">
@@ -48,21 +69,23 @@ export default function MarketplaceShowcase() {
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading && (
+            {showSkeletons ? (
               <>
                 <ListingCardSkeleton />
                 <ListingCardSkeleton />
                 <ListingCardSkeleton />
+                <ListingCardSkeleton />
+                <ListingCardSkeleton />
+                <ListingCardSkeleton />
               </>
-            )}
-
-            {!loading && hasListings &&
-              listings.slice(0, 6).map(listing => (
+            ) : hasListings ? (
+              displayListings.slice(0, 6).map(listing => (
                 <ListingCard key={listing.id} listing={listing} />
-              ))}
+              ))
+            ) : null}
           </div>
 
-          {!loading && !hasListings && !error && (
+          {!showSkeletons && !hasListings && !error && (
             <div className="rounded-xl border-2 border-dashed border-gray-600 bg-gray-800/60 px-6 py-12 text-center">
               <h3 className="text-2xl font-bold uppercase text-white">
                 Aún no hay anuncios activos
