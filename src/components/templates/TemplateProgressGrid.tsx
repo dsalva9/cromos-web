@@ -153,7 +153,7 @@ export function TemplateProgressGrid({
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 text-sm text-gray-300">
-            Los cromos que ya tengas (Tengo o Repes) no se modificarán. Solo se marcarán como "Tengo" (count 1) aquellos que estén marcados como "Falta" (count 0).
+            Los cromos que ya tengas (Tengo o Repes) no se modificarán. Solo se marcarán como &quot;Tengo&quot; (count 1) aquellos que estén marcados como &quot;Falta&quot; (count 0).
           </div>
           <DialogFooter>
             <Button

@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Badges Gamification System (2025-01-04)**
+  - Implemented comprehensive gamification system with 19 badges across 6 categories
+  - **Badge Categories**:
+    - Coleccionista (Collector): 3 tiers for copying template collections
+    - Creador (Creator): 3 tiers for creating custom templates
+    - Opinador (Reviewer): 3 tiers for rating templates
+    - Completista (Completionist): 3 tiers for completing collections 100%
+    - Trader: 3 tiers for successful marketplace transactions
+    - Top Valorado (Top Rated): Special badge for maintaining 4.5+ star rating with 5+ trades
+  - **Database Components**:
+    - `badge_definitions` table with 19 predefined badges
+    - `user_badge_progress` table tracking progress towards badges
+    - `user_badges` table storing earned badges with timestamps
+    - RPC functions: `check_and_award_badge`, `get_user_badges_with_details`, `get_badge_progress`, `increment_badge_progress`
+    - Automated triggers on collections, templates, ratings, and trades
+  - **UI Components**:
+    - BadgeCard: Display individual badge with progress/earned state
+    - BadgeGrid: Responsive grid layout for multiple badges
+    - BadgeIcon: Tier-specific styling (bronze, silver, gold, special with glow effect)
+    - BadgeMiniDisplay: Compact badge icons for marketplace cards
+    - BadgeProgress: Progress bars towards earning badges
+    - ProfileBadges: Complete badges section on profile page with tabs
+  - **Integration Points**:
+    - Profile page: Full badges section with earned/all tabs, grouped by category
+    - Marketplace cards: Display top 2 badges next to seller name with tooltips
+    - Notifications: Real-time badge earned notifications linking to profile
+  - **Real-time Updates**:
+    - WebSocket subscriptions for instant badge awards
+    - Live progress tracking without page refresh
+  - **Accessibility**:
+    - Keyboard navigation support
+    - Tooltips with badge details
+    - Responsive design for mobile/tablet/desktop
+  - **Migrations**:
+    - `20251104121546_create_badges_system.sql` - Schema and RPC functions
+    - `20251104121547_seed_badge_definitions.sql` - Badge definitions data
+  - **Documentation**:
+    - `docs/App-Testing/Fase-10-Badges/TEST-badges-system.md` - Comprehensive test cases (18 tests)
+  - **Visual Design**:
+    - Color-coded tier system with Lucide React icons
+    - Progress bars with percentage indicators
+    - Special glow effect for top-tier badges
+
 - **Panini Metadata Fields for Marketplace Listings (2025-11-01)**
   - Added rich metadata fields to `trade_listings` table for Panini-style album classification
   - **New Database Columns**:

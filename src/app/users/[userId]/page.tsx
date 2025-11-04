@@ -31,6 +31,7 @@ import {
 import { FavoriteButton } from '@/components/social/FavoriteButton';
 import { ReportButton } from '@/components/social/ReportButton';
 import { IgnoreButton } from '@/components/social/IgnoreButton';
+import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
 import {
   useUser,
   useSupabaseClient,
@@ -722,6 +723,11 @@ export default function UserProfilePage() {
                       </div>
                     </a>
                   </div>
+
+                  {/* BADGES SUBSECTION */}
+                  <div className="mt-6 pt-6 border-t border-gray-600">
+                    <ProfileBadgesSimple userId={userId} isOwnProfile={isOwnProfile} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -756,7 +762,6 @@ export default function UserProfilePage() {
                 value={listingFilter}
                 onValueChange={value => setListingFilter(value as ListingFilter)}
                 aria-label="Filtrar anuncios"
-                className="md:max-w-lg"
               />
             </div>
           </div>

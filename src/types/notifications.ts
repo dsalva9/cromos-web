@@ -19,6 +19,8 @@ export type NotificationKind =
   // Rating notifications
   | 'user_rated'
   | 'template_rated'
+  // Badge notifications
+  | 'badge_earned'
   // Admin notifications
   | 'admin_action';
 
@@ -185,6 +187,8 @@ export function getNotificationIcon(kind: NotificationKind): string {
     case 'user_rated':
     case 'template_rated':
       return 'Star';
+    case 'badge_earned':
+      return 'Award';
     case 'proposal_accepted':
       return 'CheckCircle';
     case 'proposal_rejected':

@@ -117,6 +117,14 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
         href: notification.tradeId ? `/trades/${notification.tradeId}` : null,
       };
 
+    case 'badge_earned':
+      const badgeName = notification.payload?.badge_name as string || 'una insignia';
+      return {
+        title: '¡Nueva insignia ganada!',
+        body: `Has ganado la insignia "${badgeName}"`,
+        href: `/profile#badges`,
+      };
+
     case 'admin_action':
       return {
         title: 'Acción administrativa',

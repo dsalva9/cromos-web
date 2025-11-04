@@ -116,9 +116,9 @@ export function ListingCard({ listing }: ListingCardProps) {
             )}
 
             {/* Author */}
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-gray-400">
-                <User className="h-4 w-4" />
+            <div className="flex items-center justify-between text-sm gap-2">
+              <div className="flex items-center gap-2 text-gray-400 min-w-0 flex-1">
+                <User className="h-4 w-4 flex-shrink-0" />
                 <UserLink
                   userId={listing.user_id}
                   nickname={listing.author_nickname}
@@ -129,7 +129,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               </div>
 
               {/* Views */}
-              <div className="flex items-center gap-1 text-gray-500">
+              <div className="flex items-center gap-1 text-gray-500 flex-shrink-0">
                 <Eye className="h-4 w-4" />
                 <span>{listing.views_count}</span>
               </div>

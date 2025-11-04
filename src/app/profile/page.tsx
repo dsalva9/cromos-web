@@ -10,6 +10,7 @@ import { ConfirmModal } from '@/components/ui/confirm-modal';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { useProfileData } from '@/hooks/profile/useProfileData';
+import { ProfileBadges } from '@/components/profile/ProfileBadges';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import {
@@ -549,6 +550,11 @@ function ProfileContent() {
             </ModernCard>
           </div>
         )}
+
+        {/* BADGES SECTION */}
+        <div className="mb-12">
+          <ProfileBadges userId={user.id} isOwnProfile={true} />
+        </div>
 
         {/* MIS COLECCIONES SECTION */}
         <div className="mb-12">
