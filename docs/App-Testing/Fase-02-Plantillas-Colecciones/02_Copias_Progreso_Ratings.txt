@@ -41,28 +41,53 @@ Caso CP-F02-02B: Actualizar progreso de slots (HAVE/NEED/DUPES)
     - Slots marcados muestran iconografía adecuada (color verde, dorado, rojo).
     - Valores persisten tras recargar y en móvil.
 
-Caso CP-F02-02B2: Entrada rápida por número de checklist (Quick Entry)
-  Cobertura: Modalidad de entrada rápida; navegación por teclado; mapeo automático.
+Caso CP-F02-02B2: Entrada rápida por número de checklist (Quick Entry) - ACTUALIZADO 2025-11-04
+  Cobertura: Modalidad de entrada rápida simplificada; navegación por teclado; mapeo automático.
   Pre-requisito: Copia de plantilla con números globales asignados (ver CP-F02-01A2).
   Pasos:
     1. En vista de progreso de copia, pulsar botón "Entrada Rápida" o similar.
-    2. En modal, seleccionar pestaña "Por Número".
-    3. Escribir "45" y presionar Enter.
-    4. Escribir "46" y presionar Enter.
-    5. Escribir "999" (número inexistente) y presionar Enter.
-    6. Verificar log de actualizaciones recientes en el modal.
-    7. Cambiar a pestaña "Por Página", seleccionar página "Athletic Club".
-    8. Hacer clic en slot "5A - Gorosabel" para alternar estado.
+    2. **ACTUALIZADO**: Modal abre directamente en modo "Por Número" (sin pestañas).
+    3. Verificar que el título del modal incluya ícono de hash y "Entrada Rápida por Número".
+    4. Escribir "45" y presionar Enter.
+    5. Escribir "46" y presionar Enter.
+    6. Escribir "999" (número inexistente) y presionar Enter.
+    7. Verificar log de "Últimas actualizaciones" (máximo 5 entradas).
+    8. Verificar "Referencia de Números" mostrando primeros 20 cromos con estado.
   Criterios de éxito:
-    - Modal abre con foco automático en campo de entrada.
+    - Modal abre con foco automático en campo de entrada (sin necesidad de clic).
+    - **ACTUALIZADO**: No hay pestañas ni selector de páginas (modo único).
     - Al ingresar "45", sistema localiza slot 5A y lo marca como "Tengo" sin salir del modal.
     - Mensaje de confirmación muestra: "✓ No. 45 - Gorosabel (Athletic Club, Slot 5A)".
     - Al ingresar "999", muestra "❌ No. 999 no encontrado".
-    - Campo se limpia automáticamente tras cada entrada.
-    - En modo "Por Página", se listan todos los slots de la página seleccionada.
-    - Clic en slot alterna estados: falta → tengo → repetido → falta.
-    - Badges muestran estado actual de cada slot (falta, tengo, repetido con contador).
-    - Progreso se actualiza en tiempo real en la vista principal sin cerrar modal.
+    - Campo se limpia automáticamente tras cada entrada y mantiene el foco.
+    - Lista de referencia actualiza badges en tiempo real (Falta/Tengo/Duplicado).
+    - Progreso se actualiza en la vista principal sin cerrar modal.
+    - **ELIMINADO**: Modo "Por Página" ya no existe (funcionalidad redundante con grid principal).
+
+Caso CP-F02-02B3: Completar toda la página (Bulk Completion) - NUEVO 2025-11-04
+  Cobertura: Actualización masiva; confirmación de operaciones peligrosas; preservación selectiva.
+  Pre-requisito: Copia con página parcialmente completada (algunos "Falta", algunos "Tengo", algunos "Repes").
+  Pasos:
+    1. Navegar a página con estado mixto (ej: 10 cromos Falta, 5 Tengo, 3 Repes).
+    2. Desplazarse al final del grid de cromos.
+    3. Pulsar botón "Completar toda la página" (outline amarillo, icono CheckCircle2).
+    4. Leer modal de confirmación: "¿Quieres marcar toda la página como completada?".
+    5. Verificar mensaje explicativo sobre preservación de cromos existentes.
+    6. Pulsar "Confirmar".
+    7. Observar estado de loading en botón ("Completando...").
+    8. Tras cierre de modal, verificar estado de todos los cromos en grid.
+    9. Repetir proceso en página diferente.
+  Criterios de éxito:
+    - Botón visible y centrado debajo del grid en todas las páginas.
+    - Modal explica claramente: "Los cromos que ya tengas (Tengo o Repes) no se modificarán".
+    - Solo los cromos marcados como "Falta" (count 0, badge gris) cambian a "Tengo" (count 1, badge verde).
+    - Cromos previamente "Tengo" (count 1) se mantienen sin cambios.
+    - Cromos "Repes" (count > 1, badge azul) mantienen su contador exacto.
+    - Botón "Cancelar" cierra modal sin realizar cambios.
+    - Operación completa en <2 segundos para página de ~50 cromos.
+    - Grid actualiza badges inmediatamente sin recarga.
+    - Contador de progreso global refleja nuevo estado.
+    - Operación en página 1 no afecta estado de página 2.
 
 Caso CP-F02-02C: Gestión de duplicados y decrementos
   Cobertura: Edge; límites 0; sincronización con marketplace (pre-integration).

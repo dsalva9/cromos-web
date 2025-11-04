@@ -85,17 +85,44 @@ Caso CP-F01-02E: Validaciones de tamaño y formato
     - Para formato no soportado, se muestra mensaje claro y botón “Volver a intentar”.
     - No se crean archivos en Storage (verificar en Supabase → Storage → avatars).
 
-Caso CP-F01-02F: Visualización de perfil público de otro usuario
-  Cobertura: Permisos RLS; estadísticas públicas; botón favorito.
+Caso CP-F01-02F: Visualización de perfil público de otro usuario - ACTUALIZADO 2025-11-04
+  Cobertura: Permisos RLS; estadísticas públicas; botón favorito; pestañas de anuncios.
   Pasos:
     1. Con `qa.observador@cromos.test`, abrir `/usuarios/{id}` de `qa.registrado`.
     2. Revisar secciones (información, listados activos, calificaciones recibidas).
-    3. Comprobar estado de componente “Seguir/Favorito”.
+    3. Comprobar estado de componente "Seguir/Favorito".
+    4. **ACTUALIZADO**: Desplazarse a sección "Anuncios" y verificar pestañas disponibles.
   Criterios de éxito:
     - Datos sensibles (email, botones de edición) no visibles.
     - Conteo de favoritos y calificación concuerda con base.
-    - Botón “Agregar a favoritos” aparece solo si no es el mismo usuario.
+    - Botón "Agregar a favoritos" aparece solo si no es el mismo usuario.
+    - **ACTUALIZADO**: Sección "Anuncios" muestra solo pestaña "Activos" para perfiles de terceros.
+    - **ACTUALIZADO**: No se muestran pestañas "Reservados", "Completados" ni "Eliminados" en perfiles ajenos.
     - Layout responde correctamente en desktop y móvil.
+
+Caso CP-F01-02F2: Pestañas de anuncios en perfil propio - NUEVO 2025-11-04
+  Cobertura: Gestión completa de anuncios; consistencia con Mis Anuncios; navegación móvil/desktop.
+  Pre-requisito: Usuario `qa.vendedor@cromos.test` con anuncios en estados: activo, reservado, completado, eliminado.
+  Pasos:
+    1. Iniciar sesión con `qa.vendedor@cromos.test`.
+    2. Navegar a `/usuarios/{self-id}` (perfil propio).
+    3. Desplazarse a sección "Anuncios".
+    4. **NUEVO**: En desktop, verificar pestañas segmentadas: "Activos", "Reservados", "Completados", "Eliminados".
+    5. **NUEVO**: En móvil (375px), verificar dropdown selector con las 4 opciones.
+    6. Hacer clic en pestaña/opción "Reservados" y revisar listados.
+    7. Cambiar a "Completados" y verificar contenido.
+    8. Cambiar a "Eliminados" y verificar contenido.
+    9. Navegar a `/marketplace/my-listings` y comparar pestañas y conteos.
+  Criterios de éxito:
+    - **NUEVO**: Perfil propio muestra 4 pestañas: Activos, Reservados, Completados, Eliminados.
+    - Cada pestaña muestra badge con conteo correcto (ej: "Activos (3)").
+    - Desktop: Pestañas segmentadas (SegmentedTabs) con resaltado de pestaña activa.
+    - Móvil: Dropdown (Select) con las 4 opciones y conteos entre paréntesis.
+    - Cambio de pestaña actualiza grid de anuncios sin recarga.
+    - Si pestaña vacía, muestra mensaje correspondiente: "No hay anuncios [estado]".
+    - Conteos y listados coinciden exactamente con `/marketplace/my-listings`.
+    - Navegación entre pestañas fluida (<200ms).
+    - Estado seleccionado persiste si usuario recarga página.
 
 Caso CP-F01-02G: Protección para usuarios sin sesión
   Cobertura: Acceso restringido.

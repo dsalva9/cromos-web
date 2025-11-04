@@ -47,6 +47,7 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 
 const STATUS_LABELS = {
   active: 'Activos',
+  reserved: 'Reservados',
   sold: 'Completados',
   removed: 'Eliminados',
 } as const;
@@ -55,6 +56,7 @@ type ListingFilter = keyof typeof STATUS_LABELS;
 
 const emptyStateCopy: Record<ListingFilter, string> = {
   active: 'No hay anuncios activos',
+  reserved: 'No hay anuncios reservados',
   sold: 'No hay anuncios completados',
   removed: 'No hay anuncios eliminados',
 };
@@ -208,6 +210,7 @@ export default function UserProfilePage() {
   const statusCounts = useMemo(() => {
     const counts: Record<ListingFilter, number> = {
       active: 0,
+      reserved: 0,
       sold: 0,
       removed: 0,
     };
@@ -222,7 +225,7 @@ export default function UserProfilePage() {
 
   const isOwnProfile = currentUser?.id === userId;
   const availableStatuses = useMemo<ListingFilter[]>(
-    () => (isOwnProfile ? ['active', 'sold', 'removed'] : ['active']),
+    () => (isOwnProfile ? ['active', 'reserved', 'sold', 'removed'] : ['active']),
     [isOwnProfile]
   );
 

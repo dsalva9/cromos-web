@@ -250,13 +250,22 @@
 - `update_template_metadata`, `update_template_page`, `update_template_slot`
 - `delete_template_page`, `delete_template_slot`
 
-#### **Panini-Style Album Support (NEW - 2025-10-31):**
+#### **Panini-Style Album Support (NEW - 2025-10-31, UPDATED - 2025-11-04):**
 
 - **Slot Variants**: Support for sub-slots (5A, 5B, 10A, 10B) within same position
 - **Global Numbering**: Optional checklist numbering (1-773) for official albums
-- **Quick Entry Modal**: Dual-mode entry system
-  - By Checklist Number: Fast keyboard-driven entry (1, 2, 3...)
-  - By Page: Visual page-based slot selection
+- **Quick Entry Modal**: Simplified number-only entry system (UPDATED - 2025-11-04)
+  - Fast keyboard-driven entry by checklist number (1, 2, 3...)
+  - Auto-focus on input field for rapid sequential entry
+  - Recent updates feedback showing last 5 additions
+  - Reference list showing first 20 cromos with status
+  - **REMOVED**: Page-by-page entry mode (redundant with grid interface)
+- **Bulk Page Completion** (NEW - 2025-11-04):
+  - "Completar toda la página" button below cromo grid
+  - Confirmation modal with clear explanation of behavior
+  - Only marks missing cromos (count 0) as "Tengo" (count 1)
+  - Preserves existing owned or duplicate cromos unchanged
+  - Updates all missing cromos in current page simultaneously
 - **Enhanced Display**: Variants shown throughout UI (listings, progress, templates)
 - **Backward Compatible**: Existing templates work without modification
 
@@ -365,12 +374,18 @@ user_template_progress (count - 1)
 - ✅ ReportModal with form validation
 - ✅ Report submission flow with toast notifications
 
-#### **Public User Profiles**
+#### **Public User Profiles (UPDATED - 2025-11-04)**
 
 - ✅ Avatar with fallback
 - ✅ Rating display with stars (clickable, scrolls to ratings section)
 - ✅ Active listings count and grid
 - ✅ Favorites count
+- ✅ **Listing Status Tabs** (UPDATED - 2025-11-04):
+  - Active listings visible to all users
+  - Reserved, Completed, and Removed tabs visible only on own profile
+  - Consistent with "Mis Anuncios" marketplace page
+  - Mobile: Dropdown selector
+  - Desktop: Segmented tabs with counts
 - ✅ Admin/suspended badges
 - ✅ Favorite button for other users
 - ✅ Comprehensive ratings section at bottom of profile
