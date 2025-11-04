@@ -65,22 +65,20 @@ export default function MarketplacePage() {
           </div>
 
           {user && (
-            <div className="flex gap-2 w-full md:w-auto">
-              <Link href="/marketplace/my-listings" className="flex-1 md:flex-initial">
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <Link href="/marketplace/my-listings" className="w-full sm:flex-1 md:w-auto">
                 <Button
                   variant="outline"
                   className="border-2 border-black text-white hover:bg-[#374151] w-full"
                 >
                   <List className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Mis Anuncios</span>
-                  <span className="sm:hidden">Mis</span>
+                  Mis Anuncios
                 </Button>
               </Link>
-              <Link href="/marketplace/create" className="flex-1 md:flex-initial">
+              <Link href="/marketplace/create" className="w-full sm:flex-1 md:w-auto">
                 <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold w-full">
                   <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Publicar Anuncio</span>
-                  <span className="sm:hidden">Publicar</span>
+                  Publicar Anuncio
                 </Button>
               </Link>
             </div>

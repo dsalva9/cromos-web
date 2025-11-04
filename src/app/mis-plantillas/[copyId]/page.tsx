@@ -47,11 +47,11 @@ function TemplateProgressContent() {
     <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Back and Quick Entry */}
-        <div className="flex items-center justify-between mb-4">
-          <Link href="/mis-plantillas">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
+          <Link href="/mis-plantillas" className="w-full sm:w-auto">
             <Button
               variant="ghost"
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-white w-full sm:w-auto"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a Mis Colecciones
@@ -62,7 +62,7 @@ function TemplateProgressContent() {
           {hasGlobalNumbers && (
             <Button
               onClick={() => setQuickEntryOpen(true)}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              className="bg-[#FFC000] text-black hover:bg-[#FFD700] w-full sm:w-auto"
             >
               <Zap className="mr-2 h-4 w-4" />
               Entrada Rápida

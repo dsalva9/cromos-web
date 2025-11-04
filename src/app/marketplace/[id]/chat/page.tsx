@@ -131,6 +131,13 @@ function ListingChatPageContent() {
     }
   }, [isOwner, fetchParticipants]);
 
+  // Auto-select conversation when only one exists
+  useEffect(() => {
+    if (isOwner && participants.length === 1 && !selectedParticipant) {
+      setSelectedParticipant(participants[0].user_id);
+    }
+  }, [isOwner, participants, selectedParticipant]);
+
   // Fetch transaction if listing is reserved or completed
   useEffect(() => {
     async function fetchTransaction() {
@@ -447,49 +454,51 @@ function ListingChatPageContent() {
         {listing && (
           <ModernCard className="mb-6">
             <ModernCardContent className="p-4">
-              <div className="flex gap-4">
-                {listing.image_url && (
-                  <div className="relative w-20 h-20 flex-shrink-0">
-                    <Image
-                      src={listing.image_url}
-                      alt={listing.title}
-                      fill
-                      className="object-cover rounded-md border-2 border-gray-700"
-                    />
-                  </div>
-                )}
-                <div className="flex-1">
-                  <Link href={`/marketplace/${listingId}`}>
-                    <h3 className="text-lg font-bold text-white hover:text-[#FFC000] transition-colors">
-                      {listing.title}
-                    </h3>
-                  </Link>
-                  <p className="text-sm text-gray-400">
-                    {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={cn(
-                      'px-2 py-1 rounded text-xs font-bold uppercase',
-                      listing.status === 'active' && 'bg-green-900/30 text-green-400',
-                      listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
-                      listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
-                      listing.status === 'sold' && 'bg-gray-700 text-gray-300'
-                    )}>
-                      {listing.status === 'active' && 'Disponible'}
-                      {listing.status === 'reserved' && 'Reservado'}
-                      {listing.status === 'completed' && 'Completado'}
-                      {listing.status === 'sold' && 'Vendido'}
-                    </span>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex gap-4 flex-1">
+                  {listing.image_url && (
+                    <div className="relative w-20 h-20 flex-shrink-0">
+                      <Image
+                        src={listing.image_url}
+                        alt={listing.title}
+                        fill
+                        className="object-cover rounded-md border-2 border-gray-700"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/marketplace/${listingId}`}>
+                      <h3 className="text-lg font-bold text-white hover:text-[#FFC000] transition-colors">
+                        {listing.title}
+                      </h3>
+                    </Link>
+                    <p className="text-sm text-gray-400">
+                      {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={cn(
+                        'px-2 py-1 rounded text-xs font-bold uppercase',
+                        listing.status === 'active' && 'bg-green-900/30 text-green-400',
+                        listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
+                        listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
+                        listing.status === 'sold' && 'bg-gray-700 text-gray-300'
+                      )}>
+                        {listing.status === 'active' && 'Disponible'}
+                        {listing.status === 'reserved' && 'Reservado'}
+                        {listing.status === 'completed' && 'Completado'}
+                        {listing.status === 'sold' && 'Vendido'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   {/* Seller actions */}
                   {isOwner && listing.status === 'active' && !transactionStatus && (
                     <Button
                       onClick={handleReserve}
                       disabled={reserving || !selectedParticipant}
                       variant="outline"
-                      className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                      className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                     >
                       <Package className="h-4 w-4 mr-2" />
                       {reserving ? 'Marcando...' : 'Marcar Reservado'}
@@ -501,7 +510,7 @@ function ListingChatPageContent() {
                         onClick={handleComplete}
                         disabled={completing}
                         variant="outline"
-                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
                         {completing ? 'Completando...' : 'Marcar Completado'}
@@ -510,7 +519,7 @@ function ListingChatPageContent() {
                         onClick={handleUnreserve}
                         disabled={unreserving}
                         variant="outline"
-                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
                         {unreserving ? 'Liberando...' : 'Liberar Reserva'}
@@ -523,7 +532,7 @@ function ListingChatPageContent() {
                     <Button
                       onClick={handleConfirm}
                       disabled={confirming}
-                      className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
+                      className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold w-full sm:w-auto whitespace-nowrap"
                     >
                       <Package className="h-4 w-4 mr-2" />
                       {confirming ? 'Confirmando...' : 'Confirmar Recepción'}

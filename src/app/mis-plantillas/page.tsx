@@ -125,18 +125,18 @@ function MyTemplatesContent() {
             </p>
           </div>
 
-          <div className="flex gap-2">
-            <Link href="/templates">
+          <div className="flex flex-wrap gap-2">
+            <Link href="/templates" className="w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="text-white border-gray-600 hover:bg-gray-800"
+                className="text-white border-gray-600 hover:bg-gray-800 w-full"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Explorar Plantillas de Colecciones
               </Button>
             </Link>
-            <Link href="/templates/create">
-              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+            <Link href="/templates/create" className="w-full sm:w-auto">
+              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] w-full">
                 <Plus className="mr-2 h-4 w-4" />
                 Crear Plantilla
               </Button>

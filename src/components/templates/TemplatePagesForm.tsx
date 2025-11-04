@@ -317,9 +317,9 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                 </Button>
               </div>
 
-              {/* Column Headers */}
+              {/* Column Headers - Desktop only */}
               {page.slots.length > 0 && (
-                <div className="flex items-center gap-2 px-2 pb-2 border-b border-gray-700">
+                <div className="hidden lg:flex items-center gap-2 px-2 pb-2 border-b border-gray-700">
                   <div className="w-5" /> {/* Grip icon space */}
                   <div className="w-16 text-xs text-gray-400 text-center font-medium">
                     No. Global
@@ -340,13 +340,14 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                 </div>
               )}
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {page.slots.map((slot, slotIndex) => (
                   <div
                     key={slotIndex}
-                    className="group hover:bg-slate-800/30 rounded p-2 transition-all duration-200 space-y-2"
+                    className="group hover:bg-slate-800/30 rounded p-3 transition-all duration-200 border border-gray-700 lg:border-0"
                   >
-                    <div className="flex items-center gap-2">
+                    {/* Desktop Layout - Horizontal */}
+                    <div className="hidden lg:flex items-center gap-2">
                       <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
 
                       {/* Global Number - For quick entry (1-773) */}
@@ -473,6 +474,142 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                    </div>
+
+                    {/* Mobile Layout - Vertical Stack */}
+                    <div className="lg:hidden space-y-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <GripVertical className="h-5 w-5 text-slate-400" />
+                          <span className="text-sm font-semibold text-white">
+                            Cromo #{slotIndex + 1}
+                          </span>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteSlot(pageIndex, slotIndex)}
+                          className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div>
+                          <Label className="text-xs text-gray-400">No. Global</Label>
+                          <Input
+                            type="number"
+                            value={slot.global_number || ''}
+                            onChange={e =>
+                              updateSlot(pageIndex, slotIndex, {
+                                ...slot,
+                                global_number: e.target.value
+                                  ? parseInt(e.target.value)
+                                  : undefined,
+                              })
+                            }
+                            placeholder="Número global (ej: 1-773)"
+                            className={`bg-[#374151] border-gray-600 text-white ${
+                              slot.global_number && duplicateGlobalNumbers.has(slot.global_number)
+                                ? 'border-red-500 border-2'
+                                : ''
+                            }`}
+                          />
+                          {slot.global_number && duplicateGlobalNumbers.has(slot.global_number) && (
+                            <p className="text-xs text-red-400 mt-1">Número duplicado</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <Label className="text-xs text-gray-400">Nombre del Cromo</Label>
+                          <Input
+                            value={slot.label}
+                            onChange={e =>
+                              updateSlot(pageIndex, slotIndex, {
+                                ...slot,
+                                label: e.target.value,
+                              })
+                            }
+                            placeholder="Ej: Portero"
+                            className="bg-[#374151] border-gray-600 text-white"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs text-gray-400">No. Página</Label>
+                            <Input
+                              type="number"
+                              value={slot.slot_number}
+                              onChange={e =>
+                                updateSlot(pageIndex, slotIndex, {
+                                  ...slot,
+                                  slot_number: parseInt(e.target.value) || 1,
+                                })
+                              }
+                              placeholder="Posición"
+                              min={1}
+                              className={`bg-[#374151] border-gray-600 text-white ${
+                                getDuplicateSlotCombinations(pageIndex).has(
+                                  `${slot.slot_number}-${slot.slot_variant || 'NULL'}`
+                                )
+                                  ? 'border-red-500 border-2'
+                                  : ''
+                              }`}
+                            />
+                          </div>
+
+                          <div>
+                            <Label className="text-xs text-gray-400">Variante</Label>
+                            <Input
+                              value={slot.slot_variant || ''}
+                              onChange={e =>
+                                updateSlot(pageIndex, slotIndex, {
+                                  ...slot,
+                                  slot_variant: e.target.value.toUpperCase() || undefined,
+                                })
+                              }
+                              placeholder="A, B, C..."
+                              maxLength={1}
+                              className={`bg-[#374151] border-gray-600 text-white uppercase ${
+                                getDuplicateSlotCombinations(pageIndex).has(
+                                  `${slot.slot_number}-${slot.slot_variant || 'NULL'}`
+                                )
+                                  ? 'border-red-500 border-2'
+                                  : ''
+                              }`}
+                            />
+                          </div>
+                        </div>
+                        {getDuplicateSlotCombinations(pageIndex).has(
+                          `${slot.slot_number}-${slot.slot_variant || 'NULL'}`
+                        ) && (
+                          <p className="text-xs text-red-400">Combinación de No. Página y Variante duplicada</p>
+                        )}
+
+                        <div className="flex items-center justify-between pt-2">
+                          <Label className="text-xs text-gray-400">Cromo Especial</Label>
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              id={`special-mobile-${pageIndex}-${slotIndex}`}
+                              checked={slot.is_special}
+                              onCheckedChange={checked =>
+                                updateSlot(pageIndex, slotIndex, {
+                                  ...slot,
+                                  is_special: checked,
+                                })
+                              }
+                            />
+                            <Label
+                              htmlFor={`special-mobile-${pageIndex}-${slotIndex}`}
+                              className="text-white text-sm"
+                            >
+                              {slot.is_special ? 'Sí' : 'No'}
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
