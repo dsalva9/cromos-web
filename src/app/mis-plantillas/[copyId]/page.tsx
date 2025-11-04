@@ -97,16 +97,16 @@ function TemplateProgressContent() {
               </Button>
             )}
 
-            {/* Delete Button */}
-            <Button
-              onClick={() => setDeleteDialogOpen(true)}
-              variant="destructive"
-              className="w-full sm:w-auto"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Eliminar colección
-            </Button>
-          </div>
+          {/* Delete Button */}
+          <Button
+            onClick={() => setDeleteDialogOpen(true)}
+            variant="destructive"
+            className="hidden w-full sm:inline-flex sm:w-auto"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Eliminar colección
+          </Button>
+        </div>
         </div>
 
         {/* Summary Header */}
@@ -118,6 +118,18 @@ function TemplateProgressContent() {
           onUpdateSlot={updateSlotStatus}
           copyId={copyId}
         />
+
+        {/* Mobile Delete Button */}
+        <div className="mt-6 sm:hidden">
+          <Button
+            onClick={() => setDeleteDialogOpen(true)}
+            variant="destructive"
+            className="w-full"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Eliminar colección
+          </Button>
+        </div>
 
         {/* Quick Entry Modal */}
         <QuickEntryModal
