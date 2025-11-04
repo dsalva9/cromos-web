@@ -3430,6 +3430,56 @@ get_template_progress(p_copy_id BIGINT) RETURNS TABLE (
 
 ---
 
+#### `delete_template_copy` ✅ **NEW v1.6.0**
+
+Deletes a user's template copy and all associated progress data.
+
+**Function Signature:**
+
+```sql
+delete_template_copy(p_copy_id BIGINT) RETURNS VOID
+```
+
+**Parameters:**
+
+- `p_copy_id`: ID of the template copy to delete (must belong to authenticated user)
+
+**Behavior:**
+
+- Validates user is authenticated (`auth.uid()`)
+- Validates the copy belongs to the authenticated user
+- Deletes the copy from `user_template_copies`
+- Automatically cascades deletion of all progress records in `user_template_progress`
+- **Does NOT affect marketplace listings** - published duplicates remain active
+
+**Exceptions:**
+
+- `'User must be authenticated'` - Not logged in
+- `'Copy not found or does not belong to you'` - Invalid copy_id or unauthorized access
+
+**Use Case:** User wants to stop tracking a collection and remove all progress data
+
+**Security**: SECURITY DEFINER with ownership validation
+
+**Side Effects:**
+
+- Template copy removed from user's collection list
+- All progress tracking data deleted (cascade)
+- Marketplace listings created from this copy remain unaffected
+
+**Usage Example:**
+
+```typescript
+const { error } = await supabase.rpc('delete_template_copy', {
+  p_copy_id: copyId,
+});
+
+if (error) throw error;
+// Redirect to /mis-plantillas
+```
+
+---
+
 #### `get_template_details` ✅ **UPDATED v1.6.0**
 
 Fetches complete template information including pages and slots (for viewing/editing templates).

@@ -155,6 +155,42 @@ Caso CP-F02-02H: Efectos en listados de plantillas
     - Los datos concuerdan con agregados `rating_avg` y `rating_count`.
     - En mobile, la tarjeta proyecta estrellas legibles.
 
+Caso CP-F02-02I: Eliminar colección rastreada - NUEVO 2025-11-04
+  Cobertura: Gestión de copias; eliminación segura; confirmación de operaciones destructivas.
+  Pre-requisito: Usuario con al menos una copia de plantilla con progreso registrado y anuncios publicados en el marketplace.
+  Pasos:
+    1. Iniciar sesión con usuario que tenga copias de plantillas.
+    2. Navegar a `/mis-plantillas` y seleccionar una colección con progreso.
+    3. En la vista de progreso `/mis-plantillas/[copyId]`, localizar botón "Eliminar colección" (variante destructiva, ícono papelera).
+    4. Pulsar botón "Eliminar colección".
+    5. Leer modal de confirmación con título "¿Eliminar colección?".
+    6. Verificar mensaje explicativo sobre consecuencias:
+       - "Esta acción no se puede deshacer"
+       - "Perderás todo el progreso registrado para esta colección"
+       - "Los anuncios en el mercado no se verán afectados"
+    7. Pulsar "Cancelar" y verificar que modal se cierra sin cambios.
+    8. Volver a abrir modal y pulsar "Eliminar".
+    9. Observar estado de loading en botón ("Eliminando...").
+    10. Tras eliminación exitosa, verificar redirección automática a `/mis-plantillas`.
+    11. Confirmar que la colección eliminada ya no aparece en el listado.
+    12. Verificar en marketplace que anuncios publicados desde esa copia siguen activos.
+    13. Intentar acceder directamente a URL `/mis-plantillas/[copyId]` de copia eliminada.
+  Criterios de éxito:
+    - Botón "Eliminar colección" visible en header de vista de progreso (junto a "Entrada Rápida" si aplica).
+    - Modal de confirmación muestra advertencia clara en español sobre pérdida irreversible de progreso.
+    - Botón "Cancelar" cierra modal sin realizar cambios (colección permanece).
+    - Al confirmar eliminación, RPC `delete_template_copy` se ejecuta correctamente.
+    - Toast de éxito: "Colección eliminada correctamente".
+    - Redirección automática a `/mis-plantillas` tras eliminación.
+    - Colección eliminada desaparece del listado en `/mis-plantillas`.
+    - Registros eliminados en `user_template_copies` y `user_template_progress` (cascade).
+    - Anuncios en `trade_listings` publicados desde esa copia permanecen activos e intactos.
+    - Acceso directo a URL de copia eliminada muestra "Colección no encontrada" con botón de retorno.
+    - En caso de error durante eliminación, toast muestra "Error al eliminar la colección".
+    - Operación completa en <1 segundo para colecciones con progreso extenso.
+    - Funcionalidad responsive en mobile (botón y modal legibles).
+
 Notas generales:
 - Registrar IDs de copias (`copy_id`) para usarlos en pruebas de integración (Fase 04).
 - Si se usan usuarios adicionales para valoraciones, anotar credenciales empleadas.
+- Al probar eliminación de colecciones, verificar que los `copy_id` asociados a listings en marketplace no se corrompen.

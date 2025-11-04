@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Delete Template Collection Feature (2025-11-04)**
+  - Users can now delete their tracked template collections from `/mis-plantillas/[id]`
+  - "Eliminar colección" button added to collection progress page
+  - Confirmation dialog warns users about:
+    - Irreversible action
+    - Loss of all tracked progress for that collection
+    - Marketplace listings remain unaffected
+  - **Database Components**:
+    - New RPC function: `delete_template_copy` (validates ownership and deletes copy with cascade)
+    - Automatic cascade deletion of `user_template_progress` records
+  - **UI Components**:
+    - Delete button with trash icon in collection header
+    - Dialog-based confirmation with clear warning message
+    - Loading state during deletion with success/error toast notifications
+    - Automatic redirect to `/mis-plantillas` after successful deletion
+  - **Hook Updates**:
+    - `useTemplateProgress` hook extended with `deleteTemplateCopy` function
+  - **Migrations**:
+    - `20251104170030_add_delete_template_copy_rpc.sql` - RPC function for safe deletion
+
 - **Badges Gamification System (2025-01-04)**
   - Implemented comprehensive gamification system with 19 badges across 6 categories
   - **Badge Categories**:

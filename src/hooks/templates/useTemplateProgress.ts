@@ -154,12 +154,25 @@ export function useTemplateProgress(copyId: string) {
     [supabase, copyId, progress]
   );
 
+  const deleteTemplateCopy = useCallback(async () => {
+    try {
+      const { error: deleteError } = await supabase.rpc('delete_template_copy', {
+        p_copy_id: parseInt(copyId),
+      });
+
+      if (deleteError) throw deleteError;
+    } catch (err) {
+      throw err;
+    }
+  }, [supabase, copyId]);
+
   return {
     copy,
     progress,
     loading,
     error,
     updateSlotStatus,
+    deleteTemplateCopy,
     refetch: fetchProgress,
   };
 }
