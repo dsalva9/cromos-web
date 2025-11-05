@@ -1,0 +1,204 @@
+Phase,Test Name,Status,Assigned To,Comments
+Fase 01 - Autenticacion y Perfil,CP-F01-01: Registro exitoso en escritorio,Not Started,David,Requires verifying profiles table and auth.users
+Fase 01 - Autenticacion y Perfil,CP-F01-02: Registro movil (vista 375px),Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-03: Registro bloqueado por contrasena debil y email duplicado,Not Started,David,Requires checking Supabase Auth for duplicate prevention
+Fase 01 - Autenticacion y Perfil,CP-F01-04: Inicio de sesion valido + persistencia,Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-05: Manejo de credenciales invalidas,Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-06: Recuperacion de contrasena,Not Started,David,Requires checking Supabase Auth email delivery
+Fase 01 - Autenticacion y Perfil,CP-F01-07: Acceso bloqueado para usuario suspendido,Not Started,David,Requires checking profiles.is_suspended and audit_log
+Fase 01 - Autenticacion y Perfil,CP-F01-08: Refresco automatico de sesion y logout,Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-02A: Visualizacion de perfil propio en escritorio,Not Started,David,Requires checking profiles and trade_listings tables
+Fase 01 - Autenticacion y Perfil,CP-F01-02B: Edicion de nickname y bio,Not Started,David,Requires verifying profiles.updated_at
+Fase 01 - Autenticacion y Perfil,CP-F01-02C: Seleccion de avatar predefinido,Not Started,David,Requires checking profiles.avatar_url and Storage
+Fase 01 - Autenticacion y Perfil,CP-F01-02D: Subida de avatar personalizado con recorte,Not Started,David,Requires checking Supabase Storage avatars bucket
+Fase 01 - Autenticacion y Perfil,CP-F01-02E: Validaciones de tamano y formato,Not Started,David,Requires verifying Storage constraints
+Fase 01 - Autenticacion y Perfil,CP-F01-02F: Visualizacion de perfil publico de otro usuario,Not Started,David,Requires checking RLS policies
+Fase 01 - Autenticacion y Perfil,CP-F01-02F2: Pestanas de anuncios en perfil propio,Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-02G: Proteccion para usuarios sin sesion,Not Started,,
+Fase 01 - Autenticacion y Perfil,CP-F01-02H: Menu desplegable del usuario en header,Not Started,,
+Fase 02 - Plantillas y Colecciones,CP-F02-01A: Crear plantilla privada con paginas y slots,Not Started,David,Requires checking collection_templates template_pages template_slots tables
+Fase 02 - Plantillas y Colecciones,CP-F02-01A2: Crear plantilla con variantes y numeracion global (estilo Panini),Not Started,David,Requires verifying template_slots columns slot_variant and global_number
+Fase 02 - Plantillas y Colecciones,CP-F02-01B: Validaciones de formulario y duplicados,Not Started,David,Requires checking unique constraints and validation
+Fase 02 - Plantillas y Colecciones,CP-F02-01C: Publicar plantilla y visibilidad publica,Not Started,David,Requires checking is_public and published_at columns
+Fase 02 - Plantillas y Colecciones,CP-F02-01D: Edicion de metadatos publicados,Not Started,David,Requires checking audit_log for template_visibility_change
+Fase 02 - Plantillas y Colecciones,CP-F02-01E: Edicion completa de plantilla con nuevos campos,Not Started,David,Requires verifying delete+insert operations in DB
+Fase 02 - Plantillas y Colecciones,CP-F02-01F: Eliminacion total de plantilla,Not Started,David,Requires checking is_deleted and template_deleted flags
+Fase 02 - Plantillas y Colecciones,CP-F02-01G: Restricciones de autoria,Not Started,David,Requires checking RLS policies
+Fase 02 - Plantillas y Colecciones,CP-F02-01H: Sistema de valoraciones de plantillas,Not Started,David,Requires checking template_ratings table
+Fase 02 - Plantillas y Colecciones,CP-F02-01I: Compatibilidad retroactiva con plantillas existentes,Not Started,David,Requires checking NULL handling in slot_variant and global_number
+Fase 02 - Plantillas y Colecciones,CP-F02-02A: Copiar plantilla publica,Not Started,David,Requires checking user_template_copies table
+Fase 02 - Plantillas y Colecciones,CP-F02-02B: Actualizar progreso de slots (HAVE/NEED/DUPES),Not Started,David,Requires checking user_template_progress table
+Fase 02 - Plantillas y Colecciones,CP-F02-02B2: Entrada rapida por numero de checklist (Quick Entry),Not Started,,
+Fase 02 - Plantillas y Colecciones,CP-F02-02B3: Completar toda la pagina (Bulk Completion),Not Started,David,Requires verifying batch updates in user_template_progress
+Fase 02 - Plantillas y Colecciones,CP-F02-02C: Gestion de duplicados y decrementos,Not Started,David,Requires checking count field in user_template_progress
+Fase 02 - Plantillas y Colecciones,CP-F02-02D: Filtrado y busqueda dentro de la copia,Not Started,,
+Fase 02 - Plantillas y Colecciones,CP-F02-02E: Restricciones de visibilidad y borrado de plantilla origen,Not Started,David,Requires checking template_deleted flag
+Fase 02 - Plantillas y Colecciones,CP-F02-02F: Valoraciones de plantilla (usuario no autor),Not Started,David,Requires checking template_ratings and TemplateRatingSummary
+Fase 02 - Plantillas y Colecciones,CP-F02-02G: Restricciones de valoracion,Not Started,David,Requires checking author restrictions in DB
+Fase 02 - Plantillas y Colecciones,CP-F02-02H: Efectos en listados de plantillas,Not Started,David,Requires checking rating_avg and rating_count
+Fase 02 - Plantillas y Colecciones,CP-F02-02I: Eliminar coleccion rastreada,Not Started,David,Requires checking delete_template_copy RPC and cascade deletes
+Fase 03 - Marketplace,CP-F03-01: Listados - Publicacion y gestion,Not Started,,See Fase-03 folder for detailed tests
+Fase 03 - Marketplace,CP-F03-02A: Busqueda y filtros avanzados,Not Started,David,Requires checking list_trade_listings_with_collection_filter RPC
+Fase 03 - Marketplace,CP-F03-02B: Vista de detalle y acciones contextuales,Not Started,David,Requires checking views_count field
+Fase 03 - Marketplace,CP-F03-02C: Inicio de chat marketplace y pagina de chats centralizada,Not Started,David,Requires checking listing_messages table
+Fase 03 - Marketplace,CP-F03-02D: Chat en mobile,Not Started,,
+Fase 03 - Marketplace,CP-F03-02E: Reservar listado para comprador especifico,Not Started,David,Requires checking listing_transactions table status=reserved
+Fase 03 - Marketplace,CP-F03-02F: Completar transaccion con flujo bidireccional,Not Started,David,Requires checking listing_transactions completed_at and user_ratings
+Fase 03 - Marketplace,CP-F03-02G: Cancelar reserva,Not Started,David,Requires checking status=cancelled and cancellation_reason
+Fase 03 - Marketplace,CP-F03-02H: Restricciones y seguridad del chat,Not Started,David,Requires checking RLS policies on listing_messages
+Fase 03 - Marketplace,CP-F03-02I: Favoritos y seguimiento de listados,Not Started,David,Requires checking favourites table
+Fase 03 - Marketplace,CP-F03-02J: Rendimiento y estabilidad,Not Started,David,Requires checking Realtime subscriptions
+Fase 03 - Marketplace,CP-F03-03A: Crear listado manual con campos Panini completos,Not Started,David,Requires checking trade_listings Panini metadata columns
+Fase 03 - Marketplace,CP-F03-03B: Crear listado con campos Panini parciales,Not Started,David,Requires checking NULL handling in Panini fields
+Fase 03 - Marketplace,CP-F03-03C: Crear listado sin ningun campo Panini,Not Started,David,Requires checking backward compatibility
+Fase 03 - Marketplace,CP-F03-03D: Publicar duplicado desde plantilla con auto-poblacion,Not Started,David,Requires checking publish_duplicate_to_marketplace RPC
+Fase 03 - Marketplace,CP-F03-03E: Visualizacion en template slot tiles,Not Started,,
+Fase 03 - Marketplace,CP-F03-03F: Validacion de formato de variante,Not Started,David,Requires checking check_listing_variant_format constraint
+Fase 03 - Marketplace,CP-F03-03G: Editar listado y actualizar metadata Panini,Not Started,David,Requires checking updated_at field
+Fase 04 - Integracion,CP-F04-01A: Publicar duplicado desde la copia de plantilla,Not Started,David,Requires checking copy_id and slot_id linkage
+Fase 04 - Integracion,CP-F04-01B: Sincronizacion en panel Mis listados,Not Started,David,Requires checking sync_status field
+Fase 04 - Integracion,CP-F04-01C: Decremento automatico al marcar como vendido,Not Started,David,Requires checking user_template_progress count decrement
+Fase 04 - Integracion,CP-F04-01D: Revertir venta / reactivar listado,Not Started,David,Requires checking count restoration logic
+Fase 04 - Integracion,CP-F04-01E: Alertas cuando duplicados = 0,Not Started,,
+Fase 04 - Integracion,CP-F04-01F: Bloqueo de publicacion sin duplicados,Not Started,David,Requires checking validation in DB
+Fase 04 - Integracion,CP-F04-01G: Consistencia multi-dispositivo,Not Started,David,Requires checking Realtime subscriptions
+Fase 04 - Integracion,CP-F04-01H: Integridad de datos en BD,Not Started,David,Requires checking orphaned records and sync_status
+Fase 05 - Intercambios,CP-F05-01A: Creacion de propuesta desde Encontrar intercambio,Not Started,David,Requires checking trade_proposals and trade_proposal_items tables
+Fase 05 - Intercambios,CP-F05-01B: Revision de propuesta recibida,Not Started,,
+Fase 05 - Intercambios,CP-F05-01C: Aceptar propuesta,Not Started,David,Requires checking status=accepted
+Fase 05 - Intercambios,CP-F05-01D: Rechazar propuesta,Not Started,David,Requires checking status=rejected and rejection_reason
+Fase 05 - Intercambios,CP-F05-01E: Cancelar propuesta enviada,Not Started,David,Requires checking status=cancelled
+Fase 05 - Intercambios,CP-F05-01F: Validaciones y limites,Not Started,David,Requires checking validation constraints
+Fase 05 - Intercambios,CP-F05-01G: Accesibilidad y movil,Not Started,,
+Fase 05 - Intercambios,CP-F05-02A: Chat en propuestas aceptadas,Not Started,David,Requires checking trade_chats table
+Fase 05 - Intercambios,CP-F05-02B: Indicadores de mensajes no leidos,Not Started,David,Requires checking trade_reads table
+Fase 05 - Intercambios,CP-F05-02C: Finalizacion en dos pasos,Not Started,David,Requires checking trade_finalizations table
+Fase 05 - Intercambios,CP-F05-02D: Reversion de finalizacion,Not Started,David,Requires checking deletion from trade_finalizations
+Fase 05 - Intercambios,CP-F05-02E: Historial y propuestas rechazadas,Not Started,,
+Fase 05 - Intercambios,CP-F05-02F: Notificaciones globales,Not Started,David,Requires checking notifications table
+Fase 05 - Intercambios,CP-F05-02G: Acceso no autorizado,Not Started,David,Requires checking RLS policies and trade_reads
+Fase 05 - Intercambios,CP-F05-02H: Pruebas en movil,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-01A: Favoritos de listados desde el grid,Not Started,David,Requires checking favourites table target_type=listing
+Fase 06 - Social y Notificaciones,CP-F06-01B: Favorito desde detalle y retiro,Not Started,David,Requires checking favourites deletion
+Fase 06 - Social y Notificaciones,CP-F06-01C: Favoritos de plantillas,Not Started,David,Requires checking favourites table target_type=template
+Fase 06 - Social y Notificaciones,CP-F06-01D: Seguir a un usuario,Not Started,David,Requires checking favourites table target_type=user
+Fase 06 - Social y Notificaciones,CP-F06-01E: Pagina de favoritos consolidada,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-01F: Sincronizacion multi-dispositivo,Not Started,David,Requires checking Realtime sync
+Fase 06 - Social y Notificaciones,CP-F06-01G: Restricciones y seguridad,Not Started,David,Requires checking RLS policies
+Fase 06 - Social y Notificaciones,CP-F06-02A: Valorar a un usuario tras completar venta,Not Started,David,Requires checking user_ratings table context_type=listing_transaction
+Fase 06 - Social y Notificaciones,CP-F06-02B: Editar y eliminar valoracion,Not Started,David,Requires checking user_ratings updates and deletes
+Fase 06 - Social y Notificaciones,CP-F06-02C: Valoraciones post-intercambio,Not Started,David,Requires checking context_type=trade
+Fase 06 - Social y Notificaciones,CP-F06-02D: Reporte de contenido (listado),Not Started,David,Requires checking reports table target_type=listing
+Fase 06 - Social y Notificaciones,CP-F06-02E: Reporte de usuario (abusos en chat),Not Started,David,Requires checking reports table target_type=user
+Fase 06 - Social y Notificaciones,CP-F06-02F: Sistema de notificaciones unificado,Not Started,David,Requires checking notifications table and Realtime
+Fase 06 - Social y Notificaciones,CP-F06-02G: Resumen en perfil publico,Not Started,David,Requires checking rating aggregations
+Fase 06 - Social y Notificaciones,CP-F06-02H: Localizacion y accesibilidad,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03A: Ignorar usuario desde perfil publico,Not Started,David,Requires checking ignored_users table and RPC
+Fase 06 - Social y Notificaciones,CP-F06-03B: Desbloquear usuario desde perfil publico,Not Started,David,Requires checking ignored_users deletion
+Fase 06 - Social y Notificaciones,CP-F06-03C: Filtrado automatico en marketplace - Ordenamiento cronologico,Not Started,David,Requires checking list_trade_listings_filtered RPC
+Fase 06 - Social y Notificaciones,CP-F06-03D: Filtrado automatico en marketplace - Ordenamiento por distancia,Not Started,David,Requires checking list_trade_listings_filtered_with_distance RPC
+Fase 06 - Social y Notificaciones,CP-F06-03E: Validacion de ordenamiento por distancia sin codigo postal,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03F: Proteccion de chat - Prevenir mensajes de usuario ignorado,Not Started,David,Requires checking prevent_messaging_ignored_users trigger
+Fase 06 - Social y Notificaciones,CP-F06-03G: Proteccion de chat - Prevenir acceso a conversaciones,Not Started,David,Requires checking get_listing_chats RPC with ignored users
+Fase 06 - Social y Notificaciones,CP-F06-03H: Acceso a lista de usuarios ignorados desde perfil,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03I: Acceso desde menu desktop (UserAvatarDropdown),Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03J: Acceso desde menu movil (hamburger menu),Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03K: Pagina de gestion de ignorados - Con usuarios,Not Started,David,Requires checking get_ignored_users RPC
+Fase 06 - Social y Notificaciones,CP-F06-03L: Desbloquear usuario desde pagina de gestion,Not Started,David,Requires checking ignored_users deletion
+Fase 06 - Social y Notificaciones,CP-F06-03M: Empty state en pagina de gestion,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03N: Validacion de seguridad - No ignorarse a si mismo,Not Started,David,Requires checking ignore_user RPC validation
+Fase 06 - Social y Notificaciones,CP-F06-03O: Validacion de seguridad - Usuario no existente,Not Started,David,Requires checking ignore_user RPC validation
+Fase 06 - Social y Notificaciones,CP-F06-03P: Prevencion de duplicados,Not Started,David,Requires checking UNIQUE constraint on ignored_users
+Fase 06 - Social y Notificaciones,CP-F06-03Q: RLS - Usuario solo ve sus propios ignorados,Not Started,David,Requires checking RLS policies on ignored_users
+Fase 06 - Social y Notificaciones,CP-F06-03R: Cascade delete - Eliminacion de usuario,Not Started,David,Requires checking CASCADE foreign keys
+Fase 06 - Social y Notificaciones,CP-F06-03S: Verificacion de indices - Performance,Not Started,David,Requires checking database indices with EXPLAIN ANALYZE
+Fase 06 - Social y Notificaciones,CP-F06-03T: Contador de usuarios ignorados,Not Started,David,Requires checking get_ignored_users_count RPC
+Fase 06 - Social y Notificaciones,CP-F06-03U: Paginacion de lista de ignorados,Not Started,David,Requires checking get_ignored_users with limit and offset
+Fase 06 - Social y Notificaciones,CP-F06-03V: Sincronizacion en tiempo real,Not Started,David,Requires checking Realtime subscriptions
+Fase 06 - Social y Notificaciones,CP-F06-03W: Navegacion a perfil desde lista de ignorados,Not Started,,
+Fase 06 - Social y Notificaciones,CP-F06-03X: Ignorar usuario sin codigo postal configurado,Not Started,David,Requires checking NULL handling in distance_km
+Fase 06 - Social y Notificaciones,CP-F06-03Y: Busqueda en marketplace con usuarios ignorados,Not Started,David,Requires checking full-text search with ignored users filter
+Fase 06 - Social y Notificaciones,CP-F06-03Z: Verificacion de logs y auditoria,Not Started,David,Requires checking created_at timestamps
+Fase 07 - Administracion,CP-F07-01A: Acceso al dashboard,Not Started,David,Requires checking is_admin flag
+Fase 07 - Administracion,CP-F07-01B: Estadisticas principales,Not Started,David,Requires checking DB aggregations match UI
+Fase 07 - Administracion,CP-F07-01C: Cola de reportes (pendientes),Not Started,David,Requires checking reports table
+Fase 07 - Administracion,CP-F07-01D: Resolver reporte con accion Descartar,Not Started,David,Requires checking status=dismissed and audit_log
+Fase 07 - Administracion,CP-F07-01E: Suspender contenido reportado,Not Started,David,Requires checking suspension_reason and audit_log
+Fase 07 - Administracion,CP-F07-01F: Suspender usuario desde reporte,Not Started,David,Requires checking profiles.is_suspended and suspension_reason
+Fase 07 - Administracion,CP-F07-01G: Reapertura o revision posterior,Not Started,David,Requires checking reopen_report audit log
+Fase 07 - Administracion,CP-F07-01H: Rendimiento,Not Started,David,Requires performance testing with Lighthouse
+Fase 07 - Administracion,CP-F07-02A: Acceso a pestana Marketplace admin,Not Started,David,Requires checking admin_list_marketplace_listings RPC and require_admin
+Fase 07 - Administracion,CP-F07-02B: Busqueda y filtros en marketplace admin,Not Started,,
+Fase 07 - Administracion,CP-F07-02C: Suspender listado desde admin,Not Started,David,Requires checking suspended_at and suspension_reason
+Fase 07 - Administracion,CP-F07-02D: Restaurar listado,Not Started,David,Requires checking suspension_reason cleared
+Fase 07 - Administracion,CP-F07-02E: Eliminar definitivamente listado,Not Started,David,Requires checking status=removed and audit_log
+Fase 07 - Administracion,CP-F07-02F: Moderacion de plantillas,Not Started,David,Requires checking suspended_at and rating_count/copies_count type mismatch fix
+Fase 07 - Administracion,CP-F07-02G: Eliminar plantilla,Not Started,David,Requires checking is_deleted and audit_log
+Fase 07 - Administracion,CP-F07-02H: Responsive y accesibilidad,Not Started,,
+Fase 07 - Administracion,CP-F07-02I: Seguridad,Not Started,David,Requires checking RLS and API authentication
+Fase 07 - Administracion,CP-F07-03A: Busqueda y filtros en modulo de usuarios,Not Started,David,Requires checking profiles table queries
+Fase 07 - Administracion,CP-F07-03B: Suspender y reactivar usuario,Not Started,David,Requires checking is_suspended and suspension_reason
+Fase 07 - Administracion,CP-F07-03C: Restablecimiento forzado de contrasena,Not Started,David,Requires checking Supabase Auth API and audit_log
+Fase 07 - Administracion,CP-F07-03D: Purga completa de usuario,Not Started,David,Requires checking admin_purge_user function and cascade deletes
+Fase 07 - Administracion,CP-F07-03E: Visor de auditoria,Not Started,David,Requires checking audit_log table and resolve_report filter fix
+Fase 07 - Administracion,CP-F07-03F: Seguridad de endpoints admin,Not Started,David,Requires checking API authentication
+Fase 07 - Administracion,CP-F07-03G: Responsive del modulo usuarios y audit,Not Started,,
+Fase 08 - End-to-End,CP-F08-01A: Registro y verificacion,Not Started,David,Requires checking auth.users and profiles
+Fase 08 - End-to-End,CP-F08-01B: Exploracion de plantillas destacadas,Not Started,,
+Fase 08 - End-to-End,CP-F08-01C: Copiar plantilla y personalizar,Not Started,David,Requires checking user_template_copies
+Fase 08 - End-to-End,CP-F08-01D: Registrar progreso inicial,Not Started,David,Requires checking user_template_progress
+Fase 08 - End-to-End,CP-F08-01E: Guardar favoritos basicos,Not Started,David,Requires checking favourites table
+Fase 08 - End-to-End,CP-F08-01F: Registrar salida y reingreso,Not Started,David,Requires checking data persistence across sessions
+Fase 08 - End-to-End,CP-F08-02A: Publicar duplicado desde la copia,Not Started,David,Requires checking trade_listings linkage
+Fase 08 - End-to-End,CP-F08-02B: Descubrimiento por comprador,Not Started,,
+Fase 08 - End-to-End,CP-F08-02C: Conversacion y reserva,Not Started,David,Requires checking listing_transactions
+Fase 08 - End-to-End,CP-F08-02D: Cierre de transaccion,Not Started,David,Requires checking status=completed
+Fase 08 - End-to-End,CP-F08-02E: Valoracion post-venta,Not Started,David,Requires checking user_ratings
+Fase 08 - End-to-End,CP-F08-02F: Revision de auditoria,Not Started,David,Requires checking audit_log
+Fase 08 - End-to-End,CP-F08-03A: Propuesta y negociacion,Not Started,David,Requires checking trade_proposals and trade_chats
+Fase 08 - End-to-End,CP-F08-03B: Aceptacion y finalizacion,Not Started,David,Requires checking trade_finalizations
+Fase 08 - End-to-End,CP-F08-03C: Valoracion mutua,Not Started,David,Requires checking user_ratings
+Fase 08 - End-to-End,CP-F08-03D: Reporte de incidencia,Not Started,David,Requires checking reports table
+Fase 08 - End-to-End,CP-F08-03E: Accion administrativa,Not Started,David,Requires checking audit_log and reports resolution
+Fase 08 - End-to-End,CP-F08-03F: Efectos colaterales,Not Started,David,Requires checking suspension effects
+Fase 09 - Calidad Transversal,CP-F09-01A: Navegacion por teclado,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01B: Textos alternativos y labels,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01C: Contraste de color,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01D: Saltar al contenido,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01E: Modales y dialogos,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01F: Resultados con Axe/Lighthouse,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-01G: Idioma y localizacion,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02A: Metricas de rendimiento inicial (Lighthouse),Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02B: Skeletons y estados de carga,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02C: Manejo de errores backend (500/timeout),Not Started,David,Requires simulating backend errors
+Fase 09 - Calidad Transversal,CP-F09-02D: Estados vacios,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02E: Resiliencia offline,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02F: Recuperacion tras reconexion,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-02G: Rendimiento en panel admin,Not Started,David,Requires checking query performance
+Fase 09 - Calidad Transversal,CP-F09-02H: Timeouts controlados,Not Started,David,Requires checking timeout handling
+Fase 09 - Calidad Transversal,CP-F09-03A: Smoke en navegadores desktop,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03B: Safari desktop,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03C: Responsive breakpoints,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03D: Orientacion movil y gestos,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03E: Teclado virtual y formularios,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03F: Soporte de archivos en mobile,Not Started,David,Requires checking Storage permissions
+Fase 09 - Calidad Transversal,CP-F09-03G: Modo oscuro / prefijos de sistema,Not Started,,
+Fase 09 - Calidad Transversal,CP-F09-03H: Compatibilidad con navegadores no soportados,Not Started,,
+Fase 10 - Badges,Test 1: Visualizacion de Insignias en el Perfil,Not Started,David,Requires checking user_badges and badge_definitions tables
+Fase 10 - Badges,Test 2: Ganar Insignia Coleccionista Novato,Not Started,David,Requires checking badge award logic and notifications
+Fase 10 - Badges,Test 3: Progreso hacia Insignia Coleccionista Dedicado,Not Started,David,Requires checking badge progress tracking
+Fase 10 - Badges,Test 4: Ganar Insignia Creador Principiante,Not Started,David,Requires checking template creation triggers badge
+Fase 10 - Badges,Test 5: Ganar Insignia Opinador Novato,Not Started,David,Requires checking rating triggers badge
+Fase 10 - Badges,Test 6: Ganar Insignia Completista Inicial,Not Started,David,Requires checking 100% completion triggers badge
+Fase 10 - Badges,Test 7: Ganar Insignia Trader Novato,Not Started,David,Requires checking transaction completion triggers badge
+Fase 10 - Badges,Test 8: Insignia Especial Top Valorado,Not Started,David,Requires checking complex multi-condition badge logic
+Fase 10 - Badges,Test 9: Visualizacion de Insignias en el Marketplace,Not Started,,
+Fase 10 - Badges,Test 10: Navegacion desde Notificacion,Not Started,,
+Fase 10 - Badges,Test 11: Persistencia de Datos,Not Started,David,Requires checking badge data persistence across sessions
+Fase 10 - Badges,Test 12: Prevencion de Duplicados,Not Started,David,Requires checking duplicate badge prevention logic
+Fase 10 - Badges,Test 13: Responsividad Movil,Not Started,,
+Fase 10 - Badges,Test 14: Actualizacion en Tiempo Real,Not Started,David,Requires checking Realtime subscriptions for badges
+Fase 10 - Badges,Test 15: Accesibilidad,Not Started,,
+Fase 10 - Badges,Test 16: Sin Insignias (Edge Case),Not Started,,
+Fase 10 - Badges,Test 17: Todas las Insignias (Edge Case),Not Started,David,Requires checking all 19 badges can be earned
+Fase 10 - Badges,Test 18: Concurrencia (Edge Case),Not Started,David,Requires checking concurrent badge awards without conflicts
