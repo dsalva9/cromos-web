@@ -3,7 +3,7 @@ Fase: 04 - Integración colecciones/marketplace
 Objetivo: Verificar que el puente bidireccional entre duplicados de plantillas y listados del marketplace mantenga sincronizados los conteos, estados y alertas, incluyendo decrementos automáticos y bloqueos preventivos.
 
 Pre-requisitos generales:
-- Copia activa de la plantilla “Colección QA Liga 2025” con duplicados configurados (ver CP-F02-02B).
+- Copia activa de la plantilla "Colección QA Liga 2025" con duplicados configurados (ver CP-F02-02B).
 - Usuario `qa.vendedor@cromos.test` con duplicados >0 en al menos dos slots.
 - Listados previos creados desde el módulo marketplace (IDs `listing_QA_001`, etc.).
 - Acceso a tablas `user_template_progress`, `trade_listings`, `listing_transactions`.
@@ -11,9 +11,7 @@ Pre-requisitos generales:
 
 Configuración previa:
 - Asegurar que el contador de duplicados para slot X es 3 y slot Y es 1 (registrarlo).
-- Limpiar listados antiguos que ya no estén vinculados (para no confundir en “Mis listados”).
-
-Casos de prueba:
+- Limpiar listados antiguos que ya no estén vinculados (para no confundir en "Mis listados").
 
 Caso CP-F04-01A: Publicar duplicado desde la copia de plantilla
   Cobertura: Happy path; prellenado de formulario; vínculo copy/slot.
@@ -30,33 +28,181 @@ Caso CP-F04-01A: Publicar duplicado desde la copia de plantilla
     - Duplicados del slot se mantienen (no decrementan hasta la venta).
     - Toast informa "Duplicado publicado en el marketplace".
 
-Caso CP-F04-01B: Sincronización en panel “Mis listados”
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó con vinculación correcta
+    SELECT tl.title,
+           tl.sticker_number,
+           tl.copy_id,
+           tl.slot_id,
+           tl.collection_name,
+           tl.status,
+           tl.created_at
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.copy_id IS NOT NULL
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. Verificar que el resultado muestra `copy_id` y `slot_id` no nulos
+
+    ```sql
+    -- Consulta para verificar que el sticker_number incluye la variante correctamente
+    SELECT ts.slot_number,
+           ts.slot_variant,
+           tl.sticker_number
+    FROM trade_listings tl
+    JOIN template_slots ts ON ts.id = tl.slot_id
+    WHERE tl.id = [ID_DEL_LISTADO_CREADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta
+    2. Reemplazar `[ID_DEL_LISTADO_CREADO]` con el ID real del listado
+    3. Hacer clic en **"Run"**
+    4. Verificar que `sticker_number` incluye la variante si existe
+
+    **Resultado esperado:** La primera consulta debe mostrar el listado con vinculación correcta. La segunda debe verificar que el sticker_number refleja la variante.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de la colección, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Hacer clic en "Publicar duplicado" y observar que no aparecen errores.
+    4. Tras publicar, verificar que aparece toast "Duplicado publicado en el marketplace".
+    5. En la pestaña **Network**, verificar que la petición para crear el listado devuelve código 201.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F04-01B: Sincronización en panel "Mis listados"
   Cobertura: Vista integrada; badges de sincronización.
   Pasos:
     1. Abrir `/marketplace/my-listings`.
-    2. Verificar que el listado muestra badge “Sincronizado con {plantilla}”.
+    2. Verificar que el listado muestra badge "Sincronizado con {plantilla}".
     3. Revisar columna de duplicados restantes.
   Criterios de éxito:
-    - Columna indica count actual (ej. “Duplicados restantes: 3”).
-    - Botón “Actualizar duplicados” disponible.
+    - Columna indica count actual (ej. "Duplicados restantes: 3").
+    - Botón "Actualizar duplicados" disponible.
     - Tooltip explica la relación con la copia.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar la sincronización entre listado y plantilla
+    SELECT tl.title,
+           tl.copy_id,
+           tl.slot_id,
+           utp.duplicate_count,
+           tc.title as template_title
+    FROM trade_listings tl
+    JOIN user_template_progress utp ON utp.copy_id = tl.copy_id AND utp.slot_id = tl.slot_id
+    JOIN template_copies tc ON tc.id = tl.copy_id
+    WHERE tl.id = [ID_DEL_LISTADO]
+    AND tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `duplicate_count` coincide con el mostrado en la UI.
+
+    **Resultado esperado:** La consulta debe mostrar la relación correcta entre el listado y el conteo de duplicados.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página "Mis listados", hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Observar que no aparecen errores al cargar los badges de sincronización.
+    4. Verificar que los tooltips se muestran correctamente al pasar el cursor.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los badges de sincronización se cargan correctamente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F04-01C: Decremento automático al marcar como vendido
   Cobertura: Flujo de venta → sincronización.
   Pasos:
-    1. Desde “Mis listados”, pulsar “Marcar como vendido”.
+    1. Desde "Mis listados", pulsar "Marcar como vendido".
     2. Confirmar modal.
     3. Revisar `user_template_progress` del slot asociado.
   Criterios de éxito:
     - Conteo de duplicados del slot decrementa en 1.
     - Listado cambia a estado `inactive` o `completed` según corresponda.
     - Registro de auditoría `listing_marked_sold` creado.
-    - Badge de sincronización se actualiza (“Duplicados restantes: 2”).
+    - Badge de sincronización se actualiza ("Duplicados restantes: 2").
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar el decremento de duplicados
+    SELECT utp.duplicate_count_before,
+           utp.duplicate_count_after,
+           utp.updated_at
+    FROM user_template_progress utp
+    WHERE utp.copy_id = [COPY_ID]
+    AND utp.slot_id = [SLOT_ID]
+    ORDER BY utp.updated_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[COPY_ID]` y `[SLOT_ID]` con los IDs reales.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `duplicate_count_after` es menor que `duplicate_count_before`.
+
+    ```sql
+    -- Consulta para verificar el cambio de estado del listado
+    SELECT tl.status,
+           tl.updated_at
+    FROM trade_listings tl
+    WHERE tl.id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `status` cambió a `completed` o `inactive`.
+
+    **Resultado esperado:** Las consultas deben mostrar el decremento de duplicados y el cambio de estado del listado.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página "Mis listados", hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Marcar como vendido y observar que no aparecen errores.
+    4. Tras marcar como vendido, verificar que aparece toast "Listado marcado como vendido".
+    5. En la pestaña **Network**, verificar que la petición devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de actualización devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F04-01D: Revertir venta / reactivar listado
   Cobertura: Edge; corrección de errores.
   Pasos:
-    1. Reabrir el listado (acción “Reactivar”).
+    1. Reabrir el listado (acción "Reactivar").
     2. Confirmar.
     3. Revisar duplicados vuelven a incrementar si aplica.
   Criterios de éxito:
@@ -64,33 +210,155 @@ Caso CP-F04-01D: Revertir venta / reactivar listado
     - Si se confirma, contador vuelve al valor anterior.
     - Listado reaparece como `active`.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar la reactivación del listado
+    SELECT tl.status,
+           tl.updated_at
+    FROM trade_listings tl
+    WHERE tl.id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status` volvió a `active`.
+
+    ```sql
+    -- Consulta para verificar la restauración de duplicados
+    SELECT utp.duplicate_count,
+           utp.updated_at
+    FROM user_template_progress utp
+    WHERE utp.copy_id = [COPY_ID]
+    AND utp.slot_id = [SLOT_ID];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Reemplazar `[COPY_ID]` y `[SLOT_ID]` con los IDs reales.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `duplicate_count` se incrementó.
+
+    **Resultado esperado:** Las consultas deben mostrar la reactivación del listado y la restauración del conteo de duplicados.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página "Mis listados", hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Reactivar el listado y observar que no aparecen errores.
+    4. Tras reactivar, verificar que aparece el modal de confirmación.
+    5. En la pestaña **Network**, verificar que la petición devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de reactivación devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F04-01E: Alertas cuando duplicados = 0
   Cobertura: Advertencias; bloqueo de disponibilidad.
   Pasos:
     1. Forzar duplicados = 0 (marcando ventas sucesivas).
     2. Intentar mantener listado activo.
   Criterios de éxito:
-    - UI muestra badge rojo “Sin duplicados disponibles”.
-    - Botón “Marcar como vendido” se deshabilita.
+    - UI muestra badge rojo "Sin duplicados disponibles".
+    - Botón "Marcar como vendido" se deshabilita.
     - Banner sugiere desactivar o actualizar duplicados.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que no hay duplicados disponibles
+    SELECT utp.duplicate_count
+    FROM user_template_progress utp
+    WHERE utp.copy_id = [COPY_ID]
+    AND utp.slot_id = [SLOT_ID];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[COPY_ID]` y `[SLOT_ID]` con los IDs reales.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `duplicate_count = 0`.
+
+    **Resultado esperado:** La consulta debe mostrar que no hay duplicados disponibles.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página "Mis listados", hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Verificar que aparece el badge rojo "Sin duplicados disponibles".
+    4. Intentar marcar como vendido y observar que el botón está deshabilitado.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los badges de advertencia se muestran correctamente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F04-01F: Bloqueo de publicación sin duplicados
   Cobertura: Edge; validación previa.
   Pasos:
-    1. En slot sin duplicados (count=0), intentar “Publicar duplicado”.
+    1. En slot sin duplicados (count=0), intentar "Publicar duplicado".
   Criterios de éxito:
-    - Acción no se muestra o se bloquea con mensaje “No tienes duplicados disponibles”.
+    - Acción no se muestra o se bloquea con mensaje "No tienes duplicados disponibles".
     - No se crea borrador ni listado.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que no hay duplicados en el slot
+    SELECT utp.duplicate_count
+    FROM user_template_progress utp
+    WHERE utp.copy_id = [COPY_ID]
+    AND utp.slot_id = [SLOT_ID];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[COPY_ID]` y `[SLOT_ID]` con los IDs reales.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `duplicate_count = 0`.
+
+    **Resultado esperado:** La consulta debe confirmar que no hay duplicados disponibles.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de la colección, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Intentar publicar duplicado y observar que aparece el mensaje de bloqueo.
+    4. Verificar que no se crea ningún listado nuevo.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que el bloqueo funciona correctamente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F04-01G: Consistencia multi-dispositivo
   Cobertura: Tiempo real; sincronización en paralelo.
   Pasos:
-    1. Abrir `/mi-coleccion` en escritorio y “Mis listados” en móvil simultáneamente.
+    1. Abrir `/mi-coleccion` en escritorio y "Mis listados" en móvil simultáneamente.
     2. Marcar duplicado como vendido desde móvil.
     3. Verificar actualización inmediata en escritorio (sin recargar).
   Criterios de éxito:
     - Los contadores se actualizan vía realtime (suscripción).
     - No se generan conteos inconsistentes.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En Chrome desktop, presionar **F12** para abrir DevTools.
+    2. Cambiar a la pestaña **Network** y filtrar por "WebSocket".
+    3. En modo móvil (Toggle device toolbar), realizar la acción.
+    4. Observar que los mensajes de WebSocket se reciben en tiempo real.
+    5. Verificar que la UI se actualiza sin recargar la página.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error de WebSocket en la consola
+    2. Verificar que las actualizaciones en tiempo real funcionan
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F04-01H: Integridad de datos en BD
   Cobertura: Verificación posterior.
@@ -102,6 +370,52 @@ Caso CP-F04-01H: Integridad de datos en BD
     - `sync_status` refleja estados correctos (`'in_sync'`, `'warning'`).
     - `listing_transactions` conserva referencia al listing vendido.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar registros huérfanos
+    SELECT COUNT(*) AS registros_huerfanos
+    FROM trade_listings tl
+    LEFT JOIN template_copies tc ON tc.id = tl.copy_id
+    LEFT JOIN template_slots ts ON ts.id = tl.slot_id
+    WHERE tl.copy_id IS NOT NULL 
+    AND (tc.id IS NULL OR ts.id IS NULL);
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que el resultado es 0 (no hay registros huérfanos).
+
+    ```sql
+    -- Consulta para verificar estados de sincronización
+    SELECT tl.sync_status,
+           COUNT(*) AS conteo
+    FROM trade_listings tl
+    WHERE tl.copy_id IS NOT NULL
+    GROUP BY tl.sync_status;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Hacer clic en **"Run"**.
+    3. Verificar que los estados de sincronización son correctos.
+
+    **Resultado esperado:** Las consultas deben mostrar que no hay registros huérfanos y que los estados de sincronización son correctos.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En cualquier página del marketplace, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Observar que no aparecen errores relacionados con sincronización.
+    4. Verificar que las operaciones de BD se completan correctamente.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las operaciones de BD se completan sin errores
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Notas generales:
 - Documentar cualquier desfase (>2 s) entre acciones y actualización de UI.
 - Añadir a la planilla QA referencia cruzada de `listing_id` ↔ `copy_id` ↔ `slot_id`.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

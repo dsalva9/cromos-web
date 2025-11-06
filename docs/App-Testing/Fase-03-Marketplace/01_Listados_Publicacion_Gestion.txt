@@ -1,1 +1,238 @@
--NoNewline
+Nombre del conjunto: CP-F03-01 Listados - Publicación y gestión
+Fase: 03 - Marketplace
+Objetivo: Validar la creación, edición, estado y publicación de anuncios en el marketplace, asegurando sincronización con plantillas cuando corresponda.
+
+Pre-requisitos generales:
+- Usuario vendedor: `qa.vendedor@cromos.test`.
+- Usuario comprador: `qa.comprador@cromos.test`.
+- Plantilla pública "Colección QA Liga 2025" con slots configurados.
+- Acceso a tablas `trade_listings`, `listing_transactions`.
+- Herramientas: Chrome desktop, móvil real, consola network.
+
+Configuración previa:
+- Limpiar listados previos del vendedor si existen.
+- Asegurar que el vendedor tenga al menos 3 slots con duplicados en la plantilla.
+
+Caso CP-F03-01A: Crear listado manual
+  Cobertura: Flujo feliz; validaciones; prellenado desde plantilla.
+  Pasos:
+    1. Iniciar sesión como `qa.vendedor`.
+    2. Navegar a `/marketplace/create`.
+    3. Completar título "Cromo QA Messi" y descripción.
+    4. Seleccionar plantilla "Colección QA Liga 2025" y slot 5.
+    5. Verificar que los campos se prellenan automáticamente.
+    6. Subir imagen válida.
+    7. Publicar como activo.
+  Criterios de éxito:
+    - Formulario valida campos obligatorios.
+    - Campos de plantilla se prellenan desde el slot seleccionado.
+    - Toast "Listado publicado" aparece.
+    - Redirección a detalle del listado.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó correctamente
+    SELECT tl.title,
+           tl.description,
+           tl.sticker_number,
+           tl.collection_name,
+           tl.status,
+           tl.copy_id,
+           tl.slot_id,
+           tl.created_at
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. Verificar que el resultado muestra el título "Cromo QA Messi" y que `copy_id` y `slot_id` no son nulos
+
+    ```sql
+    -- Consulta para verificar que el listado está activo
+    SELECT status,
+           views_count
+    FROM trade_listings
+    WHERE id = (
+      SELECT id FROM trade_listings
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.vendedor@cromos.test'
+      )
+      ORDER BY created_at DESC
+      LIMIT 1
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta
+    2. Reemplazar el subquery del usuario_id con el email de `qa.vendedor`
+    3. Hacer clic en **"Run"**
+    4. Verificar que el resultado muestra `status = 'active'` y `views_count = 0`
+
+    **Resultado esperado:** La primera consulta debe mostrar el listado recién creado con sus datos. La segunda debe confirmar que está activo.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de creación, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Crear el listado y observar que no aparecen errores en rojo.
+    4. Tras publicar, verificar que aparece toast "Listado publicado" sin errores.
+    5. En la página de detalle, hacer clic derecho → **Inspeccionar** → pestaña **Network**.
+    6. Recargar la página y verificar que la petición para crear el listado devuelve código 201.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F03-01B: Editar listado existente
+  Cobertura: Modificación; sincronización.
+  Pasos:
+    1. Desde `/marketplace/my-listings`, seleccionar el listado creado anteriormente.
+    2. Modificar título y descripción.
+    3. Guardar cambios.
+    4. Verificar que los cambios persisten.
+  Criterios de éxito:
+    - Cambios se guardan sin errores.
+    - Toast "Listado actualizado" aparece.
+    - Detalle del listado muestra los nuevos datos.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se actualizó
+    SELECT title,
+           description,
+           updated_at
+    FROM trade_listings
+    WHERE id = [ID_DEL_LISTADO_CREADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO_CREADO]` con el ID real del listado que se editó.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `updated_at` es más reciente que la creación.
+
+    **Resultado esperado:** La consulta debe devolver el título y descripción actualizados con la fecha de modificación reciente.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de edición, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Editar el listado y guardar.
+    4. Verificar que no aparecen errores en rojo.
+    5. Tras guardar, verificar que aparece toast "Listado actualizado".
+    6. Recargar la página de detalle y confirmar que los cambios persisten.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las peticiones de actualización devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F03-01C: Cambiar estado del listado (activar/reservar/completar/eliminar)
+  Cobertura: Workflow de estados; sincronización con marketplace.
+  Pasos:
+    1. Desde detalle del listado, cambiar estado a "Reservado".
+    2. Verificar que aparece badge "Reservado".
+    3. Cambiar a "Completado".
+    4. Verificar que el listado ya no aparece en búsquedas públicas.
+  Criterios de éxito:
+    - Estados se actualizan correctamente.
+    - Badges visuales reflejan el estado actual.
+    - Listados reservados/completados no aparecen en búsquedas.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar el cambio de estado
+    SELECT status,
+           reserved_at,
+           completed_at,
+           cancelled_at
+    FROM listing_transactions
+    WHERE listing_id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que el campo correspondiente al estado actual tiene fecha no nula.
+
+    **Resultado esperado:** La consulta debe mostrar la transacción con el estado correcto y la fecha correspondiente.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del listado, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Cambiar el estado y observar que no aparecen errores.
+    4. Tras cada cambio, verificar que aparece toast correspondiente sin errores.
+    5. En la pestaña **Network**, verificar que se envía petición para actualizar el estado.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error 500 en la consola
+    2. Verificar que las peticiones de actualización devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F03-01D: Eliminar listado
+  Cobertura: Eliminación suave; sincronización.
+  Pasos:
+    1. Desde `/marketplace/my-listings`, seleccionar un listado activo.
+    2. Pulsar "Eliminar".
+    3. Confirmar en modal.
+    4. Verificar que el listado desaparece.
+  Criterios de éxito:
+    - Listado eliminado de la interfaz.
+    - Confirmación muestra mensaje claro.
+    - Redirección automática a `/marketplace/my-listings`.
+    - Toast "Listado eliminado" aparece.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se eliminó
+    SELECT status,
+           deleted_at
+    FROM trade_listings
+    WHERE id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado eliminado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'removed'` y `deleted_at` tiene fecha reciente.
+
+    **Resultado esperado:** La consulta debe mostrar el listado como eliminado con la fecha de eliminación.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de listados, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Eliminar el listado y observar que no aparecen errores.
+    4. Tras la eliminación, verificar que aparece toast "Listado eliminado".
+    5. Verificar que la página se recarga y el listado ya no aparece.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de eliminación devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Notas generales:
+- Registrar IDs de listados creados para pruebas de integración.
+- Documentar cualquier error de sincronización entre marketplace y plantillas.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

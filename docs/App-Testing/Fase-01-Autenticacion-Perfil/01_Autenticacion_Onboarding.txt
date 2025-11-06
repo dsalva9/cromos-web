@@ -4,7 +4,7 @@ Objetivo: Validar que el ciclo completo de registro, acceso y recuperación de c
 
 Pre-requisitos generales:
 - Entorno listo con base de datos limpia o sandbox: https://cambio-cromos.vercel.app (staging) o instancia local sincronizada con las migraciones más recientes.
-- Acceso a la consola de Supabase con permisos para revisar correos transaccionales (Auth → Users → “Send magic link” history) o bandeja de correo de test (`correo+qa@cromos.test`).
+- Acceso a la consola de Supabase con permisos de lectura en Auth, Storage y SQL (`https://app.supabase.com`).
 - Dataset base:
   * `qa.admin@cromos.test` (rol admin, contraseña `Admin#12345`).
   * `qa.suspendido@cromos.test` (estado suspendido, contraseña `Suspendido#123`).
@@ -13,112 +13,203 @@ Pre-requisitos generales:
 
 Configuración previa:
 - Vaciar cookies y almacenamiento local antes de cada caso en el mismo navegador.
-- Asegurar que los correos de verificación y recuperación son redirigidos al visor de correos simulado (Mailhog/Resend sandbox) accesible para el equipo QA.
+- Asegurar que los correos de verificación y recuperación llegan al inbox de pruebas (Mailhog / Resend sandbox) accesible para QA.
 - Tener a mano la URL de deep link de verificación (`https://cambio-cromos.vercel.app/auth/verify`) para abrir manualmente si el correo no redirige automáticamente.
 
 Casos de prueba:
 
 Caso CP-F01-01: Registro exitoso en escritorio
-  Cobertura: Feliz; validación de formularios; localización en español; sesión inicial.
-  Pre-requisitos específicos: Navegador Chrome en resolución 1920x1080; email libre `nuevo+{timestamp}@cromos.test`.
+  Cobertura: Flujo feliz; validación de formularios; localización en español; creación de sesión.
+  Pre-requisitos específicos:
+    - Navegador Chrome en resolución 1920x1080.
+    - Email libre `nuevo+{timestamp}@cromos.test`.
   Pasos:
-    1. Abrir la página principal y pulsar “Crear cuenta”.
-    2. Completar email válido, contraseña fuerte (>10 caracteres, mayúscula, minúscula, número, símbolo) y confirmar términos.
-    3. Enviar formulario y seguir enlace de verificación recibido.
-    4. Continuar con el wizard de onboarding si se muestra.
-  Criterios de éxito:
-    - El formulario valida en vivo requisitos de contraseña y formato de email.
-    - Se muestra toast “Revisa tu correo” y se envía email con copy en español.
-    - El enlace de verificación inicia sesión automáticamente y lleva al dashboard “Mi colección”.
-    - Se crea registro en `profiles` con nickname inicial y se genera sesión persistente (comprobar `supabase.auth.token` en Storage).
-  Validaciones adicionales:
-    - No hay errores en consola.
-    - Registro visible en Supabase Auth con metadata correcta (rol user).
+    1. Abrir la página principal y pulsar "Crear cuenta".
+    2. Completar email válido, contraseña fuerte (>10 caracteres, mayúscula, minúscula, número, símbolo) y aceptar términos.
+    3. Enviar formulario y seguir el enlace de verificación recibido por correo.
+    4. Completar el wizard de onboarding si se muestra.
+  Validaciones UI:
+    - El formulario marca en rojo los campos inválidos y habilita el botón solo al cumplir requisitos.
+    - Se muestra toast "Revisa tu correo" en español.
+    - El enlace de verificación inicia sesión y redirige al dashboard "Mi colección".
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT u.email,
+           u.confirmed_at,
+           p.nickname,
+           p.created_at
+    FROM auth.users u
+    JOIN profiles p ON p.id = u.id
+    WHERE u.email = 'nuevo+{timestamp}@cromos.test';
+    ```
+  Instrucciones para ejecutar la consulta:
+    - En Supabase Dashboard, abre **SQL Editor**, pega la consulta y reemplaza `{timestamp}` por el valor utilizado.
+    - Ejecuta "Run" y confirma que devuelve una sola fila con `confirmed_at` no nulo y `nickname` inicial.
+  Verificación en Chrome (tokens y consola):
+    1. Haz clic derecho en la página autenticada y selecciona **Inspeccionar**.
+    2. En el panel de DevTools, abre la pestaña **Application**.
+    3. En el menú izquierdo navega a **Storage → Local Storage → https://cambio-cromos.vercel.app**.
+    4. Confirma que existe la clave `supabase.auth.token` con fecha de expiración > 50 minutos.
+    5. Cambia a la pestaña **Console** dentro de DevTools y verifica que no aparezcan mensajes de error en rojo después del registro.
 
 Caso CP-F01-02: Registro móvil (vista 375px)
   Cobertura: Responsive; accesibilidad; hint de teclado en campos.
-  Pre-requisitos específicos: Modo dispositivo iPhone 13 en DevTools Safari/Chrome; email libre.
+  Pre-requisitos específicos:
+    - Modo dispositivo iPhone 13 en Chrome DevTools o Safari.
+    - Email libre distinto al usado en CP-F01-01.
   Pasos:
-    1. Repetir flujo de registro desde menú hamburguesa.
-    2. Validar que teclado muestra tipo email/password adecuado.
-    3. Completar verificación.
-  Criterios de éxito:
-    - Layout no desborda; botones visibles sin scroll horizontal.
-    - Mensajes de validación se muestran centrados y legibles.
-    - Al finalizar, menú móvil refleja estado logueado (avatar en header).
+    1. Repetir el flujo de registro desde el menú hamburguesa.
+    2. Validar que el teclado virtual muestra tipos email/password adecuados.
+    3. Completar verificación del correo y acceder al dashboard.
+  Validaciones UI:
+    - Layout sin desbordes; botones visibles sin scroll horizontal.
+    - Mensajes de validación centrados y legibles en mobile.
+    - Al completar, el avatar aparece en el header móvil indicando que la sesión quedó activa.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Pulsa el ícono de dispositivos para mantener la vista 375px.
+    3. Selecciona la pestaña **Console** y confirma que no hay errores en rojo al enviar el formulario.
 
 Caso CP-F01-03: Registro bloqueado por contraseña débil y email duplicado
   Cobertura: Casos negativos; mensajes de error; prevención de duplicados.
-  Pre-requisitos específicos: Email existente `qa.registrado@cromos.test`.
+  Pre-requisitos específicos:
+    - Email existente `qa.registrado@cromos.test`.
   Pasos:
-    1. Intentar registrarse con contraseña “123456”.
-    2. Ajustar contraseña fuerte pero reutilizar email existente.
-  Criterios de éxito:
-    - Mensaje claro “La contraseña debe incluir…” y botón deshabilitado.
-    - Mensaje “Este correo ya está registrado” sin crear nueva cuenta.
-    - No se envía email de verificación.
-    - Logs del frontend no contienen stack traces.
+    1. Intentar registrarse con contraseña "123456".
+    2. Ajustar a contraseña fuerte pero reutilizar `qa.registrado@cromos.test`.
+  Validaciones UI:
+    - Se muestra mensaje claro "La contraseña debe incluir..." y el botón permanece deshabilitado.
+    - Para el email duplicado aparece "Este correo ya está registrado" sin crear nueva cuenta.
+    - No se envía correo de verificación.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT COUNT(*) AS total_registros
+    FROM auth.users
+    WHERE email = 'qa.registrado@cromos.test';
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Ejecuta la consulta en el SQL Editor.
+    - El resultado debe permanecer en `1`. Si aumenta, registrar incidente en la planilla.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Ve a la pestaña **Console**.
+    3. Intenta cada escenario negativo y confirma que no aparece ningún stack trace o error 500.
 
 Caso CP-F01-04: Inicio de sesión válido + persistencia
-  Cobertura: Feliz; refresco de token; recordatorio de sesión.
-  Pre-requisitos específicos: Usuario `qa.registrado@cromos.test`.
+  Cobertura: Flujo feliz; refresco de token; recordatorio de sesión.
+  Pre-requisitos específicos:
+    - Usuario `qa.registrado@cromos.test`.
   Pasos:
-    1. Iniciar sesión desde `/auth/login`.
-    2. Marcar “Recordarme”.
-    3. Cerrar pestaña, reabrir URL base tras 5 minutos.
-  Criterios de éxito:
-    - Redirección a “Mi colección” tras login con toast de bienvenida.
-    - Al volver a abrir, usuario sigue autenticado sin reingresar credenciales.
-    - `auth.session()` en consola devuelve expiración > 50 minutos.
+    1. Iniciar sesión desde `/auth/login` con "Recordarme" activado.
+    2. Cerrar la pestaña.
+    3. Reabrir la URL base tras 5 minutos.
+  Validaciones UI:
+    - Redirección a "Mi colección" tras el login con toast de bienvenida.
+    - Persistencia de sesión al reabrir la página.
+  Verificación en Chrome (consola y tokens):
+    1. Tras iniciar sesión, haz clic derecho y selecciona **Inspeccionar**.
+    2. En DevTools ve a **Console** y ejecuta `await supabaseClient.auth.getSession()`; confirma que `expires_at` es mayor a la hora actual.
+    3. Cambia a **Application → Storage → Local Storage** y valida que `supabase.auth.token` persiste después de cerrar y reabrir la pestaña.
+    4. Comprueba en **Console** que al reabrir no aparecen errores.
 
 Caso CP-F01-05: Manejo de credenciales inválidas
-  Cobertura: Error handling; bloqueo tras intentos fallidos.
-  Pre-requisitos específicos: Usuario `qa.registrado@cromos.test`.
+  Cobertura: Gestión de errores; sugerencia de recuperación.
+  Pre-requisitos específicos:
+    - Usuario `qa.registrado@cromos.test`.
   Pasos:
-    1. Intentar inicio con contraseña incorrecta tres veces.
+    1. Intentar inicio con contraseña incorrecta tres veces consecutivas.
     2. Intentar con email inexistente `fantasma@cromos.test`.
-  Criterios de éxito:
-    - Mensaje “Correo o contraseña incorrectos” en español, sin revelar cuál dato falla.
-    - Después de 3 intentos, mostrar sugerencia de recuperar contraseña.
-    - No se bloquea la cuenta real en Supabase.
+  Validaciones UI:
+    - Mensaje en español "Correo o contraseña incorrectos" sin revelar el campo inválido.
+    - Tras 3 intentos, aparece la sugerencia de recuperar contraseña.
+    - La cuenta no queda bloqueada en Supabase.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Abre la pestaña **Console**.
+    3. Ejecuta los intentos fallidos y confirma que no se registran errores en rojo ni stack traces.
 
 Caso CP-F01-06: Recuperación de contraseña
-  Cobertura: Email transaccional; expiración de link; flujo móvil/escritorio.
-  Pre-requisitos específicos: Usuario activo.
+  Cobertura: Email transaccional; expiración del enlace; flujo móvil/escritorio.
+  Pre-requisitos específicos:
+    - Usuario activo `qa.registrado@cromos.test`.
   Pasos:
-    1. Pulsar “¿Olvidaste tu contraseña?” y enviar email.
-    2. Abrir enlace en escritorio y resetear a nueva contraseña fuerte.
-    3. Repetir flujo y abrir enlace desde móvil (comprobar responsividad).
-  Criterios de éxito:
-    - Email llega en <1 min, copy sin placeholders.
-    - Link permite establecer nueva contraseña y redirige al dashboard con sesión iniciada.
-    - Intento de reutilizar link muestra mensaje “Enlace expirado”.
-    - Cambios reflejados en Supabase Auth (último login actualizado).
+    1. Pulsar "¿Olvidaste tu contraseña?" y enviar el email.
+    2. Abrir el enlace en escritorio y restablecer a una contraseña fuerte.
+    3. Repetir el flujo y abrir el enlace desde móvil para validar responsividad.
+    4. Intentar reutilizar el enlace anterior para confirmar que expira.
+  Validaciones UI:
+    - El email llega en <1 minuto con copy en español.
+    - El enlace permite definir nueva contraseña y redirige al dashboard autenticando al usuario.
+    - Reutilizar el enlace muestra mensaje "Enlace expirado".
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT email,
+           last_sign_in_at
+    FROM auth.users
+    WHERE email = 'qa.registrado@cromos.test';
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Ejecuta la consulta tras completar el restablecimiento.
+    - Verifica que `last_sign_in_at` coincide con la hora de la prueba (±2 minutos).
+  Verificación en Chrome (consola):
+    1. Tras restablecer, haz clic derecho y selecciona **Inspeccionar**.
+    2. Abre la pestaña **Console** y asegúrate de que no hay errores tras el login automático.
+    3. En **Application → Storage → Local Storage**, confirma que `supabase.auth.token` fue renovado (nueva fecha de expiración).
 
 Caso CP-F01-07: Acceso bloqueado para usuario suspendido
-  Cobertura: Edge; seguridad; mensajes de suspensión.
-  Pre-requisitos específicos: Usuario `qa.suspendido@cromos.test` con `profiles.is_suspended = true`.
+  Cobertura: Seguridad; mensajes de suspensión; auditoría.
+  Pre-requisitos específicos:
+    - Usuario `qa.suspendido@cromos.test` con `profiles.is_suspended = true`.
   Pasos:
     1. Intentar iniciar sesión con credenciales correctas.
-    2. Intentar usar enlace de recuperación recibido previamente.
-  Criterios de éxito:
-    - Pantalla muestra mensaje específico “Tu cuenta está suspendida. Contacta soporte.”
+    2. Intentar usar un enlace de recuperación recibido previamente.
+  Validaciones UI:
+    - Se muestra mensaje "Tu cuenta está suspendida. Contacta soporte."
     - No se establece sesión ni cookies.
-    - Evento registrado en `audit_log` con acción `suspension_blocked_login`.
+  Validaciones en Supabase (SQL):
+    ```sql
+    SELECT u.email,
+           p.is_suspended,
+           p.updated_at
+    FROM auth.users u
+    JOIN profiles p ON p.id = u.id
+    WHERE u.email = 'qa.suspendido@cromos.test';
+    ```
+
+    ```sql
+    SELECT action,
+           created_at,
+           metadata->>'email' AS email_afectado
+    FROM audit_log
+    WHERE action = 'suspension_blocked_login'
+    ORDER BY created_at DESC
+    LIMIT 1;
+    ```
+  Instrucciones para ejecutar las consultas:
+    - Ejecuta la primera consulta para confirmar que `is_suspended` permanece en `true`.
+    - Ejecuta la segunda y valida que `email_afectado` coincida con `qa.suspendido@cromos.test` y que la fecha corresponda a la prueba.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Abre la pestaña **Console**.
+    3. Intenta iniciar sesión; confirma que solo se muestran avisos controlados y no hay tokens en **Application → Storage → Local Storage**.
 
 Caso CP-F01-08: Refresco automático de sesión y logout
-  Cobertura: Tokens; limpieza de storage; deslogueo global.
-  Pre-requisitos específicos: Usuario recién autenticado en Chrome.
+  Cobertura: Tokens; limpieza de storage; cierre en múltiples pestañas.
+  Pre-requisitos específicos:
+    - Usuario autenticado recientemente en Chrome.
   Pasos:
     1. Abrir dos pestañas autenticadas.
-    2. En pestaña A, pulsar avatar → “Cerrar sesión”.
-    3. Verificar pestaña B refresh/restringir acceso al navegar.
-  Criterios de éxito:
-    - Logout cierra sesión en todas pestañas (al navegar, se redirige a login).
-    - Storage local y session quedan sin tokens (ver DevTools → Application).
-    - Navegación directa a `/marketplace/my-listings` redirige a login con mensaje “Inicia sesión para continuar”.
+    2. En la pestaña A, pulsar el avatar y seleccionar "Cerrar sesión".
+    3. Regresar a la pestaña B y navegar a cualquier ruta privada.
+  Validaciones UI:
+    - La pestaña B redirige a login al navegar, mostrando mensaje "Inicia sesión para continuar".
+    - No quedan componentes con información sensible.
+  Verificación en Chrome (consola y storage):
+    1. Tras cerrar sesión en la pestaña A, haz clic derecho en la pestaña B y elige **Inspeccionar**.
+    2. Ve a **Application → Storage → Local Storage** y confirma que ya no existen las claves `supabase.auth.token` ni `supabase.auth.refresh-token`.
+    3. Cambia a la pestaña **Console** y asegura que no se registran errores al intentar navegar.
 
 Notas generales:
-- Documentar capturas de cada caso en la carpeta compartida QA.
-- Registrar tiempo aproximado de ejecución por caso para estimar esfuerzos futuros.
-- Reportar cualquier discrepancia en localización a través de Jira etiqueta `i18n`.
+- Registrar capturas y tiempos de ejecución de cada caso en la carpeta compartida QA.
+- Para todas las consultas SQL, utiliza Supabase Dashboard → SQL editor y actualiza los placeholders (`{timestamp}`) antes de ejecutar.
+- Reportar cualquier discrepancia de localización mediante Jira con la etiqueta `i18n`.

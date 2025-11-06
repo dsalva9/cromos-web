@@ -17,8 +17,6 @@ Configuración previa:
 - Verificar que la plantilla de prueba tiene al menos un slot con todos los campos Panini poblados.
 - Verificar que el usuario vendedor tiene duplicados (count >= 2) en ese slot.
 
-Casos de prueba:
-
 Caso CP-F03-03A: Crear listado manual con campos Panini completos
   Cobertura: Flujo feliz; validación de campos opcionales; visualización en detalle.
   Pasos:
@@ -51,6 +49,54 @@ Caso CP-F03-03A: Crear listado manual con campos Panini completos
       * slot_variant = "A"
       * global_number = 147
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó con metadata Panini correcta
+    SELECT tl.title,
+           tl.description,
+           tl.sticker_number,
+           tl.slot_variant,
+           tl.global_number,
+           tl.page_number,
+           tl.page_title,
+           tl.collection_name,
+           tl.status,
+           tl.created_at
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.title = 'Messi Inter Miami'
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. Verificar que el resultado muestra todos los campos Panini con los valores correctos
+
+    **Resultado esperado:** La consulta debe devolver el listado recién creado con todos los campos Panini poblados correctamente.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de creación, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Completar el formulario y publicar, observando que no aparecen errores.
+    4. Tras publicar, verificar que aparece toast "Anuncio publicado con éxito".
+    5. En la página de detalle, hacer clic derecho → **Inspeccionar** → pestaña **Network**.
+    6. Recargar la página y verificar que la petición para crear el listado devuelve código 201.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-03B: Crear listado con campos Panini parciales
   Cobertura: Campos opcionales; visualización condicional.
   Pasos:
@@ -67,6 +113,47 @@ Caso CP-F03-03B: Crear listado con campos Panini parciales
     - Campos vacíos no se muestran en la tarjeta.
     - No se muestra línea "Página:" si page_number y page_title están vacíos.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó con metadata parcial
+    SELECT tl.title,
+           tl.sticker_number,
+           tl.slot_variant,
+           tl.global_number,
+           tl.page_number,
+           tl.page_title
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.sticker_number = '7'
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `slot_variant`, `page_number` y `page_title` son NULL.
+
+    **Resultado esperado:** La consulta debe devolver el listado con los campos Panini no completados como NULL.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de creación, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Completar solo los campos parciales y publicar.
+    4. Verificar que no aparecen errores y que el listado se publica.
+    5. En la pestaña **Network**, verificar que la petición devuelve código 201.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de creación devuelve código 201
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-03C: Crear listado sin ningún campo Panini
   Cobertura: Backward compatibility; visualización condicional.
   Pasos:
@@ -77,6 +164,49 @@ Caso CP-F03-03C: Crear listado sin ningún campo Panini
     - Tarjeta "Detalles del Cromo" NO aparece en el detalle.
     - No hay errores visuales ni espacios vacíos.
     - Listado funciona exactamente igual que listados legacy sin metadata.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó sin metadata Panini
+    SELECT tl.title,
+           tl.sticker_number,
+           tl.slot_variant,
+           tl.global_number,
+           tl.page_number,
+           tl.page_title
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.slot_variant IS NULL
+    AND tl.global_number IS NULL
+    AND tl.page_number IS NULL
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que todos los campos Panini son NULL.
+
+    **Resultado esperado:** La consulta debe devolver el listado con todos los campos Panini como NULL.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de creación, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Completar solo campos básicos y publicar.
+    4. Verificar que no aparecen errores y que el listado se publica.
+    5. En la pestaña **Network**, verificar que la petición devuelve código 201.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de creación devuelve código 201
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-03D: Publicar duplicado desde plantilla con auto-población
   Cobertura: Integración plantillas-marketplace; auto-población; RPC `publish_duplicate_to_marketplace`.
@@ -107,6 +237,63 @@ Caso CP-F03-03D: Publicar duplicado desde plantilla con auto-población
     - Contador de duplicados en plantilla decrementa en 1 (de 2 a 1, por ejemplo).
     - Si era el último duplicado, status cambia de "duplicate" a "owned".
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se creó desde plantilla con metadata correcta
+    SELECT tl.title,
+           tl.copy_id,
+           tl.slot_id,
+           tl.sticker_number,
+           tl.slot_variant,
+           tl.global_number,
+           tl.page_number,
+           tl.page_title,
+           tl.collection_name
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.copy_id IS NOT NULL
+    ORDER BY tl.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `copy_id` y `slot_id` no son NULL y que los campos Panini coinciden.
+
+    ```sql
+    -- Consulta para verificar que el contador de duplicados se actualizó
+    SELECT tc.status,
+           tc.duplicate_count
+    FROM template_copies tc
+    WHERE tc.id = [COPY_ID];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Reemplazar `[COPY_ID]` con el ID real de la copia.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `duplicate_count` decrementó en 1.
+
+    **Resultado esperado:** La primera consulta debe mostrar el listado con metadata correcta. La segunda debe mostrar el contador actualizado.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de la plantilla, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Hacer clic en "Publicar" y observar que el formulario se pre-pobla correctamente.
+    4. Publicar y verificar que no aparecen errores.
+    5. En la pestaña **Network**, verificar que la petición RPC devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición RPC devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-03E: Visualización en template slot tiles
   Cobertura: UI en mis-plantillas; metadata visible en tiles.
   Pasos:
@@ -120,6 +307,20 @@ Caso CP-F03-03E: Visualización en template slot tiles
     - Texto es legible (text-xs text-gray-400).
     - No hay overflow ni recortes en móvil.
     - Slots sin metadata no muestran línea adicional (solo label).
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de la plantilla, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Observar que no aparecen errores al cargar los slots.
+    4. Verificar que el texto de metadata se muestra correctamente en los tiles.
+    5. En modo móvil (F12 → Toggle device toolbar), verificar que no hay overflow.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Tomar captura de pantalla de los tiles con problemas visuales
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-03F: Validación de formato de variante
   Cobertura: Validaciones; constraints de BD.
@@ -137,6 +338,43 @@ Caso CP-F03-03F: Validación de formato de variante
     - Mensaje de error claro: "La variante debe ser una letra mayúscula (A-Z)".
     - Caso 4: Se publica correctamente con variant = "B".
     - En BD: CHECK constraint `check_listing_variant_format` previene valores inválidos.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que solo se guardan variantes válidas
+    SELECT tl.slot_variant,
+           tl.title
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.slot_variant IS NOT NULL
+    ORDER BY tl.created_at DESC
+    LIMIT 5;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que solo aparecen variantes válidas (una letra mayúscula).
+
+    **Resultado esperado:** La consulta debe devolver solo variantes válidas (A-Z, una letra).
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de creación, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Intentar crear listados con variantes inválidas y observar los mensajes de error.
+    4. Verificar que los mensajes de error son claros y útiles.
+    5. Crear listado con variante válida y verificar que se publica sin errores.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los mensajes de validación son claros
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-03G: Editar listado y actualizar metadata Panini
   Cobertura: Actualización de campos; persistencia.
@@ -157,6 +395,41 @@ Caso CP-F03-03G: Editar listado y actualizar metadata Panini
       * Página: 12 - Mediocampistas
     - BD refleja cambios con `updated_at` actualizado.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el listado se actualizó correctamente
+    SELECT tl.title,
+           tl.slot_variant,
+           tl.global_number,
+           tl.page_title,
+           tl.updated_at
+    FROM trade_listings tl
+    WHERE tl.id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que los campos Panini se actualizaron y que `updated_at` es reciente.
+
+    **Resultado esperado:** La consulta debe mostrar el listado con los campos Panini actualizados.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del listado, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Editar el listado y guardar, observando que no aparecen errores.
+    4. Tras guardar, verificar que aparece toast "Listado actualizado".
+    5. En la pestaña **Network**, verificar que la petición de actualización devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de actualización devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Notas generales:
 - Mantener registro de IDs de listados para verificación posterior.
 - Todos los test cases mantienen el tono formal y técnico del documento original.
@@ -165,6 +438,7 @@ Notas generales:
   * Tarjeta "Detalles del Cromo" en detalle de listado
   * Template slot tiles con metadata visible
   * Registros de BD mostrando columnas page_number, page_title, slot_variant, global_number
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.
 
 Referencias:
 - Documentación: docs/PANINI_METADATA_UPDATE.md

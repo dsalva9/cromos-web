@@ -6,7 +6,7 @@ Pre-requisitos generales:
 - Usuario A (emisor): `qa.traderA@cromos.test` con duplicados y necesidades configuradas.
 - Usuario B (receptor): `qa.traderB@cromos.test` con duplicados complementarios.
 - Datos semilla: 
-  * Copia “Colección QA Liga 2025” para ambos con progreso cargado (ver Fase 02).
+  * Copia "Colección QA Liga 2025" para ambos con progreso cargado (ver Fase 02).
   * Discordancias predefinidas (A necesita slots 10-12, B necesita 5-7).
 - Acceso a tablas `trade_proposals`, `trade_proposal_items`, `user_template_progress`.
 - Herramientas: Chrome desktop, Safari móvil, planilla de seguimiento.
@@ -15,44 +15,152 @@ Configuración previa:
 - Verificar que ambos usuarios no tengan propuestas pendientes entre ellos (limpiar si necesario).
 - Confirmar que ambos tienen habilitado chat y notificaciones.
 
-Casos de prueba:
-
-Caso CP-F05-01A: Creación de propuesta desde “Encontrar intercambio”
+Caso CP-F05-01A: Creación de propuesta desde "Encontrar intercambio"
   Cobertura: Happy path; sugerencias de duplicados.
   Pasos:
     1. Iniciar sesión como Usuario A.
     2. Ir a `/trades/find`, ubicar Usuario B mediante búsqueda.
-    3. Pulsar “Proponer intercambio”.
+    3. Pulsar "Proponer intercambio".
     4. En el compositor, seleccionar duplicados propios que interesen al receptor y slots que necesita.
     5. Enviar.
   Criterios de éxito:
-    - Compositor sugiere automáticamente coincidencias (panel “Ellos necesitan”).
+    - Compositor sugiere automáticamente coincidencias (panel "Ellos necesitan").
     - Validación evita enviar sin al menos un ítem por lado.
-    - Tras enviar, aparece toast “Propuesta enviada” y se crea registro en `trade_proposals` (`status='pending'`).
+    - Tras enviar, aparece toast "Propuesta enviada" y se crea registro en `trade_proposals` (`status='pending'`).
     - Usuario B recibe notificación (campana + email si configurado).
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la propuesta se creó correctamente
+    SELECT tp.id,
+           tp.sender_id,
+           tp.receiver_id,
+           tp.status,
+           tp.created_at,
+           tp.notes
+    FROM trade_proposals tp
+    WHERE tp.sender_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.traderA@cromos.test'
+    )
+    AND tp.receiver_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.traderB@cromos.test'
+    )
+    ORDER BY tp.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. Verificar que el resultado muestra `status = 'pending'` y los usuarios correctos
+
+    ```sql
+    -- Consulta para verificar los ítems de la propuesta
+    SELECT tpi.proposal_id,
+           tpi.item_type, -- 'offered' o 'requested'
+           tpi.copy_id,
+           tpi.slot_id,
+           tpi.quantity
+    FROM trade_proposal_items tpi
+    WHERE tpi.proposal_id = [ID_DE_LA_PROPUESTA]
+    ORDER BY tpi.item_type, tpi.created_at;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta
+    2. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta
+    3. Hacer clic en **"Run"**
+    4. Verificar que hay ítems de ambos tipos ('offered' y 'requested')
+
+    **Resultado esperado:** La primera consulta debe mostrar la propuesta con estado `pending`. La segunda debe mostrar los ítems ofrecidos y solicitados.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de búsqueda de intercambios, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Crear la propuesta y observar que no aparecen errores.
+    4. Tras enviar, verificar que aparece toast "Propuesta enviada".
+    5. En la pestaña **Network**, verificar que la petición para crear la propuesta devuelve código 201.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-01B: Revisión de propuesta recibida
   Cobertura: Vista detalle; información de contexto.
   Pasos:
     1. Usuario B accede a `/trades/proposals`.
-    2. Revisar pestaña “Recibidas”.
+    2. Revisar pestaña "Recibidas".
     3. Abrir modal de detalle; verificar listado de cromos ofrecidos/solicitados, notas y métricas.
   Criterios de éxito:
     - Modal muestra información de cada ítem (colección, número, estado).
     - Existe CTA para abrir chat asociado.
     - Si hay duplicados insuficientes, se muestra advertencia.
 
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de propuestas, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Abrir el modal de detalle y observar que no aparecen errores.
+    4. Verificar que la información de los ítems se carga correctamente.
+    5. En la pestaña **Network**, verificar que las peticiones de detalle devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las peticiones de detalle devuelven código 200
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F05-01C: Aceptar propuesta
   Cobertura: Cambio de estado; impacto en inventario.
   Pasos:
-    1. Usuario B pulsa “Aceptar”.
+    1. Usuario B pulsa "Aceptar".
     2. Confirmar en modal.
     3. Revisar `trade_proposals.status` y las barras de progreso en ambas copias.
   Criterios de éxito:
     - Estado cambia a `accepted`.
     - Se envía notificación a Usuario A.
     - Progreso de plantillas refleja intercambios pendientes (si el sistema descuenta al aceptar o al finalizar).
-    - Aparece opción “Marcar como finalizado” (ver Fase 05-02).
+    - Aparece opción "Marcar como finalizado" (ver Fase 05-02).
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la propuesta fue aceptada
+    SELECT tp.status,
+           tp.updated_at,
+           tp.accepted_at
+    FROM trade_proposals tp
+    WHERE tp.id = [ID_DE_LA_PROPUESTA];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'accepted'` y que `accepted_at` tiene fecha.
+
+    **Resultado esperado:** La consulta debe mostrar la propuesta con estado `accepted` y la fecha de aceptación.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de propuestas, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Aceptar la propuesta y observar que no aparecen errores.
+    4. Tras aceptar, verificar que aparece toast "Propuesta aceptada".
+    5. En la pestaña **Network**, verificar que la petición de aceptación devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de aceptación devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-01D: Rechazar propuesta
   Cobertura: Edge; motivo opcional.
@@ -61,8 +169,42 @@ Caso CP-F05-01D: Rechazar propuesta
     2. Añadir comentario opcional (máximo 250 caracteres).
   Criterios de éxito:
     - Estado cambia a `rejected`.
-    - Usuario A ve en su bandeja “Rechazada” con comentario.
+    - Usuario A ve en su bandeja "Rechazada" con comentario.
     - Registro guardado en `trade_proposals.rejection_reason`.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la propuesta fue rechazada
+    SELECT tp.status,
+           tp.rejection_reason,
+           tp.rejected_at,
+           tp.updated_at
+    FROM trade_proposals tp
+    WHERE tp.id = [ID_DE_LA_PROPUESTA];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'rejected'` y que `rejection_reason` tiene el comentario.
+
+    **Resultado esperado:** La consulta debe mostrar la propuesta con estado `rejected` y el motivo de rechazo.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de propuestas, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Rechazar la propuesta y observar que no aparecen errores.
+    4. Tras rechazar, verificar que aparece toast "Propuesta rechazada".
+    5. En la pestaña **Network**, verificar que la petición de rechazo devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de rechazo devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-01E: Cancelar propuesta enviada
   Cobertura: Retiro antes de respuesta.
@@ -72,6 +214,39 @@ Caso CP-F05-01E: Cancelar propuesta enviada
     - Estado `cancelled` y se oculta de bandeja principal (aparece en Historial).
     - Usuario B recibe notificación.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la propuesta fue cancelada
+    SELECT tp.status,
+           tp.cancelled_at,
+           tp.updated_at
+    FROM trade_proposals tp
+    WHERE tp.id = [ID_DE_LA_PROPUESTA];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'cancelled'` y que `cancelled_at` tiene fecha.
+
+    **Resultado esperado:** La consulta debe mostrar la propuesta con estado `cancelled` y la fecha de cancelación.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de propuestas, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Cancelar la propuesta y observar que no aparecen errores.
+    4. Tras cancelar, verificar que aparece toast "Propuesta cancelada".
+    5. En la pestaña **Network**, verificar que la petición de cancelación devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de cancelación devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F05-01F: Validaciones y límites
   Cobertura: Edge cases.
   Pasos:
@@ -79,9 +254,23 @@ Caso CP-F05-01F: Validaciones y límites
     2. Intentar reenviar propuesta idéntica antes de que la anterior tenga resolución.
     3. Usuario suspendido intenta crear propuesta.
   Criterios de éxito:
-    - Sistema bloquea >30 con mensaje “Máximo 30 cromos por intercambio”.
+    - Sistema bloquea >30 con mensaje "Máximo 30 cromos por intercambio".
     - Detección de duplicado muestra aviso y bloquea envío.
-    - Usuario suspendido recibe mensaje “No puedes intercambiar mientras tu cuenta esté suspendida”.
+    - Usuario suspendido recibe mensaje "No puedes intercambiar mientras tu cuenta esté suspendida".
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del compositor, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Intentar enviar propuesta con más de 30 ítems y observar el mensaje de error.
+    4. Intentar enviar propuesta duplicada y observar el aviso.
+    5. Como usuario suspendido, intentar crear propuesta y observar el bloqueo.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los mensajes de validación son claros y útiles
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-01G: Accesibilidad y móvil
   Cobertura: Responsive compositor.
@@ -93,6 +282,21 @@ Caso CP-F05-01G: Accesibilidad y móvil
     - Botones grandes y accesibles.
     - No hay overflow horizontal.
 
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En Chrome desktop, presionar **F12** para abrir DevTools.
+    2. Hacer clic en el ícono de dispositivo móvil (Toggle device toolbar).
+    3. Seleccionar un dispositivo móvil (ej: iPhone 12).
+    4. Navegar al compositor y verificar que el layout se adapta correctamente.
+    5. En la pestaña **Console**, observar que no aparecen errores de layout.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error de CSS en la consola
+    2. Tomar captura de pantalla de problemas de layout
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Notas generales:
 - Registrar IDs de propuestas (`proposal_id`) para usarlos en pruebas de chat/finalización.
 - Conservar evidencias (capturas) de estados `pending`, `accepted`, `rejected`, `cancelled`.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

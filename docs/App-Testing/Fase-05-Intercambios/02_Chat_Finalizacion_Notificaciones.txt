@@ -13,8 +13,6 @@ Configuración previa:
 - Asegurarse de que no existan mensajes previos sin leer para aislar badges.
 - Abrir consola de red para monitorear llamadas a `/rest/v1/trade_chats`.
 
-Casos de prueba:
-
 Caso CP-F05-02A: Chat en propuestas aceptadas
   Cobertura: Mensajería en tiempo real; formato; límites.
   Pasos:
@@ -27,46 +25,217 @@ Caso CP-F05-02A: Chat en propuestas aceptadas
     - Límite de 500 caracteres respetado (contador).
     - Registro en `trade_chats` con `sender_id` correcto.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que los mensajes se guardaron correctamente
+    SELECT tc.content,
+           tc.sender_id,
+           tc.proposal_id,
+           tc.created_at
+    FROM trade_chats tc
+    WHERE tc.proposal_id = [ID_DE_LA_PROPUESTA]
+    ORDER BY tc.created_at DESC
+    LIMIT 5;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta
+    5. Hacer clic en el botón **"Run"**
+    6. Verificar que los mensajes aparecen con el contenido y remitente correctos
+
+    **Resultado esperado:** La consulta debe mostrar los mensajes del chat con el contenido correcto y los IDs de remitente.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Enviar mensajes y observar que no aparecen errores.
+    4. En la pestaña **Network**, filtrar por WebSocket y verificar que hay conexión activa.
+    5. Verificar que los mensajes aparecen en tiempo real en ambos usuarios.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F05-02B: Indicadores de mensajes no leídos
   Cobertura: Badges en tarjetas y tabs.
   Pasos:
     1. Usuario A envía 3 mensajes consecutivos.
     2. Usuario B mantiene pestaña cerrada y revisa `/trades/proposals`.
   Criterios de éxito:
-    - Tarjeta en bandeja “Recibidas” muestra badge con número de mensajes no leídos.
-    - Tab “Mensajes” en header muestra indicador agregado.
+    - Tarjeta en bandeja "Recibidas" muestra badge con número de mensajes no leídos.
+    - Tab "Mensajes" en header muestra indicador agregado.
     - Al abrir el chat, los badges desaparecen y `trade_reads` registra `last_read_at`.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar el estado de lectura de mensajes
+    SELECT tr.proposal_id,
+           tr.user_id,
+           tr.last_read_at,
+           tr.created_at
+    FROM trade_reads tr
+    WHERE tr.proposal_id = [ID_DE_LA_PROPUESTA]
+    AND tr.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.traderB@cromos.test'
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `last_read_at` se actualiza después de leer los mensajes.
+
+    **Resultado esperado:** La consulta debe mostrar el registro de lectura con la fecha actualizada.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de propuestas, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Observar que los badges de mensajes no leídos aparecen correctamente.
+    4. Abrir el chat y verificar que los badges desaparecen.
+    5. En la pestaña **Network**, verificar que la petición de actualización de lectura devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los badges se actualizan correctamente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-02C: Finalización en dos pasos
   Cobertura: Flujo handshake.
   Pasos:
-    1. Usuario A pulsa “Marcar como finalizado”.
+    1. Usuario A pulsa "Marcar como finalizado".
     2. Usuario B recibe notificación y también marca como finalizado.
   Criterios de éxito:
-    - Tras primera marca, UI indica “Esperando confirmación de {usuario}”.
+    - Tras primera marca, UI indica "Esperando confirmación de {usuario}".
     - `trade_finalizations` contiene registro para usuario A al primer paso y para B tras confirmar.
     - Una vez ambos confirman, `trade_proposals.status` cambia a `completed`.
-    - Se genera notificación “Intercambio finalizado” para ambos.
+    - Se genera notificación "Intercambio finalizado" para ambos.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar las finalizaciones del intercambio
+    SELECT tf.proposal_id,
+           tf.user_id,
+           tf.completed_at,
+           tf.created_at
+    FROM trade_finalizations tf
+    WHERE tf.proposal_id = [ID_DE_LA_PROPUESTA]
+    ORDER BY tf.created_at;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que hay registros para ambos usuarios.
+
+    ```sql
+    -- Consulta para verificar que la propuesta se completó
+    SELECT tp.status,
+           tp.completed_at
+    FROM trade_proposals tp
+    WHERE tp.id = [ID_DE_LA_PROPUESTA];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `status = 'completed'` y que `completed_at` tiene fecha.
+
+    **Resultado esperado:** Las consultas deben mostrar las finalizaciones de ambos usuarios y el estado completado de la propuesta.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Marcar como finalizado y observar que no aparecen errores.
+    4. Tras la finalización, verificar que aparece la notificación.
+    5. En la pestaña **Network**, verificar que las peticiones de finalización devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las peticiones de finalización devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-02D: Reversión de finalización
   Cobertura: Edge; errores humanos.
   Pasos:
-    1. Tras completar, Usuario B intenta revertir (si existe acción “Deshacer” dentro de X minutos).
+    1. Tras completar, Usuario B intenta revertir (si existe acción "Deshacer" dentro de X minutos).
     2. Si la función no existe, documentar.
   Criterios de éxito:
     - Si hay reversión, estado vuelve a `accepted` y se elimina registro correspondiente en `trade_finalizations`.
     - Si no hay reversión, confirmar que UI comunica la imposibilidad.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar si hay reversión posible
+    SELECT tf.proposal_id,
+           tf.user_id,
+           tf.created_at
+    FROM trade_finalizations tf
+    WHERE tf.proposal_id = [ID_DE_LA_PROPUESTA]
+    ORDER BY tf.created_at DESC;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DE_LA_PROPUESTA]` con el ID real de la propuesta.
+    4. Hacer clic en **"Run"**.
+    5. Verificar si hay registros de finalización que puedan revertirse.
+
+    **Resultado esperado:** La consulta debe mostrar el estado actual de las finalizaciones.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Intentar revertir la finalización y observar el comportamiento.
+    4. Verificar que aparece el mensaje correspondiente (reversión o imposibilidad).
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que el comportamiento de reversión es consistente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F05-02E: Historial y propuestas rechazadas
-  Cobertura: Tab “Historial” y “Ver rechazadas”.
+  Cobertura: Tab "Historial" y "Ver rechazadas".
   Pasos:
-    1. Navegar a tab “Historial”.
+    1. Navegar a tab "Historial".
     2. Validar paginación y filtros (fechas, estado).
-    3. Activar toggle “Ver rechazadas” en bandeja principal.
+    3. Activar toggle "Ver rechazadas" en bandeja principal.
   Criterios de éxito:
     - Entradas muestran resumen (avatar, cromos, resultado).
     - Filtros funcionan sin recarga.
     - Rechazadas se muestran con etiqueta roja y notas.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de historial, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Navegar por el historial y observar que no aparecen errores.
+    4. Activar filtros y verificar que funcionan sin recargar la página.
+    5. En la pestaña **Network**, verificar que las peticiones de filtrado devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que los filtros funcionan correctamente
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-02F: Notificaciones globales
   Cobertura: Integración con campana.
@@ -76,26 +245,95 @@ Caso CP-F05-02F: Notificaciones globales
     3. Marcar todas como leídas.
   Criterios de éxito:
     - Cada evento genera notificación con icono y copy correcto.
-    - Las nuevas aparecen en sección “Nuevas”, el resto en “Anteriores”.
-    - Botón “Marcar todas como leídas” limpia badges y actualiza `notifications.read_at`.
+    - Las nuevas aparecen en sección "Nuevas", el resto en "Anteriores".
+    - Botón "Marcar todas como leídas" limpia badges y actualiza `notifications.read_at`.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar las notificaciones generadas
+    SELECT n.type,
+           n.title,
+           n.content,
+           n.read_at,
+           n.created_at
+    FROM notifications n
+    WHERE n.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.traderB@cromos.test'
+    )
+    ORDER BY n.created_at DESC
+    LIMIT 10;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior y pegarla en el editor.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que las notificaciones aparecen con el tipo y contenido correctos.
+
+    **Resultado esperado:** La consulta debe mostrar las notificaciones generadas con los tipos correctos.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de notificaciones, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Provocar eventos y observar que las notificaciones aparecen en tiempo real.
+    4. Marcar como leídas y verificar que los badges desaparecen.
+    5. En la pestaña **Network**, verificar que las peticiones de notificaciones devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las notificaciones se actualizan correctamente
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-02G: Acceso no autorizado
   Cobertura: Permisos.
   Pasos:
     1. Usuario tercero intenta abrir URL directa `/trades/proposals/{id}`.
   Criterios de éxito:
-    - Recibe 403 o redirección con mensaje “No tienes acceso”.
+    - Recibe 403 o redirección con mensaje "No tienes acceso".
     - No se registran lecturas en `trade_reads`.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. Como usuario tercero, intentar acceder a la URL directa.
+    2. Hacer clic derecho → **Inspeccionar**.
+    3. Cambiar a la pestaña **Console**.
+    4. Verificar que aparece error 403 con mensaje "No tienes acceso".
+    5. En la pestaña **Network**, verificar que la petición devuelve código 403.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error 403 en la consola
+    2. Verificar que el acceso no autorizado funciona correctamente
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F05-02H: Pruebas en móvil
   Cobertura: Responsive en panel de notificaciones y chat.
   Pasos:
     1. Abrir `/trades/notifications` en 375px.
-    2. Revisar accesibilidad del botón “Marcar como leídas”.
+    2. Revisar accesibilidad del botón "Marcar como leídas".
   Criterios de éxito:
     - Cards adaptadas verticalmente, sin cortes de texto.
     - Acciones accesibles con el pulgar.
 
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En Chrome desktop, presionar **F12** para abrir DevTools.
+    2. Hacer clic en el ícono de dispositivo móvil (Toggle device toolbar).
+    3. Seleccionar un dispositivo móvil (ej: iPhone 12).
+    4. Navegar a las páginas de notificaciones y chat.
+    5. En la pestaña **Console**, observar que no aparecen errores de layout.
+    6. Verificar que los botones son accesibles y el texto no se corta.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error de CSS en la consola
+    2. Tomar captura de pantalla de problemas de layout
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Notas generales:
 - Guardar ID de notificaciones generadas para rastrear en base.
 - Registrar cualquier retraso en realtime (>2 s) para análisis de Supabase.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

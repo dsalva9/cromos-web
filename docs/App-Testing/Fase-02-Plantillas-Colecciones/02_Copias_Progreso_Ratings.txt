@@ -3,16 +3,16 @@ Fase: 02 - Plantillas y Colecciones
 Objetivo: Asegurar que los usuarios puedan copiar plantillas públicas, gestionar el progreso de cada slot, mantener el conteo de duplicados y emitir valoraciones sin violar restricciones de autoría.
 
 Pre-requisitos generales:
-- Plantilla pública “Colección QA Liga 2025” creada en CP-F02-01C.
+- Plantilla pública "Colección QA Liga 2025" creada en CP-F02-01C.
 - Usuario coleccionista: `qa.coleccionista@cromos.test` (sin copias previas).
-- Usuario autor original para verificar restricciones.
+- Usuario autor original: `qa.creador@cromos.test` (para verificar restricciones).
 - Acceso a tablas `user_template_copies`, `user_template_progress`, `template_ratings`.
 - Herramientas: Chrome desktop, Safari/Chrome móvil, planilla para seguimiento de conteos.
 
 Configuración previa:
-- Borrar registros previos en `user_template_copies` del usuario coleccionista si existen.
+- Borrar registros previos en `user_template_copies` del usuario coleccionista.
 - Verificar que la plantilla esté visible públicamente (`is_public = true`, `is_deleted = false`).
-- Preparar datos de ejemplo para duplicados (p.ej. 3 cromos repetidos).
+- Preparar datos de ejemplo para duplicados (p.ej. 3 cromos repetidos del slot 5).
 
 Casos de prueba:
 
@@ -20,177 +20,338 @@ Caso CP-F02-02A: Copiar plantilla pública
   Cobertura: Happy path; inicialización de progreso.
   Pasos:
     1. Iniciar sesión con `qa.coleccionista`.
-    2. Abrir `/templates/{id}` y pulsar “Copiar plantilla”.
-    3. Asignar nombre a la copia y confirmar.
-    4. Navegar a `/mi-coleccion`.
+    2. Abrir `/templates/{id}` de la plantilla "Colección QA Liga 2025".
+    3. Pulsar "Copiar plantilla".
+    4. Asignar nombre personalizado "Mi Colección QA 2025".
+    5. Confirmar y esperar redirección.
   Criterios de éxito:
-    - Se crea registro en `user_template_copies` con `title` personalizado y `copied_at`.
-    - Página de colección muestra pestañas por páginas con totales Have/Need/Dupes = 0.
-    - Toast confirma creación y redirige a vista de progreso.
+    - Se crea registro en `user_template_copies` con `title` personalizado.
+    - Redirección automática a `/mi-coleccion/{copyId}`.
+    - Todos los slots se inicializan como 'missing' (count = 0).
+    - Toast de éxito en español.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la copia se creó correctamente
+    SELECT utc.title,
+           utc.is_active,
+           utc.copied_at,
+           p.title AS plantilla_original
+    FROM user_template_copies utc
+    JOIN collection_templates p ON p.id = utc.template_id
+    WHERE utc.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.coleccionista@cromos.test'
+    )
+    ORDER BY utc.copied_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. Verificar que el resultado muestra `title` personalizado, `is_active = true` y el nombre de la plantilla original
+
+    ```sql
+    -- Consulta para verificar que todos los slots se inicializaron como 'missing'
+    SELECT COUNT(*) AS slots_inicializados,
+           SUM(CASE WHEN utp.status = 'missing' THEN 1 ELSE 0 END) AS slots_missing
+    FROM user_template_progress utp
+    WHERE utp.copy_id = (
+      SELECT id FROM user_template_copies
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.coleccionista@cromos.test'
+      )
+      ORDER BY copied_at DESC
+      LIMIT 1
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta
+    2. Hacer clic en **"Run"**
+    3. Verificar que `slots_inicializados` es igual al total de slots y `slots_missing` es igual al total
+
+  **Resultado esperado:** La primera consulta debe mostrar la copia recién creada. La segunda debe mostrar todos los slots inicializados como 'missing'.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página de la plantilla, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Pulsar "Copiar plantilla" y observar que no aparecen errores en rojo.
+    4. Tras la redirección, verificar que aparece mensaje de éxito como "Plantilla copiada correctamente".
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F02-02B: Actualizar progreso de slots (HAVE/NEED/DUPES)
-  Cobertura: Interacciones; cálculos agregados.
+  Cobertura: Interacciones; cálculos agregados; UI reactiva.
   Pasos:
-    1. En la copia, marcar slots 1-3 como "Tengo".
+    1. En `/mi-coleccion/{copyId}`, marcar slots 1-3 como "Tengo".
     2. Marcar slot 4 como "Repetido" con cantidad 2.
     3. Marcar slot 5 como "Necesito".
-    4. Revisar contador global y barra de progreso.
+    4. Verificar contador global y badges de página.
+    5. Repetir en móvil para verificar sincronización.
   Criterios de éxito:
-    - `user_template_progress` almacena registros con `status` correcto y `count`.
-    - Panel resumen actualiza porcentajes en tiempo real (sin recarga).
-    - Slots marcados muestran iconografía adecuada (color verde, dorado, rojo).
-    - Valores persisten tras recargar y en móvil.
+    - Contadores de página se actualizan en tiempo real.
+    - Badges (completo, repetidos) aparecen correctamente.
+    - Estado persiste tras recargar página.
+    - En móvil, la interfaz se adapta sin perder funcionalidad.
 
-Caso CP-F02-02B2: Entrada rápida por número de checklist (Quick Entry) - ACTUALIZADO 2025-11-04
-  Cobertura: Modalidad de entrada rápida simplificada; navegación por teclado; mapeo automático.
-  Pre-requisito: Copia de plantilla con números globales asignados (ver CP-F02-01A2).
-  Pasos:
-    1. En vista de progreso de copia, pulsar botón "Entrada Rápida" o similar.
-    2. **ACTUALIZADO**: Modal abre directamente en modo "Por Número" (sin pestañas).
-    3. Verificar que el título del modal incluya ícono de hash y "Entrada Rápida por Número".
-    4. Escribir "45" y presionar Enter.
-    5. Escribir "46" y presionar Enter.
-    6. Escribir "999" (número inexistente) y presionar Enter.
-    7. Verificar log de "Últimas actualizaciones" (máximo 5 entradas).
-    8. Verificar "Referencia de Números" mostrando primeros 20 cromos con estado.
-  Criterios de éxito:
-    - Modal abre con foco automático en campo de entrada (sin necesidad de clic).
-    - **ACTUALIZADO**: No hay pestañas ni selector de páginas (modo único).
-    - Al ingresar "45", sistema localiza slot 5A y lo marca como "Tengo" sin salir del modal.
-    - Mensaje de confirmación muestra: "✓ No. 45 - Gorosabel (Athletic Club, Slot 5A)".
-    - Al ingresar "999", muestra "❌ No. 999 no encontrado".
-    - Campo se limpia automáticamente tras cada entrada y mantiene el foco.
-    - Lista de referencia actualiza badges en tiempo real (Falta/Tengo/Duplicado).
-    - Progreso se actualiza en la vista principal sin cerrar modal.
-    - **ELIMINADO**: Modo "Por Página" ya no existe (funcionalidad redundante con grid principal).
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar el estado actualizado de los slots
+    SELECT utp.slot_id,
+           tp.page_number || '.' || ts.slot_number AS referencia,
+           utp.status,
+           utp.count,
+           utp.updated_at
+    FROM user_template_progress utp
+    JOIN template_slots ts ON ts.id = utp.slot_id
+    JOIN template_pages tp ON tp.id = ts.page_id
+    WHERE utp.copy_id = (
+      SELECT id FROM user_template_copies
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.coleccionista@cromos.test'
+      )
+      ORDER BY copied_at DESC
+      LIMIT 1
+    )
+    AND utp.slot_id IN (1, 2, 3, 4, 5)
+    ORDER BY tp.page_number, ts.slot_number;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar y pegar la consulta anterior.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que los slots 1-3 muestran `status = 'Tengo'` y `count = 1`, el slot 4 muestra `status = 'Repetido'` y `count = 2`, y el slot 5 muestra `status = 'Necesito'` y `count = 0`.
 
-Caso CP-F02-02B3: Completar toda la página (Bulk Completion) - NUEVO 2025-11-04
-  Cobertura: Actualización masiva; confirmación de operaciones peligrosas; preservación selectiva.
-  Pre-requisito: Copia con página parcialmente completada (algunos "Falta", algunos "Tengo", algunos "Repes").
+    **Resultado esperado:** Los estados y conteos deben coincidir exactamente con las acciones realizadas en la UI.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la vista de colección, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Marcar cada slot y observar que las peticiones de actualización se envían sin errores.
+    4. Verificar que los contadores en la UI se actualizan inmediatamente después de cada acción.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error rojos en la consola
+    2. Verificar que las peticiones a la API no devuelven código 500
+    3. Reportar cualquier error de sincronización
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F02-02B2: Entrada rápida por número de checklist (Quick Entry)
+  Cobertura: Modalidad simplificada; navegación por teclado; mapeo automático.
   Pasos:
-    1. Navegar a página con estado mixto (ej: 10 cromos Falta, 5 Tengo, 3 Repes).
-    2. Desplazarse al final del grid de cromos.
-    3. Pulsar botón "Completar toda la página" (outline amarillo, icono CheckCircle2).
-    4. Leer modal de confirmación: "¿Quieres marcar toda la página como completada?".
-    5. Verificar mensaje explicativo sobre preservación de cromos existentes.
-    6. Pulsar "Confirmar".
-    7. Observar estado de loading en botón ("Completando...").
-    8. Tras cierre de modal, verificar estado de todos los cromos en grid.
-    9. Repetir proceso en página diferente.
+    1. En vista de colección, pulsar botón "Entrada Rápida".
+    2. Verificar que modal abre en modo "Por Número" (sin pestañas).
+    3. Escribir "45" y presionar Enter → debe localizar slot 45A.
+    4. Escribir "46" y presionar Enter → debe localizar slot 46.
+    5. Escribir "999" y presionar Enter → debe mostrar mensaje de no encontrado.
+    6. Escribir "1,2,3,4,5" y presionar Enter → debe actualizar múltiples slots.
+    7. Verificar límite de entradas recientes (máximo 5).
+    8. Probar en móvil (375px) para verificar responsividad.
   Criterios de éxito:
-    - Botón visible y centrado debajo del grid en todas las páginas.
-    - Modal explica claramente: "Los cromos que ya tengas (Tengo o Repes) no se modificarán".
-    - Solo los cromos marcados como "Falta" (count 0, badge gris) cambian a "Tengo" (count 1, badge verde).
-    - Cromos previamente "Tengo" (count 1) se mantienen sin cambios.
-    - Cromos "Repes" (count > 1, badge azul) mantienen su contador exacto.
-    - Botón "Cancelar" cierra modal sin realizar cambios.
-    - Operación completa en <2 segundos para página de ~50 cromos.
-    - Grid actualiza badges inmediatamente sin recarga.
-    - Contador de progreso global refleja nuevo estado.
-    - Operación en página 1 no afecta estado de página 2.
+    - Campo de entrada mantiene foco automático.
+    - Sistema localiza slots por número global si existe.
+    - Mensajes de error claros y en español.
+    - Lista de entradas recientes muestra últimas 5 actualizaciones.
+    - Modal funciona en móvil sin cortes.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el sistema encuentra el slot correcto
+    SELECT ts.slot_number,
+           ts.slot_variant,
+           ts.global_number,
+           tp.page_number,
+           tp.title AS pagina_titulo
+    FROM template_slots ts
+    JOIN template_pages tp ON tp.id = ts.page_id
+    WHERE ts.template_id = (
+      SELECT template_id FROM user_template_copies
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.coleccionista@cromos.test'
+      )
+      ORDER BY copied_at DESC
+      LIMIT 1
+    )
+    AND ts.global_number = 45;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar y pegar la consulta anterior.
+    3. Reemplazar el número 45 si se prueba con otro valor.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que devuelve el slot 45 con su variante (si existe) y página asociada.
+
+    **Resultado esperado:** La consulta debe devolver el slot solicitado con todos sus datos de referencia.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. Con la modal de entrada rápida abierta, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. Ir a la pestaña **Console**.
+    3. Escribir "45" en el campo y presionar Enter.
+    4. Verificar que no aparecen errores en la consola y que la UI responde correctamente.
+    5. Repetir con "999" y confirmar que aparece mensaje de error claro.
+
+    **Si hay errores:**
+    1. Capturar cualquier error 500 o timeout
+    2. Verificar que el manejo de errores es amigable para el usuario
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
+Caso CP-F02-02B3: Completar toda la página (Bulk Completion)
+  Cobertura: Actualización masiva; confirmaciones; preservación de datos existentes.
+  Pasos:
+    1. En una página con cromos mixtos (algunos Tengo, otros Necesito).
+    2. Pulsar botón "Completar toda la página".
+    3. Leer modal de confirmación y pulsar "Confirmar".
+    4. Verificar que todos los cromos cambian a "Tengo".
+    5. Repetir operación en otra página para verificar que solo afecta a la página actual.
+  Criterios de éxito:
+    - Modal explica claramente qué cromos se modificarán.
+    - Botón "Cancelar" cierra modal sin cambios.
+    - Solo cromos "Necesito" cambian a "Tengo" (los "Tengo" existentes se preservan).
+    - Operación se completa en <2 segundos para página con ~50 cromos.
+    - Badges de página se actualizan correctamente.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar la actualización masiva
+    SELECT COUNT(*) AS total_actualizados,
+           SUM(CASE WHEN status = 'Tengo' THEN 1 ELSE 0 END) AS ahora_tengo,
+           SUM(CASE WHEN status = 'Necesito' THEN 1 ELSE 0 END) AS ahora_necesito
+    FROM user_template_progress
+    WHERE copy_id = (
+      SELECT id FROM user_template_copies
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.coleccionista@cromos.test'
+      )
+      ORDER BY copied_at DESC
+      LIMIT 1
+    )
+    AND page_id = (
+      SELECT id FROM template_pages
+      WHERE template_id = (
+        SELECT template_id FROM user_template_copies
+        WHERE user_id = (
+          SELECT id FROM auth.users 
+          WHERE email = 'qa.coleccionista@cromos.test'
+        )
+        ORDER BY copied_at DESC
+        LIMIT 1
+      )
+      AND page_number = [NUMERO_DE_PAGINA_A_PROBAR]
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar y pegar la consulta anterior.
+    3. Reemplazar `[NUMERO_DE_PAGINA_A_PROBAR]` con el número de página que se está probando.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `ahora_tengo` aumenta y `ahora_necesito` disminuye tras la operación.
+
+    **Resultado esperado:** La consulta debe mostrar el aumento de cromos "Tengo" y la disminución de cromos "Necesito".
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. Antes de pulsar "Completar toda la página", abrir la consola como se indicó anteriormente.
+    2. Pulsar el botón y observar que se envía una petición de actualización masiva.
+    3. Tras completar, verificar que no aparecen errores y que la UI refleja los cambios correctamente.
+    4. Verificar que los contadores en la página se actualizan inmediatamente.
+
+    **Si hay errores:**
+    1. Buscar cualquier error de red o timeout en la consola
+    2. Verificar que la operación completa aunque si hay errores menores de UI
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F02-02C: Gestión de duplicados y decrementos
-  Cobertura: Edge; límites 0; sincronización con marketplace (pre-integration).
+  Cobertura: Edge cases; límites 0; sincronización con marketplace.
   Pasos:
-    1. Incrementar duplicados hasta 5 y decrementar hasta 0.
-    2. Validar que el botón “Publicar duplicado” aparece solo con count > 0.
-    3. Intentar poner valores negativos (teclado manual).
-  Criterios de éxito:
-    - Botón “-” deshabilitado cuando count = 0.
-    - Intento de introducir valor negativo se corrige a 0.
-    - Contador global de duplicados se actualiza con badges correspondientes.
+    1. En una página con un cromo marcado como "Repetido" (count = 3).
+    2. Pulsar "Marcar como vendido" y confirmar.
+    3. Verificar que el contador disminuye a 2 y el cromo cambia a "Tengo".
+    4. Intentar marcar como vendido nuevamente (count = 2).
+    5. Publicar ese cromo como duplicado en marketplace.
+    6. Verificar que el contador vuelve a 1 y aparece badge de sincronización.
+    7. Forzar contador a 0 marcando todos como vendidos.
+    8. Verificar que botón "Marcar como vendido" se deshabilita.
+    9. Verificar que aparece mensaje "Sin duplicados disponibles".
+    Criterios de éxito:
+    - Decremento funciona correctamente al marcar como vendido.
+    - Publicación como duplicado decrementa el contador automáticamente.
+    - Sistema previene acciones inválidas cuando no hay duplicados.
+    - Mensajes de error y advertencia son claros y en español.
 
-Caso CP-F02-02D: Filtrado y búsqueda dentro de la copia
-  Cobertura: Herramientas de navegación; UX.
-  Pasos:
-    1. Usar campo de búsqueda para encontrar slot “3”.
-    2. Aplicar filtro “Mostrar solo Necesito”.
-    3. Verificar funcionamiento en móvil (375px) y tablet (768px).
-  Criterios de éxito:
-    - Lista se filtra correctamente, mostrando mensajes de “sin resultados” cuando corresponde.
-    - Filtros combinados (búsqueda + estado) funcionan sin recargar.
-    - En móvil, los filtros se muestran en sheet/modal sin cortar texto.
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar el estado del contador después de operaciones
+    SELECT utp.status,
+           utp.count,
+           utp.updated_at
+    FROM user_template_progress utp
+    WHERE utp.copy_id = (
+      SELECT id FROM user_template_copies
+      WHERE user_id = (
+        SELECT id FROM auth.users 
+        WHERE email = 'qa.coleccionista@cromos.test'
+      )
+      ORDER BY copied_at DESC
+      LIMIT 1
+    )
+    AND utp.slot_id = (
+      SELECT id FROM template_slots
+      WHERE template_id = (
+        SELECT template_id FROM user_template_copies
+        WHERE user_id = (
+          SELECT id FROM auth.users 
+          WHERE email = 'qa.coleccionista@cromos.test'
+        )
+        ORDER BY copied_at DESC
+          LIMIT 1
+      )
+      AND slot_number = [NUMERO_DE_SLOT_A_PROBAR]
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar y pegar la consulta anterior.
+    3. Reemplazar `[NUMERO_DE_SLOT_A_PROBAR]` con el número del slot que se está probando.
+    4. Ejecutar la consulta antes y después de cada operación para verificar el estado.
 
-Caso CP-F02-02E: Restricciones de visibilidad y borrado de plantilla origen
-  Cobertura: Edge; resiliencia.
-  Pasos:
-    1. Con el autor, marcar la plantilla original como privada o eliminarla (ver CP-F02-01F).
-    2. Desde la copia, recargar la página.
-  Criterios de éxito:
-    - Se muestra aviso en la copia “Plantilla original no disponible”, pero progreso sigue accesible.
-    - No se borran registros de progreso.
-    - Botón “Ver plantilla original” desaparece o muestra mensaje predecible.
+    **Resultado esperado:** El `count` debe disminuir correctamente al marcar como vendido y aumentar al publicar como duplicado.
 
-Caso CP-F02-02F: Valoraciones de plantilla (usuario no autor)
-  Cobertura: Flujo completo rating; límites; localización.
-  Pasos:
-    1. Con `qa.coleccionista`, en la página pública de la plantilla, pulsar “Valorar plantilla”.
-    2. Asignar 4 estrellas y comentario de 120 caracteres.
-    3. Guardar y verificar actualización del promedio.
-    4. Editar la valoración a 5 estrellas con comentario distinto.
-    5. Eliminar valoración.
-  Criterios de éxito:
-    - Modal obliga a seleccionar al menos 1 estrella; contador de caracteres en vivo.
-    - Tras guardar, `template_ratings` contiene registro con `rating = 4` y `comment`.
-    - `TemplateRatingSummary` actualiza distribución y resalta la valoración del usuario.
-    - Botón “Eliminar valoración” solicita confirmación y limpia el registro.
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. Con la vista de colección abierta, abrir la consola como se indicó anteriormente.
+    2. Realizar cada operación (marcar como vendido, publicar duplicado) y observar las peticiones en la pestaña Network.
+    3. Verificar que las peticiones se completan con código 200 y no hay errores en la consola.
+    4. Tras forzar el contador a 0, intentar marcar como vendido y verificar que aparece mensaje de error.
 
-Caso CP-F02-02G: Restricciones de valoración
-  Cobertura: Edge; autor y usuarios no autenticados.
-  Pasos:
-    1. Autor intenta abrir modal de valoración en su propia plantilla.
-    2. Usuario no autenticado hace clic en “Valorar”.
-    3. Usuario autenticaso intenta escribir comentario >280 caracteres.
-  Criterios de éxito:
-    - Autor ve mensaje “No puedes valorar tu propia plantilla”.
-    - Usuario sin sesión es redirigido a login con redirect guardado.
-    - Comentarios >280 se bloquean con contador rojo y botón deshabilitado.
+    **Si hay errores:**
+    1. Buscar errores 400/500 en la pestaña Network
+    2. Verificar que los mensajes de error en la consola son claros y útiles
 
-Caso CP-F02-02H: Efectos en listados de plantillas
-  Cobertura: Refresco de métricas.
-  Pasos:
-    1. Tras varias valoraciones de diferentes usuarios, revisar `/templates`.
-    2. Confirmar que la tarjeta muestra rating promedio y cantidad de reseñas.
-  Criterios de éxito:
-    - Los datos concuerdan con agregados `rating_avg` y `rating_count`.
-    - En mobile, la tarjeta proyecta estrellas legibles.
-
-Caso CP-F02-02I: Eliminar colección rastreada - NUEVO 2025-11-04
-  Cobertura: Gestión de copias; eliminación segura; confirmación de operaciones destructivas.
-  Pre-requisito: Usuario con al menos una copia de plantilla con progreso registrado y anuncios publicados en el marketplace.
-  Pasos:
-    1. Iniciar sesión con usuario que tenga copias de plantillas.
-    2. Navegar a `/mis-plantillas` y seleccionar una colección con progreso.
-    3. En la vista de progreso `/mis-plantillas/[copyId]`, localizar botón "Eliminar colección" (variante destructiva, ícono papelera).
-    4. Pulsar botón "Eliminar colección".
-    5. Leer modal de confirmación con título "¿Eliminar colección?".
-    6. Verificar mensaje explicativo sobre consecuencias:
-       - "Esta acción no se puede deshacer"
-       - "Perderás todo el progreso registrado para esta colección"
-       - "Los anuncios en el mercado no se verán afectados"
-    7. Pulsar "Cancelar" y verificar que modal se cierra sin cambios.
-    8. Volver a abrir modal y pulsar "Eliminar".
-    9. Observar estado de loading en botón ("Eliminando...").
-    10. Tras eliminación exitosa, verificar redirección automática a `/mis-plantillas`.
-    11. Confirmar que la colección eliminada ya no aparece en el listado.
-    12. Verificar en marketplace que anuncios publicados desde esa copia siguen activos.
-    13. Intentar acceder directamente a URL `/mis-plantillas/[copyId]` de copia eliminada.
-  Criterios de éxito:
-    - Botón "Eliminar colección" visible en header de vista de progreso (junto a "Entrada Rápida" si aplica).
-    - Modal de confirmación muestra advertencia clara en español sobre pérdida irreversible de progreso.
-    - Botón "Cancelar" cierra modal sin realizar cambios (colección permanece).
-    - Al confirmar eliminación, RPC `delete_template_copy` se ejecuta correctamente.
-    - Toast de éxito: "Colección eliminada correctamente".
-    - Redirección automática a `/mis-plantillas` tras eliminación.
-    - Colección eliminada desaparece del listado en `/mis-plantillas`.
-    - Registros eliminados en `user_template_copies` y `user_template_progress` (cascade).
-    - Anuncios en `trade_listings` publicados desde esa copia permanecen activos e intactos.
-    - Acceso directo a URL de copia eliminada muestra "Colección no encontrada" con botón de retorno.
-    - En caso de error durante eliminación, toast muestra "Error al eliminar la colección".
-    - Operación completa en <1 segundo para colecciones con progreso extenso.
-    - Funcionalidad responsive en mobile (botón y modal legibles).
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Notas generales:
-- Registrar IDs de copias (`copy_id`) para usarlos en pruebas de integración (Fase 04).
-- Si se usan usuarios adicionales para valoraciones, anotar credenciales empleadas.
-- Al probar eliminación de colecciones, verificar que los `copy_id` asociados a listings en marketplace no se corrompen.
+- Registrar en la planilla QA los IDs de copias (`copy_id`) para usar en pruebas de integración (Fase 04).
+- Documentar cualquier desfase (>2 s) entre acciones de UI y actualización de contadores.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

@@ -1,157 +1,261 @@
 Nombre del conjunto: CP-F01-02 Gestión de Perfil y Avatar
 Fase: 01 - Autenticación y Perfil
-Objetivo: Garantizar que los usuarios activos puedan visualizar y actualizar su perfil, avatar y preferencias sin romper reglas de seguridad o estilo Retro-Comic en Web y Mobile.
+Objetivo: Garantizar que los usuarios activos puedan visualizar y actualizar su perfil, avatar y preferencias sin romper reglas de seguridad ni el estilo Retro-Comic en Web y Mobile.
 
 Pre-requisitos generales:
-- Cuenta base `qa.registrado@cromos.test` con datos incompletos para edición.
-- Cuenta secundaria `qa.observador@cromos.test` para revisar perfiles de terceros.
+- Cuenta base `qa.registrado@cromos.test` habilitada para edición.
+- Cuenta secundaria `qa.observador@cromos.test` para validar vista pública.
 - Repositorio de imágenes de prueba:
-  * `avatar_preset_01.png` (exacto 512x512, <300 KB).
+  * `avatar_preset_01.png` (512x512, <300 KB).
   * `avatar_rectangular.jpg` (1200x800, 1.8 MB).
-  * `avatar_grande.png` (2048x2048, 6 MB) para forzar validación.
-- Acceso a consola de red para monitorear llamadas a `/storage/v1/object`.
-- Herramientas: Chrome (desktop), Safari iOS o Chrome DevTools en modo 375x812, lector de pantalla (NVDA) para validar etiquetas alt.
+  * `avatar_grande.png` (2048x2048, 6 MB) para forzar validaciones.
+- Acceso a Supabase Dashboard (`https://app.supabase.com`) con permisos de lectura en Storage, Auth y SQL.
+- Herramientas: Chrome (desktop), Chrome DevTools modo 375x812 o Safari iOS, lector de pantalla (NVDA) para validar etiquetas `alt`.
 
 Configuración previa:
 - Iniciar sesión con `qa.registrado@cromos.test`.
-- Confirmar que la cuenta tiene rol user (no admin) y no está suspendida.
-- Limpiar supabase storage `avatars/qa.registrado` si existen restos de pruebas.
+- Confirmar en Supabase Auth que el usuario no es admin ni está suspendido.
+- Limpiar el bucket `avatars/qa.registrado` si existen restos de pruebas.
 
 Casos de prueba:
 
 Caso CP-F01-02A: Visualización de perfil propio en escritorio
-  Cobertura: Layout; datos estadísticos; accesibilidad.
+  Cobertura: Layout; métricas; accesibilidad.
   Pasos:
     1. Navegar a `/perfil` o acceder desde el menú del avatar.
     2. Revisar secciones: avatar, nickname, métricas (listados activos, favoritos, calificación media).
-    3. Abrir pestañas internas si existen (p.ej. “Actividad reciente”).
-  Criterios de éxito:
-    - Títulos y labels en español, tipografía retro.
-    - Métricas muestran valores coherentes con la base (consultar `profiles` y `trade_listings`).
-    - Botones de acción (“Editar perfil”, “Cambiar avatar”) visibles y habilitados.
-    - No hay scroll horizontal, componentes cumplen spacing del theme guide.
+    3. Abrir pestañas internas (por ejemplo, “Actividad reciente”) si están disponibles.
+  Validaciones UI:
+    - Títulos y labels en español con tipografía Retro-Comic.
+    - Botones “Editar perfil” y “Cambiar avatar” visibles y habilitados.
+    - No existe scroll horizontal; se respetan los márgenes del theme guide.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT u.email,
+           p.nickname,
+           p.rating_avg,
+           p.rating_count,
+           (SELECT COUNT(*) FROM trade_listings tl WHERE tl.user_id = p.id AND tl.status = 'active') AS listados_activos,
+           (SELECT COUNT(*) FROM favourites f WHERE f.user_id = p.id AND f.target_type = 'listing') AS favoritos_listados,
+           (SELECT COUNT(*) FROM favourites f WHERE f.user_id = p.id AND f.target_type = 'template') AS favoritos_plantillas
+    FROM auth.users u
+    JOIN profiles p ON p.id = u.id
+    WHERE u.email = 'qa.registrado@cromos.test';
+    ```
+  Instrucciones para ejecutar la consulta:
+    - En Supabase Dashboard abre **SQL Editor**, pega la consulta y ejecútala.
+    - Confirma que los conteos coinciden con lo mostrado en la tarjeta de métricas del perfil.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Abre la pestaña **Console** y navega por el perfil.
+    3. Asegúrate de que no se registren errores en rojo al cargar pestañas internas.
 
 Caso CP-F01-02B: Edición de nickname y bio
   Cobertura: Formularios; validaciones; guardado optimista.
   Pasos:
     1. Pulsar “Editar perfil”.
-    2. Cambiar nickname a `Coleccionista QA {timestamp}` y escribir bio <140 caracteres.
-    3. Guardar y observar notificaciones.
-    4. Recargar página para confirmar persistencia.
-  Criterios de éxito:
-    - Validación evita nickname vacío o >40 caracteres.
+    2. Cambiar nickname a `Coleccionista QA {timestamp}` y colocar bio <140 caracteres.
+    3. Guardar y observar la notificación.
+    4. Recargar la página para confirmar persistencia y revisar el header.
+  Validaciones UI:
+    - La validación bloquea nickname vacío o de más de 40 caracteres.
     - Toast “Perfil actualizado” en español.
-    - Valores nuevos visibles tras recarga y en header (menú avatar).
-    - Registro en `profiles.updated_at` actualizado (<1 min).
+    - Header y perfil muestran los nuevos datos tras recargar.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT nickname,
+           updated_at
+    FROM profiles
+    WHERE id = (SELECT id FROM auth.users WHERE email = 'qa.registrado@cromos.test');
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Ejecuta la consulta tras guardar los cambios.
+    - Confirma que `nickname` coincide con el valor nuevo y que `updated_at` está dentro del último minuto.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Ve a **Console** y realiza la edición.
+    3. Verifica que no aparezcan errores ni advertencias críticas después del guardado.
 
-Caso CP-F01-02C: Selección de avatar predefinido (Sprint 13 - Sistema actualizado)
-  Cobertura: Flujo galería; permisos Storage; caches; preset SVG.
+Caso CP-F01-02C: Selección de avatar predefinido
+  Cobertura: Galería de avatares; permisos de lectura; cache.
   Pasos:
-    1. Abrir modal "Cambiar avatar".
-    2. **ACTUALIZADO**: Seleccionar pestaña "Galería" y elegir uno de los 8 avatares predefinidos retro-comic.
-    3. Confirmar.
-    4. **NUEVO**: Verificar que el avatar aparece en el dropdown del header (menú mini-perfil).
-    5. Abrir perfil desde otro navegador con `qa.observador@cromos.test`.
-  Criterios de éxito:
-    - Avatar se actualiza instantáneamente en header y página de perfil.
-    - **ACTUALIZADO**: Sistema usa 8 avatares SVG predefinidos con diseño retro-comic.
-    - Petición a `avatars/retro-XX.svg` devuelve 200 y el URL se guarda en `profiles.avatar_url`.
-    - Otro usuario ve el mismo avatar sin requerir refresh forzado.
-    - El fallback inicial desaparece (no letras solas).
-    - **NUEVO**: Avatar se muestra correctamente en el menú desplegable del usuario en el header.
+    1. Abrir el modal “Cambiar avatar”.
+    2. Seleccionar la pestaña “Galería” y elegir uno de los 8 avatares retro-comic.
+    3. Confirmar y cerrar el modal.
+    4. Revisar el header (mini perfil) y la página de perfil.
+    5. Abrir el perfil desde `qa.observador@cromos.test` para validar consistencia.
+  Validaciones UI:
+    - El avatar cambia al instante en header y perfil sin refrescar.
+    - El dropdown del header muestra el nuevo avatar.
+    - El usuario observador ve el mismo avatar sin forzar recarga.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT avatar_url,
+           updated_at
+    FROM profiles
+    WHERE id = (SELECT id FROM auth.users WHERE email = 'qa.registrado@cromos.test');
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Confirma que `avatar_url` apunta a `avatars/retro-XX.svg` y que `updated_at` se actualizó.
+  Verificación en Chrome (network y consola):
+    1. Haz clic derecho y selecciona **Inspeccionar**.
+    2. Abre la pestaña **Network**, filtra por `avatars/`.
+    3. Selecciona la petición y comprueba que la respuesta es 200.
+    4. Cambia a **Console** y confirma que no se registran errores durante el cambio de avatar.
 
-Caso CP-F01-02D: Subida de avatar personalizado con recorte (Sprint 13 - Mejoras de procesamiento)
-  Cobertura: Procesamiento de imagen; conversión WebP; subida móvil; recorte cuadrado automático.
+Caso CP-F01-02D: Subida de avatar personalizado con recorte
+  Cobertura: Procesamiento WebP; subida móvil/escritorio; recorte automático.
   Pasos:
-    1. Desde escritorio, subir `avatar_rectangular.jpg`.
-    2. **ACTUALIZADO**: Sistema aplica recorte cuadrado automático por canvas (512x512).
-    3. Verificar en DevTools que la petición POST usa `Content-Type: image/webp`.
-    4. Repetir subida desde móvil con otra imagen pequeña.
-    5. **NUEVO**: Verificar que la imagen se comprime automáticamente a <3MB.
-  Criterios de éxito:
-    - **ACTUALIZADO**: Sistema aplica recorte cuadrado automático sin intervención manual del usuario.
-    - Archivo final comprimido ≤3 MB (actualizado desde 300KB) con dimensiones máximas 512x512 y extensión `.webp`.
-    - Header y perfil actualizan avatar tras guardado; no requiere recarga.
-    - En móvil, UI mantiene botones accesibles y no se superponen.
-    - **NUEVO**: Canvas-based processing asegura dimensiones cuadradas antes de subir.
+    1. En escritorio, subir `avatar_rectangular.jpg`.
+    2. Verificar que el recorte cuadrado se aplique automáticamente.
+    3. Revisar en DevTools que la petición POST usa `Content-Type: image/webp`.
+    4. Repetir el flujo en modo móvil con otra imagen ligera.
+    5. Confirmar que la imagen final pesa <3 MB.
+  Validaciones UI:
+    - Avatar actualizado en header y perfil sin recarga.
+    - En móvil la interfaz mantiene botones accesibles.
+  Validaciones en Supabase (SQL):
+    ```sql
+    SELECT avatar_url,
+           updated_at
+    FROM profiles
+    WHERE id = (SELECT id FROM auth.users WHERE email = 'qa.registrado@cromos.test');
+    ```
+
+    ```sql
+    SELECT name,
+           (metadata->>'size')::INTEGER AS size_bytes,
+           created_at
+    FROM storage.objects
+    WHERE bucket_id = 'avatars'
+      AND name LIKE 'qa.registrado/%'
+    ORDER BY created_at DESC
+    LIMIT 1;
+    ```
+  Instrucciones para ejecutar las consultas:
+    - La primera confirma que `avatar_url` finaliza en `.webp`.
+    - La segunda verifica que el objeto más reciente esté bajo `3_145_728` bytes (≈3 MB).
+  Verificación en Chrome (network y consola):
+    1. Haz clic derecho → **Inspeccionar**.
+    2. En **Network**, filtra por `storage/v1/object`.
+    3. Asegúrate de que la subida devuelve 200.
+    4. En la pestaña **Console**, confirma que no aparecen errores al subir desde desktop ni mobile.
 
 Caso CP-F01-02E: Validaciones de tamaño y formato
-  Cobertura: Edge cases; mensajes de error.
+  Cobertura: Manejo de errores; prevención de subidas no válidas.
   Pasos:
     1. Intentar subir `avatar_grande.png`.
-    2. Intentar subir archivo `.gif` animado.
-  Criterios de éxito:
-    - Se bloquea subida con mensaje “El archivo supera 3 MB” sin llamar a Supabase.
-    - Para formato no soportado, se muestra mensaje claro y botón “Volver a intentar”.
-    - No se crean archivos en Storage (verificar en Supabase → Storage → avatars).
+    2. Intentar subir un archivo `.gif` animado.
+  Validaciones UI:
+    - Mensaje “El archivo supera 3 MB” sin ejecutar llamadas a Supabase.
+    - Para formatos no soportados, se muestra mensaje claro y botón “Volver a intentar”.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT name,
+           created_at
+    FROM storage.objects
+    WHERE bucket_id = 'avatars'
+      AND name LIKE 'qa.registrado/%'
+      AND created_at > NOW() - INTERVAL '5 minutes';
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Ejecuta después de los intentos inválidos.
+    - El resultado debe estar vacío; si aparece un objeto nuevo, registrar bug.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho → **Inspeccionar**.
+    2. Ve a **Console** y reproduce ambos intentos.
+    3. Confirma que solo se muestran mensajes controlados (sin stack trace).
 
-Caso CP-F01-02F: Visualización de perfil público de otro usuario - ACTUALIZADO 2025-11-04
-  Cobertura: Permisos RLS; estadísticas públicas; botón favorito; pestañas de anuncios.
+Caso CP-F01-02F: Visualización de perfil público de otro usuario
+  Cobertura: Permisos RLS; estadísticas públicas; favoritos.
+  Pre-requisito: Sesión con `qa.observador@cromos.test`.
   Pasos:
-    1. Con `qa.observador@cromos.test`, abrir `/usuarios/{id}` de `qa.registrado`.
-    2. Revisar secciones (información, listados activos, calificaciones recibidas).
-    3. Comprobar estado de componente "Seguir/Favorito".
-    4. **ACTUALIZADO**: Desplazarse a sección "Anuncios" y verificar pestañas disponibles.
-  Criterios de éxito:
-    - Datos sensibles (email, botones de edición) no visibles.
-    - Conteo de favoritos y calificación concuerda con base.
-    - Botón "Agregar a favoritos" aparece solo si no es el mismo usuario.
-    - **ACTUALIZADO**: Sección "Anuncios" muestra solo pestaña "Activos" para perfiles de terceros.
-    - **ACTUALIZADO**: No se muestran pestañas "Reservados", "Completados" ni "Eliminados" en perfiles ajenos.
-    - Layout responde correctamente en desktop y móvil.
+    1. Abrir `/usuarios/{id}` del usuario `qa.registrado`.
+    2. Revisar secciones: información básica, listados activos, calificaciones recibidas.
+    3. Confirmar estado del botón “Agregar a favoritos”.
+    4. Revisar pestaña “Anuncios” y validar que solo se muestre “Activos”.
+  Validaciones UI:
+    - Datos sensibles (email, edición) no son visibles.
+    - Conteos de favoritos y calificación coinciden con la base.
+    - Botón de favoritos solo aparece si es un tercero.
+    - La sección de anuncios oculta pestañas Reservados/Completados/Eliminados.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT status,
+           COUNT(*) AS total
+    FROM trade_listings
+    WHERE user_id = (SELECT id FROM auth.users WHERE email = 'qa.registrado@cromos.test')
+    GROUP BY status
+    ORDER BY status;
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Verifica que solo existan listados `active` visibles para terceros.
+    - Si el conteo difiere de la UI, registrar incidencia.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho → **Inspeccionar** mientras navegas con la cuenta observadora.
+    2. Abre **Console** y confirma que no se registran errores ni accesos bloqueados.
 
-Caso CP-F01-02F2: Pestañas de anuncios en perfil propio - NUEVO 2025-11-04
-  Cobertura: Gestión completa de anuncios; consistencia con Mis Anuncios; navegación móvil/desktop.
-  Pre-requisito: Usuario `qa.vendedor@cromos.test` con anuncios en estados: activo, reservado, completado, eliminado.
+Caso CP-F01-02F2: Pestañas de anuncios en perfil propio
+  Cobertura: Gestión completa de anuncios; consistencia con “Mis anuncios”.
+  Pre-requisitos específicos:
+    - Usuario `qa.vendedor@cromos.test` con listados en estados activo, reservado, completado y eliminado.
   Pasos:
     1. Iniciar sesión con `qa.vendedor@cromos.test`.
-    2. Navegar a `/usuarios/{self-id}` (perfil propio).
-    3. Desplazarse a sección "Anuncios".
-    4. **NUEVO**: En desktop, verificar pestañas segmentadas: "Activos", "Reservados", "Completados", "Eliminados".
-    5. **NUEVO**: En móvil (375px), verificar dropdown selector con las 4 opciones.
-    6. Hacer clic en pestaña/opción "Reservados" y revisar listados.
-    7. Cambiar a "Completados" y verificar contenido.
-    8. Cambiar a "Eliminados" y verificar contenido.
-    9. Navegar a `/marketplace/my-listings` y comparar pestañas y conteos.
-  Criterios de éxito:
-    - **NUEVO**: Perfil propio muestra 4 pestañas: Activos, Reservados, Completados, Eliminados.
-    - Cada pestaña muestra badge con conteo correcto (ej: "Activos (3)").
-    - Desktop: Pestañas segmentadas (SegmentedTabs) con resaltado de pestaña activa.
-    - Móvil: Dropdown (Select) con las 4 opciones y conteos entre paréntesis.
-    - Cambio de pestaña actualiza grid de anuncios sin recarga.
-    - Si pestaña vacía, muestra mensaje correspondiente: "No hay anuncios [estado]".
-    - Conteos y listados coinciden exactamente con `/marketplace/my-listings`.
-    - Navegación entre pestañas fluida (<200ms).
-    - Estado seleccionado persiste si usuario recarga página.
+    2. Abrir `/usuarios/{self-id}`.
+    3. Revisar pestañas “Activos”, “Reservados”, “Completados”, “Eliminados” en desktop.
+    4. En móvil (375px) validar el selector tipo dropdown con las cuatro opciones.
+    5. Comparar conteos y contenido con `/marketplace/my-listings`.
+  Validaciones UI:
+    - Pestañas o dropdown muestran todos los estados con badges de conteo.
+    - Cambiar de pestaña actualiza el grid sin recargar.
+    - Los mensajes de estado vacío aparecen cuando corresponda.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT status,
+           COUNT(*) AS total
+    FROM trade_listings
+    WHERE user_id = (SELECT id FROM auth.users WHERE email = 'qa.vendedor@cromos.test')
+    GROUP BY status
+    ORDER BY status;
+    ```
+  Instrucciones para ejecutar la consulta:
+    - Ejecuta y compara los conteos con cada pestaña en el perfil y en “Mis anuncios”.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho → **Inspeccionar**.
+    2. Abre **Console** y navega entre pestañas.
+    3. Confirma que no hay errores ni advertencias críticas al cambiar de estado.
 
 Caso CP-F01-02G: Protección para usuarios sin sesión
   Cobertura: Acceso restringido.
   Pasos:
-    1. Abrir URL `/perfil` en ventana privada sin sesión.
-    2. Abrir `/usuarios/{id}` de perfil privado o suspendido.
-  Criterios de éxito:
-    - Se redirige a login con mensaje "Inicia sesión para ver tu perfil".
-    - Perfiles suspendidos muestran badge "Suspendido" y contenido limitado.
+    1. Abrir `/perfil` en ventana privada sin sesión.
+    2. Intentar acceder a `/usuarios/{id}` de un perfil privado o suspendido.
+  Validaciones UI:
+    - Redirección a login con mensaje “Inicia sesión para ver tu perfil”.
+    - Perfiles suspendidos muestran badge “Suspendido” y contenido limitado.
+  Verificación en Chrome (consola):
+    1. En la ventana privada, haz clic derecho → **Inspeccionar**.
+    2. Abre **Console** y revisa que las redirecciones no generen errores en rojo.
 
-Caso CP-F01-02H: Menú desplegable del usuario en header (Sprint 13 - Nueva funcionalidad)
-  Cobertura: Navegación rápida; UX; accesibilidad.
+Caso CP-F01-02H: Menú desplegable del usuario en el header
+  Cobertura: Navegación rápida; accesibilidad.
   Pasos:
-    1. Con usuario autenticado, hacer clic en el avatar en el header.
-    2. **NUEVO**: Verificar que se abre un dropdown con mini-perfil del usuario.
-    3. **NUEVO**: Revisar opciones del menú: "Mi Perfil", "Mis Anuncios", "Chats", "Favoritos", "Notificaciones".
-    4. **NUEVO**: Si el usuario es admin, verificar opción "Panel Admin".
-    5. **NUEVO**: Verificar botón "Cerrar sesión" al final del menú.
-    6. **NUEVO**: Hacer clic en cada opción y verificar navegación correcta.
-    7. Probar en móvil (375px) y verificar responsividad.
-  Criterios de éxito:
-    - **NUEVO**: Dropdown muestra avatar, nickname del usuario y opciones de navegación.
-    - **NUEVO**: Opciones del menú: "Mi Perfil" (`/profile`), "Mis Anuncios" (`/marketplace/my-listings`), "Chats" (`/chats`), "Favoritos" (`/favorites`), "Notificaciones" (`/profile/notifications`).
-    - **NUEVO**: Opción "Panel Admin" (`/admin`) visible solo para usuarios con `is_admin = true`.
-    - **NUEVO**: "Cerrar sesión" ejecuta logout correctamente y redirige a home.
-    - **NUEVO**: Dropdown se cierra al hacer clic fuera o al navegar.
-    - **NUEVO**: En móvil, dropdown se ajusta correctamente sin desbordar pantalla.
-    - **NUEVO**: Accesibilidad: navegación con teclado (Tab/Enter) funciona correctamente.
+    1. Con usuario autenticado, hacer clic en el avatar del header.
+    2. Verificar opciones: “Mi Perfil”, “Mis Anuncios”, “Chats”, “Favoritos”, “Notificaciones”.
+    3. Si el usuario es admin, validar opción “Panel Admin”.
+    4. Probar “Cerrar sesión” y reingreso.
+    5. Repetir en móvil para validar responsividad.
+  Validaciones UI:
+    - El dropdown muestra avatar, nickname y opciones descritas.
+    - “Panel Admin” solo aparece con `is_admin = true`.
+    - “Cerrar sesión” funciona y redirige a la home.
+    - Navegación con teclado (Tab/Enter) funciona.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho → **Inspeccionar**.
+    2. En **Console**, abre y navega por cada opción.
+    3. Confirma que no se registran errores ni advertencias de accesibilidad.
 
 Notas generales:
-- Registrar en planilla QA los IDs de storage generados para su posterior limpieza.
-- Si se detecta rescate incorrecto de avatar (URL temporal caduca), adjuntar HAR del request a `storage/v1/object/sign`.
+- Registrar en la planilla QA los IDs de objetos en Storage generados durante las pruebas para su limpieza posterior.
+- Para cada consulta SQL, utiliza Supabase Dashboard → SQL Editor y actualiza los placeholders antes de ejecutar.
+- Adjuntar evidencias (capturas, HAR) en la carpeta compartida QA cuando se detecten anomalías.

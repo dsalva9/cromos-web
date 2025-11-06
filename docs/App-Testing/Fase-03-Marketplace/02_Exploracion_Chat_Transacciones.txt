@@ -15,8 +15,6 @@ Configuración previa:
 - Habilitar en navegador notificaciones del sitio (para badge en header).
 - Preparar motivos de cancelación (texto) para prueba de edge.
 
-Casos de prueba:
-
 Caso CP-F03-02A: Búsqueda y filtros avanzados
   Cobertura: Happy path; rendimiento; sincronización con URL; ordenamiento por distancia; exclusión de anuncios propios.
   Pasos:
@@ -38,18 +36,104 @@ Caso CP-F03-02A: Búsqueda y filtros avanzados
     - **NUEVO**: Los listados propios están excluidos del marketplace general (verificar que `list_trade_listings_with_collection_filter` RPC excluye `user_id = auth.uid()`).
     - **NUEVO**: Los listados propios aparecen correctamente en la página "Mis Anuncios".
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que los listados propios están excluidos del marketplace general
+    SELECT COUNT(*) AS listados_propios_en_marketplace
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.status = 'active'
+    AND tl.is_deleted = FALSE;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. Iniciar sesión en Supabase Dashboard: https://app.supabase.com
+    2. En el menú izquierdo, hacer clic en **"SQL Editor"**
+    3. Copiar la consulta anterior y pegarla en el editor
+    4. Hacer clic en el botón **"Run"**
+    5. El resultado debe ser 0 cuando se ejecuta como el usuario `qa.vendedor` en el marketplace general
+
+    ```sql
+    -- Consulta para verificar que los listados propios aparecen en "Mis Anuncios"
+    SELECT COUNT(*) AS listados_propios_en_mis_anuncios
+    FROM trade_listings tl
+    WHERE tl.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.vendedor@cromos.test'
+    )
+    AND tl.status = 'active'
+    AND tl.is_deleted = FALSE;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta
+    2. Hacer clic en **"Run"**
+    3. El resultado debe ser mayor que 0 cuando se accede a `/mis-anuncios`
+
+    **Resultado esperado:** La primera consulta debe devolver 0 cuando se navega por el marketplace general. La segunda debe devolver el conteo correcto de listados propios en "Mis Anuncios".
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del marketplace, hacer clic derecho y seleccionar **Inspeccionar**.
+    2. En la ventana que se abre, hacer clic en la pestaña **Console**.
+    3. Aplicar filtros y observar que no aparecen errores en rojo.
+    4. En la pestaña **Network**, filtrar por las peticiones de búsqueda y verificar que devuelven código 200.
+    5. Verificar que las peticiones incluyen los parámetros de filtro correctos en la URL.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error
+    2. Copiar el mensaje de error (clic derecho → Copy message)
+    3. Reportar en el seguimiento de prueba
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-02B: Vista de detalle y acciones contextuales
   Cobertura: Información; CTA dinámicos según rol.
   Pasos:
     1. Abrir `/marketplace/{listing}` como comprador.
     2. Revisar galerías, datos de vendedor, resumen de template si está vinculado.
-    3. Verificar botones “Contactar vendedor”, “Favorito”.
+    3. Verificar botones "Contactar vendedor", "Favorito".
     4. Abrir mismo detalle como vendedor y como usuario no autenticado.
   Criterios de éxito:
-    - Comprador ve CTA “Contactar vendedor” y enlace al chat; vendedor ve “Ver conversaciones”.
-    - Usuario sin sesión obtiene banner “Inicia sesión para contactar”.
+    - Comprador ve CTA "Contactar vendedor" y enlace al chat; vendedor ve "Ver conversaciones".
+    - Usuario sin sesión obtiene banner "Inicia sesión para contactar".
     - Estatus del listado (activo/reservado) visible con badges consistentes.
     - Conteo de vistas aumenta al recargar (ver `views_count`).
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el conteo de vistas aumenta
+    SELECT views_count,
+           created_at,
+           updated_at
+    FROM trade_listings
+    WHERE id = [ID_DEL_LISTADO];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Ejecutar la consulta antes y después de visitar la página.
+    5. Hacer clic en **"Run"**.
+    6. Verificar que `views_count` incrementa y `updated_at` se actualiza.
+
+    **Resultado esperado:** La consulta debe mostrar un incremento en `views_count` después de visitar la página del listado.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del listado, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Recargar la página y observar que no aparecen errores.
+    4. En la pestaña **Network**, verificar que la petición para incrementar vistas devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las peticiones de actualización devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-02C: Inicio de chat marketplace (comprador → vendedor) y página de chats centralizada
   Cobertura: Realtime; permisos; UX; navegación centralizada.
@@ -71,6 +155,55 @@ Caso CP-F03-02C: Inicio de chat marketplace (comprador → vendedor) y página d
     - **NUEVO**: Conversaciones ordenadas por actividad más reciente.
     - **NUEVO**: Tarjeta de información del listado aparece en la parte superior del chat con badge de estado.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el mensaje se guardó correctamente
+    SELECT lm.content,
+           lm.sender_id,
+           lm.is_read,
+           lm.created_at
+    FROM listing_messages lm
+    WHERE lm.listing_id = [ID_DEL_LISTADO]
+    ORDER BY lm.created_at DESC
+    LIMIT 5;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que el mensaje aparece con el contenido correcto.
+
+    ```sql
+    -- Consulta para verificar el estado de lectura del mensaje
+    SELECT is_read,
+           read_at
+    FROM listing_messages
+    WHERE id = [ID_DEL_MENSAJE];
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En el mismo SQL Editor, pegar esta segunda consulta.
+    2. Reemplazar `[ID_DEL_MENSAJE]` con el ID real del mensaje.
+    3. Hacer clic en **"Run"**.
+    4. Verificar que `is_read` es `true` y `read_at` tiene fecha.
+
+    **Resultado esperado:** Las consultas deben mostrar los mensajes guardados correctamente con el estado de lectura actualizado.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Enviar un mensaje y observar que no aparecen errores.
+    4. En la pestaña **Network**, verificar que las peticiones de WebSocket están activas.
+    5. Verificar que las peticiones de envío de mensajes devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error de WebSocket en la consola
+    2. Verificar que las peticiones de envío devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-02D: Chat en mobile
   Cobertura: Responsive; navegabilidad.
   Pasos:
@@ -82,17 +215,69 @@ Caso CP-F03-02D: Chat en mobile
     - Botón enviar accesible con teclado abierto.
     - No se producen dobles envíos ni bloqueos.
 
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En Chrome desktop, presionar **F12** para abrir DevTools.
+    2. Hacer clic en el ícono de dispositivo móvil (Toggle device toolbar).
+    3. Seleccionar un dispositivo móvil (ej: iPhone 12).
+    4. Navegar al chat y enviar mensajes.
+    5. En la pestaña **Console**, observar que no aparecen errores.
+    6. Verificar que el layout se adapta correctamente.
+
+    **Si hay errores:**
+    1. Tomar captura de pantalla del error en móvil
+    2. Verificar que los mensajes se envían correctamente
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-02E: Reservar listado para comprador específico
   Cobertura: Workflow de reservas; estados `reserved`.
   Pasos:
-    1. Desde “Mis listados”, vendedor selecciona conversación con comprador.
-    2. Pulsar “Reservar para este comprador” e ingresar nota opcional.
-    3. Verificar que el listado cambia a estado “Reservado” tanto para vendedor como para otros usuarios.
+    1. Desde "Mis listados", vendedor selecciona conversación con comprador.
+    2. Pulsar "Reservar para este comprador" e ingresar nota opcional.
+    3. Verificar que el listado cambia a estado "Reservado" tanto para vendedor como para otros usuarios.
   Criterios de éxito:
     - Registro en `listing_transactions` creado con `status = 'reserved'`, `buyer_id`.
-    - UI del detalle muestra badge “Reservado para {nickname}`.
+    - UI del detalle muestra badge "Reservado para {nickname}`.
     - Usuarios terceros ven listado como reservado y sin CTA de compra.
     - Notificación se envía al comprador (ver campana en header).
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la reserva se creó correctamente
+    SELECT lt.status,
+           lt.buyer_id,
+           lt.seller_id,
+           lt.created_at,
+           lt.notes
+    FROM listing_transactions lt
+    WHERE lt.listing_id = [ID_DEL_LISTADO]
+    ORDER BY lt.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'reserved'` y que `buyer_id` corresponde al comprador.
+
+    **Resultado esperado:** La consulta debe mostrar la transacción con estado `reserved` y el ID del comprador correcto.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del listado, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Reservar el listado y observar que no aparecen errores.
+    4. Tras la reserva, verificar que aparece toast "Listado reservado".
+    5. En la pestaña **Network**, verificar que la petición de reserva devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de reserva devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-02F: Completar transacción con flujo bidireccional
   Cobertura: Cambio a `completed`; confirmación del comprador; rating automático.
@@ -114,16 +299,87 @@ Caso CP-F03-02F: Completar transacción con flujo bidireccional
     - El chat se deshabilita tras completar la transacción (input muestra "Chat cerrado").
     - Notificaciones clickables desde la campana llevan directamente al chat o página relevante.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la transacción se completó
+    SELECT lt.status,
+           lt.completed_at,
+           lt.seller_rating,
+           lt.buyer_rating
+    FROM listing_transactions lt
+    WHERE lt.listing_id = [ID_DEL_LISTADO]
+    ORDER BY lt.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'completed'` y que `completed_at` tiene fecha.
+
+    **Resultado esperado:** La consulta debe mostrar la transacción con estado `completed` y las valoraciones registradas.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Completar la transacción y observar que no aparecen errores.
+    4. Tras completar, verificar que aparece modal de valoración.
+    5. En la pestaña **Network**, verificar que las peticiones de completado devuelven código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que las peticiones de completado devuelven código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-02G: Cancelar reserva
   Cobertura: Edge; justificación obligatoria; liberación de listado.
   Pasos:
     1. Vendedor cancela desde modal indicando motivo (>30 caracteres).
-    2. Confirmar que el listado vuelve a “Activo”.
-    3. Comprador recibe notificación “Reserva cancelada”.
+    2. Confirmar que el listado vuelve a "Activo".
+    3. Comprador recibe notificación "Reserva cancelada".
   Criterios de éxito:
     - Registro de transacción marca `status = 'cancelled'`, `cancellation_reason`.
     - Audit log registra `listing_transaction_cancelled`.
     - Chat conserva historial y nota de sistema con el motivo.
+
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que la reserva se canceló
+    SELECT lt.status,
+           lt.cancellation_reason,
+           lt.cancelled_at
+    FROM listing_transactions lt
+    WHERE lt.listing_id = [ID_DEL_LISTADO]
+    ORDER BY lt.created_at DESC
+    LIMIT 1;
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que `status = 'cancelled'` y que `cancellation_reason` tiene el motivo indicado.
+
+    **Resultado esperado:** La consulta debe mostrar la transacción con estado `cancelled` y el motivo de cancelación.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Cancelar la reserva y observar que no aparecen errores.
+    4. Tras cancelar, verificar que aparece toast "Reserva cancelada".
+    5. En la pestaña **Network**, verificar que la petición de cancelación devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de cancelación devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-02H: Restricciones y seguridad del chat
   Cobertura: Permisos; bloqueo de mensajes ofensivos (si se aplica).
@@ -132,9 +388,23 @@ Caso CP-F03-02H: Restricciones y seguridad del chat
     2. Vendedor intenta enviar mensaje vacío o con >500 caracteres.
     3. Probar que usuario bloqueado por vendedor (si existe) no puede enviar mensajes.
   Criterios de éxito:
-    - Tercero recibe 403 con mensaje “No tienes acceso a esta conversación”.
+    - Tercero recibe 403 con mensaje "No tienes acceso a esta conversación".
     - Mensajes vacíos o demasiado largos se bloquean con validación local.
     - Si hay bloqueo, sistema muestra aviso pertinente.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. Como usuario tercero, intentar acceder al chat y hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Verificar que aparece error 403 con mensaje "No tienes acceso a esta conversación".
+    4. Como vendedor, intentar enviar mensaje vacío y observar la validación local.
+    5. En la pestaña **Network**, verificar que las peticiones no autorizadas devuelven código 403.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error 403 en la consola
+    2. Verificar que las validaciones locales funcionan correctamente
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
 
 Caso CP-F03-02I: Favoritos y seguimiento de listados
   Cobertura: Social integration; contadores.
@@ -147,17 +417,71 @@ Caso CP-F03-02I: Favoritos y seguimiento de listados
     - `favourites` registra entrada con `target_type = 'listing'`.
     - Contador de favoritos en tarjeta se incrementa/decrementa.
 
+  Validación en Supabase (SQL):
+    ```sql
+    -- Consulta para verificar que el favorito se registró
+    SELECT f.target_type,
+           f.target_id,
+           f.user_id,
+           f.created_at
+    FROM favourites f
+    WHERE f.target_id = [ID_DEL_LISTADO]
+    AND f.target_type = 'listing'
+    AND f.user_id = (
+      SELECT id FROM auth.users 
+      WHERE email = 'qa.comprador@cromos.test'
+    );
+    ```
+    **Instrucciones para ejecutar la consulta:**
+    1. En Supabase Dashboard, ir a **SQL Editor**.
+    2. Copiar la consulta anterior.
+    3. Reemplazar `[ID_DEL_LISTADO]` con el ID real del listado.
+    4. Hacer clic en **"Run"**.
+    5. Verificar que el favorito aparece con `target_type = 'listing'`.
+
+    **Resultado esperado:** La consulta debe mostrar el registro del favorito con el tipo y usuario correctos.
+
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del listado, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Marcar como favorito y observar que no aparecen errores.
+    4. Tras marcar, verificar que el contador se actualiza inmediatamente.
+    5. En la pestaña **Network**, verificar que la petición de favorito devuelve código 200.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error en la consola
+    2. Verificar que la petición de favorito devuelve código 200
+
+    Para más ayuda sobre cómo ejecutar consultas SQL, ver: GUIA_DE_CONSULTAS_SQL.md
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Caso CP-F03-02J: Rendimiento y estabilidad
   Cobertura: Stress; 50+ mensajes; throttle.
   Pasos:
     1. Enviar 50 mensajes alternados entre vendedor y comprador.
-    2. Verificar paginación (botón “Ver mensajes anteriores”).
-    3. Throttle “Slow 3G” y observar reconexiones realtime.
+    2. Verificar paginación (botón "Ver mensajes anteriores").
+    3. Throttle "Slow 3G" y observar reconexiones realtime.
   Criterios de éxito:
     - Chat mantiene fluidez sin duplicar mensajes.
     - Paginación carga mensajes previos correctamente.
     - Realtime reconecta automáticamente tras pérdida de red.
 
+  Verificación en Chrome (consola):
+    **Verificación en Chrome (consola):**
+    1. En la página del chat, hacer clic derecho → **Inspeccionar**.
+    2. Cambiar a la pestaña **Console**.
+    3. Enviar múltiples mensajes y observar que no aparecen errores.
+    4. En la pestaña **Network**, cambiar a "Slow 3G" y observar el comportamiento.
+    5. Verificar que las peticiones WebSocket se reconectan automáticamente.
+
+    **Si hay errores:**
+    1. Buscar mensajes de error de WebSocket en la consola
+    2. Verificar que las peticiones se reintentan correctamente
+
+    Para más ayuda sobre cómo usar la consola de Chrome, ver: GUIA_DE_CONSOLA_CHROME.md
+
 Notas generales:
 - Registrar IDs de transacciones generadas para pruebas de reputación (Fase 06).
 - Guardar capturas de las vistas de comprador, vendedor y terceros para documentar diferencias de permisos.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor y actualizar los placeholders antes de ejecutar.

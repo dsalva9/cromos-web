@@ -1,223 +1,331 @@
 Nombre del conjunto: CP-F02-01 Creación y edición de plantillas
 Fase: 02 - Plantillas y Colecciones
-Objetivo: Validar que los autores puedan crear, estructurar, publicar y modificar plantillas de colecciones respetando reglas de negocio, RLS y UI Retro-Comic.
+Objetivo: Validar que los autores puedan crear, publicar y actualizar plantillas de colecciones cumpliendo reglas de negocio, restricciones de base de datos y estilo Retro-Comic.
 
 Pre-requisitos generales:
-- Usuario autor: `qa.creador@cromos.test` (sin plantillas previas).
-- Usuario observador: `qa.observador@cromos.test` para verificar visibilidad.
-- Plantilla de referencia: “Album Mundial 2022 QA” semilla (ID `tmpl_ref_001`) para contrastar.
-- Herramientas: Chrome desktop, Chrome DevTools 768px (tablet) y 375px (móvil); planilla para registrar IDs generados.
-- Acceso a Supabase → Tables → `collection_templates`, `template_pages`, `template_slots` para verificación post-ejecución.
+- Usuario autor: `qa.creador@cromos.test` (sin plantillas publicadas).
+- Usuario observador: `qa.observador@cromos.test` para confirmar visibilidad pública.
+- Plantilla de referencia “Álbum Mundial 2022 QA” (ID `tmpl_ref_001`) disponible para comparaciones.
+- Acceso a Supabase Dashboard (`https://app.supabase.com`) con permisos de lectura en Auth, Storage y SQL.
+- Herramientas: Chrome desktop, Chrome DevTools en 768 px (tablet) y 375 px (móvil), planilla para registrar IDs generados.
 
 Configuración previa:
-- Limpiar drafts existentes del usuario QA si los hay (`is_published = false`).
-- Cerrar sesiones en otros dispositivos para evitar conflictos de locking.
-- Preparar assets opcionales (URL de portada válida y URL inválida).
+- Eliminar borradores previos del autor (`collection_templates.is_public = FALSE`) antes de iniciar.
+- Tener a mano URLs de portada válidas e inválidas para pruebas de validación.
 
 Casos de prueba:
 
 Caso CP-F02-01A: Crear plantilla privada con páginas y slots
-  Cobertura: Happy path; validaciones mínimas; guardado incremental.
+  Cobertura: Flujo feliz; guardado incremental; estructura básica.
   Pasos:
-    1. Iniciar sesión con `qa.creador`.
-    2. Ir a `/templates/new` o CTA "Crear plantilla".
-    3. Completar título "Colección QA Liga 2025", descripción (>120 caracteres), subir portada opcional.
-    4. Añadir 2 páginas:
-       - Página 1: "Equipo A", 9 slots numerados 1-9.
-       - Página 2: "Equipo B", 6 slots + marcar slot 6 como especial.
-    5. Guardar como borrador (no publicar).
-  Criterios de éxito:
-    - Botón "Guardar borrador" habilitado solo tras completar campos obligatorios.
-    - Toast "Plantilla guardada como borrador".
-    - Entradas creadas en `collection_templates` (`is_public = false`, `is_deleted = false`), `template_pages` y `template_slots`.
-    - UI muestra resumen con conteo de páginas y slots.
+    1. Iniciar sesión con `qa.creador@cromos.test`.
+    2. Navegar a `/templates/new` y completar título “Colección QA Liga 2025”, descripción >120 caracteres y portada opcional.
+    3. Agregar dos páginas:
+       - Página 1 “Equipo A” con 9 slots numerados 1-9.
+       - Página 2 “Equipo B” con 6 slots; marcar slot 6 como especial.
+    4. Guardar como borrador (sin publicar).
+  Validaciones UI:
+    - Botón “Guardar borrador” solo se habilita con campos obligatorios completos.
+    - Toast “Plantilla guardada como borrador”.
+    - Resumen lateral muestra conteo correcto de páginas y slots.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT title,
+           is_public,
+           is_deleted,
+           pages_count,
+           slots_count
+    FROM collection_templates
+    WHERE title = 'Colección QA Liga 2025';
+    ```
+    ```sql
+    SELECT tp.page_name,
+           ts.slot_number,
+           ts.is_special
+    FROM template_pages tp
+    JOIN template_slots ts ON ts.page_id = tp.id
+    WHERE tp.template_id = (
+      SELECT id FROM collection_templates
+      WHERE title = 'Colección QA Liga 2025'
+      ORDER BY created_at DESC
+      LIMIT 1
+    )
+    ORDER BY tp.page_order, ts.slot_number;
+    ```
+  Instrucciones para ejecutar las consultas:
+    - Abrir Supabase → **SQL Editor**, ejecutar ambas consultas y confirmar que `is_public = false`, `pages_count = 2`, `slots_count = 15` y que el slot 6 aparece como `is_special = true`.
+  Verificación en Chrome (consola):
+    1. Haz clic derecho en la vista de edición y selecciona **Inspeccionar**.
+    2. Ve a la pestaña **Console** antes de guardar.
+    3. Guarda el borrador y comprueba que no se registran errores en rojo.
 
-Caso CP-F02-01A2: Crear plantilla con variantes y numeración global (estilo Panini)
-  Cobertura: Happy path; slots con variantes; numeración de checklist; auto-población.
+Caso CP-F02-01A2: Crear plantilla con variantes y numeración global estilo Panini
+  Cobertura: Variantes de slots; numeración global y por página; publicación.
   Pasos:
     1. Iniciar sesión con `qa.creador`.
-    2. Ir a `/templates/create` o CTA "Crear plantilla".
-    3. Paso 1 - Información Básica: Completar título "Album LaLiga QA 2025-26", descripción, portada.
-    4. Paso 2 - Páginas y Cromos: Pulsar icono (ℹ️) junto a "Cromos de la Página" para ver ayuda sobre numeración.
-    5. Añadir página "Athletic Club" con slots:
-       - Observar columnas: "No. Global" | "Nombre del Cromo" | "No. Página" | "Variante" | "Especial"
-       - Añadir slot: observar que No. Global se auto-llena con 1, No. Página con 1
-       - Editar: No. Página = 3, sin variante, etiqueta "Sivera" (No. Global queda 1)
-       - Añadir slot: auto-llena No. Global = 2, No. Página = 2
-       - Editar: No. Página = 5, variante "A", No. Global = 1, etiqueta "Gorosabel"
-       - Añadir slot: auto-llena No. Global = 3, No. Página = 3
-       - Editar: No. Página = 5, variante "B", No. Global = 2, etiqueta "Lekue"
-       - Añadir slot: auto-llena No. Global = 4, No. Página = 4
-       - Editar: No. Página = 9, variante "A", etiqueta "Yuri"
-    6. Añadir segunda página "Real Madrid":
-       - Observar que el primer slot auto-llena No. Global = 5 (continúa del anterior)
-    7. Paso 3 - Revisión: Verificar resumen muestra slots como "3. Sivera", "5A. Gorosabel", "5B. Lekue", "9A. Yuri"
-    8. Publicar plantilla.
-  Criterios de éxito:
-    - Popover (ℹ️) muestra explicación clara de los tres conceptos: No. Global, No. Página, Variante.
-    - Campo "Variante" acepta letra única (A-Z) y auto-convierte minúsculas a mayúsculas.
-    - Campo "No. Global" se auto-poblaciona secuencialmente (1, 2, 3, 4...) pero es editable.
-    - Campo "No. Página" se auto-poblaciona incrementando el máximo de la página actual, pero es editable.
-    - No. Global continúa incrementando entre páginas (página 2 empieza donde terminó página 1).
-    - Validación impide duplicar número global: borde rojo + texto "Duplicado" aparece en tiempo real.
-    - En `template_slots`: registros con `slot_number`, `slot_variant` ('A', 'B', NULL), `global_number` y `template_id` correctos.
-    - Vista de detalle muestra slots ordenados: 3, 5A, 5B, 9A (primero por slot_number, luego por slot_variant).
-    - UI lista slots como "3. Sivera", "5A. Gorosabel", "5B. Lekue", "9A. Yuri".
+    2. Completar el asistente `/templates/create` con título “Álbum LaLiga QA 2025-26”.
+    3. En “Páginas y Cromos”, añadir página “Athletic Club”:
+       - Slot 1: global 1, página 1, sin variante, nombre “Sivera”.
+       - Slot 2 y 3: ajustar a global 1 y 2 con variantes A/B, página 5, nombre “Gorosabel” / “Lekue”.
+       - Slot 4: global 4, página 9, variante A.
+    4. Añadir segunda página “Real Madrid” y confirmar que comienza en global 5.
+    5. Completar revisión y publicar.
+  Validaciones UI:
+    - Popup de ayuda (ícono ℹ) explica numeración global/página/variante.
+    - La vista previa lista slots como “3. Sivera”, “5A. Gorosabel”, “5B. Lekue”, “9A. Yuri”.
+    - Toast “Plantilla publicada” al finalizar.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT title,
+           is_public,
+           rating_count,
+           copies_count
+    FROM collection_templates
+    WHERE title = 'Álbum LaLiga QA 2025-26'
+    ORDER BY created_at DESC
+    LIMIT 1;
+    ```
+    ```sql
+    SELECT ts.slot_number,
+           ts.global_number,
+           ts.slot_variant,
+           ts.is_special
+    FROM template_slots ts
+    WHERE ts.template_id = (
+      SELECT id FROM collection_templates
+      WHERE title = 'Álbum LaLiga QA 2025-26'
+      ORDER BY created_at DESC
+      LIMIT 1
+    )
+    ORDER BY ts.global_number, ts.slot_variant NULLS FIRST;
+    ```
+  Instrucciones:
+    - Ejecutar las consultas y confirmar que `is_public = true`, `global_number` es secuencial y `slot_variant` contiene ‘A’/‘B’ cuando se configuró.
+  Verificación en Chrome:
+    1. Abrir **Inspeccionar**.
+    2. En la pestaña **Console**, publicar y asegurarse de que no se muestran errores.
+    3. Revisar **Network** filtrando por `/rest/v1/template_slots` para comprobar respuestas 200.
 
 Caso CP-F02-01B: Validaciones de formulario y duplicados
-  Cobertura: Edge; límites de longitud; duplicados en tiempo real; validación cliente/servidor.
+  Cobertura: Mensajes de error; validación cliente/servidor.
   Pasos:
     1. Intentar guardar con título vacío y descripción <30 caracteres.
-    2. En la misma página, crear dos slots con mismo número y misma variante:
-       - Slot No. Página = 5, variante "A"
-       - Slot No. Página = 5, variante "A" (duplicado)
-       - Observar borde rojo y mensaje "Duplicado" en ambos campos (No. Página y Variante)
-    3. Crear slot 5A y slot 5 sin variante en la misma página (debe permitirse - son diferentes):
-       - Slot No. Página = 5, variante "A"
-       - Slot No. Página = 5, sin variante (dejar campo vacío)
-       - Verificar que NO aparece error de duplicado
-    4. Crear dos slots con mismo número pero diferentes variantes (debe permitirse):
-       - Slot No. Página = 5, variante "A"
-       - Slot No. Página = 5, variante "B"
-       - Verificar que NO aparece error de duplicado
-    5. Ingresar variante minúscula "a" → debe auto-convertirse a "A"
-    6. Ingresar variante con múltiples letras "AB" → debe aceptar solo el primer carácter "A" (maxLength=1)
-    7. Crear dos slots en páginas diferentes con mismo número global:
-       - Página 1, slot con No. Global = 10
-       - Página 2, slot con No. Global = 10 (duplicado)
-       - Observar borde rojo y mensaje "Duplicado" en campo No. Global de ambos slots
-    8. Intentar crear >50 slots en una página.
-    9. Intentar avanzar al paso de revisión con duplicados sin resolver.
-  Criterios de éxito:
-    - Mensajes inline claros ("El título es obligatorio").
-    - Sistema detecta duplicados (slot_number, slot_variant) en tiempo real: borde rojo + "Duplicado".
-    - Slot 5A y slot 5 (sin variante) pueden coexistir sin error.
-    - Slot 5A y slot 5B pueden coexistir sin error.
-    - Variantes minúsculas se convierten automáticamente a mayúsculas al escribir.
-    - Variantes multi-carácter están limitadas a 1 letra por el atributo maxLength del input.
-    - Número global duplicado muestra borde rojo + "Duplicado" en tiempo real en campo No. Global.
-    - Al intentar avanzar/guardar con duplicados, aparece error: "Los números de checklist globales deben ser únicos en toda la plantilla" o "Cada combinación de número y variante debe ser única en la página".
-    - Límite de 50 slots bloquea la acción con aviso.
+    2. Crear dos slots con el mismo número y variante.
+    3. Guardar y observar la respuesta.
+  Validaciones UI:
+    - Aparecen mensajes “Campo obligatorio” y bordes rojos.
+    - Al duplicar slot, se marca “Duplicado” y se bloquea el guardado.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT COUNT(*) AS slots_duplicados
+    FROM template_slots
+    WHERE template_id = (
+      SELECT id FROM collection_templates
+      WHERE title = 'Colección QA Liga 2025'
+      ORDER BY created_at DESC
+      LIMIT 1
+    )
+    GROUP BY template_id, slot_number, COALESCE(slot_variant, '')
+    HAVING COUNT(*) > 1;
+    ```
+  Instrucciones:
+    - Ejecutar después de intentar guardar; el resultado debe estar vacío.
+  Verificación en Chrome:
+    1. Abrir **Console** antes de forzar los errores.
+    2. Confirmar que solo aparecen warnings controlados, sin stack traces.
 
 Caso CP-F02-01C: Publicar plantilla y visibilidad pública
-  Cobertura: Flujo feliz; cambio de estado; indexación.
+  Cobertura: Cambios de estado; visibilidad para terceros.
   Pasos:
-    1. Abrir borrador creado y pulsar “Publicar”.
-    2. Confirmar modal.
-    3. Iniciar sesión con `qa.observador` y visitar `/templates`.
-    4. Buscar por “Colección QA Liga 2025”.
-  Criterios de éxito:
-    - Estado cambia a “Publicada” con badge verde.
-    - Registro actualiza `is_public = true`, `published_at` no nulo.
-    - Observador ve la plantilla en listado público y puede abrir detalle.
-    - URL pública muestra autor, número de copias = 0 y botón “Copiar”.
+    1. Publicar el borrador “Colección QA Liga 2025”.
+    2. Abrir la URL pública con `qa.observador`.
+  Validaciones UI:
+    - La ficha muestra badge “Pública” y aparece en listados `/templates`.
+    - El observador puede ver descripción, portada y slots.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT title,
+           is_public,
+           published_at
+    FROM collection_templates
+    WHERE title = 'Colección QA Liga 2025'
+    ORDER BY updated_at DESC
+    LIMIT 1;
+    ```
+  Instrucciones:
+    - Confirmar que `is_public = true` y `published_at` no es nulo.
+  Verificación en Chrome:
+    1. Con la plantilla publicada, abrir **Inspeccionar**.
+    2. En **Console**, navegar con `qa.observador` y comprobar que no aparecen errores.
 
 Caso CP-F02-01D: Edición de metadatos publicados
-  Cobertura: Actualizar título, descripción, visibilidad; no romper copias existentes.
+  Cobertura: Control de cambios; auditoría.
   Pasos:
-    1. Con autor, editar título y descripción (añadir “v2”).
-    2. Cambiar visibilidad a “Privada”.
-    3. Guardar y revisar efecto en listado público.
-    4. Restaurar visibilidad pública.
-  Criterios de éxito:
-    - Modal de confirmación explica impacto en usuarios.
-    - Al poner privada, desaparece de `/templates` públicos pero se conserva para el autor.
-    - Al re-publicar, resumen de copias existentes se mantiene.
-    - `audit_log` registra `template_visibility_change`.
+    1. Con plantilla publicada, editar título y descripción.
+    2. Guardar y revisar historial.
+  Validaciones UI:
+    - Toast “Plantilla actualizada”.
+    - Vista pública refleja los nuevos metadatos tras recargar.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT title,
+           description,
+           updated_at
+    FROM collection_templates
+    WHERE title LIKE 'Colección QA Liga 2025%'
+    ORDER BY updated_at DESC
+    LIMIT 1;
+    ```
+    ```sql
+    SELECT action,
+           metadata->>'template_id' AS template_id,
+           created_at
+    FROM audit_log
+    WHERE action = 'template_visibility_change'
+    ORDER BY created_at DESC
+    LIMIT 1;
+    ```
+  Instrucciones:
+    - Verificar que `updated_at` coincide con la edición y que se registra en `audit_log`.
+  Verificación en Chrome:
+    1. Abrir **Console** antes de guardar cambios.
+    2. Confirmar que no aparecen errores tras publicar la edición.
 
-Caso CP-F02-01E: Edición completa de plantilla con nuevos campos
-  Cobertura: Editar plantilla existente; wizard pre-poblado; modificar slots con variantes.
+Caso CP-F02-01E: Edición completa con nuevos campos
+  Cobertura: Eliminación y reorden de páginas/slots; integridad referencial.
   Pasos:
-    1. Desde detalle de plantilla "Album LaLiga QA 2025-26", pulsar "Editar plantilla".
-    2. Verificar que se abre el wizard de creación (3 pasos) con datos pre-poblados:
-       - Paso 1: título, descripción, portada, visibilidad ya completados
-       - Paso 2: todas las páginas y slots existentes visibles con todos sus campos
-    3. En Paso 1, cambiar título a "Album LaLiga QA 2025-26 v2".
-    4. En Paso 2, editar página "Athletic Club":
-       - Cambiar título de página a "Athletic Club de Bilbao"
-       - Modificar slot "3. Sivera": cambiar etiqueta a "Sivera (Portero)"
-       - Modificar slot "5A. Gorosabel": cambiar No. Página a 4, mantener variante "A"
-       - Añadir nuevo slot: No. Global auto-poblado (siguiente disponible), No. Página = 10, variante vacía, etiqueta "Guruzeta"
-       - Eliminar slot "9A. Yuri" (pulsar icono de papelera)
-    5. Añadir nueva página "FC Barcelona" con 3 slots.
-    6. Eliminar página "Real Madrid" completa (si existe).
-    7. Paso 3 - Revisión: Verificar cambios en resumen.
-    8. Guardar cambios.
-  Criterios de éxito:
-    - Wizard se abre con todos los datos existentes pre-poblados correctamente.
-    - Todos los campos editables: título, descripción, nombre de página, etiqueta de slot, No. Página, Variante, No. Global.
-    - Auto-población de números funciona al añadir nuevos slots (continúa secuencia existente).
-    - Al guardar, se eliminan todas las páginas/slots antiguos y se recrean con la nueva estructura (delete + insert).
-    - En BD: `collection_templates` actualizado, `template_pages` y `template_slots` reflejan nueva estructura.
-    - Columna `template_id` en `template_slots` se mantiene correcta tras la actualización.
-    - Validaciones de duplicados funcionan durante edición igual que en creación.
-    - Toast "Plantilla actualizada con éxito" y redirección a `/templates/{id}`.
+    1. Editar la plantilla publicada y:
+       - Reordenar páginas.
+       - Eliminar un slot y agregar uno nuevo.
+       - Cambiar el tipo “especial”.
+    2. Guardar y revisar vista previa.
+  Validaciones UI:
+    - La numeración se recalcula correctamente.
+    - No se muestran slots “huérfanos”.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT tp.page_name,
+           tp.page_order,
+           ts.slot_number,
+           ts.is_special
+    FROM template_pages tp
+    JOIN template_slots ts ON ts.page_id = tp.id
+    WHERE tp.template_id = (
+      SELECT id FROM collection_templates
+      WHERE title LIKE 'Colección QA Liga 2025%'
+      ORDER BY updated_at DESC
+      LIMIT 1
+    )
+    ORDER BY tp.page_order, ts.slot_number;
+    ```
+  Instrucciones:
+    - Confirmar que la ordenación coincide con la UI y que el slot eliminado ya no aparece.
+  Verificación en Chrome:
+    1. Abrir **Inspeccionar** → **Console**.
+    2. Guardar cambios y verificar que no surgen errores o peticiones fallidas en **Network**.
 
 Caso CP-F02-01F: Eliminación total de plantilla
-  Cobertura: Soft delete; confirmaciones; notificación a usuarios.
+  Cobertura: Soft delete; limpieza de contenido relacionado.
   Pasos:
-    1. Desde página de detalle, pulsar “Eliminar plantilla”.
-    2. Confirmar motivo en textarea obligatorio (>20 caracteres).
-    3. Verificar redirección a `/templates`.
-    4. Revisar base de datos.
-  Criterios de éxito:
-    - Modal indica impacto en copias existentes.
-    - Tras confirmar, se redirige con toast “Plantilla eliminada”.
-    - En DB: `is_deleted = true`, título prefijado con `[ELIMINADA]`.
-    - Copias existentes siguen activas pero marcadas como huérfanas (ver `user_template_copies.template_deleted = true` si existe).
+    1. Desde la vista de edición, seleccionar “Eliminar plantilla” y confirmar.
+    2. Revisar la lista de plantillas del autor.
+  Validaciones UI:
+    - Toast “Plantilla eliminada”.
+    - Ya no aparece en `/templates` ni en el listado del autor.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT title,
+           is_deleted,
+           deleted_at
+    FROM collection_templates
+    WHERE title LIKE 'Colección QA Liga 2025%'
+    ORDER BY deleted_at DESC
+    LIMIT 1;
+    ```
+  Instrucciones:
+    - Confirmar que `is_deleted = true` y `deleted_at` tiene timestamp.
+  Verificación en Chrome:
+    1. Abrir **Console** antes de eliminar.
+    2. Confirmar que la petición DELETE responde 200 en **Network** y no hay errores en consola.
 
 Caso CP-F02-01G: Restricciones de autoría
-  Cobertura: Intentar editar con usuario ajeno.
+  Cobertura: RLS; acceso controlado.
   Pasos:
-    1. Iniciar sesión con `qa.observador`.
-    2. Acceder a `/templates/{id}` de la plantilla creada y buscar botones de edición.
-    3. Intentar forzar URL `/templates/{id}/edit`.
-  Criterios de éxito:
-    - Botones de editar/eliminar no se muestran.
-    - Si se fuerza ruta, aparece mensaje "No tienes permiso para editar esta plantilla" y redirección.
-    - No se registran intentos fallidos de RLS en Supabase.
+    1. Con `qa.observador`, intentar editar la plantilla.
+    2. Observar respuesta y mensajes.
+  Validaciones UI:
+    - Se bloquea la edición y se muestra mensaje “No tienes permisos”.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT policyname,
+           cmd,
+           roles
+    FROM pg_policies
+    WHERE tablename = 'collection_templates';
+    ```
+  Instrucciones:
+    - Ejecutar para confirmar existencia de política `Authors can update own templates`.
+  Verificación en Chrome:
+    1. Con `qa.observador`, abrir **Console**.
+    2. Intentar editar y asegurar que la respuesta HTTP es 403 sin errores adicionales.
 
-Caso CP-F02-01H: Sistema de valoraciones de plantillas (Sprint 14)
-  Cobertura: Ratings de plantillas; UX de valoraciones; restricciones de autor.
+Caso CP-F02-01H: Sistema de valoraciones de plantillas
+  Cobertura: Rating promedio; conteo de votos.
   Pasos:
-    1. Con `qa.observador`, abrir detalle de plantilla pública `/templates/{id}`.
-    2. **NUEVO**: Verificar sección de valoraciones con resumen (promedio, distribución de estrellas, total de valoraciones).
-    3. **NUEVO**: Pulsar "Valorar plantilla" y abrir modal de valoración.
-    4. **NUEVO**: Asignar 4 estrellas y comentario opcional (máx 280 caracteres).
-    5. **NUEVO**: Guardar valoración y verificar que aparece en la lista de reseñas.
-    6. **NUEVO**: Editar valoración propia (cambiar estrellas o comentario).
-    7. **NUEVO**: Eliminar valoración propia.
-    8. **NUEVO**: Intentar valorar como autor de la plantilla.
-  Criterios de éxito:
-    - **NUEVO**: Sección de valoraciones muestra promedio en estrellas con gráfico de distribución (1⭐-5⭐).
-    - **NUEVO**: Modal permite seleccionar 1-5 estrellas con comentario opcional.
-    - **NUEVO**: Registro se crea en `template_ratings` con `rating`, `comment`, `user_id`, `template_id`.
-    - **NUEVO**: Lista de reseñas muestra valoraciones con paginación (infinite scroll).
-    - **NUEVO**: Usuario puede editar/eliminar solo su propia valoración.
-    - **NUEVO**: Autor de plantilla no puede valorar su propia plantilla (botón deshabilitado con mensaje explicativo).
-    - **NUEVO**: Toast "Valoración guardada" / "Valoración actualizada" / "Valoración eliminada" en español.
-    - **NUEVO**: Promedio se actualiza automáticamente tras cada valoración.
-    - **NUEVO**: Notificación se envía al autor de la plantilla cuando recibe valoración.
-    - **NUEVO**: Usuarios sin sesión ven "Inicia sesión para valorar".
+    1. Con `qa.observador`, puntuar la plantilla con 4 estrellas.
+    2. Cambiar a `qa.creador` y revisar resumen.
+  Validaciones UI:
+    - Rating promedio y conteo se actualizan en tiempo real.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT rating_avg,
+           rating_count
+    FROM collection_templates
+    WHERE title LIKE 'Álbum LaLiga QA 2025-26%'
+    ORDER BY updated_at DESC
+    LIMIT 1;
+    ```
+    ```sql
+    SELECT rating,
+           created_by
+    FROM template_ratings
+    WHERE template_id = (
+      SELECT id FROM collection_templates
+      WHERE title LIKE 'Álbum LaLiga QA 2025-26%'
+      ORDER BY updated_at DESC
+      LIMIT 1
+    )
+    ORDER BY created_at DESC
+    LIMIT 3;
+    ```
+  Instrucciones:
+    - Confirmar que `rating_count` incrementa y el registro corresponde al usuario evaluador.
+  Verificación en Chrome:
+    1. Abrir **Console** en la vista pública.
+    2. Puntuar y verificar ausencia de errores.
 
 Caso CP-F02-01I: Compatibilidad retroactiva con plantillas existentes
-  Cobertura: Edge; migración; funcionalidad legacy.
+  Cobertura: Migraciones de schema; manejo de NULL en nuevas columnas.
   Pasos:
-    1. Acceder a plantilla creada antes de la actualización (sin variantes ni números globales).
-    2. Visualizar detalle de la plantilla.
-    3. Copiar la plantilla y marcar progreso.
-    4. Editar la plantilla antigua (añadir un slot nuevo).
-    5. Publicar duplicado desde slot sin variante al marketplace.
-  Criterios de éxito:
-    - Plantillas antiguas se visualizan correctamente sin mostrar campos de variante/número global.
-    - En BD, columnas `slot_variant` y `global_number` aparecen como NULL para slots antiguos.
-    - Funcionalidad de copia, progreso y publicación a marketplace funciona normalmente.
-    - Al editar plantilla antigua, se puede añadir slots con o sin variantes (campos opcionales).
-    - No hay errores de tipo o validación en plantillas legacy.
-    - Ordenamiento de slots funciona correctamente (NULL se trata como menor que cualquier variante).
+    1. Abrir la plantilla de referencia “Álbum Mundial 2022 QA”.
+    2. Revisar slots existentes para confirmar que se muestran sin variantes.
+  Validaciones UI:
+    - Los slots antiguos se renderizan sin errores ni valores vacíos inesperados.
+  Validación en Supabase (SQL):
+    ```sql
+    SELECT slot_variant,
+           global_number
+    FROM template_slots
+    WHERE template_id = 'tmpl_ref_001'
+    LIMIT 5;
+    ```
+  Instrucciones:
+    - Confirmar que `slot_variant` puede ser NULL y que `global_number` tiene valores consistentes.
+  Verificación en Chrome:
+    1. Abrir **Console** en la vista de la plantilla.
+    2. Navegar por las páginas y comprobar que no se generan errores.
 
 Notas generales:
-- Registrar IDs de plantilla generados en la hoja de seguimiento para reutilizarlos en pruebas de copias.
-- Documentar tiempos de respuesta y cualquier problema de rendimiento al guardar (>2 s).
-- **NUEVO**: Anotar si alguna plantilla antigua presenta problemas tras la actualización de esquema.
-- **NUEVO**: Para plantillas con >100 slots y numeración global, medir tiempo de carga y renderizado.
+- Registrar en la planilla QA los IDs de plantillas creadas, páginas y slots para limpieza posterior.
+- Para todas las consultas, utilizar Supabase Dashboard → SQL Editor; reemplazar títulos o IDs cuando sea necesario.
+- Conservar capturas de pantalla y tiempos de ejecución en la carpeta compartida QA.
