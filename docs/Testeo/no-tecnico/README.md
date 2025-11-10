@@ -35,7 +35,7 @@ Necesitarás:
 ### 3. Configura tu entorno
 
 1. **Instala Chrome** si no lo tienes: https://www.google.com/chrome/
-2. **Solicita credenciales** de Supabase a David en Slack (#testing)
+2. **Solicita credenciales** de Supabase a David
 3. **Abre el spreadsheet** y filtra por tu nombre en la columna "Asignado_A"
 
 ## 📖 Cómo Usar Esta Carpeta
@@ -84,6 +84,7 @@ Cada archivo `.md` contiene **múltiples casos de prueba** relacionados. Por eje
 #### 3. Validaciones Técnicas (10-15 min)
 
 **Validación SQL:**
+
 1. Abre Supabase Dashboard
 2. Ve a SQL Editor
 3. Copia la consulta del test
@@ -91,6 +92,7 @@ Cada archivo `.md` contiene **múltiples casos de prueba** relacionados. Por eje
 5. Ejecuta y verifica el resultado
 
 **Verificación Chrome DevTools:**
+
 1. Abre DevTools con `F12`
 2. Ve a pestaña Console
 3. Verifica que no haya errores rojos
@@ -154,6 +156,7 @@ WHERE email = 'tester+maria_09nov@cromos.test';
 ### 6. Resultado esperado
 
 ✅ **Test EXITOSO si:**
+
 - Ves 1 fila con tu email
 - `confirmed_at` no está vacío
 - No hay errores rojos en consola
@@ -174,7 +177,7 @@ Notas: OK
 - ✅ Ejecuta los tests en orden (no saltes fases)
 - ✅ Toma capturas de pantalla de los errores
 - ✅ Copia los mensajes de error completos
-- ✅ Pregunta en Slack #testing si tienes dudas
+- ✅ Pregunta a David si tienes dudas
 - ✅ Anota el tiempo que te toma cada test (para mejorar estimaciones)
 
 ### ❌ Evita
@@ -192,7 +195,7 @@ Notas: OK
 
 1. Vuelve a leer `GUIA_DE_CONSULTAS_SQL.md`
 2. Busca la sección relevante (ej: "Reemplazar variables")
-3. Si sigue sin estar claro, contacta a David en Slack
+3. Si sigue sin estar claro, contacta a David
 4. **NUNCA adivines** - mejor preguntar
 
 ### ...un test falla pero no sé por qué?
@@ -206,13 +209,13 @@ Notas: OK
 ### ...hay un error en las instrucciones del test?
 
 1. **No modifiques** el archivo de test
-2. **Reporta** a David en Slack: "Test CP-FXX-YY tiene error en paso 3"
+2. **Reporta** a David o en el spreadsheet: "Test CP-FXX-YY tiene error en paso 3"
 3. **Continúa** con el siguiente test mientras David lo revisa
 
 ### ...no tengo acceso a Supabase?
 
 1. **STOP** - no puedes ejecutar tests sin acceso
-2. **Contacta** a David inmediatamente en Slack
+2. **Contacta** a David inmediatamente
 3. Mientras tanto, puedes leer las guías y familiarizarte con Chrome DevTools
 
 ## 📊 Seguimiento de Progreso
@@ -232,6 +235,7 @@ Notas: OK
 **Tiempo estimado:** 2-3 horas de trabajo por sesión
 
 **Distribución:**
+
 - Lunes-Miércoles: Fase-01, Fase-02 (fundacionales)
 - Jueves-Viernes: Fase-03, Fase-04 (features principales)
 - Siguiente semana: Fase-05 en adelante
@@ -243,6 +247,7 @@ Notas: OK
 **NO siempre.** Algunos tests tienen **dependencias** (columna "Bloqueador").
 
 **Ejemplo:**
+
 - CP-F03-02B (ver detalle de listado) **requiere** CP-F03-01 (crear listado)
 
 **Regla:** Ejecuta en orden de fases (01 → 10) para evitar problemas.
@@ -258,6 +263,7 @@ Los tests están diseñados específicamente para Chrome DevTools.
 **Aproximadamente 18-23 horas** distribuidas en 2-3 semanas.
 
 **Desglose:**
+
 - Fase-01: ~3 horas
 - Fase-02: ~3.5 horas
 - Fase-03: ~4 horas
@@ -274,19 +280,12 @@ Los tests están diseñados específicamente para Chrome DevTools.
 ## 📞 Contacto y Soporte
 
 ### David (Lead Técnico)
-- **Slack:** @david en canal `#testing`
+
 - **Cuándo contactar:**
   - No tienes acceso a Supabase
   - Encontraste un bug crítico
   - Las instrucciones no están claras
   - Un test falla consistentemente
-
-### Canal #testing (Slack)
-- **Para qué:**
-  - Preguntas generales
-  - Compartir hallazgos
-  - Coordinar con otros testers
-  - Reportar progreso
 
 ## ✅ Checklist: Antes de tu Primera Sesión de Testing
 
@@ -321,4 +320,4 @@ Antes de ejecutar cualquier test, asegúrate de:
 
 **Versión:** 1.0
 **Última actualización:** 2025-11-09
-**Contacto:** David (Slack #testing)
+**Contacto:** David
