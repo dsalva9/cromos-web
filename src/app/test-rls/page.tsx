@@ -162,8 +162,8 @@ export default function TestRLSPage() {
           <h2 className="text-yellow-400 font-bold mb-2">⚠️ Instructions:</h2>
           <ol className="text-yellow-200 text-sm space-y-1 list-decimal list-inside">
             <li>Make sure you are logged in as User A</li>
-            <li>Have User B's UUID ready (86b9dca5-e9ed-4c54-8aff-99cb84c3f51c)</li>
-            <li>Click "Run Full Test" or run individual tests</li>
+            <li>Have User B&apos;s UUID ready (86b9dca5-e9ed-4c54-8aff-99cb84c3f51c)</li>
+            <li>Click &quot;Run Full Test&quot; or run individual tests</li>
             <li>Expected: Own updates succeed, other updates fail</li>
           </ol>
         </div>

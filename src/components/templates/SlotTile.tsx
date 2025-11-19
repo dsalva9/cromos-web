@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Minus, Plus, Upload } from 'lucide-react';
+
+import { Minus, Plus, Upload, Check, Copy as CopyIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -38,9 +36,26 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
 
-  const getStatusColor = () => {
-    // Use consistent card styling regardless of status
-    return 'bg-gray-800 border-gray-700';
+  const getStatusStyles = () => {
+    switch (slot.status) {
+      case 'owned':
+        return 'bg-green-900/20 border-green-500/50 hover:border-green-500';
+      case 'duplicate':
+        return 'bg-[#FFC000]/10 border-[#FFC000]/50 hover:border-[#FFC000]';
+      default: // missing
+        return 'bg-gray-900 border-gray-800 hover:border-gray-600';
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (slot.status) {
+      case 'owned':
+        return <Check className="w-3 h-3 mr-1" />;
+      case 'duplicate':
+        return <CopyIcon className="w-3 h-3 mr-1" />;
+      default:
+        return null;
+    }
   };
 
   const getStatusLabel = () => {
@@ -48,7 +63,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
       case 'missing':
         return 'Falta';
       case 'owned':
-        return 'Lo Tengo';
+        return 'Tengo';
       case 'duplicate':
         return 'Repe';
       default:
@@ -95,33 +110,24 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
     let newCount: number;
 
     if (slot.status === 'missing') {
-      // Missing should never get here, but just in case
       return;
     } else if (slot.status === 'owned') {
-      // Owned (count = 1)
       if (delta > 0) {
-        // Add one -> Duplicate (count = 2)
         newStatus = 'duplicate';
         newCount = 2;
       } else {
-        // Subtract one -> Missing (count = 0)
         newStatus = 'missing';
         newCount = 0;
       }
     } else if (slot.status === 'duplicate') {
-      // Duplicate (count >= 2)
       const newTotalCount = localCount + delta;
-
       if (newTotalCount <= 0) {
-        // Count goes to 0 or less -> Missing
         newStatus = 'missing';
         newCount = 0;
       } else if (newTotalCount === 1) {
-        // Count goes to 1 -> Owned
         newStatus = 'owned';
         newCount = 1;
       } else {
-        // Count is 2 or more -> Duplicate
         newStatus = 'duplicate';
         newCount = newTotalCount;
       }
@@ -141,110 +147,103 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
   };
 
   return (
-    <ModernCard className={cn('relative', getStatusColor())}>
-      <ModernCardContent className="p-3 space-y-2">
-        {/* Label */}
-        <div className="text-center">
-          <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem]">
+    <div 
+      className={cn(
+        'relative rounded-xl border transition-all duration-200 group flex flex-col h-full overflow-hidden',
+        getStatusStyles()
+      )}
+    >
+      {/* Top Status Bar */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-1 transition-colors duration-300"
+        style={{
+          background: slot.status === 'owned' ? '#22c55e' : slot.status === 'duplicate' ? '#FFC000' : 'transparent'
+        }}
+      />
+
+      <div className="p-3 flex flex-col h-full">
+        {/* Header Info */}
+        <div className="text-center mb-3">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <span className="text-xs font-mono text-gray-500">#{slot.slot_number}</span>
+            {slot.is_special && (
+              <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1 rounded border border-purple-500/30">SPECIAL</span>
+            )}
+          </div>
+          <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem] leading-tight">
             {slot.label || `Cromo ${slot.slot_id.slice(-4)}`}
           </p>
-          {/* Number and Checklist Info */}
-          {(slot.slot_number || slot.global_number) && (
-            <p className="text-xs text-gray-400 mt-1">
-              {slot.slot_number && (
-                <>
-                  #{slot.slot_number}
-                  {slot.slot_variant}
-                </>
+        </div>
+
+        <div className="mt-auto space-y-3">
+          {/* Status Button */}
+          <button
+            onClick={handleStatusClick}
+            disabled={updating}
+            className={cn(
+              "w-full py-1.5 px-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center",
+              slot.status === 'missing' && "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white",
+              slot.status === 'owned' && "bg-green-500 text-black hover:bg-green-400",
+              slot.status === 'duplicate' && "bg-[#FFC000] text-black hover:bg-[#FFD700]"
+            )}
+          >
+            {getStatusIcon()}
+            {getStatusLabel()}
+          </button>
+
+          {/* Controls for Owned/Duplicate */}
+          {(slot.status === 'owned' || slot.status === 'duplicate') && (
+            <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+              {/* Counter */}
+              <div className="flex items-center justify-between bg-black/20 rounded-lg p-1">
+                <button
+                  onClick={() => handleCountChange(-1)}
+                  disabled={updating}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 text-white transition-colors"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <span className="text-sm font-bold text-white font-mono">
+                  {slot.status === 'owned' ? '1' : localCount}
+                </span>
+                <button
+                  onClick={() => handleCountChange(1)}
+                  disabled={updating}
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 text-white transition-colors"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Marketplace Action */}
+              {listing ? (
+                <Link href={`/marketplace/${listing.id}`} className="block">
+                  <div className="w-full bg-green-900/30 border border-green-800 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-400 hover:bg-green-900/50 transition-colors">
+                    <Upload className="w-3 h-3" />
+                    <span>EN VENTA</span>
+                  </div>
+                </Link>
+              ) : listingsLoading ? (
+                <div className="w-full h-6 bg-gray-800 animate-pulse rounded-lg" />
+              ) : (
+                <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`} className="block">
+                  <button className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg py-1 px-2 text-[10px] font-medium transition-colors flex items-center justify-center gap-1.5">
+                    <Upload className="w-3 h-3" />
+                    <span>VENDER</span>
+                  </button>
+                </Link>
               )}
-              {slot.slot_number && slot.global_number && ' | '}
-              {slot.global_number && <>Checklist #{slot.global_number}</>}
-            </p>
+            </div>
           )}
         </div>
+      </div>
 
-        {/* Status Badge */}
-        <div className="text-center">
-          <Badge
-            variant="outline"
-            className={cn(
-              'cursor-pointer uppercase text-xs font-bold border-2',
-              slot.status === 'missing' && 'bg-gray-700/50 text-gray-300 border-gray-600',
-              slot.status === 'owned' && 'bg-green-500/20 text-green-400 border-green-500',
-              slot.status === 'duplicate' && 'bg-amber-500/20 text-amber-400 border-amber-500'
-            )}
-            onClick={handleStatusClick}
-          >
-            {getStatusLabel()}
-          </Badge>
+      {/* Loading Overlay */}
+      {updating && (
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+          <div className="animate-spin h-5 w-5 border-2 border-[#FFC000] border-r-transparent rounded-full" />
         </div>
-
-        {/* Count Controls (for owned and duplicates) */}
-        {(slot.status === 'owned' || slot.status === 'duplicate') && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleCountChange(-1)}
-                disabled={updating}
-                className="h-6 w-6 p-0"
-              >
-                <Minus className="h-3 w-3" />
-              </Button>
-              <span className="text-white font-bold w-8 text-center">
-                {slot.status === 'owned'
-                  ? '1'
-                  : localCount - 1 > 0
-                    ? `${localCount - 1}`
-                    : '1'}{' '}
-                {/* Display 1 for owned or spares count (total - 1) for duplicates */}
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleCountChange(1)}
-                disabled={updating}
-                className="h-6 w-6 p-0"
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            </div>
-
-            {/* Publish Button or Published Badge */}
-            {listing ? (
-              <Link href={`/marketplace/${listing.id}`}>
-                <Badge
-                  variant="outline"
-                  className="w-full bg-green-700 text-white border-green-600 hover:bg-green-600 cursor-pointer text-xs py-1 flex items-center justify-center gap-1"
-                >
-                  <Upload className="h-3 w-3" />
-                  Publicado
-                </Badge>
-              </Link>
-            ) : listingsLoading ? (
-              <div className="w-full h-7 bg-gray-700 animate-pulse rounded" />
-            ) : (
-              <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`}>
-                <Button
-                  size="sm"
-                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] text-xs h-7"
-                >
-                  <Upload className="mr-1 h-3 w-3" />
-                  Publicar
-                </Button>
-              </Link>
-            )}
-          </div>
-        )}
-
-        {/* Loading Overlay */}
-        {updating && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-md">
-            <div className="animate-spin h-4 w-4 border-2 border-white border-r-transparent rounded-full" />
-          </div>
-        )}
-      </ModernCardContent>
-    </ModernCard>
+      )}
+    </div>
   );
 }

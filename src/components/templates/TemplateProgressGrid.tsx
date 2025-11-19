@@ -2,12 +2,11 @@
 
 import { useState, useMemo } from 'react';
 import { SlotTile } from '@/components/templates/SlotTile';
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useSlotListings } from '@/hooks/templates/useSlotListings';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, LayoutGrid } from 'lucide-react';
 
 interface SlotProgress {
   slot_id: string;
@@ -94,31 +93,64 @@ export function TemplateProgressGrid({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Page Tabs */}
-      <ModernCard>
-        <ModernCardContent className="p-4">
-          <Tabs
-            value={selectedPage.toString()}
-            onValueChange={v => setSelectedPage(Number(v))}
-          >
-            <TabsList className="w-full flex-wrap h-auto">
-              {pageNumbers.map(pageNum => (
-                <TabsTrigger
-                  key={pageNum}
-                  value={pageNum.toString()}
-                  className="flex-1 min-w-[100px]"
-                >
-                  Página {pageNum}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </ModernCardContent>
-      </ModernCard>
+      <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-2">
+        <Tabs
+          value={selectedPage.toString()}
+          onValueChange={v => setSelectedPage(Number(v))}
+          className="w-full"
+        >
+          <TabsList className="w-full flex-wrap h-auto bg-transparent gap-2 justify-start p-0">
+            {pageNumbers.map(pageNum => (
+              <TabsTrigger
+                key={pageNum}
+                value={pageNum.toString()}
+                className="
+                  data-[state=active]:bg-[#FFC000] 
+                  data-[state=active]:text-black 
+                  data-[state=active]:font-bold
+                  text-gray-400
+                  hover:text-white
+                  hover:bg-gray-800
+                  border border-transparent
+                  data-[state=active]:border-[#FFC000]
+                  rounded-lg px-4 py-2
+                  transition-all duration-200
+                  flex-1 min-w-[100px] md:flex-none
+                "
+              >
+                Página {pageNum}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Grid Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-gray-400">
+          <LayoutGrid className="w-5 h-5" />
+          <span className="font-medium">Cromos de la página {selectedPage}</span>
+        </div>
+        
+        <Button
+          onClick={() => setConfirmDialogOpen(true)}
+          variant="outline"
+          className="
+            border-[#FFC000] text-[#FFC000] 
+            hover:bg-[#FFC000] hover:text-black
+            transition-all duration-300
+            font-bold
+          "
+        >
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          Completar Página
+        </Button>
+      </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {pageGroups[selectedPage]?.map(slot => (
           <SlotTile
             key={slot.slot_id}
@@ -131,45 +163,42 @@ export function TemplateProgressGrid({
         ))}
       </div>
 
-      {/* Complete All Button */}
-      <div className="flex justify-center pt-4">
-        <Button
-          onClick={() => setConfirmDialogOpen(true)}
-          variant="outline"
-          className="border-2 border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black"
-        >
-          <CheckCircle2 className="mr-2 h-4 w-4" />
-          Completar toda la página
-        </Button>
-      </div>
-
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="bg-[#1F2937] text-white border-gray-700">
+        <DialogContent className="bg-gray-900 text-white border-gray-800">
           <DialogHeader>
-            <DialogTitle>Completar toda la página</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              ¿Quieres marcar toda la página como completada?
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <CheckCircle2 className="text-[#FFC000]" />
+              Completar toda la página
+            </DialogTitle>
+            <DialogDescription className="text-gray-400 pt-2">
+              ¿Quieres marcar todos los cromos faltantes de esta página como conseguidos?
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 text-sm text-gray-300">
-            Los cromos que ya tengas (Tengo o Repes) no se modificarán. Solo se marcarán como &quot;Tengo&quot; (count 1) aquellos que estén marcados como &quot;Falta&quot; (count 0).
+          
+          <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 text-sm text-gray-300">
+            <p>Esta acción:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-400">
+              <li>Marcará como <strong>&quot;Tengo&quot;</strong> todos los cromos que te faltan.</li>
+              <li>No modificará los cromos que ya tienes o tienes repetidos.</li>
+            </ul>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setConfirmDialogOpen(false)}
               disabled={isCompletingPage}
-              className="border-gray-600 text-white"
+              className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleCompleteAllPage}
               disabled={isCompletingPage}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
             >
-              {isCompletingPage ? 'Completando...' : 'Confirmar'}
+              {isCompletingPage ? 'Completando...' : 'Confirmar Completado'}
             </Button>
           </DialogFooter>
         </DialogContent>
