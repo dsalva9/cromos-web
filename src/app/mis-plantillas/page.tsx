@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+
 import Link from 'next/link';
 import { ArrowLeft, Plus, Check, X, Copy as CopyIcon } from 'lucide-react';
 import { TemplateSkeleton } from '@/components/skeletons/TemplateSkeleton';
@@ -168,14 +168,7 @@ function MyTemplatesContent() {
                         <h3 className="font-bold text-white text-lg line-clamp-2">
                           {copy.title}
                         </h3>
-                        <Badge
-                          className={`
-                          ${copy.is_active ? 'bg-green-500' : 'bg-gray-500'} 
-                          text-white uppercase text-xs
-                        `}
-                        >
-                          {copy.is_active ? 'Activa' : 'Inactiva'}
-                        </Badge>
+
                       </div>
 
                       {/* Author */}
