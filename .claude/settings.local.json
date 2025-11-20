@@ -35,9 +35,20 @@
       "Bash(del /F debug_admin_templates_issue.sql force_drop_and_recreate_admin_templates.sql reload_postgrest_schema.sql verify_admin_templates_function.sql verify_fix.sql)",
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\api-endpoints-panini-addition.md\")",
       "Bash(npx next lint:*)",
-      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\SPRINT-17-TESTING.md\")"
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\docs\\SPRINT-17-TESTING.md\")",
+      "WebFetch(domain:code.claude.com)",
+      "Bash(claude mcp list:*)",
+      "Bash(claude mcp remove:*)",
+      "Bash(claude mcp add:*)",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\nul\")"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

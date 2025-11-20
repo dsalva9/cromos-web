@@ -93,6 +93,7 @@
 - **Session Management**: Persistent login with automatic token refresh
 - **Protected Routes**: AuthGuard component protects authenticated pages
 - **User State**: Global user context via SupabaseProvider
+- **Password Recovery**: Forgot password flow with email link generation (`/forgot-password`)
 
 **Files**: `src/components/providers/SupabaseProvider.tsx`, `src/components/AuthGuard.tsx`
 
