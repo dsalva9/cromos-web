@@ -135,21 +135,14 @@ Spanish postal code centroids for distance calculations (v1.6.0).
 
 **Columns:**
 
-- `id` BIGSERIAL PRIMARY KEY
 - `country` TEXT NOT NULL (currently only 'ES')
 - `postcode` TEXT NOT NULL
 - `lat` DOUBLE PRECISION NOT NULL (latitude of postcode centroid)
 - `lon` DOUBLE PRECISION NOT NULL (longitude of postcode centroid)
-- `created_at` TIMESTAMPTZ DEFAULT NOW()
 
-**Indices:**
+**Constraints:**
 
-- `idx_postal_codes_lookup` ON (country, postcode) - For fast distance lookups
-- `idx_postal_codes_country` ON (country)
-
-**Unique Constraints:**
-
-- `unique_country_postcode` ON (country, postcode)
+- PRIMARY KEY (country, postcode)
 
 **RLS Policies:**
 
@@ -178,26 +171,42 @@ User-created marketplace listings for physical cards.
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
 - `copy_id` BIGINT REFERENCES user_template_copies(id) ON DELETE SET NULL
 - `slot_id` BIGINT REFERENCES template_slots(id) ON DELETE SET NULL
+- `suspended_at` TIMESTAMPTZ (timestamp when listing was suspended)
+- `suspension_reason` TEXT (reason for suspension)
+- `page_number` INTEGER (page number within the album/template, e.g., 12)
+- `page_title` TEXT (title of the page, e.g., "Delanteros")
+- `slot_variant` TEXT CHECK (slot_variant IS NULL OR slot_variant ~ '^[A-Z]$') (variant identifier A, B, C for slots at same position)
+- `global_number` INTEGER (global checklist number, e.g., 1-773 in Panini albums)
 
 **Indices:**
 
 - `idx_listings_user` ON (user_id)
 - `idx_listings_status` ON (status) WHERE status = 'active'
 - `idx_listings_created` ON (created_at DESC)
-- `idx_listings_search` USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, '')))
+- `idx_listings_search` USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, ''))) - Full-text search
+- `idx_listings_collection_name_trgm` USING GIN (collection_name gin_trgm_ops) - Fuzzy search on collection names
 - `idx_listings_copy` ON (copy_id) WHERE copy_id IS NOT NULL
 - `idx_listings_slot` ON (slot_id) WHERE slot_id IS NOT NULL
+- `idx_trade_listings_global_number` ON (global_number) WHERE global_number IS NOT NULL - Quick lookup by Panini number
 
 **RLS Policies:** ✅ **UPDATED (2025-10-30)**
 
-- Public read WHERE status = 'active' OR auth.uid() = user_id OR user has chat participation ✅ **v1.6.0 FIXED**
-  - Active listings: public access
-  - Own listings: sellers always have access
-  - Chat participants: users who have sent/received messages retain access even after listing is reserved/completed
-- Users can insert their own listings
-- Users can update their own listings (WITH CHECK added) ✅ **v1.6.0 FIXED**
-- Users can delete their own listings
-- Admins can update/delete any listing
+- **Public read** WHERE:
+  - `status = 'active'` (anyone can view active listings), OR
+  - `auth.uid() = user_id` (sellers always have access to their own listings), OR
+  - User has chat participation ✅ **v1.6.0 SECURITY FEATURE**:
+    ```sql
+    EXISTS (
+      SELECT 1 FROM trade_chats
+      WHERE listing_id = trade_listings.id
+      AND (sender_id = auth.uid() OR receiver_id = auth.uid())
+    )
+    ```
+    This allows chat participants to retain access to listings even after they become 'reserved' or 'completed', ensuring conversation history remains accessible.
+- **Insert**: Users can insert their own listings (user_id = auth.uid())
+- **Update**: Users can update their own listings (WITH CHECK: user_id = auth.uid()) ✅ **v1.6.0 FIXED**
+- **Delete**: Users can delete their own listings
+- **Admin override**: Admins can update/delete any listing
 
 **Related RPCs:**
 
@@ -230,7 +239,7 @@ Tracks reservation and completion workflow for marketplace listings.
 - `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE NOT NULL
 - `seller_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
 - `buyer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `status` TEXT CHECK (status IN ('reserved', 'completed', 'cancelled')) NOT NULL
+- `status` TEXT CHECK (status IN ('reserved', 'pending_completion', 'completed', 'cancelled')) NOT NULL
 - `reserved_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
 - `completed_at` TIMESTAMPTZ
 - `cancelled_at` TIMESTAMPTZ
@@ -248,10 +257,15 @@ Tracks reservation and completion workflow for marketplace listings.
 
 **RLS Policies:**
 
-- Users can view transactions where they are seller or buyer
-- Sellers can create reservations for their own listings
-- Sellers or buyers can update their transactions
-- Admins have full access
+- **Read**: Users can view transactions where they are seller OR buyer
+  - `auth.uid() = seller_id OR auth.uid() = buyer_id`
+- **Insert**: Sellers can create reservations (via `reserve_listing` RPC)
+  - Validation: listing must belong to seller
+- **Update**: Sellers or buyers can update transaction status
+  - Seller: can complete or cancel
+  - Buyer: can confirm completion
+  - Enforced via SECURITY DEFINER RPCs
+- **Admin override**: Admins have full access to all transactions
 
 **Related RPCs:**
 
@@ -263,8 +277,8 @@ Tracks reservation and completion workflow for marketplace listings.
 **Workflow:**
 
 1. **Reserve**: Seller uses `reserve_listing` → creates transaction (status: 'reserved'), listing status → 'reserved'
-2. **Complete**: Seller marks completed → buyer receives notification with "confirm" action
-3. **Confirm**: Buyer confirms → transaction fully completed, both can rate each other
+2. **Complete**: Seller marks completed → transaction status → 'pending_completion', buyer receives notification with "confirm" action
+3. **Confirm**: Buyer confirms → transaction status → 'completed', both can rate each other
 4. **Cancel**: Seller can cancel → transaction status → 'cancelled', listing → 'active'
 
 ---
@@ -288,6 +302,9 @@ Community-created collection templates.
 - `copies_count` INTEGER DEFAULT 0
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
+- `status` TEXT DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted'))
+- `suspended_at` TIMESTAMPTZ (timestamp when template was suspended)
+- `suspension_reason` TEXT (reason for suspension)
 
 **Indices:**
 
@@ -295,6 +312,9 @@ Community-created collection templates.
 - `idx_templates_public` ON (is_public) WHERE is_public = TRUE
 - `idx_templates_rating` ON (rating_avg DESC, rating_count DESC) WHERE is_public = TRUE
 - `idx_templates_created` ON (created_at DESC) WHERE is_public = TRUE
+- `idx_templates_popular` ON (copies_count DESC) WHERE is_public = TRUE - Popularity sorting
+- `idx_templates_title_trgm` USING GIN (title gin_trgm_ops) WHERE is_public = TRUE - Fuzzy search on titles
+- `idx_templates_desc_trgm` USING GIN (description gin_trgm_ops) WHERE is_public = TRUE AND description IS NOT NULL - Fuzzy search on descriptions
 
 **RLS Policies:**
 
@@ -348,6 +368,7 @@ Individual slots within pages.
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE NOT NULL
 - `page_id` BIGINT REFERENCES template_pages(id) ON DELETE CASCADE NOT NULL
 - `slot_number` INTEGER NOT NULL
 - `slot_variant` TEXT ✅ **v1.6.1 NEW** - Optional variant (A, B, C) for sub-slots
@@ -387,7 +408,8 @@ User copies of templates.
 
 **Constraints:**
 
-- UNIQUE(user_id, template_id)
+- **UNIQUE**(user_id, template_id) - One copy per template per user
+- **Business logic**: User can only copy each template once (can have multiple active collections from different templates)
 
 **Indices:**
 
@@ -451,7 +473,8 @@ Unified table for all favourite types.
 
 **Constraints:**
 
-- UNIQUE(user_id, target_type, target_id)
+- **UNIQUE**(user_id, target_type, target_id) - User can only favourite each entity once
+- **Business logic**: Prevents duplicate favourites
 
 **Indices:**
 
@@ -491,7 +514,8 @@ Ratings given by users to other users.
 
 **Constraints:**
 
-- UNIQUE(rater_id, rated_id, context_type, context_id)
+- **UNIQUE**(rater_id, rated_id, context_type, context_id) - One rating per transaction
+- **Business logic**: User can only rate another user once per trade/listing
 
 **Indices:**
 
@@ -529,7 +553,8 @@ Ratings given by users to templates.
 
 **Constraints:**
 
-- UNIQUE(user_id, template_id)
+- **UNIQUE**(user_id, template_id) - One rating per template per user
+- **Business logic**: User can only rate each template once (can update existing rating)
 
 **Indices:**
 
@@ -571,7 +596,8 @@ Unified table for all report types.
 
 **Constraints:**
 
-- UNIQUE(reporter_id, target_type, target_id)
+- **UNIQUE**(reporter_id, target_type, target_id) - One report per entity per user
+- **Business logic**: User can only report each entity once (prevents spam reporting)
 
 **Indices:**
 
@@ -667,17 +693,19 @@ Trade proposals between users.
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
-- `proposer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `receiver_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `status` TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'completed', 'cancelled'))
+- `collection_id` INTEGER (collection context for the trade)
+- `from_user` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL (user initiating the proposal)
+- `to_user` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL (user receiving the proposal)
+- `status` TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'cancelled', 'expired'))
 - `message` TEXT
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
 
 **Indices:**
 
-- `idx_proposals_proposer` ON (proposer_id, status)
-- `idx_proposals_receiver` ON (receiver_id, status)
+- `idx_proposals_from_user` ON (from_user, status)
+- `idx_proposals_to_user` ON (to_user, status)
+- `idx_proposals_collection` ON (collection_id)
 
 **RLS Policies:**
 
@@ -693,9 +721,9 @@ Items included in trade proposals.
 
 - `id` BIGSERIAL PRIMARY KEY
 - `proposal_id` BIGINT REFERENCES trade_proposals(id) ON DELETE CASCADE NOT NULL
-- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `sticker_number` TEXT NOT NULL
-- `collection_name` TEXT NOT NULL
+- `sticker_id` INTEGER NOT NULL (reference to sticker)
+- `direction` TEXT NOT NULL CHECK (direction IN ('offer', 'request')) (whether this is offered or requested)
+- `quantity` INTEGER NOT NULL CHECK (quantity > 0) (number of stickers)
 
 **Indices:**
 
@@ -850,26 +878,365 @@ Track finalization handshake for trades.
 - Users can read finalizations for their trades
 - Users can insert finalizations
 
+### badge_definitions
+
+Stores all available badge definitions with metadata.
+
+**Columns:**
+
+- `id` TEXT PRIMARY KEY (badge identifier, e.g., 'collector_bronze')
+- `category` TEXT NOT NULL CHECK (category IN ('collector', 'creator', 'reviewer', 'completionist', 'trader', 'top_rated'))
+- `tier` TEXT NOT NULL CHECK (tier IN ('bronze', 'silver', 'gold', 'special'))
+- `display_name_es` TEXT NOT NULL (Spanish display name)
+- `description_es` TEXT NOT NULL (Spanish description)
+- `icon_name` TEXT NOT NULL (icon identifier)
+- `threshold` INTEGER NOT NULL (count required to earn badge)
+- `sort_order` INTEGER NOT NULL (display ordering)
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**RLS Policies:**
+
+- **Public read**: Everyone can view badge definitions (no authentication required)
+- **No write access**: Badge definitions are managed via migrations only (INSERT/UPDATE/DELETE disabled for all users)
+
+**Related RPCs:**
+
+- `get_user_badges_with_details(user_id)` - Returns user badges with definition details
+- `check_and_award_badge(user_id, category)` - Checks progress and awards badges
+
+---
+
 ### user_badges
 
-User achievement badges.
+Records earned badges with timestamps and progress snapshots.
 
 **Columns:**
 
 - `id` BIGSERIAL PRIMARY KEY
 - `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
-- `badge_type` TEXT NOT NULL
+- `badge_code` TEXT (legacy - being phased out)
+- `badge_id` TEXT REFERENCES badge_definitions(id) (reference to badge definition)
+- `progress_snapshot` INTEGER (count at time of earning badge)
+- `awarded_at` TIMESTAMPTZ DEFAULT NOW() (legacy timestamp)
 - `earned_at` TIMESTAMPTZ DEFAULT NOW()
 
 **Constraints:**
 
-- UNIQUE(user_id, badge_type)
+- UNIQUE(user_id, badge_id)
 
 **RLS Policies:**
 
-- Public read
+- Public read (badges are public achievements)
 - Users can read their own badges
-- System can insert (service-managed)
+- System can insert (service-managed via RPCs)
+
+**Related RPCs:**
+
+- `get_user_badges_with_details(user_id)` - Returns user's earned badges with definitions
+- `check_and_award_badge(user_id, category)` - Awards badge if threshold met
+
+---
+
+### user_badge_progress
+
+Tracks user progress towards earning badges.
+
+**Columns:**
+
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `badge_category` TEXT NOT NULL CHECK (badge_category IN ('collector', 'creator', 'reviewer', 'completionist', 'trader', 'top_rated'))
+- `current_count` INTEGER DEFAULT 0 NOT NULL
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- PRIMARY KEY (user_id, badge_category)
+
+**RLS Policies:**
+
+- **Read**: Users can read their own progress (user_id = auth.uid())
+- **No direct write**: Progress is updated automatically via triggers and SECURITY DEFINER RPCs only
+  - Users cannot manually modify progress counters
+  - Prevents badge farming/cheating
+
+**Related RPCs:**
+
+- `get_badge_progress(user_id)` - Returns current progress for all categories
+- `increment_badge_progress(user_id, category)` - Increments counter and checks for awards
+
+**Triggers:**
+
+- Multiple triggers increment progress automatically:
+  - `trigger_collector_badge` - On user_template_copies INSERT
+  - `trigger_creator_badge` - On collection_templates INSERT
+  - `trigger_reviewer_badge` - On template_ratings INSERT
+  - `trigger_completionist_badge` - On user_template_progress UPDATE (100% completion)
+  - `trigger_trader_badge` - On trades_history INSERT (status = completed)
+  - `trigger_top_rated_badge` - On user_ratings INSERT (calculates avg rating)
+
+---
+
+### ignored_users
+
+Tracks user blocking relationships.
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL (user who is blocking)
+- `ignored_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL (user being blocked)
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(user_id, ignored_user_id)
+- CHECK (user_id != ignored_user_id) - Cannot block yourself
+
+**RLS Policies:**
+
+- **Read**: Users can read their own ignore list (user_id = auth.uid())
+- **Insert**: Users can block other users (user_id = auth.uid())
+- **Delete**: Users can unblock users from their own list (user_id = auth.uid())
+- **Privacy**: Users cannot see who has blocked them (one-way visibility)
+
+**Related RPCs:**
+
+- `ignore_user(target_user_id)` - Blocks a user
+- `unignore_user(target_user_id)` - Unblocks a user
+- `is_user_ignored(target_user_id)` - Checks if user is blocked
+- `get_ignored_users()` - Returns list of blocked users
+- `get_ignored_users_count()` - Returns count of blocked users
+
+**Triggers:**
+
+- `prevent_messaging_ignored_users` - Prevents sending messages to/from blocked users (enforced on trade_chats INSERT)
+
+---
+
+## Database Triggers
+
+### Timestamp Management
+
+#### `handle_updated_at`
+Automatically updates `updated_at` column on row modification.
+
+**Applied to:**
+- `profiles`
+- `trade_listings`
+- `collection_templates`
+- `trade_proposals`
+- `listing_transactions`
+- `reports`
+
+**Trigger:** `BEFORE UPDATE`
+
+---
+
+#### `update_updated_at_column`
+Generic trigger function for updating timestamps.
+
+**Trigger:** `BEFORE UPDATE`
+
+---
+
+### Authentication & User Management
+
+#### `handle_new_auth_user`
+Creates profile entry when new user signs up via Supabase Auth.
+
+**Applied to:** `auth.users`
+**Trigger:** `AFTER INSERT`
+**Action:** Inserts row into `profiles` with user's `id`, `email` as nickname (temporary)
+
+---
+
+### Validation Triggers
+
+#### `validate_profile_postcode`
+Validates Spanish postcode format (5 digits).
+
+**Applied to:** `profiles`
+**Trigger:** `BEFORE INSERT OR UPDATE`
+**Validation:** `postcode ~ '^[0-9]{5}$'`
+
+---
+
+### Denormalization Triggers
+
+#### `set_template_slot_template_id`
+Automatically populates `template_id` in `template_slots` from parent page.
+
+**Applied to:** `template_slots`
+**Trigger:** `BEFORE INSERT`
+**Action:** `NEW.template_id = (SELECT template_id FROM template_pages WHERE id = NEW.page_id)`
+
+**Purpose:** Denormalization for faster queries - avoids JOIN through pages table
+
+---
+
+### Notification Triggers
+
+#### `notify_chat_message`
+Creates/updates notifications when chat messages are sent.
+
+**Applied to:** `trade_chats`
+**Trigger:** `AFTER INSERT`
+**Actions:**
+- Creates `chat_unread` or `listing_chat` notification for receiver
+- Updates existing notification or creates new one
+- Handles both trade proposal chats and listing chats
+
+---
+
+#### `notify_listing_status_change`
+Sends notifications when listing status changes.
+
+**Applied to:** `trade_listings`
+**Trigger:** `AFTER UPDATE OF status`
+**Notifications:**
+- `listing_reserved` - When seller reserves listing for buyer
+- `listing_completed` - When transaction completes
+
+---
+
+#### `notify_proposal_status_change`
+Sends notifications when trade proposal status changes.
+
+**Applied to:** `trade_proposals`
+**Trigger:** `AFTER UPDATE OF status`
+**Notifications:**
+- `proposal_accepted` - When receiver accepts
+- `proposal_rejected` - When receiver rejects
+
+---
+
+#### `notify_finalization_requested`
+Notifies when trade finalization is requested.
+
+**Applied to:** `trade_finalizations`
+**Trigger:** `AFTER INSERT`
+**Notification:** `finalization_requested`
+
+---
+
+#### `notify_template_rating`
+Notifies template author when someone rates their template.
+
+**Applied to:** `template_ratings`
+**Trigger:** `AFTER INSERT`
+**Notification:** `template_rated`
+
+---
+
+#### `check_mutual_ratings_and_notify`
+Creates notifications ONLY after BOTH users have rated each other.
+
+**Applied to:** `user_ratings`
+**Trigger:** `AFTER INSERT`
+**Logic:**
+- Checks if both users have rated each other in same context
+- If yes: creates `user_rated` notification for BOTH users
+- If no: does nothing (waits for second rating)
+
+**Purpose:** Prevents premature "you've been rated" notifications
+
+---
+
+### Badge Award Triggers
+
+#### `trigger_collector_badge`
+Awards collector badges when user copies templates.
+
+**Applied to:** `user_template_copies`
+**Trigger:** `AFTER INSERT`
+**Progress:** Increments `collector` category count
+**Thresholds:** Bronze (1), Silver (5), Gold (10+)
+
+---
+
+#### `trigger_creator_badge`
+Awards creator badges when user creates public templates.
+
+**Applied to:** `collection_templates`
+**Trigger:** `AFTER INSERT WHERE is_public = TRUE`
+**Progress:** Increments `creator` category count
+**Thresholds:** Bronze (1), Silver (3), Gold (5+)
+
+---
+
+#### `trigger_reviewer_badge`
+Awards reviewer badges when user rates templates.
+
+**Applied to:** `template_ratings`
+**Trigger:** `AFTER INSERT`
+**Progress:** Increments `reviewer` category count
+**Thresholds:** Bronze (5), Silver (20), Gold (50+)
+
+---
+
+#### `trigger_completionist_badge`
+Awards completionist badges when user completes template 100%.
+
+**Applied to:** `user_template_progress`
+**Trigger:** `AFTER UPDATE`
+**Logic:** Checks if template is 100% complete
+**Progress:** Increments `completionist` category count
+**Thresholds:** Bronze (1), Silver (3), Gold (5+)
+
+---
+
+#### `trigger_trader_badge`
+Awards trader badges when trades complete successfully.
+
+**Applied to:** `trades_history`
+**Trigger:** `AFTER INSERT WHERE status = 'completed'`
+**Progress:** Increments `trader` category count
+**Thresholds:** Bronze (5), Silver (20), Gold (50+)
+
+---
+
+#### `trigger_top_rated_badge`
+Awards top-rated badges based on user rating average.
+
+**Applied to:** `user_ratings`
+**Trigger:** `AFTER INSERT OR UPDATE`
+**Logic:** Recalculates rater's average rating
+**Progress:** Updates `top_rated` category based on avg rating
+**Thresholds:** Bronze (4.0+), Silver (4.5+), Gold (4.8+)
+
+---
+
+#### `trigger_notify_badge_earned`
+Sends notification when user earns a badge.
+
+**Applied to:** `user_badges`
+**Trigger:** `AFTER INSERT`
+**Notification:** `badge_earned` with badge details in payload
+
+---
+
+#### `sync_badge_code`
+Maintains legacy `badge_code` field for backwards compatibility.
+
+**Applied to:** `user_badges`
+**Trigger:** `BEFORE INSERT OR UPDATE`
+**Action:** Syncs `badge_code` from `badge_id`
+
+---
+
+### Security Triggers
+
+#### `prevent_messaging_ignored_users`
+Blocks messages between users who have blocked each other.
+
+**Applied to:** `trade_chats`
+**Trigger:** `BEFORE INSERT`
+**Validation:**
+- Checks if sender has blocked receiver
+- Checks if receiver has blocked sender
+- Raises exception if blocked relationship exists
+
+**Purpose:** Enforces user blocking at database level
 
 ## RPC Functions
 

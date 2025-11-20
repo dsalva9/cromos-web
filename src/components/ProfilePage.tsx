@@ -159,8 +159,12 @@ function ProfileContent() {
           if (!collection) return null;
 
           // Get collection stats
+          // TODO [v1.6.0 MIGRATION]: Replace deprecated get_user_collection_stats RPC
+          // This RPC was removed in v1.6.0 (collections → templates pivot)
+          // Migration: Use get_my_template_copies() or get_template_progress(p_copy_id)
+          // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
           const { data: statsData } = await supabase.rpc(
-            'get_user_collection_stats',
+            'get_user_collection_stats', // ⚠️ DEPRECATED v1.5.0
             {
               p_user_id: user.id,
               p_collection_id: collection.id,

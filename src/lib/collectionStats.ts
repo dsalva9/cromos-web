@@ -1,5 +1,10 @@
 import type { Database } from '@/types';
 
+// TODO [v1.6.0 MIGRATION]: This entire file should be deprecated
+// The collections system was removed in v1.6.0 (pivot to templates)
+// Migration: Create templateStats.ts using get_my_template_copies() or get_template_progress()
+// See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
+
 export interface NormalizedCollectionStats {
   total_stickers: number;
   owned_stickers: number;
@@ -8,6 +13,7 @@ export interface NormalizedCollectionStats {
   missing: number;
 }
 
+// ⚠️ DEPRECATED v1.5.0 - RPC removed in v1.6.0
 type RawCollectionStats =
   Database['public']['Functions']['get_user_collection_stats']['Returns'];
 

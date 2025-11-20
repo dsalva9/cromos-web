@@ -56,8 +56,12 @@ export function useFindTraders() {
         };
 
         // Call the RPC function
+        // TODO [v1.6.0 MIGRATION]: Update find_mutual_traders RPC signature
+        // This RPC still exists but signature changed in v1.6.0
+        // Missing parameters: p_lat, p_lon, p_radius_km, p_sort (for location-based matching)
+        // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
         const { data, error: rpcError } = await supabase.rpc(
-          'find_mutual_traders',
+          'find_mutual_traders', // ⚠️ SIGNATURE CHANGED in v1.6.0
           rpcParams
         );
 

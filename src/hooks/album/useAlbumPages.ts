@@ -171,8 +171,12 @@ export function useAlbumPages(
       }
 
       try {
+        // TODO [v1.6.0 MIGRATION]: Replace deprecated get_user_collection_stats RPC
+        // This RPC was removed in v1.6.0 (collections → templates pivot)
+        // Migration: Use get_my_template_copies() or get_template_progress(p_copy_id)
+        // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
         const { data, error } = await supabase.rpc(
-          'get_user_collection_stats',
+          'get_user_collection_stats', // ⚠️ DEPRECATED v1.5.0
           {
             p_user_id: user.id,
             p_collection_id: targetCollectionId,
@@ -763,8 +767,12 @@ export function useAlbumPages(
       });
 
       // Call RPC
+      // TODO [v1.6.0 MIGRATION]: Replace deprecated mark_team_page_complete RPC
+      // This RPC was removed in v1.6.0 (collections → templates pivot)
+      // Migration: Bulk update all template slots on the page to status='owned', count=1
+      // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
       try {
-        const { data, error } = await supabase.rpc('mark_team_page_complete', {
+        const { data, error } = await supabase.rpc('mark_team_page_complete', { // ⚠️ DEPRECATED v1.5.0
           p_user_id: user.id,
           p_collection_id: collectionId,
           p_page_id: targetPageId,

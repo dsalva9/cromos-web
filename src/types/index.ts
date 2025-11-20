@@ -181,7 +181,10 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      get_user_collection_stats: {
+      // TODO [v1.6.0 MIGRATION]: Remove deprecated get_user_collection_stats type
+      // This RPC was removed in v1.6.0 - Replace with get_my_template_copies or get_template_progress
+      // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
+      get_user_collection_stats: { // ⚠️ DEPRECATED v1.5.0
         Args: {
           p_user_id: string;
           p_collection_id: number;

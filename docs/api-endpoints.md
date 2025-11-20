@@ -1,11 +1,1578 @@
 ## API Endpoints & Operations
 
-**Version**: v1.5.0
-**Status**: 🚧 v1.5.0 Admin, Location Matching & Quick Entry endpoints documented (pre-implementation)
+**Version**: v1.6.0
+**Status**: ⚠️ PARTIAL - This document is being updated from v1.5.0 to v1.6.0. Many v1.6.0 RPCs are missing. See database-schema.md for complete list.
+
+**Note**: The v1.5.0→v1.6.0 pivot removed the legacy collections system and added:
+- Marketplace system with listings and transactions
+- Community template system
+- Badge system with progress tracking
+- User blocking (ignored_users)
+- Enhanced admin moderation tools
+
+**Deprecated in v1.6.0** (removed from database):
+- All collection/sticker/page management RPCs from v1.5.0
+- `get_user_collection_stats`, `get_completion_report`
+- `bulk_add_stickers_by_numbers`, `search_stickers`
+- `mark_team_page_complete`
+- `find_mutual_traders`, `get_mutual_trade_detail`
 
 ---
 
-## RPC Functions (Database)
+## v1.6.0 RPC Functions (Current)
+
+### Marketplace Listings
+
+#### `create_trade_listing`
+
+Creates a new marketplace listing for a physical card.
+
+**Parameters:**
+- `title` TEXT - Listing title
+- `description` TEXT - Optional description
+- `sticker_number` TEXT - Optional sticker number
+- `collection_name` TEXT - Optional collection name
+- `image_url` TEXT - Optional image URL
+- `copy_id` BIGINT - Optional template copy reference
+- `slot_id` BIGINT - Optional template slot reference
+- `page_number` INTEGER - Optional page number
+- `page_title` TEXT - Optional page title
+- `slot_variant` TEXT - Optional variant (A, B, C)
+- `global_number` INTEGER - Optional global checklist number
+
+**Returns:** `BIGINT` (listing_id)
+
+---
+
+#### `list_trade_listings`
+
+Lists marketplace listings with basic filtering.
+
+**Parameters:**
+- `p_limit` INTEGER - Max results
+- `p_offset` INTEGER - Pagination offset
+- `p_search` TEXT - Optional search query
+
+**Returns:** TABLE with listing details
+
+---
+
+#### `list_trade_listings_filtered`
+
+Advanced listing search with collection filtering.
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_search` TEXT
+- `p_collection_filter` TEXT - Optional collection name filter
+
+**Returns:** TABLE with listing details
+
+---
+
+#### `list_trade_listings_filtered_with_distance`
+
+Listing search with distance-based sorting (requires postcode).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_search` TEXT
+- `p_viewer_postcode` TEXT - Viewer's postcode for distance calculation
+- `p_sort_by_distance` BOOLEAN - Whether to sort by proximity
+- `p_collection_filter` TEXT - Optional collection filter
+
+**Returns:** TABLE with listing details + distance in km
+
+---
+
+#### `get_user_listings`
+
+Get all listings for a specific user.
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with listing details
+
+---
+
+#### `get_my_listings_with_progress`
+
+Get authenticated user's listings with template progress info.
+
+**Parameters:**
+- `p_status` TEXT - Optional status filter
+
+**Returns:** TABLE with listings + template completion data
+
+---
+
+#### `update_listing_status`
+
+Updates a listing's status.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_new_status` TEXT - One of: active, reserved, completed, sold, removed
+
+**Returns:** VOID
+
+**Security:** User must own the listing or be admin
+
+---
+
+#### `update_trade_listing`
+
+Updates listing details.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_title` TEXT
+- `p_description` TEXT
+- `p_sticker_number` TEXT
+- `p_collection_name` TEXT
+- `p_image_url` TEXT
+
+**Returns:** VOID
+
+---
+
+### Marketplace Transactions
+
+#### `reserve_listing`
+
+Reserves a listing for a buyer (creates transaction).
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_buyer_id` UUID
+- `p_note` TEXT - Optional reservation message
+
+**Returns:** `BIGINT` (transaction_id)
+
+**Side Effects:**
+- Creates listing_transaction with status 'reserved'
+- Updates listing status to 'reserved'
+- Sends system message to listing chat
+- Creates notification for buyer
+
+---
+
+#### `complete_listing_transaction`
+
+Marks a transaction as completed.
+
+**Parameters:**
+- `p_transaction_id` BIGINT
+
+**Returns:** BOOLEAN
+
+**Workflow:**
+- Seller calls this → status becomes 'pending_completion'
+- Buyer gets notification with "confirm" action
+- Buyer confirms → status becomes 'completed'
+- Both users can now rate each other
+
+---
+
+#### `cancel_listing_transaction`
+
+Cancels a reservation.
+
+**Parameters:**
+- `p_transaction_id` BIGINT
+- `p_reason` TEXT - Cancellation reason
+
+**Returns:** BOOLEAN
+
+**Side Effects:**
+- Sets transaction status to 'cancelled'
+- Reverts listing status to 'active'
+- Sends notifications
+
+---
+
+#### `unreserve_listing`
+
+Unreserves a listing (seller-initiated).
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** BOOLEAN
+
+---
+
+#### `get_listing_transaction`
+
+Gets transaction details for a listing.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** TABLE with transaction details
+
+---
+
+### Marketplace Chat
+
+#### `send_listing_message`
+
+Sends a message in a listing chat.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_receiver_id` UUID
+- `p_message` TEXT (max 500 chars)
+
+**Returns:** `BIGINT` (message_id)
+
+**Validation:**
+- Prevents messaging ignored users (trigger)
+- Creates notification for receiver
+
+---
+
+#### `get_listing_chats`
+
+Gets all messages for a listing chat.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** TABLE with messages (includes system messages filtered by visibility)
+
+---
+
+#### `get_listing_chat_participants`
+
+Gets all participants in a listing's chats.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** TABLE with participant details
+
+---
+
+#### `add_system_message_to_listing_chat`
+
+Adds a system message (admin/automated).
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_message` TEXT
+- `p_visible_to_user_id` UUID - Optional (NULL = visible to all)
+
+**Returns:** `BIGINT` (message_id)
+
+---
+
+#### `mark_listing_messages_read`
+
+Marks messages as read.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** INTEGER (count of messages marked read)
+
+---
+
+#### `mark_listing_chat_notifications_read`
+
+Marks listing chat notifications as read.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+### Collection Templates
+
+#### `create_template`
+
+Creates a new collection template.
+
+**Parameters:**
+- `p_title` TEXT
+- `p_description` TEXT
+- `p_image_url` TEXT
+- `p_is_public` BOOLEAN
+
+**Returns:** `BIGINT` (template_id)
+
+---
+
+#### `delete_template`
+
+Deletes a template (author only).
+
+**Parameters:**
+- `p_template_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `publish_template`
+
+Toggles template public visibility.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_is_public` BOOLEAN
+
+**Returns:** VOID
+
+---
+
+#### `list_public_templates`
+
+Lists all public templates with filtering.
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_search` TEXT
+- `p_sort_by` TEXT - One of: recent, rating, popular
+
+**Returns:** TABLE with template details
+
+---
+
+#### `get_template_details`
+
+Gets full template details including pages and slots.
+
+**Parameters:**
+- `p_template_id` BIGINT
+
+**Returns:** JSON with complete template structure
+
+---
+
+#### `update_template_metadata`
+
+Updates template title/description/image.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_title` TEXT
+- `p_description` TEXT
+- `p_image_url` TEXT
+
+**Returns:** VOID
+
+---
+
+### Template Pages & Slots
+
+#### `add_template_page`
+
+Adds a page to a template (legacy version).
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_title` TEXT
+- `p_type` TEXT
+- `p_slots` JSONB
+
+**Returns:** `BIGINT` (page_id)
+
+---
+
+#### `add_template_page_v2`
+
+Adds a page to a template (v2 with enhanced features).
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_page_number` INTEGER
+- `p_title` TEXT
+- `p_type` TEXT
+- `p_slots_count` INTEGER
+
+**Returns:** `BIGINT` (page_id)
+
+---
+
+#### `update_template_page`
+
+Updates page details.
+
+**Parameters:**
+- `p_page_id` BIGINT
+- `p_title` TEXT
+- `p_type` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `delete_template_page`
+
+Deletes a page and all its slots.
+
+**Parameters:**
+- `p_page_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `update_template_slot`
+
+Updates slot details.
+
+**Parameters:**
+- `p_slot_id` BIGINT
+- `p_label` TEXT
+- `p_is_special` BOOLEAN
+- `p_slot_variant` TEXT
+- `p_global_number` INTEGER
+
+**Returns:** VOID
+
+---
+
+#### `delete_template_slot`
+
+Deletes a slot.
+
+**Parameters:**
+- `p_slot_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `get_slot_by_global_number`
+
+Finds a slot by its global checklist number.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_global_number` INTEGER
+
+**Returns:** TABLE with slot details
+
+---
+
+### Template Copies & Progress
+
+#### `copy_template`
+
+Creates a personal copy of a template.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_custom_title` TEXT - Optional custom title
+
+**Returns:** `BIGINT` (copy_id)
+
+**Side Effects:**
+- Increments template copies_count
+- Initializes all slots with status 'missing', count 0
+
+---
+
+#### `delete_template_copy`
+
+Deletes a user's template copy.
+
+**Parameters:**
+- `p_copy_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `get_my_template_copies`
+
+Gets user's template copies with progress.
+
+**Parameters:** None (uses auth.uid())
+
+**Returns:** TABLE with copy details + completion stats
+
+---
+
+#### `get_my_template_copies_basic`
+
+Gets basic list of user's copies without progress.
+
+**Returns:** TABLE with basic copy info
+
+---
+
+#### `get_template_copy_slots`
+
+Gets all slots for a copy with progress status.
+
+**Parameters:**
+- `p_copy_id` BIGINT
+
+**Returns:** TABLE with slots + user progress
+
+---
+
+#### `get_template_progress`
+
+Gets detailed progress for a copy (by page).
+
+**Parameters:**
+- `p_copy_id` BIGINT
+
+**Returns:** TABLE grouped by pages with completion stats
+
+---
+
+#### `update_template_progress`
+
+Updates progress for a specific slot.
+
+**Parameters:**
+- `p_copy_id` BIGINT
+- `p_slot_id` BIGINT
+- `p_status` TEXT - One of: missing, owned, duplicate
+- `p_count` INTEGER
+
+**Returns:** VOID
+
+**Side Effects:**
+- Updates user_template_progress
+- May trigger badge progress (completionist)
+
+---
+
+#### `publish_duplicate_to_marketplace`
+
+Creates marketplace listing from a template duplicate.
+
+**Parameters:**
+- `p_copy_id` BIGINT
+- `p_slot_id` BIGINT
+- `p_title` TEXT
+- `p_description` TEXT
+- `p_image_url` TEXT
+
+**Returns:** `BIGINT` (listing_id)
+
+**Validation:**
+- Slot must have status 'duplicate' and count > 0
+- Links listing to copy_id and slot_id
+
+---
+
+#### `mark_listing_sold_and_decrement`
+
+Marks listing sold and decrements template slot count.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+
+**Returns:** VOID
+
+**Side Effects:**
+- Sets listing status to 'sold'
+- Decrements user_template_progress count by 1
+- Updates status if count reaches 0
+
+---
+
+### Ratings
+
+#### `create_user_rating`
+
+Rates another user after a transaction.
+
+**Parameters:**
+- `p_rated_id` UUID
+- `p_rating` INTEGER (1-5)
+- `p_comment` TEXT
+- `p_context_type` TEXT - 'trade' or 'listing'
+- `p_context_id` BIGINT
+
+**Returns:** `BIGINT` (rating_id)
+
+**Validation:**
+- Can only rate once per context
+- Triggers mutual rating check (both rated = notifications)
+
+---
+
+#### `update_user_rating`
+
+Updates an existing user rating.
+
+**Parameters:**
+- `p_rating_id` BIGINT
+- `p_rating` INTEGER
+- `p_comment` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `delete_user_rating`
+
+Deletes a rating.
+
+**Parameters:**
+- `p_rating_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `get_user_ratings`
+
+Gets all ratings for a user.
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with rating details
+
+---
+
+#### `get_user_rating_summary`
+
+Gets rating statistics for a user.
+
+**Parameters:**
+- `p_user_id` UUID
+
+**Returns:** TABLE with avg rating, count, distribution
+
+---
+
+#### `create_template_rating`
+
+Rates a template.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_rating` INTEGER (1-5)
+- `p_comment` TEXT
+
+**Returns:** `BIGINT` (rating_id)
+
+---
+
+#### `update_template_rating`
+
+Updates a template rating.
+
+**Parameters:**
+- `p_rating_id` BIGINT
+- `p_rating` INTEGER
+- `p_comment` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `delete_template_rating`
+
+Deletes a template rating.
+
+**Parameters:**
+- `p_rating_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `get_template_ratings`
+
+Gets all ratings for a template.
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with rating details
+
+---
+
+#### `get_template_rating_summary`
+
+Gets rating statistics for a template.
+
+**Parameters:**
+- `p_template_id` BIGINT
+
+**Returns:** TABLE with avg rating, count
+
+---
+
+### Favourites
+
+#### `toggle_favourite`
+
+Toggles favourite status for listing/template/user.
+
+**Parameters:**
+- `p_target_type` TEXT - 'listing', 'template', or 'user'
+- `p_target_id` TEXT
+
+**Returns:** BOOLEAN (true if added, false if removed)
+
+---
+
+#### `is_favourited`
+
+Checks if entity is favourited.
+
+**Parameters:**
+- `p_target_type` TEXT
+- `p_target_id` TEXT
+
+**Returns:** BOOLEAN
+
+---
+
+#### `get_favourite_count`
+
+Gets favourite count for an entity.
+
+**Parameters:**
+- `p_target_type` TEXT
+- `p_target_id` TEXT
+
+**Returns:** `BIGINT`
+
+---
+
+#### `get_user_favourites`
+
+Gets user's favourites by type.
+
+**Parameters:**
+- `p_target_type` TEXT
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with favourite details
+
+---
+
+#### `list_my_favourites`
+
+Gets all favourites for authenticated user.
+
+**Parameters:**
+- `p_target_type` TEXT - Optional filter
+
+**Returns:** TABLE with all favourites
+
+---
+
+### Reports
+
+#### `create_report`
+
+Creates a report for inappropriate content.
+
+**Parameters:**
+- `p_target_type` TEXT - 'listing', 'template', 'user', 'rating'
+- `p_target_id` BIGINT
+- `p_reason` TEXT - spam, inappropriate_content, harassment, etc.
+- `p_description` TEXT
+
+**Returns:** `BIGINT` (report_id)
+
+---
+
+#### `check_entity_reported`
+
+Checks if user has already reported an entity.
+
+**Parameters:**
+- `p_target_type` TEXT
+- `p_target_id` BIGINT
+
+**Returns:** BOOLEAN
+
+---
+
+#### `get_reports`
+
+Gets reports with filtering (admin only).
+
+**Parameters:**
+- `p_status` TEXT
+- `p_target_type` TEXT
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with report details
+
+---
+
+#### `get_user_reports`
+
+Gets authenticated user's submitted reports.
+
+**Parameters:**
+- `p_status` TEXT
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with report details
+
+---
+
+#### `list_pending_reports`
+
+Lists all pending reports (admin only).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with pending reports
+
+---
+
+#### `get_report_details_with_context`
+
+Gets full report details with related entity data.
+
+**Parameters:**
+- `p_report_id` BIGINT
+
+**Returns:** TABLE with report + entity context
+
+---
+
+#### `update_report_status`
+
+Updates report status (legacy).
+
+**Parameters:**
+- `p_report_id` BIGINT
+- `p_status` TEXT
+- `p_admin_notes` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `update_report_status_v2`
+
+Updates report status (v2).
+
+**Parameters:**
+- `p_report_id` BIGINT
+- `p_new_status` TEXT
+- `p_admin_notes` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `resolve_report`
+
+Resolves a report (shorthand).
+
+**Parameters:**
+- `p_report_id` BIGINT
+- `p_admin_notes` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `bulk_update_report_status`
+
+Updates multiple reports at once.
+
+**Parameters:**
+- `p_report_ids` BIGINT[]
+- `p_status` TEXT
+- `p_admin_notes` TEXT
+
+**Returns:** TABLE with updated count
+
+---
+
+#### `escalate_report`
+
+Escalates a report priority.
+
+**Parameters:**
+- `p_report_id` BIGINT
+- `p_priority_level` TEXT
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+---
+
+### Badge System
+
+#### `get_user_badges_with_details`
+
+Gets user's earned badges with full definitions.
+
+**Parameters:**
+- `p_user_id` UUID
+
+**Returns:** TABLE with badges + definition details
+
+---
+
+#### `get_badge_progress`
+
+Gets user's progress towards badges.
+
+**Parameters:**
+- `p_user_id` UUID
+
+**Returns:** TABLE with progress for each category
+
+---
+
+#### `check_and_award_badge`
+
+Checks progress and awards badge if threshold met.
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_category` TEXT
+
+**Returns:** TABLE with awarded badge info (if any)
+
+**Note:** Called automatically by triggers, but can be manually invoked
+
+---
+
+#### `increment_badge_progress`
+
+Increments progress counter for a category.
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_category` TEXT
+
+**Returns:** INTEGER (new count)
+
+**Side Effects:**
+- May trigger badge award if threshold reached
+
+---
+
+### User Blocking
+
+#### `ignore_user`
+
+Blocks a user.
+
+**Parameters:**
+- `p_ignored_user_id` UUID
+
+**Returns:** BOOLEAN
+
+**Side Effects:**
+- Prevents future messaging between users
+- Hides user from discovery/search
+
+---
+
+#### `unignore_user`
+
+Unblocks a user.
+
+**Parameters:**
+- `p_ignored_user_id` UUID
+
+**Returns:** BOOLEAN
+
+---
+
+#### `is_user_ignored`
+
+Checks if a user is blocked.
+
+**Parameters:**
+- `p_target_user_id` UUID
+
+**Returns:** BOOLEAN
+
+---
+
+#### `get_ignored_users`
+
+Gets list of blocked users.
+
+**Returns:** TABLE with blocked user details
+
+---
+
+#### `get_ignored_users_count`
+
+Gets count of blocked users.
+
+**Returns:** INTEGER
+
+---
+
+### Notifications
+
+#### `get_notifications`
+
+Gets user notifications.
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with notification details
+
+---
+
+#### `get_notification_count`
+
+Gets unread notification count.
+
+**Returns:** INTEGER
+
+---
+
+#### `mark_notification_read`
+
+Marks a notification as read.
+
+**Parameters:**
+- `p_notification_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `mark_all_notifications_read`
+
+Marks all notifications as read.
+
+**Returns:** VOID
+
+---
+
+#### `notify_listing_event`
+
+Sends a listing-related notification.
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_user_id` UUID
+- `p_kind` TEXT
+- `p_payload` JSONB
+
+**Returns:** VOID
+
+---
+
+### Trading (Legacy)
+
+#### `create_trade_proposal`
+
+Creates a trade proposal.
+
+**Parameters:**
+- `p_collection_id` INTEGER
+- `p_to_user` UUID
+- `p_message` TEXT
+- `p_offer_items` JSONB
+- `p_request_items` JSONB
+
+**Returns:** `BIGINT` (proposal_id)
+
+---
+
+#### `respond_to_trade_proposal`
+
+Accepts/rejects a proposal.
+
+**Parameters:**
+- `p_proposal_id` BIGINT
+- `p_action` TEXT - 'accept', 'reject', 'cancel'
+
+**Returns:** TEXT (status)
+
+---
+
+#### `list_trade_proposals`
+
+Lists trade proposals (inbox/outbox).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_box` TEXT - 'inbox' or 'outbox'
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with proposals
+
+---
+
+#### `get_trade_proposal_detail`
+
+Gets full proposal details.
+
+**Parameters:**
+- `p_proposal_id` BIGINT
+
+**Returns:** JSONB with complete proposal
+
+---
+
+#### `complete_trade`
+
+Marks a trade as completed.
+
+**Parameters:**
+- `p_trade_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `cancel_trade`
+
+Cancels a trade.
+
+**Parameters:**
+- `p_trade_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `mark_trade_read`
+
+Marks trade messages as read.
+
+**Parameters:**
+- `p_trade_id` BIGINT
+
+**Returns:** VOID
+
+---
+
+#### `get_unread_counts`
+
+Gets unread message counts.
+
+**Returns:** TABLE with counts by type
+
+---
+
+#### `request_trade_finalization`
+
+Requests trade finalization.
+
+**Parameters:**
+- `p_trade_id` BIGINT
+
+**Returns:** JSONB
+
+---
+
+#### `reject_trade_finalization`
+
+Rejects finalization request.
+
+**Parameters:**
+- `p_trade_id` BIGINT
+
+**Returns:** JSONB
+
+---
+
+#### `get_user_conversations`
+
+Gets user's active conversations.
+
+**Returns:** TABLE with conversation details
+
+---
+
+### Admin Functions
+
+#### `admin_list_users`
+
+Lists all users with filtering (admin only).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_search` TEXT
+- `p_filter` TEXT
+
+**Returns:** TABLE with user details
+
+---
+
+#### `search_users_admin`
+
+Advanced user search (admin only).
+
+**Parameters:**
+- `p_query` TEXT
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with matching users
+
+---
+
+#### `admin_update_user_role`
+
+Updates user admin status (legacy).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_is_admin` BOOLEAN
+- `p_reason` TEXT
+
+**Returns:** JSONB
+
+---
+
+#### `admin_update_user_role_v2`
+
+Updates user admin status (v2).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_is_admin` BOOLEAN
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+**Side Effects:**
+- Logs to audit_log
+- Updates profile.is_admin
+
+---
+
+#### `admin_suspend_user`
+
+Suspends a user (legacy).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_is_suspended` BOOLEAN
+- `p_reason` TEXT
+
+**Returns:** JSONB
+
+---
+
+#### `admin_suspend_user_v2`
+
+Suspends a user (v2).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_is_suspended` BOOLEAN
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `admin_delete_user`
+
+Deletes a user (legacy - soft delete).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_reason` TEXT
+
+**Returns:** JSONB
+
+---
+
+#### `admin_delete_user_v2`
+
+Deletes a user (v2).
+
+**Parameters:**
+- `p_user_id` UUID
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `admin_purge_user`
+
+Permanently deletes user and all data.
+
+**Parameters:**
+- `p_user_id` UUID
+
+**Returns:** VOID
+
+**Warning:** Irreversible hard delete
+
+---
+
+#### `admin_delete_content_v2`
+
+Deletes content (listing/template/rating).
+
+**Parameters:**
+- `p_content_type` TEXT
+- `p_content_id` BIGINT
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+**Side Effects:**
+- Logs to audit_log
+- Cascades to related data
+
+---
+
+#### `bulk_delete_content`
+
+Deletes multiple content items.
+
+**Parameters:**
+- `p_content_type` TEXT
+- `p_content_ids` BIGINT[]
+- `p_reason` TEXT
+
+**Returns:** TABLE with deleted count
+
+---
+
+#### `bulk_suspend_users`
+
+Suspends multiple users.
+
+**Parameters:**
+- `p_user_ids` UUID[]
+- `p_is_suspended` BOOLEAN
+- `p_reason` TEXT
+
+**Returns:** TABLE with affected count
+
+---
+
+#### `admin_list_marketplace_listings`
+
+Lists all marketplace listings (admin view).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_status_filter` TEXT
+- `p_search` TEXT
+
+**Returns:** TABLE with listing details
+
+---
+
+#### `admin_update_listing_status`
+
+Updates listing status (admin override).
+
+**Parameters:**
+- `p_listing_id` BIGINT
+- `p_new_status` TEXT
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+---
+
+#### `admin_list_templates`
+
+Lists all templates (admin view).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_status_filter` TEXT
+- `p_search` TEXT
+
+**Returns:** TABLE with template details
+
+---
+
+#### `admin_update_template_status`
+
+Updates template status (admin).
+
+**Parameters:**
+- `p_template_id` BIGINT
+- `p_new_status` TEXT
+- `p_reason` TEXT
+
+**Returns:** VOID
+
+---
+
+### Admin Audit & Moderation
+
+#### `get_audit_log`
+
+Gets audit log entries (admin only).
+
+**Parameters:**
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+- `p_entity_type` TEXT
+- `p_admin_id` UUID
+
+**Returns:** TABLE with audit entries
+
+---
+
+#### `log_moderation_action`
+
+Logs a moderation action to audit trail.
+
+**Parameters:**
+- `p_moderation_action_type` TEXT
+- `p_moderated_entity_type` TEXT
+- `p_moderated_entity_id` BIGINT
+- `p_moderation_reason` TEXT
+- `p_old_values` JSONB
+- `p_new_values` JSONB
+
+**Returns:** `BIGINT` (log_id)
+
+---
+
+#### `get_moderation_audit_logs`
+
+Gets moderation-specific audit logs.
+
+**Parameters:**
+- `p_moderation_action_type` TEXT
+- `p_moderated_entity_type` TEXT
+- `p_admin_id` UUID
+- `p_limit` INTEGER
+- `p_offset` INTEGER
+
+**Returns:** TABLE with moderation logs
+
+---
+
+#### `get_entity_moderation_history`
+
+Gets all moderation actions for an entity.
+
+**Parameters:**
+- `p_entity_type` TEXT
+- `p_entity_id` BIGINT
+
+**Returns:** TABLE with moderation history
+
+---
+
+#### `get_admin_dashboard_stats`
+
+Gets admin dashboard statistics.
+
+**Returns:** TABLE with pending reports, active users, etc.
+
+---
+
+#### `get_recent_reports`
+
+Gets most recent reports.
+
+**Parameters:**
+- `p_limit` INTEGER
+
+**Returns:** TABLE with recent reports
+
+---
+
+#### `get_moderation_activity`
+
+Gets recent moderation actions.
+
+**Parameters:**
+- `p_limit` INTEGER
+
+**Returns:** TABLE with recent moderation
+
+---
+
+#### `get_report_statistics`
+
+Gets report statistics.
+
+**Returns:** TABLE with counts by status/type
+
+---
+
+#### `get_admin_performance_metrics`
+
+Gets admin performance metrics.
+
+**Parameters:**
+- `p_days_back` INTEGER
+
+**Returns:** TABLE with metrics per admin
+
+---
+
+#### `is_admin_user`
+
+Checks if current user is admin.
+
+**Returns:** BOOLEAN
+
+---
+
+#### `require_admin`
+
+Raises exception if not admin (helper function).
+
+**Returns:** VOID
+
+**Throws:** Exception if user is not admin
+
+---
+
+### Utility Functions
+
+#### `haversine_distance`
+
+Calculates distance between two postcodes.
+
+**Parameters:**
+- `lat1` DOUBLE PRECISION
+- `lon1` DOUBLE PRECISION
+- `lat2` DOUBLE PRECISION
+- `lon2` DOUBLE PRECISION
+
+**Returns:** DOUBLE PRECISION (distance in km)
+
+---
+
+## RPC Functions (Database) - DEPRECATED v1.5.0
+
+**⚠️ The following sections document v1.5.0 RPCs that no longer exist in v1.6.0**
 
 ### Collection Statistics
 

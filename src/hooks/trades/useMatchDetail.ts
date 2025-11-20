@@ -41,8 +41,12 @@ export function useMatchDetail() {
         setError(null);
 
         // Call the RPC function
+        // TODO [v1.6.0 MIGRATION]: Remove deprecated get_mutual_trade_detail RPC
+        // This RPC was removed in v1.4.3 (detail page removed, per api-endpoints.md line 311)
+        // Migration: Remove this hook entirely and navigate directly to trade composer
+        // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
         const { data, error: rpcError } = await supabase.rpc(
-          'get_mutual_trade_detail',
+          'get_mutual_trade_detail', // ⚠️ DEPRECATED v1.4.3, REMOVED v1.6.0
           {
             p_user_id: userId,
             p_other_user_id: otherUserId,
