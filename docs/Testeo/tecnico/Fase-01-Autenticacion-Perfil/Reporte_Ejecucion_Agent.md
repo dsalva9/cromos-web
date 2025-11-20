@@ -32,10 +32,11 @@
 - **Estado Inicial:** La página `/forgot-password` no existía (404).
 - **Acción Correctiva:** Se implementó la página `src/app/forgot-password/page.tsx` con el formulario de recuperación.
 - **Verificación:**
-  - La página carga correctamente con la estética de la app.
-  - El formulario acepta el email y llama a `supabase.auth.resetPasswordForEmail`.
-  - Se verificó manualmente que la ruta es accesible.
-  - Nota: La generación del token en BD depende del envío de email real por Supabase Auth, que puede tener retraso en entorno local.
+  - La página `/forgot-password` carga correctamente y envía el correo.
+  - El enlace del correo redirige correctamente a `/profile/reset-password` (vía `auth/callback`).
+  - El formulario de cambio de contraseña valida y actualiza la credencial correctamente.
+  - El usuario puede iniciar sesión con la nueva contraseña.
+  - **Status Final:** Flujo completo verificado en producción (Vercel).
 
 ### 4. CP-F01-07: Performance - Carga de página de perfil
 **Resultado:** ✅ Rendimiento excelente.

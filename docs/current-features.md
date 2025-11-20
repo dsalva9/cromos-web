@@ -94,6 +94,7 @@
 - **Protected Routes**: AuthGuard component protects authenticated pages
 - **User State**: Global user context via SupabaseProvider
 - **Password Recovery**: Forgot password flow with email link generation (`/forgot-password`)
+- **Password Reset**: Dedicated page for setting new password (`/profile/reset-password`)
 
 **Files**: `src/components/providers/SupabaseProvider.tsx`, `src/components/AuthGuard.tsx`
 
