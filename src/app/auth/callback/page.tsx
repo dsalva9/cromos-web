@@ -29,6 +29,10 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      // Check for next parameter in URL
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
+
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
 
@@ -65,6 +69,13 @@ export default function AuthCallback() {
         return;
       }
 
+      // If there's a next parameter, redirect there (for password reset, etc.)
+      if (next) {
+        router.push(next);
+        return;
+      }
+
+      // Otherwise, check profile completion and redirect accordingly
       const complete = isProfileComplete(
         profile?.nickname ?? null,
         profile?.postcode ?? null
