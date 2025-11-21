@@ -321,3 +321,26 @@ LIMIT 20;
 
 **Versión:** 1.0
 **Última actualización:** 2025-11-09
+
+## Resultados de la Ejecución - Fase 06 (Agent)
+
+**Fecha:** 2025-11-21
+**Ejecutado por:** Agent (Antigravity)
+
+| ID Test | Descripción | Estado | Observaciones |
+|---|---|---|---|
+| **CP-F06-02D** | RLS reportes | **PASÓ** | RLS verificado. Solo reportero y admins pueden ver reportes. |
+| **CP-F06-02H** | Constraints ratings | **PASÓ** | Constraint CHECK (1-5) funciona correctamente. |
+| **CP-F06-04F** | Trigger notificaciones | **PASÓ** | Trigger `notify_new_rating` corregido y verificado. Crea notificación tipo `user_rated`. |
+| **CP-F06-04H** | Performance feed | **PASÓ** | Query optimizada (sin columna `price`) ejecutada en < 3ms. |
+
+**Correcciones Realizadas:**
+- **Triggers:** Se crearon/corrigieron triggers para notificaciones (`notify_new_proposal`, `notify_new_rating`) usando la estructura JSONB correcta (`payload`).
+- **Constraints:** Se identificó y usó el tipo de notificación válido `user_rated` (en lugar de `new_rating`).
+- **Funciones:** Se corrigió `trigger_top_rated_badge` para usar la columna correcta `rated_id`.
+- **Realtime:** Se habilitó Realtime para la tabla `notifications`.
+
+**Conclusiones:**
+- El sistema de notificaciones y social es funcional y seguro tras las correcciones.
+- La performance del feed es excelente.
+
