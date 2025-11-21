@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
-import { normalizeCollectionStats } from '@/lib/collectionStats';
 import { logger } from '@/lib/logger';
 
 interface Collection {
@@ -32,26 +31,11 @@ interface Profile {
   postcode: string | null;
 }
 
-interface UserCollectionRawData {
-  is_active: boolean;
-  joined_at: string;
-  collections: Collection[] | Collection | null;
-}
-
 interface CacheSnapshot {
   ownedCollections: UserCollection[];
   availableCollections: Collection[];
   nickname: string;
   activeCollectionId: number | null;
-}
-
-interface CollectionStatsRow {
-  collection_id: number;
-  total_stickers: number;
-  owned_stickers: number;
-  completion_percentage: number;
-  duplicates: number;
-  missing: number;
 }
 
 export function useProfileData() {
@@ -229,94 +213,46 @@ export function useProfileData() {
       setProfile(userProfile);
       setNickname(userProfile?.nickname || '');
 
-      // Fetch user's owned collections with stats
-      const { data: userCollectionsData, error: userCollectionsError } =
-        await supabase
-          .from('user_collections')
-          .select(
-            `
-            is_active,
-            joined_at,
-            collections (
-              id,
-              name,
-              competition,
-              year,
-              description,
-              is_active
-            )
-          `
-          )
-          .eq('user_id', user.id);
+      // Fetch user's owned template copies with stats
+      const { data: myTemplatesData, error: myTemplatesError } =
+        await supabase.rpc('get_my_template_copies');
 
-      if (userCollectionsError) throw userCollectionsError;
+      if (myTemplatesError) throw myTemplatesError;
 
-      // Process owned collections
-      const validCollections = (userCollectionsData || [])
-        .map((uc: UserCollectionRawData) => {
-          if (!uc.collections) return null;
+      // Transform template copies to match UserCollection interface
+      const ownedWithStats = (myTemplatesData || []).map(template => ({
+        id: template.copy_id,
+        name: template.title,
+        competition: '', // Templates don't have competition field
+        year: '', // Templates don't have year field
+        description: null,
+        is_active: true, // Templates are always active if copied
+        is_user_active: template.is_active,
+        joined_at: template.copied_at,
+        stats: {
+          total_stickers: Number(template.total_slots),
+          owned_stickers: Number(template.completed_slots),
+          completion_percentage: Number(template.completion_percentage),
+          duplicates: 0, // Calculate from progress if needed
+          missing: Number(template.total_slots) - Number(template.completed_slots),
+        },
+      })) as UserCollection[];
 
-          const collection = Array.isArray(uc.collections)
-            ? uc.collections[0]
-            : uc.collections;
+      setOwnedCollections(ownedWithStats);
 
-          if (!collection) return null;
-
-          return {
-            collection,
-            is_active: uc.is_active,
-            joined_at: uc.joined_at,
-          };
-        })
-        .filter(Boolean) as Array<{
-          collection: Collection;
-          is_active: boolean;
-          joined_at: string;
-        }>;
-
-      // Batch fetch all stats in one RPC call (5-10x faster!)
-      const collectionIds = validCollections.map(c => c.collection.id);
-
-      if (collectionIds.length > 0) {
-        const { data: allStats } = await supabase.rpc(
-          'get_multiple_user_collection_stats',
-          { p_user_id: user.id, p_collection_ids: collectionIds }
-        ) as { data: CollectionStatsRow[] | null };
-
-        const ownedWithStats = validCollections.map(uc => {
-          const stats = allStats?.find((s: CollectionStatsRow) => s.collection_id === uc.collection.id);
-          return {
-            ...uc.collection,
-            is_user_active: uc.is_active,
-            joined_at: uc.joined_at,
-            stats: stats ? normalizeCollectionStats(stats) : {
-              total_stickers: 0,
-              owned_stickers: 0,
-              completion_percentage: 0,
-              duplicates: 0,
-              missing: 0,
-            },
-          } as UserCollection;
-        });
-
-        setOwnedCollections(ownedWithStats);
-      } else {
-        setOwnedCollections([]);
-      }
-
-      // Fetch available collections (not owned by user)
-      const ownedIds = collectionIds;
+      // Fetch available public templates (not owned by user)
+      const ownedTemplateIds = (myTemplatesData || []).map(t => t.template_id);
 
       let availableQuery = supabase
-        .from('collections')
-        .select('*')
-        .eq('is_active', true);
+        .from('collection_templates')
+        .select('id, title, description, author_id, image_url, rating_avg, rating_count, copies_count, created_at')
+        .eq('is_public', true);
 
-      if (ownedIds.length > 0) {
+      if (ownedTemplateIds.length > 0) {
         availableQuery = availableQuery.not(
           'id',
           'in',
-          `(${ownedIds.join(',')})`
+          `(${ownedTemplateIds.join(',')})`
         );
       }
 
@@ -324,7 +260,18 @@ export function useProfileData() {
         await availableQuery;
 
       if (availableError) throw availableError;
-      setAvailableCollections(availableData || []);
+
+      // Transform templates to match Collection interface
+      const availableTemplates = (availableData || []).map(template => ({
+        id: template.id,
+        name: template.title,
+        competition: '', // Templates don't have competition
+        year: '', // Templates don't have year
+        description: template.description,
+        is_active: true,
+      })) as Collection[];
+
+      setAvailableCollections(availableTemplates);
     } catch (err: unknown) {
       logger.error('Error fetching profile data:', err);
       setError(err instanceof Error ? err.message : 'Error loading profile');
@@ -338,76 +285,28 @@ export function useProfileData() {
     if (!user) return;
 
     try {
-      // Re-fetch owned collections stats only (lighter operation)
-      const { data: userCollectionsData } = await supabase
-        .from('user_collections')
-        .select(
-          `
-          is_active,
-          joined_at,
-          collections (
-            id,
-            name,
-            competition,
-            year,
-            description,
-            is_active
-          )
-        `
-        )
-        .eq('user_id', user.id);
+      // Re-fetch owned template copies with stats (lighter operation)
+      const { data: myTemplatesData } = await supabase.rpc('get_my_template_copies');
 
-      if (userCollectionsData) {
-        // Process owned collections
-        const validCollections = userCollectionsData
-          .map((uc: UserCollectionRawData) => {
-            if (!uc.collections) return null;
-
-            const collection = Array.isArray(uc.collections)
-              ? uc.collections[0]
-              : uc.collections;
-
-            if (!collection) return null;
-
-            return {
-              collection,
-              is_active: uc.is_active,
-              joined_at: uc.joined_at,
-            };
-          })
-          .filter(Boolean) as Array<{
-            collection: Collection;
-            is_active: boolean;
-            joined_at: string;
-          }>;
-
-        // Batch fetch all stats in one RPC call (5-10x faster!)
-        const collectionIds = validCollections.map(c => c.collection.id);
-
-        let validOwnedCollections: UserCollection[] = [];
-
-        if (collectionIds.length > 0) {
-          const { data: allStats } = await supabase.rpc(
-            'get_multiple_user_collection_stats',
-            { p_user_id: user.id, p_collection_ids: collectionIds }
-          ) as { data: CollectionStatsRow[] | null };
-
-          validOwnedCollections = validCollections.map(uc => {
-            const stats = allStats?.find((s: CollectionStatsRow) => s.collection_id === uc.collection.id);
-            return {
-              ...uc.collection,
-              is_user_active: uc.is_active,
-              joined_at: uc.joined_at,
-              stats: stats ? normalizeCollectionStats(stats) : {
-                total_stickers: 0,
-                owned_stickers: 0,
-                completion_percentage: 0,
-                duplicates: 0,
-                missing: 0,
-              },
-            } as UserCollection;
-          });
-        }
+      if (myTemplatesData) {
+        // Transform template copies to match UserCollection interface
+        const validOwnedCollections = myTemplatesData.map(template => ({
+          id: template.copy_id,
+          name: template.title,
+          competition: '', // Templates don't have competition field
+          year: '', // Templates don't have year field
+          description: null,
+          is_active: true,
+          is_user_active: template.is_active,
+          joined_at: template.copied_at,
+          stats: {
+            total_stickers: Number(template.total_slots),
+            owned_stickers: Number(template.completed_slots),
+            completion_percentage: Number(template.completion_percentage),
+            duplicates: 0,
+            missing: Number(template.total_slots) - Number(template.completed_slots),
+          },
+        })) as UserCollection[];
 
         // Only update if different to avoid unnecessary re-renders
         setOwnedCollections(prev => {

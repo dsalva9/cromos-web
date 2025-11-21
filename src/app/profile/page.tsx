@@ -214,34 +214,15 @@ function ProfileContent() {
         toast.success(`"${collectionToRemove.name}" eliminada de tu perfil`);
       }
 
-      // Server calls
-      const { data: stickerIds, error: stickerIdsError } = await supabase
-        .from('stickers')
-        .select('id')
-        .eq('collection_id', confirmModal.collectionId);
-
-      if (stickerIdsError) throw stickerIdsError;
-
-      if (stickerIds && stickerIds.length > 0) {
-        const { error: stickersError } = await supabase
-          .from('user_stickers')
-          .delete()
-          .eq('user_id', user.id)
-          .in(
-            'sticker_id',
-            stickerIds.map(s => s.id)
-          );
-
-        if (stickersError) throw stickersError;
-      }
-
-      const { error: collectionError } = await supabase
-        .from('user_collections')
+      // Server calls - Delete user's template copy
+      // This will cascade delete all progress entries
+      const { error: copyError } = await supabase
+        .from('user_template_copies')
         .delete()
         .eq('user_id', user.id)
-        .eq('collection_id', confirmModal.collectionId);
+        .eq('id', confirmModal.collectionId);
 
-      if (collectionError) throw collectionError;
+      if (copyError) throw copyError;
 
       // Don't refresh - optimistic update is sufficient
     } catch (err) {
@@ -280,17 +261,17 @@ function ProfileContent() {
 
       toast.success(`"${collection.name}" es ahora tu colección activa`);
 
-      // Server calls
+      // Server calls - Update template copies
       await supabase
-        .from('user_collections')
+        .from('user_template_copies')
         .update({ is_active: false })
         .eq('user_id', user.id);
 
       const { error } = await supabase
-        .from('user_collections')
+        .from('user_template_copies')
         .update({ is_active: true })
         .eq('user_id', user.id)
-        .eq('collection_id', collectionId);
+        .eq('id', collectionId);
 
       if (error) throw error;
     } catch (err) {
@@ -346,14 +327,21 @@ function ProfileContent() {
 
       toast.success(`"${collection.name}" añadida a tus colecciones`);
 
-      // Server call
-      const { error } = await supabase.from('user_collections').insert({
-        user_id: user.id,
-        collection_id: collectionId,
-        is_active: isFirstCollection,
+      // Server call - Copy template
+      const { data: copyId, error } = await supabase.rpc('copy_template', {
+        p_template_id: collectionId,
+        p_custom_title: collection.name,
       });
 
       if (error) throw error;
+
+      // If this is the first collection, set it as active
+      if (isFirstCollection && copyId) {
+        await supabase
+          .from('user_template_copies')
+          .update({ is_active: true })
+          .eq('id', copyId);
+      }
 
       // Don't refresh - optimistic update is sufficient for UI
     } catch (err) {
