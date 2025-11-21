@@ -15,7 +15,7 @@
 **System Status:**
 
 - **Official Collections System REMOVED** - 7 tables and 7 RPCs dropped
-- **Core Infrastructure Preserved** - Authentication, trading, and admin systems intact
+- **Core Infrastructure Preserved** - Authentication, marketplace, and admin systems intact
 - **Ready for New System** - Clean foundation for marketplace + templates
 
 ### ✅ Complete - Sprint 1: Marketplace MVP (Backend)
@@ -71,9 +71,7 @@
 **Remaining Features:**
 
 - ✅ Authentication System
-- ✅ Trading Proposals
-- ✅ Trade Chat System (extended for listings)
-- ✅ Trade History & Finalization
+- ✅ Chat System (extended for listings)
 - ✅ Notifications System
 - ✅ Admin Backoffice
 - ✅ Marketplace Backend
@@ -155,7 +153,7 @@
 #### **Chat from Listings**
 
 - Extended trade_chats table with listing_id
-- Separate chat flows for proposals and listings
+- Chat flow for listings
 - Message validation (500 character limit)
 - Permission checks (owner vs. buyer)
 - **NEW (2025-10-30):** Clickable usernames in all chat messages (link to user profiles)
@@ -353,11 +351,11 @@ user_template_progress (count - 1)
 #### **User Ratings System**
 
 - ✅ 1-5 star ratings with comments
-- ✅ Linked to trades or listings
+- ✅ Linked to listings
 - ✅ Automatic aggregation on profiles
 - ✅ Rating distribution statistics
 - ✅ Public user profiles with rating display
-- ⏳ Post-trade rating modal (future)
+- ⏳ Post-transaction rating modal (future)
 
 #### **Template Ratings System**
 
@@ -507,11 +505,6 @@ Sprint 15 completely modernized the notifications system to support all major pl
 - `user_rated` - Received user rating with star count
 - `template_rated` - Template received rating
 
-**Legacy Trade Notifications:**
-- `chat_unread` - Trade proposal chat messages
-- `proposal_accepted` - Trade proposal accepted
-- `proposal_rejected` - Trade proposal rejected
-- `finalization_requested` - Trade finalization requested
 
 **Admin Notifications:**
 - `admin_action` - Admin moderation actions (future)
@@ -686,9 +679,7 @@ Sprint 15 completely modernized the notifications system to support all major pl
 | ------------------- | ------- | -------- | --------- |
 | **Core Features**   |         |          |           |
 | Authentication      | ✅      | ✅       | Complete  |
-| Trading Proposals   | ✅      | ✅       | Complete  |
-| Trade Chat          | ✅      | ✅       | Complete  |
-| Trade History       | ✅      | ✅       | Complete  |
+| Chat System         | ✅      | ✅       | Complete  |
 | Notifications       | ✅      | ✅       | Complete  |
 | Admin Backoffice    | ✅      | ✅       | Complete  |
 | **Phase 1 - Pivot** |         |          |           |

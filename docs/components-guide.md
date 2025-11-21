@@ -30,10 +30,7 @@ All pages now follow the Retro-Comic theme:
 - **Navigation**: SiteHeader and SiteFooter with consistent dark theme and gold accents
 - **Profile Page (`/profile`)**: User management with themed cards and gold/red buttons
 - **Collection Pages (`/mi-coleccion`, `/mi-coleccion/[id]`)**: Album view with gold progress bars and tabs
-- **Trading Pages**:
-  - **Find Traders (`/trades/find`)**: Dark page with themed filters and match cards (links directly to composer)
-  - **Proposals Dashboard (`/trades/proposals`)**: Tab interface with gold active states, unread badges
-  - **Proposal Composer (`/trades/compose`)**: Multi-sticker selection with themed summary
+
 
 ---
 
@@ -355,489 +352,7 @@ The `ModernCard` component is used extensively on the `/profile` page and the no
 
 ---
 
-### FindTradersFilters
 
-**File**: `src/components/trades/FindTradersFilters.tsx`
-
-Advanced filter interface for trading search with debounced inputs.
-
-```typescript
-<FindTradersFilters
-  collections={ownedCollections}
-  selectedCollectionId={selectedCollectionId}
-  filters={filters}
-  onCollectionChange={handleCollectionChange}
-  onFiltersChange={handleFiltersChange}
-/>
-```
-
-**Key Features:**
-
-- **Active-first Collection Selection**: Prioritizes user's active collection with visual indicators
-- **Advanced Filter Toggle**: Collapsible advanced filters to reduce cognitive load
-- **Debounced Input**: 500ms debounce on text inputs to prevent excessive API calls
-- **Visual Filter Summary**: Active filter badges with individual removal options
-- **Keyboard Navigation**: Full ARIA support with dropdown keyboard interactions
-- **Filter Categories**:
-  - Collection dropdown with active/inactive status
-  - Player name search with search icon
-  - Rarity dropdown (Común, Rara, Épica, Legendaria)
-  - Team name text input
-  - Minimum overlap button selector (1-10+ coincidences)
-
-**State Management Pattern:**
-
-```typescript
-// Debounced filter updates
-const [localFilters, setLocalFilters] = useState(filters);
-
-useEffect(() => {
-  const timeoutId = setTimeout(() => {
-    onFiltersChange(localFilters);
-  }, 500);
-  return () => clearTimeout(timeoutId);
-}, [localFilters]);
-```
-
-### MatchCard
-
-**File**: `src/components/trades/MatchCard.tsx`
-
-Trading match summary card with mutual benefit visualization.
-
-```typescript
-<MatchCard
-  match={match}
-  collectionId={selectedCollectionId}
-/>
-```
-
-**Key Features:**
-
-- **Mutual Benefit Display**: Clear visualization of bidirectional trading opportunities
-- **User Identity**: Avatar placeholder with nickname fallback
-- **Full-Card Link**: Entire card is a focusable link with hover/focus states instead of a secondary button
-- **Color-Coded Stats**:
-  - Green for "Te pueden ofrecer" (incoming offers)
-  - Blue for "Puedes ofrecer" (outgoing offers)
-  - Teal gradient for total mutual overlap
-- **Click-to-Navigate**: Entire card routes to detail view with collection context
-
-### MatchDetail
-
-**File**: `src/components/trades/MatchDetail.tsx`
-
-Detailed side-by-side sticker lists for trading pairs.
-
-```typescript
-<MatchDetail
-  theyOffer={theyOffer}
-  iOffer={iOffer}
-  targetUserNickname={targetUserNickname}
-/>
-```
-
-**Key Features:**
-
-- **Side-by-Side Layout**: Clear separation of "they offer" vs "I offer" stickers
-- **Rarity-Based Styling**: Gradient badges matching collection rarity system
-- **Scrollable Lists**: Fixed height with overflow for large result sets
-- **Sticker Details Display**:
-  - Sticker code (#ABC123)
-  - Player name (truncated for mobile)
-  - Team name
-  - Rarity badge with color coding
-  - Duplicate count indicator (x2, x3, etc.)
-- **Empty States**: Contextual messages when no stickers available in either direction
-- **Accessibility**: Semantic HTML with proper headings and screen reader support
-
-### Trading Proposal Components ✅ **NEW - MVP COMPLETE**
-
-### ProposalList & ProposalCard
-
-**Files**: `src/components/trades/ProposalList.tsx`, `src/components/trades/ProposalCard.tsx`
-
-Display proposal summaries with status indicators and action buttons.
-
-```typescript
-<ProposalList
-  proposals={proposals}
-  loading={loading}
-  onProposalSelect={handleProposalSelect}
-  emptyMessage="No tienes propuestas en esta sección"
-/>
-
-<ProposalCard
-  proposal={proposal}
-  onClick={() => onProposalSelect(proposal.id)}
-/>
-```
-
-**ProposalList Features:**
-
-- **Responsive Grid**: 1-3 columns based on screen size
-- **Loading States**: Skeleton placeholders during data fetch
-- **Empty States**: Contextual messages for inbox/outbox sections
-- **Pagination Support**: Ready for future pagination implementation
-
-**ProposalCard Features:**
-
-- **Status Indicators**: Color-coded badges for pending/accepted/rejected/cancelled
-- **User Information**: Avatar and nickname display
-- **Proposal Summary**: Item counts for offers and requests
-- **Timestamp Display**: Relative time formatting (e.g., "hace 2 horas")
-- **Hover Effects**: Smooth transitions and visual feedback
-- **Click Navigation**: Routes to proposal detail modal
-
-### ProposalDetailModal
-
-**File**: `src/components/trades/ProposalDetailModal.tsx`
-
-Rich modal interface for viewing and responding to proposals.
-
-```typescript
-<ProposalDetailModal
-  proposalId={selectedProposalId}
-  open={modalOpen}
-  onOpenChange={setModalOpen}
-  onResponse={handleProposalResponse}
-/>
-```
-
-**Key Features:**
-
-- **Modal-Based Design**: Maintains context while viewing details
-- **Complete Proposal View**: Shows all offer/request items with full sticker details
-- **Action Buttons**: Accept, reject, cancel based on proposal status and user role
-- **Loading States**: Handles async data loading within modal
-- **Error Handling**: User-friendly error messages for failed operations
-- **Responsive Layout**: Adapts to mobile and desktop screens
-- **Status Display**: Clear indication of proposal status and timestamps
-- **Message Display**: Shows optional message from proposal creator
-
-**Modal Structure:**
-
-```typescript
-// Header with user info and status
-<ModalHeader>
-  <UserAvatar nickname={proposal.from_user_nickname} />
-  <StatusBadge status={proposal.status} />
-  <TimestampDisplay createdAt={proposal.created_at} />
-</ModalHeader>
-
-// Body with offer/request sections
-<ModalBody>
-  <StickerItemsList
-    title="Te ofrece"
-    items={proposal.offer_items}
-    variant="offer"
-  />
-  <StickerItemsList
-    title="Te pide"
-    items={proposal.request_items}
-    variant="request"
-  />
-</ModalBody>
-
-// Footer with action buttons
-<ModalFooter>
-  <ActionButtons
-    status={proposal.status}
-    canRespond={canUserRespond}
-    onAccept={handleAccept}
-    onReject={handleReject}
-    onCancel={handleCancel}
-  />
-</ModalFooter>
-```
-
-### StickerSelector
-
-**File**: `src/components/trades/StickerSelector.tsx`
-
-Multi-select interface for building proposals with offer/request sections.
-
-```typescript
-<StickerSelector
-  userStickers={availableStickers}
-  selectedOfferItems={selectedOffers}
-  selectedRequestItems={selectedRequests}
-  onOfferItemsChange={setSelectedOffers}
-  onRequestItemsChange={setSelectedRequests}
-  otherUserStickers={targetUserStickers}
-  loading={loading}
-/>
-```
-
-**Key Features:**
-
-- **Dual-Section Layout**: Separate "Ofrecer" and "Pedir" sections
-- **Multi-Select Functionality**: Toggle stickers in/out of proposal
-- **QuantityStepper Integration**: Uses shared +/- control with duplicate-aware clamping and disabled state at max=0
-- **Visual Feedback**: Selected items highlighted with checkmarks
-- **Sticker Details**: Full sticker information with rarity colors
-- **Smart Filtering**: Only shows relevant stickers for each section
-- **Selection Counts**: Real-time count of selected items
-- **Responsive Grid**: Adapts grid columns to screen size
-- **Search Integration**: Works with parent component search/filter
-
-**Selection Logic:**
-
-```typescript
-// Offer section: trade only duplicates (count - 1) the user still has
-const availableOffers = myStickers
-  .map(s => ({ ...s, duplicates: Math.max(0, s.count - 1) }))
-  .filter(s => s.duplicates > 0);
-
-// Request section: partner duplicates the user is still missing
-const myOwnedCounts = new Map(myCollection.map(s => [s.id, s.count]));
-const availableRequests = partnerStickers
-  .map(s => ({ ...s, duplicates: Math.max(0, s.count - 1) }))
-  .filter(s => s.duplicates > 0 && (myOwnedCounts.get(s.id) ?? 0) === 0);
-```
-
-### QuantityStepper
-
-**File**: `src/components/ui/QuantityStepper.tsx`
-
-Reusable counter control for adjusting proposal quantities.
-
-**Props & Behavior:**
-
-- `value: number` current quantity (component clamps it within bounds)
-- `onChange(next: number)` returns sanitized integers within the configured range
-- `min?: number` defaults to `0`; `max?: number` disables incrementing when duplicates are exhausted
-- `size?: 'sm' | 'md'` exposes compact and default sizing variants
-
-**Accessibility & UX:**
-
-- Ghost icon buttons with `aria-label`/`title` ("Disminuir", "Añadir uno")
-- Disabled states at bounds; prevents negative values or exceeding owned duplicates
-- Centered value uses `aria-live="polite"` to announce updates for screen readers
-- Keyboard focus ring handled on the outer container to match optimistic UI patterns
-
-**Usage:**
-
-- Embedded in `StickerSelector` for both offer/request lists
-- Keeps proposal summaries and submission payloads aligned with duplicate limits
-
-### ProposalSummary
-
-**File**: `src/components/trades/ProposalSummary.tsx`
-
-Preview component showing proposal contents before sending.
-
-```typescript
-<ProposalSummary
-  offerItems={selectedOfferItems}
-  requestItems={selectedRequestItems}
-  targetUserNickname={targetUserNickname}
-  message={proposalMessage}
-  onMessageChange={setProposalMessage}
-  onSubmit={handleCreateProposal}
-  loading={submitting}
-/>
-```
-
-**Key Features:**
-
-- **Proposal Preview**: Shows exactly what will be sent
-- **Message Input**: Optional message field with character limit
-- **Item Counts**: Clear summary of offer/request totals
-- **Validation Feedback**: Prevents submission of invalid proposals
-- **Loading States**: Handles async proposal creation
-- **Success Feedback**: Sonner-based toast notifications
-
-**Validation Rules:**
-
-```typescript
-const isValidProposal =
-  selectedOfferItems.length > 0 &&
-  selectedRequestItems.length > 0 &&
-  message.trim().length <= 500;
-```
-
-## Trading Hooks ✅ **COMPREHENSIVE TRADING STATE MANAGEMENT**
-
-### useFindTraders
-
-**File**: `src/hooks/trades/useFindTraders.ts`
-
-RPC-based trading search with pagination and filtering.
-
-```typescript
-const {
-  matches,
-  loading,
-  error,
-  hasMore,
-  totalCount,
-  searchTrades,
-  clearResults,
-} = useFindTraders();
-
-// Usage
-await searchTrades({
-  userId: user.id,
-  collectionId: selectedCollectionId,
-  filters: { rarity: 'rare', team: 'Barcelona', query: 'Messi', minOverlap: 2 },
-  limit: 20,
-  offset: 0,
-});
-```
-
-**Key Features:**
-
-- **RPC Integration**: Direct calls to `find_mutual_traders` Supabase function
-- **Pagination Support**: Offset-based pagination with `hasMore` indicator
-- **Error Recovery**: Automatic state reset on search errors
-- **Filter Management**: Comprehensive filter parameter handling
-- **Loading States**: Granular loading for search vs pagination operations
-
-### useMatchDetail
-
-**File**: `src/hooks/trades/useMatchDetail.ts`
-
-Detailed sticker lists for specific trading pairs.
-
-```typescript
-const { theyOffer, iOffer, loading, error, fetchDetail, clearDetail } =
-  useMatchDetail();
-
-// Usage
-await fetchDetail({
-  userId: user.id,
-  otherUserId: targetUserId,
-  collectionId: selectedCollectionId,
-});
-```
-
-**Key Features:**
-
-- **Bidirectional Results**: Separates "they_offer" vs "i_offer" results automatically
-- **RPC Integration**: Calls `get_mutual_trade_detail` Supabase function
-- **Data Transformation**: Converts raw RPC results to typed interfaces
-- **Error Handling**: State reset on errors with user-friendly messages
-- **Cache Management**: `clearDetail` for component unmounting
-
-### useProposals ✅ **NEW - PROPOSAL MANAGEMENT**
-
-**File**: `src/hooks/trades/useProposals.ts`
-
-Manages inbox/outbox proposal lists with pagination and real-time updates.
-
-```typescript
-const { proposals, loading, error, hasMore, fetchProposals, refreshProposals } =
-  useProposals();
-
-// Usage
-await fetchProposals({
-  userId: user.id,
-  box: 'inbox', // or 'outbox'
-  limit: 20,
-  offset: 0,
-});
-```
-
-**Key Features:**
-
-- **Dual Mode Support**: Handles both inbox and outbox proposal lists
-- **Pagination Ready**: Offset-based pagination for large proposal lists
-- **Real-time Refresh**: Manual refresh capability for immediate updates
-- **Error Recovery**: Comprehensive error handling with user feedback
-- **Optimistic Updates**: Immediate UI updates for proposal responses
-
-### useCreateProposal ✅ **NEW - PROPOSAL CREATION**
-
-**File**: `src/hooks/trades/useCreateProposal.ts`
-
-Handles proposal creation workflow with validation and error handling.
-
-```typescript
-const { createProposal, loading, error, success } = useCreateProposal();
-
-// Usage
-await createProposal({
-  collectionId: selectedCollectionId,
-  toUserId: targetUserId,
-  message: optionalMessage,
-  offerItems: selectedOfferItems,
-  requestItems: selectedRequestItems,
-});
-```
-
-**Key Features:**
-
-- **RPC Integration**: Calls `create_trade_proposal` Supabase function
-- **Validation Logic**: Client-side validation before server submission
-- **Error Handling**: Comprehensive error messaging for all failure scenarios
-- **Success Feedback**: Sonner-based toast notifications
-- **Loading States**: Granular loading during proposal creation
-
-### useRespondToProposal ✅ **NEW - PROPOSAL RESPONSES**
-
-**File**: `src/hooks/trades/useRespondToProposal.ts`
-
-Manages proposal responses (accept/reject/cancel) with optimistic updates.
-
-```typescript
-const { respondToProposal, loading, error } = useRespondToProposal();
-
-// Usage
-await respondToProposal({
-  proposalId: selectedProposal.id,
-  action: 'accept', // 'accept' | 'reject' | 'cancel'
-});
-```
-
-**Key Features:**
-
-- **Action Validation**: Ensures user can perform requested action based on role and status
-- **Optimistic Updates**: Immediate UI feedback before server confirmation
-- **RPC Integration**: Calls `respond_to_trade_proposal` Supabase function
-- **Error Recovery**: Rollback mechanism for failed responses
-- **Sonner Toast Integration**: Contextual success/error messaging
-
-### useProposalDetail ✅ **NEW - DETAILED PROPOSAL VIEW**
-
-**File**: `src/hooks/trades/useProposalDetail.ts`
-
-Fetches detailed proposal information with all items and metadata.
-
-```typescript
-const { proposal, loading, error, fetchDetail, clearDetail } =
-  useProposalDetail();
-
-// Usage
-await fetchDetail(proposalId);
-```
-
-**Key Features:**
-
-- **Complete Data Fetching**: Retrieves full proposal with all offer/request items
-- **RPC Integration**: Calls `get_trade_proposal_detail` Supabase function
-- **Cache Management**: Smart caching with manual clear capability
-- **Error Handling**: User-friendly error states for failed fetches
-- **Type Safety**: Returns fully typed `TradeProposalDetail` objects
-
-**Proposal Detail Structure:**
-
-```typescript
-interface TradeProposalDetail {
-  id: number;
-  from_user_id: string;
-  to_user_id: string;
-  from_user_nickname: string | null;
-  to_user_nickname: string | null;
-  collection_id: number;
-  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
-  message: string | null;
-  created_at: string;
-  updated_at: string;
-  offer_items: TradeProposalDetailItem[];
-  request_items: TradeProposalDetailItem[];
-}
-```
 
 ## Page Components
 
@@ -901,133 +416,7 @@ User profile and collection management with **true zero-reload optimistic update
 - **Per-action loading states** for granular user feedback
 - **Confirmation modals** for destructive actions with cascade delete warnings
 
-### FindTradersPage (Simplified) ✅ **v1.4.3**
 
-**File**: `src/app/trades/find/page.tsx`
-
-Streamlined trading discovery showing matches for active collection only.
-
-**Key Features:**
-
-- **Active collection only**: No filters, shows matches for user's active collection
-- **"Búsqueda avanzada" button**: Routes to `/trades/search` for advanced filtering
-- **Zero-reload interactions**: Instant pagination without page refresh
-- **Empty states** for no collections and no matches
-- **Active collection warnings** consistent with profile patterns
-- **Toast notifications** for search errors
-- **Responsive grid layout** for match cards (1-3 columns based on screen size)
-
-### AdvancedSearchPage ✅ **NEW - v1.4.3**
-
-**File**: `src/app/trades/search/page.tsx`
-
-Full-featured trading search interface with comprehensive filters.
-
-**Key Features:**
-
-- **Complete filter controls**: Collection dropdown, player search, rarity, team, minOverlap
-- **Debounced inputs**: 500ms debounce on text-based filters
-- **"Volver a Intercambios" link**: Easy return to simplified view
-- **Filter badges**: Visual summary of active filters with individual removal
-- **Pagination controls** with loading states and result counts
-- **Context tip**: Header explains relationship between simplified and advanced views
-
-### FindTraderDetailPage ⚠️ **REMOVED in v1.4.3**
-
-**This page has been removed** to streamline the user flow. Match cards now link directly to `/trades/compose`.
-
-**Rationale**: The intermediate detail page was redundant. Users can now go from finding a match to creating a proposal in one click.
-
-### ProposalsDashboardPage ✅ **v1.4.3 - ENHANCED**
-
-**File**: `src/app/trades/proposals/page.tsx`
-
-Comprehensive proposal management dashboard with inbox/outbox functionality and highlight support.
-
-**Key Features:**
-
-- **SegmentedTabs Navigation**: Equal-width RECIBIDAS|ENVIADAS tabs with icons and unread badges
-- **Query-driven Tab Selection**: `?tab=sent` param sets initial tab (for post-create redirect)
-- **One-time Highlight**: `?highlight=<proposalId>` param triggers 2-second pulse animation on newly created proposal
-- **Real-time Updates**: Fresh proposal lists with refresh capability
-- **Status Filtering**: Visual indicators for all proposal statuses
-- **Empty States**: Contextual messaging for empty inbox/outbox
-- **Responsive Design**: Mobile-optimized tab switching and card layout
-- **Loading States**: Skeleton placeholders during data fetch
-- **Error Recovery**: User-friendly error handling with retry options
-
-**State Management Pattern:**
-
-```typescript
-// Query param integration (v1.4.3)
-const tabParam = searchParams.get('tab');
-const initialTab = tabParam === 'sent' ? 'outbox' : 'inbox';
-const highlightParam = searchParams.get('highlight');
-const [highlightProposalId, setHighlightProposalId] = useState(
-  highlightParam ? parseInt(highlightParam) : null
-);
-
-// Tab switching with state preservation
-const [activeTab, setActiveTab] = useState<'inbox' | 'outbox'>(initialTab);
-const [selectedProposal, setSelectedProposal] = useState<number | null>(null);
-
-// Clear highlight after 2 seconds
-useEffect(() => {
-  if (highlightProposalId) {
-    const timer = setTimeout(() => {
-      setHighlightProposalId(null);
-      // Remove highlight param from URL without reload
-      const url = new URL(window.location.href);
-      url.searchParams.delete('highlight');
-      window.history.replaceState({}, '', url.toString());
-    }, 2000);
-    return () => clearTimeout(timer);
-  }
-}, [highlightProposalId]);
-```
-
-### ProposalComposerPage ✅ **NEW - MVP COMPLETE**
-
-**File**: `src/app/trades/compose/page.tsx`
-
-Proposal creation interface with multi-sticker selection and preview.
-
-**Key Features:**
-
-- **URL Parameter Integration**: Accepts `userId` and `collectionId` from find traders flow
-- **Multi-Step Workflow**: Sticker selection → summary/preview → submission
-- **Validation Logic**: Prevents invalid proposals with clear error messages
-- **Context Preservation**: Maintains target user and collection context throughout
-- **Back Navigation**: Returns to find traders detail with context preserved
-- **Success Flow**: Redirects to proposals dashboard after successful creation
-
-**Component Integration:**
-
-```typescript
-// Main composer workflow
-<div class="composer-container">
-  <UserContextHeader targetUser={targetUser} collection={collection} />
-
-  <StickerSelector
-    userStickers={myStickers}
-    otherUserStickers={theirStickers}
-    selectedOfferItems={offerItems}
-    selectedRequestItems={requestItems}
-    onOfferItemsChange={setOfferItems}
-    onRequestItemsChange={setRequestItems}
-  />
-
-  <ProposalSummary
-    offerItems={offerItems}
-    requestItems={requestItems}
-    targetUserNickname={targetUser.nickname}
-    message={message}
-    onMessageChange={setMessage}
-    onSubmit={handleCreateProposal}
-    loading={creating}
-  />
-</div>
-```
 
 ## Navigation Components
 
@@ -1103,20 +492,18 @@ Equal-width paired tab control following Retro-Comic theme with perfect alignmen
 <SegmentedTabs
   tabs={[
     {
-      value: 'inbox',
-      label: 'Recibidas',
-      icon: <Inbox className="h-4 w-4" />,
-      badge: unreadCount > 0 ? <Badge>...</Badge> : undefined,
+      value: 'active',
+      label: 'Activos',
+      badge: <span className="...">12</span>,
     },
     {
-      value: 'outbox',
-      label: 'Enviadas',
-      icon: <Send className="h-4 w-4" />,
+      value: 'sold',
+      label: 'Completados',
     },
   ]}
   value={activeTab}
   onValueChange={setActiveTab}
-  aria-label="Propuestas de intercambio"
+  aria-label="Filtrar anuncios"
 />
 ```
 
@@ -1146,9 +533,8 @@ Equal-width paired tab control following Retro-Comic theme with perfect alignmen
 
 **Usage locations:**
 
-- **Proposals Page** (`/trades/proposals`): RECIBIDAS | ENVIADAS tabs
-- **ProposalDetailModal**: RESUMEN | MENSAJES tabs
-- **StickerSelector** (`/trades/compose`): OFRECER | PEDIR tabs
+- **User Profile Page** (`/users/[userId]`): Active/Reserved/Sold/Removed listing filters
+- **Admin Dashboard**: Report filters (if applicable)
 
 #### ModernCard
 
@@ -1166,19 +552,18 @@ Reusable confirmation modal for destructive actions with trading support.
 <ConfirmModal
   open={confirmState.open}
   onOpenChange={setConfirmState}
-  title="Rechazar propuesta"
+  title="Eliminar colección"
   description={<span>¿Estás seguro? <strong>Esta acción no se puede deshacer</strong></span>}
-  confirmText="Rechazar"
+  confirmText="Eliminar"
   cancelText="Cancelar"
-  onConfirm={handleReject}
-  loading={rejecting}
+  onConfirm={handleDelete}
+  loading={deleting}
   variant="destructive"
 />
 ```
 
 **Enhanced Features:**
 
-- **Trading action variants** for proposal responses
 - **Multi-context support** for different destructive actions
 - **Loading state management** during async operations
 
@@ -1440,11 +825,9 @@ interface TradingComponentProps {
 - **Form validation**: Error states and accessibility
 - **Navigation**: Route protection and redirects
 - **User interactions**: Button clicks, modal interactions
-- **Trading RPC calls**: Mock Supabase functions for testing filter logic
 - **Debounced inputs**: Verify search delay and cancellation
-- **Proposal workflows**: End-to-end testing for proposal creation, response, and management
 - **Modal interactions**: Focus management and keyboard navigation in modals
-- **State management**: Verify optimistic updates and rollback for proposal actions
+- **State management**: Verify optimistic updates and rollback
 - **Theme Verification** ✅ **NEW (v1.4.1)**:
   - Visual regression testing for Retro-Comic theme
   - Verify thick borders (`border-2 border-black`) on components
@@ -1458,14 +841,12 @@ interface TradingComponentProps {
 
 ### Current Optimizations ✅ **ENHANCED FOR TRADING**
 
-- **Memoization**: `useMemo` for expensive calculations (progress stats, proposal filtering)
+- **Memoization**: `useMemo` for expensive calculations (progress stats)
 - **Callback stability**: `useCallback` for event handlers
 - **Optimistic UI**: Zero perceived latency for user actions
 - **Selective re-renders**: Proper dependency arrays
 - **Debounced inputs**: 500ms debounce for search filters
 - **Pagination**: Limit result sets to 20 items per page
-- **Modal optimization**: Lazy loading of proposal details
-- **Component splitting**: Separate components for different proposal states
 
 ### Future Improvements
 
@@ -1473,9 +854,6 @@ interface TradingComponentProps {
 - **Virtual scrolling**: Large collection support
 - **Code splitting**: Route-based component loading
 - **Caching**: React Query for server state management
-- **Trading result caching**: Local storage for recently searched users
-- **Proposal caching**: Cache proposal lists for faster navigation
-- **Real-time updates**: Supabase Realtime for live proposal updates
 
 ## Debug Components
 
@@ -1483,43 +861,12 @@ interface TradingComponentProps {
 
 - **SessionDebug**: Display current Supabase session (development only)
 - **AuthTest**: Interactive auth testing component
-- **ProposalDebug**: Display proposal state and RPC responses (development only)
 
 These should be removed from production builds.
 
 ---
 
-## Phase 2 Component Patterns ✅ **FULLY ESTABLISHED**
 
-### Comprehensive Trading Component Architecture
-
-All Phase 2 trading components follow these established patterns:
-
-1. **RPC-First Architecture**: Direct Supabase function calls without intermediate REST APIs
-2. **Debounced Search Inputs**: 500ms debounce for all text-based filters
-3. **Zero-Reload Interactions**: All filtering, pagination, and proposal management without page refreshes
-4. **Modal-Based Detail Views**: Rich modals for detailed interactions while preserving context
-5. **Optimistic State Management**: Immediate UI updates with rollback on errors
-6. **Context-Aware Navigation**: Preserve collection and user context across page navigation
-7. **Progressive Enhancement**: Works without JavaScript for basic functionality
-8. **Spanish-First UX**: All UI text, error messages, and empty states in Spanish
-9. **Active Collection Priority**: Always preselect user's active collection when available
-10. **Comprehensive Error Handling**: User-friendly error states with recovery options
-
-### Trading-Specific Patterns ✅ **NEW ARCHITECTURAL PATTERNS**
-
-11. **Proposal Lifecycle Management**: Complete workflow from creation to response with state tracking
-12. **Multi-Sticker Selection**: Complex selection interfaces supporting bulk operations
-13. **Bidirectional Data Display**: Clear "offer" vs "request" visual separation throughout
-14. **Status-Based UI**: Dynamic interfaces that adapt to proposal and user status
-15. **Modal State Coordination**: Multiple modal types working together without conflicts
-16. **RPC Security Integration**: All operations protected by SECURITY DEFINER functions
-17. **Toast Integration**: Contextual feedback for all trading actions
-18. **Responsive Trading UI**: Mobile-optimized interfaces for complex trading workflows
-
-These patterns extend the foundation from Phase 1 and establish the architectural principles for all future trading features (chat, history, advanced proposals).
-
----
 
 ## v1.5.0 Components ✅ **NEW**
 
@@ -1704,97 +1051,7 @@ These patterns extend the foundation from Phase 1 and establish the architectura
 
 ---
 
-#### Old Admin Components (Legacy - Pre-Sprint 11)
 
-**File**: `src/app/admin/page.tsx` (OLD - may be deprecated)
-
-Main admin dashboard with tabbed interface for old collection system.
-
-**Features:**
-
-- **RBAC Guard**: Only accessible to users with `is_admin = true`
-- **Tabbed Interface**: Collections | Pages | Stickers | Bulk Upload | Audit
-- **Server-side check**: Verifies admin status on page load
-- **401 Redirect**: Non-admins redirected to home
-
----
-
-#### CollectionsList
-
-**File**: `src/components/admin/CollectionsList.tsx`
-
-CRUD interface for collections management.
-
-**Features:**
-
-- **List view**: All collections with status pills (draft/published)
-- **Create/Edit forms**: Modal-based forms with validation
-- **Delete confirmation**: With cascade warning
-- **Publish toggle**: Mark collections as draft or published
-- **Retro-Comic styling**: Dark cards with gold accents
-
----
-
-#### PageEditor
-
-**File**: `src/components/admin/PageEditor.tsx`
-
-CRUD interface for collection pages.
-
-**Features:**
-
-- **Team pages**: 20 fixed slots (badge, manager, 18 players)
-- **Special pages**: Variable slots
-- **Order index control**: Drag-and-drop or numeric input
-- **Slot assignment**: Assign stickers to page slots
-
----
-
-#### StickerEditor
-
-**File**: `src/components/admin/StickerEditor.tsx`
-
-CRUD interface for individual stickers.
-
-**Features:**
-
-- **Form fields**: All sticker properties with validation
-- **Image upload**: Client-side WebP conversion + 100px thumb generation
-- **Assign to page**: Dropdown to assign to page slot
-- **Number optional**: sticker_number is optional for now
-
----
-
-#### BulkImportWizard
-
-**File**: `src/components/admin/BulkImportWizard.tsx`
-
-Multi-step wizard for bulk uploads.
-
-**Features:**
-
-- **Step 1: Upload**: CSV/XLSX file upload with drag-and-drop
-- **Step 2: Preview**: Shows validation errors, warnings, and diffs
-- **Step 3: Apply**: Transactional bulk insert/update
-- **Progress tracking**: Live progress bar during apply
-- **Error handling**: Detailed error messages per row
-
----
-
-#### AuditTable
-
-**File**: `src/components/admin/AuditTable.tsx`
-
-Read-only audit log viewer.
-
-**Features:**
-
-- **Filters**: By user, entity, action, date range
-- **Expandable rows**: Show before/after JSON diffs
-- **Pagination**: 50 entries per page
-- **Export**: CSV export of audit entries
-
----
 
 ### Badges Components (v1.5.0)
 
@@ -1948,124 +1205,7 @@ interface AvatarPickerProps {
 
 ---
 
-### Location Matching Components (v1.5.0)
 
-#### LocationSettings
-
-**File**: `src/components/profile/LocationSettings.tsx`
-
-Postcode input for location-based matching.
-
-**Props:**
-
-```typescript
-interface LocationSettingsProps {
-  currentPostcode?: string | null;
-  onUpdate: (postcode: string) => Promise<void>;
-  loading: boolean;
-}
-```
-
-**Features:**
-
-- **Postcode input**: Validates against `postal_codes` table
-- **Privacy note**: Explains centroid-based distance calculation
-- **Optional field**: Clear indicator that location is optional
-- **Auto-validation**: Real-time check if postcode exists in database
-- **Clear button**: Remove postcode to disable location matching
-
----
-
-#### TraderListSortControls
-
-**File**: `src/components/trades/TraderListSortControls.tsx`
-
-Sort and filter controls for trade matches with location.
-
-**Props:**
-
-```typescript
-interface TraderListSortControlsProps {
-  sortMode: 'distance' | 'overlap' | 'mixed';
-  radiusKm: number;
-  onSortChange: (mode: string) => void;
-  onRadiusChange: (radius: number) => void;
-  hasLocation: boolean;
-}
-```
-
-**Features:**
-
-- **Sort dropdown**: Distance / Overlap / Mixed (60/40 weighted)
-- **Radius slider**: 10–100 km with visual indicators
-- **Disabled state**: Grayed out when user has no postcode set
-- **Tooltip**: Explains mixed scoring algorithm
-- **Responsive**: Stacks vertically on mobile
-
----
-
-#### MatchCardWithDistance
-
-**File**: `src/components/trades/MatchCardWithDistance.tsx`
-
-Enhanced match card displaying distance.
-
-**Props:**
-
-```typescript
-interface MatchCardWithDistanceProps {
-  match: {
-    match_user_id: string;
-    nickname: string;
-    overlap_from_them_to_me: number;
-    overlap_from_me_to_them: number;
-    distance_km?: number | null;
-    score?: number | null;
-  };
-  onViewDetails: (userId: string) => void;
-}
-```
-
-**Features:**
-
-- **Distance badge**: "~12 km" displayed with location icon
-- **Score indicator**: Visual bar for mixed score (0-1)
-- **Fallback state**: "Distancia no disponible" when NULL
-- **Privacy-first**: Never shows exact coordinates
-- **Retro-Comic styling**: Gold accent for nearby traders (<20 km)
-
----
-
-#### useLocationMatching
-
-**File**: `src/hooks/trades/useLocationMatching.ts`
-
-Hook for location-based trade matching.
-
-**Usage:**
-
-```typescript
-const {
-  matches,
-  loading,
-  error,
-  sortMode,
-  radiusKm,
-  setSortMode,
-  setRadiusKm,
-  userLocation,
-  fetchMatches,
-} = useLocationMatching(userId, collectionId);
-```
-
-**Features:**
-
-- **Auto-fetch location**: Gets user's postcode centroid on mount
-- **Optimistic filtering**: Updates UI before RPC completes
-- **Error handling**: Toast on location fetch failure
-- **Fallback mode**: Falls back to overlap-only if no location data
-
----
 
 ## Component Checklist for New Features
 
@@ -2087,8 +1227,6 @@ When creating new components:
 11. ✅ **Debounced inputs** for search/filter functionality
 12. ✅ **RPC integration** following established Supabase patterns
 13. ✅ **Modal state management** for complex UI workflows (NEW)
-14. ✅ **Proposal lifecycle integration** for trading features (NEW)
-15. ✅ **Status-based conditional rendering** for dynamic interfaces (NEW)
 
 ---
 
@@ -2096,7 +1234,7 @@ When creating new components:
 
 ### Component Reusability ✅ **ACHIEVED**
 
-- Trading components follow established patterns from profile system
+- Components follow established patterns from profile system
 - Consistent state management across all features
 - Reusable UI patterns for similar workflows
 
@@ -2108,7 +1246,7 @@ When creating new components:
 
 ### User Experience Excellence ✅ **ACHIEVED**
 
-- Intuitive trading workflows with clear visual feedback
+- Intuitive workflows with clear visual feedback
 - Comprehensive error handling and recovery
 - Mobile-optimized responsive design throughout
 
