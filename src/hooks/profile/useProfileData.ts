@@ -38,6 +38,31 @@ interface CacheSnapshot {
   activeCollectionId: number | null;
 }
 
+interface TemplateData {
+  copy_id: number;
+  template_id: number;
+  title: string;
+  is_active: boolean;
+  copied_at: string;
+  original_author_nickname: string;
+  original_author_id: string;
+  completed_slots: number;
+  total_slots: number;
+  completion_percentage: number;
+}
+
+interface AvailableTemplateData {
+  id: number;
+  title: string;
+  description: string | null;
+  author_id: string;
+  image_url: string | null;
+  rating_avg: number;
+  rating_count: number;
+  copies_count: number;
+  created_at: string;
+}
+
 export function useProfileData() {
   const { supabase } = useSupabase();
   const { user, loading: userLoading } = useUser();
@@ -220,7 +245,7 @@ export function useProfileData() {
       if (myTemplatesError) throw myTemplatesError;
 
       // Transform template copies to match UserCollection interface
-      const ownedWithStats = (myTemplatesData || []).map(template => ({
+      const ownedWithStats = (myTemplatesData as TemplateData[] || []).map((template: TemplateData) => ({
         id: template.copy_id,
         name: template.title,
         competition: '', // Templates don't have competition field
@@ -241,7 +266,7 @@ export function useProfileData() {
       setOwnedCollections(ownedWithStats);
 
       // Fetch available public templates (not owned by user)
-      const ownedTemplateIds = (myTemplatesData || []).map(t => t.template_id);
+      const ownedTemplateIds = (myTemplatesData as TemplateData[] || []).map((t: TemplateData) => t.template_id);
 
       let availableQuery = supabase
         .from('collection_templates')
@@ -262,7 +287,7 @@ export function useProfileData() {
       if (availableError) throw availableError;
 
       // Transform templates to match Collection interface
-      const availableTemplates = (availableData || []).map(template => ({
+      const availableTemplates = (availableData as AvailableTemplateData[] || []).map((template: AvailableTemplateData) => ({
         id: template.id,
         name: template.title,
         competition: '', // Templates don't have competition
@@ -290,7 +315,7 @@ export function useProfileData() {
 
       if (myTemplatesData) {
         // Transform template copies to match UserCollection interface
-        const validOwnedCollections = myTemplatesData.map(template => ({
+        const validOwnedCollections = (myTemplatesData as TemplateData[]).map((template: TemplateData) => ({
           id: template.copy_id,
           name: template.title,
           competition: '', // Templates don't have competition field
