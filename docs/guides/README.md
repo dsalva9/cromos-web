@@ -35,14 +35,14 @@ Complete documentation for the CambioCromos marketplace and trading platform for
 
 ## ✅ Testing & Quality
 
-- Testing documentation pending
+- [Testing Guide](./TESTING.md) - Testing strategies and tools
+- [Validation Report](../pending/VALIDATION_REPORT.md) - Quality validation
 
 ---
 
 ## 🚢 Deployment & Operations
 
 - [Deployment Guide](./deployment-guide.md) - Production deployment
-- [Migration Guide](./migration-guide.md) - Database migrations
 
 ---
 
@@ -50,6 +50,8 @@ Complete documentation for the CambioCromos marketplace and trading platform for
 
 - [Project Instructions](../../PROJECT-INSTRUCTIONS.md) - Agent collaboration guidelines
 - [Agent Roles](../../AGENTS.md) - AI agent responsibilities
+- [Accessibility](./ACCESSIBILITY.md) - Accessibility standards
+- [Performance](./PERFORMANCE.md) - Performance guidelines
 
 ---
 

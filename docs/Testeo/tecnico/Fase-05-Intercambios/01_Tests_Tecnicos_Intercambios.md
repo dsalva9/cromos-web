@@ -610,3 +610,24 @@ SELECT * FROM accept_trade_proposal('{proposal_id}', '{user_id}');
 **Versión:** 1.0
 **Última actualización:** 2025-11-09
 **Autor:** David
+
+## Resultados de la Ejecución - Fase 05 (Agent)
+
+**Fecha:** 2025-11-21
+**Ejecutado por:** Agent (Antigravity)
+
+| ID Test | Descripción | Estado | Observaciones |
+|---|---|---|---|
+| **CP-F05-02F** | Transacción atómica al aceptar propuesta | **PARCIALMENTE IMPLEMENTADO** | La función `respond_to_trade_proposal` maneja la actualización de estado de forma atómica (transacción implícita). **CRÍTICO:** No implementa la lógica de intercambio de cromos (actualizar `user_template_progress`). Solo cambia el estado a 'accepted'. |
+| **CP-F05-02J** | RLS - Solo participantes ven propuestas | **PASÓ** | RLS `SELECT` funciona correctamente (solo `from_user` o `to_user`). Modificaciones directas bloqueadas por política `Disallow all modification` (correcto, fuerza uso de funciones). |
+| **CP-F05-02K** | Prevención de propuestas duplicadas | **NO IMPLEMENTADO** | No existe constraint UNIQUE ni índice parcial para evitar múltiples propuestas pendientes idénticas. La función `create_trade_proposal` tampoco realiza validación previa. |
+
+**Notas Adicionales:**
+- **Esquema Real:** Se usa `from_user`/`to_user` y tabla `trade_proposal_items`.
+- **Seguridad:** El diseño de bloquear modificaciones directas y usar funciones `SECURITY DEFINER` es robusto.
+- **Faltante:** Es necesario implementar la lógica de transferencia de cromos, ya sea en `respond_to_trade_proposal` o en una nueva función disparada por trigger o llamada explícitamente.
+- **Mejora:** Se recomienda agregar índice UNIQUE parcial para prevenir spam de propuestas duplicadas.
+
+**Conclusiones:**
+- El sistema de propuestas es seguro (RLS) pero funcionalmente incompleto (falta intercambio real de items).
+- Se requiere trabajo de desarrollo para implementar la lógica de intercambio y validaciones de duplicados.

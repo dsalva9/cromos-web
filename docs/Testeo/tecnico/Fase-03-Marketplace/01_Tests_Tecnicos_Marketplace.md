@@ -835,3 +835,30 @@ supabase.from('chat_messages').on('INSERT', (payload) => {
 **Versión:** 1.0
 **Última actualización:** 2025-11-09
 **Autor:** David
+
+## Resultados de la Ejecución - Fase 03 (Agent)
+
+**Fecha:** 2025-11-21
+**Ejecutado por:** Agent (Antigravity)
+
+| ID Test | Descripción | Estado | Observaciones |
+|---|---|---|---|
+| **CP-F03-02H** | RLS - Solo autor modifica listado | **PASÓ** | Usuario B no pudo modificar ni eliminar listado de Usuario A. Usuario A sí pudo modificar. |
+| **CP-F03-02I** | RLS - Chat Security | **PASÓ** | Usuario C (espía) no pudo leer mensajes de trade_proposal 49. Usuario A (participante) sí pudo leer. |
+| **CP-F03-02J** | Realtime - Mensajes de chat | **REQUIERE ACCIÓN** | Realtime NO está habilitado en `trade_chats`. **DEBE HABILITARSE** según `useListingChat.ts` (línea 146-170) que suscribe a cambios en `trade_chats`. Ver Sprint 13 documentación. |
+| **CP-F03-03E** | Performance - Búsqueda marketplace | **PASÓ** | Ejecución en 0.83ms. Índices GIN y BTREE presentes. Seq Scan usado por bajo volumen (59 filas). |
+| **CP-F03-03F** | Prevención chats duplicados | **IMPLEMENTADO EN LÓGICA** | No existe constraint UNIQUE en DB (correcto). Lógica implementada en `send_listing_message` RPC (líneas 59-74): valida que compradores solo envíen al owner, y que seller solo responda a usuarios que le hayan escrito primero. |
+
+**Notas Adicionales:**
+- Se utilizaron usuarios: `dsalva@gmail.com` (Vendedor), `qa.storage_a@cromos.test` (Comprador), `qa.storage_b@cromos.test` (Espía).
+- La tabla `trade_listings` no tiene columna `price` ni `listing_type`. Se usaron columnas disponibles (`sticker_number`, `collection_name`).
+- `trade_chats` contiene mensajes directamente (no hay tabla separada `chat_messages`).
+- Índices de búsqueda full-text (`idx_listings_search`) y trigram (`idx_listings_collection_name_trgm`) están implementados.
+- RLS en `trade_proposals` bloquea toda modificación (`Disallow all modification` policy).
+
+**Acciones Requeridas:**
+1. **HABILITAR Realtime en `trade_chats`**: Ir a Supabase Dashboard → Database → Replication → Habilitar "Enable Realtime" para la tabla `trade_chats`. Esto es necesario para que el chat funcione correctamente según `src/hooks/marketplace/useListingChat.ts`.
+
+**Conclusiones:**
+- **CP-F03-03F** está correctamente implementado: La prevención de duplicados se maneja a nivel de aplicación mediante validaciones en el RPC `send_listing_message`, lo cual es apropiado para este caso de uso (no requiere constraint UNIQUE en DB).
+- **CP-F03-02J** requiere acción: El test está actualizado y es válido. Realtime debe habilitarse manualmente en el dashboard.

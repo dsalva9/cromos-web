@@ -144,6 +144,10 @@ Spanish postal code centroids for distance calculations (v1.6.0).
 
 - PRIMARY KEY (country, postcode)
 
+**Indices:**
+
+- `idx_postal_codes_postcode` ON (postcode)
+
 **RLS Policies:**
 
 - Public read access
@@ -457,6 +461,45 @@ Progress tracking for each slot in user's copy.
 - `get_template_progress(copy_id)`
 - `update_template_progress(copy_id, slot_id, status, count)`
 
+## Gamification System
+
+### badge_definitions
+
+Definitions for system badges.
+
+**Columns:**
+
+- `id` TEXT PRIMARY KEY
+- `name` TEXT NOT NULL
+- `description` TEXT
+- `category` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**RLS Policies:**
+
+- Public read access
+
+### user_badge_progress
+
+Tracks user progress towards badges.
+
+**Columns:**
+
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE
+- `badge_id` TEXT REFERENCES badge_definitions(id) ON DELETE CASCADE
+- `progress` INTEGER DEFAULT 0
+- `earned_at` TIMESTAMPTZ
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+- `updated_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- PRIMARY KEY (user_id, badge_id)
+
+**RLS Policies:**
+
+- Users can view their own progress
+
 ## Social and Reputation System
 
 ### favourites
@@ -496,6 +539,25 @@ Unified table for all favourite types.
 - `is_favourited(target_type, target_id)`
 - `get_favourite_count(target_type, target_id)`
 - `get_user_favourites(target_type, limit, offset)`
+
+### ignored_users
+
+Allows users to block/ignore other users (v1.6.0).
+
+**Columns:**
+
+- `id` BIGSERIAL PRIMARY KEY
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `ignored_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Constraints:**
+
+- UNIQUE(user_id, ignored_user_id)
+
+**RLS Policies:**
+
+- Users can manage their own ignored users list
 
 ### user_ratings
 

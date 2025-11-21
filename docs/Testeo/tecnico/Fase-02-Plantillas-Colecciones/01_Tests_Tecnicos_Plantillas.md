@@ -1062,3 +1062,24 @@ SELECT id, title FROM collection_templates WHERE id = '{private_template_id}';
 **Versión:** 1.0
 **Última actualización:** 2025-11-09
 **Autor:** David
+
+## Resultados de la Ejecución - Fase 02 (Agent)
+
+**Fecha:** 2025-11-21
+**Ejecutado por:** Agent (Antigravity)
+
+| ID Test | Descripción | Estado | Observaciones |
+|---|---|---|---|
+| **CP-F02-01G** | RLS: Solo autor puede modificar | **PASÓ** | Se corrigió la política RLS de UPDATE para restringir acceso. User B bloqueado correctamente. |
+| **CP-F02-02F** | Trigger actualización progreso | **PASÓ** | `updated_at` en `user_template_progress` se actualiza correctamente al modificar items. |
+| **CP-F02-02G** | Eliminación en cascada | **PASÓ** | Al eliminar plantilla, se eliminaron copias y progreso asociado. |
+| **CP-F02-02H** | Constraint Rating (1-5) | **PASÓ** | Insertar 0 y 6 falló con error de check constraint. |
+| **CP-F02-02I** | Rating Duplicado | **PASÓ** | Segundo rating del mismo usuario falló con error de unique constraint. |
+| **CP-F02-03A** | Performance Listado Público | **PASÓ** | Ejecución rápida (0.1ms). Seq Scan utilizado (esperado por bajo volumen). |
+| **CP-F02-03B** | Constraint Total Items > 0 | **OMITIDO** | La columna `total_items` no existe en `collection_templates`. |
+| **CP-F02-03C** | RLS Plantillas Privadas | **PASÓ** | Verificado con `SET ROLE authenticated`. User B no ve la plantilla privada. |
+
+**Notas Adicionales:**
+- Se utilizaron los usuarios existentes: `dsalva@gmail.com` (Autor) y `qa.storage_a@cromos.test` (Intruso).
+- Se detectó que la tabla `collection_templates` carece de la columna `total_items` mencionada en el plan de pruebas.
+- Se corrigió una política RLS crítica en `collection_templates` durante la ejecución de CP-F02-01G.

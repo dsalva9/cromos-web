@@ -49,7 +49,7 @@ cromos-web/
 │   ├── hooks/                  # Custom React Hooks
 │   │   ├── marketplace/        # Marketplace hooks
 │   │   ├── templates/          # Template hooks
-│   │   ├── trades/             # Trading hooks
+
 │   │   └── useLocalStorage.ts  # Utility hooks
 │   │
 │   ├── lib/                    # Utility Libraries

@@ -32,11 +32,10 @@ CambioCromos is pivoting from a traditional sticker collection app to a Spanish-
 ## 📋 Table of Contents
 
 - [Features](#-features)
-- [Architecture](#-architecture)
-- [Database Schema](#-database-schema)
-- [API Endpoints](#-api-endpoints)
+- [Documentation](#-documentation)
 - [Deployment](#-deployment)
 - [Development](#-development)
+- [Project Instructions](./docs/meta/PROJECT-INSTRUCTIONS.md)
 - [Contributing](#-contributing)
 - [License](#-license)
 
