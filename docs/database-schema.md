@@ -115,6 +115,12 @@ User profiles with ratings and admin status.
 - `is_suspended` BOOLEAN DEFAULT FALSE
 - `created_at` TIMESTAMPTZ DEFAULT NOW()
 - `updated_at` TIMESTAMPTZ DEFAULT NOW()
+- `xp_total` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
+- `level` INTEGER DEFAULT 1 ✅ **v1.6.2 NEW**
+- `xp_current` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
+- `login_streak_days` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
+- `last_login_date` DATE ✅ **v1.6.2 NEW**
+- `longest_login_streak` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
 
 **Indices:**
 
@@ -756,6 +762,46 @@ Append-only log of all admin actions.
 - `admin_delete_sticker`
 - `admin_remove_sticker_image`
 - `admin_get_audit_log`
+
+## Gamification System ✅ **v1.6.2 NEW**
+
+### xp_history
+
+Tracks all XP gained by users.
+
+**Columns:**
+
+- `id` UUID PRIMARY KEY DEFAULT gen_random_uuid()
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `action_type` TEXT NOT NULL
+- `xp_earned` INTEGER NOT NULL
+- `description` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW()
+
+**Indices:**
+
+- `idx_xp_history_user` ON (user_id)
+
+### leaderboard_cache
+
+Materialized view for high-performance leaderboard queries.
+
+**Columns:**
+
+- `rank` BIGINT
+- `user_id` UUID
+- `nickname` TEXT
+- `avatar_url` TEXT
+- `level` INTEGER
+- `xp_total` INTEGER
+- `badge_count` BIGINT
+- `transaction_count` BIGINT
+- `last_updated` TIMESTAMPTZ
+
+**Indices:**
+
+- `idx_leaderboard_user_id` UNIQUE ON (user_id)
+- `idx_leaderboard_rank` ON (rank)
 
 ## Storage Buckets
 

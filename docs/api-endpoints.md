@@ -341,4 +341,28 @@ The following RPCs were part of the legacy collections system and have been remo
 
 ---
 
+## XP & Leaderboard RPCs ✅ **v1.6.2 NEW**
+
+- `calculate_level_from_xp`
+  ```sql
+  calculate_level_from_xp(total_xp INT) RETURNS INT;
+  ```
+
+- `award_xp`
+  ```sql
+  award_xp(p_user_id UUID, p_action_type TEXT, p_xp_amount INT, p_description TEXT DEFAULT NULL) RETURNS VOID;
+  ```
+
+- `update_login_streak`
+  ```sql
+  update_login_streak(p_user_id UUID) RETURNS VOID;
+  ```
+
+- `refresh_leaderboard`
+  ```sql
+  refresh_leaderboard() RETURNS VOID;
+  ```
+
+---
+
 *All RPC signatures are provided for reference; actual implementation may include additional default parameters or security definitions.*
