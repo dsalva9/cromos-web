@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Upcoming / In-Progress
+-   **Mobile Architecture Initialization**: Adopting Capacitor for Android MVP. Zero-branch strategy with `process.env` and context detection.
+
+### Pending Mobile Work (From Code Review)
+-   **Viewport & Safe Areas**: Fix meta tags and implement safe area insets.
+-   **Mobile Interactions**: Fix sticky hover states and remove autoFocus on mobile.
+-   **Input Handling**: Optimize `inputMode` for mobile keyboards.
+-   **CSS Architecture**: Standardize Z-Index and fix overscroll behavior.
+-   **Refactoring**: Split large components (`users/[userId]`, `marketplace/[id]/chat`, `profile`) to improve performance.
+
 ### Added
 - **Delete Template Collection Feature (2025-11-04)**: Users can delete tracked collections.
 - **Badges Gamification System (2025-01-04)**: 19 badges across 6 categories with real-time progress.
