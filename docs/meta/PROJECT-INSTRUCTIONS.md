@@ -16,6 +16,12 @@ We are moving to a **Modern, Dynamic, Premium** aesthetic.
 *   **Tailwind CSS**: Use utility classes for layout, but feel free to create custom complex animations or gradients in CSS modules if needed.
 *   **Responsiveness**: Mobile-first is mandatory. The app must look stunning on a phone.
 
+## Mobile Compatibility Guidelines
+*   **Touch-First**: All new UI features must be touch-first. No critical logic hidden behind Hover states.
+*   **File Inputs**: Use a unified hook (e.g., `useImageUpload`) to support native Camera intent on mobile vs file picker on web.
+*   **Gestures**: "Pull-to-refresh" behaviors should be handled carefully to not conflict with native gestures.
+*   **SSR Safety**: Any Capacitor plugin usage must be strictly guarded to run only on the client side to prevent Web build crashes.
+
 ## Technical Standards
 
 ### Database (Supabase)

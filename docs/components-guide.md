@@ -777,6 +777,13 @@ const handleTradingAction = async (actionId: string, actionType: string) => {
 </Button>
 ```
 
+## Mobile Compatibility (Capacitor)
+
+### Images & Inputs
+
+-   **Images**: Note that `next/image` optimization depends on the Vercel server. If we move to a static local bundle for Capacitor later, we must toggle `unoptimized: true`.
+-   **Inputs**: Recommend abstracting file inputs into a custom component that can detect the Capacitor runtime.
+
 ## Component Creation Guidelines
 
 ### TypeScript Interface Standards ✅ **EXTENDED FOR TRADING**
