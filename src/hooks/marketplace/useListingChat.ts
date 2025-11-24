@@ -133,9 +133,12 @@ export function useListingChat({
     [supabase, listingId, user, messages, participantId, fetchMessages]
   );
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom (mobile only)
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only auto-scroll on mobile devices
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   }, []);
 
   // Initial fetch
@@ -169,7 +172,7 @@ export function useListingChat({
     };
   }, [supabase, listingId, enableRealtime, user, fetchMessages]);
 
-  // Scroll to bottom when messages change
+  // Scroll to bottom when messages change (mobile only)
   useEffect(() => {
     if (messages.length > 0) {
       setTimeout(scrollToBottom, 100);
