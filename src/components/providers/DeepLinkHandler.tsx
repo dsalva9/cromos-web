@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { useRouter } from 'next/navigation';
 
 export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
@@ -13,7 +13,7 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    let listenerHandle: any;
+    let listenerHandle: PluginListenerHandle | undefined;
 
     // Handle deep links when app is opened from a link
     CapacitorApp.addListener('appUrlOpen', (data) => {
