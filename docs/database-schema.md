@@ -193,8 +193,9 @@ User-created marketplace listings for physical cards.
 - `idx_listings_user` ON (user_id)
 - `idx_listings_status` ON (status) WHERE status = 'active'
 - `idx_listings_created` ON (created_at DESC)
-- `idx_listings_search` USING GIN (to_tsvector('english', title || ' ' || COALESCE(collection_name, ''))) - Full-text search
+- `idx_listings_search_spanish` USING GIN (to_tsvector('spanish', title || ' ' || COALESCE(collection_name, ''))) - Full-text search (Spanish)
 - `idx_listings_collection_name_trgm` USING GIN (collection_name gin_trgm_ops) - Fuzzy search on collection names
+- `idx_listings_title_trgm` USING GIN (title gin_trgm_ops) - Fuzzy search on titles
 - `idx_listings_copy` ON (copy_id) WHERE copy_id IS NOT NULL
 - `idx_listings_slot` ON (slot_id) WHERE slot_id IS NOT NULL
 - `idx_trade_listings_global_number` ON (global_number) WHERE global_number IS NOT NULL - Quick lookup by Panini number
