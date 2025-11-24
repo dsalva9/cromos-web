@@ -36,6 +36,7 @@ export const viewport: Viewport = {
 };
 
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
+import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 
 export default function RootLayout({
   children,
@@ -48,7 +49,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-[#1F2937] text-foreground antialiased overflow-x-hidden`}
       >
         <OneSignalProvider>
-          <SupabaseProvider>
+          <DeepLinkHandler>
+            <SupabaseProvider>
           <ProfileCompletionProvider>
             <ErrorBoundary>
               <a
@@ -85,6 +87,7 @@ export default function RootLayout({
             />
           </ProfileCompletionProvider>
         </SupabaseProvider>
+      </DeepLinkHandler>
       </OneSignalProvider>
       </body>
     </html>
