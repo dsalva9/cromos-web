@@ -328,7 +328,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                     Nombre del Cromo *
                   </div>
                   <div className="w-20 text-xs text-gray-400 text-center font-medium">
-                    No. Página *
+                    No. Cromo *
                   </div>
                   <div className="w-16 text-xs text-gray-400 text-center font-medium">
                     Variante *
@@ -544,7 +544,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
 
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <Label className="text-white">No. Página *</Label>
+                            <Label className="text-white">No. Cromo *</Label>
                             <Input
                               type="number"
                               inputMode="numeric"
