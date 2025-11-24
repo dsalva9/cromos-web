@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,6 +82,14 @@ function ProfileContent() {
   // Local UI state
   const [editingNickname, setEditingNickname] = useState(false);
   const [tempNickname, setTempNickname] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingNickname && window.matchMedia('(min-width: 768px)').matches) {
+      // Small timeout to ensure element is rendered
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [editingNickname]);
 
   // Confirmation modal state
   const [confirmModal, setConfirmModal] = useState<{
@@ -438,7 +446,7 @@ function ProfileContent() {
                           placeholder="Tu nombre de usuario"
                           className="bg-gray-900 border-2 border-black text-white focus:border-[#FFC000] focus:ring-[#FFC000] flex-1"
                           onKeyDown={handleKeyDown}
-                          autoFocus
+                          ref={inputRef}
                           disabled={actionLoading['nick-user']}
                         />
                       </div>

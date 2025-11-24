@@ -486,7 +486,7 @@ function ListingChatPageContent() {
                         {listing.status === 'active' && 'Disponible'}
                         {listing.status === 'reserved' && 'Reservado'}
                         {listing.status === 'completed' && 'Completado'}
-                        {listing.status === 'sold' && 'Vendido'}
+                        {listing.status === 'sold' && 'Completado'}
                       </span>
                     </div>
                   </div>

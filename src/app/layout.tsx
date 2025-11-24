@@ -29,9 +29,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
   themeColor: '#1F2937',
 };
+
+import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 
 export default function RootLayout({
   children,
@@ -43,7 +47,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-[#1F2937] text-foreground antialiased overflow-x-hidden`}
       >
-        <SupabaseProvider>
+        <OneSignalProvider>
+          <SupabaseProvider>
           <ProfileCompletionProvider>
             <ErrorBoundary>
               <a
@@ -80,6 +85,7 @@ export default function RootLayout({
             />
           </ProfileCompletionProvider>
         </SupabaseProvider>
+      </OneSignalProvider>
       </body>
     </html>
   );

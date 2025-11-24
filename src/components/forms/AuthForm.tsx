@@ -14,6 +14,7 @@ interface FormFieldProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
 }
 
 function FormField({
@@ -26,6 +27,7 @@ function FormField({
   error,
   required = false,
   disabled = false,
+  inputMode,
 }: FormFieldProps) {
   return (
     <div className="space-y-2">
@@ -42,6 +44,7 @@ function FormField({
       <Input
         id={id}
         type={type}
+        inputMode={inputMode}
         placeholder={placeholder}
         value={value}
         onChange={e => onChange(e.target.value)}

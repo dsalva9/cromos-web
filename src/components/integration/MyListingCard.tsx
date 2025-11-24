@@ -49,7 +49,7 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
 
     try {
       await markSold(listing.listing_id);
-      toast.success('¡Anuncio marcado como vendido!');
+      toast.success('¡Anuncio marcado como completado!');
       if (listing.copy_id) {
         toast.success('Contador de repetidos actualizado automáticamente');
       }
@@ -74,9 +74,11 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
       case 'active':
         return 'Activo';
       case 'sold':
-        return 'Vendido';
+        return 'Completado';
       case 'removed':
         return 'Eliminado';
+      case 'reserved':
+        return 'Reservado';
       default:
         return status;
     }
@@ -207,7 +209,7 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
                     className="bg-green-700 hover:bg-green-600"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
-                    {confirming ? 'Haz clic de nuevo para confirmar' : 'Marcar como Vendido'}
+                    {confirming ? 'Haz clic de nuevo para confirmar' : 'Marcar como Completado'}
                   </Button>
                 </>
               )}
@@ -216,7 +218,17 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => toast.info('Función próximamente')}
+                  onClick={() => window.location.href = `/marketplace/${listing.listing_id}`}
+                >
+                  Reactivar
+                </Button>
+              )}
+              
+              {listing.status === 'sold' && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.location.href = `/marketplace/${listing.listing_id}`}
                 >
                   Reactivar
                 </Button>

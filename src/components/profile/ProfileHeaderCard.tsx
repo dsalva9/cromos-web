@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ModernCard } from '@/components/ui/modern-card';
@@ -36,6 +37,14 @@ export function ProfileHeaderCard({
   onCancelEdit,
   onChangeNickname,
 }: ProfileHeaderCardProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingNickname && window.matchMedia('(min-width: 768px)').matches) {
+      inputRef.current?.focus();
+    }
+  }, [editingNickname]);
+
   return (
     <ModernCard className="bg-white/70 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5">
       {/* Gradient Header with subtle overlay */}
@@ -71,7 +80,7 @@ export function ProfileHeaderCard({
                           onCancelEdit();
                         }
                       }}
-                      autoFocus
+                      ref={inputRef}
                     />
                   </div>
                   <div className="flex space-x-3">

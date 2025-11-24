@@ -60,7 +60,7 @@ function TemplateProgressContent() {
         <div className="text-center">
           <p className="text-white text-xl mb-4">Colección no encontrada</p>
           <Link href="/mis-plantillas">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">Volver a Mis Colecciones</Button>
+            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">Volver a Mis Álbumes</Button>
           </Link>
         </div>
       </div>
@@ -81,7 +81,7 @@ function TemplateProgressContent() {
               className="text-gray-400 hover:text-white hover:bg-gray-800 pl-0 sm:pl-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver a Mis Colecciones
+              Volver a Mis Álbumes
             </Button>
           </Link>
 

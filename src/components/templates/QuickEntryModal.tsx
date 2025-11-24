@@ -29,9 +29,9 @@ export function QuickEntryModal({
   const [recentUpdates, setRecentUpdates] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Focus input when modal opens
+  // Focus input when modal opens (Desktop only)
   useEffect(() => {
-    if (open) {
+    if (open && window.matchMedia('(min-width: 768px)').matches) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
@@ -104,11 +104,12 @@ export function QuickEntryModal({
                     ref={inputRef}
                     id="checklist-number"
                     type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={checklistInput}
                     onChange={(e) => setChecklistInput(e.target.value)}
                     placeholder="Ej: 45, 123, 773..."
                     className="bg-gray-800 border-gray-700 text-white h-12 text-lg pl-4 focus:ring-[#FFC000] focus:border-[#FFC000]"
-                    autoFocus
                   />
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-mono border border-gray-700 rounded px-1.5 py-0.5">
                     ENTER

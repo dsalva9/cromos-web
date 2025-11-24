@@ -231,6 +231,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             <Input
               id="global_number"
               type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
               aria-invalid={!!errors.global_number}
               {...register('global_number', { valueAsNumber: true })}
               placeholder="ej. 123"

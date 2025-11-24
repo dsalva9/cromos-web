@@ -43,7 +43,8 @@
       "mcp__supabase__get_project_url",
       "mcp__supabase__list_tables",
       "mcp__supabase__execute_sql",
-      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\nul\")"
+      "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\nul\")",
+      "Bash(claude mcp inspect:*)"
     ],
     "deny": [],
     "ask": []

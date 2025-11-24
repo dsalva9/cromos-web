@@ -123,6 +123,17 @@ export function useCreateTemplate() {
         );
       }
 
+      // Step 4: Automatically copy the template to the user's collection
+      const { error: copyError } = await supabase.rpc('copy_template', {
+        p_template_id: templateId,
+        p_custom_title: processedData.title // Use the same title for the copy
+      });
+
+      if (copyError) {
+        logger.error('Error auto-copying template:', copyError);
+        // We don't throw here to avoid failing the whole creation process if just the copy fails
+      }
+
       toast.success('¡Plantilla creada con éxito!');
 
       return templateId;

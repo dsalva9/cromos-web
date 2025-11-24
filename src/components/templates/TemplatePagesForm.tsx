@@ -174,7 +174,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="new-page-title">Título de la Página</Label>
+              <Label className="text-white">Título de la Página *</Label>
               <Input
                 id="new-page-title"
                 value={newPageTitle}
@@ -244,8 +244,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
             {/* Page Title and Type */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor={`page-title-${pageIndex}`}>
-                  Título de la Página
+                <Label htmlFor={`page-title-${pageIndex}`} className="text-white">
+                  Título de la Página *
                 </Label>
                 <Input
                   id={`page-title-${pageIndex}`}
@@ -322,16 +322,16 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                 <div className="hidden lg:flex items-center gap-2 px-2 pb-2 border-b border-gray-700">
                   <div className="w-5" /> {/* Grip icon space */}
                   <div className="w-16 text-xs text-gray-400 text-center font-medium">
-                    No. Global
+                    No. Global *
                   </div>
                   <div className="flex-1 text-xs text-gray-400 font-medium">
-                    Nombre del Cromo
+                    Nombre del Cromo *
                   </div>
                   <div className="w-20 text-xs text-gray-400 text-center font-medium">
-                    No. Página
+                    No. Página *
                   </div>
                   <div className="w-16 text-xs text-gray-400 text-center font-medium">
-                    Variante
+                    Variante *
                   </div>
                   <div className="w-32 text-xs text-gray-400 font-medium">
                     {/* Special toggle space */}
@@ -354,6 +354,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                       <div className="relative">
                         <Input
                           type="number"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           value={slot.global_number || ''}
                           onChange={e =>
                             updateSlot(pageIndex, slotIndex, {
@@ -395,6 +397,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                       <div className="relative">
                         <Input
                           type="number"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           value={slot.slot_number}
                           onChange={e =>
                             updateSlot(pageIndex, slotIndex, {
@@ -497,9 +501,11 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
 
                       <div className="space-y-2">
                         <div>
-                          <Label className="text-xs text-gray-400">No. Global</Label>
+                          <Label className="text-white">No. Global *</Label>
                           <Input
                             type="number"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             value={slot.global_number || ''}
                             onChange={e =>
                               updateSlot(pageIndex, slotIndex, {
@@ -522,7 +528,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                         </div>
 
                         <div>
-                          <Label className="text-xs text-gray-400">Nombre del Cromo</Label>
+                          <Label className="text-white">Nombre del Cromo *</Label>
                           <Input
                             value={slot.label}
                             onChange={e =>
@@ -538,9 +544,11 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
 
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <Label className="text-xs text-gray-400">No. Página</Label>
+                            <Label className="text-white">No. Página *</Label>
                             <Input
                               type="number"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
                               value={slot.slot_number}
                               onChange={e =>
                                 updateSlot(pageIndex, slotIndex, {
@@ -561,7 +569,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                           </div>
 
                           <div>
-                            <Label className="text-xs text-gray-400">Variante</Label>
+                            <Label className="text-white">Variante *</Label>
                             <Input
                               value={slot.slot_variant || ''}
                               onChange={e =>

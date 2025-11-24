@@ -120,6 +120,23 @@ export default function ListingDetailPage() {
   const isOwner = user?.id === listing.user_id;
   const canContact = user && !isOwner && listing.status === 'active';
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'Disponible';
+      case 'reserved':
+        return 'Reservado';
+      case 'completed':
+        return 'Completado';
+      case 'sold':
+        return 'Completado';
+      case 'removed':
+        return 'Eliminado';
+      default:
+        return status;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
@@ -157,12 +174,14 @@ export default function ListingDetailPage() {
                 <Badge
                   className={`
                   ${listing.status === 'active' ? 'bg-green-500' : ''}
+                  ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
+                  ${listing.status === 'completed' ? 'bg-blue-500' : ''}
                   ${listing.status === 'sold' ? 'bg-gray-500' : ''}
                   ${listing.status === 'removed' ? 'bg-red-500' : ''}
                   text-white uppercase border-2 border-black
                 `}
                 >
-                  {listing.status}
+                  {getStatusLabel(listing.status)}
                 </Badge>
 
                 {isOwner && (
@@ -342,13 +361,39 @@ export default function ListingDetailPage() {
                       {checkingConversations ? 'Cargando...' : 'Sin Conversaciones'}
                     </Button>
                   )}
-                  <div className="flex gap-4 justify-center">
-                    <Button variant="outline" asChild>
-                      <Link href={`/marketplace/${listing.id}/edit`}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Editar Anuncio
-                      </Link>
-                    </Button>
+                  
+                  <div className="flex gap-4 justify-center flex-wrap">
+                    {(listing.status === 'removed' || listing.status === 'sold' || listing.status === 'completed') ? (
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase
+                              .from('trade_listings')
+                              .update({ status: 'active' })
+                              .eq('id', listing.id);
+                            
+                            if (error) throw error;
+                            toast.success('Anuncio publicado nuevamente');
+                            window.location.reload();
+                          } catch (err) {
+                            logger.error('Error reactivating listing:', err);
+                            toast.error('Error al publicar el anuncio');
+                          }
+                        }}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        Publicar Anuncio
+                      </Button>
+                    ) : (
+                      <Button variant="outline" asChild>
+                        <Link href={`/marketplace/${listing.id}/edit`}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Editar Anuncio
+                        </Link>
+                      </Button>
+                    )}
+                    
                     <Button
                       variant="outline"
                       onClick={handleDelete}

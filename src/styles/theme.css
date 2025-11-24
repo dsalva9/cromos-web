@@ -127,9 +127,11 @@
   box-shadow: var(--shadow-sm);
 }
 
-.card-theme:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow);
+@media (hover: hover) {
+  .card-theme:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow);
+  }
 }
 
 /* Button styling with theme variables */
@@ -139,9 +141,11 @@
   border: 1px solid var(--brand);
 }
 
-.btn-brand:hover {
-  background-color: var(--brand-700);
-  border-color: var(--brand-700);
+@media (hover: hover) {
+  .btn-brand:hover {
+    background-color: var(--brand-700);
+    border-color: var(--brand-700);
+  }
 }
 
 .btn-surface {
@@ -150,7 +154,9 @@
   border: 1px solid var(--border);
 }
 
-.btn-surface:hover {
-  background-color: var(--surface-50);
-  border-color: var(--border-hover);
+@media (hover: hover) {
+  .btn-surface:hover {
+    background-color: var(--surface-50);
+    border-color: var(--border-hover);
+  }
 }

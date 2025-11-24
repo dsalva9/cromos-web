@@ -49,7 +49,8 @@ export default function ResetPasswordPage() {
           router.push('/');
         }, 2000);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Reset password error:', error);
       setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

@@ -46,7 +46,7 @@ export default function SiteHeader() {
 
   const baseLinks: NavigationLink[] = [
     { href: '/marketplace', label: 'Marketplace', requiresCompletion: true },
-    { href: '/mis-plantillas', label: 'Mis Colecciones', requiresCompletion: true },
+    { href: '/mis-plantillas', label: 'Mis Álbumes', requiresCompletion: true },
     { href: '/templates', label: 'Plantillas', requiresCompletion: true },
   ];
 

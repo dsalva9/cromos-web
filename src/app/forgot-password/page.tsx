@@ -31,7 +31,8 @@ export default function ForgotPasswordPage() {
           text: 'Si el email existe, recibirás un enlace para recuperar tu contraseña.',
         });
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Password reset error:', error);
       setMessage({ type: 'error', text: 'Ocurrió un error inesperado. Inténtalo de nuevo.' });
     } finally {
       setLoading(false);

@@ -153,17 +153,17 @@ export function TemplateBasicInfoForm({
 
       {/* Public/Private */}
       <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
-          <Label htmlFor="is-public">Hacer pública</Label>
-          <p className="text-sm text-gray-400">
-            Otros usuarios podrán ver y copiar esta plantilla
-          </p>
-        </div>
-        <Switch
-          id="is-public"
-          checked={data.is_public}
-          onCheckedChange={checked => onChange({ is_public: checked })}
-        />
+          <div className="space-y-0.5">
+            <Label htmlFor="is-public" className="text-white">Hacer privada</Label>
+            <p className="text-sm text-gray-400">
+              Si activas esta opción, otros usuarios no podrán ver ni copiar esta plantilla
+            </p>
+          </div>
+          <Switch
+            id="is-public"
+            checked={!data.is_public}
+            onCheckedChange={(checked) => onChange({ is_public: !checked })}
+          />
       </div>
     </div>
   );

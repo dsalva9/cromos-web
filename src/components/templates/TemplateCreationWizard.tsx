@@ -52,7 +52,7 @@ export function TemplateCreationWizard({
       title: '',
       description: '',
       image_url: '',
-      is_public: false,
+      is_public: true,
       terms_accepted: false,
       pages: [],
     }

@@ -1,11 +1,9 @@
 'use client';
 
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Eye, MapPin } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { MapPin } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 
 interface ListingCardProps {

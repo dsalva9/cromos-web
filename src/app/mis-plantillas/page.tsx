@@ -114,7 +114,7 @@ function MyTemplatesContent() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black uppercase text-white mb-3 tracking-tight">
-              Mis Colecciones
+              Mis Álbumes
             </h1>
             <p className="text-gray-400 text-lg max-w-2xl font-light">
               Gestiona tu progreso, completa tus álbumes y organiza tus cromos.

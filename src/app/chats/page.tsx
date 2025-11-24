@@ -121,7 +121,7 @@ function ChatsPageContent() {
                             {conv.listing_status === 'active' && 'Activo'}
                             {conv.listing_status === 'reserved' && 'Reservado'}
                             {conv.listing_status === 'completed' && 'Completado'}
-                            {conv.listing_status === 'sold' && 'Vendido'}
+                            {conv.listing_status === 'sold' && 'Completado'}
                           </span>
                         </div>
 

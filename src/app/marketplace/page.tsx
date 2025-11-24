@@ -6,7 +6,7 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Search, Filter } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter } from 'lucide-react';
 import Link from 'next/link';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
