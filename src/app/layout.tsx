@@ -60,7 +60,7 @@ export default function RootLayout({
               <header role="banner">
                 <SiteHeader />
               </header>
-              <main id="main-content" role="main" className="min-h-screen pt-16">
+              <main id="main-content" role="main" className="min-h-screen" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
                 {children}
               </main>
               <footer role="contentinfo" className="border-t">

@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.cambiocromos.app",
+    "sha256_cert_fingerprints": [
+      "67:7B:63:A7:BD:1C:28:BD:CB:95:09:E7:E4:67:32:10:4E:20:0F:49:61:EF:0D:08:0F:17:6B:51:19:3E:CC:CB"
+    ]
+  }
+}]
