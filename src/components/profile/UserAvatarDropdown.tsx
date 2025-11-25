@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Package, Heart, MessageCircle, LogOut, ChevronDown, EyeOff } from 'lucide-react';
+import { User, Package, Heart, MessageCircle, LogOut, ChevronDown, EyeOff, Settings } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -177,6 +177,18 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               >
                 <EyeOff className="h-4 w-4" />
                 <span>Usuarios Ignorados</span>
+              </Link>
+
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSetIsOpen(false);
+                }}
+                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors opacity-50 cursor-not-allowed"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Ajustes</span>
               </Link>
 
               {isAdmin && (

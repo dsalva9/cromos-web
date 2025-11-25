@@ -122,6 +122,18 @@ export function MobileBottomNav() {
               <span className="font-medium">Usuarios Ignorados</span>
             </Link>
 
+            <Link
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsMenuOpen(false);
+              }}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors opacity-50 cursor-not-allowed"
+            >
+              <Settings className="h-5 w-5 text-[#FFC000]" />
+              <span className="font-medium">Ajustes (Próximamente)</span>
+            </Link>
+
             <div className="h-px bg-gray-800 my-2" />
 
             <button

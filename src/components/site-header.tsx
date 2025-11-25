@@ -19,11 +19,49 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { logger } from '@/lib/logger';
 
+import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
+import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
+import Image from 'next/image';
+
 type NavigationLink = {
   href: string;
   label: string;
   requiresCompletion?: boolean;
 };
+
+// Simplified Avatar component for mobile that links directly to profile
+function MobileUserAvatar({ userId }: { userId: string }) {
+  const { profile } = useCurrentUserProfile();
+  const { supabase } = useSupabase();
+  
+  const avatarUrl = resolveAvatarUrl(profile?.avatar_url, supabase);
+  const fallback = getAvatarFallback(profile?.nickname);
+
+  return (
+    <Link href={`/users/${userId}`} className="block">
+      <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black hover:border-[#FFC000] transition-colors">
+        {avatarUrl ? (
+          <Image
+            src={avatarUrl}
+            alt={profile?.nickname || 'Usuario'}
+            fill
+            sizes="40px"
+            className="object-cover"
+          />
+        ) : (
+          <div
+            className={cn(
+              'w-full h-full flex items-center justify-center text-black font-black text-lg',
+              fallback.gradientClass
+            )}
+          >
+            {fallback.initial}
+          </div>
+        )}
+      </div>
+    </Link>
+  );
+}
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -189,9 +227,7 @@ export default function SiteHeader() {
             {!loading && user && (
               <>
                 <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
-                <Link href={`/users/${user.id}`}>
-                  <UserAvatarDropdown isAdmin={isAdmin} />
-                </Link>
+                <MobileUserAvatar userId={user.id} />
               </>
             )}
           </div>
