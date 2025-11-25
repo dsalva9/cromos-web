@@ -130,6 +130,15 @@ export default function Page() {
 </footer>
 ```
 
+### Mobile Navigation Layout
+
+On mobile devices (< 768px), the layout shifts to a native-app style:
+
+1.  **Bottom Navigation**: A fixed `MobileBottomNav` bar provides quick access to primary sections (Marketplace, Albums, Chats, Favorites, Menu).
+2.  **Floating Action Button (FAB)**: A context-aware `FloatingActionBtn` appears on specific pages (Marketplace, Templates) for primary creation actions.
+3.  **Simplified Header**: The `SiteHeader` is simplified to show only the logo, notifications, and profile link. The hamburger menu is removed in favor of the bottom nav's "More" drawer.
+4.  **Safe Areas**: Bottom padding is added to the main content to prevent obstruction by the fixed bottom nav (`pb-[calc(4rem+env(safe-area-inset-bottom))]`).
+
 ---
 
 ## Testing

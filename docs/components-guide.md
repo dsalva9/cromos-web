@@ -465,6 +465,51 @@ Navigation link with active state detection and trading route support.
 - Active state styling with gradient support
 - Click handler support for menu closing
 
+### Mobile Navigation Components
+
+#### MobileBottomNav
+
+**File**: `src/components/navigation/MobileBottomNav.tsx`
+
+Fixed bottom navigation bar for mobile devices.
+
+**Features:**
+- **Fixed Positioning**: `fixed bottom-0` with safe area support.
+- **Active State**: Highlights current route icon.
+- **"More" Drawer**: Integrated `Drawer` (via `vaul`) for secondary menu items.
+- **Icon-Only**: Clean design with icons only (no text labels) for a modern look.
+
+#### FloatingActionBtn (FAB)
+
+**File**: `src/components/navigation/FloatingActionBtn.tsx`
+
+Context-aware floating action button for primary creation actions.
+
+**Features:**
+- **Context-Aware**: Only appears on specific pages (`/marketplace`, `/templates`).
+- **Dynamic Routing**: Links to `/marketplace/create` or `/templates/create` depending on context.
+- **Positioning**: Fixed above the bottom nav with safe area awareness.
+
+#### MobileNotificationIcon
+
+**File**: `src/components/site-header.tsx` (internal component)
+
+Simplified notification indicator for the mobile header.
+
+**Features:**
+- **Direct Link**: Navigates directly to `/profile/notifications`.
+- **Badge**: Shows unread count badge positioned on the top-right of the bell icon.
+
+#### MobileUserAvatar
+
+**File**: `src/components/site-header.tsx` (internal component)
+
+Simplified user avatar for the mobile header.
+
+**Features:**
+- **Direct Link**: Navigates directly to the user's profile.
+- **No Dropdown**: Removes complex dropdown interactions on mobile for a faster experience.
+
 ## UI Components
 
 ### Base shadcn/ui Components

@@ -28,18 +28,21 @@ Release an Android MVP for Cromos using Capacitor. This approach allows us to wr
   - OneSignal integration for push notifications (chat, trades).
   - Basic deep linking support.
   - **Technical Tasks:**
-    - [ ] **Viewport & Safe Areas:** Fix `viewport` meta tag (disable zoom/scale) and implement `safe-area-inset-*` for headers/footers.
-    - [ ] **Mobile Interactions:** Remove `autoFocus` on mobile inputs and fix sticky `hover` states using `@media (hover: hover)`.
-    - [ ] **Input Handling:** Audit inputs for correct `inputMode` (numeric/decimal) to trigger appropriate mobile keyboards.
+    - [x] **Viewport & Safe Areas:** Fix `viewport` meta tag (disable zoom/scale) and implement `safe-area-inset-*` for headers/footers.
+    - [x] **Mobile Interactions:** Remove `autoFocus` on mobile inputs and fix sticky `hover` states using `@media (hover: hover)`.
+    - [x] **Input Handling:** Audit inputs for correct `inputMode` (numeric/decimal) to trigger appropriate mobile keyboards.
 
 ### Phase 2: UI Polish & Native Feel
 - **Goal:** Make it feel less like a website.
 - **Tasks:**
+  - **Navigation Redesign:** Implement fixed bottom navigation bar and FAB for key actions.
   - Handle "Safe Areas" (notch, status bar, home indicator) via CSS env variables.
   - Implement Haptic Feedback on interactions.
   - Disable browser-specific UI (text selection, callouts, tap highlights).
   - Improve "Pull-to-refresh" behavior or disable it in favor of native-like navigation.
   - **Technical Tasks:**
+    - [x] **Bottom Navigation:** Create `MobileBottomNav` component.
+    - [x] **FAB:** Create `FloatingActionBtn` component.
     - [ ] **CSS Architecture:** Implement a Z-Index scale to prevent stacking issues.
     - [ ] **Overscroll:** Add `overscroll-behavior-y: none` to prevent browser bounce/pull-to-refresh.
 
