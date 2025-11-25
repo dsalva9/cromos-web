@@ -102,7 +102,7 @@ export default function MarketplacePage() {
                     <span className="hidden md:inline">Mis Anuncios</span>
                   </Button>
                 </Link>
-                <Link href="/marketplace/create" className="flex-1 md:flex-none">
+                <Link href="/marketplace/create" className="hidden md:block md:flex-none">
                   <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-[0_0_20px_rgba(255,192,0,0.2)] hover:shadow-[0_0_30px_rgba(255,192,0,0.4)] transition-all text-sm">
                     <Plus className="mr-1 md:mr-2 h-4 w-4" />
                     Publicar

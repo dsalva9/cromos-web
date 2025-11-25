@@ -185,148 +185,20 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          <button
-            type="button"
-            className="md:hidden p-2 text-white hover:text-[#FFC000] hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md border-2 border-transparent hover:border-black transition-all duration-200"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label="Toggle navigation menu"
-            onClick={toggleMenu}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            )}
-          </button>
-        </div>
-
-        <nav
-          id="mobile-menu"
-          role="navigation"
-          aria-label="Mobile navigation"
-          className={cn(
-            'md:hidden border-t-2 border-gray-700 bg-gray-800',
-            isMenuOpen ? 'block' : 'hidden'
-          )}
-        >
-          <div className="max-h-[calc(100vh-4rem)] overflow-y-auto">
-            {/* Main Navigation Links */}
-            <ul className="py-4 space-y-2">
-              {navigationLinks.map(link => (
-                <li key={link.href}>
-                  <NavLink
-                    href={link.href}
-                    className={cn(
-                      'block px-4 py-3 mx-2 rounded-md font-bold uppercase text-base transition-all duration-200',
-                      'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
-                      'data-[current=page]:bg-[#FFC000] data-[current=page]:text-gray-900 data-[current=page]:border-2 data-[current=page]:border-black',
-                      'text-white hover:bg-gray-700 border-2 border-transparent'
-                    )}
-                    onClick={handleProtectedNavigation(link.requiresCompletion)}
-                  >
-                    {link.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-
-            {/* Notifications Section - Only for authenticated users */}
+          <div className="flex items-center gap-2 md:hidden">
             {!loading && user && (
               <>
-                <div className="border-t-2 border-gray-700" />
-                <div className="py-4">
-                  <Link
-                    href="/profile/notifications"
-                    onClick={closeMenu}
-                    className="flex items-center justify-between px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Bell className="h-5 w-5" />
-                      <span className="font-bold">Notificaciones</span>
-                    </div>
-                    {unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] text-center">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </div>
-
-                {/* User Profile Section */}
-                <div className="border-t-2 border-gray-700" />
-                <div className="py-4 space-y-1">
-                  <Link
-                    href={`/users/${user.id}`}
-                    onClick={handleProtectedNavigation()}
-                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <User className="h-5 w-5" />
-                    <span className="font-bold">Mi Perfil</span>
-                  </Link>
-
-                  <Link
-                    href="/marketplace/my-listings"
-                    onClick={handleProtectedNavigation(true)}
-                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <Package className="h-5 w-5" />
-                    <span className="font-bold">Mis Anuncios</span>
-                  </Link>
-
-                  <Link
-                    href="/chats"
-                    onClick={handleProtectedNavigation(true)}
-                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <MessageCircle className="h-5 w-5" />
-                    <span className="font-bold">Chats</span>
-                  </Link>
-
-                  <Link
-                    href="/favorites"
-                    onClick={handleProtectedNavigation()}
-                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <Heart className="h-5 w-5" />
-                    <span className="font-bold">Favoritos</span>
-                  </Link>
-
-                  <Link
-                    href="/profile/ignored"
-                    onClick={handleProtectedNavigation()}
-                    className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-gray-700 transition-colors rounded-md"
-                  >
-                    <EyeOff className="h-5 w-5" />
-                    <span className="font-bold">Usuarios Ignorados</span>
-                  </Link>
-
-                  {isAdmin && (
-                    <Link
-                      href="/admin/dashboard"
-                      onClick={handleProtectedNavigation()}
-                      className="flex items-center gap-3 px-4 py-3 mx-2 text-[#FFC000] hover:bg-gray-700 transition-colors rounded-md font-bold"
-                    >
-                      <span>Admin Panel</span>
-                    </Link>
-                  )}
-
-                  <div className="border-t-2 border-gray-700 mt-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={handleSignOut}
-                      className="flex items-center gap-3 px-4 py-3 mx-2 text-white hover:bg-red-900/20 hover:text-red-400 transition-colors w-full rounded-md"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      <span className="font-bold">Cerrar sesión</span>
-                    </button>
-                  </div>
-                </div>
+                <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
+                <Link href={`/users/${user.id}`}>
+                  <UserAvatarDropdown isAdmin={isAdmin} />
+                </Link>
               </>
             )}
           </div>
-        </nav>
       </div>
+      </div>
+
+
 
       {/* Rating Modal */}
       {ratingModalData && (

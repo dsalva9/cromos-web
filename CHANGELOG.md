@@ -23,6 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   **Native Features**:
     -   Added `OneSignalProvider` for push notifications (requires App ID).
     -   Configured Android Deep Linking for `cromos-web.vercel.app`.
+    -   Added `DeepLinkHandler` for routing incoming deep links to correct pages.
+
+**Status**: Mobile MVP Phase 1 & 2 complete. App successfully runs on Android with deep linking, safe area handling, and mobile-optimized inputs.
+
+### Mobile UI Redesign (New)
+-   **Bottom Navigation**: Implemented a fixed bottom bar with 5 icons (Marketplace, Albums, Chats, Favorites, Menu).
+-   **Floating Action Button (FAB)**: Added a global FAB for "Publicar Anuncio" and "Crear Plantilla" on mobile.
+-   **Simplified Header**: Mobile header now only shows Logo, Notifications, and Avatar.
+-   **More Menu**: Implemented a slide-up drawer for secondary navigation links.
+-   **Hidden Elements**: Hidden redundant "Publicar" buttons on mobile pages in favor of the FAB.
 
 ### Pending Mobile Work
 -   **Refactoring**: Split large components (`users/[userId]`, `marketplace/[id]/chat`, `profile`) to improve performance.

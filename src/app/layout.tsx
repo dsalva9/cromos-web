@@ -37,6 +37,8 @@ export const viewport: Viewport = {
 
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
+import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
+import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
 
 export default function RootLayout({
   children,
@@ -62,10 +64,12 @@ export default function RootLayout({
               <header role="banner">
                 <SiteHeader />
               </header>
-              <main id="main-content" role="main" className="min-h-screen" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
+              <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
                 {children}
               </main>
-              <footer role="contentinfo" className="border-t">
+              <MobileBottomNav />
+              <FloatingActionBtn />
+              <footer role="contentinfo" className="border-t hidden md:block">
                 <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
                   Ac {new Date().getFullYear()} {siteConfig.name}
                 </div>

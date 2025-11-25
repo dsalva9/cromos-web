@@ -46,7 +46,7 @@ export default function TemplatesPage() {
                   Mis Plantillas
                 </Button>
               </Link>
-              <Link href="/templates/create" className="w-full sm:w-auto">
+              <Link href="/templates/create" className="hidden md:block w-full sm:w-auto">
                 <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium w-full">
                   <Plus className="mr-2 h-4 w-4" />
                   Crear Plantilla
