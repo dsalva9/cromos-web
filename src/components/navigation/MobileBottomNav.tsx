@@ -2,13 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, EyeOff, LogOut, X } from 'lucide-react';
+import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, EyeOff, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -34,56 +33,56 @@ export function MobileBottomNav() {
           <Link
             href="/marketplace"
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
+              "flex items-center justify-center w-full h-full",
               isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
             )}
+            aria-label="Marketplace"
           >
             <Store className="h-6 w-6" />
-            <span className="text-[10px] font-medium">Market</span>
           </Link>
 
           <Link
             href="/mis-plantillas"
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
+              "flex items-center justify-center w-full h-full",
               isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
             )}
+            aria-label="Mis Álbumes"
           >
             <Library className="h-6 w-6" />
-            <span className="text-[10px] font-medium">Álbumes</span>
           </Link>
 
           <Link
             href="/chats"
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
+              "flex items-center justify-center w-full h-full",
               isActive('/chats') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
             )}
+            aria-label="Chats"
           >
             <MessageCircle className="h-6 w-6" />
-            <span className="text-[10px] font-medium">Chats</span>
           </Link>
 
           <Link
             href="/favorites"
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
+              "flex items-center justify-center w-full h-full",
               isActive('/favorites') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
             )}
+            aria-label="Favoritos"
           >
             <Heart className="h-6 w-6" />
-            <span className="text-[10px] font-medium">Favoritos</span>
           </Link>
 
           <button
             onClick={() => setIsMenuOpen(true)}
             className={cn(
-              "flex flex-col items-center justify-center w-full h-full space-y-1",
+              "flex items-center justify-center w-full h-full",
               isMenuOpen ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
             )}
+            aria-label="Menú"
           >
             <Menu className="h-6 w-6" />
-            <span className="text-[10px] font-medium">Menú</span>
           </button>
         </div>
       </nav>

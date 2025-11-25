@@ -3,7 +3,6 @@
 import { siteConfig } from '@/config/site';
 import { useState, useEffect, MouseEvent } from 'react';
 import Link from 'next/link';
-import { Menu, X, Bell, User, Package, Heart, MessageCircle, LogOut, EyeOff } from 'lucide-react';
 import NavLink from '@/components/nav-link';
 import {
   useSupabase,
@@ -22,6 +21,8 @@ import { logger } from '@/lib/logger';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import { Bell } from 'lucide-react';
 
 type NavigationLink = {
   href: string;
@@ -63,13 +64,31 @@ function MobileUserAvatar({ userId }: { userId: string }) {
   );
 }
 
+// Simplified Notification component for mobile that links directly to notifications page
+function MobileNotificationIcon() {
+  const { unreadCount } = useNotifications();
+
+  return (
+    <Link href="/profile/notifications" className="relative p-2 text-white hover:text-[#FFC000] transition-colors">
+      <Bell className="h-6 w-6" />
+      {unreadCount > 0 && (
+        <Badge
+          variant="destructive"
+          className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+        >
+          {unreadCount > 99 ? '99+' : unreadCount}
+        </Badge>
+      )}
+    </Link>
+  );
+}
+
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
   const { isComplete, loading: profileLoading } = useProfileCompletion();
-  const { unreadCount } = useNotifications();
   const router = useRouter();
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [ratingModalData, setRatingModalData] = useState<{
@@ -79,7 +98,6 @@ export default function SiteHeader() {
     listingTitle: string;
   } | null>(null);
 
-  const toggleMenu = () => setIsMenuOpen(v => !v);
   const closeMenu = () => setIsMenuOpen(false);
 
   const baseLinks: NavigationLink[] = [
@@ -149,16 +167,6 @@ export default function SiteHeader() {
       closeMenu();
     };
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      closeMenu();
-      router.push('/login');
-    } catch (error) {
-      logger.error('Sign out error:', error);
-    }
-  };
-
   const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
     setRatingModalData({ userId, nickname, listingId, listingTitle });
     setShowRatingModal(true);
@@ -226,7 +234,7 @@ export default function SiteHeader() {
           <div className="flex items-center gap-2 md:hidden">
             {!loading && user && (
               <>
-                <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
+                <MobileNotificationIcon />
                 <MobileUserAvatar userId={user.id} />
               </>
             )}
