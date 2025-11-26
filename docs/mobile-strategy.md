@@ -40,6 +40,8 @@ Release an Android MVP for Cromos using Capacitor. This approach allows us to wr
   - Implement Haptic Feedback on interactions.
   - Disable browser-specific UI (text selection, callouts, tap highlights).
   - Improve "Pull-to-refresh" behavior or disable it in favor of native-like navigation.
+  - **Splash Screen:** Add a native splash screen for better launch experience.
+  - **Push Notifications:** Enable and configure OneSignal push notifications.
   - **Technical Tasks:**
     - [x] **Bottom Navigation:** Create `MobileBottomNav` component.
     - [x] **FAB:** Create `FloatingActionBtn` component.
