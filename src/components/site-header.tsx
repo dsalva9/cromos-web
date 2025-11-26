@@ -16,7 +16,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
-import { logger } from '@/lib/logger';
 
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
