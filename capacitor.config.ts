@@ -14,7 +14,17 @@ const config: CapacitorConfig = {
       // keystorePath: undefined,
       // keystoreAlias: undefined,
     }
-  }
+  },
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#1F2937",
+      showSpinner: false,
+      androidScaleType: "CENTER_INSIDE",
+      splashFullScreen: true,
+      splashImmersive: true,
+    },
+  },
 };
 
 export default config;

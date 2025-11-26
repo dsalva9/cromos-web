@@ -24,8 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     -   Added `OneSignalProvider` for push notifications (requires App ID).
     -   Configured Android Deep Linking for `cromos-web.vercel.app`.
     -   Added `DeepLinkHandler` for routing incoming deep links to correct pages.
+    -   **Phase 2 Polish**:
+        -   Native Splash Screen (Icon & Splash images generated).
+        -   Haptic Feedback on navigation interactions.
+        -   Mobile-specific CSS polish (user-select: none, safe-area insets).
 
-**Status**: Mobile MVP Phase 1 & 2 complete. App successfully runs on Android with deep linking, safe area handling, and mobile-optimized inputs.
+**Status**: Mobile MVP Phase 1 & 2 complete. App successfully runs on Android with deep linking, safe area handling, mobile-optimized inputs, and native feel (haptics, splash).
 
 ### Mobile UI Redesign (New)
 -   **Bottom Navigation**: Implemented a fixed bottom bar with 5 icons (Marketplace, Albums, Chats, Favorites, Menu).

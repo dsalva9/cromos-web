@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { useHaptic } from '@/hooks/useHaptic';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -26,12 +27,25 @@ export function MobileBottomNav() {
     setIsMenuOpen(false);
   };
 
+
+  const { hapticImpact } = useHaptic();
+
+  const handleNavClick = () => {
+    hapticImpact();
+  };
+
+  const handleMenuClick = () => {
+    hapticImpact();
+    setIsMenuOpen(true);
+  };
+
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-50 pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-[var(--z-nav)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex justify-around items-center h-16">
           <Link
             href="/marketplace"
+            onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
@@ -43,6 +57,7 @@ export function MobileBottomNav() {
 
           <Link
             href="/mis-plantillas"
+            onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
@@ -54,6 +69,7 @@ export function MobileBottomNav() {
 
           <Link
             href="/chats"
+            onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/chats') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
@@ -65,6 +81,7 @@ export function MobileBottomNav() {
 
           <Link
             href="/favorites"
+            onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/favorites') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
@@ -75,7 +92,7 @@ export function MobileBottomNav() {
           </Link>
 
           <button
-            onClick={() => setIsMenuOpen(true)}
+            onClick={handleMenuClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isMenuOpen ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
@@ -89,14 +106,17 @@ export function MobileBottomNav() {
 
       {/* More Menu Drawer */}
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DrawerContent className="bg-gray-900 border-t border-gray-800 text-white pb-[env(safe-area-inset-bottom)]">
+        <DrawerContent className="bg-gray-900 border-t border-gray-800 text-white pb-[env(safe-area-inset-bottom)] z-[var(--z-modal)]">
           <DrawerHeader className="border-b border-gray-800 mb-2">
             <DrawerTitle className="text-center font-bold text-lg">Menú</DrawerTitle>
           </DrawerHeader>
           <div className="p-4 space-y-2">
             <Link
               href="/marketplace/my-listings"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                hapticImpact();
+                setIsMenuOpen(false);
+              }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               <Package className="h-5 w-5 text-[#FFC000]" />
@@ -105,7 +125,10 @@ export function MobileBottomNav() {
 
             <Link
               href="/templates"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                hapticImpact();
+                setIsMenuOpen(false);
+              }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               <FileText className="h-5 w-5 text-[#FFC000]" />
@@ -114,7 +137,10 @@ export function MobileBottomNav() {
 
             <Link
               href="/profile/ignored"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                hapticImpact();
+                setIsMenuOpen(false);
+              }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               <EyeOff className="h-5 w-5 text-[#FFC000]" />
@@ -125,6 +151,7 @@ export function MobileBottomNav() {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
+                hapticImpact();
                 setIsMenuOpen(false);
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors opacity-50 cursor-not-allowed"
@@ -136,7 +163,10 @@ export function MobileBottomNav() {
             <div className="h-px bg-gray-800 my-2" />
 
             <button
-              onClick={handleSignOut}
+              onClick={() => {
+                hapticImpact();
+                handleSignOut();
+              }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-red-900/20 text-red-400 w-full transition-colors"
             >
               <LogOut className="h-5 w-5" />

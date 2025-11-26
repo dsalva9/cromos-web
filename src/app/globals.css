@@ -12,6 +12,29 @@ body {
   width: 100%;
   overflow-x: hidden;
   overscroll-behavior-y: none;
+  /* Mobile-like feel: disable text selection by default */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Apply to all elements */
+html, body, *:not(input):not(textarea) {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+html, body {
+  /* Handle safe areas */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Re-enable text selection for inputs and text areas */
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 * {
@@ -98,6 +121,11 @@ body {
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0 0 0);
   --sidebar-ring: oklch(0.823 0.195 85.363);
+
+  /* Z-Index Scale */
+  --z-nav: 40;
+  --z-modal: 50;
+  --z-toast: 60;
 }
 
 .dark {

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "417621719766",
+    "project_id": "cromos-web",
+    "storage_bucket": "cromos-web.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:417621719766:android:52309513c840153faba777",
+        "android_client_info": {
+          "package_name": "com.cambiocromos.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmZmHp3tIDsWCfd78YpAQHZDB4GXVkKdg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

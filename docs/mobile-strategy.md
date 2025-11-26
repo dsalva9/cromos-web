@@ -45,8 +45,11 @@ Release an Android MVP for Cromos using Capacitor. This approach allows us to wr
   - **Technical Tasks:**
     - [x] **Bottom Navigation:** Create `MobileBottomNav` component.
     - [x] **FAB:** Create `FloatingActionBtn` component.
-    - [ ] **CSS Architecture:** Implement a Z-Index scale to prevent stacking issues.
-    - [ ] **Overscroll:** Add `overscroll-behavior-y: none` to prevent browser bounce/pull-to-refresh.
+    - [x] **CSS Architecture:** Implement a Z-Index scale to prevent stacking issues.
+    - [x] **Overscroll:** Add `overscroll-behavior-y: none` to prevent browser bounce/pull-to-refresh.
+    - [x] **Splash Screen:** Generated assets and configured plugin.
+    - [x] **Haptics:** Implemented `useHaptic` hook and applied to navigation.
+    - [x] **Safe Areas:** Configured CSS `env(safe-area-inset-*)`.
 
 ### Phase 3: Future Migration
 - **Trigger:** If performance becomes a bottleneck or native feature requirements exceed Capacitor's capabilities.
