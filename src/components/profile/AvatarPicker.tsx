@@ -131,12 +131,9 @@ export function AvatarPicker({
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[300px] max-h-[400px] overflow-y-auto pr-2">
+      <div className="max-h-[50vh] md:max-h-[400px] overflow-y-auto pr-2">
         {activeTab === 'gallery' && (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-400 sticky top-0 bg-gray-800/95 backdrop-blur-sm py-2 -mt-2 z-10">
-              Elige uno de nuestros avatares prediseñados
-            </p>
+          <div>
             <div className="grid grid-cols-4 gap-3 pb-2">
               {AVATAR_PRESETS.map(preset => (
                 <button
