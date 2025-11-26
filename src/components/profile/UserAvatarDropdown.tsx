@@ -180,12 +180,9 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               </Link>
 
               <Link
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSetIsOpen(false);
-                }}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors opacity-50 cursor-not-allowed"
+                href="/ajustes"
+                onClick={handleProtectedClick('/ajustes')}
+                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
               >
                 <Settings className="h-4 w-4" />
                 <span>Ajustes</span>

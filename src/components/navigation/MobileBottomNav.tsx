@@ -148,16 +148,15 @@ export function MobileBottomNav() {
             </Link>
 
             <Link
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
+              href="/ajustes"
+              onClick={() => {
                 hapticImpact();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors opacity-50 cursor-not-allowed"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
             >
               <Settings className="h-5 w-5 text-[#FFC000]" />
-              <span className="font-medium">Ajustes (Próximamente)</span>
+              <span className="font-medium">Ajustes</span>
             </Link>
 
             <div className="h-px bg-gray-800 my-2" />
