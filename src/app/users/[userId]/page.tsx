@@ -608,16 +608,18 @@ export default function UserProfilePage() {
                             </Button>
                           </DialogTrigger>
 
-                          <DialogContent className="space-y-4 max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle>Editar perfil</DialogTitle>
-                              <DialogDescription>
-                                Actualiza tu avatar, usuario y ubicación
-                                aproximada.
-                              </DialogDescription>
-                            </DialogHeader>
+                          <DialogContent className="max-w-2xl p-0">
+                            <div className="p-6 pb-4">
+                              <DialogHeader>
+                                <DialogTitle>Editar perfil</DialogTitle>
+                                <DialogDescription>
+                                  Actualiza tu avatar, usuario y ubicación
+                                  aproximada.
+                                </DialogDescription>
+                              </DialogHeader>
+                            </div>
 
-                            <div className="space-y-6">
+                            <div className="px-6 space-y-6 overflow-y-auto flex-1">
                               <div className="space-y-3">
                                 <Label>Avatar</Label>
                                 <AvatarPicker
@@ -661,7 +663,8 @@ export default function UserProfilePage() {
                               </div>
                             </div>
 
-                            <DialogFooter className="sm:justify-between">
+                            <div className="p-6 pt-4 border-t border-gray-600">
+                              <DialogFooter className="sm:justify-between">
                               <Button
                                 variant="outline"
                                 className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
@@ -681,7 +684,8 @@ export default function UserProfilePage() {
                                   ? 'Guardando...'
                                   : 'Guardar cambios'}
                               </Button>
-                            </DialogFooter>
+                              </DialogFooter>
+                            </div>
                           </DialogContent>
                         </Dialog>
                       )}
