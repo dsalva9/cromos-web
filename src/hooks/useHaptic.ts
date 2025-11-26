@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics } from '@capacitor/haptics';
 import { useCallback } from 'react';
 
 export function useHaptic() {

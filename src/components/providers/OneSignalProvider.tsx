@@ -16,6 +16,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
       import('onesignal-cordova-plugin').then((OneSignalModule) => {
         console.log('[OneSignal] Plugin loaded successfully');
         // Use namespace import and cast to any to bypass TypeScript errors
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const OneSignal = OneSignalModule as any;
         console.log('[OneSignal] OneSignal object:', typeof OneSignal);
         
