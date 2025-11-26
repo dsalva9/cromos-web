@@ -103,6 +103,12 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
      * Initialize OneSignal for web browsers
      */
     const initializeWeb = () => {
+      // Check if already initialized to prevent duplicate initialization
+      if (window.OneSignalDeferred && Array.isArray(window.OneSignalDeferred) && window.OneSignalDeferred.length > 0) {
+        logger.info('[OneSignal] Already initialized, skipping');
+        return;
+      }
+
       // Load OneSignal SDK dynamically
       if (!window.OneSignalDeferred) {
         const script = document.createElement('script');

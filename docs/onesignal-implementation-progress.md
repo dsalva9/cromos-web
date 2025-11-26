@@ -63,7 +63,7 @@
 2. **Set Supabase Secret** for OneSignal API Key:
    ```bash
    # Via Supabase Dashboard: Settings → Edge Functions → Secrets
-   # Add: ONESIGNAL_REST_API_KEY = os_v2_app_hoplozhuibae3fe2crudk2x4ddrz6riwk3zu2wntv7i4bmejykabzmip7dxordufvda6fcfixgwmk4pz2kpc2r4kpbpyqxv3fpaiehi
+   # Add: ONESIGNAL_REST_API_KEY = <REDACTED>
    ```
 
 ---
@@ -154,7 +154,7 @@
 ### 1. Set Supabase Secrets:
 ```bash
 # Via Dashboard: Settings → Edge Functions → Secrets
-ONESIGNAL_REST_API_KEY=os_v2_app_hoplozhuibae3fe2crudk2x4ddrz6riwk3zu2wntv7i4bmejykabzmip7dxordufvda6fcfixgwmk4pz2kpc2r4kpbpyqxv3fpaiehi
+ONESIGNAL_REST_API_KEY=<REDACTED>
 ```
 
 ### 2. Deploy Edge Function:
