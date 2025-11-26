@@ -15,8 +15,8 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
       // Dynamic import to avoid build issues with SSR/Next.js
       import('onesignal-cordova-plugin').then((OneSignalModule) => {
         console.log('[OneSignal] Plugin loaded successfully');
-        // Handle both default export and named export scenarios
-        const OneSignal = OneSignalModule.default || OneSignalModule;
+        // Use namespace import and cast to any to bypass TypeScript errors
+        const OneSignal = OneSignalModule as any;
         console.log('[OneSignal] OneSignal object:', typeof OneSignal);
         
         const ONESIGNAL_APP_ID = '3b9eb764-f440-404d-949a-1468356afc18';
