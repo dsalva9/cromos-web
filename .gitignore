@@ -65,3 +65,10 @@ stress-test-results.json
 .claude/settings.local.json
 .claude/settings.local.json
 supabase/.temp/cli-latest
+
+# Mobile / Capacitor
+android/app/google-services.json
+android/app/build/
+android/.gradle/
+android/local.properties
+ios/App/App/GoogleService-Info.plist
