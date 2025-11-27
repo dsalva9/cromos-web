@@ -63,6 +63,15 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
           logger.info('[OneSignal] User logged in:', user.id);
         }
 
+        // Get current player ID immediately (in case change event doesn't fire)
+        setTimeout(() => {
+          const currentPlayerId = OneSignal.User.PushSubscription.id;
+          if (currentPlayerId) {
+            logger.info('[OneSignal] Current player ID:', currentPlayerId);
+            savePlayerIdToDatabase(currentPlayerId);
+          }
+        }, 1000);
+
         // Listen for subscription changes to get player ID
         OneSignal.User.PushSubscription.addEventListener('change', (event: { current: { id: string } }) => {
           const playerId = event.current.id;
