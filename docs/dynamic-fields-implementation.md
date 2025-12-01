@@ -23,7 +23,8 @@ Complete refactoring of the template system to support user-defined fields for c
 3. **`add_template_page_v2`** - Handles `data JSONB` in slots
 4. **`get_template_progress`** - Returns `data JSONB` field for each slot
 5. **`get_template_details`** - Returns `item_schema` and slot `data`
-6. **`list_trade_listings_filtered_with_distance`** - Search prioritizes title > description > collection
+6. **`list_trade_listings_filtered_with_distance`** - Search prioritizes title > description > collection, returns `is_group` and `group_count`
+7. **`list_trade_listings_with_collection_filter`** - Returns `is_group` and `group_count` fields for proper badge display
 
 ---
 
@@ -100,16 +101,18 @@ Created and updated types in `src/types/v1.6.0.ts`:
 
 ### Marketplace Display
 
-#### Listing Badges (`src/components/marketplace/ListingCard.tsx`, `src/components/integration/MyListingCard.tsx`)
+#### Listing Badges (`src/components/marketplace/ListingCard.tsx`, `src/components/integration/MyListingCard.tsx`, `src/app/marketplace/[id]/page.tsx`)
 - Replaced "Activo" badge with:
-  - **"Pack de cromos"** when `is_group === true`
-  - **"Cromo"** when `is_group === false`
+  - **"Pack de cromos"** (purple) when `is_group === true`
+  - **"Cromo individual"** (blue) when `is_group === false`
+- Updated `useListings` hook to fetch and transform `is_group` and `group_count` fields
+- Added type indicator badge on listing detail page (`/marketplace/[id]`)
 
 #### Search Priority
 - **Title** matches ranked first
 - **Description** matches ranked second
 - **Collection** matches ranked third
-- Implemented in `list_trade_listings_filtered_with_distance` RPC
+- Implemented in both `list_trade_listings_filtered_with_distance` and `list_trade_listings_with_collection_filter` RPCs
 
 ---
 
