@@ -21,6 +21,8 @@ interface RpcListingResponse {
   slot_id: number | null;
   distance_km?: number | null;
   match_score?: number;
+  is_group?: boolean;
+  group_count?: number;
 }
 
 interface UseListingsParams {
@@ -125,6 +127,8 @@ export function useListings({
             copy_id: item.copy_id?.toString(),
             slot_id: item.slot_id?.toString(),
             distance_km: item.distance_km,
+            is_group: item.is_group,
+            group_count: item.group_count,
           })
         );
 

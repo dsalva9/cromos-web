@@ -171,18 +171,29 @@ export default function ListingDetailPage() {
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between mb-4">
-                <Badge
-                  className={`
-                  ${listing.status === 'active' ? 'bg-green-500' : ''}
-                  ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
-                  ${listing.status === 'completed' ? 'bg-blue-500' : ''}
-                  ${listing.status === 'sold' ? 'bg-gray-500' : ''}
-                  ${listing.status === 'removed' ? 'bg-red-500' : ''}
-                  text-white uppercase border-2 border-black
-                `}
-                >
-                  {getStatusLabel(listing.status)}
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge
+                    className={`
+                    ${listing.status === 'active' ? 'bg-green-500' : ''}
+                    ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
+                    ${listing.status === 'completed' ? 'bg-blue-500' : ''}
+                    ${listing.status === 'sold' ? 'bg-gray-500' : ''}
+                    ${listing.status === 'removed' ? 'bg-red-500' : ''}
+                    text-white uppercase border-2 border-black
+                  `}
+                  >
+                    {getStatusLabel(listing.status)}
+                  </Badge>
+
+                  <Badge
+                    className={`
+                    ${listing.is_group ? 'bg-purple-600' : 'bg-blue-600'}
+                    text-white border-2 border-black
+                  `}
+                  >
+                    {listing.is_group ? 'Pack de cromos' : 'Cromo individual'}
+                  </Badge>
+                </div>
 
                 {isOwner && (
                   <div className="flex gap-2">
