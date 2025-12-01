@@ -27,7 +27,8 @@ export function ListingCard({ listing }: ListingCardProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return 'Activo';
+        // Show "Pack de cromos" or "Cromo" for active listings
+        return listing.is_group ? 'Pack de cromos' : 'Cromo';
       case 'sold':
         return 'Vendido';
       case 'removed':

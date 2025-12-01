@@ -15,6 +15,7 @@ interface ItemSchemaBuilderProps {
 
 export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) {
   const [editingField, setEditingField] = useState<ItemFieldDefinition | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const addField = () => {
     const newField: ItemFieldDefinition = {
@@ -27,7 +28,7 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
 
   const saveField = () => {
     if (!editingField || !editingField.name.trim()) return;
-    
+
     const updatedSchema = [...schema, editingField];
     onChange(updatedSchema);
     setEditingField(null);
@@ -41,6 +42,27 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
   const updateEditingField = (updates: Partial<ItemFieldDefinition>) => {
     if (!editingField) return;
     setEditingField({ ...editingField, ...updates });
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const newSchema = [...schema];
+    const draggedItem = newSchema[draggedIndex];
+    newSchema.splice(draggedIndex, 1);
+    newSchema.splice(index, 0, draggedItem);
+
+    onChange(newSchema);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   return (
@@ -65,10 +87,19 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
       {/* Existing Fields */}
       <div className="space-y-2">
         {schema.map((field, index) => (
-          <Card key={index} className="bg-[#2D3748] border-gray-600">
+          <Card
+            key={index}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragEnd={handleDragEnd}
+            className={`bg-[#2D3748] border-gray-600 transition-opacity ${
+              draggedIndex === index ? 'opacity-50' : 'opacity-100'
+            }`}
+          >
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
-                <GripVertical className="h-5 w-5 text-gray-500" />
+                <GripVertical className="h-5 w-5 text-gray-400 cursor-grab active:cursor-grabbing hover:text-yellow-400 transition-colors" />
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-gray-400">Nombre</p>

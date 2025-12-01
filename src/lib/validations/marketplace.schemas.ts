@@ -29,9 +29,8 @@ export const listingSchema = z.object({
 
   image_url: z
     .string()
-    .url('La URL de la imagen no es válida')
-    .optional()
-    .or(z.literal('')),
+    .min(1, 'La imagen es obligatoria')
+    .url('La URL de la imagen no es válida'),
 
   // New Panini-style fields - all optional
   page_number: z

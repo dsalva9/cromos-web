@@ -24,6 +24,8 @@ export function useCreateListing() {
           p_page_title: data.page_title || null,
           p_slot_variant: data.slot_variant || null,
           p_global_number: data.global_number || null,
+          p_is_group: data.is_group || false,
+          p_group_count: data.group_count || 1,
         }
       );
 

@@ -34,15 +34,17 @@ export default function TemplateEditPage() {
     description: string;
     image_url: string;
     is_public: boolean;
+    item_schema?: Array<{
+      name: string;
+      type: 'text' | 'number' | 'checkbox' | 'select';
+      required: boolean;
+      options?: string[];
+    }>;
     pages: Array<{
       title: string;
       type: 'team' | 'special';
       slots: Array<{
-        label: string;
-        slot_number: number;
-        slot_variant?: string;
-        global_number?: number;
-        is_special: boolean;
+        data: Record<string, string | number | boolean>;
       }>;
     }>;
   }) => {
@@ -57,6 +59,7 @@ export default function TemplateEditPage() {
           description: formData.description,
           image_url: formData.image_url || null,
           is_public: formData.is_public,
+          item_schema: formData.item_schema || [],
         })
         .eq('id', templateId);
 
@@ -130,15 +133,12 @@ export default function TemplateEditPage() {
     image_url: data.template.image_url || '',
     is_public: data.template.is_public,
     terms_accepted: data.template.is_public, // Already public means terms were accepted
+    item_schema: data.template.item_schema || [],
     pages: data.pages.map(page => ({
       title: page.title,
       type: page.type as 'team' | 'special',
       slots: page.slots.map(slot => ({
-        label: slot.label || '',
-        slot_number: slot.slot_number,
-        slot_variant: slot.slot_variant || undefined,
-        global_number: slot.global_number || undefined,
-        is_special: slot.is_special,
+        data: slot.data || {},
       })),
     })),
   };

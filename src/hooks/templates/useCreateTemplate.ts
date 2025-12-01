@@ -4,9 +4,7 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
 interface TemplateSlotData {
-  label: string;
-  is_special: boolean;
-  data?: Record<string, any>;
+  data: Record<string, string | number | boolean>;
 }
 
 interface TemplatePageData {
@@ -48,18 +46,12 @@ export function useCreateTemplate() {
         throw new Error('Debe añadir al menos una página');
       }
 
-      // Create a deep copy and filter out empty slots
+      // Create a deep copy and filter out empty pages
       const processedData = {
         ...templateData,
-        pages: templateData.pages
-          .map(page => ({
-            ...page,
-            // Remove empty slots and also validate slots have a label
-            slots: page.slots.filter(
-              slot => slot.label && slot.label.trim() !== ''
-            ),
-          }))
-          .filter(page => page.title.trim() !== '' && page.slots.length > 0),
+        pages: templateData.pages.filter(
+          page => page.title.trim() !== '' && page.slots.length > 0
+        ),
       };
 
       if (processedData.pages.length === 0) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,13 +13,15 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PackagePlus, FileText } from 'lucide-react';
+import { PackagePlus, FileText, Library } from 'lucide-react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 // Simplified schema - only title, description, and images (mandatory)
 const simplifiedListingSchema = z.object({
   title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
   description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres'),
   image_url: z.string().min(1, 'La imagen es obligatoria'),
+  collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos de uso',
@@ -32,14 +34,19 @@ interface SimplifiedListingFormProps {
   initialData?: Partial<CreateListingForm>;
   onSubmit: (data: CreateListingForm) => Promise<void>;
   loading?: boolean;
+  disablePackOption?: boolean;
 }
 
 export function SimplifiedListingForm({
   initialData,
   onSubmit,
   loading,
+  disablePackOption = false,
 }: SimplifiedListingFormProps) {
+  const supabase = useSupabaseClient();
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false);
+  const [templates, setTemplates] = useState<Array<{ id: string; title: string }>>([]);
 
   const {
     register,
@@ -53,11 +60,26 @@ export function SimplifiedListingForm({
       title: initialData?.title || '',
       description: initialData?.description || '',
       image_url: initialData?.image_url || '',
+      collection_name: initialData?.collection_name || '',
       is_group: initialData?.is_group || false,
       terms_accepted: false,
     },
     mode: 'onChange',
   });
+
+  // Fetch user's templates for the collection selector
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      const { data } = await supabase.rpc('get_my_template_copies');
+      if (data) {
+        setTemplates(data.map((t: { copy_id: number; title: string }) => ({
+          id: String(t.copy_id),
+          title: t.title
+        })));
+      }
+    };
+    fetchTemplates();
+  }, [supabase]);
 
   const imageUrl = watch('image_url');
   const termsAccepted = watch('terms_accepted');
@@ -68,7 +90,7 @@ export function SimplifiedListingForm({
       title: data.title,
       description: data.description,
       sticker_number: '', // Not used anymore
-      collection_name: '', // Not used anymore
+      collection_name: data.collection_name || '',
       image_url: data.image_url,
       is_group: data.is_group,
       group_count: data.is_group ? 1 : undefined, // Will be set properly for bulk listings
@@ -81,44 +103,46 @@ export function SimplifiedListingForm({
       <ModernCard>
         <ModernCardContent className="p-6 space-y-6">
           {/* Listing Type Toggle */}
-          <div className="space-y-3">
-            <Label>Tipo de Anuncio</Label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setValue('is_group', false, { shouldValidate: true })}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  !isGroup
-                    ? 'border-[#FFC000] bg-[#FFC000]/10'
-                    : 'border-gray-600 bg-[#374151]'
-                }`}
-              >
-                <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
-                <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
-                  Cromo Individual
+          {!disablePackOption && (
+            <div className="space-y-3">
+              <Label>Tipo de Anuncio</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setValue('is_group', false, { shouldValidate: true })}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    !isGroup
+                      ? 'border-[#FFC000] bg-[#FFC000]/10'
+                      : 'border-gray-600 bg-[#374151]'
+                  }`}
+                >
+                  <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
+                  <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
+                    Cromo Individual
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue('is_group', true, { shouldValidate: true })}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    isGroup
+                      ? 'border-[#FFC000] bg-[#FFC000]/10'
+                      : 'border-gray-600 bg-[#374151]'
+                  }`}
+                >
+                  <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
+                  <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
+                    Pack de Cromos
+                  </p>
+                </button>
+              </div>
+              {isGroup && (
+                <p className="text-xs text-yellow-400 bg-yellow-900/20 p-2 rounded">
+                  ℹ️ Estás creando un anuncio para múltiples cromos. Describe todos los cromos en la descripción.
                 </p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setValue('is_group', true, { shouldValidate: true })}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  isGroup
-                    ? 'border-[#FFC000] bg-[#FFC000]/10'
-                    : 'border-gray-600 bg-[#374151]'
-                }`}
-              >
-                <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
-                <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
-                  Pack de Cromos
-                </p>
-              </button>
+              )}
             </div>
-            {isGroup && (
-              <p className="text-xs text-yellow-400 bg-yellow-900/20 p-2 rounded">
-                ℹ️ Estás creando un anuncio para múltiples cromos. Describe todos los cromos en la descripción.
-              </p>
-            )}
-          </div>
+          )}
 
           {/* Image Upload - MANDATORY */}
           <div className="space-y-2">
@@ -153,6 +177,30 @@ export function SimplifiedListingForm({
             {errors.title && (
               <p className="text-sm text-red-500">{errors.title.message}</p>
             )}
+          </div>
+
+          {/* Collection */}
+          <div className="space-y-2">
+            <Label htmlFor="collection_name">Colección</Label>
+            <div className="flex gap-2">
+              <Input
+                id="collection_name"
+                {...register('collection_name')}
+                placeholder="ej. Panini LaLiga 2024"
+                className="bg-[#374151] border-2 border-black text-white flex-1"
+              />
+              <Button
+                type="button"
+                onClick={() => setTemplatesDialogOpen(true)}
+                className="bg-[#374151] hover:bg-[#4B5563] text-white border-2 border-black shrink-0"
+                title="Seleccionar de mis plantillas"
+              >
+                <Library className="h-4 w-4" />
+              </Button>
+            </div>
+            <p className="text-sm text-gray-400">
+              Opcional: nombre de la colección o álbum
+            </p>
           </div>
 
           {/* Description */}
@@ -232,6 +280,48 @@ export function SimplifiedListingForm({
           </div>
         </ModernCardContent>
       </ModernCard>
+
+      {/* Templates Selector Dialog */}
+      <Dialog open={templatesDialogOpen} onOpenChange={setTemplatesDialogOpen}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              Mis Plantillas
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto">
+            {templates.length === 0 ? (
+              <p className="text-gray-400 text-center py-8">
+                No tienes plantillas guardadas
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {templates.map((template) => (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => {
+                      setValue('collection_name', template.title, { shouldValidate: true });
+                      setTemplatesDialogOpen(false);
+                    }}
+                    className="w-full text-left p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors border border-gray-700 hover:border-[#FFC000]"
+                  >
+                    <p className="text-white font-medium">{template.title}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="pt-4 border-t border-gray-700">
+            <Button
+              onClick={() => setTemplatesDialogOpen(false)}
+              className="w-full bg-gray-700 text-white hover:bg-gray-600"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Terms Dialog */}
       <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>

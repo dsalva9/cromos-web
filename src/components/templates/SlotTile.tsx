@@ -171,7 +171,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
             )}
           </div>
           <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem] leading-tight">
-            {slot.label || `Cromo ${slot.slot_id.slice(-4)}`}
+            {slot.label || `Cromo ${String(slot.slot_id).slice(-4)}`}
           </p>
         </div>
 

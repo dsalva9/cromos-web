@@ -30,27 +30,25 @@ export function TemplateSummaryHeader({
   progress,
 }: TemplateSummaryHeaderProps) {
   const stats = useMemo(() => {
-    // Count owned (tengo) - these are stickers with exactly 1
-    const owned = progress.filter(s => s.status === 'owned').length;
+    // Count owned (tengo) - slots with status='owned' OR status='duplicate'
+    // If you have duplicates, you still HAVE the cromo (it counts as owned)
+    const ownedOnly = progress.filter(s => s.status === 'owned').length;
+    const duplicatesSlots = progress.filter(s => s.status === 'duplicate').length;
 
-    // Count duplicates (repes) - these are stickers with 2 or more
-    const duplicates = progress.filter(s => s.status === 'duplicate').length;
+    // TENGO = slots with 'owned' OR 'duplicate' status
+    const tengoCount = ownedOnly + duplicatesSlots;
+
+    // REPES = total count of SPARE cromos (count - 1 for each duplicate slot)
+    // For example: slot 212 has count=2 (1 spare) + slot 213 has count=4 (3 spares) = 4 total spares
+    const repesCount = progress
+      .filter(s => s.status === 'duplicate')
+      .reduce((sum, s) => sum + (s.count - 1), 0);
 
     // Count missing (falta) - these are stickers with 0
     const missing = progress.filter(s => s.status === 'missing').length;
 
-    // Calculate the actual counts:
-    // tengo: count of stickers with exactly 1
-    // repes: count of stickers with 2 or more, but display as (count - 1) spares
-    // falta: count of stickers with 0
-    const tengoCount = owned;
-    const repesCount = duplicates;
-    const repesSpareCount = progress
-      .filter(s => s.status === 'duplicate')
-      .reduce((sum, s) => sum + (s.count - 1), 0);
-
-    // For completion percentage, count tengo + repes as owned
-    const ownedForCompletion = tengoCount + repesCount;
+    // For completion percentage, count all owned (tengo count already includes duplicates)
+    const ownedForCompletion = tengoCount;
 
     // Total slots should be the total number of unique stickers in the template
     const totalSlots = progress.length;
@@ -62,7 +60,6 @@ export function TemplateSummaryHeader({
       owned: tengoCount,
       duplicates: repesCount,
       missing,
-      totalDuplicatesCount: repesSpareCount,
       completionPercentage,
       ownedForCompletion,
       totalSlots,

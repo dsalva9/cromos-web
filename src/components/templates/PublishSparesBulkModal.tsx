@@ -115,7 +115,7 @@ export function PublishSparesBulkModal({
             <div className="text-sm text-blue-200">
               <p className="font-semibold mb-1">¿Cómo funciona?</p>
               <p>
-                Se creará un anuncio tipo "Pack" con todos tus cromos repetidos. La
+                Se creará un anuncio tipo &quot;Pack&quot; con todos tus cromos repetidos. La
                 descripción se genera automáticamente con los detalles de cada cromo.
                 Puedes editarla si lo deseas.
               </p>

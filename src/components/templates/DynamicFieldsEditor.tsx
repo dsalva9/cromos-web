@@ -4,8 +4,8 @@ import { ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface DynamicFieldsEditorProps {
   schema: ItemFieldDefinition[];
-  data: Record<string, any>;
-  onChange: (data: Record<string, any>) => void;
+  data: Record<string, string | number | boolean>;
+  onChange: (data: Record<string, string | number | boolean>) => void;
   idPrefix: string;
 }
 
@@ -15,7 +15,7 @@ export function DynamicFieldsEditor({
   onChange,
   idPrefix,
 }: DynamicFieldsEditorProps) {
-  const updateField = (fieldName: string, value: any) => {
+  const updateField = (fieldName: string, value: string | number | boolean) => {
     onChange({
       ...data,
       [fieldName]: value,
@@ -27,15 +27,23 @@ export function DynamicFieldsEditor({
   }
 
   return (
-    <div className="space-y-3 pt-3 border-t border-gray-600">
-      <p className="text-xs font-semibold text-yellow-400 uppercase">Campos Personalizados</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-3">
         {schema.map((field, index) => {
           const fieldId = `${idPrefix}-${field.name}-${index}`;
           const value = data?.[field.name];
+          const isNumberField = field.type === 'number';
+          const isCheckboxField = field.type === 'checkbox';
 
           return (
-            <div key={fieldId} className="space-y-1">
+            <div
+              key={fieldId}
+              className={`space-y-1 ${
+                isNumberField ? 'w-full md:w-[140px]' :
+                isCheckboxField ? 'w-full md:w-[140px]' :
+                'w-full md:flex-1 md:min-w-[200px]'
+              }`}
+            >
               <Label htmlFor={fieldId} className="text-white text-sm">
                 {field.name}
                 {field.required && <span className="text-red-400 ml-1">*</span>}
@@ -45,7 +53,7 @@ export function DynamicFieldsEditor({
                 <Input
                   id={fieldId}
                   type="text"
-                  value={value || ''}
+                  value={typeof value === 'string' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value)}
                   placeholder={`Ingresa ${field.name.toLowerCase()}`}
                   className="bg-[#374151] border-gray-600 text-white"
@@ -58,7 +66,7 @@ export function DynamicFieldsEditor({
                   id={fieldId}
                   type="number"
                   inputMode="numeric"
-                  value={value || ''}
+                  value={typeof value === 'number' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value ? parseFloat(e.target.value) : '')}
                   placeholder={`Ingresa ${field.name.toLowerCase()}`}
                   className="bg-[#374151] border-gray-600 text-white"
@@ -71,7 +79,7 @@ export function DynamicFieldsEditor({
                   <input
                     id={fieldId}
                     type="checkbox"
-                    checked={value || false}
+                    checked={typeof value === 'boolean' ? value : false}
                     onChange={(e) => updateField(field.name, e.target.checked)}
                     className="w-4 h-4 rounded border-gray-600 bg-[#374151]"
                   />
@@ -84,7 +92,7 @@ export function DynamicFieldsEditor({
               {field.type === 'select' && field.options && (
                 <select
                   id={fieldId}
-                  value={value || ''}
+                  value={typeof value === 'string' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value)}
                   className="w-full h-10 px-3 rounded-md bg-[#374151] border border-gray-600 text-white"
                   required={field.required}

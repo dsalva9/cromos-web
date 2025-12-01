@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { ItemFieldDefinition } from '@/types/v1.6.0';
 
 export interface TemplateSlot {
   id: string;
@@ -8,6 +9,7 @@ export interface TemplateSlot {
   global_number: number | null;
   label: string | null;
   is_special: boolean;
+  data: Record<string, string | number | boolean>;
 }
 
 export interface TemplatePage {
@@ -32,6 +34,7 @@ export interface TemplateDetails {
   copies_count: number;
   created_at: string;
   updated_at: string;
+  item_schema?: ItemFieldDefinition[];
 }
 
 export interface TemplateDetailsResponse {

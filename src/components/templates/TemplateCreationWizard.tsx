@@ -24,12 +24,7 @@ interface TemplateData {
     title: string;
     type: 'team' | 'special';
     slots: Array<{
-      label: string;
-      slot_number: number;
-      slot_variant?: string;
-      global_number?: number;
-      is_special: boolean;
-      data?: Record<string, any>;
+      data: Record<string, string | number | boolean>;
     }>;
   }>;
 }
@@ -113,8 +108,35 @@ export function TemplateCreationWizard({
 
   const pagesStepValid = useMemo(() => {
     if (!templateData.pages || templateData.pages.length === 0) return false;
-    return templateData.pages.every(page => templatePageSchema.safeParse(page).success);
-  }, [templateData.pages]);
+
+    // Check basic page structure
+    if (!templateData.pages.every(page => templatePageSchema.safeParse(page).success)) {
+      return false;
+    }
+
+    // If there's an item_schema, check that all required fields are filled
+    if (templateData.item_schema && templateData.item_schema.length > 0) {
+      const requiredFields = templateData.item_schema
+        .filter(field => field.required)
+        .map(field => field.name);
+
+      // Check every slot in every page
+      for (const page of templateData.pages) {
+        for (const slot of page.slots) {
+          for (const fieldName of requiredFields) {
+            const value = slot.data[fieldName];
+            // Check if field is empty (undefined, null, empty string, or NaN for numbers)
+            if (value === undefined || value === null || value === '' ||
+                (typeof value === 'number' && isNaN(value))) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
+  }, [templateData.pages, templateData.item_schema]);
 
   const canGoNext = () => {
     switch (currentStep) {

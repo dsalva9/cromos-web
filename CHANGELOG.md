@@ -14,12 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Upcoming / In-Progress
 -   **Dynamic Cromo Fields (2025-12-01)**: ✅ COMPLETE - Major refactor to allow user-defined fields for cromos in templates. Simplifies marketplace listings to title/description only. Adds group/pack listings for bulk selling.
     -   ✅ Database: Added `item_schema` to templates, `data` to slots, `is_group`/`group_count` to listings
-    -   ✅ RPCs: Updated `create_template`, `create_trade_listing`, `add_template_page_v2`, `get_template_progress`
+    -   ✅ RPCs: Updated `create_template`, `create_trade_listing`, `add_template_page_v2`, `get_template_progress`, `get_template_details`, `list_trade_listings_filtered_with_distance`
     -   ✅ Types: Added `ItemFieldDefinition` interface and updated all related types
     -   ✅ Components: Created `ItemSchemaBuilder`, `DynamicFieldsEditor`, `SimplifiedListingForm`, `PublishSparesBulkModal`
-    -   ✅ Template Creation: Full support for custom fields - users can define and use dynamic fields
-    -   ✅ Marketplace: Simplified listing creation to title/description/images only with individual/pack toggle
+    -   ✅ Template Creation: Full support for custom fields - users can define and use dynamic fields, drag-and-drop reordering
+    -   ✅ Marketplace: Simplified listing creation to title/description/collection/images with individual/pack toggle, images now mandatory
+    -   ✅ Collection Field: Added optional collection field with template selector modal for quick-filling from user's templates
     -   ✅ Bulk Listing: "Publicar Repes" feature auto-generates pack listings from album spares
+    -   ✅ Single Spare Publishing: Auto-fills title and description from album + custom fields, hides pack option
+    -   ✅ Template Stats: Fixed REPES count to show total spare cromos (sum of count-1 for all duplicate slots)
+    -   ✅ Listing Badges: Replaced "Activo" with "Pack de cromos" or "Cromo" based on `is_group` field
+    -   ✅ Marketplace Search: Prioritizes title matches, then description, then collection for better relevance
+    -   ✅ Validation: Required dynamic fields now properly validated in template creation wizard
 -   **Mobile Architecture Initialization**: Adopting Capacitor for Android MVP. Zero-branch strategy with `process.env` and context detection. Need to fix push notifications for Android, currently web notifications work.
 
 ### Mobile MVP (Phase 1 & 2)

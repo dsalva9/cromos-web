@@ -86,7 +86,7 @@ export interface SlotProgress {
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
-  data?: Record<string, any>;
+  data?: Record<string, string | number | boolean>;
 }
 
 export interface UserProfile extends Profile {

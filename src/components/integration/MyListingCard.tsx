@@ -29,6 +29,9 @@ interface MyListing {
   page_title?: string | null;
   slot_variant?: string | null;
   global_number?: number | null;
+  // Group listing
+  is_group?: boolean;
+  group_count?: number;
 }
 
 interface MyListingCardProps {
@@ -72,7 +75,7 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return 'Activo';
+        return listing.is_group ? 'Pack de cromos' : 'Cromo';
       case 'sold':
         return 'Completado';
       case 'removed':

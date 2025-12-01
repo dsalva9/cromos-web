@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { ListingForm } from '@/components/marketplace/ListingForm';
+import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { usePublishDuplicate } from '@/hooks/integration/usePublishDuplicate';
 import AuthGuard from '@/components/AuthGuard';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -29,10 +29,17 @@ function PublishDuplicateContent() {
     global_number: number | null;
     page_number: number;
     page_title: string | null;
+    data: Record<string, string | number | boolean>;
   }
 
   interface TemplateInfo {
     title: string;
+    item_schema: Array<{
+      name: string;
+      type: string;
+      label: string;
+      required: boolean;
+    }>;
   }
 
   const [slotData, setSlotData] = useState<SlotData | null>(null);
@@ -62,7 +69,20 @@ function PublishDuplicateContent() {
         return;
       }
 
-      setTemplateInfo({ title: currentCopy.title });
+      // Get template details to fetch item_schema
+      const { data: templateDetails, error: templateError } = await supabase.rpc(
+        'get_template_details',
+        { p_template_id: currentCopy.template_id }
+      );
+
+      if (templateError) {
+        console.error('Error fetching template details:', templateError);
+      }
+
+      setTemplateInfo({
+        title: currentCopy.title,
+        item_schema: templateDetails?.template?.item_schema || []
+      });
 
       // Get slot info for pre-filling
       const { data: progressData, error } = await supabase.rpc('get_template_progress', {
@@ -116,15 +136,17 @@ function PublishDuplicateContent() {
   const handlePublish = async (formData: {
     title: string;
     description?: string;
-    sticker_number?: string;
-    collection_name?: string;
     image_url?: string;
   }) => {
     try {
       const listingId = await publishDuplicate(
         parseInt(copyId),
         parseInt(slotId),
-        formData
+        {
+          title: formData.title,
+          description: formData.description,
+          image_url: formData.image_url,
+        }
       );
 
       toast.success('¡Anuncio publicado correctamente!');
@@ -175,21 +197,46 @@ function PublishDuplicateContent() {
         </ModernCard>
 
         {/* Form */}
-        <ListingForm
+        <SimplifiedListingForm
           initialData={{
-            title: slotData?.label || 'Cromo',
-            description: `Tengo ${(slotData?.count || 1) - 1} repetidos disponibles.`,
-            sticker_number: slotData?.slot_number ? String(slotData.slot_number) : '',
-            collection_name: templateInfo?.title || '',
-            image_url: '',
-            // Panini metadata fields - use actual values or undefined (not null)
-            page_number: slotData?.page_number ?? undefined,
-            page_title: slotData?.page_title || undefined,
-            slot_variant: slotData?.slot_variant || undefined,
-            global_number: slotData?.global_number ?? undefined,
+            title: (() => {
+              // Title: {Album Name} - {First Custom Field Value}
+              const firstFieldValue = templateInfo?.item_schema?.[0]
+                ? slotData?.data?.[templateInfo.item_schema[0].name]
+                : null;
+              return firstFieldValue
+                ? `${templateInfo?.title} - ${firstFieldValue}`
+                : slotData?.label || 'Cromo';
+            })(),
+            description: (() => {
+              // Description: spare count + all custom fields
+              const spareCount = (slotData?.count || 1) - 1;
+              let desc = `Tengo ${spareCount} repetidos disponibles.`;
+
+              // Add all custom fields
+              if (templateInfo?.item_schema && slotData?.data) {
+                const fields = templateInfo.item_schema
+                  .map(field => {
+                    const value = slotData.data[field.name];
+                    return value !== undefined && value !== null && value !== ''
+                      ? `${field.label}: ${value}`
+                      : null;
+                  })
+                  .filter(Boolean);
+
+                if (fields.length > 0) {
+                  desc += '\n\n' + fields.join(', ');
+                }
+              }
+
+              return desc;
+            })(),
+            image_url: undefined,
+            is_group: false,
           }}
           onSubmit={handlePublish}
           loading={publishing}
+          disablePackOption={true}
         />
       </div>
     </div>

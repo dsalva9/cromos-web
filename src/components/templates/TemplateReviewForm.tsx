@@ -15,15 +15,11 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Edit, Eye, EyeOff, FileText, Star } from 'lucide-react';
+import { Edit, Eye, EyeOff, FileText } from 'lucide-react';
 import Image from 'next/image';
 
 interface TemplateSlotData {
-  label: string;
-  slot_number: number;
-  slot_variant?: string;
-  global_number?: number;
-  is_special: boolean;
+  data: Record<string, string | number | boolean>;
 }
 
 interface TemplatePageData {
@@ -70,10 +66,6 @@ export function TemplateReviewForm({
 
   const totalSlots = data.pages.reduce(
     (sum, page) => sum + page.slots.length,
-    0
-  );
-  const totalSpecialSlots = data.pages.reduce(
-    (sum, page) => sum + page.slots.filter(slot => slot.is_special).length,
     0
   );
 
@@ -191,18 +183,6 @@ export function TemplateReviewForm({
               </div>
               <div className="text-sm text-gray-400">Cromos Totales</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#FFC000]">
-                {totalSpecialSlots}
-              </div>
-              <div className="text-sm text-gray-400">Cromos Especiales</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#FFC000]">
-                {totalSlots - totalSpecialSlots}
-              </div>
-              <div className="text-sm text-gray-400">Cromos Normales</div>
-            </div>
           </div>
 
           {/* Pages List */}
@@ -221,36 +201,9 @@ export function TemplateReviewForm({
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <FileText className="h-4 w-4" />
                     <span>{page.slots.length} cromos</span>
-                    {page.slots.some(slot => slot.is_special) && (
-                      <>
-                        <Star className="h-4 w-4 text-[#FFC000]" />
-                        <span>
-                          {page.slots.filter(slot => slot.is_special).length}{' '}
-                          especiales
-                        </span>
-                      </>
-                    )}
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {page.slots.map((slot, slotIndex) => {
-                      const slotDisplay = `${slot.slot_number}${slot.slot_variant || ''}`;
-                      const labelText = slot.label || `Cromo ${slotIndex + 1}`;
-                      const globalNum = slot.global_number ? ` (#${slot.global_number})` : '';
-
-                      return (
-                        <span
-                          key={slotIndex}
-                          className={`inline-block px-2 py-1 text-xs rounded ${
-                            slot.is_special
-                              ? 'bg-[#FFC000] text-black'
-                              : 'bg-gray-600 text-white'
-                          }`}
-                          title={`Slot ${slotDisplay}${globalNum}`}
-                        >
-                          {slotDisplay}. {labelText}
-                        </span>
-                      );
-                    })}
+                  <div className="mt-2 text-sm text-gray-400">
+                    {page.slots.length} cromo(s) configurado(s) con campos personalizados
                   </div>
                 </CardContent>
               </Card>
@@ -309,7 +262,6 @@ export function TemplateReviewForm({
             <ul className="list-disc list-inside text-gray-300 space-y-1">
               <li>{data.pages.length} página(s)</li>
               <li>{totalSlots} cromo(s) en total</li>
-              <li>{totalSpecialSlots} cromo(s) especial(es)</li>
               <li>Visibilidad: {data.is_public ? 'Pública' : 'Privada'}</li>
             </ul>
             <p className="text-sm text-gray-400 mt-4">

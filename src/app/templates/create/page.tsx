@@ -14,12 +14,17 @@ interface TemplateData {
   description: string;
   image_url: string;
   is_public: boolean;
+  item_schema?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'checkbox' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
   pages: Array<{
     title: string;
     type: 'team' | 'special';
     slots: Array<{
-      label: string;
-      is_special: boolean;
+      data: Record<string, string | number | boolean>;
     }>;
   }>;
 }
