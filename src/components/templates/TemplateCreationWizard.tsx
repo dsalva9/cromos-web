@@ -1,9 +1,8 @@
-﻿'use client';
-
-import { useMemo, useState } from 'react';
+﻿import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TemplateBasicInfoForm } from './TemplateBasicInfoForm';
+import { ItemSchemaBuilder } from './ItemSchemaBuilder';
 import { TemplatePagesForm } from './TemplatePagesForm';
 import { TemplateReviewForm } from './TemplateReviewForm';
 import { ChevronLeft, ChevronRight, Check, CheckCircle } from 'lucide-react';
@@ -12,6 +11,7 @@ import {
   templatePageSchema,
   type TemplateBasicInfoData,
 } from '@/lib/validations/template.schemas';
+import { ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface TemplateData {
   title: string;
@@ -19,6 +19,7 @@ interface TemplateData {
   image_url: string;
   is_public: boolean;
   terms_accepted?: boolean;
+  item_schema?: ItemFieldDefinition[];
   pages: Array<{
     title: string;
     type: 'team' | 'special';
@@ -28,6 +29,7 @@ interface TemplateData {
       slot_variant?: string;
       global_number?: number;
       is_special: boolean;
+      data?: Record<string, any>;
     }>;
   }>;
 }
@@ -44,9 +46,11 @@ export function TemplateCreationWizard({
   initialData,
 }: TemplateCreationWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [attempted, setAttempted] = useState<{ basic: boolean; pages: boolean }>(
-    { basic: false, pages: false }
-  );
+  const [attempted, setAttempted] = useState<{ basic: boolean; schema: boolean; pages: boolean }>({
+    basic: false,
+    schema: false,
+    pages: false,
+  });
   const [templateData, setTemplateData] = useState<TemplateData>(
     initialData || {
       title: '',
@@ -54,12 +58,14 @@ export function TemplateCreationWizard({
       image_url: '',
       is_public: true,
       terms_accepted: false,
+      item_schema: [],
       pages: [],
     }
   );
 
-    const steps = [
+  const steps = [
     { title: 'Información Básica', description: 'Título y descripción' },
+    { title: 'Información de Cromo', description: 'Define los campos' },
     { title: 'Páginas y Cromos', description: 'Añade páginas y cromos' },
     { title: 'Revisión', description: 'Revisa y publica' },
   ];
@@ -70,7 +76,8 @@ export function TemplateCreationWizard({
 
   const handleNext = () => {
     if (currentStep === 0) setAttempted(prev => ({ ...prev, basic: true }));
-    if (currentStep === 1) setAttempted(prev => ({ ...prev, pages: true }));
+    if (currentStep === 1) setAttempted(prev => ({ ...prev, schema: true }));
+    if (currentStep === 2) setAttempted(prev => ({ ...prev, pages: true }));
     if (!canGoNext()) return;
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -84,7 +91,7 @@ export function TemplateCreationWizard({
   };
 
   const handleSubmit = async () => {
-    setAttempted({ basic: true, pages: true });
+    setAttempted({ basic: true, schema: true, pages: true });
     await onSubmit(templateData);
   };
 
@@ -114,8 +121,11 @@ export function TemplateCreationWizard({
       case 0:
         return Object.keys(basicInfoErrors).length === 0;
       case 1:
-        return pagesStepValid;
+        // Item schema step - can always proceed (schema is optional)
+        return true;
       case 2:
+        return pagesStepValid;
+      case 3:
         // If template is public, terms must be accepted
         if (templateData.is_public) {
           return templateData.terms_accepted === true;
@@ -220,14 +230,14 @@ export function TemplateCreationWizard({
               </ul>
             </div>
           )}
-          {currentStep === 1 && attempted.pages && !pagesStepValid && (
+          {currentStep === 2 && attempted.pages && !pagesStepValid && (
             <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
               <p className="font-semibold">Revisa las páginas:</p>
               <p>• Cada página necesita título válido y al menos un cromo con etiqueta.</p>
               <p>• Un máximo de 50 cromos por página.</p>
             </div>
           )}
-          {currentStep === 2 && templateData.is_public && !templateData.terms_accepted && (
+          {currentStep === 3 && templateData.is_public && !templateData.terms_accepted && (
             <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
               <p className="font-semibold">Debes aceptar los términos de uso para publicar una plantilla pública.</p>
             </div>
@@ -240,12 +250,19 @@ export function TemplateCreationWizard({
             />
           )}
           {currentStep === 1 && (
-            <TemplatePagesForm
-              data={templateData}
-              onChange={updateTemplateData}
+            <ItemSchemaBuilder
+              schema={templateData.item_schema || []}
+              onChange={(schema) => updateTemplateData({ item_schema: schema })}
             />
           )}
           {currentStep === 2 && (
+            <TemplatePagesForm
+              data={templateData}
+              onChange={updateTemplateData}
+              itemSchema={templateData.item_schema}
+            />
+          )}
+          {currentStep === 3 && (
             <TemplateReviewForm
               data={templateData}
               onChange={updateTemplateData}

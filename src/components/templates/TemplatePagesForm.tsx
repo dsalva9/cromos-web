@@ -13,6 +13,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { ItemFieldDefinition } from '@/types/v1.6.0';
+import { DynamicFieldsEditor } from './DynamicFieldsEditor';
 
 interface TemplateSlotData {
   label: string;
@@ -20,6 +22,7 @@ interface TemplateSlotData {
   slot_variant?: string;
   global_number?: number;
   is_special: boolean;
+  data?: Record<string, any>;
 }
 
 interface TemplatePageData {
@@ -33,9 +36,10 @@ interface TemplatePagesFormProps {
     pages: TemplatePageData[];
   };
   onChange: (data: { pages: TemplatePageData[] }) => void;
+  itemSchema?: ItemFieldDefinition[];
 }
 
-export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
+export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesFormProps) {
   const [newPageTitle, setNewPageTitle] = useState('');
   const [newPageType, setNewPageType] = useState<'team' | 'special'>('team');
 
@@ -97,7 +101,8 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
         label: '',
         slot_number: 1,
         global_number: nextGlobalNumber,
-        is_special: false
+        is_special: false,
+        data: {},
       }],
     };
 
@@ -142,6 +147,7 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
       is_special: false,
       slot_variant: undefined,
       global_number: nextGlobalNumber,
+      data: {},
     });
     onChange({ pages: updatedPages });
   };
@@ -480,6 +486,18 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                       </Button>
                     </div>
 
+                    {/* Dynamic Fields - Desktop */}
+                    {itemSchema && itemSchema.length > 0 && (
+                      <div className="hidden lg:block mt-3">
+                        <DynamicFieldsEditor
+                          schema={itemSchema}
+                          data={slot.data || {}}
+                          onChange={(data) => updateSlot(pageIndex, slotIndex, { ...slot, data })}
+                          idPrefix={`slot-${pageIndex}-${slotIndex}`}
+                        />
+                      </div>
+                    )}
+
                     {/* Mobile Layout - Vertical Stack */}
                     <div className="lg:hidden space-y-3">
                       <div className="flex items-center justify-between mb-2">
@@ -617,6 +635,16 @@ export function TemplatePagesForm({ data, onChange }: TemplatePagesFormProps) {
                             </Label>
                           </div>
                         </div>
+
+                        {/* Dynamic Fields - Mobile */}
+                        {itemSchema && itemSchema.length > 0 && (
+                          <DynamicFieldsEditor
+                            schema={itemSchema}
+                            data={slot.data || {}}
+                            onChange={(data) => updateSlot(pageIndex, slotIndex, { ...slot, data })}
+                            idPrefix={`slot-mobile-${pageIndex}-${slotIndex}`}
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

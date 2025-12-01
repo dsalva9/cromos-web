@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ListingForm } from '@/components/marketplace/ListingForm';
+import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
@@ -45,7 +45,7 @@ function CreateListingContent() {
           <p className="text-gray-400">Comparte tu cromo con la comunidad</p>
         </div>
 
-        <ListingForm onSubmit={handleSubmit} loading={loading} />
+        <SimplifiedListingForm onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

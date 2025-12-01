@@ -13,6 +13,13 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface ItemFieldDefinition {
+  name: string;
+  type: 'text' | 'number' | 'checkbox' | 'select';
+  required: boolean;
+  options?: string[];
+}
+
 export interface Listing {
   id: string;
   user_id: string;
@@ -35,6 +42,9 @@ export interface Listing {
   page_title?: string | null;
   slot_variant?: string | null;
   global_number?: number | null;
+  // New fields
+  is_group?: boolean;
+  group_count?: number;
 }
 
 export interface Template {
@@ -50,6 +60,7 @@ export interface Template {
   copies_count: number;
   pages_count: number;
   created_at: string;
+  item_schema?: ItemFieldDefinition[];
 }
 
 export interface TemplateCopy {
@@ -75,6 +86,7 @@ export interface SlotProgress {
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
+  data?: Record<string, any>;
 }
 
 export interface UserProfile extends Profile {
@@ -129,6 +141,9 @@ export interface CreateListingForm {
   page_title?: string;
   slot_variant?: string;
   global_number?: number;
+  // New fields
+  is_group?: boolean;
+  group_count?: number;
 }
 
 export interface CreateTemplateForm {
@@ -136,6 +151,7 @@ export interface CreateTemplateForm {
   description: string;
   image_url?: string;
   is_public: boolean;
+  item_schema?: ItemFieldDefinition[];
 }
 
 export interface ReportForm {

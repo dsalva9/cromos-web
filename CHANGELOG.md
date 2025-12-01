@@ -12,7 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Upcoming / In-Progress
--   **Mobile Architecture Initialization**: Adopting Capacitor for Android MVP. Zero-branch strategy with `process.env` and context detection.
+-   **Dynamic Cromo Fields (2025-12-01)**: ✅ COMPLETE - Major refactor to allow user-defined fields for cromos in templates. Simplifies marketplace listings to title/description only. Adds group/pack listings for bulk selling.
+    -   ✅ Database: Added `item_schema` to templates, `data` to slots, `is_group`/`group_count` to listings
+    -   ✅ RPCs: Updated `create_template`, `create_trade_listing`, `add_template_page_v2`, `get_template_progress`
+    -   ✅ Types: Added `ItemFieldDefinition` interface and updated all related types
+    -   ✅ Components: Created `ItemSchemaBuilder`, `DynamicFieldsEditor`, `SimplifiedListingForm`, `PublishSparesBulkModal`
+    -   ✅ Template Creation: Full support for custom fields - users can define and use dynamic fields
+    -   ✅ Marketplace: Simplified listing creation to title/description/images only with individual/pack toggle
+    -   ✅ Bulk Listing: "Publicar Repes" feature auto-generates pack listings from album spares
+-   **Mobile Architecture Initialization**: Adopting Capacitor for Android MVP. Zero-branch strategy with `process.env` and context detection. Need to fix push notifications for Android, currently web notifications work.
 
 ### Mobile MVP (Phase 1 & 2)
 -   **Viewport & Safe Areas**: Fixed meta tags (no-zoom) and implemented CSS variables for safe area insets.

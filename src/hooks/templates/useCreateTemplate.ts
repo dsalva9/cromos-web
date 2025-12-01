@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 interface TemplateSlotData {
   label: string;
   is_special: boolean;
+  data?: Record<string, any>;
 }
 
 interface TemplatePageData {
@@ -19,6 +20,12 @@ interface TemplateData {
   description: string;
   image_url: string;
   is_public: boolean;
+  item_schema?: Array<{
+    name: string;
+    type: 'text' | 'number' | 'checkbox' | 'select';
+    required: boolean;
+    options?: string[];
+  }>;
   pages: TemplatePageData[];
 }
 
@@ -67,6 +74,7 @@ export function useCreateTemplate() {
           p_description: processedData.description.trim() || null,
           p_image_url: processedData.image_url.trim() || null,
           p_is_public: processedData.is_public,
+          p_item_schema: processedData.item_schema || [],
         }
       );
 

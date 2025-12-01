@@ -6,9 +6,10 @@ import { useTemplateProgress } from '@/hooks/templates/useTemplateProgress';
 import { TemplateProgressGrid } from '@/components/templates/TemplateProgressGrid';
 import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHeader';
 import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
+import { PublishSparesBulkModal } from '@/components/templates/PublishSparesBulkModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Trash2 } from 'lucide-react';
+import { ArrowLeft, Zap, Trash2, PackagePlus } from 'lucide-react';
 import Link from 'next/link';
 import {
   Dialog,
@@ -19,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 
 function TemplateProgressContent() {
   const params = useParams();
@@ -26,10 +28,13 @@ function TemplateProgressContent() {
   const copyId = params.copyId as string;
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bulkPublishOpen, setBulkPublishOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { copy, progress, loading, error, updateSlotStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
+
+  const { createListing } = useCreateListing();
 
   const handleDelete = async () => {
     try {
@@ -43,6 +48,29 @@ function TemplateProgressContent() {
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
+    }
+  }
+
+  const handleBulkPublish = async (description: string) => {
+    if (!copy) return;
+    
+    try {
+      const listingId = await createListing({
+        title: `Pack de Repes - ${copy.title}`,
+        description,
+        sticker_number: '',
+        collection_name: copy.title,
+        is_group: true,
+        group_count: spares.length,
+        // No image_url for now - user will need to add it manually
+      });
+
+      toast.success('¡Pack publicado con éxito!');
+      router.push(`/marketplace/${listingId}`);
+    } catch (err) {
+      toast.error('Error al publicar el pack');
+      console.error('Bulk publish error:', err);
+      throw err;
     }
   };
 
@@ -70,6 +98,9 @@ function TemplateProgressContent() {
   // Check if template has global numbers
   const hasGlobalNumbers = progress.some(slot => slot.global_number !== null);
 
+  // Get all spares (duplicates)
+  const spares = progress.filter(slot => slot.status === 'duplicate' && slot.count > 0);
+
   return (
     <div className="min-h-screen bg-[#1F2937] pb-20">
       <div className="container mx-auto px-4 py-8">
@@ -94,6 +125,17 @@ function TemplateProgressContent() {
               >
                 <Zap className="mr-2 h-4 w-4" />
                 Entrada Rápida
+              </Button>
+            )}
+
+            {/* Publicar Repes Button - Only show if there are spares */}
+            {spares.length > 0 && (
+              <Button
+                onClick={() => setBulkPublishOpen(true)}
+                className="bg-green-600 text-white hover:bg-green-700 font-bold w-full sm:w-auto shadow-lg shadow-green-600/20 transition-all hover:scale-105"
+              >
+                <PackagePlus className="mr-2 h-4 w-4" />
+                Publicar Repes ({spares.length})
               </Button>
             )}
 
@@ -180,6 +222,15 @@ function TemplateProgressContent() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Publish Spares Bulk Modal */}
+        <PublishSparesBulkModal
+          open={bulkPublishOpen}
+          onOpenChange={setBulkPublishOpen}
+          collectionTitle={copy.title}
+          spares={spares}
+          onPublish={handleBulkPublish}
+        />
       </div>
     </div>
   );
