@@ -51,6 +51,9 @@ export function useListing(listingId: string) {
           page_title: data.page_title,
           slot_variant: data.slot_variant,
           global_number: data.global_number,
+          // Pack/individual listing type
+          is_group: data.is_group,
+          group_count: data.group_count,
         });
       }
     } catch (err) {
