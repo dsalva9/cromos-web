@@ -16,6 +16,8 @@ import {
   markListingChatNotificationsRead,
 } from '@/lib/supabase/notifications';
 import { formatNotification, groupNotificationsByCategory } from '@/lib/notifications/formatter';
+import { fetchNotificationPreferences, checkNotificationEnabled } from '@/lib/supabase/notification-preferences';
+import type { GranularNotificationPreferences } from '@/types/notifications';
 
 interface UseNotificationsReturn {
   // Data
@@ -46,6 +48,22 @@ export function useNotifications(): UseNotificationsReturn {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<GranularNotificationPreferences | null>(null);
+
+  /**
+   * Fetch notification preferences
+   */
+  const loadPreferences = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const prefs = await fetchNotificationPreferences();
+      setPreferences(prefs);
+    } catch (err) {
+      logger.error('Error fetching notification preferences:', err);
+      // Continue with default preferences (all enabled)
+    }
+  }, [user]);
 
   /**
    * Fetch notifications from database
@@ -177,11 +195,23 @@ export function useNotifications(): UseNotificationsReturn {
   }, []);
 
   /**
-   * Format notifications for display
+   * Format notifications for display and filter by in-app preferences
    */
   const formattedNotifications = useMemo(() => {
-    return notifications.map(formatNotification);
-  }, [notifications]);
+    const formatted = notifications.map(formatNotification);
+
+    // Filter by in-app preferences if available
+    if (preferences) {
+      return formatted.filter((notification) => {
+        // Check if this notification type is enabled for in-app
+        const isEnabled = checkNotificationEnabled(preferences, notification.kind, 'in_app');
+        return isEnabled;
+      });
+    }
+
+    // If no preferences loaded yet, show all notifications
+    return formatted;
+  }, [notifications, preferences]);
 
   /**
    * Filter unread notifications
@@ -209,9 +239,10 @@ export function useNotifications(): UseNotificationsReturn {
    */
   useEffect(() => {
     if (user) {
+      loadPreferences();
       refresh();
     }
-  }, [user, refresh]);
+  }, [user, refresh, loadPreferences]);
 
   /**
    * Subscribe to realtime notifications

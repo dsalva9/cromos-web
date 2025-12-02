@@ -1,13 +1,14 @@
 /**
  * Notification Types
  * Sprint 15: Notifications System
+ * Extended: Granular notification preferences per channel and type
  */
 
 /**
  * All possible notification kinds in the system
  */
 export type NotificationKind =
-  // Legacy trade notifications
+  // LEGACY: Trade notifications (deprecated - do not extend)
   | 'chat_unread'
   | 'proposal_accepted'
   | 'proposal_rejected'
@@ -22,7 +23,36 @@ export type NotificationKind =
   // Badge notifications
   | 'badge_earned'
   // Admin notifications
-  | 'admin_action';
+  | 'admin_action'
+  // System notifications
+  | 'system_message'
+  | 'level_up';
+
+/**
+ * Notification channels
+ */
+export type NotificationChannel = 'in_app' | 'push' | 'email';
+
+/**
+ * Granular notification preferences structure
+ * Each channel has a map of notification types to boolean values
+ */
+export interface GranularNotificationPreferences {
+  in_app: Record<NotificationKind, boolean>;
+  push: Record<NotificationKind, boolean>;
+  email: Record<NotificationKind, boolean>;
+}
+
+/**
+ * Configuration for a single notification type
+ */
+export interface NotificationTypeConfig {
+  kind: NotificationKind;
+  label: string;
+  description: string;
+  category: NotificationCategory;
+  priority: 'high' | 'low';
+}
 
 /**
  * Actor information (who triggered the notification)
@@ -150,6 +180,7 @@ export function isTemplateNotification(kind: NotificationKind): boolean {
   return kind === 'template_rated';
 }
 
+// LEGACY: Trade notification checker (deprecated)
 export function isTradeNotification(kind: NotificationKind): boolean {
   return ['chat_unread', 'proposal_accepted', 'proposal_rejected', 'finalization_requested'].includes(kind);
 }

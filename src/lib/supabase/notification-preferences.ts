@@ -1,19 +1,26 @@
 /**
  * Notification Preferences Client Library
- * Manages user notification settings for push and email
+ * Manages granular user notification settings per channel and type
  */
 
 import { createClient } from '@/lib/supabase/client';
+import type {
+  GranularNotificationPreferences,
+  NotificationChannel,
+  NotificationKind,
+} from '@/types/notifications';
+import { getDefaultPreferences } from '@/lib/notifications/config';
 
+// Legacy interface for backward compatibility
 export interface NotificationPreferences {
   push_enabled: boolean;
   email_enabled: boolean;
 }
 
 /**
- * Fetch notification preferences for the current user
+ * Fetch granular notification preferences for the current user
  */
-export async function fetchNotificationPreferences(): Promise<NotificationPreferences> {
+export async function fetchNotificationPreferences(): Promise<GranularNotificationPreferences> {
   const supabase = createClient();
 
   const { data, error } = await supabase.rpc('get_notification_preferences');
@@ -21,20 +28,17 @@ export async function fetchNotificationPreferences(): Promise<NotificationPrefer
   if (error) {
     console.error('Error fetching notification preferences:', error);
     // Return defaults on error
-    return {
-      push_enabled: true,
-      email_enabled: true,
-    };
+    return getDefaultPreferences();
   }
 
-  return data as NotificationPreferences;
+  return data as GranularNotificationPreferences;
 }
 
 /**
- * Update notification preferences for the current user
+ * Update granular notification preferences for the current user
  */
 export async function updateNotificationPreferences(
-  preferences: NotificationPreferences
+  preferences: GranularNotificationPreferences
 ): Promise<void> {
   const supabase = createClient();
 
@@ -46,6 +50,71 @@ export async function updateNotificationPreferences(
     console.error('Error updating notification preferences:', error);
     throw new Error('Error al actualizar las preferencias de notificación');
   }
+}
+
+/**
+ * Check if a specific notification type is enabled for a channel
+ */
+export function checkNotificationEnabled(
+  preferences: GranularNotificationPreferences,
+  kind: NotificationKind,
+  channel: NotificationChannel
+): boolean {
+  return preferences[channel][kind] ?? true;
+}
+
+/**
+ * Toggle a specific notification type for a channel
+ */
+export function toggleNotificationPreference(
+  preferences: GranularNotificationPreferences,
+  kind: NotificationKind,
+  channel: NotificationChannel,
+  enabled: boolean
+): GranularNotificationPreferences {
+  return {
+    ...preferences,
+    [channel]: {
+      ...preferences[channel],
+      [kind]: enabled,
+    },
+  };
+}
+
+/**
+ * Enable all notifications for a channel
+ */
+export function enableAllForChannel(
+  preferences: GranularNotificationPreferences,
+  channel: NotificationChannel
+): GranularNotificationPreferences {
+  const updatedChannel = { ...preferences[channel] };
+  Object.keys(updatedChannel).forEach((key) => {
+    updatedChannel[key as NotificationKind] = true;
+  });
+
+  return {
+    ...preferences,
+    [channel]: updatedChannel,
+  };
+}
+
+/**
+ * Disable all notifications for a channel
+ */
+export function disableAllForChannel(
+  preferences: GranularNotificationPreferences,
+  channel: NotificationChannel
+): GranularNotificationPreferences {
+  const updatedChannel = { ...preferences[channel] };
+  Object.keys(updatedChannel).forEach((key) => {
+    updatedChannel[key as NotificationKind] = false;
+  });
+
+  return {
+    ...preferences,
+    [channel]: updatedChannel,
+  };
 }
 
 /**
