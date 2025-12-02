@@ -44,7 +44,10 @@
       "mcp__supabase__list_tables",
       "mcp__supabase__execute_sql",
       "Bash(del /F \"C:\\Users\\David\\projects\\cromos-web\\src\\nul\")",
-      "Bash(claude mcp inspect:*)"
+      "Bash(claude mcp inspect:*)",
+      "mcp__supabase__apply_migration",
+      "Bash(del /F test_mcp.txt)",
+      "mcp__supabase__list_migrations"
     ],
     "deny": [],
     "ask": []

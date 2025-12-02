@@ -6,7 +6,6 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { usePublishDuplicate } from '@/hooks/integration/usePublishDuplicate';
 import AuthGuard from '@/components/AuthGuard';
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -181,20 +180,9 @@ function PublishDuplicateContent() {
             Publicar Repetido
           </h1>
           <p className="text-gray-400">
-            Tienes {slotData?.count} repetidos de este cromo
+            Tienes {(slotData?.count || 1) - 1} {(slotData?.count || 1) - 1 === 1 ? 'repetido' : 'repetidos'} de este cromo
           </p>
         </div>
-
-        {/* Info Card */}
-        <ModernCard className="mb-6">
-          <ModernCardContent className="p-4 bg-blue-900/20 border-2 border-blue-700">
-            <p className="text-sm text-blue-200">
-              <strong>Nota:</strong> Al publicar se creará un anuncio en el mercado.
-              Puedes editar los detalles a continuación. Cuando alguien lo compre, tu
-              contador de repetidos disminuirá automáticamente.
-            </p>
-          </ModernCardContent>
-        </ModernCard>
 
         {/* Form */}
         <SimplifiedListingForm
