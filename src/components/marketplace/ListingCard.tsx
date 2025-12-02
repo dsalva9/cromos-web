@@ -11,9 +11,13 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, isPack: boolean = false) => {
     switch (status) {
       case 'active':
+        // Pack badge gets dark blue color
+        if (isPack) {
+          return 'bg-blue-900/40 text-blue-300 border-blue-700/60';
+        }
         return 'bg-green-500/20 text-green-400 border-green-500/50';
       case 'sold':
         return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
@@ -83,7 +87,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           {/* Status Badge */}
           <div className="absolute top-2 right-2">
             <span
-              className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status)}`}
+              className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status, listing.is_group)}`}
             >
               {getStatusLabel(listing.status)}
             </span>

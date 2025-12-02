@@ -12,6 +12,7 @@ interface SlotProgress {
   slot_id: string;
   page_id: string;
   page_number: number;
+  page_title: string;
   slot_number: number;
   slot_variant: string | null;
   global_number: number | null;
@@ -19,6 +20,13 @@ interface SlotProgress {
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
+  data?: Record<string, string | number | boolean>;
+}
+
+interface CustomField {
+  name: string;
+  type: string;
+  required: boolean;
 }
 
 interface TemplateProgressGridProps {
@@ -29,20 +37,22 @@ interface TemplateProgressGridProps {
     count: number
   ) => Promise<void>;
   copyId: string;
+  customFields?: CustomField[];
 }
 
 export function TemplateProgressGrid({
   progress,
   onUpdateSlot,
   copyId,
+  customFields = [],
 }: TemplateProgressGridProps) {
   const [selectedPage, setSelectedPage] = useState<number>(1);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [isCompletingPage, setIsCompletingPage] = useState(false);
   const { slotListings, loading: listingsLoading } = useSlotListings(copyId);
 
-  // Group slots by page
-  const pageGroups = useMemo(() => {
+  // Group slots by page and extract page titles
+  const { pageGroups, pageTitles } = useMemo(() => {
     const groups = progress.reduce(
       (acc, slot) => {
         if (!acc[slot.page_number]) {
@@ -53,6 +63,14 @@ export function TemplateProgressGrid({
       },
       {} as Record<number, SlotProgress[]>
     );
+
+    // Extract page titles from first slot of each page
+    const titles: Record<number, string> = {};
+    Object.entries(groups).forEach(([pageNum, slots]) => {
+      if (slots.length > 0) {
+        titles[parseInt(pageNum)] = slots[0].page_title || `Página ${pageNum}`;
+      }
+    });
 
     // Sort slots within each page by slot_number, then variant
     Object.values(groups).forEach(slots => {
@@ -65,7 +83,7 @@ export function TemplateProgressGrid({
       });
     });
 
-    return groups;
+    return { pageGroups: groups, pageTitles: titles };
   }, [progress]);
 
   const pageNumbers = Object.keys(pageGroups)
@@ -107,8 +125,8 @@ export function TemplateProgressGrid({
                 key={pageNum}
                 value={pageNum.toString()}
                 className="
-                  data-[state=active]:bg-[#FFC000] 
-                  data-[state=active]:text-black 
+                  data-[state=active]:bg-[#FFC000]
+                  data-[state=active]:text-black
                   data-[state=active]:font-bold
                   text-gray-400
                   hover:text-white
@@ -119,8 +137,9 @@ export function TemplateProgressGrid({
                   transition-all duration-200
                   flex-1 min-w-[100px] md:flex-none
                 "
+                title={pageTitles[pageNum]}
               >
-                Página {pageNum}
+                {pageTitles[pageNum]}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -131,7 +150,7 @@ export function TemplateProgressGrid({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-gray-400">
           <LayoutGrid className="w-5 h-5" />
-          <span className="font-medium">Cromos de la página {selectedPage}</span>
+          <span className="font-medium">Cromos de {pageTitles[selectedPage] || `Página ${selectedPage}`}</span>
         </div>
         
         <Button
@@ -159,6 +178,7 @@ export function TemplateProgressGrid({
             copyId={copyId}
             listing={slotListings[slot.slot_id]}
             listingsLoading={listingsLoading}
+            customFields={customFields}
           />
         ))}
       </div>

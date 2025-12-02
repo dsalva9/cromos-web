@@ -145,7 +145,7 @@ function MyCreatedTemplatesContent() {
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <TemplateCard template={template} showVisibility={true} />
+                <TemplateCard template={template} showVisibility={true} showEditButton={true} />
               </div>
             ))}
           </div>

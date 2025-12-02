@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, Star, Copy, FileText, Layout, Eye, EyeOff } from 'lucide-react';
+import { User, Star, Copy, FileText, Layout, Eye, EyeOff, Edit } from 'lucide-react';
 import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
@@ -32,11 +32,13 @@ interface Template {
 interface TemplateCardProps {
   template: Template;
   showVisibility?: boolean;
+  showEditButton?: boolean;
 }
 
 export function TemplateCard({
   template,
   showVisibility = false,
+  showEditButton = false,
 }: TemplateCardProps) {
   const { user } = useUser();
   const router = useRouter();
@@ -67,14 +69,15 @@ export function TemplateCard({
   };
 
   return (
-    <Link
-      href={`/templates/${template.id}`}
-      aria-label={`Ver plantilla: ${template.title}`}
-    >
-      <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 cursor-pointer h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
-        <ModernCardContent className="p-0 flex flex-col h-full">
+    <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
+      <ModernCardContent className="p-0 flex flex-col h-full">
           {/* Image */}
-          <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800">
+          <Link
+            href={`/templates/${template.id}`}
+            aria-label={`Ver plantilla: ${template.title}`}
+            className="block"
+          >
+            <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800 cursor-pointer">
             {template.image_url ? (
               <Image
                 src={template.image_url}
@@ -113,14 +116,20 @@ export function TemplateCard({
                 </div>
               </div>
             )}
-          </div>
+            </div>
+          </Link>
 
           {/* Content */}
           <div className="p-4 flex flex-col h-full">
             <div className="flex-grow space-y-3">
-              <h3 className="font-bold text-white text-lg line-clamp-2">
-                {template.title}
-              </h3>
+              <Link
+                href={`/templates/${template.id}`}
+                className="block hover:text-[#FFC000] transition-colors"
+              >
+                <h3 className="font-bold text-white text-lg line-clamp-2">
+                  {template.title}
+                </h3>
+              </Link>
 
               {template.description && (
                 <p className="text-sm text-slate-400 line-clamp-2">
@@ -169,29 +178,43 @@ export function TemplateCard({
               </div>
             </div>
 
-            <Button
-              onClick={handleCopy}
-              disabled={loading || copied}
-              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
-              size="sm"
-            >
-              {copied ? (
-                <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  ¡Copiada!
-                </>
-              ) : loading ? (
-                'Copiando...'
-              ) : (
-                <>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copiar Plantilla
-                </>
-              )}
-            </Button>
+            {showEditButton ? (
+              <Link
+                href={`/templates/${template.id}/edit`}
+                className="w-full mt-3 block"
+              >
+                <Button
+                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
+                  size="sm"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Editar Plantilla
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                onClick={handleCopy}
+                disabled={loading || copied}
+                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+                size="sm"
+              >
+                {copied ? (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    ¡Copiada!
+                  </>
+                ) : loading ? (
+                  'Copiando...'
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copiar Plantilla
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </ModernCardContent>
       </ModernCard>
-    </Link>
   );
 }

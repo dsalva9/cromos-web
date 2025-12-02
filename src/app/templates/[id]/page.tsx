@@ -391,29 +391,50 @@ export default function TemplateDetailsPage() {
 
                     {/* Slots list */}
                     <div className="pt-2 border-t border-slate-700">
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {page.slots.map(slot => (
-                          <div key={slot.id} className="flex items-center gap-2 text-xs">
-                            <span className="text-slate-500 font-mono w-6 flex-shrink-0">{slot.slot_number}.</span>
-                            <span
-                              className={
-                                slot.is_special ? 'text-yellow-500 font-medium' : 'text-slate-400'
-                              }
-                            >
-                              {slot.label || `Cromo ${slot.slot_number}`}
-                            </span>
-                            {/* Panini metadata inline */}
-                            {(slot.slot_variant || slot.global_number) && (
-                              <span className="text-[10px] text-slate-500">
-                                ({slot.slot_variant && <>Var: {slot.slot_variant}</>}
-                                {slot.slot_variant && slot.global_number && <> • </>}
-                                {slot.global_number && <>Global #{slot.global_number}</>})
-                              </span>
+                          <div key={slot.id} className="bg-slate-800/50 rounded-lg p-2">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-slate-500 font-mono text-xs font-bold">#{slot.slot_number}</span>
+                              {slot.label && (
+                                <span
+                                  className={
+                                    slot.is_special ? 'text-yellow-500 font-medium text-sm' : 'text-slate-300 text-sm font-medium'
+                                  }
+                                >
+                                  {slot.label}
+                                </span>
+                              )}
+                              {slot.is_special && (
+                                <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded ml-auto">
+                                  ESPECIAL
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Custom fields data */}
+                            {template.item_schema && template.item_schema.length > 0 && slot.data && Object.keys(slot.data).length > 0 && (
+                              <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-slate-700">
+                                {template.item_schema.map(field => {
+                                  const value = slot.data[field.name];
+                                  if (value === undefined || value === null || value === '') return null;
+                                  return (
+                                    <div key={field.name} className="flex gap-2 text-[11px]">
+                                      <span className="text-slate-500 font-medium">{field.name}:</span>
+                                      <span className="text-slate-300">{String(value)}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             )}
-                            {slot.is_special && (
-                              <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded ml-auto">
-                                ESPECIAL
-                              </span>
+
+                            {/* Panini metadata */}
+                            {(slot.slot_variant || slot.global_number) && (
+                              <div className="mt-1 text-[10px] text-slate-500 italic">
+                                {slot.slot_variant && <>Variante: {slot.slot_variant}</>}
+                                {slot.slot_variant && slot.global_number && <> • </>}
+                                {slot.global_number && <>Global #{slot.global_number}</>}
+                              </div>
                             )}
                           </div>
                         ))}

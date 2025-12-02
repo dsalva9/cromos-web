@@ -5,17 +5,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Plus, Trash2, GripVertical, AlertTriangle } from 'lucide-react';
 import { ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface ItemSchemaBuilderProps {
   schema: ItemFieldDefinition[];
   onChange: (schema: ItemFieldDefinition[]) => void;
+  pages?: Array<{
+    slots: Array<{
+      data: Record<string, string | number | boolean>;
+    }>;
+  }>;
 }
 
-export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) {
+export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBuilderProps) {
   const [editingField, setEditingField] = useState<ItemFieldDefinition | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [deleteWarningOpen, setDeleteWarningOpen] = useState(false);
+  const [fieldToDelete, setFieldToDelete] = useState<{ index: number; name: string } | null>(null);
 
   const addField = () => {
     const newField: ItemFieldDefinition = {
@@ -34,9 +49,41 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
     setEditingField(null);
   };
 
+  const checkFieldHasData = (fieldName: string): boolean => {
+    // Check if any slot in any page has non-empty data for this field
+    return pages.some(page =>
+      page.slots.some(slot => {
+        const value = slot.data?.[fieldName];
+        return value !== undefined && value !== null && value !== '';
+      })
+    );
+  };
+
+  const handleRemoveField = (index: number) => {
+    const field = schema[index];
+    const hasData = checkFieldHasData(field.name);
+
+    if (hasData) {
+      // Show warning dialog
+      setFieldToDelete({ index, name: field.name });
+      setDeleteWarningOpen(true);
+    } else {
+      // Delete directly
+      removeField(index);
+    }
+  };
+
   const removeField = (index: number) => {
     const updatedSchema = schema.filter((_, i) => i !== index);
     onChange(updatedSchema);
+  };
+
+  const confirmRemoveField = () => {
+    if (fieldToDelete !== null) {
+      removeField(fieldToDelete.index);
+      setDeleteWarningOpen(false);
+      setFieldToDelete(null);
+    }
   };
 
   const updateEditingField = (updates: Partial<ItemFieldDefinition>) => {
@@ -117,7 +164,7 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => removeField(index)}
+                  onClick={() => handleRemoveField(index)}
                   className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -228,6 +275,47 @@ export function ItemSchemaBuilder({ schema, onChange }: ItemSchemaBuilderProps) 
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Warning Dialog */}
+      <Dialog open={deleteWarningOpen} onOpenChange={setDeleteWarningOpen}>
+        <DialogContent className="bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <AlertTriangle className="h-6 w-6 text-yellow-500" />
+              ¿Eliminar campo con datos?
+            </DialogTitle>
+            <DialogDescription className="text-gray-400 pt-2">
+              El campo <span className="font-bold text-white">&quot;{fieldToDelete?.name}&quot;</span> tiene datos en &apos;Páginas y Cromos&apos;.
+              Si eliminas este campo, <span className="font-bold text-red-400">se perderán todos los datos</span> relacionados.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-4 my-4">
+            <p className="text-red-200 text-sm">
+              <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer. Los datos de este campo se eliminarán permanentemente de todos los cromos.
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteWarningOpen(false);
+                setFieldToDelete(null);
+              }}
+              className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmRemoveField}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold"
+            >
+              Eliminar de todas formas
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

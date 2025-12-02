@@ -275,6 +275,7 @@ export function TemplateCreationWizard({
             <ItemSchemaBuilder
               schema={templateData.item_schema || []}
               onChange={(schema) => updateTemplateData({ item_schema: schema })}
+              pages={templateData.pages}
             />
           )}
           {currentStep === 2 && (

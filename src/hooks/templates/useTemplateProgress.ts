@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
-import type { SlotProgress } from '@/types/v1.6.0';
+import type { SlotProgress, ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface TemplateCopy {
   copy_id: string;
@@ -18,6 +18,7 @@ export function useTemplateProgress(copyId: string) {
   const supabase = useSupabaseClient();
   const [copy, setCopy] = useState<TemplateCopy | null>(null);
   const [progress, setProgress] = useState<SlotProgress[]>([]);
+  const [customFields, setCustomFields] = useState<ItemFieldDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +46,18 @@ export function useTemplateProgress(copyId: string) {
       if (!currentCopy) throw new Error('Copia de plantilla no encontrada');
 
       setCopy(currentCopy);
+
+      // Get template details to fetch item_schema
+      const { data: templateDetails, error: templateError } = await supabase.rpc(
+        'get_template_details',
+        { p_template_id: currentCopy.template_id }
+      );
+
+      if (templateError) {
+        logger.error('Error fetching template details:', templateError);
+      } else if (templateDetails?.template?.item_schema) {
+        setCustomFields(templateDetails.template.item_schema);
+      }
 
       // Get progress
       const { data: progressData, error: progressError } = await supabase.rpc(
@@ -169,6 +182,7 @@ export function useTemplateProgress(copyId: string) {
   return {
     copy,
     progress,
+    customFields,
     loading,
     error,
     updateSlotStatus,

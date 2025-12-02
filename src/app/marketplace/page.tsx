@@ -23,6 +23,7 @@ export default function MarketplacePage() {
     []
   );
   const [showFilters, setShowFilters] = useState(false);
+  const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
 
   // Fetch user's postcode only
   useEffect(() => {
@@ -45,13 +46,20 @@ export default function MarketplacePage() {
 
   const hasPostcode = Boolean(userPostcode);
 
-  const { listings, loading, error, hasMore, loadMore } = useListings({
+  const { listings: allListings, loading, error, hasMore, loadMore } = useListings({
     search: searchQuery,
     limit: 20,
     sortByDistance: sortByDistance && hasPostcode,
     viewerPostcode: userPostcode,
     collectionIds: selectedCollectionIds,
   });
+
+  // Filter listings based on type
+  const listings = listingTypeFilter === 'all'
+    ? allListings
+    : allListings.filter(listing =>
+        listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
+      );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#111827] text-white">
@@ -152,6 +160,40 @@ export default function MarketplacePage() {
 
               {/* Desktop Filters */}
               <div className={`flex-col md:flex-row gap-4 md:flex ${showFilters ? 'flex' : 'hidden'}`}>
+                {/* Listing Type Filter */}
+                <div className="bg-white/5 rounded-lg p-1 border border-white/10 flex">
+                  <button
+                    onClick={() => setListingTypeFilter('all')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      listingTypeFilter === 'all'
+                        ? 'bg-[#FFC000] text-black shadow-lg'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  <button
+                    onClick={() => setListingTypeFilter('cromo')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      listingTypeFilter === 'cromo'
+                        ? 'bg-[#FFC000] text-black shadow-lg'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Cromo
+                  </button>
+                  <button
+                    onClick={() => setListingTypeFilter('pack')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      listingTypeFilter === 'pack'
+                        ? 'bg-[#FFC000] text-black shadow-lg'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Pack
+                  </button>
+                </div>
+
                 {user && (
                   <div className="w-full md:w-64">
                     <CollectionFilter

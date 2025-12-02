@@ -31,7 +31,7 @@ function TemplateProgressContent() {
   const [bulkPublishOpen, setBulkPublishOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { copy, progress, loading, error, updateSlotStatus, deleteTemplateCopy } =
+  const { copy, progress, customFields, loading, error, updateSlotStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
 
   const { createListing } = useCreateListing();
@@ -159,6 +159,7 @@ function TemplateProgressContent() {
           progress={progress}
           onUpdateSlot={updateSlotStatus}
           copyId={copyId}
+          customFields={customFields}
         />
 
         {/* Mobile Delete Button */}

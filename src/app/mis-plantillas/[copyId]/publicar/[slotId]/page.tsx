@@ -219,7 +219,7 @@ function PublishDuplicateContent() {
                   .map(field => {
                     const value = slotData.data[field.name];
                     return value !== undefined && value !== null && value !== ''
-                      ? `${field.label}: ${value}`
+                      ? `${field.name}: ${value}`
                       : null;
                   })
                   .filter(Boolean);
@@ -233,6 +233,7 @@ function PublishDuplicateContent() {
             })(),
             image_url: undefined,
             is_group: false,
+            collection_name: templateInfo?.title || '',
           }}
           onSubmit={handlePublish}
           loading={publishing}

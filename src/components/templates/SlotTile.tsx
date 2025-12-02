@@ -16,6 +16,13 @@ interface SlotProgress {
   slot_number?: number;
   slot_variant?: string | null;
   global_number?: number | null;
+  data?: Record<string, string | number | boolean>;
+}
+
+interface CustomField {
+  name: string;
+  type: string;
+  required: boolean;
 }
 
 interface SlotListing {
@@ -30,9 +37,10 @@ interface SlotTileProps {
   copyId: string;
   listing?: SlotListing;
   listingsLoading?: boolean;
+  customFields?: CustomField[];
 }
 
-export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: SlotTileProps) {
+export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [] }: SlotTileProps) {
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
 
@@ -171,8 +179,24 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
             )}
           </div>
           <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem] leading-tight">
-            {slot.label || `Cromo ${String(slot.slot_id).slice(-4)}`}
+            {slot.label || `Cromo ${slot.slot_number || ''}`}
           </p>
+
+          {/* Custom fields data */}
+          {customFields.length > 0 && slot.data && Object.keys(slot.data).length > 0 && (
+            <div className="mt-1 space-y-0.5 text-[10px]">
+              {customFields.map(field => {
+                const value = slot.data?.[field.name];
+                if (value === undefined || value === null || value === '') return null;
+                return (
+                  <div key={field.name} className="flex gap-1 text-gray-400">
+                    <span className="font-medium">{field.name}:</span>
+                    <span className="text-gray-300 truncate">{String(value)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="mt-auto space-y-3">
@@ -218,20 +242,29 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading }: S
               {/* Marketplace Action */}
               {listing ? (
                 <Link href={`/marketplace/${listing.id}`} className="block">
-                  <div className="w-full bg-green-900/30 border border-green-800 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-400 hover:bg-green-900/50 transition-colors">
+                  <div className="w-full bg-green-900/30 border border-green-800 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-400 hover:bg-green-900/50 transition-colors cursor-pointer">
                     <Upload className="w-3 h-3" />
-                    <span>EN VENTA</span>
+                    <span>VER ANUNCIO</span>
                   </div>
                 </Link>
               ) : listingsLoading ? (
                 <div className="w-full h-6 bg-gray-800 animate-pulse rounded-lg" />
-              ) : (
+              ) : slot.status === 'duplicate' && localCount >= 2 ? (
                 <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`} className="block">
                   <button className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg py-1 px-2 text-[10px] font-medium transition-colors flex items-center justify-center gap-1.5">
                     <Upload className="w-3 h-3" />
-                    <span>VENDER</span>
+                    <span>CREAR ANUNCIO</span>
                   </button>
                 </Link>
+              ) : (
+                <button
+                  disabled
+                  title="Necesitas al menos 2 cromos para crear un anuncio"
+                  className="w-full bg-gray-900 text-gray-600 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed opacity-50"
+                >
+                  <Upload className="w-3 h-3" />
+                  <span>CREAR ANUNCIO</span>
+                </button>
               )}
             </div>
           )}

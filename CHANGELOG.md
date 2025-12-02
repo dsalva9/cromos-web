@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Upcoming / In-Progress
+-   **Templates & Marketplace UX Improvements (2025-12-02)**: ✅ COMPLETE - Enhanced template management and marketplace usability with better navigation, data visibility, and filtering.
+    -   ✅ Templates: Added edit button to "Mis Plantillas" list view for direct access to template editor
+    -   ✅ Template Editor: Warning dialog when removing custom fields with existing data to prevent accidental data loss
+    -   ✅ Template Details: "Contenido de la plantilla" now displays all custom field values for each cromo
+    -   ✅ Album Progress: Page tabs show actual page titles instead of generic "Página 1", "Página 2"
+    -   ✅ Album Progress: SlotTile cards display custom field data for each cromo
+    -   ✅ Listing Creation: "Vender" button renamed to "Crear anuncio", only enabled for duplicates (count ≥ 2)
+    -   ✅ Listing Creation: Auto-generated description now uses custom field names instead of "undefined"
+    -   ✅ Listing Creation: Collection field auto-filled with album name when publishing from templates
+    -   ✅ Marketplace: Added Cromo/Pack/Todos toggle filter for better browsing
+    -   ✅ Marketplace: "Pack de Cromos" badge now uses dark blue color to differentiate from green "Cromo" badge
+    -   ✅ Slot Display: Fixed fallback labels to use slot_number instead of database IDs
+    -   ✅ Navigation: Fixed React hydration error in TemplateCard caused by nested links
+    -   ✅ Terminology: Changed "EN VENTA" to "Ver anuncio" to match app's interchange concept
 -   **Dynamic Cromo Fields (2025-12-01)**: ✅ COMPLETE - Major refactor to allow user-defined fields for cromos in templates. Simplifies marketplace listings to title/description only. Adds group/pack listings for bulk selling.
     -   ✅ Database: Added `item_schema` to templates, `data` to slots, `is_group`/`group_count` to listings
     -   ✅ RPCs: Updated `create_template`, `create_trade_listing`, `add_template_page_v2`, `get_template_progress`, `get_template_details`, `list_trade_listings_filtered_with_distance`
