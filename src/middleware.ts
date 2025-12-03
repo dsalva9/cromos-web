@@ -4,9 +4,13 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const isComingSoonMode = process.env.NEXT_PUBLIC_COMING_SOON === 'true';
   const pathname = request.nextUrl.pathname;
+  const hostname = request.headers.get('host') || '';
 
-  // If coming soon mode is enabled
-  if (isComingSoonMode) {
+  // Only show coming soon page on production domain (www.cambiocromos.com)
+  const isProductionDomain = hostname.includes('cambiocromos.com');
+
+  // If coming soon mode is enabled AND on production domain
+  if (isComingSoonMode && isProductionDomain) {
     // Allow access only to the proximamente page
     if (!pathname.startsWith('/proximamente')) {
       // Redirect all other routes to proximamente
