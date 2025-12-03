@@ -47,7 +47,13 @@
       "Bash(claude mcp inspect:*)",
       "mcp__supabase__apply_migration",
       "Bash(del /F test_mcp.txt)",
-      "mcp__supabase__list_migrations"
+      "mcp__supabase__list_migrations",
+      "Bash(npm run type-check:*)",
+      "mcp__supabase__search_docs",
+      "Bash(find:*)",
+      "mcp__supabase__list_extensions",
+      "mcp__supabase__list_edge_functions",
+      "mcp__supabase__get_advisors"
     ],
     "deny": [],
     "ask": []

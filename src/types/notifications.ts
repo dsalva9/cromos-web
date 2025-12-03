@@ -107,33 +107,33 @@ export interface AppNotification {
 export interface RawNotification {
   id: number;
   kind: string;
-  trade_id: number | null;
-  listing_id: number | null;
-  template_id: number | null;
-  rating_id: number | null;
+  trade_id?: number | null;
+  listing_id?: number | null;
+  template_id?: number | null;
+  rating_id?: number | null;
   created_at: string;
-  read_at: string | null;
+  read_at?: string | null;
   payload: Record<string, unknown>;
 
   // Actor
-  actor_id: string | null;
-  actor_nickname: string | null;
-  actor_avatar_url: string | null;
+  actor_id?: string | null;
+  actor_nickname?: string | null;
+  actor_avatar_url?: string | null;
 
   // Trade data
-  proposal_from_user: string | null;
-  proposal_to_user: string | null;
-  proposal_status: string | null;
-  from_user_nickname: string | null;
-  to_user_nickname: string | null;
+  proposal_from_user?: string | null;
+  proposal_to_user?: string | null;
+  proposal_status?: string | null;
+  from_user_nickname?: string | null;
+  to_user_nickname?: string | null;
 
   // Listing data
-  listing_title: string | null;
-  listing_status: string | null;
+  listing_title?: string | null;
+  listing_status?: string | null;
 
   // Template data
-  template_name: string | null;
-  template_status: string | null;
+  template_name?: string | null;
+  template_status?: string | null;
 }
 
 /**
