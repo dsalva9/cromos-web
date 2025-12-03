@@ -24,11 +24,17 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           .from('profiles')
           .select('is_suspended')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         // If there's an error fetching profile, allow through (fail open for non-suspended users)
         if (error) {
           console.error('Error checking suspension status:', error);
+          return true;
+        }
+
+        // If no profile data, fail open (allow through)
+        if (!data) {
+          console.log('No profile data found for user:', userId);
           return true;
         }
 
