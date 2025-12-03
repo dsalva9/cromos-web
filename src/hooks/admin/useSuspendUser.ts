@@ -9,13 +9,18 @@ export function useSuspendUser() {
     try {
       setLoading(true);
 
-      const { error } = await supabase.rpc('suspend_user_with_reason', {
+      const { error } = await supabase.rpc('admin_suspend_user_v2', {
         p_user_id: userId,
+        p_is_suspended: true,
         p_reason: reason
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Suspend user error:', error);
+        throw error;
+      }
     } catch (error) {
+      console.error('Suspend user catch:', error);
       throw error;
     } finally {
       setLoading(false);

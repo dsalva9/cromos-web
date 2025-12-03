@@ -39,10 +39,11 @@ export async function POST(request: Request) {
       }
     );
     const {
-      data: { session }
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: userError
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (userError || !user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('is_admin')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (!profile?.is_admin) {
@@ -79,13 +80,18 @@ export async function POST(request: Request) {
     );
 
     // First, call RPC to purge user data (if it exists)
-    const { error: purgeError } = await supabase.rpc('admin_purge_user', {
-      p_user_id: userId
+    // Note: Using adminClient because admin_purge_user requires proper permissions
+    const { error: purgeError } = await adminClient.rpc('admin_purge_user', {
+      p_user_id: userId,
+      p_admin_id: user.id
     });
 
     if (purgeError) {
       console.error('Error purging user data:', purgeError);
-      // Continue with auth deletion even if RPC fails
+      return NextResponse.json(
+        { error: `Error purging user data: ${purgeError.message}` },
+        { status: 500 }
+      );
     }
 
     // Delete user from auth
@@ -101,19 +107,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Log action to audit
-    await supabase.from('audit_log').insert({
+    // Log action to audit using adminClient
+    const { error: auditError } = await adminClient.from('audit_log').insert({
       user_id: userId,
-      admin_id: session.user.id,
+      admin_id: user.id,
       entity: 'user',
       entity_type: 'user',
       action: 'delete',
       moderation_action_type: 'delete_user',
       moderated_entity_type: 'user',
       moderation_reason: reason || 'No reason provided',
-      new_values: { deleted_by: session.user.id, deleted_at: new Date().toISOString() },
+      new_values: { deleted_by: user.id, deleted_at: new Date().toISOString() },
       occurred_at: new Date().toISOString()
     });
+
+    if (auditError) {
+      console.error('Error logging to audit:', auditError);
+      // Don't fail the request if audit logging fails
+    }
 
     return NextResponse.json({
       success: true,
