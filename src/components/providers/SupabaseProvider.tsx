@@ -20,11 +20,18 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkSuspendedStatus = async (userId: string) => {
       try {
-        const { data, error } = await supabase
+        // Add timeout to prevent hanging on concurrent sessions or slow queries
+        const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
+          setTimeout(() => resolve({ data: null, error: { message: 'Query timeout' } }), 5000)
+        );
+
+        const queryPromise = supabase
           .from('profiles')
           .select('is_suspended')
           .eq('id', userId)
           .maybeSingle();
+
+        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
         // If there's an error fetching profile, allow through (fail open for non-suspended users)
         if (error) {
