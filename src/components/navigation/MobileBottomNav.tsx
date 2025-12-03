@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, EyeOff, LogOut } from 'lucide-react';
+import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
@@ -133,18 +133,6 @@ export function MobileBottomNav() {
             >
               <FileText className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Plantillas</span>
-            </Link>
-
-            <Link
-              href="/profile/ignored"
-              onClick={() => {
-                hapticImpact();
-                setIsMenuOpen(false);
-              }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              <EyeOff className="h-5 w-5 text-[#FFC000]" />
-              <span className="font-medium">Usuarios Ignorados</span>
             </Link>
 
             <Link

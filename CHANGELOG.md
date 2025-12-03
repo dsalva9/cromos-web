@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Upcoming / In-Progress
+-   **Suspended User System & Settings Restructure (2025-12-02)**: ✅ COMPLETE - Comprehensive user suspension system with tabbed settings interface and account management features.
+    -   ✅ Settings: Restructured `/ajustes` into tabbed interface (Notificaciones, Ignorados, Sistema)
+    -   ✅ Account Management: Added sign out from all devices and account deletion request features
+    -   ✅ User Suspension: Prevent login with Spanish error message for suspended users
+    -   ✅ Marketplace Restrictions: Hide suspended user listings from marketplace
+    -   ✅ Chat Restrictions: Hide chats with suspended users, prevent new interactions
+    -   ✅ Admin Functions: Added unsuspend_user and improved admin_purge_user with proper deletion order
+    -   ✅ RLS Policies: Comprehensive policies to enforce suspended user restrictions
+    -   ✅ Bug Fixes: Fixed admin panel hang, profile query race conditions, and delete user constraint violations
 -   **Templates & Marketplace UX Improvements (2025-12-02)**: ✅ COMPLETE - Enhanced template management and marketplace usability with better navigation, data visibility, and filtering.
     -   ✅ Templates: Added edit button to "Mis Plantillas" list view for direct access to template editor
     -   ✅ Template Editor: Warning dialog when removing custom fields with existing data to prevent accidental data loss

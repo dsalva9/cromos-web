@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Package, Heart, MessageCircle, LogOut, ChevronDown, EyeOff, Settings } from 'lucide-react';
+import { User, Package, Heart, MessageCircle, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -168,15 +168,6 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               >
                 <Heart className="h-4 w-4" />
                 <span>Favoritos</span>
-              </Link>
-
-              <Link
-                href="/profile/ignored"
-                onClick={handleProtectedClick('/profile/ignored')}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
-              >
-                <EyeOff className="h-4 w-4" />
-                <span>Usuarios Ignorados</span>
               </Link>
 
               <Link

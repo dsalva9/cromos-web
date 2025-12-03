@@ -18,11 +18,49 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const checkSuspendedStatus = async (userId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_suspended')
+          .eq('id', userId)
+          .single();
+
+        // If there's an error fetching profile, allow through (fail open for non-suspended users)
+        if (error) {
+          console.error('Error checking suspension status:', error);
+          return true;
+        }
+
+        if (data?.is_suspended) {
+          // Sign out suspended user
+          await supabase.auth.signOut();
+          setUser(null);
+          return false; // User is suspended
+        }
+        return true; // User is not suspended
+      } catch (err) {
+        console.error('Exception checking suspension status:', err);
+        return true; // Fail open
+      }
+    };
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      (_event: string, session: Session | null) => {
-        setUser(session?.user ?? null);
+      async (_event: string, session: Session | null) => {
+        const currentUser = session?.user ?? null;
+
+        // Check if user is suspended when they have an active session
+        if (currentUser) {
+          const isNotSuspended = await checkSuspendedStatus(currentUser.id);
+          if (isNotSuspended) {
+            setUser(currentUser);
+          }
+        } else {
+          setUser(currentUser);
+        }
+
         setLoading(false);
       }
     );
@@ -30,8 +68,19 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     supabase.auth
       .getSession()
-      .then(({ data: { session } }: { data: { session: Session | null } }) => {
-        setUser(session?.user ?? null);
+      .then(async ({ data: { session } }: { data: { session: Session | null } }) => {
+        const currentUser = session?.user ?? null;
+
+        // Check if user is suspended when they have an active session
+        if (currentUser) {
+          const isNotSuspended = await checkSuspendedStatus(currentUser.id);
+          if (isNotSuspended) {
+            setUser(currentUser);
+          }
+        } else {
+          setUser(currentUser);
+        }
+
         setLoading(false);
       });
 

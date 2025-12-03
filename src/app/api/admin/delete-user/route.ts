@@ -103,11 +103,16 @@ export async function POST(request: Request) {
 
     // Log action to audit
     await supabase.from('audit_log').insert({
-      action_type: 'user_delete',
-      performed_by: session.user.id,
-      target_type: 'user',
-      target_id: userId,
-      metadata: { reason: reason || 'No reason provided' }
+      user_id: userId,
+      admin_id: session.user.id,
+      entity: 'user',
+      entity_type: 'user',
+      action: 'delete',
+      moderation_action_type: 'delete_user',
+      moderated_entity_type: 'user',
+      moderation_reason: reason || 'No reason provided',
+      new_values: { deleted_by: session.user.id, deleted_at: new Date().toISOString() },
+      occurred_at: new Date().toISOString()
     });
 
     return NextResponse.json({

@@ -39,11 +39,42 @@ export default function LoginPage() {
           return;
         }
 
+        // Check if user is suspended
+        // Note: We need to check immediately before SupabaseProvider signs them out
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('nickname, postcode')
+          .select('nickname, postcode, is_suspended')
           .eq('id', userId)
           .maybeSingle();
+
+        console.log('Profile data:', profileData, 'Error:', profileError);
+
+        // If no profile data returned (null), user might have been signed out or doesn't exist
+        if (!profileData && !profileError) {
+          console.log('No profile data, user may be suspended and already signed out');
+          await supabase.auth.signOut();
+          setLoading(false);
+          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          return;
+        }
+
+        // If profile query failed, it might be because user is suspended and can't access data
+        if (profileError) {
+          console.log('Profile error detected, signing out');
+          await supabase.auth.signOut();
+          setLoading(false);
+          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          return;
+        }
+
+        // If user is suspended, sign them out and show error
+        if (profileData?.is_suspended) {
+          console.log('User is suspended, signing out');
+          await supabase.auth.signOut();
+          setLoading(false);
+          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          return;
+        }
 
         const nickname = profileData?.nickname?.trim() ?? '';
         const postcode = profileData?.postcode?.trim() ?? '';
@@ -52,11 +83,6 @@ export default function LoginPage() {
           !!nickname &&
           nickname.toLowerCase() !== 'sin nombre' &&
           !!postcode;
-
-        if (profileError) {
-          router.push('/profile/completar');
-          return;
-        }
 
         router.push(isProfileComplete ? '/' : '/profile/completar');
       }
