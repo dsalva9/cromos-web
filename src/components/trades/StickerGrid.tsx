@@ -46,11 +46,11 @@ export function StickerGrid({
         // Find the sticker to satisfy the TradeProposalItem type
         const sticker = stickers.find(s => s.sticker_id === stickerId);
         if (!sticker) return;
-        const newItem = {
+        const newItem: TradeProposalItem = {
           ...sticker,
           quantity: newQuantity,
           direction: mode as TradeProposalItemDirection,
-        } as TradeProposalItem;
+        };
         updatedItems.push(newItem);
       }
     } else {
