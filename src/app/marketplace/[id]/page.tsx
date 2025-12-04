@@ -20,6 +20,10 @@ import {
 } from '@/lib/profile/resolveAvatarUrl';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { useSoftDeleteListing } from '@/hooks/marketplace/useSoftDeleteListing';
+import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
+import { DeleteListingModal } from '@/components/marketplace/DeleteListingModal';
+import { RotateCcw } from 'lucide-react';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -28,11 +32,15 @@ export default function ListingDetailPage() {
   const supabase = useSupabaseClient();
   const listingId = params.id as string;
 
-  const { listing, loading, error, incrementViews, deleteListing } =
+  const { listing, loading, error, incrementViews, refetch } =
     useListing(listingId);
+  const { softDeleteListing, loading: deleteLoading } = useSoftDeleteListing();
+  const { restoreListing, loading: restoreLoading } = useRestoreListing();
 
   const [hasConversations, setHasConversations] = useState(false);
   const [checkingConversations, setCheckingConversations] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id) {
@@ -40,6 +48,29 @@ export default function ListingDetailPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listing?.id, user?.id]); // Only run when listing or user ID changes, incrementViews is stable
+
+  // Check if user is admin
+  useEffect(() => {
+    async function checkAdmin() {
+      if (!user?.id) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && data) {
+          setIsAdmin(data.is_admin || false);
+        }
+      } catch (err) {
+        logger.error('Error checking admin status:', err);
+      }
+    }
+
+    void checkAdmin();
+  }, [user?.id, supabase]);
 
   // Check if listing has conversations
   useEffect(() => {
@@ -72,16 +103,14 @@ export default function ListingDetailPage() {
     void checkConversations();
   }, [listing, user, listingId, supabase]);
 
-  const handleDelete = async () => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este anuncio?')) return;
-
+  const handleSoftDelete = async () => {
     try {
-      await deleteListing();
-      toast.success('Anuncio eliminado con éxito');
-      router.push('/marketplace');
+      await softDeleteListing(listingId);
+      toast.success('Anuncio movido a Eliminados');
+      router.push('/marketplace/my-listings?tab=ELIMINADO');
     } catch (error) {
       logger.error('Delete error:', error);
-      toast.error('Error al eliminar el anuncio');
+      // Error already handled by hook
     }
   };
 
@@ -119,6 +148,30 @@ export default function ListingDetailPage() {
 
   const isOwner = user?.id === listing.user_id;
   const canContact = user && !isOwner && listing.status === 'active';
+
+  // Hide ELIMINADO/removed listings from non-owners (except admins)
+  if ((listing.status === 'ELIMINADO' || listing.status === 'removed') && !isOwner && !isAdmin) {
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#374151] border-2 border-black flex items-center justify-center">
+            <Trash className="h-12 w-12 text-gray-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Anuncio no encontrado
+          </h2>
+          <p className="text-gray-400 mb-6">
+            Este anuncio puede haber sido eliminado o ya no está disponible
+          </p>
+          <Link href="/marketplace">
+            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+              Volver al Marketplace
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -195,7 +248,7 @@ export default function ListingDetailPage() {
                   </Badge>
                 </div>
 
-                {isOwner && (
+                {isOwner && listing.status === 'active' && (
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" asChild>
                       <Link href={`/marketplace/${listing.id}/edit`}>
@@ -205,8 +258,8 @@ export default function ListingDetailPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={handleDelete}
-                      className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                      onClick={() => setShowDeleteModal(true)}
+                      className="text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
@@ -374,29 +427,30 @@ export default function ListingDetailPage() {
                   )}
                   
                   <div className="flex gap-4 justify-center flex-wrap">
-                    {(listing.status === 'removed' || listing.status === 'sold' || listing.status === 'completed') ? (
-                      <Button 
+                    {(listing.status === 'removed' || listing.status === 'ELIMINADO') ? (
+                      // Show Restaurar button for soft-deleted listings
+                      <Button
                         className="bg-green-600 hover:bg-green-700 text-white"
                         onClick={async () => {
                           try {
-                            const { error } = await supabase
-                              .from('trade_listings')
-                              .update({ status: 'active' })
-                              .eq('id', listing.id);
-                            
-                            if (error) throw error;
-                            toast.success('Anuncio publicado nuevamente');
+                            await restoreListing(listingId);
+                            toast.success('Anuncio restaurado correctamente');
                             window.location.reload();
                           } catch (err) {
-                            logger.error('Error reactivating listing:', err);
-                            toast.error('Error al publicar el anuncio');
+                            logger.error('Error restoring listing:', err);
+                            toast.error('Error al restaurar el anuncio');
                           }
                         }}
+                        disabled={restoreLoading}
                       >
-                        <Eye className="mr-2 h-4 w-4" />
-                        Publicar Anuncio
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Restaurar Anuncio
                       </Button>
+                    ) : (listing.status === 'sold' || listing.status === 'completed' || listing.status === 'reserved') ? (
+                      // No action buttons for completed/sold/reserved listings
+                      null
                     ) : (
+                      // Show Edit button for active listings
                       <Button variant="outline" asChild>
                         <Link href={`/marketplace/${listing.id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
@@ -404,15 +458,17 @@ export default function ListingDetailPage() {
                         </Link>
                       </Button>
                     )}
-                    
-                    <Button
-                      variant="outline"
-                      onClick={handleDelete}
-                      className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Eliminar Anuncio
-                    </Button>
+
+                    {listing.status === 'active' && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowDeleteModal(true)}
+                        className="text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
+                      >
+                        <Trash className="mr-2 h-4 w-4" />
+                        Eliminar Anuncio
+                      </Button>
+                    )}
                   </div>
                 </div>
               )}
@@ -446,6 +502,19 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Soft Delete Modal */}
+      <DeleteListingModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleSoftDelete}
+        listing={{
+          id: listing.id,
+          title: listing.title,
+          status: listing.status,
+        }}
+        loading={deleteLoading}
+      />
     </div>
   );
 }

@@ -18,16 +18,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type ListingStatus = 'active' | 'reserved' | 'completed' | 'removed';
+type ListingStatus = 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO';
 
 function MyListingsContent() {
   const { listings, loading, error, refetch } = useMyListings();
   const [selectedStatus, setSelectedStatus] = useState<ListingStatus>('active');
 
+  // Callback to change tab after actions
+  const handleTabChange = (status: ListingStatus) => {
+    setSelectedStatus(status);
+  };
+
   const activeListings = listings.filter(l => l.status === 'active');
   const reservedListings = listings.filter(l => l.status === 'reserved');
   const completedListings = listings.filter(l => l.status === 'completed' || l.status === 'sold');
-  const removedListings = listings.filter(l => l.status === 'removed');
+  const eliminadoListings = listings.filter(l => l.status === 'ELIMINADO' || l.status === 'removed');
 
   return (
     <div className="min-h-screen bg-[#1F2937]">
@@ -70,7 +75,7 @@ function MyListingsContent() {
                 <SelectItem value="active" className="text-white">Activos ({activeListings.length})</SelectItem>
                 <SelectItem value="reserved" className="text-white">Reservados ({reservedListings.length})</SelectItem>
                 <SelectItem value="completed" className="text-white">Completados ({completedListings.length})</SelectItem>
-                <SelectItem value="removed" className="text-white">Eliminados ({removedListings.length})</SelectItem>
+                <SelectItem value="ELIMINADO" className="text-white">Eliminados ({eliminadoListings.length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -87,8 +92,8 @@ function MyListingsContent() {
               <TabsTrigger value="completed">
                 Completados ({completedListings.length})
               </TabsTrigger>
-              <TabsTrigger value="removed">
-                Eliminados ({removedListings.length})
+              <TabsTrigger value="ELIMINADO">
+                Eliminados ({eliminadoListings.length})
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -116,6 +121,7 @@ function MyListingsContent() {
                     key={listing.id || listing.listing_id}
                     listing={listing}
                     onUpdate={refetch}
+                    onTabChange={handleTabChange}
                   />
                 ))
               )}
@@ -135,6 +141,7 @@ function MyListingsContent() {
                     key={listing.id || listing.listing_id}
                     listing={listing}
                     onUpdate={refetch}
+                    onTabChange={handleTabChange}
                   />
                 ))
               )}
@@ -154,25 +161,27 @@ function MyListingsContent() {
                     key={listing.id || listing.listing_id}
                     listing={listing}
                     onUpdate={refetch}
+                    onTabChange={handleTabChange}
                   />
                 ))
               )}
             </div>
           )}
 
-          {/* Removed Listings */}
-          {selectedStatus === 'removed' && (
+          {/* ELIMINADO Listings (includes both 'ELIMINADO' and 'removed' statuses) */}
+          {selectedStatus === 'ELIMINADO' && (
             <div className="space-y-4">
-              {removedListings.length === 0 ? (
+              {eliminadoListings.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-gray-400">No tienes anuncios eliminados</p>
                 </div>
               ) : (
-                removedListings.map(listing => (
+                eliminadoListings.map(listing => (
                   <MyListingCard
                     key={listing.id || listing.listing_id}
                     listing={listing}
                     onUpdate={refetch}
+                    onTabChange={handleTabChange}
                   />
                 ))
               )}

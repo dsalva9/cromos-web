@@ -6,10 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Eye, Edit, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Eye, Edit, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react';
 import { useMarkSold } from '@/hooks/integration/useMarkSold';
+import { useSoftDeleteListing } from '@/hooks/marketplace/useSoftDeleteListing';
+import { useHardDeleteListing } from '@/hooks/marketplace/useHardDeleteListing';
+import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
+import { DeleteListingModal } from '@/components/marketplace/DeleteListingModal';
+import { HardDeleteModal } from '@/components/marketplace/HardDeleteModal';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 
 interface MyListing {
   listing_id: string;
@@ -37,11 +43,17 @@ interface MyListing {
 interface MyListingCardProps {
   listing: MyListing;
   onUpdate: () => void;
+  onTabChange?: (status: 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO') => void;
 }
 
-export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
-  const { markSold, loading } = useMarkSold();
+export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardProps) {
+  const { markSold, loading: markSoldLoading } = useMarkSold();
+  const { softDeleteListing, loading: softDeleteLoading } = useSoftDeleteListing();
+  const { hardDeleteListing, loading: hardDeleteLoading } = useHardDeleteListing();
+  const { restoreListing, loading: restoreLoading } = useRestoreListing();
   const [confirming, setConfirming] = useState(false);
+  const [showSoftDeleteModal, setShowSoftDeleteModal] = useState(false);
+  const [showHardDeleteModal, setShowHardDeleteModal] = useState(false);
 
   const handleMarkSold = async () => {
     if (!confirming) {
@@ -63,6 +75,43 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
       setConfirming(false);
     }
   };
+  const handleSoftDelete = async () => {
+    try {
+      await softDeleteListing(listing.listing_id);
+      onUpdate(); // Refresh listings
+      // Navigate to Eliminados tab after successful soft delete
+      if (onTabChange) {
+        onTabChange('ELIMINADO');
+      }
+    } catch (error) {
+      // Error handling is done in hook
+      console.error('Soft delete failed:', error);
+    }
+  };
+
+  const handleHardDelete = async () => {
+    try {
+      await hardDeleteListing(listing.listing_id);
+      onUpdate(); // Refresh listings
+    } catch (error) {
+      // Error handling is done in hook
+      console.error('Hard delete failed:', error);
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      await restoreListing(listing.listing_id);
+      onUpdate(); // Refresh listings
+      // Navigate to Activos tab after successful restore
+      if (onTabChange) {
+        onTabChange('active');
+      }
+    } catch (error) {
+      // Error handling is done in hook
+      console.error('Restore failed:', error);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
@@ -79,6 +128,8 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
       case 'sold':
         return 'Completado';
       case 'removed':
+        return 'Eliminado';
+      case 'ELIMINADO':
         return 'Eliminado';
       case 'reserved':
         return 'Reservado';
@@ -128,6 +179,7 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
                 ${listing.status === 'active' ? 'bg-green-500' : ''}
                 ${listing.status === 'sold' ? 'bg-gray-500' : ''}
                 ${listing.status === 'removed' ? 'bg-red-500' : ''}
+                ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
                 text-white uppercase flex-shrink-0
               `}>
                 {getStatusLabel(listing.status)}
@@ -208,35 +260,88 @@ export function MyListingCard({ listing, onUpdate }: MyListingCardProps) {
                   <Button
                     size="sm"
                     onClick={handleMarkSold}
-                    disabled={loading}
+                    disabled={markSoldLoading}
                     className="bg-green-700 hover:bg-green-600"
                   >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     {confirming ? 'Haz clic de nuevo para confirmar' : 'Marcar como Completado'}
                   </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowSoftDeleteModal(true)}
+                    disabled={softDeleteLoading}
+                    className="border-blue-500 text-blue-500 hover:bg-blue-50 hover:border-blue-600"
+                    data-testid="soft-delete-button"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </Button>
                 </>
               )}
 
-              {listing.status === 'removed' && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => window.location.href = `/marketplace/${listing.listing_id}`}
-                >
-                  Reactivar
-                </Button>
+              {(listing.status === 'ELIMINADO' || listing.status === 'removed') && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRestore}
+                    disabled={restoreLoading}
+                    className="border-green-500 text-green-500 hover:bg-green-50 hover:border-green-600"
+                    data-testid="restore-button"
+                  >
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Restaurar
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowHardDeleteModal(true)}
+                    disabled={hardDeleteLoading}
+                    className="border-red-700 text-red-700 hover:bg-red-50 hover:border-red-800"
+                    data-testid="hard-delete-button"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar Definitivamente
+                  </Button>
+                </>
               )}
               
-              {listing.status === 'sold' && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => window.location.href = `/marketplace/${listing.listing_id}`}
-                >
-                  Reactivar
-                </Button>
-              )}
+              {/* Removed Reactivar button for sold/completed listings */}
+              {/* Removed Eliminar button for reserved listings - no actions for reserved */}
             </div>
+
+            {/* Soft Delete Confirmation Modal (for active listings) */}
+            <DeleteListingModal
+              isOpen={showSoftDeleteModal}
+              onClose={() => setShowSoftDeleteModal(false)}
+              onConfirm={handleSoftDelete}
+              listing={{
+                id: listing.listing_id,
+                title: listing.title,
+                status: listing.status,
+                hasActiveChats: false, // Could be determined from chat data if needed
+                hasActiveTransactions: listing.status === 'reserved'
+              }}
+              loading={softDeleteLoading}
+            />
+
+            {/* Hard Delete Confirmation Modal (for ELIMINADO listings) */}
+            <HardDeleteModal
+              isOpen={showHardDeleteModal}
+              onClose={() => setShowHardDeleteModal(false)}
+              onConfirm={handleHardDelete}
+              listing={{
+                id: listing.listing_id,
+                title: listing.title,
+                status: listing.status,
+                hasActiveChats: false, // Could be determined from chat data if needed
+                hasActiveTransactions: false // ELIMINADO listings shouldn't have active transactions
+              }}
+              loading={hardDeleteLoading}
+            />
           </div>
         </div>
       </ModernCardContent>

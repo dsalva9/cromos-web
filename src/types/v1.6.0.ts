@@ -31,7 +31,7 @@ export interface Listing {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
-  status: 'active' | 'reserved' | 'completed' | 'sold' | 'removed';
+  status: 'active' | 'reserved' | 'completed' | 'sold' | 'removed' | 'ELIMINADO';
   views_count: number;
   created_at: string;
   copy_id?: string | null;
@@ -104,7 +104,7 @@ export interface Favorite {
 
 // Common utility types
 export type SortOption = 'recent' | 'rating' | 'popular';
-export type ListingStatus = 'active' | 'sold' | 'removed';
+export type ListingStatus = 'active' | 'sold' | 'removed' | 'ELIMINADO';
 export type SlotStatus = 'missing' | 'owned' | 'duplicate';
 export type ReportReason =
   | 'spam'

@@ -110,6 +110,18 @@ The following RPCs were part of the legacy collections system and have been remo
   unreserve_listing(p_listing_id BIGINT) RETURNS BOOLEAN;
   ```
 
+- `delete_listing_with_history` ✅ **NEW (2025-12-03)**
+  ```sql
+  delete_listing_with_history(p_listing_id BIGINT)
+  RETURNS TABLE (
+    success BOOLEAN,
+    message TEXT,
+    deleted_chat_count INTEGER,
+    deleted_transaction_count INTEGER,
+    media_files_deleted INTEGER
+  );
+  ```
+
 - `get_listing_transaction`
   ```sql
   get_listing_transaction(p_listing_id BIGINT) RETURNS TABLE (...);
