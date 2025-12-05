@@ -7,15 +7,31 @@ import { logger } from '@/lib/logger';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 
-function isProfileComplete(nickname: string | null, postcode: string | null) {
+function isProfileComplete(
+  nickname: string | null,
+  postcode: string | null,
+  avatarUrl: string | null
+) {
   const safeNickname = nickname?.trim() ?? '';
   const safePostcode = postcode?.trim() ?? '';
+  const safeAvatar = avatarUrl?.trim() ?? '';
 
-  if (!safeNickname || safeNickname.toLowerCase() === 'sin nombre') {
+  const nicknameLower = safeNickname.toLowerCase();
+  const postcodeLower = safePostcode.toLowerCase();
+
+  const hasPlaceholderNickname =
+    nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
+  const hasPlaceholderPostcode = postcodeLower === 'pending';
+
+  if (!safeNickname || hasPlaceholderNickname) {
     return false;
   }
 
-  if (!safePostcode) {
+  if (!safePostcode || hasPlaceholderPostcode) {
+    return false;
+  }
+
+  if (!safeAvatar) {
     return false;
   }
 
@@ -51,7 +67,7 @@ export default function AuthCallback() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('is_suspended, nickname, postcode')
+        .select('is_suspended, nickname, postcode, avatar_url')
         .eq('id', sessionUser.id)
         .single();
 
@@ -78,7 +94,8 @@ export default function AuthCallback() {
       // Otherwise, check profile completion and redirect accordingly
       const complete = isProfileComplete(
         profile?.nickname ?? null,
-        profile?.postcode ?? null
+        profile?.postcode ?? null,
+        profile?.avatar_url ?? null
       );
 
       router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);

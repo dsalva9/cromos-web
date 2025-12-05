@@ -39,6 +39,7 @@ import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
+import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
 
 export default function RootLayout({
   children,
@@ -65,7 +66,7 @@ export default function RootLayout({
                     <SiteHeader />
                   </header>
                   <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
-                    {children}
+                    <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
                   </main>
                   <MobileBottomNav />
                   <FloatingActionBtn />

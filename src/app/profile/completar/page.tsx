@@ -114,6 +114,11 @@ function CompleteProfileContent() {
       return;
     }
 
+    if (!formAvatarPath && !avatarBlob) {
+      setErrorMessage('Selecciona un avatar para tu perfil.');
+      return;
+    }
+
     setErrorMessage(null);
     setSaving(true);
 
@@ -178,6 +183,7 @@ function CompleteProfileContent() {
       updateProfile({
         nickname: trimmedNickname,
         postcode: trimmedPostcode,
+        avatar_url: finalAvatarPath,
       });
       await refresh();
 
@@ -279,4 +285,5 @@ export default function CompleteProfilePage() {
     </AuthGuard>
   );
 }
+
 

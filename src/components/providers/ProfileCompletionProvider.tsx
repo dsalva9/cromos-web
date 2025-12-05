@@ -17,6 +17,7 @@ import { logger } from '@/lib/logger';
 type MinimalProfile = {
   nickname: string | null;
   postcode: string | null;
+  avatar_url: string | null;
 };
 
 interface ProfileCompletionContextValue {
@@ -36,9 +37,12 @@ function normalizeProfile(profile: MinimalProfile | null) {
     typeof profile.nickname === 'string' ? profile.nickname.trim() : null;
   const postcode =
     typeof profile.postcode === 'string' ? profile.postcode.trim() : null;
+  const avatarUrl =
+    typeof profile.avatar_url === 'string' ? profile.avatar_url.trim() : null;
   return {
     nickname: nickname && nickname.length > 0 ? nickname : null,
     postcode: postcode && postcode.length > 0 ? postcode : null,
+    avatar_url: avatarUrl && avatarUrl.length > 0 ? avatarUrl : null,
   };
 }
 
@@ -48,9 +52,17 @@ function computeIsComplete(profile: MinimalProfile | null) {
 
   const nickname = normalized.nickname;
   const postcode = normalized.postcode;
+  const avatarUrl = normalized.avatar_url;
 
-  if (!nickname || !postcode) return false;
-  if (nickname.toLowerCase() === 'sin nombre') return false;
+  if (!nickname || !postcode || !avatarUrl) return false;
+  const nicknameLower = nickname.toLowerCase();
+  const postcodeLower = postcode.toLowerCase();
+
+  const hasPlaceholderNickname =
+    nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
+  const hasPlaceholderPostcode = postcodeLower === 'pending';
+
+  if (hasPlaceholderNickname || hasPlaceholderPostcode) return false;
 
   return true;
 }
@@ -77,7 +89,7 @@ export function ProfileCompletionProvider({
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, postcode')
+        .select('nickname, postcode, avatar_url')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -88,8 +100,9 @@ export function ProfileCompletionProvider({
           ? {
               nickname: data.nickname ?? null,
               postcode: data.postcode ?? null,
+              avatar_url: data.avatar_url ?? null,
             }
-          : { nickname: null, postcode: null }
+          : { nickname: null, postcode: null, avatar_url: null }
       );
     } catch (error) {
       logger.error('Error fetching profile completion status', error);
@@ -128,6 +141,7 @@ export function ProfileCompletionProvider({
         const next = {
           nickname: changes.nickname ?? prev?.nickname ?? null,
           postcode: changes.postcode ?? prev?.postcode ?? null,
+          avatar_url: changes.avatar_url ?? prev?.avatar_url ?? null,
         };
         return next;
       });

@@ -28,8 +28,10 @@ export function ProfileCompletionGuard({
     const isOnCompletionRoute =
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
+    const isAuthFlow = pathname?.startsWith('/auth');
+    const isExemptRoute = isOnCompletionRoute || isAuthFlow;
 
-    if (!isComplete && !isOnCompletionRoute) {
+    if (!isComplete && !isExemptRoute) {
       if (!hasWarnedRef.current) {
         hasWarnedRef.current = true;
         toast.info(
@@ -42,6 +44,11 @@ export function ProfileCompletionGuard({
     }
   }, [authLoading, isComplete, loading, pathname, router, user]);
 
+  // Public/unauthenticated users should see the app normally
+  if (!user) {
+    return <>{children}</>;
+  }
+
   if (!isComplete) {
     if (authLoading || loading) {
       return null;
@@ -50,8 +57,10 @@ export function ProfileCompletionGuard({
     const isOnCompletionRoute =
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
+    const isAuthFlow = pathname?.startsWith('/auth');
+    const isExemptRoute = isOnCompletionRoute || isAuthFlow;
 
-    if (isOnCompletionRoute) {
+    if (isExemptRoute) {
       return <>{children}</>;
     }
 
