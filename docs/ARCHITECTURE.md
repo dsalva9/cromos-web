@@ -477,9 +477,48 @@ test('user can create listing', async ({ page }) => {
 - SQL files en `scripts/`
 - Version control en git
 
+## Data Retention & Compliance
+
+### Current State
+
+**Status**: Ready to Implement (Pre-Launch)
+
+The platform currently has no automated data retention mechanisms. Since we're **not live yet**, we can implement a clean, purpose-built system without migration complexity.
+
+### Planned Implementation
+
+See:
+- `docs/guides/DATA_RETENTION_POLICY.md` - Complete retention policy
+- `docs/guides/DATA_RETENTION_IMPLEMENTATION_V2.md` - **Pre-launch implementation plan**
+
+**Key Features:**
+- Centralized retention scheduling system
+- Automated cleanup jobs (pg_cron)
+- Legal hold mechanism for preservation orders
+- Data anonymization for system integrity
+- GDPR/DSA compliance (right to erasure, data portability)
+
+**Retention Periods:**
+- Deleted listings: 90 days
+- Deleted templates: 90 days
+- Messages: 180 days after account deletion
+- Reports: 1 year (then anonymized)
+- User accounts: 90 days (fraud prevention)
+- Audit logs: Permanent (never deleted)
+- Notifications: 30 days (read), 90 days (unread)
+
+**Architecture Highlights:**
+- Single `retention_schedule` table tracks all pending deletions
+- Daily cron job processes scheduled deletions
+- Legal hold flag prevents deletion under court order
+- All deletions logged in permanent audit trail
+
+**Timeline**: 2-3 weeks (simplified for pre-launch)
+
 ## Roadmap Técnico
 
 ### v1.7.0 (Próximo)
+- [ ] Data retention system implementation
 - [ ] Request caching con SWR
 - [ ] Virtual scrolling para listas largas
 - [ ] Service worker para offline
@@ -490,8 +529,9 @@ test('user can create listing', async ({ page }) => {
 - [ ] GraphQL API layer
 - [ ] Redis caching
 - [ ] Advanced analytics
+- [ ] Automated data export before deletion
 
 ---
 
-**Última actualización**: 2025-01-22
-**Versión del documento**: 1.0
+**Última actualización**: 2025-12-04
+**Versión del documento**: 1.1
