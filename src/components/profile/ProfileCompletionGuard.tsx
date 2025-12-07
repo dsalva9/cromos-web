@@ -20,6 +20,7 @@ export function ProfileCompletionGuard({
   const router = useRouter();
   const pathname = usePathname();
   const hasWarnedRef = useRef(false);
+  const previousCompleteRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     if (authLoading || loading) return;
@@ -31,6 +32,13 @@ export function ProfileCompletionGuard({
     const isAuthFlow = pathname?.startsWith('/auth');
     const isExemptRoute = isOnCompletionRoute || isAuthFlow;
 
+    // Track state transitions to reset warning flag
+    if (previousCompleteRef.current === false && isComplete === true) {
+      // User just completed their profile, reset warning flag
+      hasWarnedRef.current = false;
+    }
+    previousCompleteRef.current = isComplete;
+
     if (!isComplete && !isExemptRoute) {
       if (!hasWarnedRef.current) {
         hasWarnedRef.current = true;
@@ -39,8 +47,6 @@ export function ProfileCompletionGuard({
         );
       }
       router.replace(completionRoute);
-    } else if (isComplete) {
-      hasWarnedRef.current = false;
     }
   }, [authLoading, isComplete, loading, pathname, router, user]);
 
