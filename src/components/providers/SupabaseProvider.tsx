@@ -27,7 +27,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
         const queryPromise = supabase
           .from('profiles')
-          .select('is_suspended')
+          .select('suspended_at, deleted_at')
           .eq('id', userId)
           .maybeSingle();
 
@@ -45,7 +45,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           return true;
         }
 
-        if (data?.is_suspended) {
+        if (data?.suspended_at || data?.deleted_at) {
           // Sign out suspended user
           await supabase.auth.signOut();
           setUser(null);

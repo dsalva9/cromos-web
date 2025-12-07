@@ -40,6 +40,7 @@ import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
 import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
+import { AccountDeletionBanner } from '@/components/deletion';
 
 export default function RootLayout({
   children,
@@ -65,6 +66,7 @@ export default function RootLayout({
                   <header role="banner">
                     <SiteHeader />
                   </header>
+                  <AccountDeletionBanner />
                   <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
                     <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
                   </main>

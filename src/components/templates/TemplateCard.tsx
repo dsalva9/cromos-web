@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
+import { Alert } from '@/components/ui/alert';
 import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,6 +13,7 @@ import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';
+import { DeletionCountdown } from '@/components/deletion';
 
 interface Template {
   id: string;
@@ -27,6 +29,8 @@ interface Template {
   total_slots: number;
   created_at: string;
   is_public?: boolean;
+  deleted_at?: string | null;
+  scheduled_for?: string | null;
 }
 
 interface TemplateCardProps {
@@ -135,6 +139,18 @@ export function TemplateCard({
                 <p className="text-sm text-slate-400 line-clamp-2">
                   {template.description}
                 </p>
+              )}
+
+              {/* Deletion Countdown */}
+              {template.deleted_at && template.scheduled_for && (
+                <Alert className="bg-yellow-900/20 border-yellow-700 p-2">
+                  <DeletionCountdown
+                    deletedAt={template.deleted_at}
+                    scheduledFor={template.scheduled_for}
+                    entityType="template"
+                    className="text-xs"
+                  />
+                </Alert>
               )}
 
               <div className="flex items-center gap-4 text-sm text-slate-400">

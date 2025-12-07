@@ -26,6 +26,9 @@ interface MyListing {
   page_title: string | null;
   slot_variant: string | null;
   global_number: number | null;
+  // Deletion metadata
+  deleted_at?: string | null;
+  scheduled_for?: string | null;
 }
 
 export interface MyListingWithAttention extends MyListing {

@@ -4,26 +4,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { AlertTriangle, LogOut, Trash2, Loader2 } from 'lucide-react';
-import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { DeleteAccountDialog } from '@/components/deletion';
 
 export function SystemSettingsTab() {
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const { user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
-  const [deletingAccount, setDeletingAccount] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [confirmText, setConfirmText] = useState('');
 
   const handleSignOutAllDevices = async () => {
     try {
@@ -48,40 +39,6 @@ export function SystemSettingsTab() {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (confirmText !== 'ELIMINAR') {
-      toast.error('Debes escribir "ELIMINAR" para confirmar');
-      return;
-    }
-
-    try {
-      setDeletingAccount(true);
-
-      // Call the database function to request account deletion
-      const { error } = await supabase.rpc('request_account_deletion');
-
-      if (error) throw error;
-
-      toast.success(
-        'Tu solicitud de eliminación de cuenta ha sido recibida. Un administrador la revisará pronto.'
-      );
-
-      // Sign out after requesting deletion
-      await supabase.auth.signOut();
-      router.push('/login');
-    } catch (error) {
-      console.error('Error requesting account deletion:', error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Error al solicitar eliminación de cuenta'
-      );
-    } finally {
-      setDeletingAccount(false);
-      setShowDeleteDialog(false);
-      setConfirmText('');
-    }
-  };
 
   return (
     <div className="space-y-4 md:space-y-6">
@@ -135,8 +92,8 @@ export function SystemSettingsTab() {
                 Eliminar mi cuenta
               </h3>
               <p className="text-sm md:text-base text-gray-400 mb-4">
-                Esta acción suspenderá tu cuenta y notificará a los
-                administradores para su eliminación manual. Perderás:
+                Esta acción programará tu cuenta para eliminación permanente en 90 días.
+                Durante este período puedes cancelar la eliminación. Perderás:
               </p>
               <ul className="text-sm md:text-base text-gray-400 mb-4 list-disc list-inside space-y-1">
                 <li>Todos tus datos de usuario</li>
@@ -154,85 +111,23 @@ export function SystemSettingsTab() {
               </div>
               <Button
                 onClick={() => setShowDeleteDialog(true)}
-                disabled={deletingAccount}
                 variant="outline"
                 className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border-2 border-red-500 hover:text-red-300 w-full sm:w-auto text-sm md:text-base"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Solicitar eliminación de cuenta
+                Eliminar mi cuenta
               </Button>
             </div>
           </div>
         </ModernCardContent>
       </ModernCard>
 
-      {/* Delete Account Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent className="bg-gray-800 border-2 border-red-500 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold text-red-400 flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              ¿Estás absolutamente seguro?
-            </AlertDialogTitle>
-            <div className="text-gray-300 text-sm space-y-3">
-              <p>
-                Esta acción suspenderá tu cuenta y enviará una solicitud a los
-                administradores para su eliminación permanente. No podrás
-                recuperar:
-              </p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Tus datos de usuario</li>
-                <li>Historial de transacciones</li>
-                <li>Anuncios del marketplace</li>
-                <li>Colecciones y plantillas</li>
-                <li>Mensajes y chats</li>
-              </ul>
-              <div className="p-3 bg-red-900/30 border border-red-500 rounded">
-                <p className="font-bold text-red-400">
-                  Para confirmar, escribe &quot;ELIMINAR&quot; a continuación:
-                </p>
-              </div>
-            </div>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <input
-              type="text"
-              value={confirmText}
-              onChange={e => setConfirmText(e.target.value)}
-              placeholder="Escribe ELIMINAR"
-              className="w-full px-4 py-2 bg-gray-900 border-2 border-gray-600 rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
-            />
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              className="bg-gray-700 hover:bg-gray-600 text-white border-2 border-black"
-              onClick={() => {
-                setConfirmText('');
-                setShowDeleteDialog(false);
-              }}
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteAccount}
-              disabled={confirmText !== 'ELIMINAR' || deletingAccount}
-              className="bg-red-600 hover:bg-red-700 text-white border-2 border-black disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {deletingAccount ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar mi cuenta
-                </>
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Account Dialog */}
+      <DeleteAccountDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        userEmail={user?.email || ''}
+      />
     </div>
   );
 }

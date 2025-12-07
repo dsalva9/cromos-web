@@ -16,6 +16,7 @@ import { HardDeleteModal } from '@/components/marketplace/HardDeleteModal';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { DeletionCountdown } from '@/components/deletion';
 
 interface MyListing {
   listing_id: string;
@@ -38,6 +39,9 @@ interface MyListing {
   // Group listing
   is_group?: boolean;
   group_count?: number;
+  // Deletion metadata
+  deleted_at?: string | null;
+  scheduled_for?: string | null;
 }
 
 interface MyListingCardProps {
@@ -193,6 +197,17 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 <AlertDescription className="text-red-200">
                   Ya no tienes repetidos de este cromo. Considera eliminar este anuncio.
                 </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Deletion Countdown */}
+            {(listing.status === 'ELIMINADO' || listing.status === 'removed') && listing.deleted_at && listing.scheduled_for && (
+              <Alert className="bg-yellow-900/20 border-yellow-700">
+                <DeletionCountdown
+                  deletedAt={listing.deleted_at}
+                  scheduledFor={listing.scheduled_for}
+                  entityType="listing"
+                />
               </Alert>
             )}
 

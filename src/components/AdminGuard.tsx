@@ -34,7 +34,7 @@ export default function AdminGuard({
         // Check if user has is_admin flag and is not suspended
         const { data, error } = await supabase
           .from('profiles')
-          .select('is_admin, is_suspended')
+          .select('is_admin, suspended_at, deleted_at')
           .eq('id', user.id)
           .single();
 
@@ -45,9 +45,9 @@ export default function AdminGuard({
           return;
         }
 
-        // Check if user is suspended
-        if (data?.is_suspended) {
-          logger.warn('AdminGuard: User is suspended', { userId: user.id });
+        // Check if user is suspended or deleted
+        if (data?.suspended_at || data?.deleted_at) {
+          logger.warn('AdminGuard: User is suspended or deleted', { userId: user.id });
           await supabase.auth.signOut();
           router.push('/login');
           return;

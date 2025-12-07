@@ -25,6 +25,8 @@ interface Template {
   created_at: string;
   author_id: string;
   author_nickname: string;
+  deleted_at?: string | null;
+  scheduled_for?: string | null;
 }
 
 function MyCreatedTemplatesContent() {
@@ -44,7 +46,7 @@ function MyCreatedTemplatesContent() {
         // Fetch templates created by the logged-in user
         const { data: templatesData, error: fetchError } = await supabase
           .from('collection_templates')
-          .select('id, title, description, image_url, is_public, created_at, author_id, rating_avg, rating_count, copies_count')
+          .select('id, title, description, image_url, is_public, created_at, author_id, rating_avg, rating_count, copies_count, deleted_at')
           .eq('author_id', user.id)
           .order('created_at', { ascending: false });
 
@@ -59,10 +61,31 @@ function MyCreatedTemplatesContent() {
 
         const userNickname = profileData?.nickname || 'Usuario';
 
+        // Fetch retention schedule for deleted templates
+        const deletedTemplateIds = (templatesData || [])
+          .filter(t => t.deleted_at)
+          .map(t => t.id.toString());
+
+        let scheduleMap: Record<string, string> = {};
+        if (deletedTemplateIds.length > 0) {
+          const { data: scheduleData } = await supabase
+            .from('retention_schedule')
+            .select('entity_id, scheduled_for')
+            .eq('entity_type', 'template')
+            .in('entity_id', deletedTemplateIds)
+            .is('processed_at', null);
+
+          scheduleMap = (scheduleData || []).reduce((acc, item) => {
+            acc[item.entity_id] = item.scheduled_for;
+            return acc;
+          }, {} as Record<string, string>);
+        }
+
         // Transform the data
         const transformedData: Template[] = (templatesData || []).map((template) => {
+          const templateId = template.id.toString();
           return {
-            id: template.id.toString(),
+            id: templateId,
             title: template.title,
             description: template.description,
             image_url: template.image_url,
@@ -75,6 +98,8 @@ function MyCreatedTemplatesContent() {
             created_at: template.created_at,
             author_id: template.author_id,
             author_nickname: userNickname,
+            deleted_at: template.deleted_at,
+            scheduled_for: scheduleMap[templateId] || null,
           };
         });
 

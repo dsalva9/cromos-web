@@ -67,7 +67,7 @@ export default function AuthCallback() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('is_suspended, nickname, postcode, avatar_url')
+        .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
         .eq('id', sessionUser.id)
         .single();
 
@@ -77,7 +77,7 @@ export default function AuthCallback() {
         return;
       }
 
-      if (profile?.is_suspended) {
+      if (profile?.suspended_at || profile?.deleted_at) {
         await supabase.auth.signOut();
         setError(
           'Tu cuenta ha sido suspendida. Por favor, contacta al administrador.'

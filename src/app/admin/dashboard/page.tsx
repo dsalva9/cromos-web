@@ -1,15 +1,19 @@
 'use client';
 
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { ModernCard, ModernCardContent, ModernCardHeader } from '@/components/ui/modern-card';
 import {
   Users,
   Package,
   FileText,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Shield
 } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
+import { RetentionDashboard } from '@/components/admin/retention';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function AdminDashboardContent() {
   const { stats, loading, error } = useAdminStats();
@@ -153,6 +157,33 @@ function AdminDashboardContent() {
                   </p>
                 </div>
               </div>
+            </ModernCardContent>
+          </ModernCard>
+        </div>
+
+        {/* Data Retention Card */}
+        <div className="mt-8">
+          <ModernCard>
+            <ModernCardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-6 w-6 text-[#FFC000]" />
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Gestión de Retención de Datos</h2>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Administrar eliminaciones programadas y retenciones legales
+                    </p>
+                  </div>
+                </div>
+                <Link href="/admin/retention">
+                  <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+                    Ver Cola Completa →
+                  </Button>
+                </Link>
+              </div>
+            </ModernCardHeader>
+            <ModernCardContent className="pt-4">
+              <RetentionDashboard />
             </ModernCardContent>
           </ModernCard>
         </div>
