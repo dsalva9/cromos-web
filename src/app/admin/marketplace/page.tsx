@@ -22,7 +22,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Search, ExternalLink, Ban, CheckCircle, Trash2 } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -33,14 +33,14 @@ export default function AdminMarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
-    action: 'suspend' | 'restore' | 'delete' | null;
+    action: 'delete' | null;
     listingId: string | null;
     listingTitle: string | null;
   }>({ open: false, action: null, listingId: null, listingTitle: null });
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { listings, loading, suspendListing, restoreListing, deleteListing } =
+  const { listings, loading, deleteListing } =
     useAdminListings(statusFilter, searchQuery);
 
   const handleAction = async () => {
@@ -48,15 +48,9 @@ export default function AdminMarketplacePage() {
 
     setActionLoading(true);
     try {
-      if (actionDialog.action === 'suspend') {
-        await suspendListing(actionDialog.listingId, reason);
-        toast.success('Listado suspendido con éxito');
-      } else if (actionDialog.action === 'restore') {
-        await restoreListing(actionDialog.listingId);
-        toast.success('Listado reactivado con éxito');
-      } else if (actionDialog.action === 'delete') {
+      if (actionDialog.action === 'delete') {
         await deleteListing(actionDialog.listingId, reason);
-        toast.success('Listado eliminado con éxito');
+        toast.success('Listado eliminado con éxito (90 días de retención)');
       }
       setActionDialog({ open: false, action: null, listingId: null, listingTitle: null });
       setReason('');
@@ -164,44 +158,6 @@ export default function AdminMarketplacePage() {
                         </Button>
                       </Link>
 
-                      {listing.status === 'active' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setActionDialog({
-                              open: true,
-                              action: 'suspend',
-                              listingId: listing.id,
-                              listingTitle: listing.title
-                            })
-                          }
-                          className="w-full border-yellow-600 text-yellow-500 hover:bg-yellow-600/10"
-                        >
-                          <Ban className="h-4 w-4 mr-2" />
-                          Suspender
-                        </Button>
-                      )}
-
-                      {listing.status === 'suspended' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setActionDialog({
-                              open: true,
-                              action: 'restore',
-                              listingId: listing.id,
-                              listingTitle: listing.title
-                            })
-                          }
-                          className="w-full border-green-600 text-green-500 hover:bg-green-600/10"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Reactivar
-                        </Button>
-                      )}
-
                       <Button
                         variant="outline"
                         size="sm"
@@ -238,30 +194,27 @@ export default function AdminMarketplacePage() {
         <Dialog open={actionDialog.open} onOpenChange={(open) => setActionDialog({ ...actionDialog, open })}>
           <DialogContent className="bg-slate-800 text-white border-slate-700">
             <DialogHeader>
-              <DialogTitle>
-                {actionDialog.action === 'suspend' && 'Suspender Listado'}
-                {actionDialog.action === 'restore' && 'Reactivar Listado'}
-                {actionDialog.action === 'delete' && 'Eliminar Listado'}
-              </DialogTitle>
+              <DialogTitle>Eliminar Listado</DialogTitle>
               <DialogDescription className="text-slate-400">
                 {actionDialog.listingTitle}
               </DialogDescription>
             </DialogHeader>
 
-            {(actionDialog.action === 'suspend' || actionDialog.action === 'delete') && (
-              <div className="space-y-2 py-4">
-                <label className="text-sm font-medium text-slate-300">
-                  Motivo {actionDialog.action === 'suspend' ? '(requerido)' : '(opcional)'}
-                </label>
-                <Textarea
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Explica por qué se toma esta acción..."
-                  rows={3}
-                  className="bg-slate-900 border-slate-700 text-white"
-                />
-              </div>
-            )}
+            <div className="space-y-2 py-4">
+              <label className="text-sm font-medium text-slate-300">
+                Motivo (requerido)
+              </label>
+              <Textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Explica por qué se elimina este listado..."
+                rows={3}
+                className="bg-slate-900 border-slate-700 text-white"
+              />
+              <p className="text-xs text-slate-400 mt-2">
+                El listado será eliminado permanentemente después de 90 días de retención.
+              </p>
+            </div>
 
             <DialogFooter>
               <Button
@@ -274,14 +227,8 @@ export default function AdminMarketplacePage() {
               </Button>
               <Button
                 onClick={handleAction}
-                disabled={actionLoading || (actionDialog.action === 'suspend' && !reason)}
-                className={
-                  actionDialog.action === 'delete'
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : actionDialog.action === 'suspend'
-                    ? 'bg-yellow-600 hover:bg-yellow-700'
-                    : 'bg-green-600 hover:bg-green-700'
-                }
+                disabled={actionLoading || !reason}
+                className="bg-red-600 hover:bg-red-700"
               >
                 {actionLoading ? (
                   <>
@@ -289,7 +236,7 @@ export default function AdminMarketplacePage() {
                     Procesando...
                   </>
                 ) : (
-                  <>Confirmar</>
+                  <>Confirmar Eliminación</>
                 )}
               </Button>
             </DialogFooter>

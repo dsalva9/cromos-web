@@ -57,58 +57,13 @@ export function useAdminListings(
     fetchListings();
   }, [fetchListings]);
 
-  const suspendListing = useCallback(
-    async (listingId: string, reason: string) => {
-      try {
-        const { error: suspendError } = await supabase.rpc(
-          'admin_update_listing_status',
-          {
-            p_listing_id: parseInt(listingId),
-            p_status: 'suspended',
-            p_reason: reason
-          }
-        );
-
-        if (suspendError) throw suspendError;
-
-        await fetchListings();
-      } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al suspender listado');
-      }
-    },
-    [supabase, fetchListings]
-  );
-
-  const restoreListing = useCallback(
-    async (listingId: string) => {
-      try {
-        const { error: restoreError } = await supabase.rpc(
-          'admin_update_listing_status',
-          {
-            p_listing_id: parseInt(listingId),
-            p_status: 'active',
-            p_reason: null
-          }
-        );
-
-        if (restoreError) throw restoreError;
-
-        await fetchListings();
-      } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al reactivar listado');
-      }
-    },
-    [supabase, fetchListings]
-  );
-
   const deleteListing = useCallback(
     async (listingId: string, reason: string) => {
       try {
         const { error: deleteError } = await supabase.rpc(
-          'admin_update_listing_status',
+          'admin_delete_listing',
           {
             p_listing_id: parseInt(listingId),
-            p_status: 'removed',
             p_reason: reason
           }
         );
@@ -129,8 +84,6 @@ export function useAdminListings(
     error,
     totalCount,
     refresh: fetchListings,
-    suspendListing,
-    restoreListing,
     deleteListing
   };
 }

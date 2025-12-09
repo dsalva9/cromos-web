@@ -54,58 +54,13 @@ export function useAdminTemplates(
     fetchTemplates();
   }, [fetchTemplates]);
 
-  const suspendTemplate = useCallback(
-    async (templateId: string, reason: string) => {
-      try {
-        const { error: suspendError } = await supabase.rpc(
-          'admin_update_template_status',
-          {
-            p_template_id: parseInt(templateId),
-            p_status: 'suspended',
-            p_reason: reason
-          }
-        );
-
-        if (suspendError) throw suspendError;
-
-        await fetchTemplates();
-      } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al suspender plantilla');
-      }
-    },
-    [supabase, fetchTemplates]
-  );
-
-  const restoreTemplate = useCallback(
-    async (templateId: string) => {
-      try {
-        const { error: restoreError } = await supabase.rpc(
-          'admin_update_template_status',
-          {
-            p_template_id: parseInt(templateId),
-            p_status: 'active',
-            p_reason: null
-          }
-        );
-
-        if (restoreError) throw restoreError;
-
-        await fetchTemplates();
-      } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al reactivar plantilla');
-      }
-    },
-    [supabase, fetchTemplates]
-  );
-
   const deleteTemplate = useCallback(
     async (templateId: string, reason: string) => {
       try {
         const { error: deleteError } = await supabase.rpc(
-          'admin_update_template_status',
+          'admin_delete_template',
           {
             p_template_id: parseInt(templateId),
-            p_status: 'deleted',
             p_reason: reason
           }
         );
@@ -126,8 +81,6 @@ export function useAdminTemplates(
     error,
     totalCount,
     refresh: fetchTemplates,
-    suspendTemplate,
-    restoreTemplate,
     deleteTemplate
   };
 }
