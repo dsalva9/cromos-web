@@ -66,7 +66,6 @@ export function useCreateTemplate() {
           p_description: processedData.description.trim() || null,
           p_image_url: processedData.image_url.trim() || null,
           p_is_public: processedData.is_public,
-          p_item_schema: processedData.item_schema || [],
         }
       );
 
