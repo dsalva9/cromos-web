@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MessageCircle, Eye, Calendar, Edit, Trash } from 'lucide-react';
+import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2 } from 'lucide-react';
 import {
   useUser,
   useSupabaseClient,
@@ -224,7 +224,7 @@ export default function ListingDetailPage() {
           <div className="space-y-6">
             <div>
               <div className="flex items-start justify-between mb-4">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Badge
                     className={`
                     ${listing.status === 'active' ? 'bg-green-500' : ''}
@@ -246,6 +246,22 @@ export default function ListingDetailPage() {
                   >
                     {listing.is_group ? 'Pack de cromos' : 'Cromo individual'}
                   </Badge>
+
+                  {/* Suspension Badge - Only visible to admins, hidden if author deleted or listing removed */}
+                  {isAdmin && listing.author_is_suspended && !listing.author_deleted_at && listing.status !== 'removed' && (
+                    <Badge className="bg-red-900 text-red-200 border-2 border-red-700 flex items-center gap-1">
+                      <Ban className="h-3 w-3" />
+                      Autor Suspendido
+                    </Badge>
+                  )}
+
+                  {/* Author Deletion Badge - Only visible to admins, hidden if listing removed */}
+                  {isAdmin && listing.author_deleted_at && listing.status !== 'removed' && (
+                    <Badge className="bg-orange-900 text-orange-200 border-2 border-orange-700 flex items-center gap-1">
+                      <Trash2 className="h-3 w-3" />
+                      Autor Eliminado
+                    </Badge>
+                  )}
                 </div>
 
                 {isOwner && listing.status === 'active' && (

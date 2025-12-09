@@ -11,6 +11,7 @@ interface UserProfile {
   favorites_count: number;
   is_admin: boolean;
   is_suspended: boolean;
+  deleted_at: string | null;
   postcode: string | null;
   location_label: string | null;
 }
@@ -61,6 +62,7 @@ export function useUserProfile(userId: string) {
         favorites_count: Number(favCountData) || 0,
         is_admin: Boolean(profileData.is_admin),
         is_suspended: Boolean(profileData.is_suspended),
+        deleted_at: profileData.deleted_at ?? null,
         postcode: profileData.postcode ?? null,
         location_label: locationLabel,
       };

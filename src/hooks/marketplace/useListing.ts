@@ -21,7 +21,9 @@ export function useListing(listingId: string) {
           *,
           author:profiles!user_id (
             nickname,
-            avatar_url
+            avatar_url,
+            is_suspended,
+            deleted_at
           )
         `
         )
@@ -36,6 +38,8 @@ export function useListing(listingId: string) {
           user_id: data.user_id,
           author_nickname: data.author.nickname,
           author_avatar_url: data.author.avatar_url,
+          author_is_suspended: data.author.is_suspended,  // Include suspension status
+          author_deleted_at: data.author.deleted_at,  // NEW: Include deletion timestamp
           title: data.title,
           description: data.description,
           sticker_number: data.sticker_number,

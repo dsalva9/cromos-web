@@ -38,7 +38,7 @@ import {
 } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
-import { User, Star, Heart, Package, MapPin, Pencil } from 'lucide-react';
+import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2 } from 'lucide-react';
 import {
   AvatarPicker,
   AvatarSelection,
@@ -557,16 +557,23 @@ export default function UserProfilePage() {
                         </a>
                       </div>
 
-                      {/* Badges - Admin badge only visible to admins */}
+                      {/* Badges - Admin and suspension badges only visible to admins */}
                       <div className="flex gap-2 mt-3">
                         {profile.is_admin && isCurrentUserAdmin && (
                           <Badge className="bg-red-600 text-white">
                             Administrador
                           </Badge>
                         )}
-                        {profile.is_suspended && (
-                          <Badge className="bg-gray-600 text-white">
-                            Suspendido
+                        {profile.is_suspended && !profile.deleted_at && isCurrentUserAdmin && (
+                          <Badge className="bg-red-900 text-red-200 border-2 border-red-700 flex items-center gap-1">
+                            <Ban className="h-3 w-3" />
+                            Usuario Suspendido
+                          </Badge>
+                        )}
+                        {profile.deleted_at && isCurrentUserAdmin && (
+                          <Badge className="bg-orange-900 text-orange-200 border-2 border-orange-700 flex items-center gap-1">
+                            <Trash2 className="h-3 w-3" />
+                            Usuario Eliminado
                           </Badge>
                         )}
                       </div>

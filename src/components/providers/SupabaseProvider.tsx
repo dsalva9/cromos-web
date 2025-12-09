@@ -35,7 +35,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
         // If there's an error fetching profile, allow through (fail open for non-suspended users)
         if (error) {
-          console.error('Error checking suspension status:', error);
+          console.error('Error checking suspension status:', error.message || error);
           return true;
         }
 
@@ -61,15 +61,32 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      async (_event: string, session: Session | null) => {
+      async (event: string, session: Session | null) => {
+        // Handle invalid refresh token by clearing session
+        if (event === 'TOKEN_REFRESHED' && !session) {
+          await supabase.auth.signOut();
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
         const currentUser = session?.user ?? null;
 
+        // Only check suspension on specific events (not during recovery/refresh)
+        const shouldCheckSuspension =
+          event === 'SIGNED_IN' ||
+          event === 'INITIAL_SESSION' ||
+          event === 'USER_UPDATED';
+
         // Check if user is suspended when they have an active session
-        if (currentUser) {
+        if (currentUser && shouldCheckSuspension) {
           const isNotSuspended = await checkSuspendedStatus(currentUser.id);
           if (isNotSuspended) {
             setUser(currentUser);
           }
+        } else if (currentUser) {
+          // For other events, just set the user without checking
+          setUser(currentUser);
         } else {
           setUser(currentUser);
         }
@@ -94,6 +111,15 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           setUser(currentUser);
         }
 
+        setLoading(false);
+      })
+      .catch(async (error) => {
+        // Handle invalid refresh token on initial load
+        if (error?.message?.includes('refresh') || error?.message?.includes('Refresh Token')) {
+          // Clear the invalid session silently
+          await supabase.auth.signOut();
+          setUser(null);
+        }
         setLoading(false);
       });
 

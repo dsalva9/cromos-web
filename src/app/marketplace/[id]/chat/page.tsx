@@ -93,12 +93,29 @@ function ListingChatPageContent() {
         return;
       }
 
-      // Get author info
+      // Get author info including suspension and deletion status
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('nickname, avatar_url')
+        .select('nickname, avatar_url, is_suspended, deleted_at, is_admin')
         .eq('id', listingData.user_id)
         .single();
+
+      // Check if current user is admin
+      const { data: currentUserProfile } = user ? await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const isCurrentUserAdmin = currentUserProfile?.is_admin || false;
+
+      // Block access if author is suspended or deleted and viewer is not admin
+      if (profileData && !isCurrentUserAdmin) {
+        if (profileData.is_suspended || profileData.deleted_at) {
+          setListingAccessDenied(true);
+          return;
+        }
+      }
 
       // Combine data to match Listing interface
       const fullListing: Listing = {
@@ -735,10 +752,10 @@ function ListingChatPageContent() {
 
                 {/* Composer */}
                 <div className="border-t-2 border-gray-700 p-4">
-                  {/* Check if listing access was denied (RLS blocked non-participant) */}
+                  {/* Check if listing access was denied (RLS blocked non-participant or author suspended/deleted) */}
                   {listingAccessDenied && !isOwner ? (
                     <p className="text-gray-400 text-center italic">
-                      Este anuncio está reservado para otro usuario
+                      No tienes acceso a este chat
                     </p>
                   ) : listing?.status === 'completed' && !isReservedBuyer && !isOwner ? (
                     <p className="text-gray-400 text-center italic">

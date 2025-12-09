@@ -1,16 +1,40 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { UserLink } from '@/components/ui/user-link';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin } from 'lucide-react';
+import { MapPin, Ban, Trash2 } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
+import { useUser } from '@/components/providers/SupabaseProvider';
 
 interface ListingCardProps {
   listing: Listing;
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
+  const { user } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Check if current user is admin
+    const checkAdmin = async () => {
+      const { createClient } = await import('@/lib/supabase/client');
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+
+      setIsAdmin(data?.is_admin || false);
+    };
+
+    checkAdmin();
+  }, [user]);
+
   const getStatusColor = (status: string, isPack: boolean = false) => {
     switch (status) {
       case 'active':
@@ -85,12 +109,28 @@ export function ListingCard({ listing }: ListingCardProps) {
           )}
 
           {/* Status Badge */}
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2 right-2 flex flex-col gap-1">
             <span
               className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status, listing.is_group)}`}
             >
               {getStatusLabel(listing.status)}
             </span>
+
+            {/* Suspension Badge - Only visible to admins, hidden if author deleted or listing removed */}
+            {isAdmin && listing.author_is_suspended && !listing.author_deleted_at && listing.status !== 'removed' && (
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md bg-red-900/60 text-red-300 border-red-700/60 flex items-center gap-1">
+                <Ban className="h-3 w-3" />
+                Suspendido
+              </span>
+            )}
+
+            {/* Author Deletion Badge - Only visible to admins, hidden if listing removed */}
+            {isAdmin && listing.author_deleted_at && listing.status !== 'removed' && (
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md bg-orange-900/60 text-orange-300 border-orange-700/60 flex items-center gap-1">
+                <Trash2 className="h-3 w-3" />
+                Autor eliminado
+              </span>
+            )}
           </div>
 
           {/* Overlay Gradient */}

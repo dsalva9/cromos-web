@@ -9,6 +9,8 @@ interface RpcListingResponse {
   author_nickname: string;
   author_avatar_url: string | null;
   author_postcode?: string | null;
+  author_is_suspended?: boolean;  // Suspension status
+  author_deleted_at?: string | null;  // NEW: Deletion timestamp
   title: string;
   description: string | null;
   sticker_number: string | null;
@@ -116,6 +118,8 @@ export function useListings({
             author_nickname: item.author_nickname,
             author_avatar_url: item.author_avatar_url,
             author_postcode: item.author_postcode,
+            author_is_suspended: item.author_is_suspended,  // Include suspension status
+            author_deleted_at: item.author_deleted_at,  // NEW: Include deletion timestamp
             title: item.title,
             description: item.description,
             sticker_number: item.sticker_number,
