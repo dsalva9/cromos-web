@@ -96,9 +96,18 @@ export function TemplateCard({
               </div>
             )}
 
-            {/* Visibility Badge */}
-            {showVisibility && template.is_public !== undefined && (
-              <div className="absolute top-2 right-2">
+            {/* Badges (Visibility and Deletion) */}
+            <div className="absolute top-2 right-2 flex flex-col gap-2">
+              {/* Deletion Badge (always show if deleted) */}
+              {template.deleted_at && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/90 text-white">
+                  <FileText className="h-3 w-3" />
+                  Eliminada
+                </div>
+              )}
+
+              {/* Visibility Badge */}
+              {showVisibility && template.is_public !== undefined && (
                 <div
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
                     template.is_public
@@ -118,8 +127,8 @@ export function TemplateCard({
                     </>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             </div>
           </Link>
 

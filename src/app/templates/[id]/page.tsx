@@ -222,9 +222,18 @@ export default function TemplateDetailsPage() {
                 {/* Details */}
                 <div className="flex-grow space-y-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">
-                      {template.title}
-                    </h1>
+                    <div className="flex items-start gap-3 mb-2">
+                      <h1 className="text-3xl font-bold text-white flex-grow">
+                        {template.title}
+                      </h1>
+                      {/* Deletion Badge for Admins */}
+                      {template.deleted_at && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/90 text-white flex-shrink-0">
+                          <FileText className="h-3 w-3" />
+                          Eliminada
+                        </div>
+                      )}
+                    </div>
                     {template.description && (
                       <p className="text-slate-400">{template.description}</p>
                     )}

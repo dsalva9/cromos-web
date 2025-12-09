@@ -62,6 +62,7 @@ export interface Template {
   copies_count: number;
   pages_count: number;
   created_at: string;
+  deleted_at?: string | null;
   item_schema?: ItemFieldDefinition[];
 }
 
