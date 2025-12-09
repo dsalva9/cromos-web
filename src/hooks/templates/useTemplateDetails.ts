@@ -34,6 +34,7 @@ export interface TemplateDetails {
   copies_count: number;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
   item_schema?: ItemFieldDefinition[];
 }
 
