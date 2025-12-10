@@ -8,6 +8,12 @@ import { useListingChat } from '@/hooks/marketplace/useListingChat';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { ArrowLeft, Send, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
@@ -44,6 +50,7 @@ function ListingChatPageContent() {
   const [counterpartyRating, setCounterpartyRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const [bothRated, setBothRated] = useState(false);
   const [listingAccessDenied, setListingAccessDenied] = useState(false);
+  const [chatTermsDialogOpen, setChatTermsDialogOpen] = useState(false);
 
   const {
     messages,
@@ -789,13 +796,13 @@ function ListingChatPageContent() {
                               className="text-sm text-gray-300 cursor-pointer leading-relaxed"
                             >
                               Acepto los{' '}
-                              <Link
-                                href="/terms"
-                                target="_blank"
-                                className="text-[#FFC000] hover:underline"
+                              <button
+                                type="button"
+                                onClick={() => setChatTermsDialogOpen(true)}
+                                className="text-[#FFC000] hover:underline font-semibold"
                               >
                                 términos y condiciones
-                              </Link>{' '}
+                              </button>{' '}
                               y me comprometo a realizar intercambios de manera honesta y respetuosa.
                             </label>
                           </div>
@@ -843,6 +850,30 @@ function ListingChatPageContent() {
             onSubmit={handleSubmitRating}
           />
         )}
+
+        {/* Chat Terms Dialog */}
+        <Dialog open={chatTermsDialogOpen} onOpenChange={setChatTermsDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-900 text-gray-200 border-2 border-black">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black uppercase text-white">
+                Términos y Condiciones del Chat
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 text-sm leading-relaxed">
+              <p>
+                El chat de Cambiocromos.com te permite comunicarte con otros usuarios de forma privada para intercambiar o vender cromos. El contenido de los mensajes no se usa con fines comerciales, pero puede ser revisado si otro usuario reporta abuso, fraude o incumplimiento de nuestras normas. No compartas información personal sensible ni enlaces externos que puedan poner en riesgo tu seguridad. Respeta siempre a los demás usuarios. El mal uso del chat puede suponer la suspensión de tu cuenta. Al continuar, aceptas nuestras Condiciones de uso y Política de privacidad.
+              </p>
+              <div className="pt-4">
+                <Button
+                  onClick={() => setChatTermsDialogOpen(false)}
+                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold uppercase"
+                >
+                  Cerrar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

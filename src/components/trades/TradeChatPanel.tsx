@@ -6,7 +6,7 @@ import { useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { UserLink } from '@/components/ui/user-link';
-import { Send, ChevronDown, Loader2 } from 'lucide-react';
+import { Send, ChevronDown, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -41,10 +41,24 @@ export function TradeChatPanel({
   const [sending, setSending] = useState(false);
   const [showNewMessagesPill, setShowNewMessagesPill] = useState(false);
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
+  const [showChatDisclaimer, setShowChatDisclaimer] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastMessageCountRef = useRef(0);
+
+  // Check if user has seen the chat disclaimer
+  useEffect(() => {
+    const hasSeenDisclaimer = localStorage.getItem('chat_disclaimer_seen');
+    if (!hasSeenDisclaimer && tradeId) {
+      setShowChatDisclaimer(true);
+    }
+  }, [tradeId]);
+
+  const handleDismissDisclaimer = () => {
+    localStorage.setItem('chat_disclaimer_seen', 'true');
+    setShowChatDisclaimer(false);
+  };
 
   // Auto-scroll to bottom on initial load or new message (only if not scrolled up)
   useEffect(() => {
@@ -151,6 +165,25 @@ export function TradeChatPanel({
           )}
         </div>
       </div>
+
+      {/* Chat Disclaimer Banner */}
+      {showChatDisclaimer && (
+        <div className="bg-[#FFC000] border-b-2 border-black px-4 py-3 flex-shrink-0">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-xs text-gray-900 leading-relaxed flex-1">
+              El chat de Cambiocromos.com te permite comunicarte con otros usuarios de forma privada para intercambiar o vender cromos. El contenido de los mensajes no se usa con fines comerciales, pero puede ser revisado si otro usuario reporta abuso, fraude o incumplimiento de nuestras normas. No compartas información personal sensible ni enlaces externos que puedan poner en riesgo tu seguridad. Respeta siempre a los demás usuarios. El mal uso del chat puede suponer la suspensión de tu cuenta. Al continuar, aceptas nuestras Condiciones de uso y Política de privacidad.
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDismissDisclaimer}
+              className="text-gray-900 hover:bg-[#FFD633] p-1 h-auto flex-shrink-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Messages area with fixed height and scroll */}
       <div

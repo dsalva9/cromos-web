@@ -41,6 +41,7 @@ import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
 import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
+import { SiteFooter } from '@/components/layout/SiteFooter';
 
 export default function RootLayout({
   children,
@@ -72,11 +73,7 @@ export default function RootLayout({
                   </main>
                   <MobileBottomNav />
                   <FloatingActionBtn />
-                  <footer role="contentinfo" className="border-t hidden md:block">
-                    <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-                      Ac {new Date().getFullYear()} {siteConfig.name}
-                    </div>
-                  </footer>
+                  <SiteFooter />
                 </ErrorBoundary>
                 <Toaster
                   position="top-right"

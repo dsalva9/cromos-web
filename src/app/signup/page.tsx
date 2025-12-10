@@ -264,26 +264,10 @@ export default function SignupPage() {
                 <DialogTitle className="text-2xl font-black uppercase text-white">
                   Terminos del servicio
                 </DialogTitle>
-                <DialogDescription className="text-sm text-gray-300">
-                  Este contenido es temporal y sera reemplazado por la version definitiva.
-                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 text-sm leading-relaxed text-gray-200">
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ac mi
-                  sed nulla bibendum efficitur. Donec vitae nisl ac massa tincidunt tempus.
-                  Morbi non lorem vitae est porta maximus in sit amet justo.
-                </p>
-                <p>
-                  Suspendisse potenti. Sed tristique ligula at luctus molestie. Proin
-                  finibus, ipsum vitae facilisis convallis, lectus massa suscipit mauris,
-                  in tristique orci urna et urna. Curabitur nec felis sed nulla viverra
-                  scelerisque quis et justo.
-                </p>
-                <p>
-                  Nulla facilisi. Etiam consequat mi nec vulputate sollicitudin. Etiam
-                  pharetra, leo sed gravida maximus, nisi velit lobortis ante, vel
-                  convallis lectus neque sed erat. Donec ut eros id arcu finibus viverra.
+                  Al registrarte en Cambiocromos.com, aceptas nuestras Condiciones de uso y Política de privacidad. Tus datos se usarán para crear tu perfil, permitirte interactuar con otros coleccionistas y ofrecerte una experiencia personalizada. Puedes registrarte con correo o redes sociales. Si usas una red social, esta nos compartirá la información básica necesaria (nombre, email, foto, etc.), según su propia política de privacidad. Cambiocromos.com no comparte tus datos personales con otros usuarios sin tu consentimiento. Podrás editar o eliminar tu cuenta en cualquier momento. Al continuar, confirmas que eres mayor de edad o que cuentas con autorización de tus tutores legales, y aceptas nuestras condiciones.
                 </p>
               </div>
               <DialogFooter>

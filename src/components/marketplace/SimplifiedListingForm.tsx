@@ -328,32 +328,12 @@ export function SimplifiedListingForm({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Términos de Uso
+              Términos de Uso - Publicación de Cromos
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-gray-300">
             <p>
-              Al publicar un anuncio en CambioCromos, aceptas cumplir con las siguientes condiciones:
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              1. Veracidad de la Información
-            </h3>
-            <p>
-              Debes proporcionar información veraz y precisa sobre los cromos que ofreces.
-              Las imágenes deben corresponder al artículo real.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              2. Responsabilidad del Usuario
-            </h3>
-            <p>
-              Eres responsable de la descripción, precio y condiciones de tu anuncio.
-              CambioCromos actúa como intermediario y no se hace responsable de las transacciones.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              3. Contenido Apropiado
-            </h3>
-            <p>
-              No se permite contenido ofensivo, fraudulento o que infrinja derechos de terceros.
+              Recuerda que las imágenes, descripciones o nombres que subas deben ser tuyos o contar con los derechos necesarios para usarlos. Cambiocromos.com no publica contenido por ti, solo te ofrece el espacio para compartirlo con otros coleccionistas. El usuario es el único responsable del contenido que publique. Si subes imágenes que infrinjan derechos de autor, marcas registradas o cualquier norma legal, podremos retirarlas y suspender tu cuenta. Cambiocromos.com no es propietaria de los cromos ni intermedia en las ventas o intercambios; solo pone en contacto a los usuarios. Al continuar, declaras que tienes derecho a publicar el contenido y aceptas nuestra Política de contenidos.
             </p>
             <div className="pt-4">
               <Button

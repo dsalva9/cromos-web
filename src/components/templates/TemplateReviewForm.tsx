@@ -278,49 +278,12 @@ export function TemplateReviewForm({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Términos de Uso
+              Términos de Uso - Plantillas Públicas
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-gray-300">
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
-            </p>
-            <p>
-              Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-              cupidatat non proident, sunt in culpa qui officia deserunt mollit
-              anim id est laborum.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              1. Aceptación de los Términos
-            </h3>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              2. Uso del Servicio
-            </h3>
-            <p>
-              Duis aute irure dolor in reprehenderit in voluptate velit esse
-              cillum dolore eu fugiat nulla pariatur.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              3. Contenido del Usuario
-            </h3>
-            <p>
-              Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-              officia deserunt mollit anim id est laborum.
-            </p>
-            <h3 className="text-lg font-semibold text-white">
-              4. Privacidad y Protección de Datos
-            </h3>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Si decides compartir una plantilla o listado público, recuerda que esta información quedará visible para otros usuarios. Solo subas contenido original o sobre el que tengas derechos de uso. Al publicarlo, autorizas a Cambiocromos.com a mostrarlo dentro de la plataforma con fines informativos o de comunidad, sin adquirir derechos de propiedad sobre él. Podrás eliminar tu plantilla cuando quieras. Al continuar, aceptas las Condiciones de uso y garantizas que el contenido que compartes cumple la ley y los derechos de terceros.
             </p>
             <div className="pt-4">
               <Button
