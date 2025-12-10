@@ -77,31 +77,56 @@ export function useCreateTemplate() {
       const templateId = template;
 
       // Step 2: Add pages with slots
+      // Step 2: Add pages with slots
       for (const page of processedData.pages) {
-        // Ensure slots is an array and convert to JSON string
-        const slotsArray = Array.isArray(page.slots) ? page.slots : [];
-        const slotsJson = JSON.stringify(slotsArray);
+        // Flatten the slots data structure for the RPC
+        // The RPC expects an array of objects with label, is_special, etc.
+        // But our internal state has { data: { label: ..., ... } }
+        const flatSlots = (Array.isArray(page.slots) ? page.slots : []).map(slot => {
+          const slotData = slot.data || {};
+
+          // Helper to safely get number or null
+          const getNumberOrNull = (val: unknown): number | null => {
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string' && val.trim() !== '') {
+              const parsed = Number(val);
+              return isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          };
+
+          return {
+            label: String(slotData.label || ''),
+            is_special: Boolean(slotData.is_special),
+            slot_variant: slotData.slot_variant ? String(slotData.slot_variant) : null,
+            global_number: getNumberOrNull(slotData.global_number),
+            // Pass through other data fields if needed, although RPC might ignore them
+            ...slotData
+          };
+        });
+
+        const slotsJson = JSON.stringify(flatSlots);
 
         logger.debug('Sending slots data:', {
           page: page.title,
-          slotsCount: slotsArray.length,
-          slotsArray,
+          slotsCount: flatSlots.length,
+          slotsArray: flatSlots,
           slotsJson,
         });
 
         const { error: pageError } = await supabase.rpc(
-          'add_template_page_v2', // Use the new RPC with better JSON handling
+          'add_template_page_v2',
           {
             p_template_id: templateId,
             p_title: page.title.trim(),
             p_type: page.type,
-            p_slots: slotsArray, // Send as array, let the new RPC handle it
+            p_slots: flatSlots,
           }
         );
 
         if (pageError) {
           logger.error('Page creation error:', pageError);
-          logger.error('Slots data that caused error:', slotsArray);
+          logger.error('Slots data that caused error:', flatSlots);
           logger.error('Slots JSON that caused error:', slotsJson);
           throw new Error(
             pageError.message || `Error al añadir la página "${page.title}"`
