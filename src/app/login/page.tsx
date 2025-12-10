@@ -43,7 +43,7 @@ export default function LoginPage() {
         // Note: We need to check immediately before SupabaseProvider signs them out
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('nickname, postcode, is_suspended')
+          .select('nickname, postcode, avatar_url, is_suspended')
           .eq('id', userId)
           .maybeSingle();
 
@@ -78,11 +78,21 @@ export default function LoginPage() {
 
         const nickname = profileData?.nickname?.trim() ?? '';
         const postcode = profileData?.postcode?.trim() ?? '';
+        const avatarUrl = profileData?.avatar_url?.trim() ?? '';
+
+        const nicknameLower = nickname.toLowerCase();
+        const postcodeLower = postcode.toLowerCase();
+
+        const hasPlaceholderNickname =
+          nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
+        const hasPlaceholderPostcode = postcodeLower === 'pending';
 
         const isProfileComplete =
           !!nickname &&
-          nickname.toLowerCase() !== 'sin nombre' &&
-          !!postcode;
+          !!postcode &&
+          !!avatarUrl &&
+          !hasPlaceholderNickname &&
+          !hasPlaceholderPostcode;
 
         router.push(isProfileComplete ? '/' : '/profile/completar');
       }
