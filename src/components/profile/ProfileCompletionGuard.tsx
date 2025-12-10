@@ -30,7 +30,8 @@ export function ProfileCompletionGuard({
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
     const isAuthFlow = pathname?.startsWith('/auth');
-    const isExemptRoute = isOnCompletionRoute || isAuthFlow;
+    const isAuthPage = pathname === '/login' || pathname === '/signup';
+    const isExemptRoute = isOnCompletionRoute || isAuthFlow || isAuthPage;
 
     console.log('[ProfileCompletionGuard] Running check:', {
       userId: user.id,
@@ -76,7 +77,8 @@ export function ProfileCompletionGuard({
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
     const isAuthFlow = pathname?.startsWith('/auth');
-    const isExemptRoute = isOnCompletionRoute || isAuthFlow;
+    const isAuthPage = pathname === '/login' || pathname === '/signup';
+    const isExemptRoute = isOnCompletionRoute || isAuthFlow || isAuthPage;
 
     if (isExemptRoute) {
       return <>{children}</>;
