@@ -91,13 +91,13 @@ export function ListingCard({ listing }: ListingCardProps) {
     >
       <div className="group relative h-full bg-gray-900/40 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden hover:border-[#FFC000]/50 hover:shadow-[0_0_15px_rgba(255,192,0,0.1)] transition-all duration-300 hover:-translate-y-1">
         {/* Image Container */}
-        <div className="relative aspect-square bg-gray-800/50">
+        <div className="relative aspect-square bg-gray-800/50 overflow-hidden">
           {listing.image_url ? (
             <Image
               src={listing.image_url}
               alt={`Imagen del anuncio ${listing.title}`}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             />
           ) : (
@@ -109,7 +109,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           )}
 
           {/* Status Badge */}
-          <div className="absolute top-2 right-2 flex flex-col gap-1">
+          <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
             <span
               className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status, listing.is_group)}`}
             >

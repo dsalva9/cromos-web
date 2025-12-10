@@ -164,7 +164,7 @@ export default function MarketplacePage() {
                 <div className="bg-white/5 rounded-lg p-1 border border-white/10 flex">
                   <button
                     onClick={() => setListingTypeFilter('all')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
                       listingTypeFilter === 'all'
                         ? 'bg-[#FFC000] text-black shadow-lg'
                         : 'text-gray-400 hover:text-white'
@@ -174,7 +174,7 @@ export default function MarketplacePage() {
                   </button>
                   <button
                     onClick={() => setListingTypeFilter('cromo')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
                       listingTypeFilter === 'cromo'
                         ? 'bg-[#FFC000] text-black shadow-lg'
                         : 'text-gray-400 hover:text-white'
@@ -184,7 +184,7 @@ export default function MarketplacePage() {
                   </button>
                   <button
                     onClick={() => setListingTypeFilter('pack')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
                       listingTypeFilter === 'pack'
                         ? 'bg-[#FFC000] text-black shadow-lg'
                         : 'text-gray-400 hover:text-white'
@@ -203,10 +203,10 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
-                <div className="hidden md:flex bg-white/5 rounded-lg p-1 border border-white/10">
+                <div className="hidden lg:flex bg-white/5 rounded-lg p-1 border border-white/10">
                   <button
                     onClick={() => setSortByDistance(false)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                       !sortByDistance
                         ? 'bg-[#FFC000] text-black shadow-lg'
                         : 'text-gray-400 hover:text-white'
@@ -217,7 +217,7 @@ export default function MarketplacePage() {
                   <button
                     onClick={() => hasPostcode && setSortByDistance(true)}
                     disabled={!hasPostcode}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                       sortByDistance
                         ? 'bg-[#FFC000] text-black shadow-lg'
                         : 'text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
