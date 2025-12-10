@@ -6,6 +6,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useUserBadges } from '@/hooks/badges/useUserBadges';
 import { BadgeCard } from '@/components/badges/BadgeCard';
 import { BadgesModal } from '@/components/badges/BadgesModal';
@@ -56,12 +57,12 @@ export function ProfileBadgesSimple({
             <Award className="w-5 h-5 text-[#FFC000]" />
             <h3 className="text-lg font-bold text-white">Insignias</h3>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
+          <Link
+            href="/profile#badges"
             className="text-xs text-[#FFC000] hover:text-yellow-400 font-semibold underline"
           >
             Ver todas las insignias
-          </button>
+          </Link>
         </div>
 
         <div className="text-center py-8 border-2 border-dashed border-gray-600 rounded-lg">
@@ -94,12 +95,12 @@ export function ProfileBadgesSimple({
             ({badges.length})
           </span>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
+        <Link
+          href="/profile#badges"
           className="text-xs text-[#FFC000] hover:text-yellow-400 font-semibold underline"
         >
           Ver todas
-        </button>
+        </Link>
       </div>
 
       {/* Earned Badges Grid */}
