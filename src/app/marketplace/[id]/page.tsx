@@ -24,6 +24,16 @@ import { useSoftDeleteListing } from '@/hooks/marketplace/useSoftDeleteListing';
 import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
 import { DeleteListingModal } from '@/components/marketplace/DeleteListingModal';
 import { RotateCcw } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -40,6 +50,9 @@ export default function ListingDetailPage() {
   const [hasConversations, setHasConversations] = useState(false);
   const [checkingConversations, setCheckingConversations] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAdminDeleteDialog, setShowAdminDeleteDialog] = useState(false);
+  const [adminDeleteReason, setAdminDeleteReason] = useState('');
+  const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -111,6 +124,33 @@ export default function ListingDetailPage() {
     } catch (error) {
       logger.error('Delete error:', error);
       // Error already handled by hook
+    }
+  };
+
+  const handleAdminDelete = async () => {
+    if (!adminDeleteReason.trim()) {
+      toast.error('Por favor ingresa un motivo para eliminar');
+      return;
+    }
+
+    setAdminDeleteLoading(true);
+    try {
+      const { error } = await supabase.rpc('admin_delete_listing', {
+        p_listing_id: parseInt(listingId, 10),
+        p_reason: adminDeleteReason
+      });
+
+      if (error) throw error;
+
+      toast.success('Listado eliminado con éxito (90 días de retención)');
+      setShowAdminDeleteDialog(false);
+      setAdminDeleteReason('');
+      refetch(); // Refresh to show deleted state
+    } catch (error) {
+      logger.error('Admin delete error:', error);
+      toast.error('Error al eliminar el listado');
+    } finally {
+      setAdminDeleteLoading(false);
     }
   };
 
@@ -264,17 +304,19 @@ export default function ListingDetailPage() {
                   )}
                 </div>
 
-                {isOwner && listing.status === 'active' && (
+                {(isOwner || isAdmin) && listing.status === 'active' && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/marketplace/${listing.id}/edit`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    {isOwner && (
+                      <Button size="sm" variant="outline" asChild>
+                        <Link href={`/marketplace/${listing.id}/edit`}>
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => setShowDeleteModal(true)}
+                      onClick={() => isAdmin && !isOwner ? setShowAdminDeleteDialog(true) : setShowDeleteModal(true)}
                       className="text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
                     >
                       <Trash className="h-4 w-4" />
@@ -475,10 +517,10 @@ export default function ListingDetailPage() {
                       </Button>
                     )}
 
-                    {listing.status === 'active' && (
+                    {listing.status === 'active' && (isOwner || isAdmin) && (
                       <Button
                         variant="outline"
-                        onClick={() => setShowDeleteModal(true)}
+                        onClick={() => isAdmin && !isOwner ? setShowAdminDeleteDialog(true) : setShowDeleteModal(true)}
                         className="text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
                       >
                         <Trash className="mr-2 h-4 w-4" />
@@ -519,7 +561,7 @@ export default function ListingDetailPage() {
         </div>
       </div>
 
-      {/* Soft Delete Modal */}
+      {/* Soft Delete Modal (for owners) */}
       <DeleteListingModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -531,6 +573,62 @@ export default function ListingDetailPage() {
         }}
         loading={deleteLoading}
       />
+
+      {/* Admin Delete Dialog */}
+      <Dialog open={showAdminDeleteDialog} onOpenChange={setShowAdminDeleteDialog}>
+        <DialogContent className="bg-slate-800 text-white border-slate-700">
+          <DialogHeader>
+            <DialogTitle>Eliminar Listado (Admin)</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              {listing.title}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 py-4">
+            <label className="text-sm font-medium text-slate-300">
+              Motivo (requerido)
+            </label>
+            <Textarea
+              value={adminDeleteReason}
+              onChange={(e) => setAdminDeleteReason(e.target.value)}
+              placeholder="Explica por qué se elimina este listado..."
+              rows={3}
+              className="bg-slate-900 border-slate-700 text-white"
+            />
+            <p className="text-xs text-slate-400 mt-2">
+              El listado será eliminado permanentemente después de 90 días de retención.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowAdminDeleteDialog(false);
+                setAdminDeleteReason('');
+              }}
+              disabled={adminDeleteLoading}
+              className="border-slate-600 text-white hover:bg-slate-700"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleAdminDelete}
+              disabled={adminDeleteLoading || !adminDeleteReason.trim()}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {adminDeleteLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                <>Confirmar Eliminación</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

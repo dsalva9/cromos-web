@@ -22,13 +22,15 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Search, ExternalLink, Trash2 } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Trash2, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import AdminGuard from '@/components/AdminGuard';
+import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
 
-export default function AdminMarketplacePage() {
+function MarketplaceContent() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionDialog, setActionDialog] = useState<{
@@ -40,8 +42,9 @@ export default function AdminMarketplacePage() {
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { listings, loading, deleteListing } =
+  const { listings, loading, deleteListing, refresh } =
     useAdminListings(statusFilter, searchQuery);
+  const { restoreListing, loading: restoreLoading } = useRestoreListing();
 
   const handleAction = async () => {
     if (!actionDialog.listingId || !actionDialog.action) return;
@@ -60,6 +63,16 @@ export default function AdminMarketplacePage() {
       );
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleRestore = async (listingId: string) => {
+    try {
+      await restoreListing(listingId);
+      toast.success('Listado restaurado correctamente');
+      refresh();
+    } catch (error) {
+      toast.error('Error al restaurar el listado');
     }
   };
 
@@ -158,22 +171,35 @@ export default function AdminMarketplacePage() {
                         </Button>
                       </Link>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setActionDialog({
-                            open: true,
-                            action: 'delete',
-                            listingId: listing.id,
-                            listingTitle: listing.title
-                          })
-                        }
-                        className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Eliminar
-                      </Button>
+                      {listing.deleted_at ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRestore(listing.id)}
+                          disabled={restoreLoading}
+                          className="w-full border-green-600 text-green-500 hover:bg-green-600/10"
+                        >
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          Restaurar
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setActionDialog({
+                              open: true,
+                              action: 'delete',
+                              listingId: listing.id,
+                              listingTitle: listing.title
+                            })
+                          }
+                          className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Eliminar
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </ModernCardContent>
@@ -244,5 +270,13 @@ export default function AdminMarketplacePage() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function AdminMarketplacePage() {
+  return (
+    <AdminGuard>
+      <MarketplaceContent />
+    </AdminGuard>
   );
 }

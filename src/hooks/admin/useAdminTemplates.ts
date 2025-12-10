@@ -7,6 +7,7 @@ export interface AdminTemplate {
   id: string;
   title: string;
   status: string;
+  deleted_at: string | null;
   created_at: string;
   author_id: string;
   author_nickname: string;

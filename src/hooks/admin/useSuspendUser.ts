@@ -26,7 +26,7 @@ export function useSuspendUser() {
     }
   };
 
-  const unsuspendUser = async (userId: string, reason: string): Promise<void> => {
+  const unsuspendUser = async (userId: string): Promise<void> => {
     try {
       setLoading(true);
 

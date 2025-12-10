@@ -8,6 +8,8 @@ interface AdminUser {
   avatar_url: string | null;
   is_admin: boolean;
   is_suspended: boolean;
+  is_pending_deletion: boolean;
+  deletion_scheduled_for: string | null;
   rating_avg: number;
   rating_count: number;
   active_listings_count: number;
@@ -15,7 +17,7 @@ interface AdminUser {
   created_at: string;
 }
 
-export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended') {
+export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended' | 'pending_deletion') {
   const supabase = useSupabaseClient();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);

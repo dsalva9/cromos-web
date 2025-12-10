@@ -20,7 +20,7 @@ import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 function UserSearchContent() {
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<'all' | 'active' | 'suspended'>('all');
+  const [status, setStatus] = useState<'all' | 'active' | 'suspended' | 'pending_deletion'>('all');
   const debouncedQuery = useDebounce(query, 500);
   const { supabase } = useSupabase();
 
@@ -41,11 +41,10 @@ function UserSearchContent() {
   };
 
   const handleUnsuspend = async (userId: string, nickname: string) => {
-    const reason = prompt(`Enter reason for unsuspending ${nickname}:`);
-    if (!reason) return;
+    if (!confirm(`Unsuspend ${nickname}? This will restore full account access.`)) return;
 
     try {
-      await unsuspendUser(userId, reason);
+      await unsuspendUser(userId);
       toast.success('User unsuspended successfully');
       refetch();
     } catch {
@@ -74,28 +73,20 @@ function UserSearchContent() {
     }
   };
 
-  const handleDeleteUser = async (userId: string, nickname: string) => {
-    const reason = prompt(`DANGER: Enter reason for deleting user ${nickname}. This action CANNOT be undone:`);
-    if (!reason) return;
-
-    if (!confirm(`Are you ABSOLUTELY SURE you want to permanently delete ${nickname}? This will delete all their data and CANNOT be undone.`)) return;
+  const handleMoveToDeletion = async (userId: string, nickname: string) => {
+    if (!confirm(`Move ${nickname} to deletion queue? The account will be permanently deleted in 90 days. You can still unsuspend to cancel.`)) return;
 
     try {
-      const response = await fetch('/api/admin/delete-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, reason })
+      const { error } = await supabase.rpc('admin_move_to_deletion', {
+        p_user_id: userId
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to delete user');
-      }
+      if (error) throw error;
 
-      toast.success('User deleted successfully');
+      toast.success('Account moved to deletion queue (90 days)');
       refetch();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to delete user');
+      toast.error(error instanceof Error ? error.message : 'Failed to move to deletion');
     }
   };
 
@@ -133,7 +124,7 @@ function UserSearchContent() {
             {/* Status Filter */}
             <div className="space-y-2">
               <Label className="text-white">Status</Label>
-              <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended') => setStatus(v)}>
+              <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended' | 'pending_deletion') => setStatus(v)}>
                 <SelectTrigger className="bg-[#374151] border-2 border-black text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -141,6 +132,7 @@ function UserSearchContent() {
                   <SelectItem value="all">All Users</SelectItem>
                   <SelectItem value="active">Active Only</SelectItem>
                   <SelectItem value="suspended">Suspended Only</SelectItem>
+                  <SelectItem value="pending_deletion">Pending Deletion</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -211,7 +203,9 @@ function UserSearchContent() {
                           {user.is_admin && (
                             <Badge className="bg-red-600 text-white">Admin</Badge>
                           )}
-                          {user.is_suspended && (
+                          {user.is_pending_deletion ? (
+                            <Badge className="bg-orange-600 text-white">Pending Deletion</Badge>
+                          ) : user.is_suspended && (
                             <Badge className="bg-gray-600 text-white">Suspended</Badge>
                           )}
                         </div>
@@ -254,15 +248,26 @@ function UserSearchContent() {
                       {!user.is_admin && (
                         <>
                           {user.is_suspended ? (
-                            <Button
-                              size="sm"
-                              onClick={() => handleUnsuspend(user.user_id, user.nickname)}
-                              disabled={actionLoading}
-                              className="bg-green-700 hover:bg-green-600"
-                            >
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Unsuspend
-                            </Button>
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => handleUnsuspend(user.user_id, user.nickname)}
+                                disabled={actionLoading}
+                                className="bg-green-700 hover:bg-green-600"
+                              >
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Unsuspend
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => handleMoveToDeletion(user.user_id, user.nickname)}
+                                disabled={actionLoading || user.is_pending_deletion}
+                                className="bg-orange-700 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <AlertTriangle className="mr-2 h-4 w-4" />
+                                {user.is_pending_deletion ? 'Already Pending Deletion' : 'Move to Deletion'}
+                              </Button>
+                            </>
                           ) : (
                             <Button
                               size="sm"
@@ -283,16 +288,6 @@ function UserSearchContent() {
                           >
                             <Mail className="mr-2 h-4 w-4" />
                             Reset Password
-                          </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteUser(user.user_id, user.nickname)}
-                            className="border-red-600 text-red-500 hover:bg-red-600/10"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete User
                           </Button>
                         </>
                       )}

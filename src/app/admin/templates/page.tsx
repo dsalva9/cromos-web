@@ -22,41 +22,38 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Search, ExternalLink, Ban, CheckCircle, Trash2, Star } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import AdminGuard from '@/components/AdminGuard';
+import { useRestoreTemplate } from '@/hooks/templates/useRestoreTemplate';
 
-export default function AdminTemplatesPage() {
+function TemplatesContent() {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
-    action: 'suspend' | 'restore' | 'delete' | null;
+    action: 'delete' | null;
     templateId: string | null;
     templateTitle: string | null;
   }>({ open: false, action: null, templateId: null, templateTitle: null });
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { templates, loading, suspendTemplate, restoreTemplate, deleteTemplate } =
+  const { templates, loading, deleteTemplate, refresh } =
     useAdminTemplates(statusFilter, searchQuery);
+  const { restoreTemplate, loading: restoreLoading } = useRestoreTemplate();
 
   const handleAction = async () => {
     if (!actionDialog.templateId || !actionDialog.action) return;
 
     setActionLoading(true);
     try {
-      if (actionDialog.action === 'suspend') {
-        await suspendTemplate(actionDialog.templateId, reason);
-        toast.success('Plantilla suspendida con éxito');
-      } else if (actionDialog.action === 'restore') {
-        await restoreTemplate(actionDialog.templateId);
-        toast.success('Plantilla reactivada con éxito');
-      } else if (actionDialog.action === 'delete') {
+      if (actionDialog.action === 'delete') {
         await deleteTemplate(actionDialog.templateId, reason);
-        toast.success('Plantilla eliminada con éxito');
+        toast.success('Plantilla eliminada con éxito (90 días de retención, álbumes preservados)');
       }
       setActionDialog({ open: false, action: null, templateId: null, templateTitle: null });
       setReason('');
@@ -66,6 +63,16 @@ export default function AdminTemplatesPage() {
       );
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleRestore = async (templateId: string) => {
+    try {
+      await restoreTemplate(templateId);
+      toast.success('Plantilla restaurada correctamente');
+      refresh();
+    } catch (error) {
+      toast.error('Error al restaurar la plantilla');
     }
   };
 
@@ -170,60 +177,35 @@ export default function AdminTemplatesPage() {
                         </Button>
                       </Link>
 
-                      {template.status === 'active' && (
+                      {template.deleted_at ? (
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() =>
-                            setActionDialog({
-                              open: true,
-                              action: 'suspend',
-                              templateId: template.id,
-                              templateTitle: template.title
-                            })
-                          }
-                          className="w-full border-yellow-600 text-yellow-500 hover:bg-yellow-600/10"
-                        >
-                          <Ban className="h-4 w-4 mr-2" />
-                          Suspender
-                        </Button>
-                      )}
-
-                      {template.status === 'suspended' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setActionDialog({
-                              open: true,
-                              action: 'restore',
-                              templateId: template.id,
-                              templateTitle: template.title
-                            })
-                          }
+                          onClick={() => handleRestore(template.id)}
+                          disabled={restoreLoading}
                           className="w-full border-green-600 text-green-500 hover:bg-green-600/10"
                         >
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Reactivar
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          Restaurar
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setActionDialog({
+                              open: true,
+                              action: 'delete',
+                              templateId: template.id,
+                              templateTitle: template.title
+                            })
+                          }
+                          className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Eliminar
                         </Button>
                       )}
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setActionDialog({
-                            open: true,
-                            action: 'delete',
-                            templateId: template.id,
-                            templateTitle: template.title
-                          })
-                        }
-                        className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Eliminar
-                      </Button>
                     </div>
                   </div>
                 </ModernCardContent>
@@ -244,30 +226,27 @@ export default function AdminTemplatesPage() {
         <Dialog open={actionDialog.open} onOpenChange={(open) => setActionDialog({ ...actionDialog, open })}>
           <DialogContent className="bg-slate-800 text-white border-slate-700">
             <DialogHeader>
-              <DialogTitle>
-                {actionDialog.action === 'suspend' && 'Suspender Plantilla'}
-                {actionDialog.action === 'restore' && 'Reactivar Plantilla'}
-                {actionDialog.action === 'delete' && 'Eliminar Plantilla'}
-              </DialogTitle>
+              <DialogTitle>Eliminar Plantilla</DialogTitle>
               <DialogDescription className="text-slate-400">
                 {actionDialog.templateTitle}
               </DialogDescription>
             </DialogHeader>
 
-            {(actionDialog.action === 'suspend' || actionDialog.action === 'delete') && (
-              <div className="space-y-2 py-4">
-                <label className="text-sm font-medium text-slate-300">
-                  Motivo {actionDialog.action === 'suspend' ? '(requerido)' : '(opcional)'}
-                </label>
-                <Textarea
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Explica por qué se toma esta acción..."
-                  rows={3}
-                  className="bg-slate-900 border-slate-700 text-white"
-                />
-              </div>
-            )}
+            <div className="space-y-2 py-4">
+              <label className="text-sm font-medium text-slate-300">
+                Motivo (requerido)
+              </label>
+              <Textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Explica por qué se elimina esta plantilla..."
+                rows={3}
+                className="bg-slate-900 border-slate-700 text-white"
+              />
+              <p className="text-xs text-slate-400 mt-2">
+                La plantilla será eliminada permanentemente después de 90 días de retención. Los álbumes de usuarios (copias) se preservarán.
+              </p>
+            </div>
 
             <DialogFooter>
               <Button
@@ -280,14 +259,8 @@ export default function AdminTemplatesPage() {
               </Button>
               <Button
                 onClick={handleAction}
-                disabled={actionLoading || (actionDialog.action === 'suspend' && !reason)}
-                className={
-                  actionDialog.action === 'delete'
-                    ? 'bg-red-600 hover:bg-red-700'
-                    : actionDialog.action === 'suspend'
-                    ? 'bg-yellow-600 hover:bg-yellow-700'
-                    : 'bg-green-600 hover:bg-green-700'
-                }
+                disabled={actionLoading || !reason}
+                className="bg-red-600 hover:bg-red-700"
               >
                 {actionLoading ? (
                   <>
@@ -295,7 +268,7 @@ export default function AdminTemplatesPage() {
                     Procesando...
                   </>
                 ) : (
-                  <>Confirmar</>
+                  <>Confirmar Eliminación</>
                 )}
               </Button>
             </DialogFooter>
@@ -303,5 +276,13 @@ export default function AdminTemplatesPage() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function AdminTemplatesPage() {
+  return (
+    <AdminGuard>
+      <TemplatesContent />
+    </AdminGuard>
   );
 }

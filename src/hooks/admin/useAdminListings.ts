@@ -8,6 +8,7 @@ export interface AdminListing {
   title: string;
   collection_name: string;
   status: string;
+  deleted_at: string | null;
   created_at: string;
   seller_id: string;
   seller_nickname: string;
