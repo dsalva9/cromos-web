@@ -6,8 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Eye, Edit, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react';
-import { useMarkSold } from '@/hooks/integration/useMarkSold';
+import { Eye, Edit, AlertTriangle, Trash2 } from 'lucide-react';
 import { useSoftDeleteListing } from '@/hooks/marketplace/useSoftDeleteListing';
 import { useHardDeleteListing } from '@/hooks/marketplace/useHardDeleteListing';
 import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
@@ -51,34 +50,12 @@ interface MyListingCardProps {
 }
 
 export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardProps) {
-  const { markSold, loading: markSoldLoading } = useMarkSold();
   const { softDeleteListing, loading: softDeleteLoading } = useSoftDeleteListing();
   const { hardDeleteListing, loading: hardDeleteLoading } = useHardDeleteListing();
   const { restoreListing, loading: restoreLoading } = useRestoreListing();
-  const [confirming, setConfirming] = useState(false);
   const [showSoftDeleteModal, setShowSoftDeleteModal] = useState(false);
   const [showHardDeleteModal, setShowHardDeleteModal] = useState(false);
 
-  const handleMarkSold = async () => {
-    if (!confirming) {
-      setConfirming(true);
-      setTimeout(() => setConfirming(false), 3000); // Reset after 3 seconds
-      return;
-    }
-
-    try {
-      await markSold(listing.listing_id);
-      toast.success('¡Anuncio marcado como completado!');
-      if (listing.copy_id) {
-        toast.success('Contador de repetidos actualizado automáticamente');
-      }
-      onUpdate();
-    } catch {
-      toast.error('Error al marcar como vendido');
-    } finally {
-      setConfirming(false);
-    }
-  };
   const handleSoftDelete = async () => {
     try {
       await softDeleteListing(listing.listing_id);
@@ -271,16 +248,6 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                       Editar
                     </Button>
                   </Link>
-
-                  <Button
-                    size="sm"
-                    onClick={handleMarkSold}
-                    disabled={markSoldLoading}
-                    className="bg-green-700 hover:bg-green-600"
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    {confirming ? 'Haz clic de nuevo para confirmar' : 'Marcar como Completado'}
-                  </Button>
 
                   <Button
                     size="sm"
