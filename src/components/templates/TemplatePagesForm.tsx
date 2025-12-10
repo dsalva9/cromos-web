@@ -119,7 +119,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="team" id="team" />
                   <Label htmlFor="team" className="text-white">
-                    Equipo
+                    Normal
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -152,7 +152,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 <CardTitle className="text-white">{page.title}</CardTitle>
                 <p className="text-sm text-gray-400">
                   {page.slots.length} cromos · (
-                  {page.type === 'team' ? 'Equipo' : 'Especial'})
+                  {page.type === 'team' ? 'Normal' : 'Especial'})
                 </p>
               </div>
             </div>
@@ -195,7 +195,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="team" id={`team-${pageIndex}`} />
                     <Label htmlFor={`team-${pageIndex}`} className="text-white">
-                      Equipo
+                      Normal
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">

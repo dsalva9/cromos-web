@@ -195,7 +195,7 @@ export function TemplateReviewForm({
                     <Badge
                       variant={page.type === 'team' ? 'default' : 'secondary'}
                     >
-                      {page.type === 'team' ? 'Equipo' : 'Especial'}
+                      {page.type === 'team' ? 'Normal' : 'Especial'}
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-400">
