@@ -15,7 +15,7 @@ interface ProfileCompletionGuardProps {
 export function ProfileCompletionGuard({
   children,
 }: ProfileCompletionGuardProps) {
-  const { isComplete, loading } = useProfileCompletion();
+  const { isComplete, loading, profile } = useProfileCompletion();
   const { user, loading: authLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -32,6 +32,17 @@ export function ProfileCompletionGuard({
     const isAuthFlow = pathname?.startsWith('/auth');
     const isExemptRoute = isOnCompletionRoute || isAuthFlow;
 
+    console.log('[ProfileCompletionGuard] Running check:', {
+      userId: user.id,
+      pathname,
+      isComplete,
+      profile,
+      loading,
+      authLoading,
+      isExemptRoute,
+      hasWarned: hasWarnedRef.current,
+    });
+
     // Track state transitions to reset warning flag
     if (previousCompleteRef.current === false && isComplete === true) {
       // User just completed their profile, reset warning flag
@@ -40,6 +51,7 @@ export function ProfileCompletionGuard({
     previousCompleteRef.current = isComplete;
 
     if (!isComplete && !isExemptRoute) {
+      console.log('[ProfileCompletionGuard] Profile incomplete, showing toast');
       if (!hasWarnedRef.current) {
         hasWarnedRef.current = true;
         toast.info(
@@ -48,7 +60,7 @@ export function ProfileCompletionGuard({
       }
       router.replace(completionRoute);
     }
-  }, [authLoading, isComplete, loading, pathname, router, user]);
+  }, [authLoading, isComplete, loading, pathname, profile, router, user]);
 
   // Public/unauthenticated users should see the app normally
   if (!user) {

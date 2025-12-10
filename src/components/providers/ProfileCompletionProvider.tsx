@@ -84,6 +84,7 @@ export function ProfileCompletionProvider({
       return;
     }
 
+    console.log('[ProfileCompletionProvider] Fetching profile for user:', user.id);
     setLoading(true);
 
     try {
@@ -95,15 +96,18 @@ export function ProfileCompletionProvider({
 
       if (error) throw error;
 
-      setProfile(
-        data
-          ? {
-              nickname: data.nickname ?? null,
-              postcode: data.postcode ?? null,
-              avatar_url: data.avatar_url ?? null,
-            }
-          : { nickname: null, postcode: null, avatar_url: null }
-      );
+      const profileData = data
+        ? {
+            nickname: data.nickname ?? null,
+            postcode: data.postcode ?? null,
+            avatar_url: data.avatar_url ?? null,
+          }
+        : { nickname: null, postcode: null, avatar_url: null };
+
+      console.log('[ProfileCompletionProvider] Fetched profile:', profileData);
+      console.log('[ProfileCompletionProvider] isComplete:', computeIsComplete(profileData));
+
+      setProfile(profileData);
     } catch (error) {
       logger.error('Error fetching profile completion status', error);
       setProfile(null);
