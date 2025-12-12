@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 
@@ -45,69 +44,96 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for next parameter in URL
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get('next');
+    let mounted = true;
 
-    const handleAuthCallback = async (event: AuthChangeEvent, session: Session | null) => {
-      logger.info('Auth callback event:', event);
+    const handleAuthCallback = async () => {
+      try {
+        // Check for next parameter in URL
+        const params = new URLSearchParams(window.location.search);
+        const next = params.get('next');
+        const code = params.get('code');
 
-      // Wait for auth events that indicate successful authentication
-      if (event !== 'SIGNED_IN' && event !== 'PASSWORD_RECOVERY') {
-        return;
-      }
+        logger.info('Auth callback started', { hasCode: !!code, next });
 
-      const sessionUser = session?.user;
+        // If there's a code, exchange it for a session
+        if (code) {
+          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
 
-      if (!sessionUser) {
-        logger.error('No user in session after auth event');
-        router.push('/login');
-        return;
-      }
+          if (exchangeError) {
+            logger.error('Error exchanging code for session:', exchangeError);
+            setError('Error al procesar autenticación');
+            return;
+          }
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
-        .eq('id', sessionUser.id)
-        .single();
+          logger.info('Code exchanged successfully', { userId: data.session?.user?.id });
+        }
 
-      if (profileError) {
-        logger.error('Error checking user suspension status:', profileError);
-        router.push(PROFILE_COMPLETION_ROUTE);
-        return;
-      }
+        // Get the current session
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-      if (profile?.suspended_at || profile?.deleted_at) {
-        await supabase.auth.signOut();
-        setError(
-          'Tu cuenta ha sido suspendida. Por favor, contacta al administrador.'
+        if (sessionError) {
+          logger.error('Error getting session:', sessionError);
+          setError('Error al procesar autenticación');
+          return;
+        }
+
+        const sessionUser = sessionData.session?.user;
+
+        if (!sessionUser) {
+          logger.error('No user in session after code exchange');
+          if (mounted) router.push('/login');
+          return;
+        }
+
+        // Get user profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
+          .eq('id', sessionUser.id)
+          .single();
+
+        if (profileError) {
+          logger.error('Error checking user suspension status:', profileError);
+          if (mounted) router.push(PROFILE_COMPLETION_ROUTE);
+          return;
+        }
+
+        if (profile?.suspended_at || profile?.deleted_at) {
+          await supabase.auth.signOut();
+          if (mounted) {
+            setError(
+              'Tu cuenta ha sido suspendida. Por favor, contacta al administrador.'
+            );
+          }
+          return;
+        }
+
+        // If there's a next parameter, redirect there (for password reset, etc.)
+        if (next) {
+          logger.info('Redirecting to next:', next);
+          if (mounted) router.push(next);
+          return;
+        }
+
+        // Otherwise, check profile completion and redirect accordingly
+        const complete = isProfileComplete(
+          profile?.nickname ?? null,
+          profile?.postcode ?? null,
+          profile?.avatar_url ?? null
         );
-        return;
+
+        logger.info('Redirecting based on profile completion:', { complete });
+        if (mounted) router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);
+      } catch (err) {
+        logger.error('Unexpected error in auth callback:', err);
+        if (mounted) setError('Error inesperado al procesar autenticación');
       }
-
-      // If there's a next parameter, redirect there (for password reset, etc.)
-      if (next) {
-        router.push(next);
-        return;
-      }
-
-      // Otherwise, check profile completion and redirect accordingly
-      const complete = isProfileComplete(
-        profile?.nickname ?? null,
-        profile?.postcode ?? null,
-        profile?.avatar_url ?? null
-      );
-
-      router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);
     };
 
-    // Listen for auth state changes to handle code exchange
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(handleAuthCallback);
+    handleAuthCallback();
 
     return () => {
-      subscription.unsubscribe();
+      mounted = false;
     };
   }, [supabase, router]);
 
