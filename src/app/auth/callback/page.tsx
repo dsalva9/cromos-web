@@ -68,9 +68,8 @@ export default function AuthCallback() {
           logger.info('Code exchanged successfully', { userId: data.session?.user?.id });
 
           // Check if this is a password recovery flow
-          const amr = data.session?.user?.amr;
-          const lastAuth = amr?.[amr.length - 1];
-          if (lastAuth?.method === 'recovery' || next === '/profile/reset-password') {
+          // For password recovery, we check if the next param indicates reset password
+          if (next === '/profile/reset-password') {
             // Set flag to require password reset
             sessionStorage.setItem('password_recovery_required', 'true');
             logger.info('Password recovery flag set');

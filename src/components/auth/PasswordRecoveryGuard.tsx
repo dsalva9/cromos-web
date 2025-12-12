@@ -30,38 +30,8 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           return;
         }
 
-        // Also check the user's AMR (Authentication Method Reference)
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (session?.user) {
-          // Check if the last authentication method was 'recovery'
-          const amr = session.user.amr;
-          const lastAuth = amr?.[amr.length - 1];
-
-          if (lastAuth?.method === 'recovery' || lastAuth?.method === 'otp') {
-            // Check if this is a fresh recovery session (within last 5 minutes)
-            const authTime = lastAuth.timestamp ? new Date(lastAuth.timestamp * 1000) : null;
-            const now = new Date();
-            const minutesSinceAuth = authTime
-              ? (now.getTime() - authTime.getTime()) / (1000 * 60)
-              : Infinity;
-
-            if (minutesSinceAuth < 5) {
-              logger.info('Recent recovery session detected', {
-                method: lastAuth.method,
-                minutesSinceAuth
-              });
-
-              // Set recovery flag
-              sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
-
-              if (pathname !== RESET_PASSWORD_ROUTE) {
-                router.replace(RESET_PASSWORD_ROUTE);
-                return;
-              }
-            }
-          }
-        }
+        // The recovery flag is the primary indicator
+        // No need to check AMR as the flag is set during the callback
       } catch (error) {
         logger.error('Error checking recovery state:', error);
       } finally {
