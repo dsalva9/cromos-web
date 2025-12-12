@@ -33,7 +33,7 @@ type NavigationLink = {
 function MobileUserAvatar({ userId }: { userId: string }) {
   const { profile } = useCurrentUserProfile();
   const { supabase } = useSupabase();
-  
+
   const avatarUrl = resolveAvatarUrl(profile?.avatar_url, supabase);
   const fallback = getAvatarFallback(profile?.nickname);
 
@@ -150,23 +150,23 @@ export default function SiteHeader() {
 
   const handleProtectedNavigation =
     (requiresCompletion?: boolean) =>
-    (event: MouseEvent<HTMLAnchorElement>) => {
-      if (
-        requiresCompletion &&
-        user &&
-        (!isComplete || profileLoading)
-      ) {
-        event.preventDefault();
-        closeMenu();
-        toast.info(
-          'Necesitas completar tu perfil para empezar a cambiar cromos!'
-        );
-        router.push('/profile/completar');
-        return;
-      }
+      (event: MouseEvent<HTMLAnchorElement>) => {
+        if (
+          requiresCompletion &&
+          user &&
+          (!isComplete || profileLoading)
+        ) {
+          event.preventDefault();
+          closeMenu();
+          toast.info(
+            'Necesitas completar tu perfil para empezar a cambiar cromos!'
+          );
+          router.push('/profile/completar');
+          return;
+        }
 
-      closeMenu();
-    };
+        closeMenu();
+      };
 
   const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
     setRatingModalData({ userId, nickname, listingId, listingTitle });
@@ -190,7 +190,7 @@ export default function SiteHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-gray-900 border-b-2 border-black shadow-xl" style={{ paddingTop: 'var(--sat, 0px)' }}>
+    <header className="fixed top-0 left-0 right-0 z-[100] bg-gray-900 border-b-2 border-black shadow-xl border-2 border-red-500" style={{ paddingTop: 'var(--sat, 0px)' }}>
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link
@@ -240,7 +240,7 @@ export default function SiteHeader() {
               </>
             )}
           </div>
-      </div>
+        </div>
       </div>
 
 
