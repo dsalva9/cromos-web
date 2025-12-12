@@ -44,6 +44,8 @@ export default function ResetPasswordPage() {
         setError(error.message);
       } else {
         setSuccess(true);
+        // Clear the password recovery flag
+        sessionStorage.removeItem('password_recovery_required');
         // Redirect to home after 2 seconds
         setTimeout(() => {
           router.push('/');

@@ -53,11 +53,32 @@
       "Bash(find:*)",
       "mcp__supabase__list_extensions",
       "mcp__supabase__list_edge_functions",
-      "mcp__supabase__get_advisors"
+      "mcp__supabase__get_advisors",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__list_organizations",
+      "Bash(npm outdated:*)",
+      "mcp__supabase__get_anon_key",
+      "Bash(git mv:*)",
+      "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\database\\migrations\\20251203000000_add_delete_listing_rpc.sql\")",
+      "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\docs\\features\\DELETE_LISTING_FEATURE.md\" \"C:\\Users\\dsalv\\Projects\\cromos-web\\docs\\testing\\DELETE_LISTING_DEPLOYMENT.md\")",
+      "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\src\\hooks\\marketplace\\useDeleteListing.ts\")",
+      "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\docs\\guides\\DATA_RETENTION_COMPLETE_PLAN.md\" \"C:\\Users\\dsalv\\Projects\\cromos-web\\docs\\guides\\DATA_RETENTION_IMPLEMENTATION.md\" \"C:\\Users\\dsalv\\Projects\\cromos-web\\docs\\guides\\DATA_RETENTION_IMPLEMENTATION_V2.md\")",
+      "mcp__ide__getDiagnostics",
+      "mcp__supabase__get_logs",
+      "Bash(npm run dev:*)",
+      "Bash(taskkill /F /PID 16936)",
+      "Bash(taskkill:*)",
+      "Bash(ls:*)",
+      "Bash(git rm:*)",
+      "Bash(del /F \"src\\app\\users\\[userId]\\UserProfileClient.tsx\" nul)",
+      "WebFetch(domain:cromos-web.vercel.app)",
+      "WebFetch(domain:cromos-web-git-main-davids-projects-963c9306.vercel.app)",
+      "mcp__supabase__get_project"
     ],
     "deny": [],
     "ask": []
   },
+  "enableAllProjectMcpServers": false,
   "enabledMcpjsonServers": [
     "supabase"
   ]

@@ -66,6 +66,15 @@ export default function AuthCallback() {
           }
 
           logger.info('Code exchanged successfully', { userId: data.session?.user?.id });
+
+          // Check if this is a password recovery flow
+          const amr = data.session?.user?.amr;
+          const lastAuth = amr?.[amr.length - 1];
+          if (lastAuth?.method === 'recovery' || next === '/profile/reset-password') {
+            // Set flag to require password reset
+            sessionStorage.setItem('password_recovery_required', 'true');
+            logger.info('Password recovery flag set');
+          }
         }
 
         // Get the current session
