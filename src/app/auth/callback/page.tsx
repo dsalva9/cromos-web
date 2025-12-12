@@ -55,28 +55,22 @@ export default function AuthCallback() {
 
         logger.info('Auth callback started', { hasCode: !!code, next });
 
-        // If there's a code, exchange it for a session
+        // Check if this is a password recovery flow
+        if (next === '/profile/reset-password') {
+          // Set flag to require password reset
+          sessionStorage.setItem('password_recovery_required', 'true');
+          console.log('[AuthCallback] Password recovery flag set in sessionStorage');
+          logger.info('Password recovery flag set');
+        } else {
+          console.log('[AuthCallback] Not a password recovery flow, next:', next);
+        }
+
+        // The @supabase/ssr client handles code exchange automatically
+        // For password recovery, it establishes the session automatically
+        // We just need to wait a moment for it to complete
         if (code) {
-          const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-
-          if (exchangeError) {
-            logger.error('Error exchanging code for session:', exchangeError);
-            setError('Error al procesar autenticación');
-            return;
-          }
-
-          logger.info('Code exchanged successfully', { userId: data.session?.user?.id });
-
-          // Check if this is a password recovery flow
-          // For password recovery, we check if the next param indicates reset password
-          if (next === '/profile/reset-password') {
-            // Set flag to require password reset
-            sessionStorage.setItem('password_recovery_required', 'true');
-            console.log('[AuthCallback] Password recovery flag set in sessionStorage');
-            logger.info('Password recovery flag set');
-          } else {
-            console.log('[AuthCallback] Not a password recovery flow, next:', next);
-          }
+          // Wait a bit for the automatic code exchange to complete
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // Get the current session

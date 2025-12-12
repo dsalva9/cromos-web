@@ -1,7 +1,7 @@
 'use client';
 
 import { siteConfig } from '@/config/site';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
@@ -16,6 +16,22 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('');
   const { supabase } = useSupabase();
   const router = useRouter();
+
+  // Set recovery flag when page loads (user came from recovery link)
+  useEffect(() => {
+    // Check if user has a session and if they arrived here via recovery
+    const checkAndSetRecoveryFlag = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // Set the recovery flag to prevent navigation until password is changed
+        sessionStorage.setItem('password_recovery_required', 'true');
+        console.log('[ResetPassword] Recovery flag set - user must reset password');
+      }
+    };
+
+    checkAndSetRecoveryFlag();
+  }, [supabase]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
