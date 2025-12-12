@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 
@@ -44,23 +45,22 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
-      // Check for next parameter in URL
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get('next');
+    // Check for next parameter in URL
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('next');
 
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
+    const handleAuthCallback = async (event: AuthChangeEvent, session: Session | null) => {
+      logger.info('Auth callback event:', event);
 
-      if (sessionError) {
-        logger.error('Error during auth callback:', sessionError);
-        setError('Error al procesar autenticación');
+      // Wait for auth events that indicate successful authentication
+      if (event !== 'SIGNED_IN' && event !== 'PASSWORD_RECOVERY') {
         return;
       }
 
-      const sessionUser = sessionData.session?.user;
+      const sessionUser = session?.user;
 
       if (!sessionUser) {
+        logger.error('No user in session after auth event');
         router.push('/login');
         return;
       }
@@ -101,7 +101,14 @@ export default function AuthCallback() {
       router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);
     };
 
-    handleAuthCallback();
+    // Listen for auth state changes to handle code exchange
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(handleAuthCallback);
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [supabase, router]);
 
   if (error) {
