@@ -72,7 +72,10 @@ export default function AuthCallback() {
           if (next === '/profile/reset-password') {
             // Set flag to require password reset
             sessionStorage.setItem('password_recovery_required', 'true');
+            console.log('[AuthCallback] Password recovery flag set in sessionStorage');
             logger.info('Password recovery flag set');
+          } else {
+            console.log('[AuthCallback] Not a password recovery flow, next:', next);
           }
         }
 

@@ -24,8 +24,15 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
         // Check if there's a recovery flag in session storage
         const recoveryRequired = sessionStorage.getItem(RECOVERY_FLAG_KEY);
 
+        console.log('[PasswordRecoveryGuard] Checking recovery state:', {
+          recoveryRequired,
+          pathname,
+          shouldRedirect: recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE
+        });
+
         if (recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE) {
           logger.info('Password recovery required, redirecting to reset page');
+          console.log('[PasswordRecoveryGuard] Redirecting to:', RESET_PASSWORD_ROUTE);
           router.replace(RESET_PASSWORD_ROUTE);
           return;
         }
