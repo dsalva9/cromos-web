@@ -8,11 +8,20 @@ import {
   FileText,
   AlertTriangle,
   CheckCircle,
-  Shield
+  Shield,
+  Clock,
+  UserX
 } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
-import { RetentionDashboard } from '@/components/admin/retention';
+import {
+  RetentionDashboard,
+  SuspendedUsersTable,
+  PendingDeletionUsersTable,
+  PendingDeletionListingsTable,
+  PendingDeletionTemplatesTable
+} from '@/components/admin/retention';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 
 function AdminDashboardContent() {
@@ -188,24 +197,64 @@ function AdminDashboardContent() {
           </ModernCard>
         </div>
 
-        {/* Suspended Users Alert */}
+        {/* Suspended Users Section */}
         {stats.suspended_users > 0 && (
-          <ModernCard className="mt-6 border-2 border-red-700">
-            <ModernCardContent className="p-4 bg-red-900/20">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-6 w-6 text-red-400" />
+          <ModernCard className="mt-8">
+            <ModernCardHeader>
+              <div className="flex items-center gap-2">
+                <UserX className="h-6 w-6 text-orange-500" />
                 <div>
-                  <p className="text-red-200 font-bold">
-                    {stats.suspended_users} suspended {stats.suspended_users === 1 ? 'user' : 'users'}
-                  </p>
-                  <p className="text-red-300 text-sm">
-                    Review suspended accounts in the Users tab
+                  <h2 className="text-xl font-bold text-white">Suspended Users</h2>
+                  <p className="text-sm text-gray-400 mt-1">
+                    {stats.suspended_users} user{stats.suspended_users === 1 ? '' : 's'} currently suspended
                   </p>
                 </div>
               </div>
+            </ModernCardHeader>
+            <ModernCardContent className="pt-4">
+              <SuspendedUsersTable />
             </ModernCardContent>
           </ModernCard>
         )}
+
+        {/* Pending Deletion Section */}
+        <ModernCard className="mt-8">
+          <ModernCardHeader>
+            <div className="flex items-center gap-2">
+              <Clock className="h-6 w-6 text-red-500" />
+              <div>
+                <h2 className="text-xl font-bold text-white">Items Pending Deletion</h2>
+                <p className="text-sm text-gray-400 mt-1">
+                  Scheduled for permanent deletion with permanent delete option
+                </p>
+              </div>
+            </div>
+          </ModernCardHeader>
+          <ModernCardContent className="pt-4">
+            <Tabs defaultValue="users" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 bg-[#2D3748]">
+                <TabsTrigger value="users" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                  Users
+                </TabsTrigger>
+                <TabsTrigger value="listings" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                  Listings
+                </TabsTrigger>
+                <TabsTrigger value="templates" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                  Templates
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="users" className="mt-4">
+                <PendingDeletionUsersTable />
+              </TabsContent>
+              <TabsContent value="listings" className="mt-4">
+                <PendingDeletionListingsTable />
+              </TabsContent>
+              <TabsContent value="templates" className="mt-4">
+                <PendingDeletionTemplatesTable />
+              </TabsContent>
+            </Tabs>
+          </ModernCardContent>
+        </ModernCard>
       </div>
     </div>
   );

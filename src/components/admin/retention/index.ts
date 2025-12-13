@@ -5,3 +5,7 @@ export { MoveToDeletionDialog } from './MoveToDeletionDialog';
 export { UnsuspendAccountDialog } from './UnsuspendAccountDialog';
 export { RetentionQueueTable } from './RetentionQueueTable';
 export { LegalHoldControls } from './LegalHoldControls';
+export { SuspendedUsersTable } from './SuspendedUsersTable';
+export { PendingDeletionUsersTable } from './PendingDeletionUsersTable';
+export { PendingDeletionListingsTable } from './PendingDeletionListingsTable';
+export { PendingDeletionTemplatesTable } from './PendingDeletionTemplatesTable';
