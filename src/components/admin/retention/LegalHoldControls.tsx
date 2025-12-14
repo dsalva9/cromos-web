@@ -83,8 +83,7 @@ export function LegalHoldControls({
       const { error } = await supabase
         .from('retention_schedule')
         .update({
-          legal_hold_until: null,
-          reason: null
+          legal_hold_until: null
         })
         .eq('id', item.id);
 

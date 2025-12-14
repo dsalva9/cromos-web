@@ -73,7 +73,8 @@
       "Bash(del /F \"src\\app\\users\\[userId]\\UserProfileClient.tsx\" nul)",
       "WebFetch(domain:cromos-web.vercel.app)",
       "WebFetch(domain:cromos-web-git-main-davids-projects-963c9306.vercel.app)",
-      "mcp__supabase__get_project"
+      "mcp__supabase__get_project",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
