@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, Trash2 } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -15,7 +15,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/audit')) return 'audit';
     if (pathname.includes('/admin/marketplace')) return 'marketplace';
     if (pathname.includes('/admin/templates')) return 'templates';
-    if (pathname.includes('/admin/retention-test')) return 'retention-test';
     return 'dashboard';
   };
 
@@ -38,7 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navigation Tabs */}
             <Tabs value={getActiveTab()} className="w-full">
-              <TabsList className="grid w-full max-w-5xl grid-cols-7 bg-[#1F2937]">
+              <TabsList className="grid w-full max-w-5xl grid-cols-6 bg-[#1F2937]">
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
@@ -96,16 +95,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Audit Log
-                  </TabsTrigger>
-                </Link>
-
-                <Link href="/admin/retention-test">
-                  <TabsTrigger
-                    value="retention-test"
-                    className="w-full data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Retention Test
                   </TabsTrigger>
                 </Link>
               </TabsList>
