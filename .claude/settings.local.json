@@ -74,7 +74,16 @@
       "WebFetch(domain:cromos-web.vercel.app)",
       "WebFetch(domain:cromos-web-git-main-davids-projects-963c9306.vercel.app)",
       "mcp__supabase__get_project",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_type"
     ],
     "deny": [],
     "ask": []
