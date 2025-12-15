@@ -39,7 +39,8 @@ export function useListing(listingId: string) {
           author_nickname: data.author.nickname,
           author_avatar_url: data.author.avatar_url,
           author_is_suspended: data.author.is_suspended,  // Include suspension status
-          author_deleted_at: data.author.deleted_at,  // NEW: Include deletion timestamp
+          author_deleted_at: data.author.deleted_at,  // Include author deletion timestamp
+          deleted_at: data.deleted_at,  // Include listing deletion timestamp
           title: data.title,
           description: data.description,
           sticker_number: data.sticker_number,

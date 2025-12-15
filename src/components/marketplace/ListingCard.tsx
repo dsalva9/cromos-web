@@ -131,6 +131,14 @@ export function ListingCard({ listing }: ListingCardProps) {
                 Autor eliminado
               </span>
             )}
+
+            {/* Listing Deleted Badge - Only visible to admins */}
+            {isAdmin && listing.deleted_at && (
+              <span className="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md bg-red-600/70 text-white border-red-800/60 flex items-center gap-1">
+                <Trash2 className="h-3 w-3" />
+                Eliminado
+              </span>
+            )}
           </div>
 
           {/* Overlay Gradient */}

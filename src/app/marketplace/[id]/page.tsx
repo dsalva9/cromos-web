@@ -302,6 +302,14 @@ export default function ListingDetailPage() {
                       Autor Eliminado
                     </Badge>
                   )}
+
+                  {/* Listing Deleted Badge - Only visible to admins */}
+                  {isAdmin && listing.deleted_at && (
+                    <Badge className="bg-red-600 text-white border-2 border-red-800 flex items-center gap-1">
+                      <Trash2 className="h-3 w-3" />
+                      Eliminado
+                    </Badge>
+                  )}
                 </div>
 
                 {(isOwner || isAdmin) && listing.status === 'active' && (

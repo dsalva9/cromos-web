@@ -16,7 +16,8 @@ import { UserLink } from '@/components/ui/user-link';
 import { useReportDetails } from '@/hooks/admin/useReportDetails';
 import { useResolveReport } from '@/hooks/admin/useResolveReport';
 import { toast } from 'sonner';
-import { AlertTriangle, X, Trash, Ban } from 'lucide-react';
+import { AlertTriangle, X, Trash, Ban, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 interface ReportDetailModalProps {
   reportId: string;
@@ -149,7 +150,37 @@ export function ReportDetailModal({
 
           {/* Reported Content */}
           <div className="border-2 border-gray-700 rounded-md p-4 space-y-3">
-            <h3 className="font-bold text-white">Reported Content</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-white">Reported Content</h3>
+              {/* View Content Link */}
+              {report.entity_type === 'user' && report.entity_id && (
+                <Link
+                  href={`/users/${report.entity_id}`}
+                  target="_blank"
+                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                >
+                  View Profile <ExternalLink className="h-4 w-4" />
+                </Link>
+              )}
+              {report.entity_type === 'listing' && report.entity_id && (
+                <Link
+                  href={`/marketplace/${report.entity_id}`}
+                  target="_blank"
+                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                >
+                  View Listing <ExternalLink className="h-4 w-4" />
+                </Link>
+              )}
+              {report.entity_type === 'template' && report.entity_id && (
+                <Link
+                  href={`/templates/${report.entity_id}`}
+                  target="_blank"
+                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                >
+                  View Template <ExternalLink className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
 
             {report.entity_type === 'user' && content.nickname && (
               <div className="space-y-2">
@@ -291,17 +322,21 @@ export function ReportDetailModal({
                 : 'Dismiss Report'}
             </Button>
 
-            <Button
-              onClick={() => handleResolve('remove_content')}
-              disabled={resolving || !adminNotes.trim()}
-              className="w-full bg-orange-600 hover:bg-orange-700"
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              {confirming === 'remove_content'
-                ? 'Click again to confirm'
-                : 'Remove Content'}
-            </Button>
+            {/* Show Remove Content button only for listings and templates */}
+            {(report.entity_type === 'listing' || report.entity_type === 'template') && (
+              <Button
+                onClick={() => handleResolve('remove_content')}
+                disabled={resolving || !adminNotes.trim()}
+                className="w-full bg-orange-600 hover:bg-orange-700"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                {confirming === 'remove_content'
+                  ? 'Click again to confirm'
+                  : 'Remove Content'}
+              </Button>
+            )}
 
+            {/* Show Suspend User button for all report types */}
             <Button
               onClick={() => handleResolve('suspend_user')}
               disabled={resolving || !adminNotes.trim()}
@@ -310,7 +345,9 @@ export function ReportDetailModal({
               <Ban className="mr-2 h-4 w-4" />
               {confirming === 'suspend_user'
                 ? 'Click again to confirm'
-                : 'Suspend User'}
+                : report.entity_type === 'user'
+                  ? 'Suspend User'
+                  : 'Suspend Content Owner'}
             </Button>
           </div>
         </div>

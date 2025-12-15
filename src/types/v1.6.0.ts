@@ -27,7 +27,8 @@ export interface Listing {
   author_avatar_url: string | null;
   author_postcode?: string | null;
   author_is_suspended?: boolean;  // For admin suspension indicators
-  author_deleted_at?: string | null;  // NEW: For admin deletion indicators
+  author_deleted_at?: string | null;  // For admin deletion indicators
+  deleted_at?: string | null;  // Listing soft deletion timestamp
   title: string;
   description: string | null;
   sticker_number: string | null;

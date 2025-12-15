@@ -4,6 +4,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 interface ReportDetails {
   report: {
     entity_type: string;
+    entity_id: string;
     reason: string;
     description: string | null;
     reporter_nickname: string;

@@ -16,7 +16,7 @@ export function useReport() {
 
       const { error } = await supabase.rpc('create_report', {
         p_target_type: entityType,
-        p_target_id: parseInt(entityId),
+        p_target_id: entityId, // Pass as string - function now accepts TEXT
         p_reason: reason,
         p_description: description || null,
       });

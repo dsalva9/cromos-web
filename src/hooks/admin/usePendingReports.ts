@@ -6,6 +6,7 @@ interface PendingReport {
   reporter_nickname: string;
   entity_type: string;
   entity_id: number;
+  entity_title: string;
   reason: string;
   description: string | null;
   created_at: string;

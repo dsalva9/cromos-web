@@ -92,7 +92,10 @@ function ReportsQueueContent() {
                             {report.reason}
                           </Badge>
                         </div>
-                        <p className="text-white font-bold">
+                        <p className="text-white font-bold text-lg mb-1">
+                          {report.entity_title || 'Unknown'}
+                        </p>
+                        <p className="text-gray-400 text-sm">
                           Reported by {report.reporter_nickname}
                         </p>
                       </div>

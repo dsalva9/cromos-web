@@ -28,6 +28,7 @@ import { createRipple } from '@/lib/animations';
 import { TemplateRatingSummary } from '@/components/templates/TemplateRatingSummary';
 import { TemplateRatingDialog } from '@/components/templates/TemplateRatingDialog';
 import { TemplateReviewList } from '@/components/templates/TemplateReviewList';
+import { ReportButton } from '@/components/social/ReportButton';
 import {
   Dialog,
   DialogContent,
@@ -353,6 +354,16 @@ export default function TemplateDetailsPage() {
                       </>
                     )}
                   </Button>
+
+                  {/* Report Button */}
+                  <div className="pt-2">
+                    <ReportButton
+                      entityType="template"
+                      entityId={templateId}
+                      variant="outline"
+                      size="default"
+                    />
+                  </div>
                 </>
               )}
 
