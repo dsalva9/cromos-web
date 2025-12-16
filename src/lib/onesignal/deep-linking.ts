@@ -59,9 +59,9 @@ export function generateDeepLinkPath(data: NotificationData): string {
 
     case 'template_rated':
       if (data.template_id) {
-        return `/plantillas/${data.template_id}`;
+        return `/templates/${data.template_id}`;
       }
-      return '/plantillas';
+      return '/templates';
 
     case 'user_rated':
       return '/profile';
