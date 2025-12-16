@@ -17,7 +17,8 @@ export default function Home() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash && hash.includes('type=recovery')) {
-      router.push('/profile/reset-password');
+      // Preserve the hash when redirecting so Supabase can process the tokens
+      router.push(`/profile/reset-password${hash}`);
     }
   }, [router]);
 

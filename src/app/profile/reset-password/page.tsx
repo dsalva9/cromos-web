@@ -14,6 +14,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [checkingSession, setCheckingSession] = useState(true);
   const { supabase } = useSupabase();
   const router = useRouter();
 
@@ -21,13 +22,20 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     // Check if user has a session and if they arrived here via recovery
     const checkAndSetRecoveryFlag = async () => {
+      // Give Supabase a moment to process hash tokens if present
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
         // Set the recovery flag to prevent navigation until password is changed
         sessionStorage.setItem('password_recovery_required', 'true');
         console.log('[ResetPassword] Recovery flag set - user must reset password');
+      } else {
+        setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
       }
+
+      setCheckingSession(false);
     };
 
     checkAndSetRecoveryFlag();
@@ -99,7 +107,16 @@ export default function ResetPasswordPage() {
             </p>
           </div>
 
-          {success ? (
+          {checkingSession ? (
+            <div className="bg-gray-700 border-2 border-black rounded-md p-6 text-center">
+              <p className="text-white font-bold text-lg mb-2">
+                Verificando sesión...
+              </p>
+              <p className="text-white text-sm">
+                Por favor espera un momento
+              </p>
+            </div>
+          ) : success ? (
             <div className="bg-green-600 border-2 border-black rounded-md p-6 text-center">
               <p className="text-white font-bold text-lg mb-2">
                 ✅ Contraseña actualizada
@@ -166,7 +183,7 @@ export default function ResetPasswordPage() {
             </form>
           )}
 
-          {!success && (
+          {!success && !checkingSession && (
             <div className="mt-8 text-center">
               <Link
                 href="/login"
