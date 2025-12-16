@@ -44,6 +44,12 @@ export function generateDeepLinkPath(data: NotificationData): string {
       return '/trades';
 
     case 'listing_chat':
+      // For chat notifications, go directly to the chat
+      if (data.listing_id) {
+        return `/marketplace/${data.listing_id}/chat`;
+      }
+      return '/marketplace';
+
     case 'listing_reserved':
     case 'listing_completed':
       if (data.listing_id) {
