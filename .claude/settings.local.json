@@ -83,7 +83,12 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_resize",
-      "mcp__playwright__browser_type"
+      "mcp__playwright__browser_type",
+      "Bash(npx cap:*)",
+      "Bash(adb logcat:*)",
+      "mcp__supabase__deploy_edge_function",
+      "Bash(if exist nul del /F nul)",
+      "Bash(del nul)"
     ],
     "deny": [],
     "ask": []

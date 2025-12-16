@@ -2,7 +2,7 @@
 
 import { siteConfig } from '@/config/site';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
@@ -16,6 +16,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const { supabase } = useSupabase();
   const router = useRouter();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/');
+      }
+    };
+
+    checkAuth();
+  }, [supabase, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
