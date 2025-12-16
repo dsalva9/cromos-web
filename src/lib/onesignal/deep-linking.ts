@@ -38,10 +38,9 @@ export function generateDeepLinkPath(data: NotificationData): string {
     case 'proposal_accepted':
     case 'proposal_rejected':
     case 'finalization_requested':
-      if (data.trade_id) {
-        return `/trades/${data.trade_id}`;
-      }
-      return '/trades';
+      // Trade routes don't exist yet, redirect to chats page
+      // TODO: Create dedicated /trades/[id] route for trade proposals
+      return '/chats';
 
     case 'listing_chat':
       // For chat notifications, go directly to the chat
