@@ -20,7 +20,7 @@ interface NotificationPayload {
 interface UserSettings {
   user_id: string;
   email: string | null;
-  onesignal_player_id: string | null;
+  onesignal_player_ids: string[] | null;  // Changed to array to support multiple devices
   preferences: {
     push: Record<string, boolean>;
     email: Record<string, boolean>;
@@ -96,13 +96,14 @@ serve(async (req) => {
 
     console.log('[send-push-notification] User settings:', {
       user_id: userSettings.user_id,
-      has_player_id: !!userSettings.onesignal_player_id,
+      player_ids_count: userSettings.onesignal_player_ids?.length || 0,
+      player_ids: userSettings.onesignal_player_ids,
       preferences: userSettings.preferences,
     });
 
-    // Check if user has a OneSignal player ID
-    if (!userSettings.onesignal_player_id) {
-      console.log('[send-push-notification] No player ID for user:', user_id);
+    // Check if user has any OneSignal player IDs
+    if (!userSettings.onesignal_player_ids || userSettings.onesignal_player_ids.length === 0) {
+      console.log('[send-push-notification] No player IDs for user:', user_id);
       return new Response(
         JSON.stringify({ message: 'User not subscribed to push notifications' }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -123,9 +124,10 @@ serve(async (req) => {
       );
     }
 
-    // Send push notification via OneSignal REST API
+    // Send push notification to ALL devices via OneSignal REST API
     console.log('[send-push-notification] Sending to OneSignal:', {
-      player_id: userSettings.onesignal_player_id,
+      player_ids: userSettings.onesignal_player_ids,
+      device_count: userSettings.onesignal_player_ids.length,
       title,
       body,
     });
@@ -138,7 +140,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         app_id: ONESIGNAL_APP_ID,
-        include_player_ids: [userSettings.onesignal_player_id],
+        include_player_ids: userSettings.onesignal_player_ids,  // Send to all devices
         headings: { en: title },
         contents: { en: body },
         data: {
