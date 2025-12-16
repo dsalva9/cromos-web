@@ -22,6 +22,7 @@ import { Listing } from '@/types/v1.6.0';
 import Link from 'next/link';
 import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { FloatingActionMenu } from '@/components/chat/FloatingActionMenu';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -298,8 +299,14 @@ function ListingChatPageContent() {
   };
 
   const handleReserve = async () => {
-    if (!listing || !isOwner || !user || !selectedParticipant) {
+    if (!listing || !isOwner || !user) {
+      toast.error('Error: no se puede reservar en este momento');
+      return;
+    }
+
+    if (!selectedParticipant) {
       toast.error('Debes seleccionar una conversación para reservar');
+      setShowConversationList(true);
       return;
     }
 
@@ -553,99 +560,55 @@ function ListingChatPageContent() {
         {listing && (
           <ModernCard className="mb-6">
             <ModernCardContent className="p-4">
-              {/* Mobile: Collapsible */}
+              {/* Mobile: Collapsible - REDESIGNED for Phase 2 */}
               <div className="md:hidden">
                 <button
                   onClick={() => setListingCardExpanded(!listingCardExpanded)}
-                  className="w-full flex items-center gap-3"
+                  className="w-full flex items-center gap-2 py-2"
                 >
                   {listing.image_url && (
-                    <div className="relative w-12 h-12 flex-shrink-0">
+                    <div className="relative w-10 h-10 flex-shrink-0">
                       <Image
                         src={listing.image_url}
                         alt={listing.title}
                         fill
-                        className="object-cover rounded-md border-2 border-gray-700"
+                        className="object-cover rounded border border-gray-700"
                       />
                     </div>
                   )}
                   <div className="flex-1 min-w-0 text-left">
-                    <h3 className="text-sm font-bold text-white truncate">
+                    <p className="text-xs font-bold text-white truncate">
                       {listing.title}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={cn(
-                        'px-2 py-0.5 rounded text-xs font-bold uppercase',
-                        listing.status === 'active' && 'bg-green-900/30 text-green-400',
-                        listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
-                        listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
-                        listing.status === 'sold' && 'bg-gray-700 text-gray-300'
-                      )}>
-                        {listing.status === 'active' && 'Disponible'}
-                        {listing.status === 'reserved' && 'Reservado'}
-                        {listing.status === 'completed' && 'Completado'}
-                        {listing.status === 'sold' && 'Completado'}
-                      </span>
-                    </div>
+                    </p>
                   </div>
+                  <span className={cn(
+                    'px-1.5 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
+                    listing.status === 'active' && 'bg-green-900/30 text-green-400',
+                    listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
+                    listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
+                    listing.status === 'sold' && 'bg-gray-700 text-gray-300'
+                  )}>
+                    {listing.status === 'active' && 'Activo'}
+                    {listing.status === 'reserved' && 'Reservado'}
+                    {listing.status === 'completed' && 'Completado'}
+                    {listing.status === 'sold' && 'Completado'}
+                  </span>
                   <ChevronDown
                     className={cn(
-                      'h-5 w-5 text-gray-400 transition-transform',
+                      'h-4 w-4 text-gray-400 transition-transform flex-shrink-0',
                       listingCardExpanded && 'rotate-180'
                     )}
                   />
                 </button>
 
                 {listingCardExpanded && (
-                  <div className="mt-4 pt-4 border-t border-gray-700">
-                    <p className="text-sm text-gray-400 mb-3">
+                  <div className="mt-2 pt-2 border-t border-gray-700">
+                    <p className="text-sm text-gray-400 mb-2">
                       {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
                     </p>
-                    <div className="flex flex-col gap-2">
-                      {/* Action buttons - moved here */}
-                      {isOwner && listing.status === 'active' && !transactionStatus && (
-                        <Button
-                          onClick={handleReserve}
-                          disabled={reserving || !selectedParticipant}
-                          variant="outline"
-                          className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full"
-                        >
-                          <Package className="h-4 w-4 mr-2" />
-                          {reserving ? 'Marcando...' : 'Marcar Reservado'}
-                        </Button>
-                      )}
-                      {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
-                        <>
-                          <Button
-                            onClick={handleComplete}
-                            disabled={completing}
-                            variant="outline"
-                            className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full"
-                          >
-                            <Package className="h-4 w-4 mr-2" />
-                            {completing ? 'Completando...' : 'Marcar Completado'}
-                          </Button>
-                          <Button
-                            onClick={handleUnreserve}
-                            disabled={unreserving}
-                            variant="outline"
-                            className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full"
-                          >
-                            <Package className="h-4 w-4 mr-2" />
-                            {unreserving ? 'Liberando...' : 'Liberar Reserva'}
-                          </Button>
-                        </>
-                      )}
-                      {isBuyer && listing.status === 'reserved' && transactionStatus === 'pending_completion' && (
-                        <Button
-                          onClick={handleConfirm}
-                          disabled={confirming}
-                          className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold w-full"
-                        >
-                          <Package className="h-4 w-4 mr-2" />
-                          {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
-                        </Button>
-                      )}
+                    {/* Action buttons REMOVED - now in FloatingActionMenu */}
+                    <div className="text-xs text-gray-500 italic">
+                      Usa el botón flotante para gestionar el anuncio
                     </div>
                   </div>
                 )}
@@ -1130,6 +1093,26 @@ function ListingChatPageContent() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Floating Action Menu - Mobile Only */}
+        <div className="md:hidden">
+          <FloatingActionMenu
+            // Seller actions
+            canReserve={isOwner && listing?.status === 'active' && !transactionStatus}
+            canComplete={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
+            canUnreserve={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
+            onReserve={handleReserve}
+            onComplete={handleComplete}
+            onUnreserve={handleUnreserve}
+            reserving={reserving}
+            completing={completing}
+            unreserving={unreserving}
+            // Buyer actions
+            canConfirm={isBuyer && listing?.status === 'reserved' && transactionStatus === 'pending_completion'}
+            onConfirm={handleConfirm}
+            confirming={confirming}
+          />
+        </div>
       </div>
     </div>
   );
