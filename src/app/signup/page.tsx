@@ -71,7 +71,7 @@ export default function SignupPage() {
         setSuccess(true);
       }
     } catch {
-      setError('An unexpected error occurred');
+      setError('unexpected');
     } finally {
       setLoading(false);
     }
@@ -245,7 +245,18 @@ export default function SignupPage() {
 
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
-                <p className="text-sm text-white font-bold">{error}</p>
+                <p className="text-sm text-white font-bold">
+                  {error === 'unexpected' ? 'Ocurrió un error inesperado.' : error}
+                </p>
+                <p className="text-sm text-white font-bold mt-2">
+                  Por favor contacta con{' '}
+                  <a
+                    href="mailto:soporte@cambiocromos.com"
+                    className="underline hover:text-gray-200"
+                  >
+                    soporte@cambiocromos.com
+                  </a>
+                </p>
               </div>
             )}
 

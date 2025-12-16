@@ -191,7 +191,7 @@ function CompleteProfileContent() {
       router.push('/');
     } catch (error) {
       logger.error('Error completing profile', error);
-      setErrorMessage('No pudimos guardar tu perfil. Intenta nuevamente.');
+      setErrorMessage('profile_save_error');
     } finally {
       setSaving(false);
     }
@@ -257,7 +257,22 @@ function CompleteProfileContent() {
 
               {errorMessage && (
                 <div className="bg-red-600/80 border-2 border-black rounded-md px-4 py-3 text-sm font-bold text-white">
-                  {errorMessage}
+                  {errorMessage === 'profile_save_error' ? (
+                    <>
+                      No pudimos guardar tu perfil. Intenta nuevamente.
+                      <br />
+                      <br />
+                      Por favor contacta con{' '}
+                      <a
+                        href="mailto:soporte@cambiocromos.com"
+                        className="underline hover:text-gray-200"
+                      >
+                        soporte@cambiocromos.com
+                      </a>
+                    </>
+                  ) : (
+                    errorMessage
+                  )}
                 </div>
               )}
 

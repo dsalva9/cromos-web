@@ -88,7 +88,8 @@
       "Bash(adb logcat:*)",
       "mcp__supabase__deploy_edge_function",
       "Bash(if exist nul del /F nul)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\src\\components\\auth\\PasswordResetGuard.tsx\")"
     ],
     "deny": [],
     "ask": []

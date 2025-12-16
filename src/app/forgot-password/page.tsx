@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        setMessage({ type: 'error', text: error.message });
+        setMessage({ type: 'error', text: `${error.message}\n\nPor favor contacta con soporte@cambiocromos.com` });
       } else {
         setMessage({
           type: 'success',
@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
       }
     } catch (error) {
       console.error('Password reset error:', error);
-      setMessage({ type: 'error', text: 'Ocurrió un error inesperado. Inténtalo de nuevo.' });
+      setMessage({ type: 'error', text: 'Ocurrió un error inesperado. Inténtalo de nuevo.\n\nPor favor contacta con soporte@cambiocromos.com' });
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,23 @@ export default function ForgotPasswordPage() {
                   message.type === 'success' ? 'bg-green-600' : 'bg-[#E84D4D]'
                 }`}
               >
-                <p className="text-sm text-white font-bold">{message.text}</p>
+                <p className="text-sm text-white font-bold whitespace-pre-line">
+                  {message.text.split('soporte@cambiocromos.com').map((part, index, array) => (
+                    index < array.length - 1 ? (
+                      <span key={index}>
+                        {part}
+                        <a
+                          href="mailto:soporte@cambiocromos.com"
+                          className="underline hover:text-gray-200"
+                        >
+                          soporte@cambiocromos.com
+                        </a>
+                      </span>
+                    ) : (
+                      part
+                    )
+                  ))}
+                </p>
               </div>
             )}
 

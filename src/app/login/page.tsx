@@ -66,7 +66,7 @@ export default function LoginPage() {
           console.log('No profile data, user may be suspended and already signed out');
           await supabase.auth.signOut();
           setLoading(false);
-          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          setError('suspended');
           return;
         }
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
           console.log('Profile error detected, signing out');
           await supabase.auth.signOut();
           setLoading(false);
-          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          setError('suspended');
           return;
         }
 
@@ -84,7 +84,7 @@ export default function LoginPage() {
           console.log('User is suspended, signing out');
           await supabase.auth.signOut();
           setLoading(false);
-          setError('Tu cuenta está suspendida, por favor contacta con admin@cambiocromos.com');
+          setError('suspended');
           return;
         }
 
@@ -178,7 +178,32 @@ export default function LoginPage() {
 
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
-                <p className="text-sm text-white font-bold">{error}</p>
+                <p className="text-sm text-white font-bold">
+                  {error === 'suspended' ? (
+                    <>
+                      Tu cuenta está suspendida, por favor contacta con{' '}
+                      <a
+                        href="mailto:admin@cambiocromos.com"
+                        className="underline hover:text-gray-200"
+                      >
+                        admin@cambiocromos.com
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      {error}
+                      <br />
+                      <br />
+                      Por favor contacta con{' '}
+                      <a
+                        href="mailto:soporte@cambiocromos.com"
+                        className="underline hover:text-gray-200"
+                      >
+                        soporte@cambiocromos.com
+                      </a>
+                    </>
+                  )}
+                </p>
               </div>
             )}
 
