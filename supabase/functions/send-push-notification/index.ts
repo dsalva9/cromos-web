@@ -21,8 +21,11 @@ interface UserSettings {
   user_id: string;
   email: string | null;
   onesignal_player_id: string | null;
-  push_enabled: boolean;
-  email_enabled: boolean;
+  preferences: {
+    push: Record<string, boolean>;
+    email: Record<string, boolean>;
+    in_app: Record<string, boolean>;
+  };
 }
 
 serve(async (req) => {
@@ -76,14 +79,12 @@ serve(async (req) => {
     if (settingsError) {
       console.error('[send-push-notification] Error fetching settings:', settingsError);
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch user settings' }),
+        JSON.stringify({ error: 'Failed to fetch user settings', details: settingsError }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const userSettings: UserSettings = settings[0];
-
-    if (!userSettings) {
+    if (!settings || settings.length === 0) {
       console.log('[send-push-notification] User not found:', user_id);
       return new Response(
         JSON.stringify({ error: 'User not found' }),
@@ -91,14 +92,13 @@ serve(async (req) => {
       );
     }
 
-    // Check if user has push notifications enabled
-    if (!userSettings.push_enabled) {
-      console.log('[send-push-notification] Push disabled for user:', user_id);
-      return new Response(
-        JSON.stringify({ message: 'Push notifications disabled for user' }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
+    const userSettings: UserSettings = settings[0];
+
+    console.log('[send-push-notification] User settings:', {
+      user_id: userSettings.user_id,
+      has_player_id: !!userSettings.onesignal_player_id,
+      preferences: userSettings.preferences,
+    });
 
     // Check if user has a OneSignal player ID
     if (!userSettings.onesignal_player_id) {
@@ -109,7 +109,27 @@ serve(async (req) => {
       );
     }
 
+    // Check if push notifications are enabled for this specific notification type
+    const pushEnabled = userSettings.preferences?.push?.[notification_kind] ?? true;
+
+    if (!pushEnabled) {
+      console.log('[send-push-notification] Push disabled for notification type:', {
+        user_id,
+        notification_kind,
+      });
+      return new Response(
+        JSON.stringify({ message: `Push notifications disabled for ${notification_kind}` }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Send push notification via OneSignal REST API
+    console.log('[send-push-notification] Sending to OneSignal:', {
+      player_id: userSettings.onesignal_player_id,
+      title,
+      body,
+    });
+
     const oneSignalResponse = await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
       headers: {
