@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
 
 export async function POST(request: Request) {
   try {
@@ -90,15 +91,50 @@ export async function POST(request: Request) {
     }
 
     // Generate password reset link
-    const { error } = await adminClient.auth.admin.generateLink({
+    const { data: linkData, error } = await adminClient.auth.admin.generateLink({
       type: 'recovery',
       email: userData.user.email
     });
 
-    if (error) {
+    if (error || !linkData) {
       console.error('Error generating reset link:', error);
       return NextResponse.json(
         { error: 'Error al generar enlace de restablecimiento' },
+        { status: 500 }
+      );
+    }
+
+    // Send email using Resend
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      console.error('RESEND_API_KEY not configured');
+      return NextResponse.json(
+        { error: 'Configuración de email incompleta' },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(resendApiKey);
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+
+    try {
+      await resend.emails.send({
+        from: fromEmail,
+        to: userData.user.email,
+        subject: 'Restablecer tu contraseña',
+        html: `
+          <h2>Restablecimiento de contraseña</h2>
+          <p>Un administrador ha solicitado restablecer tu contraseña.</p>
+          <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+          <p><a href="${linkData.properties.action_link}">Restablecer contraseña</a></p>
+          <p>Este enlace expirará en 24 horas.</p>
+          <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+        `
+      });
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      return NextResponse.json(
+        { error: 'Error al enviar el correo' },
         { status: 500 }
       );
     }
