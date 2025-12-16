@@ -115,11 +115,10 @@ export async function POST(request: Request) {
     }
 
     const resend = new Resend(resendApiKey);
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
     try {
       await resend.emails.send({
-        from: fromEmail,
+        from: 'CambioCromos <info@cambiocromos.com>',
         to: userData.user.email,
         subject: 'Restablecer tu contraseña',
         html: `
