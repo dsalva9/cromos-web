@@ -169,6 +169,15 @@ export default function TemplateDetailsPage() {
             <p className="text-slate-400">
               {error?.message || 'No se pudo cargar la plantilla'}
             </p>
+            <p className="text-slate-400">
+              Por favor contacta con{' '}
+              <a
+                href="mailto:soporte@cambiocromos.com"
+                className="text-[#FFC000] hover:text-yellow-400 underline"
+              >
+                soporte@cambiocromos.com
+              </a>
+            </p>
             <Button
               onClick={() => router.push('/templates')}
               className="bg-[#FFC000] text-black hover:bg-[#FFD700]"

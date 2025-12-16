@@ -259,6 +259,15 @@ export default function UserProfilePage() {
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
           <p className="text-white text-xl mb-4">Usuario no encontrado</p>
+          <p className="text-gray-400 mt-4">
+            Por favor contacta con{' '}
+            <a
+              href="mailto:soporte@cambiocromos.com"
+              className="text-[#FFC000] hover:text-yellow-400 underline"
+            >
+              soporte@cambiocromos.com
+            </a>
+          </p>
         </div>
       </div>
     );

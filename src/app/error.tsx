@@ -29,6 +29,15 @@ export default function Error({
             <p className="text-gray-400">
               Encontramos un error al cargar esta página.
             </p>
+            <p className="text-gray-400 mt-4">
+              Por favor contacta con{' '}
+              <a
+                href="mailto:soporte@cambiocromos.com"
+                className="text-[#FFC000] hover:text-yellow-400 underline"
+              >
+                soporte@cambiocromos.com
+              </a>
+            </p>
           </div>
 
           {process.env.NODE_ENV === 'development' && error && (

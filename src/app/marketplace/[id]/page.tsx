@@ -176,6 +176,15 @@ export default function ListingDetailPage() {
             {error ||
               'Este anuncio puede haber sido eliminado o ya no está disponible'}
           </p>
+          <p className="text-gray-400 mb-6">
+            Por favor contacta con{' '}
+            <a
+              href="mailto:soporte@cambiocromos.com"
+              className="text-[#FFC000] hover:text-yellow-400 underline"
+            >
+              soporte@cambiocromos.com
+            </a>
+          </p>
           <Link href="/marketplace">
             <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
               Volver al Marketplace
@@ -202,6 +211,15 @@ export default function ListingDetailPage() {
           </h2>
           <p className="text-gray-400 mb-6">
             Este anuncio puede haber sido eliminado o ya no está disponible
+          </p>
+          <p className="text-gray-400 mb-6">
+            Por favor contacta con{' '}
+            <a
+              href="mailto:soporte@cambiocromos.com"
+              className="text-[#FFC000] hover:text-yellow-400 underline"
+            >
+              soporte@cambiocromos.com
+            </a>
           </p>
           <Link href="/marketplace">
             <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">

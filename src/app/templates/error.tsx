@@ -14,9 +14,18 @@ export default function Error({
       {_error?.digest && (
         <span className="sr-only">{_error.digest}</span>
       )}
-      <h2 className="text-2xl font-bold mb-4">Algo saliA3 mal</h2>
+      <h2 className="text-2xl font-bold mb-4">Algo salió mal</h2>
       <p className="text-muted-foreground mb-6 text-center max-w-md">
-        Lo sentimos, ocurriA3 un error al cargar las plantillas. Intenta de nuevo.
+        Lo sentimos, ocurrió un error al cargar las plantillas. Intenta de nuevo.
+      </p>
+      <p className="text-muted-foreground mb-6 text-center max-w-md">
+        Por favor contacta con{' '}
+        <a
+          href="mailto:soporte@cambiocromos.com"
+          className="text-[#FFC000] hover:text-yellow-400 underline"
+        >
+          soporte@cambiocromos.com
+        </a>
       </p>
       <Button onClick={reset}>Intentar de nuevo</Button>
     </div>
