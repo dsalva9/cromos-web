@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -255,28 +255,24 @@ function ListingChatPageContent() {
     void fetchRatings();
   }, [listing, listingId, supabase, user]);
 
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   // Improve auto-scroll behavior
   useEffect(() => {
     // Scroll to bottom when messages change
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-
-    // On mobile, also ensure input stays visible
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setTimeout(() => {
-        // Scroll the message container to bottom
-        const messageContainer = messagesEndRef.current?.closest('.overflow-y-auto');
-        if (messageContainer) {
-          messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-      }, 100);
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
   // Also scroll when conversation changes
   useEffect(() => {
     if (selectedParticipant) {
+      // Small timeout to allow render
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
       }, 100);
     }
   }, [selectedParticipant]);
@@ -848,6 +844,7 @@ function ListingChatPageContent() {
               <ModernCardContent className="p-0">
                 {/* Messages */}
                 <div
+                  ref={chatContainerRef}
                   className="overflow-y-auto p-4 space-y-3"
                   style={{ height: chatHeight }}
                 >
@@ -1099,8 +1096,8 @@ function ListingChatPageContent() {
           <FloatingActionMenu
             // Seller actions
             canReserve={isOwner && listing?.status === 'active' && !transactionStatus}
-            canComplete={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
-            canUnreserve={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
+            canComplete={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved' && transaction?.buyer_id === selectedParticipant}
+            canUnreserve={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved' && transaction?.buyer_id === selectedParticipant}
             onReserve={handleReserve}
             onComplete={handleComplete}
             onUnreserve={handleUnreserve}

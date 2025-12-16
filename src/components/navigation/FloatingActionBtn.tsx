@@ -12,7 +12,9 @@ export function FloatingActionBtn() {
   let actionLink = null;
   let ariaLabel = '';
 
-  if (pathname === '/marketplace' || pathname?.startsWith('/marketplace/')) {
+  if ((pathname === '/marketplace' || pathname?.startsWith('/marketplace/')) &&
+    !pathname?.includes('/chat') &&
+    !pathname?.endsWith('/create')) {
     // Only show on main marketplace page or subpages where it makes sense?
     // User asked: "when we are in Marketplace"
     // Let's show it on /marketplace and /marketplace/my-listings, but maybe not on detail pages if they cover it?
