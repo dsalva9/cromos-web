@@ -19,6 +19,7 @@ interface BadgeCardProps {
   showEarnedDate?: boolean;
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  isHighlighted?: boolean;
 }
 
 export function BadgeCard({
@@ -28,6 +29,7 @@ export function BadgeCard({
   showEarnedDate = true,
   size = 'medium',
   className,
+  isHighlighted = false,
 }: BadgeCardProps) {
   const colors = getBadgeTierColors(badge.tier);
   const isProgress = 'is_earned' in badge;
@@ -68,9 +70,17 @@ export function BadgeCard({
         colors.border,
         isEarned ? colors.bg : 'bg-gray-50 dark:bg-gray-900/30 opacity-60',
         isEarned && 'hover:shadow-md',
+        isHighlighted && 'animate-[highlight_3s_ease-in-out]',
         styles.container,
         className
       )}
+      style={
+        isHighlighted
+          ? {
+              animation: 'highlight 3s ease-in-out',
+            }
+          : undefined
+      }
     >
       <div className="flex items-start gap-3">
         <BadgeIcon

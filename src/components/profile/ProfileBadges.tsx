@@ -28,7 +28,7 @@ export function ProfileBadges({
 }: ProfileBadgesProps) {
   const { isLoading: badgesLoading } = useUserBadges(userId);
   const { progress, isLoading: progressLoading } = useBadgeProgress(userId);
-  const [, setHighlightBadge] = useState<string | null>(null);
+  const [highlightBadge, setHighlightBadge] = useState<string | null>(null);
 
   // Handle URL fragment for scrolling and highlighting
   useEffect(() => {
@@ -159,6 +159,7 @@ export function ProfileBadges({
                   showProgress={true}
                   columns={3}
                   size="medium"
+                  highlightBadgeId={highlightBadge}
                 />
               </div>
             );
@@ -182,6 +183,7 @@ export function ProfileBadges({
               showProgress={false}
               columns={3}
               size="medium"
+              highlightBadgeId={highlightBadge}
             />
           )}
         </TabsContent>

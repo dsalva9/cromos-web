@@ -11,6 +11,7 @@ export interface NotificationData {
   template_id?: number;
   trade_id?: number;
   rating_id?: number;
+  badge_id?: string;
   deep_link?: string;
 }
 
@@ -54,7 +55,10 @@ export function generateDeepLink(data: NotificationData): string {
       return `${baseUrl}/profile`;
 
     case 'badge_earned':
-      return `${baseUrl}/profile/badges`;
+      if (data.badge_id) {
+        return `${baseUrl}/profile?badge=${data.badge_id}#badges`;
+      }
+      return `${baseUrl}/profile#badges`;
 
     case 'admin_action':
       return `${baseUrl}/profile`;
@@ -93,6 +97,7 @@ export function parseNotificationData(payload: unknown): NotificationData | null
     template_id: data.template_id ? Number(data.template_id) : undefined,
     trade_id: data.trade_id ? Number(data.trade_id) : undefined,
     rating_id: data.rating_id ? Number(data.rating_id) : undefined,
+    badge_id: data.badge_id as string | undefined,
     deep_link: data.deep_link as string | undefined,
   };
 }

@@ -16,6 +16,7 @@ interface BadgeGridProps {
   size?: 'small' | 'medium' | 'large';
   className?: string;
   emptyMessage?: string;
+  highlightBadgeId?: string | null;
 }
 
 const columnClasses = {
@@ -32,6 +33,7 @@ export function BadgeGrid({
   size = 'medium',
   className,
   emptyMessage = 'No hay insignias para mostrar',
+  highlightBadgeId,
 }: BadgeGridProps) {
   if (badges.length === 0) {
     return (
@@ -49,6 +51,7 @@ export function BadgeGrid({
           badge={badge}
           showProgress={showProgress}
           size={size}
+          isHighlighted={highlightBadgeId === badge.badge_id}
         />
       ))}
     </div>
