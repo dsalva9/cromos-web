@@ -35,7 +35,7 @@ const CHANNELS: { id: NotificationChannel; label: string; icon: typeof Bell; col
   { id: 'email', label: 'Email', icon: Mail, color: 'orange' },
 ];
 
-const ACTIVE_CATEGORIES: NotificationCategory[] = ['marketplace', 'community', 'system'];
+const ACTIVE_CATEGORIES: NotificationCategory[] = ['marketplace', 'community'];
 
 export function NotificationPreferencesMatrix({
   preferences,
