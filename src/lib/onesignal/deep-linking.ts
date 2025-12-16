@@ -3,6 +3,7 @@
  * Routes users to the correct page when clicking push notifications
  */
 
+import { Capacitor } from '@capacitor/core';
 import type { NotificationKind } from './config';
 
 export interface NotificationData {
@@ -16,15 +17,20 @@ export interface NotificationData {
 }
 
 /**
- * Generate deep link URL from notification data
+ * Generate deep link path from notification data
+ * Returns just the path, not the full URL
  */
-export function generateDeepLink(data: NotificationData): string {
-  // If explicit deep link is provided, use it
+export function generateDeepLinkPath(data: NotificationData): string {
+  // If explicit deep link is provided, extract the path
   if (data.deep_link) {
-    return data.deep_link;
+    try {
+      const url = new URL(data.deep_link);
+      return url.pathname + url.search + url.hash;
+    } catch {
+      // If it's already a path, return it
+      return data.deep_link;
+    }
   }
-
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cromos.vercel.app';
 
   // Route based on notification kind and associated IDs
   switch (data.notification_kind) {
@@ -33,51 +39,74 @@ export function generateDeepLink(data: NotificationData): string {
     case 'proposal_rejected':
     case 'finalization_requested':
       if (data.trade_id) {
-        return `${baseUrl}/trades/${data.trade_id}`;
+        return `/trades/${data.trade_id}`;
       }
-      return `${baseUrl}/trades`;
+      return '/trades';
 
     case 'listing_chat':
     case 'listing_reserved':
     case 'listing_completed':
       if (data.listing_id) {
-        return `${baseUrl}/marketplace/${data.listing_id}`;
+        return `/marketplace/${data.listing_id}`;
       }
-      return `${baseUrl}/marketplace`;
+      return '/marketplace';
 
     case 'template_rated':
       if (data.template_id) {
-        return `${baseUrl}/plantillas/${data.template_id}`;
+        return `/plantillas/${data.template_id}`;
       }
-      return `${baseUrl}/plantillas`;
+      return '/plantillas';
 
     case 'user_rated':
-      return `${baseUrl}/profile`;
+      return '/profile';
 
     case 'badge_earned':
       if (data.badge_id) {
-        return `${baseUrl}/profile?badge=${data.badge_id}#badges`;
+        return `/profile?badge=${data.badge_id}#badges`;
       }
-      return `${baseUrl}/profile#badges`;
+      return '/profile#badges';
 
     case 'admin_action':
-      return `${baseUrl}/profile`;
+      return '/profile';
 
     default:
-      return `${baseUrl}/profile/notifications`;
+      return '/profile/notifications';
   }
 }
 
 /**
  * Handle notification click event
  * Called when user clicks a push notification
+ *
+ * For native apps (Capacitor), navigates within the app using Next.js router
+ * For web, uses window.location to navigate
  */
 export function handleNotificationClick(data: NotificationData): void {
-  const deepLink = generateDeepLink(data);
-  
-  // For web, navigate to the URL
-  if (typeof window !== 'undefined') {
-    window.location.href = deepLink;
+  const deepLinkPath = generateDeepLinkPath(data);
+
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  console.log('[Deep Linking] Navigating to:', deepLinkPath);
+
+  // Check if running in a native app (Capacitor)
+  const isNative = Capacitor.isNativePlatform();
+
+  if (isNative) {
+    // For native apps, use pushState to navigate within the app
+    // This keeps the user in the app instead of opening the browser
+    window.history.pushState({}, '', deepLinkPath);
+
+    // Trigger a popstate event to let Next.js router handle the navigation
+    const popStateEvent = new PopStateEvent('popstate', { state: {} });
+    window.dispatchEvent(popStateEvent);
+
+    // Also manually reload the page to ensure navigation happens
+    window.location.href = deepLinkPath;
+  } else {
+    // For web, just navigate normally
+    window.location.href = deepLinkPath;
   }
 }
 
