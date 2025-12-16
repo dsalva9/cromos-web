@@ -37,8 +37,24 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           return;
         }
 
-        // The recovery flag is the primary indicator
-        // No need to check AMR as the flag is set during the callback
+        // Also check if user has a recovery session (AMR contains 'recovery')
+        // This catches cases where the flag hasn't been set yet
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const amr = session.user.amr || [];
+          const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
+
+          if (hasRecoveryAuth && pathname !== RESET_PASSWORD_ROUTE) {
+            // Set the flag if it's not set yet
+            if (recoveryRequired !== 'true') {
+              sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
+            }
+            logger.info('Recovery session detected via AMR, redirecting to reset page');
+            console.log('[PasswordRecoveryGuard] Recovery session detected, redirecting to:', RESET_PASSWORD_ROUTE);
+            router.replace(RESET_PASSWORD_ROUTE);
+            return;
+          }
+        }
       } catch (error) {
         logger.error('Error checking recovery state:', error);
       } finally {
