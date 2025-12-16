@@ -32,10 +32,11 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
      */
     const savePlayerIdToDatabase = async (playerId: string) => {
       try {
+        console.log('[OneSignal] Calling updateOneSignalPlayerId with:', playerId);
         await updateOneSignalPlayerId(playerId);
-        logger.info('[OneSignal] Player ID saved to database:', playerId);
+        console.log('[OneSignal] ✅ Player ID saved to database:', playerId);
       } catch (error) {
-        logger.error('[OneSignal] Failed to save player ID:', error);
+        console.error('[OneSignal] ❌ Failed to save player ID:', error);
       }
     };
 
@@ -44,67 +45,125 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
      */
     const initializeNative = () => {
       const initOneSignal = () => {
+        logger.info('[OneSignal] Native initOneSignal called');
+        logger.info('[OneSignal] Checking for plugins...', {
+          hasWindow: typeof window !== 'undefined',
+          hasPlugins: !!(window as any).plugins,
+          pluginKeys: (window as any).plugins ? Object.keys((window as any).plugins) : [],
+        });
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const OneSignal = (window as any).plugins?.OneSignal;
 
         if (!OneSignal) {
           logger.error('[OneSignal] Plugin not found on window.plugins');
+          logger.error('[OneSignal] Available plugins:', (window as any).plugins);
           return;
         }
 
         logger.info('[OneSignal] Native plugin found, initializing...');
+        logger.info('[OneSignal] OneSignal plugin methods:', Object.keys(OneSignal));
 
-        // Initialize OneSignal
-        OneSignal.initialize(ONESIGNAL_CONFIG.appId);
+        try {
+          // Initialize OneSignal
+          logger.info('[OneSignal] Calling OneSignal.initialize with appId:', ONESIGNAL_CONFIG.appId);
+          OneSignal.initialize(ONESIGNAL_CONFIG.appId);
+          logger.info('[OneSignal] Initialize called successfully');
+        } catch (error) {
+          logger.error('[OneSignal] Error during initialize:', error);
+          return;
+        }
 
         // Set external user ID (for targeting specific users)
         if (user) {
-          OneSignal.login(user.id);
-          logger.info('[OneSignal] User logged in:', user.id);
+          try {
+            OneSignal.login(user.id);
+            logger.info('[OneSignal] User logged in:', user.id);
+          } catch (error) {
+            logger.error('[OneSignal] Error logging in user:', error);
+          }
         }
 
-        // Get current player ID immediately (in case change event doesn't fire)
-        setTimeout(() => {
-          const currentPlayerId = OneSignal.User.PushSubscription.id;
-          if (currentPlayerId) {
-            logger.info('[OneSignal] Current player ID:', currentPlayerId);
-            savePlayerIdToDatabase(currentPlayerId);
-          }
-        }, 1000);
+        // Get current subscription ID using Cordova plugin API
+        try {
+          console.log('[OneSignal] Getting push subscription ID...');
+          OneSignal.User.pushSubscription.getIdAsync((id: string | null) => {
+            console.log('[OneSignal] Got subscription ID:', id);
+            if (id) {
+              console.log('[OneSignal] Saving player ID to database:', id);
+              savePlayerIdToDatabase(id);
+            }
+          });
+        } catch (error) {
+          console.error('[OneSignal] Error getting subscription ID:', error);
+        }
 
-        // Listen for subscription changes to get player ID
-        OneSignal.User.PushSubscription.addEventListener('change', (event: { current: { id: string } }) => {
-          const playerId = event.current.id;
-          if (playerId) {
-            logger.info('[OneSignal] Player ID received:', playerId);
-            savePlayerIdToDatabase(playerId);
-          }
-        });
+        // Listen for subscription changes using Cordova plugin API
+        try {
+          logger.info('[OneSignal] Adding subscription change listener...');
+          OneSignal.User.pushSubscription.addEventListener('change', (event: { current: { id: string } }) => {
+            logger.info('[OneSignal] Subscription changed:', event);
+            const playerId = event.current?.id;
+            if (playerId) {
+              logger.info('[OneSignal] Player ID received:', playerId);
+              savePlayerIdToDatabase(playerId);
+            }
+          });
+        } catch (error) {
+          logger.error('[OneSignal] Error adding subscription listener:', error);
+        }
 
-        // Listen for notification clicks
-        OneSignal.Notifications.addEventListener('click', (event: { notification: { additionalData?: unknown } }) => {
-          logger.info('[OneSignal] Notification clicked:', event);
-          const data = parseNotificationData(event.notification.additionalData);
-          if (data) {
-            handleNotificationClick(data);
-          }
-        });
+        // Listen for notification clicks using Cordova plugin API
+        try {
+          logger.info('[OneSignal] Adding notification click listener...');
+          OneSignal.Notifications.addEventListener('click', (event: { notification: { additionalData?: unknown } }) => {
+            logger.info('[OneSignal] Notification clicked:', event);
+            const data = parseNotificationData(event.notification?.additionalData);
+            if (data) {
+              handleNotificationClick(data);
+            }
+          });
+        } catch (error) {
+          logger.error('[OneSignal] Error adding click listener:', error);
+        }
 
         // Request permission
-        OneSignal.Notifications.requestPermission(true)
-          .then((accepted: boolean) => {
-            logger.info('[OneSignal] Permission granted:', accepted);
-          })
-          .catch((err: unknown) => {
-            logger.error('[OneSignal] Permission request error:', err);
-          });
+        try {
+          logger.info('[OneSignal] Requesting notification permission...');
+          OneSignal.Notifications.requestPermission(true)
+            .then((accepted: boolean) => {
+              logger.info('[OneSignal] Permission granted:', accepted);
+              if (!accepted) {
+                logger.warn('[OneSignal] User denied notification permission');
+              }
+            })
+            .catch((err: unknown) => {
+              logger.error('[OneSignal] Permission request error:', err);
+            });
+        } catch (error) {
+          logger.error('[OneSignal] Error requesting permission:', error);
+        }
       };
 
       // Wait for deviceready event
+      logger.info('[OneSignal] Setting up deviceready listener, readyState:', document.readyState);
+
+      const onDeviceReady = () => {
+        logger.info('[OneSignal] deviceready event fired!');
+        initOneSignal();
+      };
+
       if (document.readyState === 'complete') {
+        logger.info('[OneSignal] Document already complete, initializing after timeout');
         setTimeout(initOneSignal, 100);
       } else {
-        document.addEventListener('deviceready', initOneSignal, false);
+        logger.info('[OneSignal] Waiting for deviceready event');
+        document.addEventListener('deviceready', onDeviceReady, false);
+
+        // Also log when DOMContentLoaded fires
+        document.addEventListener('DOMContentLoaded', () => {
+          logger.info('[OneSignal] DOMContentLoaded fired');
+        });
       }
     };
 
@@ -191,13 +250,22 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
     };
 
     const isNative = Capacitor.isNativePlatform();
-    logger.info('[OneSignal] Initializing...', { isNative, userId: user.id });
+    const platform = Capacitor.getPlatform();
+
+    logger.info('[OneSignal] Initializing...', {
+      isNative,
+      platform,
+      userId: user.id,
+      capacitorVersion: Capacitor,
+    });
 
     if (isNative) {
       // Mobile (Capacitor) initialization
+      logger.info('[OneSignal] Starting NATIVE initialization for platform:', platform);
       initializeNative();
     } else {
       // Web initialization
+      logger.info('[OneSignal] Starting WEB initialization');
       initializeWeb();
     }
   }, [user]);
