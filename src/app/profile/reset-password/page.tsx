@@ -22,20 +22,53 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     // Check if user has a session and if they arrived here via recovery
     const checkAndSetRecoveryFlag = async () => {
-      // Give Supabase a moment to process hash tokens if present
-      await new Promise(resolve => setTimeout(resolve, 500));
+      try {
+        // Check for hash tokens in the URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
 
-      const { data: { session } } = await supabase.auth.getSession();
+        // If we have recovery tokens, set the session
+        if (accessToken && type === 'recovery') {
+          console.log('[ResetPassword] Found recovery tokens, setting session...');
 
-      if (session) {
-        // Set the recovery flag to prevent navigation until password is changed
-        sessionStorage.setItem('password_recovery_required', 'true');
-        console.log('[ResetPassword] Recovery flag set - user must reset password');
-      } else {
-        setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          });
+
+          if (error) {
+            console.error('[ResetPassword] Error setting session:', error);
+            setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
+            setCheckingSession(false);
+            return;
+          }
+
+          if (data.session) {
+            console.log('[ResetPassword] Session established successfully');
+            sessionStorage.setItem('password_recovery_required', 'true');
+            setCheckingSession(false);
+            return;
+          }
+        }
+
+        // If no hash tokens, check if there's already a session
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session) {
+          sessionStorage.setItem('password_recovery_required', 'true');
+          console.log('[ResetPassword] Existing session found');
+        } else {
+          setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
+        }
+
+        setCheckingSession(false);
+      } catch (err) {
+        console.error('[ResetPassword] Exception:', err);
+        setError('Error al procesar la recuperación. Por favor, intenta nuevamente.');
+        setCheckingSession(false);
       }
-
-      setCheckingSession(false);
     };
 
     checkAndSetRecoveryFlag();
