@@ -168,17 +168,33 @@ export function useTemplateRatings(templateId: string) {
       }
 
       try {
+        // Validate templateId
+        const parsedTemplateId = parseInt(templateId);
+        if (isNaN(parsedTemplateId)) {
+          console.error('Invalid template ID:', templateId);
+          throw new Error(`ID de plantilla inválido: "${templateId}"`);
+        }
+
+        // Validate rating
+        if (!rating || rating < 1 || rating > 5) {
+          console.error('Invalid rating:', rating);
+          throw new Error('La valoración debe estar entre 1 y 5');
+        }
+
         // Convert empty strings to null for the comment parameter
         const cleanComment = comment && comment.trim() ? comment : null;
 
         console.log('Creating rating with params:', {
-          p_template_id: parseInt(templateId),
+          p_template_id: parsedTemplateId,
           p_rating: rating,
-          p_comment: cleanComment
+          p_comment: cleanComment,
+          templateId_raw: templateId,
+          rating_type: typeof rating,
+          comment_type: typeof cleanComment
         });
 
         const { data: ratingData, error: rateError } = await supabase.rpc('create_template_rating', {
-          p_template_id: parseInt(templateId),
+          p_template_id: parsedTemplateId,
           p_rating: rating,
           p_comment: cleanComment
         });
