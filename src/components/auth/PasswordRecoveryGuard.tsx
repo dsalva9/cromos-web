@@ -37,12 +37,13 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           return;
         }
 
-        // Also check if user has a recovery session (AMR contains 'recovery')
+        // Also check if user has a recovery session (AMR contains 'otp')
         // This catches cases where the flag hasn't been set yet
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const amr = session.user.amr || [];
-          const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
+        if (session) {
+          // AMR (Authentication Method Reference) is on the session, not the user
+          const amr = (session as any).amr || [];
+          const hasRecoveryAuth = amr.some((item: any) => item.method === 'otp');
 
           if (hasRecoveryAuth && pathname !== RESET_PASSWORD_ROUTE) {
             // Set the flag if it's not set yet
