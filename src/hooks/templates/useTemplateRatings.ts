@@ -168,16 +168,19 @@ export function useTemplateRatings(templateId: string) {
       }
 
       try {
+        // Convert empty strings to null for the comment parameter
+        const cleanComment = comment && comment.trim() ? comment : null;
+
         console.log('Creating rating with params:', {
           p_template_id: parseInt(templateId),
           p_rating: rating,
-          p_comment: comment ?? null
+          p_comment: cleanComment
         });
 
         const { data: ratingData, error: rateError } = await supabase.rpc('create_template_rating', {
           p_template_id: parseInt(templateId),
           p_rating: rating,
-          p_comment: comment ?? null
+          p_comment: cleanComment
         });
 
         if (rateError) {
@@ -225,10 +228,13 @@ export function useTemplateRatings(templateId: string) {
       }
 
       try {
+        // Convert empty strings to null for the comment parameter
+        const cleanComment = comment && comment.trim() ? comment : null;
+
         const { error: updateError } = await supabase.rpc('update_template_rating', {
           p_rating_id: parseInt(ratingId),
           p_rating: rating,
-          p_comment: comment || null
+          p_comment: cleanComment
         });
 
         if (updateError) throw updateError;
