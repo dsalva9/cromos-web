@@ -6,9 +6,20 @@ import HowItWorks from '@/components/home/HowItWorks';
 import MarketplaceShowcase from '@/components/home/MarketplaceShowcase';
 import FeatureHighlights from '@/components/home/FeatureHighlights';
 import SiteFooter from '@/components/site-footer';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const { user, loading } = useUser();
+  const router = useRouter();
+
+  // Handle password recovery redirect
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      router.push('/profile/reset-password');
+    }
+  }, [router]);
 
   if (loading) {
     return (
