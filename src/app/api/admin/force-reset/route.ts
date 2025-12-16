@@ -78,10 +78,21 @@ export async function POST(request: Request) {
       }
     );
 
+    // Fetch user's email first
+    const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);
+
+    if (userError || !userData?.user?.email) {
+      console.error('Error fetching user:', userError);
+      return NextResponse.json(
+        { error: 'Usuario no encontrado' },
+        { status: 404 }
+      );
+    }
+
     // Generate password reset link
     const { error } = await adminClient.auth.admin.generateLink({
       type: 'recovery',
-      email: userId // Note: This should be email, we need to fetch user email first
+      email: userData.user.email
     });
 
     if (error) {
