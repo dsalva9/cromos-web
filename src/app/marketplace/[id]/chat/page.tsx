@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useListingChat } from '@/hooks/marketplace/useListingChat';
-import { useResponsiveChatHeight } from '@/hooks/useResponsiveChatHeight';
+
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -56,7 +56,7 @@ function ListingChatPageContent() {
   const [listingCardExpanded, setListingCardExpanded] = useState(false);
   const [showConversationList, setShowConversationList] = useState(true);
 
-  const chatHeight = useResponsiveChatHeight();
+
 
   const {
     messages,
@@ -494,10 +494,10 @@ function ListingChatPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937] py-8">
-      <div className="container mx-auto px-4 max-w-5xl">
+    <div className="h-[calc(100dvh-9rem)] md:h-auto md:min-h-screen bg-[#1F2937] flex flex-col md:block pb-0 md:py-8">
+      <div className="container mx-auto px-4 max-w-5xl flex-1 md:flex-none flex flex-col md:block min-h-0">
         {/* Header */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 hidden md:flex items-center gap-4 pt-4 md:pt-0">
           <Button
             variant="ghost"
             size="sm"
@@ -510,51 +510,69 @@ function ListingChatPageContent() {
         </div>
 
         {/* Mobile sticky header with context */}
-        <div className="md:hidden sticky top-0 bg-[#1F2937] border-b-2 border-gray-700 z-20 mb-4 -mt-8 -mx-4 px-4 py-3">
-          <div className="flex items-center gap-3">
-            {isOwner && selectedParticipant ? (
-              <>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-white truncate">
-                    {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
-                  </p>
-                  {listing && (
-                    <p className="text-xs text-gray-400 truncate">
+        {(!isOwner || selectedParticipant) && (
+          <div className="md:hidden flex-none bg-[#1F2937] border-b-2 border-gray-700 z-20 mb-4 -mx-4 px-4 py-3">
+            <div className="flex items-center gap-3">
+              {isOwner && selectedParticipant ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="-ml-2 text-white hover:bg-gray-800"
+                    onClick={() => router.push(`/marketplace/${listingId}`)}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-white truncate">
+                      {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
+                    </p>
+                    {listing && (
+                      <p className="text-xs text-gray-400 truncate">
+                        {listing.title}
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setListingCardExpanded(true)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <Info className="h-5 w-5" />
+                  </button>
+                </>
+              ) : !isOwner && listing ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="-ml-2 text-white hover:bg-gray-800"
+                    onClick={() => router.push(`/marketplace/${listingId}`)}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-white truncate">
                       {listing.title}
                     </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setListingCardExpanded(true)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Info className="h-5 w-5" />
-                </button>
-              </>
-            ) : !isOwner && listing ? (
-              <>
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-sm text-white truncate">
-                    {listing.title}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    Vendedor: {listing.author_nickname}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setListingCardExpanded(true)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <Info className="h-5 w-5" />
-                </button>
-              </>
-            ) : null}
+                    <p className="text-xs text-gray-400 truncate">
+                      Vendedor: {listing.author_nickname}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setListingCardExpanded(true)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <Info className="h-5 w-5" />
+                  </button>
+                </>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Listing Info Card */}
         {listing && (
-          <ModernCard className="mb-6">
+          <ModernCard className="mb-6 hidden md:block">
             <ModernCardContent className="p-4">
               {/* Mobile: Collapsible - REDESIGNED for Phase 2 */}
               <div className="md:hidden">
@@ -703,78 +721,119 @@ function ListingChatPageContent() {
           </ModernCard>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Mobile Info Modal (replacing inline accordion if desired, but for now just fix the layout structure in grid) */}
+        {listingCardExpanded && (
+          <Dialog open={listingCardExpanded} onOpenChange={setListingCardExpanded}>
+            <DialogContent className="bg-gray-900 border-2 border-gray-700 w-[95%] rounded-lg">
+              <DialogHeader>
+                <DialogTitle className="text-white">Información del Anuncio</DialogTitle>
+              </DialogHeader>
+              {listing && (
+                <div className="space-y-4">
+                  <div className="relative w-full aspect-square md:hidden">
+                    {listing.image_url ? (
+                      <Image
+                        src={listing.image_url}
+                        alt={listing.title}
+                        fill
+                        className="object-cover rounded-md"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-800 flex items-center justify-center rounded-md">
+                        <span className="text-gray-500">Sin imagen</span>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-lg">{listing.title}</h3>
+                    <p className="text-gray-400">{listing.collection_name} - #{listing.sticker_number}</p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className={cn(
+                        'px-2 py-1 rounded text-xs font-bold uppercase',
+                        listing.status === 'active' && 'bg-green-900/30 text-green-400',
+                        listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
+                        listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
+                        listing.status === 'sold' && 'bg-gray-700 text-gray-300'
+                      )}>
+                        {listing.status === 'active' && 'Disponible'}
+                        {listing.status === 'reserved' && 'Reservado'}
+                        {listing.status === 'completed' && 'Completado'}
+                        {listing.status === 'sold' && 'Completado'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-800 p-3 rounded-md">
+                    <p className="text-sm text-gray-300 whitespace-pre-wrap">{listing.description || 'Sin descripción'}</p>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
+
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 md:h-auto pb-20 md:pb-0">
           {/* Participants sidebar (seller only) */}
           {isOwner && participants.length > 0 && (
             <>
-              {/* Mobile: Show list OR back button */}
-              <div className="md:hidden">
-                {showConversationList || !selectedParticipant ? (
-                  <div className="mb-6">
-                    <ModernCard>
-                      <ModernCardContent className="p-4">
-                        <h3 className="font-bold text-white mb-3">
-                          Conversaciones ({participants.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {participants.map(participant => {
-                            const isReservedForThisParticipant =
-                              listing?.status === 'reserved' &&
-                              transactionId &&
-                              transaction?.buyer_id === participant.user_id;
+              {/* Mobile: Show list OR hidden if showing chat */}
+              <div className={cn("md:hidden flex-1 overflow-y-auto min-h-0", selectedParticipant ? "hidden" : "block")}>
+                <div className="mb-6">
+                  <ModernCard>
+                    <ModernCardContent className="p-4">
+                      <h3 className="font-bold text-white mb-3">
+                        Conversaciones ({participants.length})
+                      </h3>
+                      <div className="space-y-2">
+                        {participants.map(participant => {
+                          const isReservedForThisParticipant =
+                            listing?.status === 'reserved' &&
+                            transactionId &&
+                            transaction?.buyer_id === participant.user_id;
 
-                            return (
-                              <button
-                                key={participant.user_id}
-                                onClick={() => {
-                                  setSelectedParticipant(participant.user_id);
-                                  setShowConversationList(false);
-                                }}
-                                className={cn(
-                                  'w-full text-left p-3 rounded-md transition-colors',
-                                  selectedParticipant === participant.user_id
-                                    ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
-                                    : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
-                                )}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-bold text-white">
-                                      {participant.nickname}
-                                    </span>
-                                    {isReservedForThisParticipant && (
-                                      <span className="bg-yellow-900/30 text-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded">
-                                        Reservado
-                                      </span>
-                                    )}
-                                  </div>
-                                  {participant.unread_count > 0 && (
-                                    <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
-                                      {participant.unread_count}
+                          return (
+                            <button
+                              key={participant.user_id}
+                              onClick={() => {
+                                setSelectedParticipant(participant.user_id);
+                                setShowConversationList(false);
+                              }}
+                              className={cn(
+                                'w-full text-left p-3 rounded-md transition-colors',
+                                selectedParticipant === participant.user_id
+                                  ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
+                                  : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-white">
+                                    {participant.nickname}
+                                  </span>
+                                  {isReservedForThisParticipant && (
+                                    <span className="bg-yellow-900/30 text-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded">
+                                      Reservado
                                     </span>
                                   )}
                                 </div>
-                                {participant.last_message && (
-                                  <p className="text-sm text-gray-400 truncate mt-1">
-                                    {participant.last_message}
-                                  </p>
+                                {participant.unread_count > 0 && (
+                                  <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {participant.unread_count}
+                                  </span>
                                 )}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </ModernCardContent>
-                    </ModernCard>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowConversationList(true)}
-                    className="flex items-center gap-2 mb-4 text-[#FFC000] hover:text-yellow-400 transition-colors"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span className="text-sm font-bold">Conversaciones ({participants.length})</span>
-                  </button>
-                )}
+                              </div>
+                              {participant.last_message && (
+                                <p className="text-sm text-gray-400 truncate mt-1">
+                                  {participant.last_message}
+                                </p>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </ModernCardContent>
+                  </ModernCard>
+                </div>
               </div>
 
               {/* Desktop: Always show sidebar */}
@@ -837,16 +896,17 @@ function ListingChatPageContent() {
           {/* Chat panel */}
           <div className={cn(
             isOwner && participants.length > 0 ? 'md:col-span-2' : 'md:col-span-3',
-            // Hide on mobile when showing conversation list
-            isOwner && showConversationList && !selectedParticipant && 'hidden md:block'
+            // Mobile: Show if appropriate
+            'flex flex-col min-h-0',
+            // On mobile, if owner and no selected participant, hide chat (show list instead)
+            isOwner && !selectedParticipant ? 'hidden md:block' : 'flex'
           )}>
-            <ModernCard>
-              <ModernCardContent className="p-0">
+            <ModernCard className="flex flex-col flex-1 min-h-0 border-0 md:border-2">
+              <ModernCardContent className="p-0 flex flex-col flex-1 min-h-0">
                 {/* Messages */}
                 <div
                   ref={chatContainerRef}
-                  className="overflow-y-auto p-4 space-y-3"
-                  style={{ height: chatHeight }}
+                  className="overflow-y-auto p-4 space-y-3 flex-1 min-h-0"
                 >
                   {isOwner && !selectedParticipant && participants.length > 0 ? (
                     <div className="flex items-center justify-center h-full">
@@ -975,77 +1035,133 @@ function ListingChatPageContent() {
 
                 {/* Composer */}
                 <div className="border-t-2 border-gray-700 p-4">
-                  {/* Check if listing access was denied (RLS blocked non-participant or author suspended/deleted) */}
-                  {listingAccessDenied && !isOwner ? (
-                    <p className="text-gray-400 text-center italic">
-                      No tienes acceso a este chat
-                    </p>
-                  ) : listing?.status === 'completed' && !isReservedBuyer && !isOwner ? (
-                    <p className="text-gray-400 text-center italic">
-                      Este anuncio ya no está disponible
-                    </p>
-                  ) : listing?.status === 'completed' && (isReservedBuyer || isOwner) ? (
-                    <p className="text-gray-400 text-center italic">
-                      Chat cerrado - La transacción ha sido completada
-                    </p>
-                  ) : listing?.status === 'reserved' && !isReservedBuyer && !isOwner ? (
-                    <p className="text-gray-400 text-center italic">
-                      Este anuncio está reservado para otro usuario
-                    </p>
-                  ) : isOwner && !selectedParticipant && participants.length > 0 ? (
-                    <p className="text-gray-400 text-center">
-                      Selecciona una conversación para responder
-                    </p>
-                  ) : (
-                    <>
-                      {/* ToS acceptance for buyers with no messages */}
-                      {!isOwner && messages.length === 0 && (
-                        <div className="mb-4 p-3 bg-gray-800 rounded-md border border-gray-700">
-                          <div className="flex items-start gap-3">
-                            <Checkbox
-                              id="tos-chat"
-                              checked={tosAccepted}
-                              onCheckedChange={(checked) => setTosAccepted(checked === true)}
-                            />
-                            <label
-                              htmlFor="tos-chat"
-                              className="text-sm text-gray-300 cursor-pointer leading-relaxed"
-                            >
-                              Acepto los{' '}
-                              <button
-                                type="button"
-                                onClick={() => setChatTermsDialogOpen(true)}
-                                className="text-[#FFC000] hover:underline font-semibold"
-                              >
-                                términos y condiciones
-                              </button>{' '}
-                              y me comprometo a realizar intercambios de manera honesta y respetuosa.
-                            </label>
-                          </div>
-                        </div>
-                      )}
+                  {/* Logic for chat disabling */}
+                  {(() => {
+                    const isReserved = listing?.status === 'reserved';
+                    const isCompleted = listing?.status === 'completed';
+                    const isReservedParticipant = isReserved && transaction?.buyer_id === selectedParticipant;
 
-                      <div className="flex gap-2">
-                        <textarea
-                          value={messageText}
-                          onChange={e => setMessageText(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          placeholder="Escribe un mensaje..."
-                          maxLength={500}
-                          rows={2}
-                          className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={sending}
-                        />
-                        <Button
-                          onClick={handleSend}
-                          disabled={!messageText.trim() || sending}
-                          className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
-                        >
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </>
-                  )}
+                    // Access denied (RLS or blocked)
+                    if (listingAccessDenied && !isOwner) {
+                      return (
+                        <p className="text-gray-400 text-center italic">
+                          No tienes acceso a este chat
+                        </p>
+                      );
+                    }
+
+                    // Completed listing
+                    if (isCompleted) {
+                      // Only allow chat if it was the successful transaction (for history/rating) - though typically completed chats are read-only eventually
+                      // For now, let's keep it simple: if completed, chat is closed for everyone or maybe just read-only?
+                      // The original code said: "Chat cerrado - La transacción ha sido completada" if isReservedBuyer or isOwner
+                      if ((isReservedBuyer || isOwner)) {
+                        return (
+                          <p className="text-gray-400 text-center italic">
+                            Chat cerrado - La transacción ha sido completada
+                          </p>
+                        );
+                      }
+                      return (
+                        <p className="text-gray-400 text-center italic">
+                          Este anuncio ya no está disponible
+                        </p>
+                      );
+                    }
+
+                    // Reserved listing logic
+                    if (isReserved) {
+                      // Case 1: Owner viewing the reserved buyer's chat -> ALLOW
+                      if (isOwner && isReservedParticipant) {
+                        return null; // Render composer
+                      }
+
+                      // Case 2: Owner viewing OTHER chat -> BLOCK
+                      if (isOwner && !isReservedParticipant) {
+                        return (
+                          <p className="text-gray-400 text-center italic">
+                            Este anuncio está reservado para otro usuario
+                          </p>
+                        );
+                      }
+
+                      // Case 3: Reserved Buyer viewing their chat -> ALLOW
+                      if (!isOwner && isReservedBuyer) {
+                        return null; // Render composer
+                      }
+
+                      // Case 4: Other Buyer viewing their chat -> BLOCK
+                      if (!isOwner && !isReservedBuyer) {
+                        return (
+                          <p className="text-gray-400 text-center italic">
+                            Este anuncio está reservado para otro usuario
+                          </p>
+                        );
+                      }
+                    }
+
+                    // Active listings
+                    // Owner needs to select a participant
+                    if (isOwner && !selectedParticipant && participants.length > 0) {
+                      return (
+                        <p className="text-gray-400 text-center">
+                          Selecciona una conversación para responder
+                        </p>
+                      );
+                    }
+
+                    // Default: Allow chat
+                    return null;
+                  })() || (
+                      <>
+                        {/* ToS acceptance for buyers with no messages */}
+                        {!isOwner && messages.length === 0 && (
+                          <div className="mb-4 p-3 bg-gray-800 rounded-md border border-gray-700">
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                id="tos-chat"
+                                checked={tosAccepted}
+                                onCheckedChange={(checked) => setTosAccepted(checked === true)}
+                              />
+                              <label
+                                htmlFor="tos-chat"
+                                className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                              >
+                                Acepto los{' '}
+                                <button
+                                  type="button"
+                                  onClick={() => setChatTermsDialogOpen(true)}
+                                  className="text-[#FFC000] hover:underline font-semibold"
+                                >
+                                  términos y condiciones
+                                </button>{' '}
+                                y me comprometo a realizar intercambios de manera honesta y respetuosa.
+                              </label>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2">
+                          <textarea
+                            value={messageText}
+                            onChange={e => setMessageText(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Escribe un mensaje..."
+                            maxLength={500}
+                            rows={2}
+                            className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={sending}
+                          />
+                          <Button
+                            onClick={handleSend}
+                            disabled={!messageText.trim() || sending}
+                            className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   <p className="text-xs text-gray-500 mt-2">
                     {messageText.length}/500 caracteres
                   </p>
