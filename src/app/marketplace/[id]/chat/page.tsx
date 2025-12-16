@@ -501,11 +501,11 @@ function ListingChatPageContent() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/marketplace/${listingId}`)}
+            onClick={() => router.push('/chats')}
             className="text-white hover:bg-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver al anuncio
+            Volver a mis chats
           </Button>
         </div>
 
@@ -519,7 +519,7 @@ function ListingChatPageContent() {
                     variant="ghost"
                     size="icon"
                     className="-ml-2 text-white hover:bg-gray-800"
-                    onClick={() => router.push(`/marketplace/${listingId}`)}
+                    onClick={() => participants.length > 1 ? setSelectedParticipant(null) : router.push('/chats')}
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
@@ -546,7 +546,7 @@ function ListingChatPageContent() {
                     variant="ghost"
                     size="icon"
                     className="-ml-2 text-white hover:bg-gray-800"
-                    onClick={() => router.push(`/marketplace/${listingId}`)}
+                    onClick={() => router.push('/chats')}
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
