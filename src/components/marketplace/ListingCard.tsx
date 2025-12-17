@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { MapPin, Ban, Trash2 } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 
 interface ListingCardProps {
   listing: Listing;
@@ -107,6 +108,11 @@ export function ListingCard({ listing }: ListingCardProps) {
               </div>
             </div>
           )}
+
+          {/* Favorite Button */}
+          <div className="absolute top-2 left-2 z-20">
+            <ListingFavoriteButton listingId={listing.id} variant="icon" />
+          </div>
 
           {/* Status Badge */}
           <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">

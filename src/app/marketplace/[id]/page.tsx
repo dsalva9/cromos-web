@@ -14,6 +14,7 @@ import {
   useSupabaseClient,
 } from '@/components/providers/SupabaseProvider';
 import { ReportButton } from '@/components/social/ReportButton';
+import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import {
   resolveAvatarUrl,
   getAvatarFallback,
@@ -483,6 +484,13 @@ export default function ListingDetailPage() {
                     Contactar Vendedor
                   </Link>
                 </Button>
+              )}
+
+              {/* Favorite Button - shown to all authenticated non-owners */}
+              {user && !isOwner && (
+                <div className="mt-4">
+                  <ListingFavoriteButton listingId={listing.id} variant="full" />
+                </div>
               )}
 
               {isOwner && (
