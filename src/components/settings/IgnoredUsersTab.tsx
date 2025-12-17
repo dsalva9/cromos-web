@@ -39,14 +39,14 @@ export function IgnoredUsersTab() {
 
       if (error) throw error;
 
-      toast.success(`${nickname} ha sido eliminado de tu lista de ignorados`);
+      toast.success(`${nickname} ha sido eliminado de tu lista de bloqueados`);
       removeFromIgnoredList(userId);
     } catch (error) {
       console.error('Error unignoring user:', error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al dejar de ignorar usuario'
+          : 'Error al desbloquear usuario'
       );
     } finally {
       setUnignoring(null);
@@ -99,10 +99,10 @@ export function IgnoredUsersTab() {
         <ModernCardContent className="p-16 text-center">
           <Eye className="w-20 h-20 text-white/50 mx-auto mb-6" />
           <h2 className="text-2xl font-semibold text-white mb-4">
-            No tienes usuarios ignorados
+            No tienes usuarios bloqueados
           </h2>
           <p className="text-white/80 text-lg">
-            Cuando ignores a usuarios, aparecerán aquí para que puedas
+            Cuando bloquees a usuarios, aparecerán aquí para que puedas
             gestionarlos.
           </p>
         </ModernCardContent>
@@ -157,7 +157,7 @@ export function IgnoredUsersTab() {
                       </h3>
                     </Link>
                     <p className="text-gray-400 text-sm">
-                      Ignorado {formatDate(ignoredUser.created_at)}
+                      Bloqueado {formatDate(ignoredUser.created_at)}
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export function IgnoredUsersTab() {
                         Eliminando...
                       </>
                     ) : (
-                      'Quitar de ignorados'
+                      'Desbloquear'
                     )}
                   </Button>
                 </div>

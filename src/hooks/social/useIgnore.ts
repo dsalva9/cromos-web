@@ -17,12 +17,12 @@ export function useIgnore() {
 
         if (error) throw error;
 
-        toast.success('Usuario ignorado correctamente');
+        toast.success('Usuario bloqueado correctamente');
         return true;
       } catch (error) {
         console.error('Error ignoring user:', error);
         toast.error(
-          error instanceof Error ? error.message : 'Error al ignorar usuario'
+          error instanceof Error ? error.message : 'Error al bloquear usuario'
         );
         return false;
       } finally {
@@ -43,14 +43,14 @@ export function useIgnore() {
 
         if (error) throw error;
 
-        toast.success('Usuario dejado de ignorar correctamente');
+        toast.success('Usuario desbloqueado correctamente');
         return true;
       } catch (error) {
         console.error('Error unignoring user:', error);
         toast.error(
           error instanceof Error
             ? error.message
-            : 'Error al dejar de ignorar usuario'
+            : 'Error al desbloquear usuario'
         );
         return false;
       } finally {
@@ -119,7 +119,7 @@ export function useIgnoredUsers() {
         setError(
           err instanceof Error
             ? err.message
-            : 'Error al cargar usuarios ignorados'
+            : 'Error al cargar usuarios bloqueados'
         );
       } finally {
         setLoading(false);

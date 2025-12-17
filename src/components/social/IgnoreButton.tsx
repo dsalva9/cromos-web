@@ -76,12 +76,12 @@ export function IgnoreButton({
       {isIgnored ? (
         <>
           <Eye className="h-4 w-4 mr-2" />
-          Dejar de ignorar
+          Desbloquear
         </>
       ) : (
         <>
           <EyeOff className="h-4 w-4 mr-2" />
-          Ignorar
+          Bloquear
         </>
       )}
     </Button>

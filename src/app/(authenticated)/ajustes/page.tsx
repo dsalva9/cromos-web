@@ -56,7 +56,7 @@ export default function AjustesPage() {
                 Notificaciones
               </TabsTrigger>
               <TabsTrigger value="ignorados" className="flex-1">
-                Ignorados
+                Bloqueados
               </TabsTrigger>
               <TabsTrigger value="sistema" className="flex-1">
                 Sistema
