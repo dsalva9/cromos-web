@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useMyFavorites } from '@/hooks/social/useMyFavorites';
 import { useMyFavoriteListings } from '@/hooks/marketplace/useMyFavoriteListings';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -14,7 +15,10 @@ import AuthGuard from '@/components/AuthGuard';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
+type TabType = 'users' | 'listings';
+
 function FavoritesContent() {
+  const [activeTab, setActiveTab] = useState<TabType>('users');
   const { favorites: userFavorites, loading: usersLoading, refetch: refetchUsers } = useMyFavorites();
   const { favorites: listingFavorites, loading: listingsLoading, refetch: refetchListings } = useMyFavoriteListings();
   const { toggleFavorite } = useFavorites();
@@ -52,6 +56,9 @@ function FavoritesContent() {
   }
 
   const hasNoFavorites = userFavorites.length === 0 && listingFavorites.length === 0;
+  const currentTabHasNoFavorites =
+    (activeTab === 'users' && userFavorites.length === 0) ||
+    (activeTab === 'listings' && listingFavorites.length === 0);
 
   return (
     <div className="min-h-screen bg-[#1F2937]">
@@ -66,7 +73,60 @@ function FavoritesContent() {
           </p>
         </div>
 
-        {/* Empty State */}
+        {/* Tabs */}
+        {!hasNoFavorites && (
+          <div className="mb-8 flex gap-4 border-b border-white/10">
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`
+                pb-4 px-2 font-bold transition-colors relative
+                ${activeTab === 'users'
+                  ? 'text-[#FFC000]'
+                  : 'text-gray-400 hover:text-white'
+                }
+              `}
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                <span>Usuarios</span>
+                {userFavorites.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs">
+                    {userFavorites.length}
+                  </span>
+                )}
+              </div>
+              {activeTab === 'users' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FFC000]" />
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab('listings')}
+              className={`
+                pb-4 px-2 font-bold transition-colors relative
+                ${activeTab === 'listings'
+                  ? 'text-[#FFC000]'
+                  : 'text-gray-400 hover:text-white'
+                }
+              `}
+            >
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" />
+                <span>Anuncios</span>
+                {listingFavorites.length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs">
+                    {listingFavorites.length}
+                  </span>
+                )}
+              </div>
+              {activeTab === 'listings' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FFC000]" />
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Empty State - All favorites */}
         {hasNoFavorites && (
           <div className="text-center py-16">
             <Heart className="h-16 w-16 mx-auto mb-4 text-gray-600" />
@@ -84,13 +144,29 @@ function FavoritesContent() {
           </div>
         )}
 
+        {/* Empty State - Current tab */}
+        {!hasNoFavorites && currentTabHasNoFavorites && (
+          <div className="text-center py-16">
+            {activeTab === 'users' ? (
+              <User className="h-16 w-16 mx-auto mb-4 text-gray-600" />
+            ) : (
+              <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-gray-600" />
+            )}
+            <p className="text-gray-400 text-lg mb-4">
+              No tienes {activeTab === 'users' ? 'usuarios' : 'anuncios'} favoritos
+            </p>
+            <p className="text-gray-500 text-sm mb-6">
+              {activeTab === 'users'
+                ? 'Visita perfiles de usuarios y agrégalos a tus favoritos'
+                : 'Explora el marketplace y marca anuncios como favoritos'
+              }
+            </p>
+          </div>
+        )}
+
         {/* Usuarios Favoritos Section */}
-        {userFavorites.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <User className="h-6 w-6" />
-              Usuarios Favoritos
-            </h2>
+        {activeTab === 'users' && userFavorites.length > 0 && (
+          <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userFavorites.map((favorite) => {
                 const avatarUrl = resolveAvatarUrl(favorite.avatar_url, supabase);
@@ -166,12 +242,8 @@ function FavoritesContent() {
         )}
 
         {/* Anuncios Favoritos Section */}
-        {listingFavorites.length > 0 && (
+        {activeTab === 'listings' && listingFavorites.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <ShoppingBag className="h-6 w-6" />
-              Anuncios Favoritos
-            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {listingFavorites.map((favorite) => (
                 <ModernCard key={favorite.listing_id}>

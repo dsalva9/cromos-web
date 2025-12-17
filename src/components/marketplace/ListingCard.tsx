@@ -56,8 +56,8 @@ export function ListingCard({ listing }: ListingCardProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        // Show "Pack de cromos" or "Cromo" for active listings
-        return listing.is_group ? 'Pack de cromos' : 'Cromo';
+        // Only show badge for packs
+        return listing.is_group ? 'Pack de cromos' : null;
       case 'sold':
         return 'Vendido';
       case 'removed':
@@ -116,11 +116,13 @@ export function ListingCard({ listing }: ListingCardProps) {
 
           {/* Status Badge */}
           <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
-            <span
-              className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status, listing.is_group)}`}
-            >
-              {getStatusLabel(listing.status)}
-            </span>
+            {getStatusLabel(listing.status) && (
+              <span
+                className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur-md ${getStatusColor(listing.status, listing.is_group)}`}
+              >
+                {getStatusLabel(listing.status)}
+              </span>
+            )}
 
             {/* Suspension Badge - Only visible to admins, hidden if author deleted or listing removed */}
             {isAdmin && listing.author_is_suspended && !listing.author_deleted_at && listing.status !== 'removed' && (

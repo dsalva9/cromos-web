@@ -94,8 +94,8 @@ export function ListingFavoriteButton({
           p-2 rounded-full
           transition-all duration-200
           ${favorited
-            ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg'
-            : 'bg-white/90 hover:bg-white text-gray-700 shadow-md'
+            ? 'bg-red-500/80 hover:bg-red-600/90 text-white shadow-lg'
+            : 'bg-white/70 hover:bg-white/90 text-gray-600 shadow-md'
           }
           ${loading || checkingStatus ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}
         `}
