@@ -91,7 +91,6 @@ export function ListingFavoriteButton({
         onClick={handleToggle}
         disabled={loading || checkingStatus}
         className={`
-          absolute top-2 right-2 z-10
           p-2 rounded-full
           transition-all duration-200
           ${favorited

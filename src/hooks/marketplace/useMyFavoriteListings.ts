@@ -6,7 +6,7 @@ export interface FavoriteListing {
   title: string;
   image_url: string;
   status: string;
-  listing_type: string;
+  is_group: boolean;
   collection_name: string;
   author_nickname: string;
   author_avatar_url: string | null;
