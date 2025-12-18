@@ -61,25 +61,25 @@ export class ErrorBoundary extends React.Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white border-2 border-gray-200 rounded-lg p-8 text-center space-y-6">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center space-y-6">
             <AlertTriangle className="w-16 h-16 text-red-500 mx-auto" />
 
             <div>
-              <h1 className="text-2xl font-black text-gray-900 mb-2 uppercase">
+              <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-2 uppercase">
                 ¡Ups! Algo salió mal
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Lo sentimos, ha ocurrido un error inesperado. Por favor, intenta de nuevo.
               </p>
             </div>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="text-left">
-                <summary className="text-sm text-gray-600 cursor-pointer">
+                <summary className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
                   Detalles del error (solo en desarrollo)
                 </summary>
-                <pre className="mt-2 text-xs text-red-600 overflow-auto p-2 bg-gray-100 rounded">
+                <pre className="mt-2 text-xs text-red-600 overflow-auto p-2 bg-gray-50 dark:bg-gray-900 rounded">
                   {this.state.error.message}
                 </pre>
               </details>
@@ -95,7 +95,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               <Button
                 onClick={this.handleReset}
                 variant="outline"
-                className="flex-1 border-2 border-gray-900 text-gray-900"
+                className="flex-1 border-2 border-gray-900 dark:border-gray-700 text-gray-900 dark:text-white"
               >
                 Ir al Inicio
               </Button>

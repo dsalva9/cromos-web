@@ -72,12 +72,12 @@ export function SlotSelectionModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-white border-2 border-black text-gray-900 max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="bg-white dark:bg-gray-800 border-2 border-black text-gray-900 dark:text-white max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             Seleccionar Cromo a Publicar
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-gray-600 dark:text-gray-400">
             Colección: <span className="text-[#FFC000]">{collectionTitle}</span>
           </DialogDescription>
         </DialogHeader>
@@ -85,13 +85,13 @@ export function SlotSelectionModal({
         {loading && (
           <div className="py-8 text-center">
             <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full mx-auto" />
-            <p className="text-gray-600 mt-4">Cargando cromos...</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-4">Cargando cromos...</p>
           </div>
         )}
 
         {!loading && duplicateSlots.length === 0 && (
-          <div className="py-8 text-center text-gray-600">
-            <p className="font-semibold text-gray-900 mb-2">No tienes cromos repetidos en esta colección</p>
+          <div className="py-8 text-center text-gray-600 dark:text-gray-400">
+            <p className="font-semibold text-gray-900 dark:text-white mb-2">No tienes cromos repetidos en esta colección</p>
             <p className="text-sm">
               Para auto-completar el número del cromo, selecciona uno marcado como &quot;REPE&quot; en tu colección.
             </p>
@@ -101,7 +101,7 @@ export function SlotSelectionModal({
             <Button
               onClick={onClose}
               variant="outline"
-              className="mt-4 border-2 border-black text-gray-900 hover:bg-gray-50"
+              className="mt-4 border-2 border-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cerrar y escribir manualmente
             </Button>
@@ -112,7 +112,7 @@ export function SlotSelectionModal({
           <div className="space-y-6">
             {pages.map(page => (
               <div key={`${page.pageNumber}-${page.pageTitle}`}>
-                <h3 className="text-sm font-bold text-gray-600 uppercase mb-3">
+                <h3 className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-3">
                   Página {page.pageNumber}: {page.pageTitle}
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -124,7 +124,7 @@ export function SlotSelectionModal({
                         onClose();
                       }}
                       variant="outline"
-                      className="h-auto p-3 flex flex-col items-start gap-2 border-2 border-black bg-gray-50 hover:bg-[#FFC000] hover:text-black hover:border-[#FFC000] transition-colors"
+                      className="h-auto p-3 flex flex-col items-start gap-2 border-2 border-black bg-gray-50 dark:bg-gray-800 hover:bg-[#FFC000] hover:text-black hover:border-[#FFC000] transition-colors"
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="font-bold text-sm">
@@ -156,11 +156,11 @@ export function SlotSelectionModal({
               </div>
             ))}
 
-            <div className="pt-4 border-t border-gray-200 flex justify-end">
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
               <Button
                 onClick={onClose}
                 variant="outline"
-                className="border-2 border-black text-gray-900 hover:bg-gray-50"
+                className="border-2 border-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancelar
               </Button>

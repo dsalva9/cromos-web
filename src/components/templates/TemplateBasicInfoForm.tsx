@@ -67,8 +67,8 @@ export function TemplateBasicInfoForm({
           value={data.title}
           onChange={e => onChange({ title: e.target.value })}
           placeholder="Ej: Álbum Cromos Euro 2024"
-          className={`bg-gray-50 text-gray-900 ${
-            errors?.title ? 'border-red-500' : 'border-gray-200'
+          className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white ${
+            errors?.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
           }`}
           required
         />
@@ -92,8 +92,8 @@ export function TemplateBasicInfoForm({
           onChange={e => onChange({ description: e.target.value })}
           placeholder="Describe tu plantilla..."
           rows={4}
-          className={`bg-gray-50 text-gray-900 resize-none ${
-            errors?.description ? 'border-red-500' : 'border-gray-200'
+          className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white resize-none ${
+            errors?.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
           }`}
         />
         {errors?.description && (
@@ -126,9 +126,9 @@ export function TemplateBasicInfoForm({
             </Button>
           </div>
         ) : (
-          <div className="border-2 border-dashed border-gray-200 rounded-md p-6">
+          <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-md p-6">
             <div className="text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-600" />
+              <Upload className="mx-auto h-12 w-12 text-gray-600 dark:text-gray-400" />
               <div className="mt-2">
                 <label htmlFor="image-upload" className="cursor-pointer">
                   <span className="text-[#FFC000] hover:text-[#FFD700]">
@@ -142,7 +142,7 @@ export function TemplateBasicInfoForm({
                     className="sr-only"
                   />
                 </label>
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                   PNG, JPG, GIF hasta 10MB
                 </p>
               </div>
@@ -154,8 +154,8 @@ export function TemplateBasicInfoForm({
       {/* Public/Private */}
       <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="is-public" className="text-gray-900">Hacer privada</Label>
-            <p className="text-sm text-gray-600">
+            <Label htmlFor="is-public" className="text-gray-900 dark:text-white">Hacer privada</Label>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Si activas esta opción, otros usuarios no podrán ver ni copiar esta plantilla
             </p>
           </div>

@@ -145,12 +145,12 @@ export function CameraCaptureModal({
         </VisuallyHidden>
         <div className="relative bg-black">
           {permissionDenied ? (
-            <div className="p-8 text-center">
+            <div className="p-8 text-center bg-white dark:bg-gray-800">
               <Camera className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-gray-900 font-bold text-lg mb-2">
+              <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">
                 Permiso de cámara denegado
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Para usar la cámara, habilita los permisos en la configuración de tu
                 navegador.
               </p>
@@ -165,7 +165,7 @@ export function CameraCaptureModal({
                 alt="Captura"
                 className="w-full h-auto max-h-[500px] object-contain"
               />
-              <div className="flex gap-4 p-4 bg-white">
+              <div className="flex gap-4 p-4 bg-white dark:bg-gray-800">
                 <Button
                   onClick={handleRetake}
                   variant="outline"
@@ -195,7 +195,7 @@ export function CameraCaptureModal({
                 className="w-full h-auto max-h-[500px] object-contain"
               />
               <canvas ref={canvasRef} className="hidden" />
-              <div className="flex gap-4 p-4 bg-white">
+              <div className="flex gap-4 p-4 bg-white dark:bg-gray-800">
                 <Button onClick={onClose} variant="outline" className="flex-1">
                   <X className="h-4 w-4 mr-2" />
                   Cancelar

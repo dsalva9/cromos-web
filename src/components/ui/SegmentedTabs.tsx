@@ -57,7 +57,7 @@ export function SegmentedTabs({
       role="tablist"
       aria-label={ariaLabel}
       data-testid="segmented-tabs"
-      className={`grid gap-0 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-1 ${className || ''}`}
+      className={`grid gap-0 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-800 p-1 ${className || ''}`}
       style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
     >
       {tabs.map((tab, index) => {
@@ -80,8 +80,8 @@ export function SegmentedTabs({
               transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-inset
               ${isActive
-                ? 'bg-white text-black shadow-sm'
-                : 'bg-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                ? 'bg-white dark:bg-gray-900 text-black dark:text-white shadow-sm'
+                : 'bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
               }
             `}
           >

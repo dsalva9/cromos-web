@@ -197,12 +197,12 @@ export function TemplateCreationWizard({
                         ? 'text-green-400'
                         : index === currentStep
                         ? 'text-yellow-400'
-                        : 'text-slate-600'
+                        : 'text-slate-600 dark:text-slate-400'
                     }`}
                   >
                     {step.title}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">{step.description}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{step.description}</p>
                 </div>
               </div>
 
@@ -231,11 +231,11 @@ export function TemplateCreationWizard({
       </div>
 
       {/* Step Content */}
-      <Card className="bg-white border-gray-200 text-gray-900">
+      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>{steps[currentStep].title}</span>
-            <span className="text-sm font-normal text-gray-600">
+            <span className="text-sm font-normal text-gray-600 dark:text-gray-400">
               {steps[currentStep].description}
             </span>
           </CardTitle>
@@ -260,7 +260,7 @@ export function TemplateCreationWizard({
             </div>
           )}
           {currentStep === 3 && templateData.is_public && !templateData.terms_accepted && (
-            <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
+            <div className="mb-4 rounded border border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-800 dark:text-red-200" role="alert">
               <p className="font-semibold">Debes aceptar los términos de uso para publicar una plantilla pública.</p>
             </div>
           )}
@@ -298,7 +298,7 @@ export function TemplateCreationWizard({
               variant="outline"
               onClick={handlePrevious}
               disabled={currentStep === 0}
-              className="text-gray-900 border-gray-200"
+              className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Anterior

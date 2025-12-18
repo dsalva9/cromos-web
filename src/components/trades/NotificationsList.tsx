@@ -156,7 +156,7 @@ export function NotificationsList({
 
   if (error) {
     return (
-      <ModernCard className="bg-white border-2 border-black shadow-xl">
+      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl">
         <ModernCardContent className="p-6 text-center">
           <p className="text-[#E84D4D] font-bold">{error}</p>
         </ModernCardContent>
@@ -169,8 +169,8 @@ export function NotificationsList({
 
   if (notifications.length === 0) {
     return (
-      <ModernCard className="bg-white border-2 border-dashed border-gray-200 shadow-xl">
-        <ModernCardContent className="p-8 text-center text-gray-600">
+      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 shadow-xl">
+        <ModernCardContent className="p-8 text-center text-gray-600 dark:text-gray-400">
           <Bell className="mx-auto h-12 w-12 mb-4" />
           <p className="font-bold">No tienes notificaciones.</p>
           <p className="text-sm mt-2">
@@ -190,7 +190,7 @@ export function NotificationsList({
             variant="outline"
             size="sm"
             onClick={handleMarkAllRead}
-            className="border-2 border-black font-bold uppercase rounded-md shadow-lg bg-gray-50 text-gray-900 hover:bg-gray-100"
+            className="border-2 border-black font-bold uppercase rounded-md shadow-lg bg-gray-50 text-gray-900 dark:text-white hover:bg-gray-100"
           >
             Marcar todo como leído
           </Button>
@@ -200,12 +200,12 @@ export function NotificationsList({
       {/* Unread notifications */}
       {unreadNotifications.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold uppercase text-gray-900">Nuevas</h2>
+          <h2 className="text-xl font-bold uppercase text-gray-900 dark:text-white">Nuevas</h2>
           <div className="grid gap-4">
             {unreadNotifications.map(notification => (
               <ModernCard
                 key={notification.id}
-                className="bg-white border-2 border-[#FFC000] shadow-xl hover:shadow-2xl transition-all cursor-pointer"
+                className="bg-white dark:bg-gray-800 border-2 border-[#FFC000] shadow-xl hover:shadow-2xl transition-all cursor-pointer"
                 onClick={() => handleNotificationClick(notification)}
               >
                 <ModernCardContent className="p-4">
@@ -216,10 +216,10 @@ export function NotificationsList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-900 text-sm">
+                          <h3 className="font-bold text-gray-900 dark:text-white text-sm">
                             {getNotificationTitle(notification)}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             <UserLink
                               userId={
                                 getCounterpartyInfo(notification)
@@ -268,7 +268,7 @@ export function NotificationsList({
             {readNotifications.map(notification => (
               <ModernCard
                 key={notification.id}
-                className="bg-white border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer opacity-75 hover:opacity-100"
+                className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 shadow-xl hover:shadow-2xl transition-all cursor-pointer opacity-75 hover:opacity-100"
                 onClick={() => handleNotificationClick(notification)}
               >
                 <ModernCardContent className="p-4">

@@ -47,11 +47,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
   const getStatusStyles = () => {
     switch (slot.status) {
       case 'owned':
-        return 'bg-green-50 border-green-200 hover:border-green-400 shadow-sm';
+        return 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-700 hover:border-green-400 dark:hover:border-green-500 shadow-sm';
       case 'duplicate':
-        return 'bg-yellow-50 border-yellow-200 hover:border-yellow-400 shadow-sm';
+        return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-700 hover:border-yellow-400 dark:hover:border-yellow-500 shadow-sm';
       default: // missing
-        return 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-md';
+        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md';
     }
   };
 
@@ -173,12 +173,12 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
         {/* Header Info */}
         <div className="text-center mb-3">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <span className="text-xs font-mono text-gray-500">#{slot.slot_number}</span>
+            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">#{slot.slot_number}</span>
             {slot.is_special && (
-              <span className="text-[10px] bg-purple-50 text-purple-600 px-1 rounded border border-purple-200 font-bold">SPECIAL</span>
+              <span className="text-[10px] bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 px-1 rounded border border-purple-200 dark:border-purple-700 font-bold">SPECIAL</span>
             )}
           </div>
-          <p className="text-xs font-bold text-gray-900 line-clamp-2 min-h-[2rem] leading-tight">
+          <p className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 min-h-[2rem] leading-tight">
             {slot.label || `Cromo ${slot.slot_number || ''}`}
           </p>
 
@@ -189,8 +189,8 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 const value = slot.data?.[field.name];
                 if (value === undefined || value === null || value === '') return null;
                 return (
-                  <div key={field.name} className="flex gap-1 text-gray-500 justify-center">
-                    <span className="font-medium text-gray-400">{field.name}:</span>
+                  <div key={field.name} className="flex gap-1 text-gray-500 dark:text-gray-400 justify-center">
+                    <span className="font-medium text-gray-400 dark:text-gray-500">{field.name}:</span>
                     <span className="truncate">{String(value)}</span>
                   </div>
                 );
@@ -206,9 +206,9 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
             disabled={updating}
             className={cn(
               "w-full py-1.5 px-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center shadow-sm",
-              slot.status === 'missing' && "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-black",
-              slot.status === 'owned' && "bg-green-100 text-green-700 hover:bg-green-200",
-              slot.status === 'duplicate' && "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+              slot.status === 'missing' && "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-black dark:hover:text-white",
+              slot.status === 'owned' && "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900",
+              slot.status === 'duplicate' && "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900"
             )}
           >
             {getStatusIcon()}
@@ -219,21 +219,21 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           {(slot.status === 'owned' || slot.status === 'duplicate') && (
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
               {/* Counter */}
-              <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
+              <div className="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 shadow-sm">
                 <button
                   onClick={() => handleCountChange(-1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="text-sm font-bold text-gray-900 font-mono">
+                <span className="text-sm font-bold text-gray-900 dark:text-white font-mono">
                   {slot.status === 'owned' ? '1' : localCount}
                 </span>
                 <button
                   onClick={() => handleCountChange(1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -248,10 +248,10 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                   </div>
                 </Link>
               ) : listingsLoading ? (
-                <div className="w-full h-6 bg-gray-100 animate-pulse rounded-lg" />
+                <div className="w-full h-6 bg-gray-100 dark:bg-gray-700 animate-pulse rounded-lg" />
               ) : slot.status === 'duplicate' && localCount >= 2 ? (
                 <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`} className="block">
-                  <button className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-black rounded-lg py-1 px-2 text-[10px] font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                  <button className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white rounded-lg py-1 px-2 text-[10px] font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm">
                     <Upload className="w-3 h-3" />
                     <span>CREAR ANUNCIO</span>
                   </button>
@@ -260,7 +260,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 <button
                   disabled
                   title="Necesitas al menos 2 cromos para crear un anuncio"
-                  className="w-full bg-gray-50 border border-gray-100 text-gray-400 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed"
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed"
                 >
                   <Upload className="w-3 h-3" />
                   <span>CREAR ANUNCIO</span>
@@ -273,7 +273,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
 
       {/* Loading Overlay */}
       {updating && (
-        <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-[1px] flex items-center justify-center z-10">
           <div className="animate-spin h-5 w-5 border-2 border-[#FFC000] border-r-transparent rounded-full" />
         </div>
       )}

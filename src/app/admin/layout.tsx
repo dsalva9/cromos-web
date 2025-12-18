@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,6 +9,26 @@ import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    // Force dark mode for admin, override user preference
+    const root = document.documentElement;
+    root.classList.add('dark');
+
+    // Cleanup: restore user preference when leaving admin
+    return () => {
+      // Re-apply user's theme preference
+      const userTheme = localStorage.getItem('theme') || 'light';
+      if (userTheme === 'light') {
+        root.classList.remove('dark');
+      } else if (userTheme === 'system') {
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (!systemPrefersDark) {
+          root.classList.remove('dark');
+        }
+      }
+    };
+  }, []);
 
   const getActiveTab = () => {
     if (pathname.includes('/admin/reports')) return 'reports';

@@ -44,7 +44,7 @@ export function DynamicFieldsEditor({
                 'w-full md:flex-1 md:min-w-[200px]'
               }`}
             >
-              <Label htmlFor={fieldId} className="text-gray-900 text-sm">
+              <Label htmlFor={fieldId} className="text-gray-900 dark:text-white text-sm">
                 {field.name}
                 {field.required && <span className="text-red-400 ml-1">*</span>}
               </Label>
@@ -56,7 +56,7 @@ export function DynamicFieldsEditor({
                   value={typeof value === 'string' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value)}
                   placeholder={`Ingresa ${field.name.toLowerCase()}`}
-                  className="bg-white border-gray-200 text-gray-900"
+                  className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 />
               )}
@@ -69,7 +69,7 @@ export function DynamicFieldsEditor({
                   value={typeof value === 'number' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value ? parseFloat(e.target.value) : '')}
                   placeholder={`Ingresa ${field.name.toLowerCase()}`}
-                  className="bg-white border-gray-200 text-gray-900"
+                  className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 />
               )}
@@ -81,9 +81,9 @@ export function DynamicFieldsEditor({
                     type="checkbox"
                     checked={typeof value === 'boolean' ? value : false}
                     onChange={(e) => updateField(field.name, e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-200 bg-white"
+                    className="w-4 h-4 rounded border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                   />
-                  <Label htmlFor={fieldId} className="text-gray-600 text-sm cursor-pointer">
+                  <Label htmlFor={fieldId} className="text-gray-600 dark:text-gray-400 text-sm cursor-pointer">
                     {value ? 'Sí' : 'No'}
                   </Label>
                 </div>
@@ -94,7 +94,7 @@ export function DynamicFieldsEditor({
                   id={fieldId}
                   value={typeof value === 'string' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value)}
-                  className="w-full h-10 px-3 rounded-md bg-white border border-gray-200 text-gray-900"
+                  className="w-full h-10 px-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 >
                   <option value="">Selecciona {field.name.toLowerCase()}</option>

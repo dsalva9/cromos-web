@@ -43,6 +43,7 @@ import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGu
 import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
 import { SiteFooter } from '@/components/layout/SiteFooter';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
 export default function RootLayout({
   children,
@@ -50,15 +51,35 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" data-theme="light" className="overflow-x-hidden">
+    <html lang="es" data-theme="light" className="overflow-x-hidden" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 'light';
+                  const root = document.documentElement;
+
+                  if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    root.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-gray-50 text-foreground antialiased overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-gray-50 dark:bg-gray-900 text-foreground antialiased overflow-x-hidden`}
+        suppressHydrationWarning
       >
         <SupabaseProvider>
-          <OneSignalProvider>
-            <DeepLinkHandler>
-              <ProfileCompletionProvider>
-                <ErrorBoundary>
+          <ThemeProvider>
+            <OneSignalProvider>
+              <DeepLinkHandler>
+                <ProfileCompletionProvider>
+                  <ErrorBoundary>
                   <a
                     href="#main-content"
                     className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
@@ -85,16 +106,13 @@ export default function RootLayout({
                   expand={false}
                   duration={3000}
                   toastOptions={{
-                    className: 'border border-gray-200 shadow-lg',
-                    style: {
-                      background: '#FFFFFF',
-                      color: '#111827',
-                    },
+                    className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
                   }}
                 />
-              </ProfileCompletionProvider>
-            </DeepLinkHandler>
-          </OneSignalProvider>
+                </ProfileCompletionProvider>
+              </DeepLinkHandler>
+            </OneSignalProvider>
+          </ThemeProvider>
         </SupabaseProvider>
       </body>
     </html>

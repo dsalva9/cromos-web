@@ -115,12 +115,12 @@ export function ProfileBadges({
           <div className="flex items-center gap-1">
             <Award className="w-4 h-4 text-green-600" />
             <span className="font-semibold">{earnedBadges.length}</span>
-            <span className="text-gray-500">ganadas</span>
+            <span className="text-gray-500 dark:text-gray-400">ganadas</span>
           </div>
           <div className="flex items-center gap-1">
             <TrendingUp className="w-4 h-4 text-blue-600" />
             <span className="font-semibold">{unearnedBadges.length}</span>
-            <span className="text-gray-500">por ganar</span>
+            <span className="text-gray-500 dark:text-gray-400">por ganar</span>
           </div>
         </div>
       </div>

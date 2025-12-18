@@ -101,11 +101,11 @@ export function DeleteListingModal({
               </AlertDescription>
             </Alert>
 
-            <div className="bg-gray-50 p-4 rounded-lg border space-y-3">
-              <p className="text-sm text-gray-700 font-medium">
+            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700 space-y-3">
+              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                 Se eliminará temporalmente el anuncio:
               </p>
-              <div className="ml-2 space-y-2 text-sm text-gray-600">
+              <div className="ml-2 space-y-2 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-2">
                   <Trash2 className="h-4 w-4 text-blue-500" />
                   <span><strong>"{listing.title}"</strong></span>
@@ -135,8 +135,8 @@ export function DeleteListingModal({
           <div className="space-y-4">
             <div className="flex flex-col items-center justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
-              <p className="text-gray-600">Eliminando anuncio...</p>
-              <p className="text-sm text-gray-500">Esto puede tardar unos segundos</p>
+              <p className="text-gray-600 dark:text-gray-400">Eliminando anuncio...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Esto puede tardar unos segundos</p>
             </div>
           </div>
         );
@@ -146,8 +146,8 @@ export function DeleteListingModal({
           <div className="space-y-4">
             <div className="flex flex-col items-center justify-center py-8">
               <CheckCircle className="h-12 w-12 text-green-600 mb-4" />
-              <p className="text-gray-700 font-medium">¡Anuncio eliminado correctamente!</p>
-              <p className="text-sm text-gray-500">Todos los datos asociados han sido eliminados</p>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">¡Anuncio eliminado correctamente!</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Todos los datos asociados han sido eliminados</p>
             </div>
           </div>
         );

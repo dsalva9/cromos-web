@@ -248,7 +248,7 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
@@ -256,10 +256,10 @@ export default function UserProfilePage() {
 
   if (error || !profile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-900 text-xl mb-4">Usuario no encontrado</p>
-          <p className="text-gray-500 mt-4">
+          <p className="text-gray-900 dark:text-white text-xl mb-4">Usuario no encontrado</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-4">
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
@@ -438,10 +438,10 @@ export default function UserProfilePage() {
     href?: string
   ) => {
     const card = (
-      <div className="text-center bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-gray-200 transition-colors">
+      <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
         {icon}
-        <p className="text-2xl font-black text-gray-900">{value}</p>
-        <p className="text-sm text-gray-500">{label}</p>
+        <p className="text-2xl font-black text-gray-900 dark:text-white">{value}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
       </div>
     );
 
@@ -475,13 +475,13 @@ export default function UserProfilePage() {
     const percentage = total > 0 ? (count / total) * 100 : 0;
     return (
       <div className="flex items-center gap-3 w-full">
-        <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+        <div className="flex-1 h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
           <div
             className="h-full bg-[#FFC000] transition-all"
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <span className="text-sm text-gray-500 font-bold min-w-[3rem] text-right">
+        <span className="text-sm text-gray-500 dark:text-gray-400 font-bold min-w-[3rem] text-right">
           {count}
         </span>
       </div>
@@ -489,11 +489,11 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Profile Header */}
-          <div className="mb-8 rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300">
+          <div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm transition-all duration-300">
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Avatar */}
@@ -504,10 +504,10 @@ export default function UserProfilePage() {
                       alt={profile.nickname}
                       width={120}
                       height={120}
-                      className="rounded-full border border-gray-200 object-cover shadow-sm bg-gray-50"
+                      className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800"
                     />
                   ) : (
-                    <div className="w-30 h-30 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
+                    <div className="w-30 h-30 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
                       <User className="h-16 w-16 text-gray-400" />
                     </div>
                   )}
@@ -517,17 +517,17 @@ export default function UserProfilePage() {
                 <div className="flex-1">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
                     <div>
-                      <h1 className="text-3xl font-black text-gray-900 mb-2">
+                      <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
                         {profile.nickname}
                       </h1>
 
                       {/* Email & Location */}
                       {emailDisplay && (
-                        <p className="text-gray-500 text-sm md:text-base font-medium">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium">
                           {emailDisplay}
                         </p>
                       )}
-                      <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
                         <MapPin className="h-4 w-4 text-gray-400" />
                         <span>
                           {locationDisplay ??
@@ -549,13 +549,13 @@ export default function UserProfilePage() {
                               ?.scrollIntoView({ behavior: 'smooth' });
                           }}
                         >
-                          <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg border border-gray-100">
+                          <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700">
                             <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
-                            <span className="text-gray-900 font-bold text-lg">
+                            <span className="text-gray-900 dark:text-white font-bold text-lg">
                               {profile.rating_avg.toFixed(1)}
                             </span>
                           </div>
-                          <span className="text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium">
+                          <span className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">
                             ({profile.rating_count}{' '}
                             {profile.rating_count === 1
                               ? 'valoración'
@@ -616,7 +616,7 @@ export default function UserProfilePage() {
                           <DialogTrigger asChild>
                             <Button
                               variant="outline"
-                              className="border-gray-200 text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900"
+                              className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                             >
                               <Pencil className="w-4 h-4 mr-2" />
                               Editar perfil
@@ -671,18 +671,18 @@ export default function UserProfilePage() {
                                   required
                                   inputMode="numeric"
                                 />
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-gray-400 dark:text-gray-500">
                                   Mostramos tu ubicación aproximada en base al
                                   código postal.
                                 </p>
                               </div>
                             </div>
 
-                            <div className="p-6 pt-4 border-t border-gray-100">
+                            <div className="p-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                               <DialogFooter className="sm:justify-between">
                                 <Button
                                   variant="outline"
-                                  className="border-gray-200 text-gray-500 hover:text-gray-900"
+                                  className="border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                                   onClick={() => setEditDialogOpen(false)}
                                   type="button"
                                   disabled={savingProfile}
@@ -733,18 +733,18 @@ export default function UserProfilePage() {
                       }}
                       className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-transform hover:scale-[1.02]"
                     >
-                      <div className="text-center bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-gray-200 transition-colors">
+                      <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
                         <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                        <p className="text-2xl font-black text-gray-900">
+                        <p className="text-2xl font-black text-gray-900 dark:text-white">
                           {profile.rating_count}
                         </p>
-                        <p className="text-sm text-gray-500">Valoraciones</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
                       </div>
                     </a>
                   </div>
 
                   {/* BADGES SUBSECTION */}
-                  <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <ProfileBadgesSimple userId={userId} isOwnProfile={isOwnProfile} />
                   </div>
                 </div>
@@ -756,17 +756,17 @@ export default function UserProfilePage() {
         {/* Listings */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <h2 className="text-2xl font-black text-gray-900">Anuncios</h2>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white">Anuncios</h2>
 
             {/* Mobile: Dropdown */}
             <div className="md:hidden w-full">
               <Select value={listingFilter} onValueChange={(value) => setListingFilter(value as ListingFilter)}>
-                <SelectTrigger className="w-full bg-white border border-gray-200 text-gray-900 h-12">
+                <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white h-12">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 text-gray-900">
+                <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
                   {listingTabs.map(tab => (
-                    <SelectItem key={tab.value} value={tab.value} className="text-gray-900 focus:bg-gray-100">
+                    <SelectItem key={tab.value} value={tab.value} className="text-gray-900 dark:text-white focus:bg-gray-100 dark:focus:bg-gray-700">
                       {tab.label} ({statusCounts[tab.value as ListingFilter]})
                     </SelectItem>
                   ))}
@@ -786,12 +786,12 @@ export default function UserProfilePage() {
           </div>
 
           {filteredListings.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-lg bg-white/50">
-              <p className="text-gray-500 text-lg">
+            <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-white/50 dark:bg-gray-800/50">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
                 {emptyStateCopy[listingFilter]}
               </p>
               {isOwnProfile && listingFilter === 'active' && (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   Crea anuncios desde{' '}
                   <Link
                     href="/marketplace/create"
@@ -821,7 +821,7 @@ export default function UserProfilePage() {
 
         {/* Ratings Section */}
         <div id="valoraciones" className="space-y-6 mt-12 scroll-mt-8">
-          <h2 className="text-2xl font-black text-gray-900">Valoraciones</h2>
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white">Valoraciones</h2>
 
           {loadingRatings ? (
             <div className="flex items-center justify-center py-12">
@@ -830,17 +830,17 @@ export default function UserProfilePage() {
           ) : ratingSummary && ratingSummary.rating_count > 0 ? (
             <>
               {/* Summary Card */}
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Overall Rating */}
                   <div className="text-center md:text-left">
                     <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-                      <span className="text-5xl font-black text-gray-900">
+                      <span className="text-5xl font-black text-gray-900 dark:text-white">
                         {ratingSummary.rating_avg.toFixed(1)}
                       </span>
                       <Star className="h-8 w-8 fill-[#FFC000] text-[#FFC000]" />
                     </div>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                       Basado en {ratingSummary.rating_count}{' '}
                       {ratingSummary.rating_count === 1
                         ? 'valoración'
@@ -851,7 +851,7 @@ export default function UserProfilePage() {
                   {/* Rating Distribution */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-700 min-w-[4rem]">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
                         5 estrellas
                       </span>
                       {renderRatingBar(
@@ -860,7 +860,7 @@ export default function UserProfilePage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-700 min-w-[4rem]">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
                         4 estrellas
                       </span>
                       {renderRatingBar(
@@ -869,7 +869,7 @@ export default function UserProfilePage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-700 min-w-[4rem]">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
                         3 estrellas
                       </span>
                       {renderRatingBar(
@@ -878,7 +878,7 @@ export default function UserProfilePage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-700 min-w-[4rem]">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
                         2 estrellas
                       </span>
                       {renderRatingBar(
@@ -887,7 +887,7 @@ export default function UserProfilePage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-700 min-w-[4rem]">
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
                         1 estrella
                       </span>
                       {renderRatingBar(
@@ -909,7 +909,7 @@ export default function UserProfilePage() {
                   return (
                     <div
                       key={rating.id}
-                      className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 transition-all hover:shadow-md"
+                      className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-4 transition-all hover:shadow-md"
                     >
                       <div className="flex gap-4">
                         {/* Rater Avatar */}
@@ -923,10 +923,10 @@ export default function UserProfilePage() {
                               alt={rating.rater_nickname}
                               width={48}
                               height={48}
-                              className="rounded-full border border-gray-200 hover:opacity-80 transition-opacity bg-gray-50"
+                              className="rounded-full border border-gray-200 dark:border-gray-700 hover:opacity-80 transition-opacity bg-gray-50 dark:bg-gray-800"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center hover:opacity-80 transition-opacity text-gray-400">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:opacity-80 transition-opacity text-gray-400">
                               <User className="h-6 w-6" />
                             </div>
                           )}
@@ -945,7 +945,7 @@ export default function UserProfilePage() {
                                 {renderStars(rating.rating)}
                                 <Badge
                                   variant="outline"
-                                  className="text-xs border-gray-200 text-gray-500 bg-gray-50"
+                                  className="text-xs border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800"
                                 >
                                   {rating.context_type === 'listing'
                                     ? 'Anuncio'
@@ -953,7 +953,7 @@ export default function UserProfilePage() {
                                 </Badge>
                               </div>
                             </div>
-                            <span className="text-xs text-gray-400 font-medium">
+                            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
                               {new Date(rating.created_at).toLocaleDateString(
                                 'es-ES',
                                 {
@@ -967,7 +967,7 @@ export default function UserProfilePage() {
 
                           {/* Comment */}
                           {rating.comment && (
-                            <p className="text-gray-700 text-sm mt-2 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                            <p className="text-gray-700 dark:text-gray-300 text-sm mt-2 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                               {rating.comment}
                             </p>
                           )}
@@ -979,8 +979,8 @@ export default function UserProfilePage() {
               </div>
             </>
           ) : (
-            <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-lg bg-white/50">
-              <p className="text-gray-500 text-lg">
+            <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-white/50 dark:bg-gray-800/50">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
                 Este usuario aún no ha recibido valoraciones
               </p>
             </div>

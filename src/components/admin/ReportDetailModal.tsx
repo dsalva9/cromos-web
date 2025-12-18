@@ -66,10 +66,10 @@ export function ReportDetailModal({
   if (loading) {
     return (
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="bg-[#1F2937] border-2 border-black max-w-3xl">
+        <DialogContent className="bg-white dark:bg-[#1F2937] border-2 border-black max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Loading report</DialogTitle>
-            <DialogDescription className="text-gray-300">
+            <DialogTitle className="text-gray-900 dark:text-white">Loading report</DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-300">
               Fetching report details. This dialog will update once the report
               is ready.
             </DialogDescription>
@@ -85,12 +85,12 @@ export function ReportDetailModal({
   if (!details) {
     return (
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="bg-[#1F2937] border-2 border-black">
+        <DialogContent className="bg-white dark:bg-[#1F2937] border-2 border-black">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-gray-900 dark:text-white">
               Unable to load report
             </DialogTitle>
-            <DialogDescription className="text-gray-300">
+            <DialogDescription className="text-gray-600 dark:text-gray-300">
               We could not fetch the details for this report. Please try again
               or refresh the page.
             </DialogDescription>
@@ -113,13 +113,13 @@ export function ReportDetailModal({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1F2937] border-2 border-black max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-white dark:bg-[#1F2937] border-2 border-black max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
+          <DialogTitle className="text-gray-900 dark:text-white flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
             Report Details
           </DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogDescription className="text-gray-600 dark:text-gray-300">
             Review the reported content, add administration notes, and choose
             the appropriate action.
           </DialogDescription>
@@ -134,24 +134,24 @@ export function ReportDetailModal({
               </Badge>
               <Badge variant="outline">{report.reason}</Badge>
             </div>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Reported by{' '}
-              <span className="text-white font-bold">
+              <span className="text-gray-900 dark:text-white font-bold">
                 {report.reporter_nickname}
               </span>{' '}
               on {new Date(report.created_at).toLocaleString()}
             </p>
             {report.description && (
-              <div className="bg-[#374151] p-3 rounded-md">
-                <p className="text-gray-300 text-sm">{report.description}</p>
+              <div className="bg-gray-100 dark:bg-[#374151] p-3 rounded-md">
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{report.description}</p>
               </div>
             )}
           </div>
 
           {/* Reported Content */}
-          <div className="border-2 border-gray-700 rounded-md p-4 space-y-3">
+          <div className="border-2 border-gray-200 dark:border-gray-700 rounded-md p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-white">Reported Content</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">Reported Content</h3>
               {/* View Content Link */}
               {report.entity_type === 'user' && report.entity_id && (
                 <Link
@@ -184,15 +184,15 @@ export function ReportDetailModal({
 
             {report.entity_type === 'user' && content.nickname && (
               <div className="space-y-2">
-                <p className="text-gray-300">
-                  <span className="text-gray-400">User:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">User:</span>{' '}
                   {content.nickname}
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Email:</span> {content.email}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Email:</span> {content.email}
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Rating:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Rating:</span>{' '}
                   {typeof content.rating_avg === 'number'
                     ? content.rating_avg.toFixed(1)
                     : '0.0'}{' '}
@@ -206,18 +206,18 @@ export function ReportDetailModal({
 
             {report.entity_type === 'listing' && content.title && (
               <div className="space-y-2">
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Title:</span> {content.title}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Title:</span> {content.title}
                 </p>
                 {content.description && (
-                  <p className="text-gray-300 text-sm">{content.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">{content.description}</p>
                 )}
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Status:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Status:</span>{' '}
                   {content.status}
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">By:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">By:</span>{' '}
                   <UserLink
                     userId={String(content.user_id || '')}
                     nickname={String(content.user_nickname || '')}
@@ -230,11 +230,11 @@ export function ReportDetailModal({
 
             {report.entity_type === 'template' && content.title && (
               <div className="space-y-2">
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Title:</span> {content.title}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Title:</span> {content.title}
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Author:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Author:</span>{' '}
                   <UserLink
                     userId={String(content.author_id || '')}
                     nickname={String(content.author_nickname || '')}
@@ -242,15 +242,15 @@ export function ReportDetailModal({
                     disabled={!content.author_id}
                   />
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Rating:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Rating:</span>{' '}
                   {typeof content.rating_avg === 'number'
                     ? content.rating_avg.toFixed(1)
                     : '0.0'}{' '}
                   ⭐
                 </p>
-                <p className="text-gray-300">
-                  <span className="text-gray-400">Public:</span>{' '}
+                <p className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">Public:</span>{' '}
                   {content.is_public ? 'Yes' : 'No'}
                 </p>
               </div>
@@ -259,30 +259,30 @@ export function ReportDetailModal({
 
           {/* User History (if applicable) */}
           {history && (
-            <div className="border-2 border-gray-700 rounded-md p-4 space-y-2">
-              <h3 className="font-bold text-white">User History</h3>
+            <div className="border-2 border-gray-200 dark:border-gray-700 rounded-md p-4 space-y-2">
+              <h3 className="font-bold text-gray-900 dark:text-white">User History</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-400">Total Reports Received</p>
-                  <p className="text-white font-bold">
+                  <p className="text-gray-600 dark:text-gray-400">Total Reports Received</p>
+                  <p className="text-gray-900 dark:text-white font-bold">
                     {history.total_reports_received}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Total Listings</p>
-                  <p className="text-white font-bold">
+                  <p className="text-gray-600 dark:text-gray-400">Total Listings</p>
+                  <p className="text-gray-900 dark:text-white font-bold">
                     {history.total_listings}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Templates Created</p>
-                  <p className="text-white font-bold">
+                  <p className="text-gray-600 dark:text-gray-400">Templates Created</p>
+                  <p className="text-gray-900 dark:text-white font-bold">
                     {history.total_templates_created}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-400">Rating Average</p>
-                  <p className="text-white font-bold">
+                  <p className="text-gray-600 dark:text-gray-400">Rating Average</p>
+                  <p className="text-gray-900 dark:text-white font-bold">
                     {history.rating_avg &&
                     typeof history.rating_avg === 'number'
                       ? history.rating_avg.toFixed(1)
@@ -295,7 +295,7 @@ export function ReportDetailModal({
 
           {/* Admin Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-white">
+            <Label htmlFor="notes" className="text-gray-900 dark:text-white">
               Admin Notes (Required)
             </Label>
             <Textarea
@@ -304,7 +304,7 @@ export function ReportDetailModal({
               onChange={e => setAdminNotes(e.target.value)}
               placeholder="Explain your decision..."
               rows={3}
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white dark:bg-[#374151] border-2 border-black text-gray-900 dark:text-white"
             />
           </div>
 

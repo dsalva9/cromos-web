@@ -35,15 +35,15 @@ function MyListingsContent() {
   const eliminadoListings = listings.filter(l => l.status === 'ELIMINADO' || l.status === 'removed');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
+            <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
               Mis Anuncios
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Gestiona tus anuncios del mercado
             </p>
           </div>
@@ -133,7 +133,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {reservedListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600">No tienes anuncios reservados</p>
+                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios reservados</p>
                 </div>
               ) : (
                 reservedListings.map(listing => (
@@ -153,7 +153,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {completedListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600">No tienes anuncios completados</p>
+                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios completados</p>
                 </div>
               ) : (
                 completedListings.map(listing => (
@@ -173,7 +173,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {eliminadoListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600">No tienes anuncios eliminados</p>
+                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios eliminados</p>
                 </div>
               ) : (
                 eliminadoListings.map(listing => (

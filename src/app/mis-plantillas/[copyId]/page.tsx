@@ -76,7 +76,7 @@ function TemplateProgressContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
@@ -84,9 +84,9 @@ function TemplateProgressContent() {
 
   if (error || !copy) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-900 text-xl mb-4">Colección no encontrada</p>
+          <p className="text-gray-900 dark:text-white text-xl mb-4">Colección no encontrada</p>
           <Link href="/mis-plantillas">
             <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">Volver a Mis Álbumes</Button>
           </Link>
@@ -102,14 +102,14 @@ function TemplateProgressContent() {
   const spares = progress.filter(slot => slot.status === 'duplicate' && slot.count > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Back and Quick Entry */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <Link href="/mis-plantillas" className="w-full sm:w-auto">
             <Button
               variant="ghost"
-              className="text-gray-500 hover:text-gray-900 hover:bg-gray-100 pl-0 sm:pl-4"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 pl-0 sm:pl-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver a Mis Álbumes
@@ -163,11 +163,11 @@ function TemplateProgressContent() {
         />
 
         {/* Mobile Delete Button */}
-        <div className="mt-12 sm:hidden border-t border-gray-200 pt-8">
+        <div className="mt-12 sm:hidden border-t border-gray-200 dark:border-gray-700 pt-8">
           <Button
             onClick={() => setDeleteDialogOpen(true)}
             variant="ghost"
-            className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 border border-gray-200"
+            className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950 border border-gray-200 dark:border-gray-700"
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Eliminar colección
@@ -187,18 +187,18 @@ function TemplateProgressContent() {
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent className="bg-white border-gray-200 shadow-xl">
+          <DialogContent className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-xl">
             <DialogHeader>
-              <DialogTitle className="text-gray-900 text-xl flex items-center gap-3">
-                <div className="bg-red-100 p-2 rounded-lg">
+              <DialogTitle className="text-gray-900 dark:text-white text-xl flex items-center gap-3">
+                <div className="bg-red-100 dark:bg-red-950 p-2 rounded-lg">
                   <Trash2 className="w-6 h-6 text-red-600" />
                 </div>
                 ¿Eliminar colección?
               </DialogTitle>
-              <DialogDescription className="text-gray-500 pt-4">
+              <DialogDescription className="text-gray-500 dark:text-gray-400 pt-4">
                 Esta acción no se puede deshacer. Perderás todo el progreso
                 registrado para esta colección.
-                <div className="mt-4 bg-red-50 border border-red-100 rounded-lg p-3 text-red-800 text-sm">
+                <div className="mt-4 bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-900 rounded-lg p-3 text-red-800 dark:text-red-400 text-sm">
                   <strong>Nota:</strong> Los anuncios en el mercado no se verán afectados por esta acción.
                 </div>
               </DialogDescription>
@@ -208,7 +208,7 @@ function TemplateProgressContent() {
                 variant="ghost"
                 onClick={() => setDeleteDialogOpen(false)}
                 disabled={isDeleting}
-                className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancelar
               </Button>

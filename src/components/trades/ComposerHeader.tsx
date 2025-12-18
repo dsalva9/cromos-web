@@ -36,7 +36,7 @@ export function ComposerHeader({
   };
 
   return (
-    <ModernCard className="bg-white border-2 border-black">
+    <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black">
       <ModernCardContent className="p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-4">
@@ -48,10 +48,10 @@ export function ComposerHeader({
               <AvatarFallback>{getInitials(fromUser?.nickname)}</AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left">
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {fromUser?.nickname ?? 'Tú'}
               </p>
-              <p className="text-sm text-gray-600">Ofertante</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Ofertante</p>
             </div>
           </div>
 
@@ -69,16 +69,16 @@ export function ComposerHeader({
               <AvatarFallback>{getInitials(toUser.nickname)}</AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-right">
-              <p className="text-lg font-bold text-gray-900">{toUser.nickname}</p>
-              <p className="text-sm text-gray-600">Receptor</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">{toUser.nickname}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Receptor</p>
             </div>
           </div>
         </div>
-        <div className="text-center mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600 uppercase tracking-wider">
+        <div className="text-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400 uppercase tracking-wider">
             Colección
           </p>
-          <p className="text-lg font-semibold text-gray-900">{collection.name}</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">{collection.name}</p>
         </div>
       </ModernCardContent>
     </ModernCard>

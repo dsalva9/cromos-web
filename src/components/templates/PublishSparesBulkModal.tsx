@@ -93,17 +93,17 @@ export function PublishSparesBulkModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-gray-200">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle className="text-gray-900 text-2xl flex items-center gap-3">
+          <DialogTitle className="text-gray-900 dark:text-white text-2xl flex items-center gap-3">
             <div className="bg-[#FFC000]/10 p-2 rounded-lg">
               <PackagePlus className="w-6 h-6 text-[#FFC000]" />
             </div>
             Publicar Pack de Repes
           </DialogTitle>
-          <DialogDescription className="text-gray-600 pt-2">
+          <DialogDescription className="text-gray-600 dark:text-gray-400 pt-2">
             Vas a publicar todos tus cromos repetidos de{' '}
-            <span className="text-gray-900 font-semibold">{collectionTitle}</span> en un
+            <span className="text-gray-900 dark:text-white font-semibold">{collectionTitle}</span> en un
             solo anuncio.
           </DialogDescription>
         </DialogHeader>
@@ -123,14 +123,14 @@ export function PublishSparesBulkModal({
           </div>
 
           {/* Spares Count */}
-          <div className="bg-white rounded-lg p-4">
-            <p className="text-gray-600 text-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               <span className="text-[#FFC000] font-bold text-lg">
                 {spares.length}
               </span>{' '}
               {spares.length === 1 ? 'cromo repetido' : 'cromos repetidos'}
             </p>
-            <p className="text-gray-600 text-xs mt-1">
+            <p className="text-gray-600 dark:text-gray-400 text-xs mt-1">
               Total de unidades:{' '}
               {spares.reduce((sum, spare) => sum + spare.count, 0)}
             </p>
@@ -138,7 +138,7 @@ export function PublishSparesBulkModal({
 
           {/* Description Preview/Edit */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-gray-900">
+            <Label htmlFor="description" className="text-gray-900 dark:text-white">
               Descripción del Pack
             </Label>
             <Textarea
@@ -147,9 +147,9 @@ export function PublishSparesBulkModal({
               onChange={(e) => setCustomDescription(e.target.value)}
               placeholder="Descripción generada automáticamente..."
               rows={12}
-              className="bg-white border-gray-200 text-gray-900 font-mono text-sm resize-none"
+              className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm resize-none"
             />
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               Puedes editar la descripción antes de publicar. Se incluyen todos los
               detalles de cada cromo.
             </p>
@@ -161,7 +161,7 @@ export function PublishSparesBulkModal({
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={isPublishing}
-            className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             Cancelar
           </Button>

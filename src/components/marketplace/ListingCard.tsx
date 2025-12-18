@@ -83,11 +83,11 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <div className="group relative h-full flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-0" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div className="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
         {listing.image_url ? (
           <Image
             src={listing.image_url}
@@ -97,7 +97,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300 font-bold text-6xl">
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-300 dark:text-gray-400 font-bold text-6xl">
             {listing.title.charAt(0).toUpperCase()}
           </div>
         )}
@@ -126,20 +126,20 @@ export function ListingCard({ listing }: ListingCardProps) {
       <div className="p-3 flex flex-col flex-1 gap-2">
         {/* Title & Collection */}
         <div className="min-h-[3rem]">
-          <h3 className="font-bold text-gray-900 leading-tight line-clamp-2 text-sm group-hover:text-primary transition-colors">
+          <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-primary transition-colors">
             {listing.title}
           </h3>
           {listing.collection_name && (
-            <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
               {listing.collection_name}
             </p>
           )}
         </div>
 
         {/* User Info Row */}
-        <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100">
+        <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
           <Link href={`/users/${listing.user_id}`} className="z-10 relative block shrink-0">
-            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 ring-1 ring-gray-100">
+            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 ring-1 ring-gray-100 dark:ring-gray-700">
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
@@ -166,10 +166,10 @@ export function ListingCard({ listing }: ListingCardProps) {
               userId={listing.user_id}
               nickname={listing.author_nickname}
               variant="default"
-              className="text-xs font-medium text-gray-900 hover:text-primary truncate block max-w-[100px] !text-gray-900 transition-colors"
+              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
               forceSpan={false}
             />
-            <div className="flex items-center gap-1 text-[10px] text-gray-500">
+            <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
               {listing.distance_km !== undefined && listing.distance_km !== null && (
                 <span className="flex items-center">
                   <MapPin className="h-3 w-3 mr-0.5" />

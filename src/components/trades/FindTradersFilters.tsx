@@ -88,10 +88,10 @@ export function FindTradersFilters({
     localFilters.minOverlap > 1;
 
   return (
-    <div className="space-y-4 bg-white border-2 border-black rounded-md p-4 shadow-xl">
+    <div className="space-y-4 bg-white dark:bg-gray-800 border-2 border-black rounded-md p-4 shadow-xl">
       {/* Collection Selector */}
       <div>
-        <label className="block text-sm font-bold uppercase text-gray-900 mb-2">
+        <label className="block text-sm font-bold uppercase text-gray-900 dark:text-white mb-2">
           Colección
         </label>
         <div className="relative">
@@ -133,7 +133,7 @@ export function FindTradersFilters({
                       onCollectionChange(collection.id);
                       setIsCollectionDropdownOpen(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center justify-between focus:outline-none focus:bg-gray-200 text-gray-900 font-medium transition-colors border-b border-gray-200 last:border-b-0"
+                    className="w-full px-4 py-2 text-left hover:bg-gray-100 flex items-center justify-between focus:outline-none focus:bg-gray-200 text-gray-900 dark:text-white font-medium transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
                   >
                     <span className="truncate">
                       {collection.name} ({collection.year})
@@ -156,17 +156,17 @@ export function FindTradersFilters({
 
       {/* Search Query */}
       <div>
-        <label className="block text-sm font-bold uppercase text-gray-900 mb-2">
+        <label className="block text-sm font-bold uppercase text-gray-900 dark:text-white mb-2">
           Buscar jugador
         </label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
           <Input
             type="text"
             placeholder="Nombre del jugador..."
             value={localFilters.query}
             onChange={e => handleFilterUpdate('query', e.target.value)}
-            className="pl-10 bg-gray-50 border-2 border-black text-gray-900 placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
+            className="pl-10 bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
           />
         </div>
       </div>
@@ -178,7 +178,7 @@ export function FindTradersFilters({
           variant="outline"
           size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="text-gray-900 hover:text-white bg-gray-50 hover:bg-[#FFC000] border-2 border-black font-bold uppercase text-xs rounded-md"
+          className="text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-[#FFC000] border-2 border-black font-bold uppercase text-xs rounded-md"
         >
           <Filter className="w-4 h-4 mr-2" />
           Filtros avanzados
@@ -193,7 +193,7 @@ export function FindTradersFilters({
             variant="outline"
             size="sm"
             onClick={clearFilters}
-            className="text-gray-900 hover:text-white bg-gray-50 hover:bg-[#E84D4D] border-2 border-black font-bold uppercase text-xs rounded-md"
+            className="text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-[#E84D4D] border-2 border-black font-bold uppercase text-xs rounded-md"
           >
             <X className="w-4 h-4 mr-1" />
             Limpiar filtros
@@ -203,21 +203,21 @@ export function FindTradersFilters({
 
       {/* Advanced Filters */}
       {showAdvanced && (
-        <div className="space-y-4 pt-4 border-t-2 border-gray-200">
+        <div className="space-y-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
           {/* Rarity Filter */}
           <div>
-            <label className="block text-sm font-bold uppercase text-gray-900 mb-2">
+            <label className="block text-sm font-bold uppercase text-gray-900 dark:text-white mb-2">
               Rareza
             </label>
             <div className="relative">
               <button
                 onClick={() => setIsRarityDropdownOpen(!isRarityDropdownOpen)}
-                className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white transition-colors text-gray-900 font-medium"
+                className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 transition-colors text-gray-900 dark:text-white font-medium"
                 aria-haspopup="listbox"
                 aria-expanded={isRarityDropdownOpen}
               >
                 <span>{selectedRarity?.label || 'Todas las rarezas'}</span>
-                <ChevronDown className="w-4 h-4 text-gray-600" />
+                <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               </button>
 
               {isRarityDropdownOpen && (
@@ -234,7 +234,7 @@ export function FindTradersFilters({
                           handleFilterUpdate('rarity', option.value);
                           setIsRarityDropdownOpen(false);
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-200 text-gray-900 font-medium transition-colors border-b border-gray-200 last:border-b-0"
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-200 text-gray-900 dark:text-white font-medium transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
                       >
                         {option.label}
                       </button>
@@ -247,7 +247,7 @@ export function FindTradersFilters({
 
           {/* Team Filter */}
           <div>
-            <label className="block text-sm font-bold uppercase text-gray-900 mb-2">
+            <label className="block text-sm font-bold uppercase text-gray-900 dark:text-white mb-2">
               Equipo
             </label>
             <Input
@@ -255,13 +255,13 @@ export function FindTradersFilters({
               placeholder="Nombre del equipo..."
               value={localFilters.team}
               onChange={e => handleFilterUpdate('team', e.target.value)}
-              className="bg-gray-50 border-2 border-black text-gray-900 placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
+              className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
             />
           </div>
 
           {/* Min Overlap Filter */}
           <div>
-            <label className="block text-sm font-bold uppercase text-gray-900 mb-2">
+            <label className="block text-sm font-bold uppercase text-gray-900 dark:text-white mb-2">
               Coincidencias mínimas
             </label>
             <div className="flex flex-wrap gap-2">
@@ -277,14 +277,14 @@ export function FindTradersFilters({
                   className={
                     localFilters.minOverlap === value
                       ? 'bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold rounded-md'
-                      : 'text-gray-900 hover:text-white bg-gray-50 hover:bg-gray-700 border-2 border-black font-bold rounded-md'
+                      : 'text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-gray-700 border-2 border-black font-bold rounded-md'
                   }
                 >
                   {value}+
                 </Button>
               ))}
             </div>
-            <p className="text-xs text-gray-600 mt-2 font-medium">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">
               Número mínimo de cromos que pueden intercambiarse mutuamente
             </p>
           </div>
@@ -293,7 +293,7 @@ export function FindTradersFilters({
 
       {/* Active Filters Summary */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-gray-200">
+        <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
           {localFilters.rarity && (
             <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Rareza:{' '}

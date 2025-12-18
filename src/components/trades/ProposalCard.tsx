@@ -76,7 +76,7 @@ export function ProposalCard({
 
       <ModernCard
         onClick={onClick}
-        className={`bg-white hover:bg-gray-50 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
+        className={`bg-white dark:bg-gray-800 hover:bg-gray-50 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
           isHighlighted
             ? 'border-[#FFC000] animate-pulse-border'
             : 'border-black'
@@ -91,7 +91,7 @@ export function ProposalCard({
       >
         <ModernCardContent className="p-4">
           <div className="flex justify-between items-start">
-            <p className="font-bold text-lg text-gray-900 uppercase">
+            <p className="font-bold text-lg text-gray-900 dark:text-white uppercase">
               {isInbox ? (
                 <ArrowRight className="inline h-4 w-4 mr-2 text-green-400" />
               ) : (
@@ -109,7 +109,7 @@ export function ProposalCard({
               {getStatusLabel(proposal.status)}
             </Badge>
           </div>
-          <p className="text-xs text-gray-600 mt-1 mb-4">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 mb-4">
             {new Date(proposal.created_at).toLocaleDateString('es-ES', {
               day: 'numeric',
               month: 'long',

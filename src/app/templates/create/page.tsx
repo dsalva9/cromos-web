@@ -47,7 +47,7 @@ export default function CreateTemplatePage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
@@ -55,12 +55,12 @@ export default function CreateTemplatePage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="text-gray-900 border-gray-200"
+                className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900">
+            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 dark:text-white">
               Crear Plantilla
             </h1>
           </div>

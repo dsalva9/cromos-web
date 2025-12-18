@@ -62,32 +62,32 @@ export default function MarketplacePage() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 pb-24 md:pb-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white pb-24 md:pb-8">
       {/* Hero Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="container mx-auto px-4 py-6 md:py-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex-1 w-full">
               <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
-                <span className="text-black">
+                <span className="text-black dark:text-white">
                   Marketplace
                 </span>
               </h1>
 
               {/* Stats Badges */}
               <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                   <span className="text-base md:text-lg">🔥</span>
-                  <span className="font-bold text-black">{listings.length}</span>
+                  <span className="font-bold text-black dark:text-white">{listings.length}</span>
                   <span className="hidden md:inline">activos</span>
                 </div>
-                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                   <span className="text-base md:text-lg">👥</span>
                   <span className="hidden md:inline">Comunidad activa</span>
                   <span className="md:hidden">Activa</span>
                 </div>
                 {!loading && listings.length > 0 && (
-                  <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                  <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                     <span className="text-base md:text-lg">⚡</span>
                     <span className="hidden md:inline">Actualizado hoy</span>
                     <span className="md:hidden">Hoy</span>
@@ -101,7 +101,7 @@ export default function MarketplacePage() {
                 <Link href="/marketplace/my-listings" className="md:flex-none">
                   <Button
                     variant="outline"
-                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 h-10 md:h-12 px-3 md:px-6 text-sm"
+                    className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 md:h-12 px-3 md:px-6 text-sm"
                   >
                     <List className="h-4 w-4 md:mr-2" />
                     <span className="hidden md:inline">Mis Anuncios</span>
@@ -122,7 +122,7 @@ export default function MarketplacePage() {
       <div className="container mx-auto px-4 py-6">
         {/* Controls Bar */}
         <div className="sticky top-20 md:top-24 z-30 mb-6">
-          <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-xl p-3 shadow-lg">
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
             <div className="flex flex-col md:flex-row gap-3">
               {/* Search */}
               <div className="flex-1">
@@ -130,7 +130,7 @@ export default function MarketplacePage() {
                   value={searchQuery}
                   onChange={setSearchQuery}
                   placeholder="Buscar por título, colección..."
-                  className="bg-gray-50 border-gray-200 text-black placeholder:text-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
+                  className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
                 />
               </div>
 
@@ -139,7 +139,7 @@ export default function MarketplacePage() {
                 <Button
                   onClick={() => setShowFilters(!showFilters)}
                   variant="outline"
-                  className={`flex-1 ${showFilters ? 'bg-[#FFC000]/10 text-black border-[#FFC000]/50' : 'bg-white text-gray-600 border-gray-200'}`}
+                  className={`flex-1 ${showFilters ? 'bg-[#FFC000]/10 text-black dark:text-white border-[#FFC000]/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                 >
                   <Filter className="mr-2 h-4 w-4" />
                   Filtros
@@ -147,7 +147,7 @@ export default function MarketplacePage() {
                 <Button
                   onClick={() => hasPostcode && setSortByDistance(!sortByDistance)}
                   variant="outline"
-                  className={`flex-1 ${sortByDistance ? 'bg-[#FFC000]/10 text-black border-[#FFC000]/50' : 'bg-white text-gray-600 border-gray-200'}`}
+                  className={`flex-1 ${sortByDistance ? 'bg-[#FFC000]/10 text-black dark:text-white border-[#FFC000]/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                   disabled={!hasPostcode}
                 >
                   {sortByDistance ? <MapPin className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />}
@@ -158,12 +158,12 @@ export default function MarketplacePage() {
               {/* Desktop Filters */}
               <div className={`flex-col md:flex-row gap-3 md:flex ${showFilters ? 'flex' : 'hidden'}`}>
                 {/* Listing Type Filter */}
-                <div className="bg-gray-100 rounded-lg p-1 flex">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex">
                   <button
                     onClick={() => setListingTypeFilter('all')}
                     className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'all'
-                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                        : 'text-gray-500 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                   >
                     Todos
@@ -171,8 +171,8 @@ export default function MarketplacePage() {
                   <button
                     onClick={() => setListingTypeFilter('cromo')}
                     className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'cromo'
-                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                        : 'text-gray-500 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                   >
                     Cromo
@@ -180,8 +180,8 @@ export default function MarketplacePage() {
                   <button
                     onClick={() => setListingTypeFilter('pack')}
                     className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'pack'
-                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                        : 'text-gray-500 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                   >
                     Pack
@@ -197,12 +197,12 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
-                <div className="hidden lg:flex bg-gray-100 rounded-lg p-1">
+                <div className="hidden lg:flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                   <button
                     onClick={() => setSortByDistance(false)}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${!sortByDistance
-                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                        : 'text-gray-500 hover:text-gray-900'
+                        ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                   >
                     Reciente
@@ -211,8 +211,8 @@ export default function MarketplacePage() {
                     onClick={() => hasPostcode && setSortByDistance(true)}
                     disabled={!hasPostcode}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${sortByDistance
-                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                        : 'text-gray-500 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed'
+                        ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
                       }`}
                     title={!hasPostcode ? 'Añade tu código postal en el perfil' : undefined}
                   >
@@ -226,7 +226,7 @@ export default function MarketplacePage() {
 
         {/* Listings Grid */}
         {error && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-6 rounded-xl mb-8 text-center">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 text-center">
             <p className="font-bold text-lg mb-1">Error al cargar anuncios</p>
             <p className="text-sm opacity-80">{error}</p>
           </div>
@@ -252,7 +252,7 @@ export default function MarketplacePage() {
             <Button
               onClick={loadMore}
               variant="outline"
-              className="bg-white border-gray-200 text-gray-900 hover:bg-gray-50 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
+              className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
             >
               Cargar Más Anuncios
             </Button>
@@ -268,7 +268,7 @@ export default function MarketplacePage() {
 
         {/* Empty State */}
         {!loading && listings.length === 0 && (
-          <div className="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+          <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 border border-gray-100 dark:border-gray-700">
             <EmptyState
               icon={Package}
               title={

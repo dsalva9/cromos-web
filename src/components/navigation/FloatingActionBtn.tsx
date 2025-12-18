@@ -35,8 +35,8 @@ export function FloatingActionBtn() {
       <Link
         href={actionLink}
         className={cn(
-          "w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFC000]",
-          "bg-[#FFC000] text-black hover:bg-[#FFD700]"
+          "w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFC000] focus:ring-offset-white dark:focus:ring-offset-gray-900",
+          "bg-[#FFC000] text-black hover:bg-[#FFD700] dark:hover:bg-[#FFD700]"
         )}
         aria-label={ariaLabel}
       >

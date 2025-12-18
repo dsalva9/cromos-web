@@ -23,9 +23,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <Icon className="w-24 h-24 text-slate-600 mb-6" />
-      <h3 className="text-xl font-semibold text-slate-300 mb-2">{title}</h3>
-      <p className="text-slate-400 mb-6 max-w-md">{description}</p>
+      <Icon className="w-24 h-24 text-gray-400 dark:text-gray-600 mb-6" />
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-300 mb-2">{title}</h3>
+      <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md">{description}</p>
       {actionLabel && (actionHref || onAction) && (
         <>
           {actionHref ? (

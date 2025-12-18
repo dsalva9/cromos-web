@@ -117,23 +117,23 @@ export function HardDeleteModal({
               </AlertDescription>
             </Alert>
             
-            <div className="bg-white p-4 rounded-lg border border-red-200">
-              <ul className="space-y-3 text-sm text-gray-900">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-red-200 dark:border-gray-700">
+              <ul className="space-y-3 text-sm text-gray-900 dark:text-white">
                 <li className="flex items-start gap-3">
                   <Trash2 className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-900">El anuncio: <strong className="text-red-700">"{listing.title}"</strong></span>
+                  <span className="text-gray-900 dark:text-white">El anuncio: <strong className="text-red-700 dark:text-red-400">"{listing.title}"</strong></span>
                 </li>
                 <li className="flex items-start gap-3">
                   <MessageSquare className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-900">Todo el historial de chat asociado</span>
+                  <span className="text-gray-900 dark:text-white">Todo el historial de chat asociado</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <FileImage className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-900">Las imágenes y archivos multimedia</span>
+                  <span className="text-gray-900 dark:text-white">Las imágenes y archivos multimedia</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-900">Cualquier transacción asociada</span>
+                  <span className="text-gray-900 dark:text-white">Cualquier transacción asociada</span>
                 </li>
               </ul>
             </div>
@@ -152,8 +152,8 @@ export function HardDeleteModal({
       case 'confirmation':
         return (
           <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <p className="text-sm text-gray-700 mb-4">
+            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700">
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                 Para confirmar la eliminación permanente del anuncio, marca la siguiente casilla:
               </p>
 
@@ -166,7 +166,7 @@ export function HardDeleteModal({
                   disabled={loading}
                   data-testid="hard-delete-confirmation-checkbox"
                 />
-                <span className="text-sm text-gray-700 group-hover:text-gray-900 select-none">
+                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white select-none">
                   <strong>Deseo eliminar definitivamente este anuncio</strong> y comprendo que esta acción es irreversible y eliminará todas las conversaciones de chat asociadas.
                 </span>
               </label>
@@ -186,8 +186,8 @@ export function HardDeleteModal({
           <div className="space-y-4">
             <div className="flex flex-col items-center justify-center py-8">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
-              <p className="text-gray-600 font-medium">Eliminando permanentemente...</p>
-              <p className="text-sm text-gray-500">Esta acción es irreversible</p>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">Eliminando permanentemente...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Esta acción es irreversible</p>
             </div>
           </div>
         );
@@ -197,8 +197,8 @@ export function HardDeleteModal({
           <div className="space-y-4">
             <div className="flex flex-col items-center justify-center py-8">
               <CheckCircle className="h-12 w-12 text-green-600 mb-4" />
-              <p className="text-gray-700 font-medium">¡Anuncio eliminado permanentemente!</p>
-              <p className="text-sm text-gray-500">Todos los datos asociados han sido eliminados</p>
+              <p className="text-gray-700 dark:text-gray-300 font-medium">¡Anuncio eliminado permanentemente!</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Todos los datos asociados han sido eliminados</p>
             </div>
           </div>
         );

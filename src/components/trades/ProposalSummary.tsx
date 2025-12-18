@@ -39,20 +39,20 @@ export function ProposalSummary({
   const MAX_MESSAGE_LENGTH = 500;
 
   return (
-    <ModernCard className="bg-white border-2 border-black shadow-xl">
+    <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl">
       <div className="p-6 pb-0">
-        <h2 className="text-lg font-bold uppercase text-gray-900">Resumen de la Propuesta</h2>
+        <h2 className="text-lg font-bold uppercase text-gray-900 dark:text-white">Resumen de la Propuesta</h2>
       </div>
       <ModernCardContent className="space-y-6 p-6">
         <div className="space-y-4 text-sm">
           <div className="flex justify-between items-center bg-gray-50 p-3 rounded-md border-2 border-black">
-            <p className="font-bold text-gray-900 uppercase">Tu Oferta:</p>
+            <p className="font-bold text-gray-900 dark:text-white uppercase">Tu Oferta:</p>
             <p className="font-bold text-[#FFC000]">
               {offerCount} cromo{offerCount !== 1 ? 's' : ''}
             </p>
           </div>
           <div className="flex justify-between items-center bg-gray-50 p-3 rounded-md border-2 border-black">
-            <p className="font-bold text-gray-900 uppercase">
+            <p className="font-bold text-gray-900 dark:text-white uppercase">
               Tu Pedido a {targetUserNickname}:
             </p>
             <p className="font-bold text-[#FFC000]">
@@ -67,9 +67,9 @@ export function ProposalSummary({
             value={message}
             onChange={e => onMessageChange(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}
-            className="bg-gray-50 border-2 border-black text-gray-900 rounded-md focus:ring-2 focus:ring-[#FFC000]"
+            className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-[#FFC000]"
           />
-          <p className="text-xs text-gray-600 mt-2 text-right font-bold">
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-right font-bold">
             {message.length} / {MAX_MESSAGE_LENGTH}
           </p>
         </div>

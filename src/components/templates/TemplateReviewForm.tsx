@@ -72,9 +72,9 @@ export function TemplateReviewForm({
   return (
     <div className="space-y-6">
       {/* Basic Info Review */}
-      <Card className="bg-gray-50 border-gray-200">
+      <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900 flex items-center justify-between">
+          <CardTitle className="text-gray-900 dark:text-white flex items-center justify-between">
             Información Básica
             <Button
               variant="ghost"
@@ -89,30 +89,30 @@ export function TemplateReviewForm({
         <CardContent className="space-y-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label>Título</Label>
+            <Label className="text-gray-900 dark:text-white">Título</Label>
             {isEditing.title ? (
               <Input
                 value={data.title}
                 onChange={e => onChange({ title: e.target.value })}
-                className="bg-white border-gray-200 text-gray-900"
+                className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
               />
             ) : (
-              <p className="text-gray-900">{data.title || 'Sin título'}</p>
+              <p className="text-gray-900 dark:text-white">{data.title || 'Sin título'}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label>Descripción</Label>
+            <Label className="text-gray-900 dark:text-white">Descripción</Label>
             {isEditing.description ? (
               <Textarea
                 value={data.description}
                 onChange={e => onChange({ description: e.target.value })}
                 rows={3}
-                className="bg-white border-gray-200 text-gray-900 resize-none"
+                className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white resize-none"
               />
             ) : (
-              <p className="text-gray-900">
+              <p className="text-gray-900 dark:text-white">
                 {data.description || 'Sin descripción'}
               </p>
             )}
@@ -121,7 +121,7 @@ export function TemplateReviewForm({
           {/* Image */}
           {data.image_url && (
             <div className="space-y-2">
-              <Label>Imagen</Label>
+              <Label className="text-gray-900 dark:text-white">Imagen</Label>
               <div className="relative h-48 w-full">
                 <Image
                   src={data.image_url}
@@ -137,8 +137,8 @@ export function TemplateReviewForm({
           {/* Public/Private */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Visibilidad</Label>
-              <p className="text-sm text-gray-600">
+              <Label className="text-gray-900 dark:text-white">Visibilidad</Label>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {data.is_public
                   ? 'Pública - Otros usuarios pueden verla'
                   : 'Privada - Solo tú puedes verla'}
@@ -149,7 +149,7 @@ export function TemplateReviewForm({
                 checked={data.is_public}
                 onCheckedChange={checked => onChange({ is_public: checked })}
               />
-              <span className="text-gray-900">
+              <span className="text-gray-900 dark:text-white">
                 {data.is_public ? (
                   <Eye className="h-4 w-4" />
                 ) : (
@@ -162,9 +162,9 @@ export function TemplateReviewForm({
       </Card>
 
       {/* Pages and Slots Summary */}
-      <Card className="bg-gray-50 border-gray-200">
+      <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900">
+          <CardTitle className="text-gray-900 dark:text-white">
             Resumen de Páginas y Cromos
           </CardTitle>
         </CardHeader>
@@ -175,34 +175,34 @@ export function TemplateReviewForm({
               <div className="text-2xl font-bold text-[#FFC000]">
                 {data.pages.length}
               </div>
-              <div className="text-sm text-gray-600">Páginas</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Páginas</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-[#FFC000]">
                 {totalSlots}
               </div>
-              <div className="text-sm text-gray-600">Cromos Totales</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Cromos Totales</div>
             </div>
           </div>
 
           {/* Pages List */}
           <div className="space-y-3">
             {data.pages.map((page, pageIndex) => (
-              <Card key={pageIndex} className="bg-white border-gray-200">
+              <Card key={pageIndex} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-gray-900">{page.title}</h4>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{page.title}</h4>
                     <Badge
                       variant={page.type === 'team' ? 'default' : 'secondary'}
                     >
                       {page.type === 'team' ? 'Normal' : 'Especial'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <FileText className="h-4 w-4" />
                     <span>{page.slots.length} cromos</span>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600">
+                  <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                     {page.slots.length} cromo(s) configurado(s) con campos personalizados
                   </div>
                 </CardContent>
@@ -214,9 +214,9 @@ export function TemplateReviewForm({
 
       {/* Terms of Use for Public Templates */}
       {data.is_public && (
-        <Card className="bg-gray-50 border-gray-200">
+        <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-900">Términos de Uso</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">Términos de Uso</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-start space-x-3">
@@ -231,7 +231,7 @@ export function TemplateReviewForm({
               <div className="flex-1">
                 <Label
                   htmlFor="template-terms"
-                  className="text-sm text-gray-600 cursor-pointer"
+                  className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                 >
                   Al crear esta plantilla pública acepto los{' '}
                   <button
@@ -250,21 +250,21 @@ export function TemplateReviewForm({
       )}
 
       {/* Final Confirmation */}
-      <Card className="bg-gray-50 border-gray-200">
+      <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900">Confirmación Final</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-white">Confirmación Final</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <p className="text-gray-900">
+            <p className="text-gray-900 dark:text-white">
               Estás a punto de crear una plantilla con:
             </p>
-            <ul className="list-disc list-inside text-gray-600 space-y-1">
+            <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
               <li>{data.pages.length} página(s)</li>
               <li>{totalSlots} cromo(s) en total</li>
               <li>Visibilidad: {data.is_public ? 'Pública' : 'Privada'}</li>
             </ul>
-            <p className="text-sm text-gray-600 mt-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
               Una vez creada, la plantilla estará disponible para que tú y otros
               usuarios (si es pública) puedan usarla como base para sus
               colecciones.
@@ -275,13 +275,13 @@ export function TemplateReviewForm({
 
       {/* Terms Dialog */}
       <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-900">
+            <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
               Términos de Uso - Plantillas Públicas
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 text-gray-600">
+          <div className="space-y-4 text-gray-600 dark:text-gray-400">
             <p>
               Si decides compartir una plantilla o listado público, recuerda que esta información quedará visible para otros usuarios. Solo subas contenido original o sobre el que tengas derechos de uso. Al publicarlo, autorizas a Cambiocromos.com a mostrarlo dentro de la plataforma con fines informativos o de comunidad, sin adquirir derechos de propiedad sobre él. Podrás eliminar tu plantilla cuando quieras. Al continuar, aceptas las Condiciones de uso y garantizas que el contenido que compartes cumple la ley y los derechos de terceros.
             </p>

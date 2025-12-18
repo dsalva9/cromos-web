@@ -95,13 +95,13 @@ export function IgnoredUsersTab() {
 
   if (ignoredUsers.length === 0) {
     return (
-      <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
+      <ModernCard className="bg-white dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
         <ModernCardContent className="p-16 text-center">
-          <Eye className="w-20 h-20 text-white/50 mx-auto mb-6" />
-          <h2 className="text-2xl font-semibold text-white mb-4">
+          <Eye className="w-20 h-20 text-white/50 dark:text-white/50 mx-auto mb-6" />
+          <h2 className="text-2xl font-semibold text-white dark:text-white mb-4">
             No tienes usuarios bloqueados
           </h2>
-          <p className="text-white/80 text-lg">
+          <p className="text-white/80 dark:text-white/80 text-lg">
             Cuando bloquees a usuarios, aparecerán aquí para que puedas
             gestionarlos.
           </p>
@@ -120,7 +120,7 @@ export function IgnoredUsersTab() {
         return (
           <ModernCard
             key={ignoredUser.ignored_user_id}
-            className="bg-white border-2 border-black hover:shadow-xl transition-all duration-300"
+            className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-700 hover:shadow-xl transition-all duration-300"
           >
             <ModernCardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -137,10 +137,10 @@ export function IgnoredUsersTab() {
                         alt={ignoredUser.nickname}
                         width={60}
                         height={60}
-                        className="rounded-full border-2 border-black object-cover hover:opacity-80 transition-opacity"
+                        className="rounded-full border-2 border-black dark:border-gray-700 object-cover hover:opacity-80 transition-opacity"
                       />
                     ) : (
-                      <div className="w-15 h-15 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center hover:opacity-80 transition-opacity">
+                      <div className="w-15 h-15 rounded-full bg-[#FFC000] border-2 border-black dark:border-gray-700 flex items-center justify-center hover:opacity-80 transition-opacity">
                         <User className="h-8 w-8 text-black" />
                       </div>
                     )}
@@ -152,11 +152,11 @@ export function IgnoredUsersTab() {
                       href={`/users/${ignoredUser.ignored_user_id}`}
                       className="block"
                     >
-                      <h3 className="text-xl font-bold text-gray-900 hover:text-[#FFC000] transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white hover:text-[#FFC000] transition-colors">
                         {ignoredUser.nickname}
                       </h3>
                     </Link>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Bloqueado {formatDate(ignoredUser.created_at)}
                     </p>
                   </div>
@@ -176,7 +176,7 @@ export function IgnoredUsersTab() {
                     disabled={
                       unignoring === ignoredUser.ignored_user_id
                     }
-                    className="border-2 border-black text-gray-900 bg-gray-50 hover:bg-[#FFC000] hover:text-gray-900"
+                    className="border-2 border-black dark:border-gray-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 hover:bg-[#FFC000] hover:text-gray-900 dark:hover:text-gray-900"
                   >
                     {unignoring === ignoredUser.ignored_user_id ? (
                       <>

@@ -32,7 +32,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
       className="block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]"
       aria-label={`Crear propuesta de intercambio con ${displayName}`}
     >
-      <ModernCard className="bg-white border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
+      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
         <ModernCardContent className="p-6">
           {/* User Header */}
           <div className="flex items-center space-x-3 mb-4">
@@ -40,7 +40,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
               <User className="w-5 h-5 text-gray-900" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold uppercase text-gray-900 truncate">
+              <h3 className="font-bold uppercase text-gray-900 dark:text-white truncate">
                 <UserLink
                   userId={match.match_user_id}
                   nickname={match.nickname}
@@ -48,7 +48,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
                   forceSpan={true} // Keep as text since this is already a link card
                 />
               </h3>
-              <p className="text-xs text-gray-600 font-medium">
+              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
                 Intercambio disponible
               </p>
             </div>

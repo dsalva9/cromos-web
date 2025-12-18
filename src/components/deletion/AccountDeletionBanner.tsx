@@ -53,7 +53,7 @@ export function AccountDeletionBanner() {
                 onClick={() => setShowCancelDialog(true)}
                 variant="outline"
                 size="sm"
-                className="bg-white text-black hover:bg-gray-100 border-white font-semibold"
+                className="bg-white dark:bg-gray-800 text-black hover:bg-gray-100 border-white font-semibold"
               >
                 Cancel Deletion
               </Button>

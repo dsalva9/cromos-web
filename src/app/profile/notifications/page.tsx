@@ -106,18 +106,19 @@ function NotificationsCenterContent() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      {/* Hero Section */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div>
-            <h1 className="text-3xl font-display font-bold text-comic-dark mb-2">
-              Notificaciones
-            </h1>
-            <p className="text-comic-muted">
-              Mantente al día con todas tus actividades
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container max-w-4xl mx-auto py-8 px-4">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-2">
+                Notificaciones
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Mantente al día con todas tus actividades
+              </p>
+            </div>
 
           {unreadCount > 0 && (
             <Button
@@ -132,12 +133,12 @@ function NotificationsCenterContent() {
         </div>
       </div>
 
-      {/* Error Display */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-          {error}
-        </div>
-      )}
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+            {error}
+          </div>
+        )}
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'unread' | 'history')}>
@@ -146,7 +147,7 @@ function NotificationsCenterContent() {
             <Bell className="h-4 w-4" />
             Nuevas
             {unreadCount > 0 && (
-              <span className="ml-1 px-2 py-0.5 bg-comic-accent text-white text-xs rounded-full">
+              <span className="ml-1 px-2 py-0.5 bg-[#FFC000] text-black text-xs rounded-full font-bold">
                 {unreadCount}
               </span>
             )}
@@ -160,18 +161,18 @@ function NotificationsCenterContent() {
         {/* Unread Tab */}
         <TabsContent value="unread" className="space-y-6">
           {loading && (
-            <div className="text-center py-12 text-comic-muted">
+            <div className="text-center py-12 text-gray-600 dark:text-gray-400">
               Cargando notificaciones...
             </div>
           )}
 
           {!loading && unreadNotifications.length === 0 && (
             <div className="text-center py-12">
-              <Bell className="h-16 w-16 mx-auto text-comic-muted mb-4 opacity-50" />
-              <h3 className="text-lg font-bold text-comic-dark mb-2">
+              <Bell className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 No hay notificaciones nuevas
               </h3>
-              <p className="text-comic-muted">
+              <p className="text-gray-600 dark:text-gray-400">
                 Estás al día con todas tus actividades
               </p>
             </div>
@@ -184,7 +185,7 @@ function NotificationsCenterContent() {
 
                 return (
                   <div key={category}>
-                    <h2 className="text-lg font-bold text-comic-dark mb-3">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                       {categoryLabels[category as keyof typeof categoryLabels]}
                     </h2>
                     <div className="space-y-2">
@@ -207,18 +208,18 @@ function NotificationsCenterContent() {
         {/* History Tab */}
         <TabsContent value="history" className="space-y-6">
           {loading && (
-            <div className="text-center py-12 text-comic-muted">
+            <div className="text-center py-12 text-gray-600 dark:text-gray-400">
               Cargando historial...
             </div>
           )}
 
           {!loading && readNotifications.length === 0 && (
             <div className="text-center py-12">
-              <Inbox className="h-16 w-16 mx-auto text-comic-muted mb-4 opacity-50" />
-              <h3 className="text-lg font-bold text-comic-dark mb-2">
+              <Inbox className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 No hay notificaciones leídas
               </h3>
-              <p className="text-comic-muted">
+              <p className="text-gray-600 dark:text-gray-400">
                 El historial aparecerá aquí cuando marques notificaciones como leídas
               </p>
             </div>
@@ -231,7 +232,7 @@ function NotificationsCenterContent() {
 
                 return (
                   <div key={category}>
-                    <h2 className="text-lg font-bold text-comic-dark mb-3">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                       {categoryLabels[category as keyof typeof categoryLabels]}
                     </h2>
                     <div className="space-y-2">
@@ -249,22 +250,23 @@ function NotificationsCenterContent() {
             </>
           )}
         </TabsContent>
-      </Tabs>
+        </Tabs>
 
-      {/* Rating Modal */}
-      {ratingModalData && (
-        <UserRatingDialog
-          open={showRatingModal}
-          onOpenChange={setShowRatingModal}
-          userToRate={{
-            id: ratingModalData.userId,
-            nickname: ratingModalData.nickname
-          }}
-          listingTitle={ratingModalData.listingTitle}
-          listingId={ratingModalData.listingId}
-          onSubmit={handleSubmitRating}
-        />
-      )}
+        {/* Rating Modal */}
+        {ratingModalData && (
+          <UserRatingDialog
+            open={showRatingModal}
+            onOpenChange={setShowRatingModal}
+            userToRate={{
+              id: ratingModalData.userId,
+              nickname: ratingModalData.nickname
+            }}
+            listingTitle={ratingModalData.listingTitle}
+            listingId={ratingModalData.listingId}
+            onSubmit={handleSubmitRating}
+          />
+        )}
+      </div>
     </div>
   );
 }

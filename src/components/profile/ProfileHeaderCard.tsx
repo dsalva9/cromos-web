@@ -46,7 +46,7 @@ export function ProfileHeaderCard({
   }, [editingNickname]);
 
   return (
-    <ModernCard className="bg-white/70 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5">
+    <ModernCard className="bg-white dark:bg-gray-800/70 backdrop-blur-sm overflow-hidden hover:shadow-2xl transition-all duration-300 ring-1 ring-black/5 dark:ring-white/10">
       {/* Gradient Header with subtle overlay */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 relative">
         <div className="absolute inset-0 bg-black/10" />
@@ -71,7 +71,7 @@ export function ProfileHeaderCard({
                       value={nickname}
                       onChange={e => onChangeNickname(e.target.value)}
                       placeholder="Tu nombre de usuario"
-                      className="bg-white/90 border-0 text-gray-800 flex-1 text-xl font-bold focus-visible:ring-2 focus-visible:ring-white/50"
+                      className="bg-white/90 dark:bg-gray-800/90 border-0 text-gray-800 dark:text-white flex-1 text-xl font-bold focus-visible:ring-2 focus-visible:ring-white/50"
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           onSaveNickname();
@@ -96,7 +96,7 @@ export function ProfileHeaderCard({
                       size="sm"
                       variant="outline"
                       onClick={onCancelEdit}
-                      className="bg-white/90 text-gray-800 border-0 hover:bg-white ring-0"
+                      className="bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white border-0 hover:bg-white dark:hover:bg-gray-700 ring-0"
                     >
                       <XCircle className="w-4 h-4 mr-2" />
                       Cancelar

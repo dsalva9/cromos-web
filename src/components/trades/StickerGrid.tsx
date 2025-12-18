@@ -63,8 +63,8 @@ export function StickerGrid({
 
   if (stickers.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 bg-white rounded-md border-2 border-black shadow-xl">
-        <p className="text-gray-600 font-bold">{emptyMessage}</p>
+      <div className="flex items-center justify-center h-40 bg-white dark:bg-gray-800 rounded-md border-2 border-black shadow-xl">
+        <p className="text-gray-600 dark:text-gray-400 font-bold">{emptyMessage}</p>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export function StickerGrid({
                 : 'border-black'
             )}
           >
-            <ModernCardContent className="p-2 relative bg-white">
+            <ModernCardContent className="p-2 relative bg-white dark:bg-gray-800">
               {selectedQuantity > 0 && (
                 <CheckCircle2 className="absolute top-2 right-2 h-6 w-6 text-[#FFC000] bg-gray-50 rounded-full p-0.5 z-10 border-2 border-black" />
               )}
@@ -100,15 +100,15 @@ export function StickerGrid({
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-6xl text-gray-600">?</span>
+                    <span className="text-6xl text-gray-600 dark:text-gray-400">?</span>
                   </div>
                 )}
               </div>
               <div className="text-center px-1">
-                <p className="text-sm font-bold truncate text-gray-900">
+                <p className="text-sm font-bold truncate text-gray-900 dark:text-white">
                   {sticker.stickers?.player_name}
                 </p>
-                <p className="text-xs text-gray-600 mb-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
                   {sticker.stickers?.collection_teams?.team_name ?? sticker.stickers?.code}
                 </p>
                 <QuantityStepper

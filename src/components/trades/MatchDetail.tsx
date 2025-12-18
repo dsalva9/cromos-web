@@ -63,7 +63,7 @@ function StickerList({
   headerColor,
 }: StickerListProps) {
   return (
-    <ModernCard className="bg-white border-2 border-black shadow-xl">
+    <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl">
       <div className={`${headerColor} p-4 rounded-t-md border-b-2 border-black`}>
         <div className="flex items-center space-x-2">
           {icon}
@@ -76,7 +76,7 @@ function StickerList({
 
       <ModernCardContent className="p-0">
         {stickers.length === 0 ? (
-          <div className="p-6 text-center text-gray-600">{emptyMessage}</div>
+          <div className="p-6 text-center text-gray-600 dark:text-gray-400">{emptyMessage}</div>
         ) : (
           <div className="max-h-96 overflow-y-auto">
             {stickers.map((sticker, index) => (
@@ -87,7 +87,7 @@ function StickerList({
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-mono text-gray-900 bg-gray-200 px-2 py-1 rounded-md border-2 border-black font-bold">
+                      <span className="text-sm font-mono text-gray-900 dark:text-white bg-gray-200 px-2 py-1 rounded-md border-2 border-black font-bold">
                         #{sticker.sticker_code}
                       </span>
                       <Badge
@@ -98,11 +98,11 @@ function StickerList({
                       </Badge>
                     </div>
 
-                    <h4 className="font-semibold text-gray-900 truncate">
+                    <h4 className="font-semibold text-gray-900 dark:text-white truncate">
                       {sticker.player_name}
                     </h4>
 
-                    <p className="text-sm text-gray-600 truncate">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                       {sticker.team_name}
                     </p>
                   </div>

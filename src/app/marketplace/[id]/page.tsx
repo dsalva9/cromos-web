@@ -157,7 +157,7 @@ export default function ListingDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
@@ -165,19 +165,19 @@ export default function ListingDetailPage() {
 
   if (error || !listing) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white border-2 border-black flex items-center justify-center">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white dark:bg-gray-800 border-2 border-black flex items-center justify-center">
             <Trash className="h-12 w-12 text-gray-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Anuncio no encontrado
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             {error ||
               'Este anuncio puede haber sido eliminado o ya no está disponible'}
           </p>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
@@ -202,18 +202,18 @@ export default function ListingDetailPage() {
   // Hide ELIMINADO/removed listings from non-owners (except admins)
   if ((listing.status === 'ELIMINADO' || listing.status === 'removed') && !isOwner && !isAdmin) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white border-2 border-black flex items-center justify-center">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-white dark:bg-gray-800 border-2 border-black flex items-center justify-center">
             <Trash className="h-12 w-12 text-gray-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Anuncio no encontrado
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Este anuncio puede haber sido eliminado o ya no está disponible
           </p>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
@@ -250,14 +250,14 @@ export default function ListingDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Image */}
           <div>
             <ModernCard>
               <ModernCardContent className="p-0">
-                <div className="relative aspect-square bg-white">
+                <div className="relative aspect-square bg-white dark:bg-gray-800">
                   {listing.image_url ? (
                     <Image
                       src={listing.image_url}
@@ -269,7 +269,7 @@ export default function ListingDetailPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-9xl font-black text-gray-600">
+                      <div className="text-9xl font-black text-gray-600 dark:text-gray-400">
                         {listing.title.charAt(0).toUpperCase()}
                       </div>
                     </div>
@@ -352,12 +352,12 @@ export default function ListingDetailPage() {
                 )}
               </div>
 
-              <h1 className="text-3xl font-black text-gray-900 mb-4">
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-4">
                 {listing.title}
               </h1>
 
               {/* Basic Metadata */}
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-6">
+              <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
                 {listing.collection_name && (
                   <div>
                     <span className="font-bold">Colección:</span>{' '}
@@ -382,13 +382,13 @@ export default function ListingDetailPage() {
                 listing.global_number) && (
                 <ModernCard className="mb-6">
                   <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-gray-900 mb-3">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-3">
                       Detalles del Cromo
                     </h3>
                     <div className="space-y-2 text-sm">
                       {(listing.page_number || listing.page_title) && (
-                        <div className="text-gray-600">
-                          <span className="font-bold text-gray-900">Página:</span>{' '}
+                        <div className="text-gray-600 dark:text-gray-400">
+                          <span className="font-bold text-gray-900 dark:text-white">Página:</span>{' '}
                           {listing.page_number && `${listing.page_number}`}
                           {listing.page_number &&
                             listing.page_title &&
@@ -397,8 +397,8 @@ export default function ListingDetailPage() {
                         </div>
                       )}
                       {(listing.sticker_number || listing.slot_variant) && (
-                        <div className="text-gray-600">
-                          <span className="font-bold text-gray-900">
+                        <div className="text-gray-600 dark:text-gray-400">
+                          <span className="font-bold text-gray-900 dark:text-white">
                             Número de cromo:
                           </span>{' '}
                           #{listing.sticker_number}
@@ -406,8 +406,8 @@ export default function ListingDetailPage() {
                         </div>
                       )}
                       {listing.global_number && (
-                        <div className="text-gray-600">
-                          <span className="font-bold text-gray-900">
+                        <div className="text-gray-600 dark:text-gray-400">
+                          <span className="font-bold text-gray-900 dark:text-white">
                             Número global:
                           </span>{' '}
                           #{listing.global_number}
@@ -422,8 +422,8 @@ export default function ListingDetailPage() {
               {listing.description && (
                 <ModernCard className="mb-6">
                   <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-gray-900 mb-2">Descripción</h3>
-                    <p className="text-gray-600 whitespace-pre-wrap">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-2">Descripción</h3>
+                    <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                       {listing.description}
                     </p>
                   </ModernCardContent>
@@ -433,7 +433,7 @@ export default function ListingDetailPage() {
               {/* Seller */}
               <ModernCard className="mb-6">
                 <ModernCardContent className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-3">Vendedor</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Vendedor</h3>
                   <Link href={`/users/${listing.user_id}`}>
                     <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                       {(() => {
@@ -462,10 +462,10 @@ export default function ListingDetailPage() {
                         );
                       })()}
                       <div>
-                        <p className="font-bold text-gray-900">
+                        <p className="font-bold text-gray-900 dark:text-white">
                           {listing.author_nickname}
                         </p>
-                        <p className="text-sm text-gray-600">Ver perfil</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Ver perfil</p>
                       </div>
                     </div>
                   </Link>
@@ -495,7 +495,7 @@ export default function ListingDetailPage() {
 
               {isOwner && (
                 <div className="text-center space-y-4">
-                  <p className="text-gray-600 text-sm">Este es tu anuncio</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">Este es tu anuncio</p>
                   {hasConversations ? (
                     <Button
                       size="lg"
@@ -567,7 +567,7 @@ export default function ListingDetailPage() {
 
               {!user && (
                 <div className="text-center">
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
                     <Link
                       href="/login"
                       className="text-[#FFC000] hover:underline"
@@ -581,7 +581,7 @@ export default function ListingDetailPage() {
 
               {/* Report Button */}
               {user && !isOwner && (
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <ReportButton
                     entityType="listing"
                     entityId={listing.id}

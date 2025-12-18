@@ -49,7 +49,7 @@ function FavoritesContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
@@ -61,28 +61,28 @@ function FavoritesContent() {
     (activeTab === 'listings' && listingFavorites.length === 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
+          <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
             Mis favoritos
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Usuarios y anuncios que has marcado como favoritos
           </p>
         </div>
 
         {/* Tabs */}
         {!hasNoFavorites && (
-          <div className="mb-8 flex gap-4 border-b border-gray-200">
+          <div className="mb-8 flex gap-4 border-b border-gray-200 dark:border-gray-700">
             <button
               onClick={() => setActiveTab('users')}
               className={`
                 pb-4 px-2 font-bold transition-colors relative
                 ${activeTab === 'users'
                   ? 'text-[#FFC000]'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }
               `}
             >
@@ -106,7 +106,7 @@ function FavoritesContent() {
                 pb-4 px-2 font-bold transition-colors relative
                 ${activeTab === 'listings'
                   ? 'text-[#FFC000]'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }
               `}
             >
@@ -130,7 +130,7 @@ function FavoritesContent() {
         {hasNoFavorites && (
           <div className="text-center py-16">
             <Heart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-600 text-lg mb-4">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
               Todavía no tienes favoritos
             </p>
             <p className="text-gray-500 text-sm mb-6">
@@ -152,7 +152,7 @@ function FavoritesContent() {
             ) : (
               <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-gray-300" />
             )}
-            <p className="text-gray-600 text-lg mb-4">
+            <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
               No tienes {activeTab === 'users' ? 'usuarios' : 'anuncios'} favoritos
             </p>
             <p className="text-gray-500 text-sm mb-6">
@@ -193,20 +193,20 @@ function FavoritesContent() {
 
                         {/* Name */}
                         <Link href={`/users/${favorite.favorite_user_id}`}>
-                          <h3 className="font-bold text-gray-900 text-lg hover:text-[#FFC000] transition-colors">
+                          <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-[#FFC000] transition-colors">
                             {favorite.nickname}
                           </h3>
                         </Link>
 
                         {/* Stats */}
-                        <div className="flex items-center gap-4 text-sm text-gray-600 w-full justify-center">
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 w-full justify-center">
                           <div className="flex items-center gap-1">
                             <Package className="h-4 w-4" />
                             <span>{favorite.active_listings_count}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
-                            <span className="text-gray-900 font-bold">
+                            <span className="text-gray-900 dark:text-white font-bold">
                               {favorite.rating_avg?.toFixed(1) || '0.0'}
                             </span>
                           </div>
@@ -271,17 +271,17 @@ function FavoritesContent() {
                       {/* Content */}
                       <div className="p-4 space-y-3">
                         <div>
-                          <h3 className="font-bold text-gray-900 text-lg line-clamp-1 hover:text-[#FFC000] transition-colors">
+                          <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-1 hover:text-[#FFC000] transition-colors">
                             {favorite.title}
                           </h3>
                           {favorite.collection_name && (
-                            <p className="text-sm text-gray-600 line-clamp-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
                               {favorite.collection_name}
                             </p>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between text-xs text-gray-600">
+                        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
                           <span className="truncate">{favorite.author_nickname}</span>
                           <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
                             favorite.status === 'active' ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-600'

@@ -95,7 +95,7 @@ export function ProposalList({
     return (
       <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(3)].map((_, i) => (
-          <ModernCard key={i} className="bg-white border-2 border-black animate-pulse shadow-xl">
+          <ModernCard key={i} className="bg-white dark:bg-gray-800 border-2 border-black animate-pulse shadow-xl">
             <ModernCardContent className="p-4 space-y-3">
               <div className="h-4 bg-gray-200 rounded-md w-3/4"></div>
               <div className="h-3 bg-gray-100 rounded-md w-1/2"></div>
@@ -112,8 +112,8 @@ export function ProposalList({
 
   if (optimisticProposals.length === 0) {
     return (
-      <ModernCard className="bg-white border-2 border-dashed border-gray-200 shadow-xl">
-        <ModernCardContent className="p-8 text-center text-gray-600">
+      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 shadow-xl">
+        <ModernCardContent className="p-8 text-center text-gray-600 dark:text-gray-400">
           <Inbox className="mx-auto h-12 w-12 mb-4" />
           <p className="font-bold">No hay propuestas en esta bandeja.</p>
         </ModernCardContent>

@@ -24,14 +24,14 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-900 text-xl font-bold">Cargando...</div>
+      <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center">
+        <div className="text-gray-900 dark:text-white text-xl font-bold">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col">
       <main className="flex-1">
         <Hero isAuthenticated={!!user} />
         <HowItWorks />

@@ -40,25 +40,25 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
+        <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-md bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-black uppercase text-gray-900 mb-2">
+            <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-white mb-2">
               Recuperar Contraseña
             </h2>
-            <p className="text-gray-600 font-medium">
+            <p className="text-gray-600 dark:text-gray-400 font-medium">
               Ingresa tu email y te enviaremos las instrucciones
             </p>
           </div>
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-bold uppercase text-gray-900"
+                className="text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
                 Email
               </label>
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 

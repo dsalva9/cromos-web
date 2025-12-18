@@ -16,9 +16,9 @@ interface LegalModalProps {
 export function LegalModal({ open, onOpenChange }: LegalModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-white text-gray-900 border-2 border-gray-200">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase text-gray-900">
+          <DialogTitle className="text-2xl font-black uppercase text-gray-900 dark:text-white">
             Información Legal
           </DialogTitle>
         </DialogHeader>

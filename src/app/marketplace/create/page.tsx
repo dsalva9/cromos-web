@@ -28,7 +28,7 @@ function CreateListingContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Link
           href="/marketplace"
@@ -39,10 +39,10 @@ function CreateListingContent() {
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
+          <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
             Publicar Anuncio
           </h1>
-          <p className="text-gray-600">Comparte tu cromo con la comunidad</p>
+          <p className="text-gray-600 dark:text-gray-400">Comparte tu cromo con la comunidad</p>
         </div>
 
         <SimplifiedListingForm onSubmit={handleSubmit} loading={loading} />

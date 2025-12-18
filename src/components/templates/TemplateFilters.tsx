@@ -36,9 +36,9 @@ export function TemplateFilters({
 
       {/* Sort */}
       <div className="flex items-center gap-4">
-        <Label className="text-gray-900">Ordenar por:</Label>
+        <Label className="text-gray-900 dark:text-white">Ordenar por:</Label>
         <Select value={sortBy} onValueChange={onSortChange}>
-          <SelectTrigger className="w-48 bg-white border-2 border-gray-200 text-gray-900">
+          <SelectTrigger className="w-48 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

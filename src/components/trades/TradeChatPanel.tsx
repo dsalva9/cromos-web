@@ -136,7 +136,7 @@ export function TradeChatPanel({
 
   if (!tradeId) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-400 font-bold">
+      <div className="flex items-center justify-center h-64 text-gray-400 dark:text-gray-400 font-bold">
         Selecciona una propuesta para ver el chat
       </div>
     );
@@ -170,14 +170,14 @@ export function TradeChatPanel({
       {showChatDisclaimer && (
         <div className="bg-[#FFC000] border-b-2 border-black px-4 py-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
-            <p className="text-xs text-gray-900 leading-relaxed flex-1">
+            <p className="text-xs text-gray-900 dark:text-gray-900 leading-relaxed flex-1">
               El chat de Cambiocromos.com te permite comunicarte con otros usuarios de forma privada para intercambiar o vender cromos. El contenido de los mensajes no se usa con fines comerciales, pero puede ser revisado si otro usuario reporta abuso, fraude o incumplimiento de nuestras normas. No compartas información personal sensible ni enlaces externos que puedan poner en riesgo tu seguridad. Respeta siempre a los demás usuarios. El mal uso del chat puede suponer la suspensión de tu cuenta. Al continuar, aceptas nuestras Condiciones de uso y Política de privacidad.
             </p>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleDismissDisclaimer}
-              className="text-gray-900 hover:bg-[#FFD633] p-1 h-auto flex-shrink-0"
+              className="text-gray-900 dark:text-gray-900 hover:bg-[#FFD633] p-1 h-auto flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </Button>
