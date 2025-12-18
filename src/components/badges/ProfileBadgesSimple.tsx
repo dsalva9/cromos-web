@@ -32,14 +32,14 @@ export function ProfileBadgesSimple({
       <div className={cn('space-y-3', className)}>
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-[#FFC000]" />
-          <h3 className="text-lg font-bold text-white">Insignias</h3>
+          <h3 className="text-lg font-bold text-gray-900">Insignias</h3>
         </div>
         <div className="animate-pulse">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-24 bg-gray-700 rounded-lg border-2 border-black"
+                className="h-24 bg-gray-100 rounded-lg border border-gray-200"
               />
             ))}
           </div>
@@ -55,19 +55,19 @@ export function ProfileBadgesSimple({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-[#FFC000]" />
-            <h3 className="text-lg font-bold text-white">Insignias</h3>
+            <h3 className="text-lg font-bold text-gray-900">Insignias</h3>
           </div>
           <Link
             href="/profile#badges"
-            className="text-xs text-[#FFC000] hover:text-yellow-400 font-semibold underline"
+            className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
           >
             Ver todas las insignias
           </Link>
         </div>
 
-        <div className="text-center py-8 border-2 border-dashed border-gray-600 rounded-lg">
-          <Award className="w-12 h-12 text-gray-600 mx-auto mb-2" />
-          <p className="text-sm text-gray-400">
+        <div className="text-center py-8 border border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+          <Award className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
             {isOwnProfile
               ? 'Aún no has ganado ninguna insignia'
               : 'Sin insignias ganadas'}
@@ -90,14 +90,14 @@ export function ProfileBadgesSimple({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-[#FFC000]" />
-          <h3 className="text-lg font-bold text-white">Insignias</h3>
-          <span className="text-xs text-gray-400 font-semibold">
+          <h3 className="text-lg font-bold text-gray-900">Insignias</h3>
+          <span className="text-xs text-gray-500 font-semibold">
             ({badges.length})
           </span>
         </div>
         <Link
           href="/profile#badges"
-          className="text-xs text-[#FFC000] hover:text-yellow-400 font-semibold underline"
+          className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
         >
           Ver todas
         </Link>

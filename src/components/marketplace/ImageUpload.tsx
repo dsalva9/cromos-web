@@ -109,7 +109,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
           <div className="relative">
             <ModernCard>
               <ModernCardContent className="p-0">
-                <div className="relative aspect-square bg-[#374151]">
+                <div className="relative aspect-square bg-white">
                   <Image
                     src={value}
                     alt="Vista previa del anuncio"
@@ -135,12 +135,12 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
           <ModernCard>
             <ModernCardContent className="p-8">
               <div className="flex flex-col items-center justify-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-[#374151] border-2 border-black flex items-center justify-center" aria-hidden="true">
-                  <ImageIcon className="h-8 w-8 text-gray-400" />
+                <div className="w-16 h-16 rounded-full bg-gray-50 border-2 border-black flex items-center justify-center" aria-hidden="true">
+                  <ImageIcon className="h-8 w-8 text-gray-600" />
                 </div>
                 <div className="text-center">
-                  <p className="text-white font-bold mb-2">Añadir Imagen</p>
-                  <p className="text-gray-400 text-sm mb-4">
+                  <p className="text-gray-900 font-bold mb-2">Añadir Imagen</p>
+                  <p className="text-gray-600 text-sm mb-4">
                     Sube una foto de tu cromo para mayor visibilidad
                   </p>
                   <div className="flex gap-2 justify-center">

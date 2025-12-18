@@ -120,7 +120,7 @@ export function IgnoredUsersTab() {
         return (
           <ModernCard
             key={ignoredUser.ignored_user_id}
-            className="bg-[#374151] border-2 border-black hover:shadow-xl transition-all duration-300"
+            className="bg-white border-2 border-black hover:shadow-xl transition-all duration-300"
           >
             <ModernCardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -152,11 +152,11 @@ export function IgnoredUsersTab() {
                       href={`/users/${ignoredUser.ignored_user_id}`}
                       className="block"
                     >
-                      <h3 className="text-xl font-bold text-white hover:text-[#FFC000] transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 hover:text-[#FFC000] transition-colors">
                         {ignoredUser.nickname}
                       </h3>
                     </Link>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-600 text-sm">
                       Bloqueado {formatDate(ignoredUser.created_at)}
                     </p>
                   </div>
@@ -176,7 +176,7 @@ export function IgnoredUsersTab() {
                     disabled={
                       unignoring === ignoredUser.ignored_user_id
                     }
-                    className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
+                    className="border-2 border-black text-gray-900 bg-gray-50 hover:bg-[#FFC000] hover:text-gray-900"
                   >
                     {unignoring === ignoredUser.ignored_user_id ? (
                       <>

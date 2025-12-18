@@ -28,7 +28,7 @@ export default function HowItWorks() {
   return (
     <section className="container mx-auto px-4 py-16 border-t-4 border-black">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-extrabold uppercase text-white text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-extrabold uppercase text-gray-900 text-center mb-12">
           Tu flujo de intercambio en tres pasos
         </h2>
 
@@ -38,22 +38,22 @@ export default function HowItWorks() {
             return (
               <ModernCard
                 key={step.title}
-                className="bg-gray-800 border-2 border-black shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
+                className="bg-white border-2 border-black shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
               >
                 <ModernCardContent className="p-6 text-center space-y-5">
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFC000] text-gray-900 font-extrabold text-xl border-2 border-black rounded-lg shadow-lg">
                     {index + 1}
                   </div>
 
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg border-2 border-black bg-gray-900 shadow-lg">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg border-2 border-black bg-gray-100 shadow-lg">
                     <Icon className="h-8 w-8 text-[#FFC000]" />
                   </div>
 
-                  <h3 className="text-xl font-bold text-white uppercase">
+                  <h3 className="text-xl font-bold text-gray-900 uppercase">
                     {step.title}
                   </h3>
 
-                  <p className="text-gray-300 leading-relaxed">
+                  <p className="text-gray-700 leading-relaxed">
                     {step.description}
                   </p>
                 </ModernCardContent>

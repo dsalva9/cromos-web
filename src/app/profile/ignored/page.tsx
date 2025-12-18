@@ -73,9 +73,9 @@ export default function IgnoredUsersPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-white text-xl mb-4">
+          <p className="text-gray-900 text-xl mb-4">
             Debes iniciar sesión para ver esta página
           </p>
           <Link href="/login">
@@ -89,15 +89,15 @@ export default function IgnoredUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937]">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-black text-white mb-2">
+            <h1 className="text-4xl font-black text-gray-900 mb-2">
               Usuarios Bloqueados
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               Gestiona tu lista de usuarios que has decidido bloquear
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function IgnoredUsersPage() {
             </div>
           ) : error ? (
             <div className="text-center py-16">
-              <p className="text-red-400 text-lg mb-4">{error}</p>
+              <p className="text-red-600 text-lg mb-4">{error}</p>
               <Button
                 onClick={() => void fetchIgnoredUsers()}
                 className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900"
@@ -118,13 +118,13 @@ export default function IgnoredUsersPage() {
               </Button>
             </div>
           ) : ignoredUsers.length === 0 ? (
-            <ModernCard className="bg-white/10 backdrop-blur-sm border border-white/20">
+            <ModernCard className="bg-gray-100 border border-gray-200">
               <ModernCardContent className="p-16 text-center">
-                <Eye className="w-20 h-20 text-white/50 mx-auto mb-6" />
-                <h2 className="text-2xl font-semibold text-white mb-4">
+                <Eye className="w-20 h-20 text-gray-400 mx-auto mb-6" />
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                   No tienes usuarios bloqueados
                 </h2>
-                <p className="text-white/80 text-lg">
+                <p className="text-gray-700 text-lg">
                   Cuando bloquees a usuarios, aparecerán aquí para que puedas
                   gestionarlos.
                 </p>
@@ -140,7 +140,7 @@ export default function IgnoredUsersPage() {
                 return (
                   <ModernCard
                     key={ignoredUser.ignored_user_id}
-                    className="bg-[#374151] border-2 border-black hover:shadow-xl transition-all duration-300"
+                    className="bg-white border-2 border-black hover:shadow-xl transition-all duration-300"
                   >
                     <ModernCardContent className="p-6">
                       <div className="flex items-center justify-between">
@@ -172,11 +172,11 @@ export default function IgnoredUsersPage() {
                               href={`/users/${ignoredUser.ignored_user_id}`}
                               className="block"
                             >
-                              <h3 className="text-xl font-bold text-white hover:text-[#FFC000] transition-colors">
+                              <h3 className="text-xl font-bold text-gray-900 hover:text-[#FFC000] transition-colors">
                                 {ignoredUser.nickname}
                               </h3>
                             </Link>
-                            <p className="text-gray-400 text-sm">
+                            <p className="text-gray-600 text-sm">
                               Bloqueado {formatDate(ignoredUser.created_at)}
                             </p>
                           </div>
@@ -196,7 +196,7 @@ export default function IgnoredUsersPage() {
                             disabled={
                               unignoring === ignoredUser.ignored_user_id
                             }
-                            className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
+                            className="border-2 border-black text-gray-900 bg-white hover:bg-[#FFC000] hover:text-gray-900"
                           >
                             {unignoring === ignoredUser.ignored_user_id ? (
                               <>
@@ -221,7 +221,7 @@ export default function IgnoredUsersPage() {
             <Link href="/profile">
               <Button
                 variant="outline"
-                className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
+                className="border-2 border-black text-gray-900 bg-white hover:bg-[#FFC000] hover:text-gray-900"
               >
                 Volver a mi perfil
               </Button>

@@ -124,7 +124,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       <ModernCardContent className="p-0">
         <div className="flex flex-col md:flex-row gap-4 p-4">
           {/* Image */}
-          <div className="relative w-full md:w-32 h-32 bg-[#374151] rounded-md flex-shrink-0">
+          <div className="relative w-full md:w-32 h-32 bg-white rounded-md flex-shrink-0">
             {listing.image_url ? (
               <Image
                 src={listing.image_url}
@@ -147,12 +147,12 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             <div className="flex items-start justify-between gap-4">
               <div>
                 <Link href={`/marketplace/${listing.listing_id}`}>
-                  <h3 className="font-bold text-white text-lg hover:text-[#FFC000] transition-colors">
+                  <h3 className="font-bold text-gray-900 text-lg hover:text-[#FFC000] transition-colors">
                     {listing.title}
                   </h3>
                 </Link>
                 {listing.collection_name && (
-                  <p className="text-sm text-gray-400">{listing.collection_name}</p>
+                  <p className="text-sm text-gray-600">{listing.collection_name}</p>
                 )}
               </div>
 
@@ -195,8 +195,8 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                   Sincronizado con Colección
                 </Badge>
                 {listing.current_count !== null && (
-                  <span className="text-gray-400">
-                    Repetidos actuales: <span className="font-bold text-white">{listing.current_count}</span>
+                  <span className="text-gray-600">
+                    Repetidos actuales: <span className="font-bold text-gray-900">{listing.current_count}</span>
                   </span>
                 )}
               </div>
@@ -204,10 +204,10 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
             {/* Panini Metadata */}
             {(listing.page_number || listing.page_title || listing.sticker_number || listing.slot_variant || listing.global_number) && (
-              <div className="text-xs text-gray-400 space-y-1">
+              <div className="text-xs text-gray-600 space-y-1">
                 {(listing.page_number || listing.page_title) && (
                   <div>
-                    <span className="font-bold text-gray-300">Página:</span>{' '}
+                    <span className="font-bold text-gray-900">Página:</span>{' '}
                     {listing.page_number && `${listing.page_number}`}
                     {listing.page_number && listing.page_title && ' - '}
                     {listing.page_title}
@@ -215,13 +215,13 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 )}
                 {(listing.sticker_number || listing.slot_variant) && (
                   <div>
-                    <span className="font-bold text-gray-300">Número de cromo:</span>{' '}
+                    <span className="font-bold text-gray-900">Número de cromo:</span>{' '}
                     #{listing.sticker_number}{listing.slot_variant}
                   </div>
                 )}
                 {listing.global_number && (
                   <div>
-                    <span className="font-bold text-gray-300">Número global:</span>{' '}
+                    <span className="font-bold text-gray-900">Número global:</span>{' '}
                     #{listing.global_number}
                   </div>
                 )}
@@ -229,7 +229,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-4 text-sm text-gray-400">
+            <div className="flex items-center gap-4 text-sm text-gray-600">
               <div className="flex items-center gap-1">
                 <Eye className="h-4 w-4" />
                 {listing.views_count} vistas

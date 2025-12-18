@@ -59,13 +59,13 @@ export function CancelDeletionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-[#1F2937] border-gray-700">
+      <DialogContent className="sm:max-w-[450px] bg-gray-50 border-gray-200">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-white">
+          <DialogTitle className="flex items-center gap-2 text-gray-900">
             <RotateCcw className="h-5 w-5 text-green-500" />
             Cancel Account Deletion
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-gray-600">
             Are you sure you want to cancel your account deletion?
           </DialogDescription>
         </DialogHeader>
@@ -73,7 +73,7 @@ export function CancelDeletionDialog({
         <div className="py-4">
           <Alert className="bg-green-500/10 border-green-500">
             <CheckCircle className="h-4 w-4 text-green-500" />
-            <AlertDescription className="text-gray-300">
+            <AlertDescription className="text-gray-600">
               <p className="font-semibold mb-2">Your account will be fully restored:</p>
               <ul className="list-disc list-inside space-y-1 text-sm">
                 <li>You'll keep all your listings and templates</li>
@@ -81,7 +81,7 @@ export function CancelDeletionDialog({
                 <li>Your profile will stay active</li>
                 <li>All ratings and reviews preserved</li>
               </ul>
-              <p className="mt-3 text-xs text-gray-400">
+              <p className="mt-3 text-xs text-gray-600">
                 You currently have {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining before permanent deletion.
               </p>
             </AlertDescription>
@@ -93,7 +93,7 @@ export function CancelDeletionDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            className="border-gray-200 text-gray-600 hover:bg-gray-100"
           >
             Close
           </Button>

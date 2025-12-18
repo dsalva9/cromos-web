@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { User, Package, Heart, LogOut, ChevronDown, Settings, LayoutTemplate } from 'lucide-react';
+import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -80,7 +80,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
         onClick={() => handleSetIsOpen(!isOpen)}
         className={cn(
           'flex items-center gap-2 rounded-full border-2 border-black transition-all',
-          'hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-900',
+          'hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-50',
           isOpen && 'border-[#FFC000]'
         )}
         aria-expanded={isOpen}
@@ -108,7 +108,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
         </div>
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-white transition-transform mr-1',
+            'h-4 w-4 text-gray-900 transition-transform mr-1',
             isOpen && 'rotate-180'
           )}
         />
@@ -125,19 +125,19 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
           />
 
           {/* Menu */}
-          <div className="absolute right-0 mt-2 w-56 z-50 bg-gray-800 border-2 border-black rounded-md shadow-xl">
-            <div className="p-3 border-b border-gray-700">
-              <p className="font-bold text-white truncate">
+          <div className="absolute right-0 mt-2 w-56 z-50 bg-white border-2 border-black rounded-md shadow-xl">
+            <div className="p-3 border-b border-gray-200">
+              <p className="font-bold text-gray-900 truncate">
                 {profile?.nickname || 'Usuario'}
               </p>
-              <p className="text-sm text-gray-400 truncate">{user.email}</p>
+              <p className="text-sm text-gray-600 truncate">{user.email}</p>
             </div>
 
             <div className="py-2">
               <Link
                 href={`/users/${user.id}`}
                 onClick={handleProtectedClick(`/users/${user.id}`)}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 <User className="h-4 w-4" />
                 <span>Mi Perfil</span>
@@ -146,7 +146,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               <Link
                 href="/marketplace/my-listings"
                 onClick={handleProtectedClick('/marketplace/my-listings', true)}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 <Package className="h-4 w-4" />
                 <span>Mis Anuncios</span>
@@ -155,25 +155,16 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               <Link
                 href="/templates"
                 onClick={handleProtectedClick('/templates', true)}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 <LayoutTemplate className="h-4 w-4" />
                 <span>Plantillas</span>
               </Link>
 
               <Link
-                href="/favorites"
-                onClick={handleProtectedClick('/favorites')}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
-              >
-                <Heart className="h-4 w-4" />
-                <span>Favoritos</span>
-              </Link>
-
-              <Link
                 href="/ajustes"
                 onClick={handleProtectedClick('/ajustes')}
-                className="flex items-center gap-3 px-4 py-2 text-white hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 hover:bg-gray-100 transition-colors"
               >
                 <Settings className="h-4 w-4" />
                 <span>Ajustes</span>
@@ -181,11 +172,11 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
 
               {isAdmin && (
                 <>
-                  <div className="my-2 border-t border-gray-700" />
+                  <div className="my-2 border-t border-gray-200" />
                   <Link
                     href="/admin/dashboard"
                     onClick={handleProtectedClick('/admin/dashboard')}
-                    className="flex items-center gap-3 px-4 py-2 text-[#FFC000] hover:bg-gray-700 transition-colors font-bold"
+                    className="flex items-center gap-3 px-4 py-2 text-[#FFC000] hover:bg-gray-100 transition-colors font-bold"
                   >
                     <span>Admin Panel</span>
                   </Link>
@@ -193,11 +184,11 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               )}
             </div>
 
-            <div className="border-t border-gray-700">
+            <div className="border-t border-gray-200">
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-3 px-4 py-3 text-white hover:bg-red-900/20 hover:text-red-400 transition-colors w-full"
+                className="flex items-center gap-3 px-4 py-3 text-gray-900 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Cerrar sesión</span>

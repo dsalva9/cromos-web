@@ -32,10 +32,10 @@ export default function AlbumSummaryHeader({
   }, [onHeightChange]);
 
   return (
-    <div ref={ref} className="sticky top-16 z-40 bg-gray-900 border-b-2 border-black py-4 shadow-xl">
-      <div className="container mx-auto px-4 flex flex-col gap-4 text-white">
+    <div ref={ref} className="sticky top-16 z-40 bg-white border-b-2 border-black py-4 shadow-xl">
+      <div className="container mx-auto px-4 flex flex-col gap-4 text-gray-900">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-bold">
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-600 font-bold">
             Mi colección
           </p>
           <h1 className="text-2xl font-black uppercase">
@@ -45,25 +45,25 @@ export default function AlbumSummaryHeader({
 
         <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 items-center text-sm">
           <div className="font-black">
-            <span className="text-white">TENGO</span>{' '}
+            <span className="text-gray-900">TENGO</span>{' '}
             <span className="text-[#FFC000]">
               {owned !== null ? owned : '--'}
             </span>
           </div>
           <div className="font-black">
-            <span className="text-white">FALTAN</span>{' '}
+            <span className="text-gray-900">FALTAN</span>{' '}
             <span className="text-[#FFC000]">
               {missing !== null ? missing : '--'}
             </span>
           </div>
           <div className="font-black">
-            <span className="text-white">REPES</span>{' '}
+            <span className="text-gray-900">REPES</span>{' '}
             <span className="text-[#FFC000]">
               {duplicates !== null ? duplicates : '--'}
             </span>
           </div>
           <div className="font-black">
-            <span className="text-white">TOTAL</span>{' '}
+            <span className="text-gray-900">TOTAL</span>{' '}
             <span className="text-2xl bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
               {completion !== null ? `${completion}%` : '--%'}
             </span>

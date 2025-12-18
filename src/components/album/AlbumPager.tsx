@@ -98,11 +98,11 @@ export default function AlbumPager({
         key={page.id}
         href={`/mi-coleccion/${collectionId}?page=${page.id}`}
         className={cn(
-          'flex items-center gap-3 px-4 py-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-[#FFC000]',
+          'flex items-center gap-3 px-4 py-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#FFC000]',
           'whitespace-nowrap text-sm',
           isActive
             ? 'bg-[#FFC000] text-gray-900 font-black border-2 border-black uppercase'
-            : 'bg-gray-800 text-gray-300 border-2 border-black hover:bg-gray-700 font-bold'
+            : 'bg-white text-gray-600 border-2 border-black hover:bg-gray-100 font-bold'
         )}
         aria-current={isActive ? 'page' : undefined}
       >
@@ -124,14 +124,14 @@ export default function AlbumPager({
 
   return (
     <div
-      className="sticky z-30 bg-gray-900 border-y-2 border-black shadow-xl"
+      className="sticky z-30 bg-white border-y-2 border-black shadow-xl"
       style={stickyStyle}
     >
       {canScrollLeft && (
         <Button
           variant="outline"
           size="icon"
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-md bg-gray-800 hover:bg-gray-700 border-2 border-black text-white shadow-xl"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-md bg-white hover:bg-gray-100 border-2 border-black text-gray-900 shadow-xl"
           onClick={() => scroll('left')}
         >
           <ChevronLeft className="h-6 w-6" />
@@ -150,9 +150,9 @@ export default function AlbumPager({
 
         {specialPages.length > 0 && (
           <>
-            <div className="h-8 w-px bg-gray-600 mx-2" />
+            <div className="h-8 w-px bg-gray-200 mx-2" />
             <div className="flex items-center gap-2">
-              <div className="flex flex-shrink-0 items-center gap-2 text-gray-400 font-bold uppercase text-sm ml-2">
+              <div className="flex flex-shrink-0 items-center gap-2 text-gray-600 font-bold uppercase text-sm ml-2">
                 <Sparkles className="h-5 w-5" />
                 <span>Especiales</span>
               </div>
@@ -165,7 +165,7 @@ export default function AlbumPager({
         <Button
           variant="outline"
           size="icon"
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-md bg-gray-800 hover:bg-gray-700 border-2 border-black text-white shadow-xl"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-40 h-10 w-10 rounded-md bg-white hover:bg-gray-100 border-2 border-black text-gray-900 shadow-xl"
           onClick={() => scroll('right')}
         >
           <ChevronRight className="h-6 w-6" />

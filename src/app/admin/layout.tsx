@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#1F2937]">
+      <div className="dark min-h-screen bg-[#1F2937]">
         {/* Admin Header */}
         <div className="border-b-2 border-black bg-[#111827]">
           <div className="container mx-auto px-4 py-4">

@@ -231,11 +231,11 @@ export function TemplateCreationWizard({
       </div>
 
       {/* Step Content */}
-      <Card className="bg-[#374151] border-gray-700 text-white">
+      <Card className="bg-white border-gray-200 text-gray-900">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>{steps[currentStep].title}</span>
-            <span className="text-sm font-normal text-gray-400">
+            <span className="text-sm font-normal text-gray-600">
               {steps[currentStep].description}
             </span>
           </CardTitle>
@@ -298,7 +298,7 @@ export function TemplateCreationWizard({
               variant="outline"
               onClick={handlePrevious}
               disabled={currentStep === 0}
-              className="text-white border-gray-600"
+              className="text-gray-900 border-gray-200"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Anterior

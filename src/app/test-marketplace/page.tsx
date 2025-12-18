@@ -35,15 +35,15 @@ export default function TestMarketplacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937] p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-black text-white mb-8">
+        <h1 className="text-3xl font-black text-gray-900 mb-8">
           Marketplace Test Page
         </h1>
 
         {/* Test Create Listing */}
-        <div className="bg-[#374151] border-2 border-black p-6 rounded-lg mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="bg-white border-2 border-black p-6 rounded-lg mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
             Test Create Listing
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -53,7 +53,7 @@ export default function TestMarketplacePage() {
                 setTestData(prev => ({ ...prev, title: e.target.value }))
               }
               placeholder="Title"
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white border-2 border-black text-gray-900"
             />
             <Input
               value={testData.collection_name}
@@ -64,7 +64,7 @@ export default function TestMarketplacePage() {
                 }))
               }
               placeholder="Collection"
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white border-2 border-black text-gray-900"
             />
             <Input
               value={testData.sticker_number}
@@ -75,7 +75,7 @@ export default function TestMarketplacePage() {
                 }))
               }
               placeholder="Number"
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white border-2 border-black text-gray-900"
             />
             <Input
               value={testData.description}
@@ -83,7 +83,7 @@ export default function TestMarketplacePage() {
                 setTestData(prev => ({ ...prev, description: e.target.value }))
               }
               placeholder="Description"
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white border-2 border-black text-gray-900"
             />
           </div>
           <Button
@@ -96,12 +96,12 @@ export default function TestMarketplacePage() {
         </div>
 
         {/* Test Listings Display */}
-        <div className="bg-[#374151] border-2 border-black p-6 rounded-lg">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="bg-white border-2 border-black p-6 rounded-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
             Current Listings
           </h2>
 
-          {loading && <p className="text-white">Loading listings...</p>}
+          {loading && <p className="text-gray-900">Loading listings...</p>}
 
           {error && (
             <div className="bg-red-900 text-red-100 p-4 rounded mb-4">
@@ -114,19 +114,19 @@ export default function TestMarketplacePage() {
             {listings.map(listing => (
               <div
                 key={listing.id}
-                className="bg-[#1F2937] border-2 border-black p-4 rounded"
+                className="bg-gray-50 border-2 border-black p-4 rounded"
               >
-                <h3 className="font-bold text-white">{listing.title}</h3>
-                <p className="text-gray-400">By: {listing.author_nickname}</p>
-                <p className="text-gray-400">Status: {listing.status}</p>
-                <p className="text-gray-400">Views: {listing.views_count}</p>
+                <h3 className="font-bold text-gray-900">{listing.title}</h3>
+                <p className="text-gray-600">By: {listing.author_nickname}</p>
+                <p className="text-gray-600">Status: {listing.status}</p>
+                <p className="text-gray-600">Views: {listing.views_count}</p>
                 {listing.collection_name && (
-                  <p className="text-gray-400">
+                  <p className="text-gray-600">
                     Collection: {listing.collection_name}
                   </p>
                 )}
                 {listing.sticker_number && (
-                  <p className="text-gray-400">
+                  <p className="text-gray-600">
                     Number: #{listing.sticker_number}
                   </p>
                 )}
@@ -138,7 +138,7 @@ export default function TestMarketplacePage() {
           </div>
 
           {!loading && listings.length === 0 && (
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               No listings found. Create one above!
             </p>
           )}

@@ -77,21 +77,21 @@ function ReservationsPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937] py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-3xl font-black text-white mb-6">Mis Reservas</h1>
+        <h1 className="text-3xl font-black text-gray-900 mb-6">Mis Reservas</h1>
 
         {reservations.length === 0 ? (
           <ModernCard>
             <ModernCardContent className="p-8 text-center">
-              <p className="text-gray-400 text-lg mb-4">
+              <p className="text-gray-600 text-lg mb-4">
                 No tienes ninguna reserva activa
               </p>
               <Link href="/marketplace">
@@ -118,11 +118,11 @@ function ReservationsPageContent() {
                     {/* Details */}
                     <div className="flex-1">
                       <Link href={`/marketplace/${reservation.listing_id}`}>
-                        <h3 className="font-bold text-white text-lg hover:text-[#FFC000] transition-colors">
+                        <h3 className="font-bold text-gray-900 text-lg hover:text-[#FFC000] transition-colors">
                           {reservation.listing_title}
                         </h3>
                       </Link>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-gray-600 mt-1">
                         Vendedor: {reservation.seller_nickname}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">

@@ -198,21 +198,21 @@ function CompleteProfileContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937] py-12">
+    <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto bg-gray-800 border-2 border-black rounded-xl shadow-xl p-8">
+        <div className="max-w-3xl mx-auto bg-white border-2 border-black rounded-xl shadow-xl p-8">
           <header className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-black text-white">
+            <h1 className="text-3xl md:text-4xl font-black text-gray-900">
               Completa tu perfil
             </h1>
-            <p className="text-gray-300 mt-2">
+            <p className="text-gray-600 mt-2">
               Necesitamos algunos datos básicos antes de que puedas usar todas las secciones de la app.
             </p>
           </header>
 
           {loadingProfile ? (
             <div className="h-64 flex items-center justify-center">
-              <span className="text-gray-300">Cargando perfil...</span>
+              <span className="text-gray-600">Cargando perfil...</span>
             </div>
           ) : (
             <div className="space-y-6">
@@ -250,7 +250,7 @@ function CompleteProfileContent() {
                   required
                   disabled={saving}
                 />
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-600">
                   Usamos tu código postal para mostrar tu ubicación aproximada en intercambios.
                 </p>
               </div>

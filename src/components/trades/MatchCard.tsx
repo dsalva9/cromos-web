@@ -32,7 +32,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
       className="block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]"
       aria-label={`Crear propuesta de intercambio con ${displayName}`}
     >
-      <ModernCard className="bg-gray-800 border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
+      <ModernCard className="bg-white border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
         <ModernCardContent className="p-6">
           {/* User Header */}
           <div className="flex items-center space-x-3 mb-4">
@@ -40,7 +40,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
               <User className="w-5 h-5 text-gray-900" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold uppercase text-white truncate">
+              <h3 className="font-bold uppercase text-gray-900 truncate">
                 <UserLink
                   userId={match.match_user_id}
                   nickname={match.nickname}
@@ -48,7 +48,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
                   forceSpan={true} // Keep as text since this is already a link card
                 />
               </h3>
-              <p className="text-xs text-gray-400 font-medium">
+              <p className="text-xs text-gray-600 font-medium">
                 Intercambio disponible
               </p>
             </div>
@@ -57,7 +57,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
           {/* Exchange Stats */}
           <div className="space-y-3 mb-4">
             {/* What they can offer me */}
-            <div className="flex items-center justify-between p-3 bg-gray-900 border-2 border-black rounded-md">
+            <div className="flex items-center justify-between p-3 bg-gray-50 border-2 border-black rounded-md">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-green-500 border border-black rounded-md flex items-center justify-center">
                   <ArrowDown
@@ -80,7 +80,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
             </div>
 
             {/* What I can offer them */}
-            <div className="flex items-center justify-between p-3 bg-gray-900 border-2 border-black rounded-md">
+            <div className="flex items-center justify-between p-3 bg-gray-50 border-2 border-black rounded-md">
               <div className="flex items-center space-x-2">
                 <div className="w-6 h-6 bg-blue-500 border border-black rounded-md flex items-center justify-center">
                   <ArrowUp className="h-3 w-3 text-white" aria-hidden="true" />

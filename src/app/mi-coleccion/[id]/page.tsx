@@ -39,23 +39,23 @@ function AlbumView() {
 
   if (!collectionId) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl">Coleccion no encontrada.</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-900 text-xl">Coleccion no encontrada.</div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl">Cargando album...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-900 text-xl">Cargando album...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center text-white">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-900">
         Error: {error}
       </div>
     );
@@ -63,8 +63,8 @@ function AlbumView() {
 
   if (!currentPage) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-900 text-xl">
           No pudimos cargar esta pagina del album.
         </div>
       </div>
@@ -72,7 +72,7 @@ function AlbumView() {
   }
 
   return (
-    <div className="bg-[#1F2937]">
+    <div className="bg-gray-50">
       <div className="min-h-screen">
         <AlbumSummaryHeader
           collectionName={activeCollection?.name}
@@ -97,19 +97,19 @@ function AlbumView() {
           />
 
           {collections.length > 1 && (
-            <div className="mt-16 pt-8 border-t-2 border-gray-700 flex flex-col items-center gap-4">
-              <h3 className="text-xl font-black uppercase text-white">
+            <div className="mt-16 pt-8 border-t-2 border-gray-200 flex flex-col items-center gap-4">
+              <h3 className="text-xl font-black uppercase text-gray-900">
                 Otras Colecciones
               </h3>
               <div className="flex flex-col gap-2 items-center">
-                <label className="text-xs uppercase tracking-widest font-bold text-gray-300">
+                <label className="text-xs uppercase tracking-widest font-bold text-gray-700">
                   Cambiar de colección
                 </label>
                 <select
                   value={activeCollection?.id ?? ''}
                   onChange={e => switchCollection(Number(e.target.value))}
                   disabled={switchingCollection}
-                  className="bg-gray-800 text-white text-sm font-bold px-4 py-2 rounded-md shadow-xl focus:outline-none focus:ring-2 focus:ring-[#FFC000] border-2 border-black"
+                  className="bg-white text-gray-900 text-sm font-bold px-4 py-2 rounded-md shadow-xl focus:outline-none focus:ring-2 focus:ring-[#FFC000] border-2 border-black"
                 >
                   {collections.map(option => (
                     <option key={option.id} value={option.id}>
@@ -132,8 +132,8 @@ function CollectionPageContent() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-          <div className="text-white text-xl">Cargando...</div>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-gray-900 text-xl">Cargando...</div>
         </div>
       }
     >

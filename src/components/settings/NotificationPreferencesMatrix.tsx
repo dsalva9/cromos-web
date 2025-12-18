@@ -98,7 +98,7 @@ export function NotificationPreferencesMatrix({
         <button
           onClick={handleReset}
           disabled={saving}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
           <RotateCcw className="w-4 h-4" />
           Restaurar valores por defecto
@@ -109,7 +109,7 @@ export function NotificationPreferencesMatrix({
             <button
               onClick={handleCancel}
               disabled={saving}
-              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed text-center"
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-center"
             >
               Cancelar
             </button>
@@ -135,11 +135,11 @@ export function NotificationPreferencesMatrix({
       </div>
 
       {/* Matrix table - Desktop */}
-      <div className="hidden sm:block overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div className="hidden sm:block overflow-x-auto border border-gray-200 rounded-lg">
         <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-900">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-2/5">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
                 Tipo de Notificación
               </th>
               {CHANNELS.map(({ id, label, icon: Icon, color }) => {
@@ -147,7 +147,7 @@ export function NotificationPreferencesMatrix({
                 return (
                   <th
                     key={id}
-                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
@@ -157,7 +157,7 @@ export function NotificationPreferencesMatrix({
                       <button
                         onClick={() => handleToggleAllChannel(id, !allEnabled)}
                         disabled={saving}
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50 flex items-center gap-1"
+                        className="text-xs text-blue-600 hover:underline disabled:opacity-50 flex items-center gap-1"
                       >
                         {allEnabled ? (
                           <>
@@ -177,7 +177,7 @@ export function NotificationPreferencesMatrix({
               })}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-white divide-y divide-gray-200">
             {ACTIVE_CATEGORIES.map((category) => {
               const types = visibleTypes.filter((t) => t.category === category);
               if (types.length === 0) return null;
@@ -185,10 +185,10 @@ export function NotificationPreferencesMatrix({
               return (
                 <React.Fragment key={category}>
                   {/* Category header row */}
-                  <tr className="bg-gray-100 dark:bg-gray-900/50">
+                  <tr className="bg-gray-100">
                     <td
                       colSpan={4}
-                      className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white"
+                      className="px-6 py-3 text-sm font-semibold text-gray-900"
                     >
                       {CATEGORY_INFO[category].label}
                     </td>
@@ -198,16 +198,16 @@ export function NotificationPreferencesMatrix({
                   {types.map((config) => (
                     <tr
                       key={config.kind}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                      className="hover:bg-gray-50 transition-colors"
                     >
                       {/* Notification label */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            <span className="text-sm font-medium text-gray-900">
                               {config.label}
                             </span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            <p className="text-xs text-gray-500 mt-0.5">
                               {config.description}
                             </p>
                           </div>
@@ -221,10 +221,10 @@ export function NotificationPreferencesMatrix({
                             type="button"
                             onClick={() => handleToggle(config.kind, channel)}
                             disabled={saving}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                               localPreferences[channel][config.kind]
                                 ? 'bg-blue-600'
-                                : 'bg-gray-200 dark:bg-gray-700'
+                                : 'bg-gray-200'
                             } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             aria-label={`${
                               localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
@@ -258,7 +258,7 @@ export function NotificationPreferencesMatrix({
           return (
             <div key={category} className="space-y-3">
               {/* Category header */}
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white px-2">
+              <h3 className="text-sm font-semibold text-gray-900 px-2">
                 {CATEGORY_INFO[category].label}
               </h3>
 
@@ -266,25 +266,25 @@ export function NotificationPreferencesMatrix({
               {types.map((config) => (
                 <div
                   key={config.kind}
-                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3"
+                  className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
                 >
                   {/* Notification title */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                    <h4 className="text-sm font-medium text-gray-900">
                       {config.label}
                     </h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       {config.description}
                     </p>
                   </div>
 
                   {/* Channel toggles */}
-                  <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <div className="space-y-2 pt-2 border-t border-gray-200">
                     {CHANNELS.map(({ id: channel, label, icon: Icon }) => (
                       <div key={channel} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                          <Icon className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-700">
                             {label}
                           </span>
                         </div>
@@ -292,10 +292,10 @@ export function NotificationPreferencesMatrix({
                           type="button"
                           onClick={() => handleToggle(config.kind, channel)}
                           disabled={saving}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                             localPreferences[channel][config.kind]
                               ? 'bg-blue-600'
-                              : 'bg-gray-200 dark:bg-gray-700'
+                              : 'bg-gray-200'
                           } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                           aria-label={`${
                             localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'

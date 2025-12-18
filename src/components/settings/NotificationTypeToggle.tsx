@@ -19,14 +19,14 @@ export function NotificationTypeToggle({
   disabled = false,
 }: NotificationTypeToggleProps) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
+    <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
       <div className="flex items-center gap-3 flex-1">
         {/* Label and description */}
         <div className="flex-1">
-          <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+          <h4 className="text-sm font-medium text-gray-900">
             {config.label}
           </h4>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-600 mt-0.5">
             {config.description}
           </p>
         </div>

@@ -323,16 +323,16 @@ function CollectionContent() {
 
   if (userLoading || loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-white text-xl">Cargando tu colecci�n...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-900 text-xl">Cargando tu colecci�n...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="text-center space-y-4 text-white">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-4 text-gray-900">
           <h1 className="text-2xl font-bold">Error</h1>
           <p>{error}</p>
           <Button
@@ -347,30 +347,30 @@ function CollectionContent() {
   }
 
   return (
-    <div className="bg-[#1F2937] min-h-screen">
-      <div className="sticky top-16 z-40 bg-gray-800 py-4">
+    <div className="bg-gray-50 min-h-screen">
+      <div className="sticky top-16 z-40 bg-white py-4">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-between items-center text-white">
+          <div className="flex flex-wrap justify-between items-center text-gray-900">
             <div className="font-bold">
-              <span className="text-gray-300">TOTAL</span>{' '}
+              <span className="text-gray-600">TOTAL</span>{' '}
               <span className="text-[#FFC000]">{progress.total_stickers}</span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">TENGO</span>{' '}
+              <span className="text-gray-600">TENGO</span>{' '}
               <span className="text-[#FFC000]">
                 {progress.owned_unique_stickers}
               </span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">FALTAN</span>{' '}
+              <span className="text-gray-600">FALTAN</span>{' '}
               <span className="text-[#FFC000]">{progress.missing_count}</span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">REPES</span>{' '}
+              <span className="text-gray-600">REPES</span>{' '}
               <span className="text-[#FFC000]">{progress.duplicates_count}</span>
             </div>
             <div className="font-bold">
-              <span className="text-gray-300">TOTAL</span>{' '}
+              <span className="text-gray-600">TOTAL</span>{' '}
               <span className="text-[#FFC000]">
                 {progress.completion_percentage}%
               </span>
@@ -383,11 +383,11 @@ function CollectionContent() {
       <div className="container mx-auto px-4 py-8">
         {/* Header with Collection Info */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-extrabold uppercase text-white drop-shadow-lg">
+          <h1 className="text-4xl font-extrabold uppercase text-gray-900 drop-shadow-lg">
             {activeCollection?.name || 'Mi Colecci�n'}
           </h1>
           {activeCollection?.description && (
-            <p className="text-white/80 mt-2">{activeCollection.description}</p>
+            <p className="text-gray-600 mt-2">{activeCollection.description}</p>
           )}
         </div>
 
@@ -405,7 +405,7 @@ function CollectionContent() {
             return (
               <ModernCard
                 key={sticker.id}
-                className="bg-gray-800 border-2 border-black rounded-lg shadow-xl transition-transform hover:scale-[1.02]"
+                className="bg-white border-2 border-gray-200 rounded-lg shadow-xl transition-transform hover:scale-[1.02]"
               >
                 <ModernCardContent className="p-3">
                   {/* Player Image Area */}
@@ -421,7 +421,7 @@ function CollectionContent() {
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-4xl font-bold text-white/80">
+                        <span className="text-4xl font-bold text-gray-400">
                           {fallbackInitial}
                         </span>
                       </div>
@@ -429,7 +429,7 @@ function CollectionContent() {
 
                     {/* Status Indicators */}
                     {sticker.count > 1 && (
-                      <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-black px-2 py-0.5 font-extrabold">
+                      <div className="absolute top-2 right-2 bg-[#E84D4D] text-white border-2 border-gray-900 px-2 py-0.5 font-extrabold">
                         REPE
                       </div>
                     )}
@@ -443,7 +443,7 @@ function CollectionContent() {
 
                   {/* Player Info */}
                   <div className="mb-3 text-center">
-                    <h3 className="text-xl font-bold uppercase text-white mt-2">
+                    <h3 className="text-xl font-bold uppercase text-gray-900 mt-2">
                       {sticker.player_name}
                     </h3>
                   </div>
@@ -456,7 +456,7 @@ function CollectionContent() {
                         className={`w-full flex-1 text-xs rounded-md transition-all duration-200 ${
                           sticker.count > 0
                             ? 'bg-[#FFC000] text-gray-900 font-bold border border-black'
-                            : 'bg-gray-700 text-white font-bold border border-black'
+                            : 'bg-gray-300 text-gray-900 font-bold border border-gray-400'
                         }`}
                         onClick={() => updateStickerOwnership(sticker.id)}
                       >
@@ -470,7 +470,7 @@ function CollectionContent() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="w-full flex-1 text-lg font-bold border-black bg-gray-700 text-white hover:bg-gray-600"
+                          className="w-full flex-1 text-lg font-bold border-gray-400 bg-gray-300 text-gray-900 hover:bg-gray-400"
                           onClick={() => reduceStickerOwnership(sticker.id)}
                         >
                           -
@@ -485,7 +485,7 @@ function CollectionContent() {
         </div>
         {stickers.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-white text-xl">No hay cromos disponibles</div>
+            <div className="text-gray-900 text-xl">No hay cromos disponibles</div>
           </div>
         )}
       </div>

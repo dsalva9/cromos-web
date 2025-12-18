@@ -113,7 +113,7 @@ export function TemplateProgressGrid({
   return (
     <div className="space-y-8">
       {/* Page Tabs */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-2">
+      <div className="bg-white border border-gray-200 rounded-xl p-2 shadow-sm">
         <Tabs
           value={selectedPage.toString()}
           onValueChange={v => setSelectedPage(Number(v))}
@@ -128,9 +128,9 @@ export function TemplateProgressGrid({
                   data-[state=active]:bg-[#FFC000]
                   data-[state=active]:text-black
                   data-[state=active]:font-bold
-                  text-gray-400
-                  hover:text-white
-                  hover:bg-gray-800
+                  text-gray-500
+                  hover:text-black
+                  hover:bg-gray-100
                   border border-transparent
                   data-[state=active]:border-[#FFC000]
                   rounded-lg px-4 py-2
@@ -148,11 +148,11 @@ export function TemplateProgressGrid({
 
       {/* Grid Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-gray-400">
+        <div className="flex items-center gap-2 text-gray-500">
           <LayoutGrid className="w-5 h-5" />
           <span className="font-medium">Cromos de {pageTitles[selectedPage] || `Página ${selectedPage}`}</span>
         </div>
-        
+
         <Button
           onClick={() => setConfirmDialogOpen(true)}
           variant="outline"
@@ -185,20 +185,20 @@ export function TemplateProgressGrid({
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-        <DialogContent className="bg-gray-900 text-white border-gray-800">
+        <DialogContent className="bg-white text-gray-900 border-gray-200 shadow-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <CheckCircle2 className="text-[#FFC000]" />
               Completar toda la página
             </DialogTitle>
-            <DialogDescription className="text-gray-400 pt-2">
+            <DialogDescription className="text-gray-500 pt-2">
               ¿Quieres marcar todos los cromos faltantes de esta página como conseguidos?
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 text-sm text-gray-300">
+
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm text-gray-700">
             <p>Esta acción:</p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-400">
+            <ul className="list-disc list-inside mt-2 space-y-1 text-gray-600">
               <li>Marcará como <strong>&quot;Tengo&quot;</strong> todos los cromos que te faltan.</li>
               <li>No modificará los cromos que ya tienes o tienes repetidos.</li>
             </ul>
@@ -209,7 +209,7 @@ export function TemplateProgressGrid({
               variant="ghost"
               onClick={() => setConfirmDialogOpen(false)}
               disabled={isCompletingPage}
-              className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800"
+              className="border-gray-200 text-gray-500 hover:text-gray-900 hover:bg-gray-100"
             >
               Cancelar
             </Button>

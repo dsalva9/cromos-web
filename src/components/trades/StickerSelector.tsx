@@ -59,10 +59,10 @@ export function StickerSelector({
   if (loading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-10 w-full max-w-sm bg-gray-800 border-2 border-black" />
+        <Skeleton className="h-10 w-full max-w-sm bg-gray-200 border-2 border-black" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] w-full rounded-md bg-gray-800 border-2 border-black" />
+            <Skeleton key={i} className="aspect-[3/4] w-full rounded-md bg-gray-200 border-2 border-black" />
           ))}
         </div>
       </div>

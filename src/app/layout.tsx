@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#1F2937',
+  themeColor: '#FFFFFF',
 };
 
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="es" data-theme="light" className="overflow-x-hidden">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-[#1F2937] text-foreground antialiased overflow-x-hidden`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-gray-50 text-foreground antialiased overflow-x-hidden`}
       >
         <SupabaseProvider>
           <OneSignalProvider>
@@ -61,7 +61,7 @@ export default function RootLayout({
                 <ErrorBoundary>
                   <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-[#1F2937]"
+                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
                   >
                     Saltar al contenido principal
                   </a>
@@ -85,10 +85,10 @@ export default function RootLayout({
                   expand={false}
                   duration={3000}
                   toastOptions={{
-                    className: 'border-2 border-black',
+                    className: 'border border-gray-200 shadow-lg',
                     style: {
-                      background: '#374151',
-                      color: 'white',
+                      background: '#FFFFFF',
+                      color: '#111827',
                     },
                   }}
                 />

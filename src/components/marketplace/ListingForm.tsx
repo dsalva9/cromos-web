@@ -136,7 +136,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               value={imageUrl}
               onChange={url => setValue('image_url', url || '')}
             />
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Sube una foto de tu cromo para mayor visibilidad
             </p>
           </div>
@@ -152,7 +152,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-describedby={errors.title ? 'title-error' : undefined}
               {...register('title')}
               placeholder="ej. Messi Inter Miami 2024"
-              className={`bg-[#374151] border-2 text-white ${
+              className={`bg-white border-2 text-gray-900 ${
                 errors.title ? 'border-red-500' : 'border-black'
               }`}
             />
@@ -173,7 +173,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               placeholder="Buscar o seleccionar colección..."
               className={errors.collection_name ? 'border-red-500' : ''}
             />
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-600">
               Selecciona de tus colecciones para auto-completar el número, o escribe libremente
             </p>
             {errors.collection_name && (
@@ -195,7 +195,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 }
                 {...register('sticker_number')}
                 placeholder="ej. 10, 5A"
-                className={`bg-[#374151] border-2 text-white ${
+                className={`bg-white border-2 text-gray-900 ${
                   errors.sticker_number ? 'border-red-500' : 'border-black'
                 }`}
               />
@@ -213,7 +213,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 aria-invalid={!!errors.slot_variant}
                 {...register('slot_variant')}
                 placeholder="ej. A, B"
-                className={`bg-[#374151] border-2 text-white ${
+                className={`bg-white border-2 text-gray-900 ${
                   errors.slot_variant ? 'border-red-500' : 'border-black'
                 }`}
               />
@@ -236,7 +236,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-invalid={!!errors.global_number}
               {...register('global_number', { valueAsNumber: true })}
               placeholder="ej. 123"
-              className={`bg-[#374151] border-2 text-white ${
+              className={`bg-white border-2 text-gray-900 ${
                 errors.global_number ? 'border-red-500' : 'border-black'
               }`}
             />
@@ -255,7 +255,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-invalid={!!errors.page_title}
               {...register('page_title')}
               placeholder="ej. Delanteros"
-              className={`bg-[#374151] border-2 text-white ${
+              className={`bg-white border-2 text-gray-900 ${
                 errors.page_title ? 'border-red-500' : 'border-black'
               }`}
             />
@@ -278,7 +278,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               {...register('description')}
               placeholder="Describe el estado del cromo, si está nuevo, usado, etc."
               rows={4}
-              className={`bg-[#374151] border-2 text-white resize-none ${
+              className={`bg-white border-2 text-gray-900 resize-none ${
                 errors.description ? 'border-red-500' : 'border-black'
               }`}
             />
@@ -305,7 +305,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               <div className="flex-1">
                 <Label
                   htmlFor="terms"
-                  className="text-sm text-gray-300 cursor-pointer"
+                  className="text-sm text-gray-700 cursor-pointer"
                 >
                   He leído y estoy de acuerdo con los{' '}
                   <button
@@ -358,7 +358,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               Términos de Uso - Publicación de Cromos
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 text-gray-300">
+          <div className="space-y-4 text-gray-700">
             <p>
               Recuerda que las imágenes, descripciones o nombres que subas deben ser tuyos o contar con los derechos necesarios para usarlos. Cambiocromos.com no publica contenido por ti, solo te ofrece el espacio para compartirlo con otros coleccionistas. El usuario es el único responsable del contenido que publique. Si subes imágenes que infrinjan derechos de autor, marcas registradas o cualquier norma legal, podremos retirarlas y suspender tu cuenta. Cambiocromos.com no es propietaria de los cromos ni intermedia en las ventas o intercambios; solo pone en contacto a los usuarios. Al continuar, declaras que tienes derecho a publicar el contenido y aceptas nuestra Política de contenidos.
             </p>

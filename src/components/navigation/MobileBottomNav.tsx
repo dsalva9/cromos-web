@@ -18,7 +18,7 @@ export function MobileBottomNav() {
 
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
-  
+
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
   const handleSignOut = async () => {
@@ -41,14 +41,14 @@ export function MobileBottomNav() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-[var(--z-nav)] pb-[env(safe-area-inset-bottom)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-[var(--z-nav)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex justify-around items-center h-16">
           <Link
             href="/marketplace"
             onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
+              isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-500 hover:text-gray-900"
             )}
             aria-label="Marketplace"
           >
@@ -60,7 +60,7 @@ export function MobileBottomNav() {
             onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
+              isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-500 hover:text-gray-900"
             )}
             aria-label="Mis Álbumes"
           >
@@ -72,7 +72,7 @@ export function MobileBottomNav() {
             onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/chats') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
+              isActive('/chats') ? "text-[#FFC000]" : "text-gray-500 hover:text-gray-900"
             )}
             aria-label="Chats"
           >
@@ -84,7 +84,7 @@ export function MobileBottomNav() {
             onClick={handleNavClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/favorites') ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
+              isActive('/favorites') ? "text-[#FFC000]" : "text-gray-500 hover:text-gray-900"
             )}
             aria-label="Favoritos"
           >
@@ -95,7 +95,7 @@ export function MobileBottomNav() {
             onClick={handleMenuClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isMenuOpen ? "text-[#FFC000]" : "text-gray-400 hover:text-gray-200"
+              isMenuOpen ? "text-[#FFC000]" : "text-gray-500 hover:text-gray-900"
             )}
             aria-label="Menú"
           >
@@ -106,8 +106,8 @@ export function MobileBottomNav() {
 
       {/* More Menu Drawer */}
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DrawerContent className="bg-gray-900 border-t border-gray-800 text-white pb-[env(safe-area-inset-bottom)] z-[var(--z-modal)]">
-          <DrawerHeader className="border-b border-gray-800 mb-2">
+        <DrawerContent className="bg-white border-t border-gray-200 text-black pb-[env(safe-area-inset-bottom)] z-[var(--z-modal)]">
+          <DrawerHeader className="border-b border-gray-100 mb-2">
             <DrawerTitle className="text-center font-bold text-lg">Menú</DrawerTitle>
           </DrawerHeader>
           <div className="p-4 space-y-2">
@@ -117,7 +117,7 @@ export function MobileBottomNav() {
                 hapticImpact();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Package className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Mis Anuncios</span>
@@ -129,7 +129,7 @@ export function MobileBottomNav() {
                 hapticImpact();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <FileText className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Plantillas</span>
@@ -141,20 +141,20 @@ export function MobileBottomNav() {
                 hapticImpact();
                 setIsMenuOpen(false);
               }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Settings className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Ajustes</span>
             </Link>
 
-            <div className="h-px bg-gray-800 my-2" />
+            <div className="h-px bg-gray-200 my-2" />
 
             <button
               onClick={() => {
                 hapticImpact();
                 handleSignOut();
               }}
-              className="flex items-center gap-3 p-3 rounded-lg hover:bg-red-900/20 text-red-400 w-full transition-colors"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 text-red-600 w-full transition-colors"
             >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Cerrar Sesión</span>

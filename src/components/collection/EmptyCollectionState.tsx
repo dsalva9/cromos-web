@@ -16,18 +16,18 @@ export default function EmptyCollectionState() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="container mx-auto px-4 max-w-2xl">
-        <ModernCard className="bg-gray-800 border-2 border-black shadow-xl">
+        <ModernCard className="bg-white border-2 border-gray-200 shadow-xl">
           <ModernCardContent className="p-12 text-center">
             <Trophy className="w-20 h-20 text-[#FFC000] mx-auto mb-6" />
-            <h1 className="text-3xl font-black uppercase text-white mb-4">
+            <h1 className="text-3xl font-black uppercase text-gray-900 mb-4">
               ¡Bienvenido a {siteConfig.name}!
             </h1>
-            <h2 className="text-xl font-bold text-white mb-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               Aún no sigues ninguna colección
             </h2>
-            <p className="text-gray-300 text-lg mb-8 leading-relaxed font-medium">
+            <p className="text-gray-600 text-lg mb-8 leading-relaxed font-medium">
               Para empezar a intercambiar cromos, primero necesitas seguir una
               colección. Explora las colecciones disponibles y elige la que más
               te guste.
@@ -43,7 +43,7 @@ export default function EmptyCollectionState() {
                 Seguir una Colección
               </Button>
 
-              <p className="text-sm text-gray-400 font-medium">
+              <p className="text-sm text-gray-600 font-medium">
                 Ve a tu perfil para explorar las colecciones disponibles
               </p>
             </div>

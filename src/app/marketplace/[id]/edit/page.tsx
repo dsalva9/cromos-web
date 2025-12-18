@@ -38,7 +38,7 @@ function EditListingContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
@@ -46,16 +46,16 @@ function EditListingContent() {
 
   if (error || !listing) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Anuncio no encontrado
           </h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             {error ||
               'Este anuncio puede haber sido eliminado o ya no está disponible'}
           </p>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
@@ -77,12 +77,12 @@ function EditListingContent() {
   // Check if user is the owner
   if (user?.id !== listing.user_id) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Acceso denegado
           </h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             Solo puedes editar tus propios anuncios
           </p>
           <Link href={`/marketplace/${listingId}`}>
@@ -96,20 +96,20 @@ function EditListingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937]">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="mb-8">
           <Link
             href={`/marketplace/${listingId}`}
-            className="inline-flex items-center text-gray-400 hover:text-white mb-4"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver al Anuncio
           </Link>
-          <h1 className="text-3xl font-black uppercase text-white mb-2">
+          <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
             Editar Anuncio
           </h1>
-          <p className="text-gray-400">
+          <p className="text-gray-600">
             Actualiza la información de tu anuncio
           </p>
         </div>

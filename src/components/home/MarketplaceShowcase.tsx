@@ -34,7 +34,7 @@ export default function MarketplaceShowcase() {
   const showSkeletons = !isReady || loading;
 
   return (
-    <section className="border-t-4 border-black bg-[#111827]">
+    <section className="border-t-4 border-black bg-gray-50">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -42,10 +42,10 @@ export default function MarketplaceShowcase() {
               <p className="text-sm font-semibold uppercase tracking-wider text-[#FFC000]">
                 Marketplace en vivo
               </p>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-white uppercase">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 uppercase">
                 Últimos anuncios publicados
               </h2>
-              <p className="mt-2 text-gray-300 max-w-2xl">
+              <p className="mt-2 text-gray-700 max-w-2xl">
                 Publica tus duplicados y encuentra nuevos cromos sin salir de la
                 plataforma. Los listados se actualizan en tiempo real gracias a
                 nuestro backend optimizado.
@@ -62,7 +62,7 @@ export default function MarketplaceShowcase() {
           </div>
 
           {error && (
-            <div className="flex items-center gap-3 rounded-lg border-2 border-red-500 bg-red-900/30 px-4 py-3 text-red-200">
+            <div className="flex items-center gap-3 rounded-lg border-2 border-red-300 bg-red-50 px-4 py-3 text-red-800">
               <AlertCircle className="h-5 w-5 flex-shrink-0" />
               <span>Ha ocurrido un error al cargar los anuncios: {error}</span>
             </div>
@@ -86,11 +86,11 @@ export default function MarketplaceShowcase() {
           </div>
 
           {!showSkeletons && !hasListings && !error && (
-            <div className="rounded-xl border-2 border-dashed border-gray-600 bg-gray-800/60 px-6 py-12 text-center">
-              <h3 className="text-2xl font-bold uppercase text-white">
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-100 px-6 py-12 text-center">
+              <h3 className="text-2xl font-bold uppercase text-gray-900">
                 Aún no hay anuncios activos
               </h3>
-              <p className="mt-3 text-gray-400">
+              <p className="mt-3 text-gray-600">
                 Sé la primera persona en publicar tus duplicados y activa la
                 comunidad de intercambio.
               </p>
@@ -99,7 +99,7 @@ export default function MarketplaceShowcase() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="mt-6 border-2 border-black bg-gray-900 text-white hover:bg-gray-800 font-bold"
+                className="mt-6 border-2 border-black bg-white text-gray-900 hover:bg-gray-50 font-bold"
               >
                 <Link href="/marketplace/create">Publicar un anuncio</Link>
               </Button>

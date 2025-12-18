@@ -103,7 +103,7 @@ export function AvatarPicker({
   return (
     <div className="space-y-4">
       {/* Tabs */}
-      <div className="flex border-b border-gray-700">
+      <div className="flex border-b border-gray-200">
         <button
           type="button"
           onClick={() => setActiveTab('gallery')}
@@ -111,7 +111,7 @@ export function AvatarPicker({
             'px-4 py-2 font-bold transition-colors relative',
             activeTab === 'gallery'
               ? 'text-[#FFC000] border-b-2 border-[#FFC000]'
-              : 'text-gray-400 hover:text-white'
+              : 'text-gray-600 hover:text-gray-900'
           )}
         >
           Galería
@@ -123,7 +123,7 @@ export function AvatarPicker({
             'px-4 py-2 font-bold transition-colors relative',
             activeTab === 'upload'
               ? 'text-[#FFC000] border-b-2 border-[#FFC000]'
-              : 'text-gray-400 hover:text-white'
+              : 'text-gray-600 hover:text-gray-900'
           )}
         >
           Subir foto
@@ -143,10 +143,10 @@ export function AvatarPicker({
                   disabled={uploading || processing}
                   className={cn(
                     'relative aspect-square rounded-lg border-2 overflow-hidden transition-all',
-                    'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-800',
+                    'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-50',
                     selectedPresetId === preset.id
                       ? 'border-[#FFC000] shadow-lg shadow-[#FFC000]/50'
-                      : 'border-gray-600 hover:border-gray-400'
+                      : 'border-gray-200 hover:border-gray-400'
                   )}
                   aria-label={preset.label}
                   title={preset.label}
@@ -166,7 +166,7 @@ export function AvatarPicker({
 
         {activeTab === 'upload' && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Sube tu propia foto (será recortada a formato cuadrado)
             </p>
 
@@ -189,13 +189,13 @@ export function AvatarPicker({
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-600 rounded-lg">
-                <Upload className="h-12 w-12 text-gray-400 mb-3" />
+              <div className="flex flex-col items-center justify-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
+                <Upload className="h-12 w-12 text-gray-600 mb-3" />
                 <Label htmlFor="avatar-file-upload" className="cursor-pointer">
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-2 border-black text-white bg-[#1F2937] hover:bg-[#FFC000] hover:text-gray-900"
+                    className="border-2 border-black text-gray-900 bg-gray-50 hover:bg-[#FFC000] hover:text-gray-900"
                     disabled={processing || uploading}
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -211,7 +211,7 @@ export function AvatarPicker({
                   onChange={handleFileSelect}
                   disabled={processing || uploading}
                 />
-                <p className="text-xs text-gray-500 mt-3">
+                <p className="text-xs text-gray-600 mt-3">
                   JPG, PNG o WebP • Máx. 3MB
                 </p>
               </div>
@@ -230,7 +230,7 @@ export function AvatarPicker({
       </div>
 
       {/* Actions */}
-      <div className="flex justify-between pt-4 border-t border-gray-700">
+      <div className="flex justify-between pt-4 border-t border-gray-200">
         {currentAvatarUrl || hasSelection ? (
           <Button
             type="button"

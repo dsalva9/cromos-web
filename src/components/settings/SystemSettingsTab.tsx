@@ -43,24 +43,24 @@ export function SystemSettingsTab() {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Sign Out All Devices */}
-      <ModernCard className="bg-[#374151] border-2 border-black">
+      <ModernCard className="bg-white border border-gray-200">
         <ModernCardContent className="p-4 md:p-6">
           <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center">
-              <LogOut className="h-6 w-6 text-blue-400" />
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 border-2 border-blue-500 flex items-center justify-center">
+              <LogOut className="h-6 w-6 text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-2">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                 Cerrar sesión en todos los dispositivos
               </h3>
-              <p className="text-sm md:text-base text-gray-400 mb-4">
+              <p className="text-sm md:text-base text-gray-600 mb-4">
                 Cierra tu sesión en todos los dispositivos donde hayas iniciado
                 sesión, incluyendo este. Tendrás que volver a iniciar sesión.
               </p>
               <Button
                 onClick={handleSignOutAllDevices}
                 disabled={signingOut}
-                className="bg-blue-600 hover:bg-blue-700 text-white border-2 border-black w-full sm:w-auto text-sm md:text-base"
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto text-sm md:text-base"
               >
                 {signingOut ? (
                   <>
@@ -81,21 +81,21 @@ export function SystemSettingsTab() {
       </ModernCard>
 
       {/* Delete Account */}
-      <ModernCard className="bg-[#374151] border-2 border-red-500">
+      <ModernCard className="bg-white border-2 border-red-500">
         <ModernCardContent className="p-4 md:p-6">
           <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center">
-              <AlertTriangle className="h-6 w-6 text-red-400" />
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-50 border-2 border-red-500 flex items-center justify-center">
+              <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg md:text-xl font-bold text-white mb-2">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                 Eliminar mi cuenta
               </h3>
-              <p className="text-sm md:text-base text-gray-400 mb-4">
+              <p className="text-sm md:text-base text-gray-600 mb-4">
                 Esta acción programará tu cuenta para eliminación permanente en 90 días.
                 Durante este período puedes cancelar la eliminación. Perderás:
               </p>
-              <ul className="text-sm md:text-base text-gray-400 mb-4 list-disc list-inside space-y-1">
+              <ul className="text-sm md:text-base text-gray-600 mb-4 list-disc list-inside space-y-1">
                 <li>Todos tus datos de usuario</li>
                 <li>Historial de intercambios</li>
                 <li>Todos tus anuncios del marketplace</li>
@@ -103,8 +103,8 @@ export function SystemSettingsTab() {
                 <li>Mensajes y conversaciones</li>
                 <li>Valoraciones y comentarios</li>
               </ul>
-              <div className="bg-red-900/20 border-2 border-red-500 rounded-lg p-3 md:p-4 mb-4">
-                <p className="text-sm md:text-base text-red-400 font-bold flex items-center gap-2">
+              <div className="bg-red-50 border-2 border-red-500 rounded-lg p-3 md:p-4 mb-4">
+                <p className="text-sm md:text-base text-red-600 font-bold flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 flex-shrink-0" />
                   Esta acción es irreversible
                 </p>
@@ -112,7 +112,7 @@ export function SystemSettingsTab() {
               <Button
                 onClick={() => setShowDeleteDialog(true)}
                 variant="outline"
-                className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border-2 border-red-500 hover:text-red-300 w-full sm:w-auto text-sm md:text-base"
+                className="bg-red-50 hover:bg-red-100 text-red-600 border-2 border-red-500 hover:text-red-700 w-full sm:w-auto text-sm md:text-base"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Eliminar mi cuenta

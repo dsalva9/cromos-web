@@ -117,35 +117,35 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-black uppercase text-white mb-2">
+        <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-black uppercase text-white mb-2">
+            <h2 className="text-2xl font-black uppercase text-gray-900 mb-2">
               Nueva Contraseña
             </h2>
-            <p className="text-gray-300 font-medium">
+            <p className="text-gray-700 font-medium">
               Ingresa tu nueva contraseña
             </p>
           </div>
 
           {checkingSession ? (
-            <div className="bg-gray-700 border-2 border-black rounded-md p-6 text-center">
-              <p className="text-white font-bold text-lg mb-2">
+            <div className="bg-gray-100 border-2 border-black rounded-md p-6 text-center">
+              <p className="text-gray-900 font-bold text-lg mb-2">
                 Verificando sesión...
               </p>
-              <p className="text-white text-sm">
+              <p className="text-gray-700 text-sm">
                 Por favor espera un momento
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function ResetPasswordPage() {
               <div className="space-y-2">
                 <label
                   htmlFor="password"
-                  className="text-sm font-bold uppercase text-white"
+                  className="text-sm font-bold uppercase text-gray-900"
                 >
                   Nueva Contraseña
                 </label>
@@ -176,14 +176,14 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
                 />
               </div>
 
               <div className="space-y-2">
                 <label
                   htmlFor="confirmPassword"
-                  className="text-sm font-bold uppercase text-white"
+                  className="text-sm font-bold uppercase text-gray-900"
                 >
                   Confirmar Contraseña
                 </label>
@@ -196,7 +196,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
                 />
               </div>
 

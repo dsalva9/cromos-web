@@ -76,7 +76,7 @@ export function ProposalCard({
 
       <ModernCard
         onClick={onClick}
-        className={`bg-gray-800 hover:bg-gray-700 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
+        className={`bg-white hover:bg-gray-50 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
           isHighlighted
             ? 'border-[#FFC000] animate-pulse-border'
             : 'border-black'
@@ -91,7 +91,7 @@ export function ProposalCard({
       >
         <ModernCardContent className="p-4">
           <div className="flex justify-between items-start">
-            <p className="font-bold text-lg text-white uppercase">
+            <p className="font-bold text-lg text-gray-900 uppercase">
               {isInbox ? (
                 <ArrowRight className="inline h-4 w-4 mr-2 text-green-400" />
               ) : (
@@ -109,7 +109,7 @@ export function ProposalCard({
               {getStatusLabel(proposal.status)}
             </Badge>
           </div>
-          <p className="text-xs text-gray-400 mt-1 mb-4">
+          <p className="text-xs text-gray-600 mt-1 mb-4">
             {new Date(proposal.created_at).toLocaleDateString('es-ES', {
               day: 'numeric',
               month: 'long',
@@ -117,19 +117,19 @@ export function ProposalCard({
             })}
           </p>
           <div className="space-y-2 text-sm">
-            <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+            <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md border-2 border-black">
               <span className="text-green-400 flex items-center font-bold">
                 <ArrowDown className="h-4 w-4 mr-1" /> Ofreces
               </span>
-              <span className="font-bold text-white">
+              <span className="font-bold text-gray-900">
                 {proposal.offer_item_count} cromos
               </span>
             </div>
-            <div className="flex items-center justify-between bg-gray-900 p-2 rounded-md border-2 border-black">
+            <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md border-2 border-black">
               <span className="text-blue-400 flex items-center font-bold">
                 <ArrowUp className="h-4 w-4 mr-1" /> Pides
               </span>
-              <span className="font-bold text-white">
+              <span className="font-bold text-gray-900">
                 {proposal.request_item_count} cromos
               </span>
             </div>

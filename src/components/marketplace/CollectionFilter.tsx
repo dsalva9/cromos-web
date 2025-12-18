@@ -80,7 +80,7 @@ export function CollectionFilter({
           <Button
             variant="outline"
             size="sm"
-            className={`border-2 border-black text-white hover:bg-[#374151] font-bold ${
+            className={`border-2 border-black text-gray-900 hover:bg-gray-50 font-bold ${
               hasActiveFilters ? 'bg-[#FFC000] text-black hover:bg-[#FFD700]' : ''
             }`}
           >
@@ -97,12 +97,12 @@ export function CollectionFilter({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-80 bg-[#374151] border-2 border-black text-white"
+          className="w-80 bg-white border-2 border-black text-gray-900"
           align="start"
         >
           <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-center justify-between pb-2 border-b border-gray-600">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-200">
               <h4 className="font-bold text-sm uppercase">
                 Filtrar por Colección
               </h4>
@@ -112,7 +112,7 @@ export function CollectionFilter({
                     variant="ghost"
                     size="sm"
                     onClick={selectAll}
-                    className="h-auto p-1 text-xs text-[#FFC000] hover:text-[#FFD700] hover:bg-[#1F2937]"
+                    className="h-auto p-1 text-xs text-[#FFC000] hover:text-[#FFD700] hover:bg-gray-100"
                   >
                     Todas
                   </Button>
@@ -122,7 +122,7 @@ export function CollectionFilter({
                     variant="ghost"
                     size="sm"
                     onClick={clearFilters}
-                    className="h-auto p-1 text-xs text-gray-400 hover:text-white hover:bg-[#1F2937]"
+                    className="h-auto p-1 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   >
                     <X className="h-3 w-3 mr-1" />
                     Limpiar
@@ -133,14 +133,14 @@ export function CollectionFilter({
 
             {/* Loading State */}
             {loading && (
-              <div className="py-6 text-center text-sm text-gray-400">
+              <div className="py-6 text-center text-sm text-gray-600">
                 Cargando colecciones...
               </div>
             )}
 
             {/* Error State */}
             {error && (
-              <div className="py-4 px-3 bg-red-900/50 border border-red-500 rounded text-sm text-red-200">
+              <div className="py-4 px-3 bg-red-100 border border-red-300 rounded text-sm text-red-700">
                 Error: {error}
               </div>
             )}
@@ -151,7 +151,7 @@ export function CollectionFilter({
                 {collections.map(collection => (
                   <label
                     key={collection.copy_id}
-                    className="flex items-start gap-3 p-2 rounded hover:bg-[#1F2937] cursor-pointer transition-colors"
+                    className="flex items-start gap-3 p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors"
                   >
                     <Checkbox
                       checked={selectedCollectionIds.includes(
@@ -160,16 +160,16 @@ export function CollectionFilter({
                       onCheckedChange={() =>
                         toggleCollection(collection.copy_id)
                       }
-                      className="mt-0.5 border-gray-500 data-[state=checked]:bg-[#FFC000] data-[state=checked]:border-[#FFC000] data-[state=checked]:text-black"
+                      className="mt-0.5 border-gray-300 data-[state=checked]:bg-[#FFC000] data-[state=checked]:border-[#FFC000] data-[state=checked]:text-black"
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">
+                      <p className="text-sm font-medium text-gray-900 truncate">
                         {collection.title}
                       </p>
                       {collection.is_active && (
                         <Badge
                           variant="outline"
-                          className="mt-1 text-xs border-green-500 text-green-400"
+                          className="mt-1 text-xs border-green-500 text-green-600"
                         >
                           Activa
                         </Badge>
@@ -182,7 +182,7 @@ export function CollectionFilter({
 
             {/* Empty State */}
             {!loading && !error && collections.length === 0 && (
-              <div className="py-6 text-center text-sm text-gray-400">
+              <div className="py-6 text-center text-sm text-gray-600">
                 No tienes colecciones copiadas aún.
               </div>
             )}
@@ -196,7 +196,7 @@ export function CollectionFilter({
           variant="ghost"
           size="sm"
           onClick={clearFilters}
-          className="text-gray-400 hover:text-white hover:bg-[#374151]"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
         >
           <X className="h-4 w-4" />
         </Button>

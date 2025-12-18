@@ -20,7 +20,7 @@ export default function Hero({ isAuthenticated }: HeroProps) {
           </Badge>
           <Badge
             variant="outline"
-            className="bg-gray-800 text-white border-2 border-black px-4 py-2 text-sm font-bold shadow-xl"
+            className="bg-white text-gray-900 border-2 border-black px-4 py-2 text-sm font-bold shadow-xl"
           >
             <ShieldCheck className="mr-2 h-4 w-4" />
             Moderación con auditoría
@@ -28,12 +28,12 @@ export default function Hero({ isAuthenticated }: HeroProps) {
         </div>
 
         <div className="space-y-6">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold uppercase text-white leading-tight">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold uppercase text-gray-900 leading-tight">
             Intercambia cromos con
             <br />
             <span className="text-[#FFC000]">plantillas inteligentes</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
             Gestiona tu colección, publica duplicados y negocia intercambios en
             un entorno seguro, optimizado y listo para escalar a futuros
             agentes.
@@ -41,13 +41,13 @@ export default function Hero({ isAuthenticated }: HeroProps) {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border-2 border-black bg-gray-800 px-4 py-3 text-sm font-semibold uppercase text-gray-200 shadow-lg">
+          <div className="rounded-lg border-2 border-black bg-white px-4 py-3 text-sm font-semibold uppercase text-gray-900 shadow-lg">
             Plantillas sincronizadas con el marketplace
           </div>
-          <div className="rounded-lg border-2 border-black bg-gray-800 px-4 py-3 text-sm font-semibold uppercase text-gray-200 shadow-lg">
+          <div className="rounded-lg border-2 border-black bg-white px-4 py-3 text-sm font-semibold uppercase text-gray-900 shadow-lg">
             Chats privados y reputación verificada
           </div>
-          <div className="rounded-lg border-2 border-black bg-gray-800 px-4 py-3 text-sm font-semibold uppercase text-gray-200 shadow-lg">
+          <div className="rounded-lg border-2 border-black bg-white px-4 py-3 text-sm font-semibold uppercase text-gray-900 shadow-lg">
             Moderación con registro de auditoría
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function Hero({ isAuthenticated }: HeroProps) {
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold text-lg px-8 py-6 border-2 border-black rounded-lg shadow-xl transition-all hover:scale-105 focus:ring-4 focus:ring-gray-500"
+                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg px-8 py-6 border-2 border-black rounded-lg shadow-xl transition-all hover:scale-105 focus:ring-4 focus:ring-gray-300"
               >
                 <Link href="/mis-plantillas">Mis plantillas</Link>
               </Button>
@@ -84,7 +84,7 @@ export default function Hero({ isAuthenticated }: HeroProps) {
                 asChild
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 text-white font-bold text-lg px-8 py-6 border-2 border-black rounded-lg shadow-xl transition-all hover:scale-105 focus:ring-4 focus:ring-gray-500"
+                className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 font-bold text-lg px-8 py-6 border-2 border-black rounded-lg shadow-xl transition-all hover:scale-105 focus:ring-4 focus:ring-gray-300"
               >
                 <Link href="/marketplace">Explorar marketplace</Link>
               </Button>

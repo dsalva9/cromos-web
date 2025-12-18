@@ -79,35 +79,35 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
           <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
             📧
           </div>
-          <h1 className="text-3xl font-black uppercase text-white mb-2">
+          <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
             ¡Revisa tu email!
           </h1>
         </div>
 
         {/* Success Card */}
-        <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
+        <div className="w-full max-w-md bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
           <div className="p-8 text-center">
             <div className="mb-6">
               <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl">✅</span>
               </div>
-              <h2 className="text-xl font-black uppercase text-white mb-2">
+              <h2 className="text-xl font-black uppercase text-gray-900 mb-2">
                 Cuenta creada
               </h2>
-              <p className="text-gray-300 font-medium">
+              <p className="text-gray-600 font-medium">
                 Te hemos enviado un enlace de confirmación a{' '}
                 <strong>{email}</strong>
               </p>
             </div>
 
             <div className="space-y-4">
-              <p className="text-sm text-gray-300 font-medium">
+              <p className="text-sm text-gray-600 font-medium">
                 Haz clic en el enlace del email para activar tu cuenta y empezar
                 a coleccionar cromos.
               </p>
@@ -125,7 +125,7 @@ export default function SignupPage() {
         <div className="mt-8">
           <Link
             href="/"
-            className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
+            className="text-gray-600 hover:text-gray-900 text-sm font-bold hover:underline"
           >
             ← Volver al inicio
           </Link>
@@ -135,25 +135,25 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-black uppercase text-white mb-2">
+        <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
       {/* Signup Card */}
-      <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-black uppercase text-white mb-2">
+            <h2 className="text-2xl font-black uppercase text-gray-900 mb-2">
               Crear Cuenta
             </h2>
-            <p className="text-gray-300 font-medium">
+            <p className="text-gray-600 font-medium">
               Únete a la comunidad de coleccionistas
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function SignupPage() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-bold uppercase text-white"
+                className="text-sm font-bold uppercase text-gray-900"
               >
                 Email
               </label>
@@ -173,14 +173,14 @@ export default function SignupPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-bold uppercase text-white"
+                className="text-sm font-bold uppercase text-gray-900"
               >
                 Contraseña
               </label>
@@ -191,14 +191,14 @@ export default function SignupPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="text-sm font-bold uppercase text-white"
+                className="text-sm font-bold uppercase text-gray-900"
               >
                 Confirmar Contraseña
               </label>
@@ -209,11 +209,11 @@ export default function SignupPage() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
-            <div className="rounded-md border-2 border-black bg-gray-900 px-4 py-3">
+            <div className="rounded-md border-2 border-black bg-gray-50 px-4 py-3">
               <div className="flex items-start gap-3">
                 <Checkbox
                   id="terms"
@@ -222,18 +222,18 @@ export default function SignupPage() {
                   className="mt-1"
                   aria-describedby="terms-helper"
                 />
-                <div className="text-sm text-gray-300 leading-relaxed">
+                <div className="text-sm text-gray-600 leading-relaxed">
                   <label
                     htmlFor="terms"
-                    className="font-medium text-white cursor-pointer select-none"
+                    className="font-medium text-gray-900 cursor-pointer select-none"
                   >
                     Acepto los terminos del servicio
                   </label>
-                  <p id="terms-helper" className="mt-1 text-xs text-gray-400">
+                  <p id="terms-helper" className="mt-1 text-xs text-gray-600">
                     <button
                       type="button"
                       onClick={() => setTermsDialogOpen(true)}
-                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 rounded-sm"
+                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
                       Leer terminos completos
                     </button>{' '}
@@ -270,13 +270,13 @@ export default function SignupPage() {
           </form>
 
           <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
-            <DialogContent className="bg-gray-900 text-gray-200 border-2 border-black">
+            <DialogContent className="bg-white text-gray-900 border-2 border-black">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black uppercase text-white">
+                <DialogTitle className="text-2xl font-black uppercase text-gray-900">
                   Terminos del servicio
                 </DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 text-sm leading-relaxed text-gray-200">
+              <div className="space-y-4 text-sm leading-relaxed text-gray-900">
                 <p>
                   Al registrarte en Cambiocromos.com, aceptas nuestras Condiciones de uso y Política de privacidad. Tus datos se usarán para crear tu perfil, permitirte interactuar con otros coleccionistas y ofrecerte una experiencia personalizada. Puedes registrarte con correo o redes sociales. Si usas una red social, esta nos compartirá la información básica necesaria (nombre, email, foto, etc.), según su propia política de privacidad. Cambiocromos.com no comparte tus datos personales con otros usuarios sin tu consentimiento. Podrás editar o eliminar tu cuenta en cualquier momento. Al continuar, confirmas que eres mayor de edad o que cuentas con autorización de tus tutores legales, y aceptas nuestras condiciones.
                 </p>
@@ -285,7 +285,7 @@ export default function SignupPage() {
                 <Button
                   type="button"
                   variant="secondary"
-                  className="bg-gray-800 text-white border-2 border-black hover:bg-gray-700"
+                  className="bg-gray-100 text-gray-900 border-2 border-black hover:bg-gray-200"
                   onClick={() => setTermsDialogOpen(false)}
                 >
                   Cerrar
@@ -295,8 +295,8 @@ export default function SignupPage() {
           </Dialog>
 
           <div className="mt-8 text-center">
-            <div className="border-t-2 border-gray-700 pt-6">
-              <p className="text-sm text-gray-300 font-medium">
+            <div className="border-t-2 border-gray-200 pt-6">
+              <p className="text-sm text-gray-600 font-medium">
                 ¿Ya tienes cuenta?{' '}
                 <Link
                   href="/login"
@@ -314,7 +314,7 @@ export default function SignupPage() {
       <div className="mt-8">
         <Link
           href="/"
-          className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
+          className="text-gray-600 hover:text-gray-900 text-sm font-bold hover:underline"
         >
           ← Volver al inicio
         </Link>

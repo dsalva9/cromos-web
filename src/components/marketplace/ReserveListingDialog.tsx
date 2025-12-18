@@ -75,7 +75,7 @@ export function ReserveListingDialog({
               <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
             </div>
           ) : participants.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-gray-600">
               <p>No hay compradores interesados aún.</p>
               <p className="text-sm mt-2">
                 Espera a que alguien te contacte a través del chat.
@@ -93,7 +93,7 @@ export function ReserveListingDialog({
                     className={`w-full text-left p-3 rounded-md border-2 transition-all ${
                       selectedBuyerId === participant.user_id
                         ? 'border-[#FFC000] bg-[#FFC000]/10'
-                        : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ export function ReserveListingDialog({
                       )}
                     </div>
                     {participant.last_message && (
-                      <p className="text-sm text-gray-400 truncate mt-1">
+                      <p className="text-sm text-gray-600 truncate mt-1">
                         {participant.last_message}
                       </p>
                     )}

@@ -487,14 +487,14 @@ function ListingChatPageContent() {
 
   if (loading && messages.length === 0) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="h-[calc(100dvh-9rem)] md:h-auto md:min-h-screen bg-[#1F2937] flex flex-col md:block pb-0 md:py-8">
+    <div className="h-[calc(100dvh-9rem)] md:h-auto md:min-h-screen bg-gray-50 flex flex-col md:block pb-0 md:py-8">
       <div className="container mx-auto px-4 max-w-5xl flex-1 md:flex-none flex flex-col md:block min-h-0">
         {/* Header */}
         <div className="mb-6 hidden md:flex items-center gap-4 pt-4 md:pt-0">
@@ -502,7 +502,7 @@ function ListingChatPageContent() {
             variant="ghost"
             size="sm"
             onClick={() => router.push('/chats')}
-            className="text-white hover:bg-gray-800"
+            className="text-gray-900 hover:bg-gray-100"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver a mis chats
@@ -511,31 +511,31 @@ function ListingChatPageContent() {
 
         {/* Mobile sticky header with context */}
         {(!isOwner || selectedParticipant) && (
-          <div className="md:hidden flex-none bg-[#1F2937] border-b-2 border-gray-700 z-20 mb-4 -mx-4 px-4 py-3">
+          <div className="md:hidden flex-none bg-gray-50 border-b-2 border-gray-200 z-20 mb-4 -mx-4 px-4 py-3">
             <div className="flex items-center gap-3">
               {isOwner && selectedParticipant ? (
                 <>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="-ml-2 text-white hover:bg-gray-800"
+                    className="-ml-2 text-gray-900 hover:bg-gray-100"
                     onClick={() => participants.length > 1 ? setSelectedParticipant(null) : router.push('/chats')}
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-white truncate">
+                    <p className="font-bold text-sm text-gray-900 truncate">
                       {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
                     </p>
                     {listing && (
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-gray-600 truncate">
                         {listing.title}
                       </p>
                     )}
                   </div>
                   <button
                     onClick={() => setListingCardExpanded(true)}
-                    className="text-gray-400 hover:text-white"
+                    className="text-gray-600 hover:text-gray-900"
                   >
                     <Info className="h-5 w-5" />
                   </button>
@@ -545,22 +545,22 @@ function ListingChatPageContent() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="-ml-2 text-white hover:bg-gray-800"
+                    className="-ml-2 text-gray-900 hover:bg-gray-100"
                     onClick={() => router.push('/chats')}
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-white truncate">
+                    <p className="font-bold text-sm text-gray-900 truncate">
                       {listing.title}
                     </p>
-                    <p className="text-xs text-gray-400 truncate">
+                    <p className="text-xs text-gray-600 truncate">
                       Vendedor: {listing.author_nickname}
                     </p>
                   </div>
                   <button
                     onClick={() => setListingCardExpanded(true)}
-                    className="text-gray-400 hover:text-white"
+                    className="text-gray-600 hover:text-gray-900"
                   >
                     <Info className="h-5 w-5" />
                   </button>
@@ -591,16 +591,16 @@ function ListingChatPageContent() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-xs font-bold text-white truncate">
+                    <p className="text-xs font-bold text-gray-900 truncate">
                       {listing.title}
                     </p>
                   </div>
                   <span className={cn(
                     'px-1.5 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
-                    listing.status === 'active' && 'bg-green-900/30 text-green-400',
-                    listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
-                    listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
-                    listing.status === 'sold' && 'bg-gray-700 text-gray-300'
+                    listing.status === 'active' && 'bg-green-100 text-green-700',
+                    listing.status === 'reserved' && 'bg-yellow-100 text-yellow-700',
+                    listing.status === 'completed' && 'bg-blue-100 text-blue-700',
+                    listing.status === 'sold' && 'bg-gray-200 text-gray-700'
                   )}>
                     {listing.status === 'active' && 'Activo'}
                     {listing.status === 'reserved' && 'Reservado'}
@@ -616,8 +616,8 @@ function ListingChatPageContent() {
                 </button>
 
                 {listingCardExpanded && (
-                  <div className="mt-2 pt-2 border-t border-gray-700">
-                    <p className="text-sm text-gray-400 mb-2">
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-sm text-gray-600 mb-2">
                       {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
                     </p>
                     {/* Action buttons REMOVED - now in FloatingActionMenu */}
@@ -638,26 +638,26 @@ function ListingChatPageContent() {
                           src={listing.image_url}
                           alt={listing.title}
                           fill
-                          className="object-cover rounded-md border-2 border-gray-700"
+                          className="object-cover rounded-md border-2 border-gray-200"
                         />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <Link href={`/marketplace/${listingId}`}>
-                        <h3 className="text-lg font-bold text-white hover:text-[#FFC000] transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 hover:text-[#FFC000] transition-colors">
                           {listing.title}
                         </h3>
                       </Link>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-600">
                         {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className={cn(
                           'px-2 py-1 rounded text-xs font-bold uppercase',
-                          listing.status === 'active' && 'bg-green-900/30 text-green-400',
-                          listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
-                          listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
-                          listing.status === 'sold' && 'bg-gray-700 text-gray-300'
+                          listing.status === 'active' && 'bg-green-100 text-green-700',
+                          listing.status === 'reserved' && 'bg-yellow-100 text-yellow-700',
+                          listing.status === 'completed' && 'bg-blue-100 text-blue-700',
+                          listing.status === 'sold' && 'bg-gray-200 text-gray-700'
                         )}>
                           {listing.status === 'active' && 'Disponible'}
                           {listing.status === 'reserved' && 'Reservado'}
@@ -674,7 +674,7 @@ function ListingChatPageContent() {
                         onClick={handleReserve}
                         disabled={reserving || !selectedParticipant}
                         variant="outline"
-                        className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
+                        className="bg-white text-gray-900 border-gray-200 hover:bg-gray-50 w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
                         {reserving ? 'Marcando...' : 'Marcar Reservado'}
@@ -686,7 +686,7 @@ function ListingChatPageContent() {
                           onClick={handleComplete}
                           disabled={completing}
                           variant="outline"
-                          className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
+                          className="bg-white text-gray-900 border-gray-200 hover:bg-gray-50 w-full sm:w-auto whitespace-nowrap"
                         >
                           <Package className="h-4 w-4 mr-2" />
                           {completing ? 'Completando...' : 'Marcar Completado'}
@@ -695,7 +695,7 @@ function ListingChatPageContent() {
                           onClick={handleUnreserve}
                           disabled={unreserving}
                           variant="outline"
-                          className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
+                          className="bg-white text-gray-900 border-gray-200 hover:bg-gray-50 w-full sm:w-auto whitespace-nowrap"
                         >
                           <Package className="h-4 w-4 mr-2" />
                           {unreserving ? 'Liberando...' : 'Liberar Reserva'}
@@ -724,9 +724,9 @@ function ListingChatPageContent() {
         {/* Mobile Info Modal (replacing inline accordion if desired, but for now just fix the layout structure in grid) */}
         {listingCardExpanded && (
           <Dialog open={listingCardExpanded} onOpenChange={setListingCardExpanded}>
-            <DialogContent className="bg-gray-900 border-2 border-gray-700 w-[95%] rounded-lg">
+            <DialogContent className="bg-white border-2 border-gray-200 w-[95%] rounded-lg">
               <DialogHeader>
-                <DialogTitle className="text-white">Información del Anuncio</DialogTitle>
+                <DialogTitle className="text-gray-900">Información del Anuncio</DialogTitle>
               </DialogHeader>
               {listing && (
                 <div className="space-y-4">
@@ -739,14 +739,14 @@ function ListingChatPageContent() {
                         className="object-cover rounded-md"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gray-800 flex items-center justify-center rounded-md">
+                      <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-md">
                         <span className="text-gray-500">Sin imagen</span>
                       </div>
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-lg">{listing.title}</h3>
-                    <p className="text-gray-400">{listing.collection_name} - #{listing.sticker_number}</p>
+                    <h3 className="font-bold text-gray-900 text-lg">{listing.title}</h3>
+                    <p className="text-gray-600">{listing.collection_name} - #{listing.sticker_number}</p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       <span className={cn(
                         'px-2 py-1 rounded text-xs font-bold uppercase',
@@ -762,8 +762,8 @@ function ListingChatPageContent() {
                       </span>
                     </div>
                   </div>
-                  <div className="bg-gray-800 p-3 rounded-md">
-                    <p className="text-sm text-gray-300 whitespace-pre-wrap">{listing.description || 'Sin descripción'}</p>
+                  <div className="bg-gray-100 p-3 rounded-md">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{listing.description || 'Sin descripción'}</p>
                   </div>
                 </div>
               )}
@@ -781,7 +781,7 @@ function ListingChatPageContent() {
                 <div className="mb-6">
                   <ModernCard>
                     <ModernCardContent className="p-4">
-                      <h3 className="font-bold text-white mb-3">
+                      <h3 className="font-bold text-gray-900 mb-3">
                         Conversaciones ({participants.length})
                       </h3>
                       <div className="space-y-2">
@@ -802,16 +802,16 @@ function ListingChatPageContent() {
                                 'w-full text-left p-3 rounded-md transition-colors',
                                 selectedParticipant === participant.user_id
                                   ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
-                                  : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
+                                  : 'bg-gray-100 hover:bg-gray-200 border-2 border-transparent'
                               )}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-bold text-white">
+                                  <span className="font-bold text-gray-900">
                                     {participant.nickname}
                                   </span>
                                   {isReservedForThisParticipant && (
-                                    <span className="bg-yellow-900/30 text-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded">
+                                    <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-1.5 py-0.5 rounded">
                                       Reservado
                                     </span>
                                   )}
@@ -823,7 +823,7 @@ function ListingChatPageContent() {
                                 )}
                               </div>
                               {participant.last_message && (
-                                <p className="text-sm text-gray-400 truncate mt-1">
+                                <p className="text-sm text-gray-600 truncate mt-1">
                                   {participant.last_message}
                                 </p>
                               )}
@@ -840,7 +840,7 @@ function ListingChatPageContent() {
               <div className="hidden md:block md:col-span-1">
                 <ModernCard>
                   <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-white mb-3">
+                    <h3 className="font-bold text-gray-900 mb-3">
                       Conversaciones
                     </h3>
                     <div className="space-y-2">
@@ -858,16 +858,16 @@ function ListingChatPageContent() {
                               'w-full text-left p-3 rounded-md transition-colors',
                               selectedParticipant === participant.user_id
                                 ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
-                                : 'bg-gray-800 hover:bg-gray-700 border-2 border-transparent'
+                                : 'bg-gray-100 hover:bg-gray-200 border-2 border-transparent'
                             )}
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-white">
+                                <span className="font-bold text-gray-900">
                                   {participant.nickname}
                                 </span>
                                 {isReservedForThisParticipant && (
-                                  <span className="bg-yellow-900/30 text-yellow-400 text-xs font-bold px-1.5 py-0.5 rounded">
+                                  <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-1.5 py-0.5 rounded">
                                     Reservado
                                   </span>
                                 )}
@@ -879,7 +879,7 @@ function ListingChatPageContent() {
                               )}
                             </div>
                             {participant.last_message && (
-                              <p className="text-sm text-gray-400 truncate mt-1">
+                              <p className="text-sm text-gray-600 truncate mt-1">
                                 {participant.last_message}
                               </p>
                             )}
@@ -932,7 +932,7 @@ function ListingChatPageContent() {
                               key={message.id}
                               className="flex justify-center my-4"
                             >
-                              <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                              <div className="bg-gray-100 text-gray-900 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
                                 <p className="italic">{message.message}</p>
                                 <p className="text-xs mt-1 opacity-60">
                                   {new Date(message.created_at).toLocaleTimeString('es-ES', {
@@ -998,13 +998,13 @@ function ListingChatPageContent() {
                             // Show rating link if user hasn't rated yet
                             <button
                               onClick={() => setShowRatingModal(true)}
-                              className="bg-gray-700/50 text-white rounded-lg px-6 py-3 text-sm border border-[#FFC000] hover:bg-gray-700 transition-colors"
+                              className="bg-gray-100 text-gray-900 rounded-lg px-6 py-3 text-sm border border-[#FFC000] hover:bg-gray-200 transition-colors"
                             >
                               ⭐ Haz clic aquí para valorar a {counterpartyToRate.nickname}
                             </button>
                           ) : (
                             // Show system message with user's rating
-                            <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                            <div className="bg-gray-100 text-gray-900 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
                               <p>
                                 Has valorado a {counterpartyToRate.nickname} con{' '}
                                 {'⭐'.repeat(myRating.rating)} ({myRating.rating}/5)
@@ -1018,7 +1018,7 @@ function ListingChatPageContent() {
                       {/* Show counterparty's rating when both have rated */}
                       {listing?.status === 'completed' && bothRated && counterpartyRating && (
                         <div className="flex justify-center my-4">
-                          <div className="bg-gray-700/50 text-gray-300 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gray-600">
+                          <div className="bg-gray-100 text-gray-900 rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
                             <p>
                               {isOwner ? 'El comprador' : 'El vendedor'} te ha valorado con{' '}
                               {'⭐'.repeat(counterpartyRating.rating)} ({counterpartyRating.rating}/5)
@@ -1034,7 +1034,7 @@ function ListingChatPageContent() {
                 </div>
 
                 {/* Composer */}
-                <div className="border-t-2 border-gray-700 p-4">
+                <div className="border-t-2 border-gray-200 p-4">
                   {/* Logic for chat disabling */}
                   {(() => {
                     const isReserved = listing?.status === 'reserved';
@@ -1116,7 +1116,7 @@ function ListingChatPageContent() {
                       <>
                         {/* ToS acceptance for buyers with no messages */}
                         {!isOwner && messages.length === 0 && (
-                          <div className="mb-4 p-3 bg-gray-800 rounded-md border border-gray-700">
+                          <div className="mb-4 p-3 bg-gray-100 rounded-md border border-gray-200">
                             <div className="flex items-start gap-3">
                               <Checkbox
                                 id="tos-chat"
@@ -1125,7 +1125,7 @@ function ListingChatPageContent() {
                               />
                               <label
                                 htmlFor="tos-chat"
-                                className="text-sm text-gray-300 cursor-pointer leading-relaxed"
+                                className="text-sm text-gray-700 cursor-pointer leading-relaxed"
                               >
                                 Acepto los{' '}
                                 <button
@@ -1149,7 +1149,7 @@ function ListingChatPageContent() {
                             placeholder="Escribe un mensaje..."
                             maxLength={500}
                             rows={2}
-                            className="flex-1 bg-gray-800 text-white rounded-md px-4 py-2 border-2 border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 bg-white text-gray-900 rounded-md px-4 py-2 border-2 border-gray-200 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={sending}
                           />
                           <Button

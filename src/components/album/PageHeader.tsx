@@ -91,11 +91,11 @@ export default function PageHeader({
 
   return (
     <>
-      <div className="sticky bottom-0 z-20 bg-gray-900 border-t-2 border-black py-3 shadow-xl">
+      <div className="sticky bottom-0 z-20 bg-white border-t-2 border-black py-3 shadow-xl">
         <div className="container mx-auto flex items-center justify-between gap-4 px-4">
           {/* Desktop: Team title */}
           <div className="hidden sm:flex items-center gap-4 flex-1 min-w-0">
-            <h2 className="text-xl md:text-2xl font-black uppercase text-white truncate">
+            <h2 className="text-xl md:text-2xl font-black uppercase text-gray-900 truncate">
               {page.title}
             </h2>
           </div>
@@ -127,7 +127,7 @@ export default function PageHeader({
               transition: 'opacity 0.1s',
             }}
           >
-            <h2 className="text-lg font-black uppercase text-white truncate">
+            <h2 className="text-lg font-black uppercase text-gray-900 truncate">
               {page.title}
             </h2>
           </div>
@@ -136,7 +136,7 @@ export default function PageHeader({
           <div className="flex w-full sm:max-w-xs items-center justify-center gap-4">
             <Progress
               value={progress}
-              className="h-2 w-full bg-gray-700 border border-black rounded-md"
+              className="h-2 w-full bg-gray-200 border border-black rounded-md"
               indicatorClassName="bg-[#FFC000]"
             />
             <span className="flex-shrink-0 text-sm font-black text-[#FFC000] uppercase">
@@ -148,10 +148,10 @@ export default function PageHeader({
           {canComplete && (
             <button
               onClick={() => setShowActionSheet(true)}
-              className="md:hidden p-2 rounded-md hover:bg-gray-800 transition-colors border-2 border-transparent hover:border-black"
+              className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-black"
               aria-label="Más opciones"
             >
-              <MoreVertical className="w-5 h-5 text-gray-300" />
+              <MoreVertical className="w-5 h-5 text-gray-600" />
             </button>
           )}
 
@@ -173,10 +173,10 @@ export default function PageHeader({
 
       {/* Desktop: Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-gray-900 border-2 border-black text-white shadow-xl">
+        <DialogContent className="bg-white border-2 border-black text-gray-900 shadow-xl">
           <DialogHeader>
             <DialogTitle className="font-black uppercase text-xl">Confirmar completar equipo</DialogTitle>
-            <DialogDescription className="text-gray-300 font-medium">
+            <DialogDescription className="text-gray-600 font-medium">
               Vas a marcar {missingCount} cromos de <strong>{page.title}</strong>{' '}
               como TENGO. No se tocarán REPES. ¿Confirmas?
             </DialogDescription>
@@ -186,7 +186,7 @@ export default function PageHeader({
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
               disabled={isCompleting}
-              className="bg-gray-800 text-white hover:bg-gray-700 border-2 border-black font-bold uppercase rounded-md"
+              className="bg-white text-gray-900 hover:bg-gray-100 border-2 border-black font-bold uppercase rounded-md"
             >
               Cancelar
             </Button>
@@ -205,18 +205,18 @@ export default function PageHeader({
       {/* Mobile: Action Sheet (Bottom Sheet) */}
       <Dialog open={showActionSheet} onOpenChange={setShowActionSheet}>
         <DialogContent
-          className="sm:max-w-lg p-0 gap-0 bg-gray-900 border-2 border-black border-b-0 bottom-0 top-auto translate-y-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom rounded-t-xl rounded-b-none shadow-2xl"
+          className="sm:max-w-lg p-0 gap-0 bg-white border-2 border-black border-b-0 bottom-0 top-auto translate-y-0 data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom rounded-t-xl rounded-b-none shadow-2xl"
           showCloseButton={false}
         >
           <div className="flex flex-col gap-2 p-4">
             <div className="flex justify-center mb-2">
-              <div className="w-12 h-1 bg-gray-600 rounded-full" />
+              <div className="w-12 h-1 bg-gray-200 rounded-full" />
             </div>
             <DialogHeader className="text-left space-y-1">
-              <DialogTitle className="text-lg font-black uppercase text-white">
+              <DialogTitle className="text-lg font-black uppercase text-gray-900">
                 {page.title}
               </DialogTitle>
-              <DialogDescription className="text-sm text-gray-300 font-medium">
+              <DialogDescription className="text-sm text-gray-600 font-medium">
                 Marcar {missingCount} cromos como TENGO. No se tocarán REPES.
               </DialogDescription>
             </DialogHeader>
@@ -235,7 +235,7 @@ export default function PageHeader({
                 variant="outline"
                 onClick={() => setShowActionSheet(false)}
                 disabled={isCompleting}
-                className="w-full h-12 text-base bg-gray-800 text-white hover:bg-gray-700 border-2 border-black font-bold uppercase rounded-md"
+                className="w-full h-12 text-base bg-white text-gray-900 hover:bg-gray-100 border-2 border-black font-bold uppercase rounded-md"
               >
                 Cancelar
               </Button>

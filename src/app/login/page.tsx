@@ -116,32 +116,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
         <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
-        <h1 className="text-3xl font-black uppercase text-white mb-2">
+        <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
           {siteConfig.name}
         </h1>
       </div>
 
       {/* Login Card */}
-      <div className="w-full max-w-md bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-black uppercase text-white mb-2">
+            <h2 className="text-2xl font-black uppercase text-gray-900 mb-2">
               Iniciar Sesión
             </h2>
-            <p className="text-gray-300 font-medium">Accede a tu colección de cromos</p>
+            <p className="text-gray-600 font-medium">Accede a tu colección de cromos</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-bold uppercase text-white"
+                className="text-sm font-bold uppercase text-gray-900"
               >
                 Email
               </label>
@@ -153,14 +153,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-bold uppercase text-white"
+                className="text-sm font-bold uppercase text-gray-900"
               >
                 Contraseña
               </label>
@@ -172,7 +172,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-900 border-2 border-black text-white placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
@@ -224,8 +224,8 @@ export default function LoginPage() {
               ¿Olvidaste tu contraseña?
             </Link>
 
-            <div className="border-t-2 border-gray-700 pt-4">
-              <p className="text-sm text-gray-300 font-medium">
+            <div className="border-t-2 border-gray-200 pt-4">
+              <p className="text-sm text-gray-600 font-medium">
                 ¿No tienes cuenta?{' '}
                 <Link
                   href="/signup"
@@ -243,7 +243,7 @@ export default function LoginPage() {
       <div className="mt-8">
         <Link
           href="/"
-          className="text-gray-300 hover:text-white text-sm font-bold hover:underline"
+          className="text-gray-600 hover:text-gray-900 text-sm font-bold hover:underline"
         >
           ← Volver al inicio
         </Link>

@@ -74,10 +74,10 @@ export function ReportModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1F2937] border-2 border-black">
+      <DialogContent className="bg-gray-50 border-2 border-black">
         <DialogHeader>
-          <DialogTitle className="text-white">Denunciar Contenido</DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogTitle className="text-gray-900">Denunciar Contenido</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Ayúdanos a mantener una comunidad segura denunciando contenido
             inapropiado.
           </DialogDescription>
@@ -86,7 +86,7 @@ export function ReportModal({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Reason */}
           <div className="space-y-3">
-            <Label className="text-white">
+            <Label className="text-gray-900">
               ¿Por qué estás denunciando esto?
             </Label>
             <RadioGroup value={reason} onValueChange={setReason}>
@@ -95,7 +95,7 @@ export function ReportModal({
                   <RadioGroupItem value={option.value} id={option.value} />
                   <Label
                     htmlFor={option.value}
-                    className="text-gray-300 cursor-pointer"
+                    className="text-gray-600 cursor-pointer"
                   >
                     {option.label}
                   </Label>
@@ -106,7 +106,7 @@ export function ReportModal({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-white">
+            <Label htmlFor="description" className="text-gray-900">
               Detalles adicionales (opcional)
             </Label>
             <Textarea
@@ -116,9 +116,9 @@ export function ReportModal({
               placeholder="Proporciona cualquier información adicional..."
               rows={4}
               maxLength={500}
-              className="bg-[#374151] border-2 border-black text-white"
+              className="bg-white border-2 border-black text-gray-900"
             />
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               {description.length} / 500 caracteres
             </p>
           </div>

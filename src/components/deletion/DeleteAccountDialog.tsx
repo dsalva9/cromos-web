@@ -87,13 +87,13 @@ export function DeleteAccountDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-[#1F2937] border-gray-700">
+      <DialogContent className="sm:max-w-[500px] bg-gray-50 border-gray-200">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-white">
+          <DialogTitle className="flex items-center gap-2 text-gray-900">
             <Trash2 className="h-5 w-5 text-red-500" />
             Delete Account
           </DialogTitle>
-          <DialogDescription className="text-gray-400">
+          <DialogDescription className="text-gray-600">
             This action will permanently delete your account after 90 days.
             You can cancel within this period.
           </DialogDescription>
@@ -119,7 +119,7 @@ export function DeleteAccountDialog({
 
           <div className="space-y-3">
             <div>
-              <Label htmlFor="email" className="text-gray-300">
+              <Label htmlFor="email" className="text-gray-600">
                 Confirm your email
               </Label>
               <Input
@@ -128,13 +128,13 @@ export function DeleteAccountDialog({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={userEmail}
-                className="bg-[#374151] border-gray-600 text-white mt-1"
+                className="bg-white border-gray-200 text-gray-900 mt-1"
                 disabled={loading}
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-gray-300">
+              <Label htmlFor="password" className="text-gray-600">
                 Enter your password
               </Label>
               <Input
@@ -143,7 +143,7 @@ export function DeleteAccountDialog({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-[#374151] border-gray-600 text-white mt-1"
+                className="bg-white border-gray-200 text-gray-900 mt-1"
                 disabled={loading}
               />
             </div>
@@ -155,7 +155,7 @@ export function DeleteAccountDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
-            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            className="border-gray-200 text-gray-600 hover:bg-gray-100"
           >
             Cancel
           </Button>

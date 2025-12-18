@@ -113,11 +113,11 @@ export function SimplifiedListingForm({
                   className={`p-4 rounded-lg border-2 transition-all ${
                     !isGroup
                       ? 'border-[#FFC000] bg-[#FFC000]/10'
-                      : 'border-gray-600 bg-[#374151]'
+                      : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
-                  <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
+                  <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
+                  <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
                     Cromo Individual
                   </p>
                 </button>
@@ -127,11 +127,11 @@ export function SimplifiedListingForm({
                   className={`p-4 rounded-lg border-2 transition-all ${
                     isGroup
                       ? 'border-[#FFC000] bg-[#FFC000]/10'
-                      : 'border-gray-600 bg-[#374151]'
+                      : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-400'}`} />
-                  <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-300'}`}>
+                  <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
+                  <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
                     Pack de Cromos
                   </p>
                 </button>
@@ -156,7 +156,7 @@ export function SimplifiedListingForm({
             {errors.image_url && (
               <p className="text-sm text-red-500">{errors.image_url.message}</p>
             )}
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               La imagen es obligatoria para publicar un anuncio
             </p>
           </div>
@@ -170,7 +170,7 @@ export function SimplifiedListingForm({
               id="title"
               {...register('title')}
               placeholder={isGroup ? "ej. Pack de 10 cromos de la Liga" : "ej. Messi Inter Miami 2024"}
-              className={`bg-[#374151] border-2 text-white ${
+              className={`bg-white border-2 text-gray-900 ${
                 errors.title ? 'border-red-500' : 'border-black'
               }`}
             />
@@ -187,18 +187,18 @@ export function SimplifiedListingForm({
                 id="collection_name"
                 {...register('collection_name')}
                 placeholder="ej. Panini LaLiga 2024"
-                className="bg-[#374151] border-2 border-black text-white flex-1"
+                className="bg-white border-2 border-black text-gray-900 flex-1"
               />
               <Button
                 type="button"
                 onClick={() => setTemplatesDialogOpen(true)}
-                className="bg-[#374151] hover:bg-[#4B5563] text-white border-2 border-black shrink-0"
+                className="bg-white hover:bg-gray-100 text-gray-900 border-2 border-black shrink-0"
                 title="Seleccionar de mis plantillas"
               >
                 <Library className="h-4 w-4" />
               </Button>
             </div>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Opcional: nombre de la colección o álbum
             </p>
           </div>
@@ -217,14 +217,14 @@ export function SimplifiedListingForm({
                   : "Describe el cromo, su estado, características especiales, etc."
               }
               rows={6}
-              className={`bg-[#374151] border-2 text-white resize-none ${
+              className={`bg-white border-2 text-gray-900 resize-none ${
                 errors.description ? 'border-red-500' : 'border-black'
               }`}
             />
             {errors.description && (
               <p className="text-sm text-red-500">{errors.description.message}</p>
             )}
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               {isGroup
                 ? "Lista todos los cromos incluidos con sus detalles"
                 : "Incluye número, colección, rareza, y cualquier detalle relevante"}
@@ -247,7 +247,7 @@ export function SimplifiedListingForm({
               <div className="flex-1">
                 <Label
                   htmlFor="terms"
-                  className="text-sm text-gray-300 cursor-pointer"
+                  className="text-sm text-gray-700 cursor-pointer"
                 >
                   He leído y estoy de acuerdo con los{' '}
                   <button
@@ -291,7 +291,7 @@ export function SimplifiedListingForm({
           </DialogHeader>
           <div className="flex-1 overflow-y-auto">
             {templates.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">
+              <p className="text-gray-600 text-center py-8">
                 No tienes plantillas guardadas
               </p>
             ) : (
@@ -304,18 +304,18 @@ export function SimplifiedListingForm({
                       setValue('collection_name', template.title, { shouldValidate: true });
                       setTemplatesDialogOpen(false);
                     }}
-                    className="w-full text-left p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors border border-gray-700 hover:border-[#FFC000]"
+                    className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 hover:border-[#FFC000]"
                   >
-                    <p className="text-white font-medium">{template.title}</p>
+                    <p className="text-gray-900 font-medium">{template.title}</p>
                   </button>
                 ))}
               </div>
             )}
           </div>
-          <div className="pt-4 border-t border-gray-700">
+          <div className="pt-4 border-t border-gray-200">
             <Button
               onClick={() => setTemplatesDialogOpen(false)}
-              className="w-full bg-gray-700 text-white hover:bg-gray-600"
+              className="w-full bg-gray-200 text-gray-900 hover:bg-gray-300"
             >
               Cancelar
             </Button>
@@ -331,7 +331,7 @@ export function SimplifiedListingForm({
               Términos de Uso - Publicación de Cromos
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 text-gray-300">
+          <div className="space-y-4 text-gray-700">
             <p>
               Recuerda que las imágenes, descripciones o nombres que subas deben ser tuyos o contar con los derechos necesarios para usarlos. Cambiocromos.com no publica contenido por ti, solo te ofrece el espacio para compartirlo con otros coleccionistas. El usuario es el único responsable del contenido que publique. Si subes imágenes que infrinjan derechos de autor, marcas registradas o cualquier norma legal, podremos retirarlas y suspender tu cuenta. Cambiocromos.com no es propietaria de los cromos ni intermedia en las ventas o intercambios; solo pone en contacto a los usuarios. Al continuar, declaras que tienes derecho a publicar el contenido y aceptas nuestra Política de contenidos.
             </p>

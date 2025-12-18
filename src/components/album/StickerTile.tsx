@@ -101,9 +101,9 @@ export default function StickerTile({
     if (slotRole === 'manager') Icon = User;
 
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 border-2 border-dashed border-gray-600 rounded-md p-2 text-center">
-        <Icon className="w-8 h-8 text-gray-500 mb-2" />
-        <span className="text-xs font-bold text-gray-400 uppercase">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white border-2 border-dashed border-gray-200 rounded-md p-2 text-center">
+        <Icon className="w-8 h-8 text-gray-600 mb-2" />
+        <span className="text-xs font-bold text-gray-600 uppercase">
           #{slot.slot_index + 1}
         </span>
       </div>
@@ -116,7 +116,7 @@ export default function StickerTile({
         onClick={handleIncrease}
         disabled={disabledIncrease}
         className={cn(
-          'aspect-[3/4] w-full relative rounded-md overflow-hidden bg-gray-800 border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-[#1F2937] disabled:cursor-not-allowed transition-all',
+          'aspect-[3/4] w-full relative rounded-md overflow-hidden bg-white border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed transition-all',
           ownedCount === 0 && 'grayscale hover:grayscale-0'
         )}
         aria-label={`A�adir ${sticker?.player_name ?? 'cromo'}`}
@@ -210,7 +210,7 @@ export default function StickerTile({
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
-              className="hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 bg-gray-800 text-white font-bold border-2 border-black hover:bg-gray-700 focus:ring-[#FFC000] relative"
+              className="hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 bg-white text-gray-900 font-bold border-2 border-black hover:bg-gray-100 focus:ring-[#FFC000] relative"
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >

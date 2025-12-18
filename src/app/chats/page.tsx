@@ -49,18 +49,18 @@ function ChatsPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1F2937] py-8">
+    <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-black text-white mb-2">Mis Chats</h1>
-          <p className="text-gray-400">
+          <h1 className="text-3xl font-black text-gray-900 mb-2">Mis Chats</h1>
+          <p className="text-gray-600">
             Todas tus conversaciones sobre anuncios del marketplace
           </p>
         </div>
@@ -68,8 +68,8 @@ function ChatsPageContent() {
         {conversations.length === 0 ? (
           <ModernCard>
             <ModernCardContent className="p-8 text-center">
-              <MessageCircle className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400 text-lg mb-4">
+              <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 text-lg mb-4">
                 No tienes conversaciones activas
               </p>
               <Link
@@ -97,7 +97,7 @@ function ChatsPageContent() {
                             src={conv.listing_image_url}
                             alt={conv.listing_title}
                             fill
-                            className="object-cover rounded-md border-2 border-gray-700"
+                            className="object-cover rounded-md border border-gray-200"
                           />
                         </div>
                       )}
@@ -106,16 +106,16 @@ function ChatsPageContent() {
                       <div className="flex-1 min-w-0">
                         {/* Title and Status */}
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-bold text-white truncate">
+                          <h3 className="font-bold text-gray-900 truncate">
                             {conv.listing_title}
                           </h3>
                           <span
                             className={cn(
                               'px-2 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
-                              conv.listing_status === 'active' && 'bg-green-900/30 text-green-400',
-                              conv.listing_status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
-                              conv.listing_status === 'completed' && 'bg-blue-900/30 text-blue-400',
-                              conv.listing_status === 'sold' && 'bg-gray-700 text-gray-300'
+                              conv.listing_status === 'active' && 'bg-green-100 text-green-700',
+                              conv.listing_status === 'reserved' && 'bg-yellow-100 text-yellow-700',
+                              conv.listing_status === 'completed' && 'bg-blue-100 text-blue-700',
+                              conv.listing_status === 'sold' && 'bg-gray-200 text-gray-700'
                             )}
                           >
                             {conv.listing_status === 'active' && 'Activo'}
@@ -126,7 +126,7 @@ function ChatsPageContent() {
                         </div>
 
                         {/* Counterparty */}
-                        <p className="text-sm text-gray-400 mb-2">
+                        <p className="text-sm text-gray-600 mb-2">
                           {conv.is_seller ? (
                             <>Comprador: {conv.counterparty_nickname}</>
                           ) : (
@@ -137,7 +137,7 @@ function ChatsPageContent() {
                         {/* Last Message */}
                         {conv.last_message && (
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm text-gray-300 truncate flex-1">
+                            <p className="text-sm text-gray-700 truncate flex-1">
                               {conv.last_message}
                             </p>
                             {conv.unread_count > 0 && (
@@ -150,7 +150,7 @@ function ChatsPageContent() {
 
                         {/* Timestamp */}
                         {conv.last_message_at && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs text-gray-400 mt-1">
                             {new Date(conv.last_message_at).toLocaleDateString('es-ES', {
                               day: 'numeric',
                               month: 'short',

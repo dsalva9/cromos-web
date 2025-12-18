@@ -62,7 +62,7 @@ export function QuantityStepper({
   return (
     <div
       className={cn(
-        'flex items-center justify-center rounded-md border-2 border-black bg-gray-900',
+        'flex items-center justify-center rounded-md border-2 border-black bg-gray-50',
         styles.container,
         className
       )}
@@ -70,7 +70,7 @@ export function QuantityStepper({
       <Button
         variant="ghost"
         size="icon"
-        className={cn('rounded-r-none hover:bg-gray-700', styles.button)}
+        className={cn('rounded-r-none hover:bg-gray-200', styles.button)}
         onClick={handleDecrement}
         disabled={atMin}
         aria-label="Disminuir cantidad"
@@ -79,7 +79,7 @@ export function QuantityStepper({
       </Button>
       <div
         className={cn(
-          'flex h-full items-center justify-center font-bold text-white',
+          'flex h-full items-center justify-center font-bold text-gray-900',
           styles.value
         )}
         aria-live="polite"
@@ -89,7 +89,7 @@ export function QuantityStepper({
       <Button
         variant="ghost"
         size="icon"
-        className={cn('rounded-l-none hover:bg-gray-700', styles.button)}
+        className={cn('rounded-l-none hover:bg-gray-200', styles.button)}
         onClick={handleIncrement}
         disabled={atMax}
         aria-label="Aumentar cantidad"

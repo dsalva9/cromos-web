@@ -61,7 +61,7 @@ export function FloatingActionMenu({
                                 setIsOpen(false);
                             }}
                             disabled={reserving}
-                            className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-[#FFC000]"
+                            className="flex items-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full shadow-lg hover:bg-gray-100 transition-all whitespace-nowrap border-2 border-[#FFC000]"
                         >
                             <Package className="h-5 w-5" />
                             <span className="font-bold text-sm">
@@ -77,7 +77,7 @@ export function FloatingActionMenu({
                                 setIsOpen(false);
                             }}
                             disabled={completing}
-                            className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-green-500"
+                            className="flex items-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full shadow-lg hover:bg-gray-100 transition-all whitespace-nowrap border-2 border-green-500"
                         >
                             <CheckCircle className="h-5 w-5" />
                             <span className="font-bold text-sm">
@@ -93,7 +93,7 @@ export function FloatingActionMenu({
                                 setIsOpen(false);
                             }}
                             disabled={unreserving}
-                            className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-red-500"
+                            className="flex items-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full shadow-lg hover:bg-gray-100 transition-all whitespace-nowrap border-2 border-red-500"
                         >
                             <XCircle className="h-5 w-5" />
                             <span className="font-bold text-sm">

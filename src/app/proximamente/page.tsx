@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 
 export default function ProximamentePage() {
   return (
-    <div className="min-h-screen bg-[#1F2937] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full text-center space-y-8">
         {/* Logo/Title */}
         <div className="space-y-4">
-          <h1 className="text-5xl md:text-7xl font-bold text-white">
+          <h1 className="text-5xl md:text-7xl font-bold text-gray-900">
             CambioCromos
           </h1>
           <div className="h-1 w-24 bg-[#FFC000] mx-auto rounded-full"></div>
@@ -30,7 +30,7 @@ export default function ProximamentePage() {
 
         {/* Description */}
         <div className="space-y-4">
-          <p className="text-lg text-gray-400 max-w-xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-xl mx-auto">
             La plataforma definitiva para coleccionar e intercambiar cromos deportivos
             estará disponible muy pronto.
           </p>

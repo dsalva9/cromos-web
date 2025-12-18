@@ -62,17 +62,17 @@ function ItemList({
         {title}
       </h3>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400 font-bold">Nada.</p>
+        <p className="text-sm text-gray-600 font-bold">Nada.</p>
       ) : (
         <ul className="space-y-2">
           {items.map(item => (
             <li
               key={item.id}
-              className="flex justify-between items-center bg-gray-800 p-3 rounded-md border-2 border-black"
+              className="flex justify-between items-center bg-gray-50 p-3 rounded-md border-2 border-black"
             >
               <div>
-                <p className="font-bold text-white">{item.player_name}</p>
-                <p className="text-xs text-gray-300">
+                <p className="font-bold text-gray-900">{item.player_name}</p>
+                <p className="text-xs text-gray-600">
                   {item.sticker_code} - {item.team_name}
                 </p>
               </div>
@@ -265,13 +265,13 @@ export function ProposalDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-gray-900 text-white border-2 border-black shadow-xl flex flex-col">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-white text-gray-900 border-2 border-black shadow-xl flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold uppercase">
             Detalle de la Propuesta
           </DialogTitle>
           {detail && (
-            <DialogDescription className="text-gray-300">
+            <DialogDescription className="text-gray-600">
               Propuesta de{' '}
               <strong className="text-[#FFC000]">
                 {detail.proposal.from_user_nickname}
@@ -339,7 +339,7 @@ export function ProposalDetailModal({
                       <h3 className="text-lg font-bold uppercase mb-2">
                         Mensaje
                       </h3>
-                      <p className="text-sm text-gray-300 bg-gray-800 p-3 rounded-md border-2 border-black">
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md border-2 border-black">
                         {detail.proposal.message}
                       </p>
                     </div>
@@ -347,14 +347,14 @@ export function ProposalDetailModal({
 
                   {/* Finalization status (only show for accepted proposals) */}
                   {isAccepted && (
-                    <div className="bg-gray-800 border-2 border-black rounded-md p-4">
+                    <div className="bg-gray-50 border-2 border-black rounded-md p-4">
                       <h3 className="text-lg font-bold uppercase mb-2 flex items-center">
                         <CheckCircle className="h-5 w-5 mr-2 text-green-400" />
                         Estado de Finalización
                       </h3>
                       <div className="space-y-3">
                         {!hasPendingFinalization && (
-                          <p className="text-sm text-gray-300">
+                          <p className="text-sm text-gray-600">
                             El intercambio ha sido aceptado. Cuando ambos
                             confirmen que completaron el intercambio, se marcará
                             como finalizado.
@@ -374,12 +374,12 @@ export function ProposalDetailModal({
                         )}
 
                         {otherUserRequestedFinalization && (
-                          <div className="bg-blue-500 bg-opacity-20 border-2 border-blue-400 rounded-md p-3">
-                            <p className="text-sm font-bold text-blue-400">
+                          <div className="bg-blue-50 border-2 border-blue-400 rounded-md p-3">
+                            <p className="text-sm font-bold text-blue-600">
                               ⚠ La otra persona solicitó finalizar el
                               intercambio
                             </p>
-                            <p className="text-xs text-white mt-1">
+                            <p className="text-xs text-gray-900 mt-1">
                               Si ya completaste el intercambio, acepta la
                               finalización. Si no, puedes rechazarla.
                             </p>
@@ -433,7 +433,7 @@ export function ProposalDetailModal({
               </Button>
               <Button
                 variant="outline"
-                className="bg-gray-800 hover:bg-gray-700 text-white border-2 border-black font-bold uppercase"
+                className="bg-gray-50 hover:bg-gray-100 text-gray-900 border-2 border-black font-bold uppercase"
                 onClick={handleRejectFinalization}
                 disabled={finalizingLoading}
               >

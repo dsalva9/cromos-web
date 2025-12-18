@@ -78,7 +78,7 @@ export function CollectionCombobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'w-full justify-between bg-[#374151] border-2 border-black text-white hover:bg-[#4B5563] hover:text-white',
+            'w-full justify-between bg-white border-2 border-black text-gray-900 hover:bg-gray-50 hover:text-gray-900',
             className
           )}
         >
@@ -89,18 +89,18 @@ export function CollectionCombobox({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[--radix-popover-trigger-width] p-0 bg-[#374151] border-2 border-black"
+        className="w-[--radix-popover-trigger-width] p-0 bg-white border-2 border-black"
         align="start"
       >
-        <Command className="bg-[#374151] text-white">
+        <Command className="bg-white text-gray-900">
           <CommandInput
             placeholder={placeholder}
             value={inputValue}
             onValueChange={handleInputChange}
-            className="text-white placeholder:text-gray-400"
+            className="text-gray-900 placeholder:text-gray-600"
           />
           <CommandList>
-            <CommandEmpty className="text-gray-400 py-6">
+            <CommandEmpty className="text-gray-600 py-6">
               {inputValue ? (
                 <div className="space-y-2">
                   <p className="text-sm">No se encontró la colección</p>
@@ -121,7 +121,7 @@ export function CollectionCombobox({
 
             {/* User's Collections */}
             {!loading && collections.length > 0 && (
-              <CommandGroup heading="Mis Colecciones" className="text-gray-400">
+              <CommandGroup heading="Mis Colecciones" className="text-gray-600">
                 {collections
                   .filter(col =>
                     inputValue
@@ -136,7 +136,7 @@ export function CollectionCombobox({
                       onClick={() => {
                         handleSelect(collection.title, collection.copy_id);
                       }}
-                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-[#1F2937] active:bg-[#1F2937] text-white"
+                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-gray-100 active:bg-gray-100 text-gray-900"
                     >
                       <Check
                         className={cn(
@@ -148,7 +148,7 @@ export function CollectionCombobox({
                       />
                       <span className="truncate">{collection.title}</span>
                       {collection.is_active && (
-                        <span className="ml-auto text-xs text-green-400">
+                        <span className="ml-auto text-xs text-green-600">
                           ★
                         </span>
                       )}
@@ -159,19 +159,19 @@ export function CollectionCombobox({
 
             {/* Loading State */}
             {loading && (
-              <div className="py-6 text-center text-sm text-gray-400">
+              <div className="py-6 text-center text-sm text-gray-600">
                 Cargando colecciones...
               </div>
             )}
 
             {/* Free Text Option */}
             {inputValue && inputValue.length > 0 && (
-              <CommandGroup heading="Otra" className="text-gray-400">
+              <CommandGroup heading="Otra" className="text-gray-600">
                 <div
                   onClick={() => {
                     handleSelect(inputValue);
                   }}
-                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-[#1F2937] active:bg-[#1F2937] text-white"
+                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-gray-100 active:bg-gray-100 text-gray-900"
                 >
                   <span className="truncate">
                     Usar &quot;{inputValue}&quot;

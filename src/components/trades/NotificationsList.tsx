@@ -142,11 +142,11 @@ export function NotificationsList({
         {[...Array(3)].map((_, i) => (
           <ModernCard
             key={i}
-            className="bg-gray-800 border-2 border-black animate-pulse shadow-xl"
+            className="bg-white border-2 border-black animate-pulse shadow-xl"
           >
             <ModernCardContent className="p-4 space-y-3">
-              <div className="h-4 bg-gray-600 rounded-md w-3/4"></div>
-              <div className="h-3 bg-gray-700 rounded-md w-1/2"></div>
+              <div className="h-4 bg-gray-200 rounded-md w-3/4"></div>
+              <div className="h-3 bg-gray-100 rounded-md w-1/2"></div>
             </ModernCardContent>
           </ModernCard>
         ))}
@@ -156,7 +156,7 @@ export function NotificationsList({
 
   if (error) {
     return (
-      <ModernCard className="bg-gray-800 border-2 border-black shadow-xl">
+      <ModernCard className="bg-white border-2 border-black shadow-xl">
         <ModernCardContent className="p-6 text-center">
           <p className="text-[#E84D4D] font-bold">{error}</p>
         </ModernCardContent>
@@ -169,8 +169,8 @@ export function NotificationsList({
 
   if (notifications.length === 0) {
     return (
-      <ModernCard className="bg-gray-800 border-2 border-dashed border-gray-600 shadow-xl">
-        <ModernCardContent className="p-8 text-center text-gray-400">
+      <ModernCard className="bg-white border-2 border-dashed border-gray-200 shadow-xl">
+        <ModernCardContent className="p-8 text-center text-gray-600">
           <Bell className="mx-auto h-12 w-12 mb-4" />
           <p className="font-bold">No tienes notificaciones.</p>
           <p className="text-sm mt-2">
@@ -190,7 +190,7 @@ export function NotificationsList({
             variant="outline"
             size="sm"
             onClick={handleMarkAllRead}
-            className="border-2 border-black font-bold uppercase rounded-md shadow-lg bg-gray-800 text-gray-300 hover:bg-gray-700"
+            className="border-2 border-black font-bold uppercase rounded-md shadow-lg bg-gray-50 text-gray-900 hover:bg-gray-100"
           >
             Marcar todo como leído
           </Button>
@@ -200,12 +200,12 @@ export function NotificationsList({
       {/* Unread notifications */}
       {unreadNotifications.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold uppercase text-white">Nuevas</h2>
+          <h2 className="text-xl font-bold uppercase text-gray-900">Nuevas</h2>
           <div className="grid gap-4">
             {unreadNotifications.map(notification => (
               <ModernCard
                 key={notification.id}
-                className="bg-gray-800 border-2 border-[#FFC000] shadow-xl hover:shadow-2xl transition-all cursor-pointer"
+                className="bg-white border-2 border-[#FFC000] shadow-xl hover:shadow-2xl transition-all cursor-pointer"
                 onClick={() => handleNotificationClick(notification)}
               >
                 <ModernCardContent className="p-4">
@@ -216,10 +216,10 @@ export function NotificationsList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
-                          <h3 className="font-bold text-white text-sm">
+                          <h3 className="font-bold text-gray-900 text-sm">
                             {getNotificationTitle(notification)}
                           </h3>
-                          <p className="text-sm text-gray-300 mt-1">
+                          <p className="text-sm text-gray-600 mt-1">
                             <UserLink
                               userId={
                                 getCounterpartyInfo(notification)
@@ -237,7 +237,7 @@ export function NotificationsList({
                             />{' '}
                             {getNotificationDescriptionText(notification)}
                           </p>
-                          <p className="text-xs text-gray-400 mt-2">
+                          <p className="text-xs text-gray-600 mt-2">
                             {formatDistanceToNow(
                               new Date(notification.created_at),
                               {
@@ -247,7 +247,7 @@ export function NotificationsList({
                             )}
                           </p>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-gray-600 flex-shrink-0" />
                       </div>
                     </div>
                   </div>
@@ -261,14 +261,14 @@ export function NotificationsList({
       {/* Read notifications */}
       {readNotifications.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-bold uppercase text-gray-400">
+          <h2 className="text-xl font-bold uppercase text-gray-600">
             Anteriores
           </h2>
           <div className="grid gap-4">
             {readNotifications.map(notification => (
               <ModernCard
                 key={notification.id}
-                className="bg-gray-800 border-2 border-gray-700 shadow-xl hover:shadow-2xl transition-all cursor-pointer opacity-75 hover:opacity-100"
+                className="bg-white border-2 border-gray-200 shadow-xl hover:shadow-2xl transition-all cursor-pointer opacity-75 hover:opacity-100"
                 onClick={() => handleNotificationClick(notification)}
               >
                 <ModernCardContent className="p-4">
@@ -279,10 +279,10 @@ export function NotificationsList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
-                          <h3 className="font-bold text-gray-300 text-sm">
+                          <h3 className="font-bold text-gray-700 text-sm">
                             {getNotificationTitle(notification)}
                           </h3>
-                          <p className="text-sm text-gray-400 mt-1">
+                          <p className="text-sm text-gray-600 mt-1">
                             <UserLink
                               userId={
                                 getCounterpartyInfo(notification)
@@ -300,7 +300,7 @@ export function NotificationsList({
                             />{' '}
                             {getNotificationDescriptionText(notification)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="text-xs text-gray-600 mt-2">
                             {formatDistanceToNow(
                               new Date(notification.created_at),
                               {
@@ -310,7 +310,7 @@ export function NotificationsList({
                             )}
                           </p>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-gray-600 flex-shrink-0" />
                       </div>
                     </div>
                   </div>

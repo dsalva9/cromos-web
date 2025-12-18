@@ -68,7 +68,7 @@ export function BadgeCard({
       className={cn(
         'rounded-lg border-2 transition-all duration-200',
         colors.border,
-        isEarned ? colors.bg : 'bg-gray-50 dark:bg-gray-900/30 opacity-60',
+        isEarned ? colors.bg : 'bg-gray-50 opacity-60',
         isEarned && 'hover:shadow-md',
         isHighlighted && 'animate-[highlight_3s_ease-in-out]',
         styles.container,
@@ -95,7 +95,7 @@ export function BadgeCard({
             className={cn(
               'font-semibold',
               styles.title,
-              isEarned ? colors.text : 'text-gray-500 dark:text-gray-400'
+              isEarned ? colors.text : 'text-gray-500'
             )}
           >
             {badge.display_name_es}
@@ -107,8 +107,8 @@ export function BadgeCard({
                 'mt-1',
                 styles.description,
                 isEarned
-                  ? 'text-gray-600 dark:text-gray-300'
-                  : 'text-gray-400 dark:text-gray-500'
+                  ? 'text-gray-600'
+                  : 'text-gray-400'
               )}
             >
               {badge.description_es}
@@ -118,13 +118,13 @@ export function BadgeCard({
           {/* Progress bar for unearned badges */}
           {showProgress && isProgress && !badge.is_earned && (
             <div className="mt-3">
-              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
                 <span>
                   {badge.current_progress} / {badge.threshold}
                 </span>
                 <span>{Math.round(progressPercent)}%</span>
               </div>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className={cn(
                     'h-full transition-all duration-500',
@@ -138,7 +138,7 @@ export function BadgeCard({
 
           {/* Earned date for earned badges */}
           {showEarnedDate && isEarned && 'earned_at' in badge && badge.earned_at && (
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-xs text-gray-500">
               Ganada el{' '}
               {format(new Date(badge.earned_at), 'dd MMM yyyy', {
                 locale: es,

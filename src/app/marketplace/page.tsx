@@ -58,39 +58,36 @@ export default function MarketplacePage() {
   const listings = listingTypeFilter === 'all'
     ? allListings
     : allListings.filter(listing =>
-        listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
-      );
+      listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
+    );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#111827] text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900 pb-24 md:pb-8">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#1e3a8a]/30 via-[#111827] to-[#111827] border-b border-white/5">
-        {/* Subtle glow effect */}
-        <div className="absolute top-0 left-0 w-[600px] h-[300px] bg-[#1e3a8a]/20 blur-[100px] rounded-full pointer-events-none" />
-        
-        <div className="container mx-auto px-4 py-6 md:py-10 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-6 md:py-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex-1 w-full">
-              <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3 md:mb-4">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FFC000] to-white">
+              <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
+                <span className="text-black">
                   Marketplace
                 </span>
               </h1>
-              
-              {/* Stats Badges - Horizontal scroll on mobile */}
+
+              {/* Stats Badges */}
               <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-xs md:text-sm font-medium text-white flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                   <span className="text-base md:text-lg">🔥</span>
-                  <span className="font-bold text-[#FFC000]">{listings.length}</span>
+                  <span className="font-bold text-black">{listings.length}</span>
                   <span className="hidden md:inline">activos</span>
                 </div>
-                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-xs md:text-sm font-medium text-white flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                   <span className="text-base md:text-lg">👥</span>
                   <span className="hidden md:inline">Comunidad activa</span>
                   <span className="md:hidden">Activa</span>
                 </div>
                 {!loading && listings.length > 0 && (
-                  <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-xs md:text-sm font-medium text-white flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
+                  <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 border border-gray-200 text-xs md:text-sm font-medium text-gray-700 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                     <span className="text-base md:text-lg">⚡</span>
                     <span className="hidden md:inline">Actualizado hoy</span>
                     <span className="md:hidden">Hoy</span>
@@ -104,14 +101,14 @@ export default function MarketplacePage() {
                 <Link href="/marketplace/my-listings" className="md:flex-none">
                   <Button
                     variant="outline"
-                    className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm h-10 md:h-12 px-3 md:px-6 text-sm"
+                    className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 h-10 md:h-12 px-3 md:px-6 text-sm"
                   >
                     <List className="h-4 w-4 md:mr-2" />
                     <span className="hidden md:inline">Mis Anuncios</span>
                   </Button>
                 </Link>
                 <Link href="/marketplace/create" className="hidden md:block md:flex-none">
-                  <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-[0_0_20px_rgba(255,192,0,0.2)] hover:shadow-[0_0_30px_rgba(255,192,0,0.4)] transition-all text-sm">
+                  <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                     <Plus className="mr-1 md:mr-2 h-4 w-4" />
                     Publicar
                   </Button>
@@ -122,18 +119,18 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6">
         {/* Controls Bar */}
-        <div className="sticky top-4 z-30 mb-8">
-          <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
-            <div className="flex flex-col md:flex-row gap-4">
+        <div className="sticky top-20 md:top-24 z-30 mb-6">
+          <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-xl p-3 shadow-lg">
+            <div className="flex flex-col md:flex-row gap-3">
               {/* Search */}
               <div className="flex-1">
                 <SearchBar
                   value={searchQuery}
                   onChange={setSearchQuery}
                   placeholder="Buscar por título, colección..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#FFC000]/50"
+                  className="bg-gray-50 border-gray-200 text-black placeholder:text-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
                 />
               </div>
 
@@ -142,7 +139,7 @@ export default function MarketplacePage() {
                 <Button
                   onClick={() => setShowFilters(!showFilters)}
                   variant="outline"
-                  className={`flex-1 border-white/10 ${showFilters ? 'bg-[#FFC000]/10 text-[#FFC000] border-[#FFC000]/50' : 'bg-white/5 text-gray-400'}`}
+                  className={`flex-1 ${showFilters ? 'bg-[#FFC000]/10 text-black border-[#FFC000]/50' : 'bg-white text-gray-600 border-gray-200'}`}
                 >
                   <Filter className="mr-2 h-4 w-4" />
                   Filtros
@@ -150,7 +147,7 @@ export default function MarketplacePage() {
                 <Button
                   onClick={() => hasPostcode && setSortByDistance(!sortByDistance)}
                   variant="outline"
-                  className={`flex-1 border-white/10 ${sortByDistance ? 'bg-[#FFC000]/10 text-[#FFC000] border-[#FFC000]/50' : 'bg-white/5 text-gray-400'}`}
+                  className={`flex-1 ${sortByDistance ? 'bg-[#FFC000]/10 text-black border-[#FFC000]/50' : 'bg-white text-gray-600 border-gray-200'}`}
                   disabled={!hasPostcode}
                 >
                   {sortByDistance ? <MapPin className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />}
@@ -159,36 +156,33 @@ export default function MarketplacePage() {
               </div>
 
               {/* Desktop Filters */}
-              <div className={`flex-col md:flex-row gap-4 md:flex ${showFilters ? 'flex' : 'hidden'}`}>
+              <div className={`flex-col md:flex-row gap-3 md:flex ${showFilters ? 'flex' : 'hidden'}`}>
                 {/* Listing Type Filter */}
-                <div className="bg-white/5 rounded-lg p-1 border border-white/10 flex">
+                <div className="bg-gray-100 rounded-lg p-1 flex">
                   <button
                     onClick={() => setListingTypeFilter('all')}
-                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
-                      listingTypeFilter === 'all'
-                        ? 'bg-[#FFC000] text-black shadow-lg'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'all'
+                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                        : 'text-gray-500 hover:text-gray-900'
+                      }`}
                   >
                     Todos
                   </button>
                   <button
                     onClick={() => setListingTypeFilter('cromo')}
-                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
-                      listingTypeFilter === 'cromo'
-                        ? 'bg-[#FFC000] text-black shadow-lg'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'cromo'
+                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                        : 'text-gray-500 hover:text-gray-900'
+                      }`}
                   >
                     Cromo
                   </button>
                   <button
                     onClick={() => setListingTypeFilter('pack')}
-                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${
-                      listingTypeFilter === 'pack'
-                        ? 'bg-[#FFC000] text-black shadow-lg'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
+                    className={`px-3 md:px-4 py-2 rounded-md text-xs md:text-sm font-medium transition-all ${listingTypeFilter === 'pack'
+                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                        : 'text-gray-500 hover:text-gray-900'
+                      }`}
                   >
                     Pack
                   </button>
@@ -203,25 +197,23 @@ export default function MarketplacePage() {
                   </div>
                 )}
 
-                <div className="hidden lg:flex bg-white/5 rounded-lg p-1 border border-white/10">
+                <div className="hidden lg:flex bg-gray-100 rounded-lg p-1">
                   <button
                     onClick={() => setSortByDistance(false)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
-                      !sortByDistance
-                        ? 'bg-[#FFC000] text-black shadow-lg'
-                        : 'text-gray-400 hover:text-white'
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${!sortByDistance
+                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                        : 'text-gray-500 hover:text-gray-900'
+                      }`}
                   >
                     Reciente
                   </button>
                   <button
                     onClick={() => hasPostcode && setSortByDistance(true)}
                     disabled={!hasPostcode}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
-                      sortByDistance
-                        ? 'bg-[#FFC000] text-black shadow-lg'
-                        : 'text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed'
-                    }`}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${sortByDistance
+                        ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                        : 'text-gray-500 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed'
+                      }`}
                     title={!hasPostcode ? 'Añade tu código postal en el perfil' : undefined}
                   >
                     Distancia
@@ -234,7 +226,7 @@ export default function MarketplacePage() {
 
         {/* Listings Grid */}
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-6 rounded-xl mb-8 text-center">
+          <div className="bg-red-50 text-red-700 border border-red-200 p-6 rounded-xl mb-8 text-center">
             <p className="font-bold text-lg mb-1">Error al cargar anuncios</p>
             <p className="text-sm opacity-80">{error}</p>
           </div>
@@ -260,7 +252,7 @@ export default function MarketplacePage() {
             <Button
               onClick={loadMore}
               variant="outline"
-              className="bg-white/5 border-white/10 text-white hover:bg-white/10 px-8 py-6 text-lg h-auto rounded-xl backdrop-blur-sm"
+              className="bg-white border-gray-200 text-gray-900 hover:bg-gray-50 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
             >
               Cargar Más Anuncios
             </Button>
@@ -276,7 +268,7 @@ export default function MarketplacePage() {
 
         {/* Empty State */}
         {!loading && listings.length === 0 && (
-          <div className="mt-12">
+          <div className="mt-12 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
             <EmptyState
               icon={Package}
               title={

@@ -92,20 +92,20 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
   return (
     <div className="space-y-6">
         {/* Add New Page */}
-        <Card className="bg-[#1F2937] border-gray-700">
+        <Card className="bg-gray-50 border-gray-200">
         <CardHeader>
-          <CardTitle className="text-white">Añadir Nueva Página</CardTitle>
+          <CardTitle className="text-gray-900">Añadir Nueva Página</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-white">Título de la Página *</Label>
+              <Label className="text-gray-900">Título de la Página *</Label>
               <Input
                 id="new-page-title"
                 value={newPageTitle}
                 onChange={e => setNewPageTitle(e.target.value)}
                 placeholder="Ej: Primera Equipación"
-                className="bg-[#374151] border-gray-600 text-white"
+                className="bg-white border-gray-200 text-gray-900"
               />
             </div>
             <div className="space-y-2">
@@ -118,13 +118,13 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="team" id="team" />
-                  <Label htmlFor="team" className="text-white">
+                  <Label htmlFor="team" className="text-gray-900">
                     Normal
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="special" id="special" />
-                  <Label htmlFor="special" className="text-white">
+                  <Label htmlFor="special" className="text-gray-900">
                     Especial
                   </Label>
                 </div>
@@ -144,13 +144,13 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
 
       {/* Existing Pages */}
       {data.pages.map((page, pageIndex) => (
-        <Card key={pageIndex} className="bg-[#1F2937] border-gray-700">
+        <Card key={pageIndex} className="bg-gray-50 border-gray-200">
           <CardHeader className="flex flex-row items-center justify-between group">
             <div className="flex items-center gap-2">
               <GripVertical className="h-6 w-6 text-slate-400 hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
               <div>
-                <CardTitle className="text-white">{page.title}</CardTitle>
-                <p className="text-sm text-gray-400">
+                <CardTitle className="text-gray-900">{page.title}</CardTitle>
+                <p className="text-sm text-gray-600">
                   {page.slots.length} cromos · (
                   {page.type === 'team' ? 'Normal' : 'Especial'})
                 </p>
@@ -169,7 +169,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             {/* Page Title and Type */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor={`page-title-${pageIndex}`} className="text-white">
+                <Label htmlFor={`page-title-${pageIndex}`} className="text-gray-900">
                   Título de la Página *
                 </Label>
                 <Input
@@ -178,7 +178,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   onChange={e =>
                     updatePage(pageIndex, { ...page, title: e.target.value })
                   }
-                  className="bg-[#374151] border-gray-600 text-white"
+                  className="bg-white border-gray-200 text-gray-900"
                 />
               </div>
               <div className="space-y-2">
@@ -194,13 +194,13 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="team" id={`team-${pageIndex}`} />
-                    <Label htmlFor={`team-${pageIndex}`} className="text-white">
+                    <Label htmlFor={`team-${pageIndex}`} className="text-gray-900">
                       Normal
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="special" id={`special-${pageIndex}`} />
-                    <Label htmlFor={`special-${pageIndex}`} className="text-white">
+                    <Label htmlFor={`special-${pageIndex}`} className="text-gray-900">
                       Especial
                     </Label>
                   </div>
@@ -216,7 +216,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   variant="outline"
                   size="sm"
                   onClick={() => addSlot(pageIndex)}
-                  className="text-white border-gray-600"
+                  className="text-gray-900 border-gray-200"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Añadir Cromo
@@ -227,12 +227,12 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 {page.slots.map((slot, slotIndex) => (
                   <div
                     key={slotIndex}
-                    className="group hover:bg-slate-800/30 rounded p-3 transition-all duration-200 border border-gray-700"
+                    className="group hover:bg-gray-100/30 rounded p-3 transition-all duration-200 border border-gray-200"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-semibold text-gray-900">
                           Cromo #{slotIndex + 1}
                         </span>
                       </div>
@@ -255,7 +255,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                         idPrefix={`slot-${pageIndex}-${slotIndex}`}
                       />
                     ) : (
-                      <p className="text-sm text-gray-400 italic">
+                      <p className="text-sm text-gray-600 italic">
                         Define campos personalizados en el paso anterior para agregar datos a los cromos.
                       </p>
                     )}
@@ -270,7 +270,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
       {/* Empty State */}
       {data.pages.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-gray-400">
+          <p className="text-gray-600">
             No hay páginas añadidas. Añade tu primera página para comenzar.
           </p>
         </div>

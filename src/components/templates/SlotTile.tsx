@@ -47,11 +47,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
   const getStatusStyles = () => {
     switch (slot.status) {
       case 'owned':
-        return 'bg-green-900/20 border-green-500/50 hover:border-green-500';
+        return 'bg-green-50 border-green-200 hover:border-green-400 shadow-sm';
       case 'duplicate':
-        return 'bg-[#FFC000]/10 border-[#FFC000]/50 hover:border-[#FFC000]';
+        return 'bg-yellow-50 border-yellow-200 hover:border-yellow-400 shadow-sm';
       default: // missing
-        return 'bg-gray-900 border-gray-800 hover:border-gray-600';
+        return 'bg-white border-gray-200 hover:border-gray-400 hover:shadow-md';
     }
   };
 
@@ -155,17 +155,17 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
   };
 
   return (
-    <div 
+    <div
       className={cn(
         'relative rounded-xl border transition-all duration-200 group flex flex-col h-full overflow-hidden',
         getStatusStyles()
       )}
     >
       {/* Top Status Bar */}
-      <div 
+      <div
         className="absolute top-0 left-0 right-0 h-1 transition-colors duration-300"
         style={{
-          background: slot.status === 'owned' ? '#22c55e' : slot.status === 'duplicate' ? '#FFC000' : 'transparent'
+          background: slot.status === 'owned' ? '#22c55e' : slot.status === 'duplicate' ? '#EAB308' : 'transparent'
         }}
       />
 
@@ -175,10 +175,10 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-xs font-mono text-gray-500">#{slot.slot_number}</span>
             {slot.is_special && (
-              <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1 rounded border border-purple-500/30">SPECIAL</span>
+              <span className="text-[10px] bg-purple-50 text-purple-600 px-1 rounded border border-purple-200 font-bold">SPECIAL</span>
             )}
           </div>
-          <p className="text-xs font-bold text-white line-clamp-2 min-h-[2rem] leading-tight">
+          <p className="text-xs font-bold text-gray-900 line-clamp-2 min-h-[2rem] leading-tight">
             {slot.label || `Cromo ${slot.slot_number || ''}`}
           </p>
 
@@ -189,9 +189,9 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 const value = slot.data?.[field.name];
                 if (value === undefined || value === null || value === '') return null;
                 return (
-                  <div key={field.name} className="flex gap-1 text-gray-400">
-                    <span className="font-medium">{field.name}:</span>
-                    <span className="text-gray-300 truncate">{String(value)}</span>
+                  <div key={field.name} className="flex gap-1 text-gray-500 justify-center">
+                    <span className="font-medium text-gray-400">{field.name}:</span>
+                    <span className="truncate">{String(value)}</span>
                   </div>
                 );
               })}
@@ -205,10 +205,10 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
             onClick={handleStatusClick}
             disabled={updating}
             className={cn(
-              "w-full py-1.5 px-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center",
-              slot.status === 'missing' && "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white",
-              slot.status === 'owned' && "bg-green-500 text-black hover:bg-green-400",
-              slot.status === 'duplicate' && "bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              "w-full py-1.5 px-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center shadow-sm",
+              slot.status === 'missing' && "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-black",
+              slot.status === 'owned' && "bg-green-100 text-green-700 hover:bg-green-200",
+              slot.status === 'duplicate' && "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
             )}
           >
             {getStatusIcon()}
@@ -219,21 +219,21 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           {(slot.status === 'owned' || slot.status === 'duplicate') && (
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
               {/* Counter */}
-              <div className="flex items-center justify-between bg-black/20 rounded-lg p-1">
+              <div className="flex items-center justify-between bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
                 <button
                   onClick={() => handleCountChange(-1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 text-white transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 transition-colors"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="text-sm font-bold text-white font-mono">
+                <span className="text-sm font-bold text-gray-900 font-mono">
                   {slot.status === 'owned' ? '1' : localCount}
                 </span>
                 <button
                   onClick={() => handleCountChange(1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-white/10 text-white transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-500 transition-colors"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -242,16 +242,16 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
               {/* Marketplace Action */}
               {listing ? (
                 <Link href={`/marketplace/${listing.id}`} className="block">
-                  <div className="w-full bg-green-900/30 border border-green-800 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-400 hover:bg-green-900/50 transition-colors cursor-pointer">
+                  <div className="w-full bg-green-50 border border-green-200 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-700 hover:bg-green-100 transition-colors cursor-pointer font-bold">
                     <Upload className="w-3 h-3" />
                     <span>VER ANUNCIO</span>
                   </div>
                 </Link>
               ) : listingsLoading ? (
-                <div className="w-full h-6 bg-gray-800 animate-pulse rounded-lg" />
+                <div className="w-full h-6 bg-gray-100 animate-pulse rounded-lg" />
               ) : slot.status === 'duplicate' && localCount >= 2 ? (
                 <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`} className="block">
-                  <button className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg py-1 px-2 text-[10px] font-medium transition-colors flex items-center justify-center gap-1.5">
+                  <button className="w-full bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 hover:text-black rounded-lg py-1 px-2 text-[10px] font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm">
                     <Upload className="w-3 h-3" />
                     <span>CREAR ANUNCIO</span>
                   </button>
@@ -260,7 +260,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 <button
                   disabled
                   title="Necesitas al menos 2 cromos para crear un anuncio"
-                  className="w-full bg-gray-900 text-gray-600 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed opacity-50"
+                  className="w-full bg-gray-50 border border-gray-100 text-gray-400 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed"
                 >
                   <Upload className="w-3 h-3" />
                   <span>CREAR ANUNCIO</span>
@@ -273,7 +273,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
 
       {/* Loading Overlay */}
       {updating && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-[1px] flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10">
           <div className="animate-spin h-5 w-5 border-2 border-[#FFC000] border-r-transparent rounded-full" />
         </div>
       )}

@@ -23,14 +23,14 @@ export function SearchBar({ value, onChange, placeholder, className }: SearchBar
 
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
       <Input
         type="text"
         value={localValue}
         onChange={e => setLocalValue(e.target.value)}
         placeholder={placeholder || 'Search...'}
         className={cn(
-          "pl-10 bg-[#374151] border-2 border-black text-white placeholder:text-gray-400",
+          "pl-10 bg-white border-2 border-black text-gray-900 placeholder:text-gray-600",
           className
         )}
       />

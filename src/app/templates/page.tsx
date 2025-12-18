@@ -25,15 +25,15 @@ export default function TemplatesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#1F2937]">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-white mb-2">
+            <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 mb-2">
               Plantillas Comunitarias
             </h1>
-            <p className="text-slate-300">
+            <p className="text-gray-600">
               Descubre y copia plantillas de colección creadas por la comunidad
             </p>
           </div>

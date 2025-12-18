@@ -29,15 +29,15 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Custom brand colors for CambioCromos
+        // Custom brand colors for CambioCromos (Light Mode First)
         primary: {
           DEFAULT: '#FFC000',
           dark: '#FFD700',
         },
         background: {
-          DEFAULT: '#1F2937',
-          dark: '#111827',
-          light: '#374151',
+          DEFAULT: '#F3F4F6',
+          light: '#FFFFFF',
+          gray: '#E5E7EB',
         },
 
         // Keep shadcn/ui variables for compatibility

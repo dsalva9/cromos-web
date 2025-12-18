@@ -15,16 +15,14 @@ export interface SegmentedTabsProps {
 }
 
 /**
- * SegmentedTabs - Equal-width paired tab control following Retro-Comic theme
+ * SegmentedTabs - Equal-width paired tab control
  *
  * Features:
  * - Equal-width columns using CSS Grid
- * - Outer border on container only (border-2 border-black)
- * - Flush seams with single-pixel dividers (no double borders)
+ * - Modern light mode aesthetic
+ * - Flush seams with single-pixel dividers
  * - Gold active state (#FFC000)
- * - Rounded outer corners only (inner corners square)
- * - No layout shift on focus/active (ring without border change)
- * - Full keyboard navigation (Arrow keys, Home, End)
+ * - Rounded outer corners
  * - ARIA compliant
  */
 export function SegmentedTabs({
@@ -59,12 +57,11 @@ export function SegmentedTabs({
       role="tablist"
       aria-label={ariaLabel}
       data-testid="segmented-tabs"
-      className={`grid gap-0 border-2 border-black rounded-md overflow-hidden ${className || ''}`}
+      className={`grid gap-0 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-1 ${className || ''}`}
       style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
     >
       {tabs.map((tab, index) => {
         const isActive = value === tab.value;
-        const isFirst = index === 0;
 
         return (
           <button
@@ -79,11 +76,13 @@ export function SegmentedTabs({
             title={tab.label}
             className={`
               relative inline-flex items-center justify-center px-4 py-2
-              font-semibold text-sm uppercase w-full
-              transition-colors duration-200
+              font-bold text-sm uppercase w-full rounded-md
+              transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-inset
-              ${isActive ? 'bg-[#FFC000] text-black z-10' : 'bg-gray-800 text-white hover:bg-gray-700'}
-              ${!isFirst ? 'before:content-[""] before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-black' : ''}
+              ${isActive
+                ? 'bg-white text-black shadow-sm'
+                : 'bg-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+              }
             `}
           >
             <span className="flex items-center justify-center gap-2 truncate">

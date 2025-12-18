@@ -105,7 +105,7 @@ export default function TemplateEditPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="h-8 w-8 text-[#FFC000] animate-spin" />
       </div>
     );
@@ -113,7 +113,7 @@ export default function TemplateEditPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-xl mb-4">Error al cargar la plantilla</p>
           <Link href="/templates">
@@ -145,7 +145,7 @@ export default function TemplateEditPage() {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-[#1F2937]">
+      <div className="min-h-screen bg-gray-50">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Header */}
           <Link
@@ -157,10 +157,10 @@ export default function TemplateEditPage() {
           </Link>
 
           <div className="mb-8">
-            <h1 className="text-3xl font-black uppercase text-white mb-2">
+            <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
               Editar Plantilla
             </h1>
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               Modifica la información, páginas y cromos de tu plantilla
             </p>
           </div>

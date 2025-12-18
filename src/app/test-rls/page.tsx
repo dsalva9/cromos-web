@@ -152,15 +152,15 @@ export default function TestRLSPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="bg-gray-800 rounded-lg shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-white mb-2">RLS Security Test Page</h1>
-        <p className="text-gray-300 mb-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">RLS Security Test Page</h1>
+        <p className="text-gray-600 mb-6">
           Test Row Level Security policies on the profiles table
         </p>
 
-        <div className="bg-yellow-900/30 border border-yellow-500 rounded p-4 mb-6">
-          <h2 className="text-yellow-400 font-bold mb-2">⚠️ Instructions:</h2>
-          <ol className="text-yellow-200 text-sm space-y-1 list-decimal list-inside">
+        <div className="bg-yellow-50 border border-yellow-300 rounded p-4 mb-6">
+          <h2 className="text-yellow-700 font-bold mb-2">⚠️ Instructions:</h2>
+          <ol className="text-yellow-800 text-sm space-y-1 list-decimal list-inside">
             <li>Make sure you are logged in as User A</li>
             <li>Have User B&apos;s UUID ready (86b9dca5-e9ed-4c54-8aff-99cb84c3f51c)</li>
             <li>Click &quot;Run Full Test&quot; or run individual tests</li>
@@ -172,7 +172,7 @@ export default function TestRLSPage() {
           <button
             onClick={runFullTest}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded"
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded"
           >
             {loading ? 'Running Tests...' : 'Run Full Test Suite'}
           </button>
@@ -181,21 +181,21 @@ export default function TestRLSPage() {
             <button
               onClick={testUpdateOwnProfile}
               disabled={loading}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded"
             >
               Test: Update Own
             </button>
             <button
               onClick={testUpdateOtherProfile}
               disabled={loading}
-              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded"
             >
               Test: Update Other
             </button>
             <button
               onClick={testReadOtherProfile}
               disabled={loading}
-              className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded"
+              className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded"
             >
               Test: Read Other
             </button>
@@ -209,9 +209,9 @@ export default function TestRLSPage() {
           </button>
         </div>
 
-        <div className="bg-gray-900 rounded p-4">
-          <h2 className="text-white font-bold mb-2">Test Results:</h2>
-          <div className="bg-black rounded p-3 font-mono text-sm h-96 overflow-y-auto">
+        <div className="bg-gray-100 rounded p-4">
+          <h2 className="text-gray-900 font-bold mb-2">Test Results:</h2>
+          <div className="bg-gray-50 rounded p-3 font-mono text-sm h-96 overflow-y-auto border border-gray-200">
             {results.length === 0 ? (
               <p className="text-gray-500">No tests run yet...</p>
             ) : (
@@ -229,10 +229,10 @@ export default function TestRLSPage() {
           </div>
         </div>
 
-        <div className="mt-6 bg-gray-700 rounded p-4">
-          <h3 className="text-white font-bold mb-2">Quick Reference:</h3>
-          <div className="text-gray-300 text-sm space-y-1">
-            <p><strong>User B ID:</strong> <code className="bg-gray-800 px-2 py-1 rounded">86b9dca5-e9ed-4c54-8aff-99cb84c3f51c</code></p>
+        <div className="mt-6 bg-gray-100 rounded p-4">
+          <h3 className="text-gray-900 font-bold mb-2">Quick Reference:</h3>
+          <div className="text-gray-700 text-sm space-y-1">
+            <p><strong>User B ID:</strong> <code className="bg-gray-200 px-2 py-1 rounded">86b9dca5-e9ed-4c54-8aff-99cb84c3f51c</code></p>
             <p><strong>Test ID:</strong> CP-F01-02D</p>
           </div>
         </div>
