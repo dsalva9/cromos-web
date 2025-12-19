@@ -18,7 +18,7 @@ import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 type TabType = 'users' | 'listings';
 
 function FavoritesContent() {
-  const [activeTab, setActiveTab] = useState<TabType>('users');
+  const [activeTab, setActiveTab] = useState<TabType>('listings');
   const { favorites: userFavorites, loading: usersLoading, refetch: refetchUsers } = useMyFavorites();
   const { favorites: listingFavorites, loading: listingsLoading, refetch: refetchListings } = useMyFavoriteListings();
   const { toggleFavorite } = useFavorites();
