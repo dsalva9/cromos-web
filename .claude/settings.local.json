@@ -90,7 +90,11 @@
       "Bash(if exist nul del /F nul)",
       "Bash(del nul)",
       "Bash(del /F \"C:\\Users\\dsalv\\Projects\\cromos-web\\src\\components\\auth\\PasswordResetGuard.tsx\")",
-      "mcp__playwright__browser_run_code"
+      "mcp__playwright__browser_run_code",
+      "Bash(while read file)",
+      "Bash(do grep -q \"dark:bg\" \"$file\")",
+      "Bash(echo:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

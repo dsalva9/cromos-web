@@ -105,7 +105,9 @@ export function TemplateBasicInfoForm({
 
       {/* Image */}
       <div className="space-y-2">
-        <Label>Imagen de la Plantilla</Label>
+        <Label>
+          Imagen de la Plantilla <span className="text-red-500">*</span>
+        </Label>
         {imagePreview ? (
           <div className="relative h-48 w-full">
             <Image
@@ -132,12 +134,13 @@ export function TemplateBasicInfoForm({
               <div className="mt-2">
                 <label htmlFor="image-upload" className="cursor-pointer">
                   <span className="text-[#FFC000] hover:text-[#FFD700]">
-                    Sube una imagen
+                    Sube una imagen o toma una foto
                   </span>
                   <input
                     id="image-upload"
                     type="file"
                     accept="image/*"
+                    capture="environment"
                     onChange={handleImageUpload}
                     className="sr-only"
                   />
@@ -148,6 +151,9 @@ export function TemplateBasicInfoForm({
               </div>
             </div>
           </div>
+        )}
+        {errors?.image_url && (
+          <p className="text-sm text-red-500">{errors.image_url}</p>
         )}
       </div>
 

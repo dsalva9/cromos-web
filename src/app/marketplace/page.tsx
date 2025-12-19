@@ -6,12 +6,11 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Filter } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Package } from 'lucide-react';
 
 export default function MarketplacePage() {
   const { user } = useUser();
@@ -93,12 +92,21 @@ export default function MarketplacePage() {
                     <span className="md:hidden">Hoy</span>
                   </div>
                 )}
+                {/* Mobile: Mis Anuncios in same row - icon only */}
+                {user && (
+                  <Link href="/marketplace/my-listings" className="md:hidden shrink-0">
+                    <div className="h-8 w-8 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center justify-center transition-colors cursor-pointer">
+                      <List className="h-4 w-4" />
+                    </div>
+                  </Link>
+                )}
               </div>
             </div>
 
             {user && (
               <div className="flex gap-2 md:gap-3 w-full md:w-auto shrink-0">
-                <Link href="/marketplace/my-listings" className="md:flex-none">
+                {/* Desktop: Mis Anuncios button */}
+                <Link href="/marketplace/my-listings" className="hidden md:block md:flex-none">
                   <Button
                     variant="outline"
                     className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 md:h-12 px-3 md:px-6 text-sm"
@@ -107,7 +115,7 @@ export default function MarketplacePage() {
                     <span className="hidden md:inline">Mis Anuncios</span>
                   </Button>
                 </Link>
-                <Link href="/marketplace/create" className="hidden md:block md:flex-none">
+                <Link href="/marketplace/create" className="flex-1 md:flex-none">
                   <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                     <Plus className="mr-1 md:mr-2 h-4 w-4" />
                     Publicar

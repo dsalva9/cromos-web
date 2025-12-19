@@ -3,6 +3,7 @@
 
 import { Check, X, Copy as CopyIcon, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
+import Link from 'next/link';
 
 interface TemplateCopy {
   copy_id: string;
@@ -11,6 +12,7 @@ interface TemplateCopy {
   is_active: boolean;
   copied_at: string;
   original_author_nickname: string;
+  original_author_id: string;
   completed_slots: number;
   total_slots: number;
 }
@@ -96,7 +98,15 @@ export function TemplateSummaryHeader({
               </div>
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                 <User className="w-4 h-4" />
-                <span className="text-sm">por {copy.original_author_nickname}</span>
+                <span className="text-sm">
+                  por{' '}
+                  <Link
+                    href={`/users/${copy.original_author_id}`}
+                    className="hover:text-[#FFC000] transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
+                  >
+                    {copy.original_author_nickname}
+                  </Link>
+                </span>
               </div>
             </div>
 

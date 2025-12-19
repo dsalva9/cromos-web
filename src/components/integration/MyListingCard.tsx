@@ -105,7 +105,8 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return listing.is_group ? 'Pack de cromos' : 'Cromo';
+        // Only show badge for packs, not individual listings
+        return listing.is_group ? 'Pack' : null;
       case 'sold':
         return 'Completado';
       case 'removed':
@@ -147,24 +148,27 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             <div className="flex items-start justify-between gap-4">
               <div>
                 <Link href={`/marketplace/${listing.listing_id}`}>
-                  <h3 className="font-bold text-gray-900 text-lg hover:text-[#FFC000] transition-colors">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-[#FFC000] transition-colors">
                     {listing.title}
                   </h3>
                 </Link>
                 {listing.collection_name && (
-                  <p className="text-sm text-gray-600">{listing.collection_name}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{listing.collection_name}</p>
                 )}
               </div>
 
-              <Badge className={`
-                ${listing.status === 'active' ? 'bg-green-500' : ''}
-                ${listing.status === 'sold' ? 'bg-gray-500' : ''}
-                ${listing.status === 'removed' ? 'bg-red-500' : ''}
-                ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
-                text-white uppercase flex-shrink-0
-              `}>
-                {getStatusLabel(listing.status)}
-              </Badge>
+              {getStatusLabel(listing.status) && (
+                <Badge className={`
+                  ${listing.status === 'active' && listing.is_group ? 'bg-blue-500' : ''}
+                  ${listing.status === 'sold' ? 'bg-gray-500' : ''}
+                  ${listing.status === 'removed' ? 'bg-red-500' : ''}
+                  ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
+                  ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
+                  text-white uppercase flex-shrink-0
+                `}>
+                  {getStatusLabel(listing.status)}
+                </Badge>
+              )}
             </div>
 
             {/* Alert if needs attention */}
@@ -191,7 +195,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             {/* Sync Info */}
             {listing.copy_id && (
               <div className="flex items-center gap-2 text-sm">
-                <Badge variant="outline" className="bg-blue-900/20 border-blue-700 text-blue-200">
+                <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-200">
                   Sincronizado con Colección
                 </Badge>
                 {listing.current_count !== null && (

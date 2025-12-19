@@ -10,6 +10,7 @@ interface TemplateCopy {
   is_active: boolean;
   copied_at: string;
   original_author_nickname: string;
+  original_author_id: string;
   completed_slots: number;
   total_slots: number;
 }

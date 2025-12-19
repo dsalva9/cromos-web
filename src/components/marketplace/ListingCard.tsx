@@ -161,12 +161,12 @@ export function ListingCard({ listing }: ListingCardProps) {
             </div>
           </Link>
 
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 z-10 relative">
             <UserLink
               userId={listing.user_id}
               nickname={listing.author_nickname}
               variant="default"
-              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
+              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors z-10"
               forceSpan={false}
             />
             <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">

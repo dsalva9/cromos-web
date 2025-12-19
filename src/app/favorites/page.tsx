@@ -244,63 +244,76 @@ function FavoritesContent() {
         {/* Anuncios Favoritos Section */}
         {activeTab === 'listings' && listingFavorites.length > 0 && (
           <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
               {listingFavorites.map((favorite) => (
-                <ModernCard key={favorite.listing_id}>
-                  <ModernCardContent className="p-0">
-                    <Link href={`/marketplace/${favorite.listing_id}`}>
+                <ModernCard key={favorite.listing_id} className="group relative h-full flex flex-col">
+                  <ModernCardContent className="p-0 h-full flex flex-col">
+                    <Link href={`/marketplace/${favorite.listing_id}`} className="flex-1 flex flex-col">
                       {/* Image */}
-                      <div className="relative aspect-square bg-gray-100">
+                      <div className="relative aspect-square bg-gray-100 dark:bg-gray-900">
                         {favorite.image_url ? (
                           <Image
                             src={favorite.image_url}
                             alt={favorite.title}
                             fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                            <div className="text-6xl font-black text-gray-300">
-                              {favorite.title.charAt(0).toUpperCase()}
-                            </div>
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-300 dark:text-gray-400 font-bold text-4xl md:text-6xl">
+                            {favorite.title.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+
+                        {/* Status Badge - only show for packs when active, or for sold/removed */}
+                        {(favorite.status !== 'active' || favorite.is_group) && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border ${
+                              favorite.status === 'active' && favorite.is_group
+                                ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700'
+                                : 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
+                            }`}>
+                              {favorite.status === 'active' && favorite.is_group ? 'Pack' : 'Vendido'}
+                            </span>
                           </div>
                         )}
                       </div>
 
                       {/* Content */}
-                      <div className="p-4 space-y-3">
-                        <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-1 hover:text-[#FFC000] transition-colors">
+                      <div className="p-3 flex flex-col flex-1 gap-2">
+                        <div className="min-h-[3rem]">
+                          <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-[#FFC000] transition-colors">
                             {favorite.title}
                           </h3>
                           {favorite.collection_name && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
                               {favorite.collection_name}
                             </p>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                          <span className="truncate">{favorite.author_nickname}</span>
-                          <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
-                            favorite.status === 'active' ? 'bg-green-500/20 text-green-600' : 'bg-gray-500/20 text-gray-600'
-                          }`}>
-                            {favorite.status === 'active' ? 'Activo' : 'Vendido'}
-                          </span>
+                        <div className="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
+                          <Link
+                            href={`/users/${favorite.author_id}`}
+                            className="text-xs text-gray-600 dark:text-gray-400 hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors truncate block z-10 relative"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {favorite.author_nickname}
+                          </Link>
                         </div>
                       </div>
                     </Link>
 
                     {/* Remove Button */}
-                    <div className="p-4 pt-0">
+                    <div className="p-3 pt-0">
                       <Button
+                        size="sm"
                         variant="outline"
                         onClick={() => handleRemoveListing(favorite.listing_id)}
-                        className="w-full text-red-500 hover:text-red-600"
+                        className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 text-xs"
                       >
-                        <Heart className="h-4 w-4 fill-current mr-2" />
-                        Eliminar de favoritos
+                        <Heart className="h-3 w-3 fill-current mr-1" />
+                        Quitar
                       </Button>
                     </div>
                   </ModernCardContent>

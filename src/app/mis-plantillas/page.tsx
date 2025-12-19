@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   LayoutGrid,
   Plus,
@@ -21,6 +22,7 @@ interface TemplateCopy {
   copy_id: string;
   template_id: string;
   title: string;
+  image_url?: string;
   is_active: boolean;
   copied_at: string;
   original_author_nickname: string;
@@ -165,6 +167,21 @@ function MyTemplatesContent() {
               return (
                 <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block h-full">
                   <div className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden hover:border-[#FFC000] transition-all duration-300 hover:shadow-xl hover:shadow-black/5 h-full flex flex-col">
+                    {/* Image */}
+                    {copy.image_url && (
+                      <div className="relative aspect-[16/9] bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                        <Image
+                          src={copy.image_url}
+                          alt={copy.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                        {/* Overlay gradient for better text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                      </div>
+                    )}
+
                     {/* Top Gradient Bar */}
                     <div className={`h-1.5 w-full ${isComplete ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-[#FFC000] to-[#FFD700]'}`} />
 
@@ -183,7 +200,16 @@ function MyTemplatesContent() {
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 font-medium">
                           <User className="w-3.5 h-3.5" />
-                          <span className="truncate">por {copy.original_author_nickname}</span>
+                          <span className="truncate">
+                            por{' '}
+                            <Link
+                              href={`/users/${copy.original_author_id}`}
+                              className="hover:text-[#FFC000] transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {copy.original_author_nickname}
+                            </Link>
+                          </span>
                         </p>
                       </div>
 

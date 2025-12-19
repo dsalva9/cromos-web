@@ -137,7 +137,7 @@ export function SimplifiedListingForm({
                 </button>
               </div>
               {isGroup && (
-                <p className="text-xs text-yellow-400 bg-yellow-900/20 p-2 rounded">
+                <p className="text-xs text-yellow-800 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 p-3 rounded-lg">
                   ℹ️ Estás creando un anuncio para múltiples cromos. Describe todos los cromos en la descripción.
                 </p>
               )}
@@ -242,12 +242,12 @@ export function SimplifiedListingForm({
                     shouldValidate: true,
                   })
                 }
-                className="mt-1"
+                className="mt-1 border-2 border-gray-400 dark:border-gray-300 data-[state=checked]:bg-[#FFC000] data-[state=checked]:border-[#FFC000]"
               />
               <div className="flex-1">
                 <Label
                   htmlFor="terms"
-                  className="text-sm text-gray-700 cursor-pointer"
+                  className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                 >
                   He leído y estoy de acuerdo con los{' '}
                   <button
