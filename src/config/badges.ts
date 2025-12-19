@@ -160,3 +160,20 @@ export function getBadgeTierColors(tier: BadgeTier) {
 export function getCategoryInfo(category: BadgeCategory) {
   return BADGE_CATEGORIES[category];
 }
+
+/**
+ * Tier display labels (football-themed)
+ */
+export const BADGE_TIER_LABELS: Record<BadgeTier, string> = {
+  bronze: 'CANTERA',
+  silver: 'TITULAR',
+  gold: 'ESTRELLA',
+  special: 'LEYENDA',
+};
+
+/**
+ * Get tier display label
+ */
+export function getTierLabel(tier: BadgeTier): string {
+  return BADGE_TIER_LABELS[tier];
+}
