@@ -92,13 +92,16 @@ export default function MarketplacePage() {
                     <span className="md:hidden">Hoy</span>
                   </div>
                 )}
-                {/* Mobile: Mis Anuncios in same row - icon only */}
+                {/* Mobile: Mis Anuncios aligned to right */}
                 {user && (
-                  <Link href="/marketplace/my-listings" className="md:hidden shrink-0">
-                    <div className="h-8 w-8 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center justify-center transition-colors cursor-pointer">
-                      <List className="h-4 w-4" />
-                    </div>
-                  </Link>
+                  <>
+                    <div className="flex-1 md:hidden" />
+                    <Link href="/marketplace/my-listings" className="md:hidden shrink-0">
+                      <div className="h-8 w-8 rounded-md bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center justify-center transition-colors cursor-pointer">
+                        <List className="h-4 w-4" />
+                      </div>
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

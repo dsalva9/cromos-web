@@ -5,7 +5,7 @@ import { useMyListings } from '@/hooks/integration/useMyListings';
 import { MyListingCard } from '@/components/integration/MyListingCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Plus, Package } from 'lucide-react';
+import { Plus, Package, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
@@ -37,6 +37,15 @@ function MyListingsContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
+        {/* Back Link */}
+        <Link
+          href="/marketplace"
+          className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Volver al Marketplace
+        </Link>
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
