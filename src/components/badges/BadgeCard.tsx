@@ -93,7 +93,7 @@ export function BadgeCard({
         <div className="flex-1 min-w-0">
           <h3
             className={cn(
-              'font-semibold',
+              'font-semibold truncate',
               styles.title,
               isEarned ? colors.text : 'text-gray-500'
             )}
