@@ -95,13 +95,13 @@ export function IgnoredUsersTab() {
 
   if (ignoredUsers.length === 0) {
     return (
-      <ModernCard className="bg-white dark:bg-gray-800/10 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+      <ModernCard className="bg-white dark:bg-gray-800/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700/20">
         <ModernCardContent className="p-16 text-center">
-          <Eye className="w-20 h-20 text-white/50 dark:text-white/50 mx-auto mb-6" />
-          <h2 className="text-2xl font-semibold text-white dark:text-white mb-4">
+          <Eye className="w-20 h-20 text-gray-400 dark:text-white/50 mx-auto mb-6" />
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
             No tienes usuarios bloqueados
           </h2>
-          <p className="text-white/80 dark:text-white/80 text-lg">
+          <p className="text-gray-600 dark:text-white/80 text-lg">
             Cuando bloquees a usuarios, aparecerán aquí para que puedas
             gestionarlos.
           </p>
