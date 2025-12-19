@@ -146,8 +146,8 @@ function ProfileContent() {
   // Loading and error states
   if (userLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-900 text-xl">Cargando perfil...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-900 dark:text-white text-xl">Cargando perfil...</div>
       </div>
     );
   }
@@ -159,8 +159,8 @@ function ProfileContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center space-y-4 text-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center space-y-4 text-gray-900 dark:text-white">
           <h1 className="text-2xl font-bold uppercase">Error</h1>
           <p>{error}</p>
           <Button
@@ -175,14 +175,14 @@ function ProfileContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-black uppercase text-gray-900 drop-shadow-lg mb-2">
+          <h1 className="text-4xl font-black uppercase text-gray-900 dark:text-white drop-shadow-lg mb-2">
             Mi Perfil
           </h1>
-          <p className="text-gray-600">Gestiona tu información y colecciones</p>
+          <p className="text-gray-600 dark:text-gray-400">Gestiona tu información y colecciones</p>
 
           {/* Quick Actions */}
           <div className="flex justify-center gap-4 mt-6">
@@ -190,7 +190,7 @@ function ProfileContent() {
               variant="outline"
               size="sm"
               onClick={() => router.push('/profile/ignored')}
-              className="border-2 border-black text-gray-900 bg-white hover:bg-[#FFC000] hover:text-gray-900"
+              className="border-2 border-black dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 hover:bg-[#FFC000] hover:text-gray-900"
             >
               <EyeOff className="w-4 h-4 mr-2" />
               Usuarios Ignorados
@@ -200,7 +200,7 @@ function ProfileContent() {
 
         {/* Profile Card */}
         <div className="mb-12">
-          <ModernCard className="bg-white border-2 border-black rounded-md shadow-xl overflow-hidden">
+          <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-700 rounded-md shadow-xl overflow-hidden">
             {/* Gradient Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
               <div className="flex items-center space-x-6">

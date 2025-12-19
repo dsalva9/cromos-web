@@ -59,7 +59,7 @@ export function ProfileBadges({
       <div className={cn('space-y-4', className)} id="badges">
         <div className="flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Insignias</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Insignias</h2>
         </div>
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -109,17 +109,17 @@ export function ProfileBadges({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold">Insignias</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Insignias</h2>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-1">
-            <Award className="w-4 h-4 text-green-600" />
-            <span className="font-semibold">{earnedBadges.length}</span>
+            <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
+            <span className="font-semibold text-gray-900 dark:text-white">{earnedBadges.length}</span>
             <span className="text-gray-500 dark:text-gray-400">ganadas</span>
           </div>
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4 text-blue-600" />
-            <span className="font-semibold">{unearnedBadges.length}</span>
+            <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="font-semibold text-gray-900 dark:text-white">{unearnedBadges.length}</span>
             <span className="text-gray-500 dark:text-gray-400">por ganar</span>
           </div>
         </div>
