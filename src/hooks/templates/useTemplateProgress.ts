@@ -7,6 +7,7 @@ interface TemplateCopy {
   copy_id: string;
   template_id: string;
   title: string;
+  image_url?: string | null;
   is_active: boolean;
   copied_at: string;
   original_author_nickname: string;

@@ -4,11 +4,13 @@
 import { Check, X, Copy as CopyIcon, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface TemplateCopy {
   copy_id: string;
   template_id: string;
   title: string;
+  image_url?: string | null;
   is_active: boolean;
   copied_at: string;
   original_author_nickname: string;
@@ -83,35 +85,51 @@ export function TemplateSummaryHeader({
       <div className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row gap-8 items-start justify-between">
 
-          {/* Left Column: Title & Info */}
-          <div className="flex-1 space-y-4 w-full">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white tracking-tight uppercase">
-                  {copy.title}
-                </h1>
-                {isComplete && (
-                  <div className="bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 p-2 rounded-full">
-                    <Trophy className="w-6 h-6" />
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                <User className="w-4 h-4" />
-                <span className="text-sm">
-                  por{' '}
-                  <Link
-                    href={`/users/${copy.original_author_id}`}
-                    className="hover:text-[#FFC000] transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
-                  >
-                    {copy.original_author_nickname}
-                  </Link>
-                </span>
+          {/* Left Column: Image, Title & Info */}
+          <div className="flex-1 w-full">
+            <div className="flex gap-4 md:gap-6 mb-4">
+              {/* Template Image */}
+              {copy.image_url && (
+                <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
+                  <Image
+                    src={copy.image_url}
+                    alt={copy.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 96px, 128px"
+                  />
+                </div>
+              )}
+
+              {/* Title & Author */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2 flex-wrap">
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-gray-900 dark:text-white tracking-tight uppercase break-words">
+                    {copy.title}
+                  </h1>
+                  {isComplete && (
+                    <div className="bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 p-2 rounded-full flex-shrink-0">
+                      <Trophy className="w-5 h-5 md:w-6 md:h-6" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                  <User className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm truncate">
+                    por{' '}
+                    <Link
+                      href={`/users/${copy.original_author_id}`}
+                      className="hover:text-[#FFC000] transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
+                    >
+                      {copy.original_author_nickname}
+                    </Link>
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Progress Bar */}
-            <div className="space-y-3 max-w-xl">
+            <div className="space-y-3 w-full max-w-xl">
               <div className="flex justify-between text-sm font-bold">
                 <span className="text-gray-500 dark:text-gray-400">Progreso General</span>
                 <span className={isComplete ? "text-green-600 dark:text-green-400" : "text-black dark:text-white"}>
