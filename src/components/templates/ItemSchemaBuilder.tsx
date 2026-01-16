@@ -118,7 +118,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Campos del Cromo</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Define qué información tendrá cada cromo de tu plantilla
+            Define qué información tendrá cada cromo de tu colección
           </p>
         </div>
         <Button
@@ -140,9 +140,8 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
             onDragStart={() => handleDragStart(index)}
             onDragOver={(e) => handleDragOver(e, index)}
             onDragEnd={handleDragEnd}
-            className={`bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 transition-opacity ${
-              draggedIndex === index ? 'opacity-50' : 'opacity-100'
-            }`}
+            className={`bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 transition-opacity ${draggedIndex === index ? 'opacity-50' : 'opacity-100'
+              }`}
           >
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
@@ -154,7 +153,12 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Tipo</p>
-                    <p className="text-gray-900 dark:text-white capitalize">{field.type}</p>
+                    <p className="text-gray-900 dark:text-white capitalize">
+                      {field.type === 'text' ? 'Texto' :
+                        field.type === 'number' ? 'Número' :
+                          field.type === 'checkbox' ? 'Casilla' :
+                            field.type === 'select' ? 'Selección' : field.type}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Requerido</p>

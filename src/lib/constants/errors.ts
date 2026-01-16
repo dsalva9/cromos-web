@@ -31,9 +31,9 @@ export const ERROR_MESSAGES = {
   LISTING_NOT_FOUND: 'El anuncio no existe o ha sido eliminado.',
 
   // Template Errors
-  TEMPLATE_CREATE_FAILED: 'Error al crear la plantilla. Inténtalo de nuevo.',
-  TEMPLATE_COPY_FAILED: 'Error al copiar la plantilla.',
-  TEMPLATE_NOT_FOUND: 'La plantilla no existe.',
+  TEMPLATE_CREATE_FAILED: 'Error al crear la colección. Inténtalo de nuevo.',
+  TEMPLATE_COPY_FAILED: 'Error al copiar la colección.',
+  TEMPLATE_NOT_FOUND: 'La colección no existe.',
   TEMPLATE_EMPTY_SLOTS: 'Debe añadir al menos un cromo a la página.',
 
   // Upload Errors
@@ -64,9 +64,9 @@ export const SUCCESS_MESSAGES = {
   LISTING_DELETED: 'Anuncio eliminado con éxito',
 
   // Templates
-  TEMPLATE_CREATED: '¡Plantilla creada con éxito!',
-  TEMPLATE_COPIED: '¡Plantilla copiada con éxito!',
-  TEMPLATE_UPDATED: '¡Plantilla actualizada con éxito!',
+  TEMPLATE_CREATED: '¡Colección creada con éxito!',
+  TEMPLATE_COPIED: '¡Colección copiada con éxito!',
+  TEMPLATE_UPDATED: '¡Colección actualizada con éxito!',
 
   // Progress
   PROGRESS_UPDATED: '¡Actualizado!',

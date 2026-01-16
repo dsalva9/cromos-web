@@ -55,8 +55,8 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
   },
   {
     kind: 'template_rated',
-    label: 'Valoración de plantilla',
-    description: 'Cuando alguien valora tu plantilla',
+    label: 'Valoración de colección',
+    description: 'Cuando alguien valora tu colección',
     category: 'community',
     priority: 'low',
   },
@@ -180,13 +180,13 @@ export const CATEGORY_INFO: Record<
     icon: 'ShoppingCart',
   },
   templates: {
-    label: 'Plantillas',
-    description: 'Notificaciones sobre tus plantillas',
+    label: 'Colecciones',
+    description: 'Notificaciones sobre tus colecciones',
     icon: 'FileText',
   },
   community: {
     label: 'Comunidad',
-    description: 'Valoraciones, insignias y plantillas',
+    description: 'Valoraciones, insignias y colecciones',
     icon: 'Users',
   },
   trades: {

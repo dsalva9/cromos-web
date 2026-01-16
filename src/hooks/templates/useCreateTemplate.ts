@@ -71,7 +71,7 @@ export function useCreateTemplate() {
 
       if (templateError) {
         logger.error('Template creation error:', templateError);
-        throw new Error(templateError.message || 'Error al crear la plantilla');
+        throw new Error(templateError.message || 'Error al crear la colección');
       }
 
       const templateId = template;
@@ -143,7 +143,7 @@ export function useCreateTemplate() {
       if (publishError) {
         logger.error('Publish error:', publishError);
         throw new Error(
-          publishError.message || 'Error al publicar la plantilla'
+          publishError.message || 'Error al publicar la colección'
         );
       }
 
@@ -158,14 +158,14 @@ export function useCreateTemplate() {
         // We don't throw here to avoid failing the whole creation process if just the copy fails
       }
 
-      toast.success('¡Plantilla creada con éxito!');
+      toast.success('¡Colección creada con éxito!');
 
       return templateId;
     } catch (err) {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : 'Error desconocido al crear la plantilla';
+          : 'Error desconocido al crear la colección';
       setError(errorMessage);
       toast.error(errorMessage);
       throw err;

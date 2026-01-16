@@ -66,8 +66,8 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
         body: needsConfirmation
           ? `${actorName} ha marcado "${notification.listingTitle || 'el artículo'}" como completado. Confirma que todo está correcto.`
           : isSellerCompleted
-          ? `La transacción de "${notification.listingTitle || 'tu artículo'}" se ha completado`
-          : `Tu compra de "${notification.listingTitle || 'el artículo'}" se ha completado`,
+            ? `La transacción de "${notification.listingTitle || 'tu artículo'}" se ha completado`
+            : `Tu compra de "${notification.listingTitle || 'el artículo'}" se ha completado`,
         href: notification.listingId ? `/marketplace/${notification.listingId}` : null,
       };
 
@@ -84,8 +84,8 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
       const templateRating = notification.payload?.rating_value || 0;
       const templateStars = '⭐'.repeat(Math.floor(templateRating as number));
       return {
-        title: 'Valoración de plantilla',
-        body: `${actorName} ha valorado tu plantilla "${notification.templateName || 'una plantilla'}" con ${templateStars} (${templateRating}/5)`,
+        title: 'Valoración de colección',
+        body: `${actorName} ha valorado tu colección "${notification.templateName || 'una colección'}" con ${templateStars} (${templateRating}/5)`,
         href: notification.templateId ? `/templates/${notification.templateId}` : null,
       };
 

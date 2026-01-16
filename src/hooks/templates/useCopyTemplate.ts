@@ -21,9 +21,9 @@ export function useCopyTemplate() {
         const code = (error as { code?: string; message?: string }).code;
         const message = (error as { code?: string; message?: string }).message || '';
         if (code === '23505' || message.toLowerCase().includes('duplicate')) {
-          throw new Error('Ya has copiado esta plantilla.');
+          throw new Error('Ya has copiado esta colección.');
         }
-        throw new Error(message || 'Error al copiar la plantilla.');
+        throw new Error(message || 'Error al copiar la colección.');
       }
 
       if (!data) {

@@ -99,7 +99,7 @@ function NotificationsCenterContent() {
 
   const categoryLabels = {
     marketplace: 'Marketplace',
-    templates: 'Plantillas',
+    templates: 'Colecciones',
     community: 'Comunidad',
     trades: 'Intercambios',
     system: 'Sistema',
@@ -120,18 +120,18 @@ function NotificationsCenterContent() {
               </p>
             </div>
 
-          {unreadCount > 0 && (
-            <Button
-              onClick={handleMarkAllAsRead}
-              variant="outline"
-              className="gap-2 w-full sm:w-auto shrink-0"
-            >
-              <CheckCheck className="h-4 w-4" />
-              Marcar todas como leídas
-            </Button>
-          )}
+            {unreadCount > 0 && (
+              <Button
+                onClick={handleMarkAllAsRead}
+                variant="outline"
+                className="gap-2 w-full sm:w-auto shrink-0"
+              >
+                <CheckCheck className="h-4 w-4" />
+                Marcar todas como leídas
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
 
         {/* Error Display */}
         {error && (
@@ -140,116 +140,116 @@ function NotificationsCenterContent() {
           </div>
         )}
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'unread' | 'history')}>
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="unread" className="gap-2">
-            <Bell className="h-4 w-4" />
-            Nuevas
-            {unreadCount > 0 && (
-              <span className="ml-1 px-2 py-0.5 bg-[#FFC000] text-black text-xs rounded-full font-bold">
-                {unreadCount}
-              </span>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'unread' | 'history')}>
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="unread" className="gap-2">
+              <Bell className="h-4 w-4" />
+              Nuevas
+              {unreadCount > 0 && (
+                <span className="ml-1 px-2 py-0.5 bg-[#FFC000] text-black text-xs rounded-full font-bold">
+                  {unreadCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2">
+              <Inbox className="h-4 w-4" />
+              Historial
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Unread Tab */}
+          <TabsContent value="unread" className="space-y-6">
+            {loading && (
+              <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+                Cargando notificaciones...
+              </div>
             )}
-          </TabsTrigger>
-          <TabsTrigger value="history" className="gap-2">
-            <Inbox className="h-4 w-4" />
-            Historial
-          </TabsTrigger>
-        </TabsList>
 
-        {/* Unread Tab */}
-        <TabsContent value="unread" className="space-y-6">
-          {loading && (
-            <div className="text-center py-12 text-gray-600 dark:text-gray-400">
-              Cargando notificaciones...
-            </div>
-          )}
+            {!loading && unreadNotifications.length === 0 && (
+              <div className="text-center py-12">
+                <Bell className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  No hay notificaciones nuevas
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Estás al día con todas tus actividades
+                </p>
+              </div>
+            )}
 
-          {!loading && unreadNotifications.length === 0 && (
-            <div className="text-center py-12">
-              <Bell className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                No hay notificaciones nuevas
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Estás al día con todas tus actividades
-              </p>
-            </div>
-          )}
+            {!loading && unreadNotifications.length > 0 && (
+              <>
+                {Object.entries(categorizedNotifications).map(([category, notifications]) => {
+                  if (notifications.length === 0) return null;
 
-          {!loading && unreadNotifications.length > 0 && (
-            <>
-              {Object.entries(categorizedNotifications).map(([category, notifications]) => {
-                if (notifications.length === 0) return null;
-
-                return (
-                  <div key={category}>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                      {categoryLabels[category as keyof typeof categoryLabels]}
-                    </h2>
-                    <div className="space-y-2">
-                      {notifications.map((notification) => (
-                        <NotificationCard
-                          key={notification.id}
-                          notification={notification}
-                          onMarkAsRead={handleMarkAsRead}
-                          onOpenRatingModal={handleOpenRatingModal}
-                        />
-                      ))}
+                  return (
+                    <div key={category}>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                        {categoryLabels[category as keyof typeof categoryLabels]}
+                      </h2>
+                      <div className="space-y-2">
+                        {notifications.map((notification) => (
+                          <NotificationCard
+                            key={notification.id}
+                            notification={notification}
+                            onMarkAsRead={handleMarkAsRead}
+                            onOpenRatingModal={handleOpenRatingModal}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </>
-          )}
-        </TabsContent>
+                  );
+                })}
+              </>
+            )}
+          </TabsContent>
 
-        {/* History Tab */}
-        <TabsContent value="history" className="space-y-6">
-          {loading && (
-            <div className="text-center py-12 text-gray-600 dark:text-gray-400">
-              Cargando historial...
-            </div>
-          )}
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            {loading && (
+              <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+                Cargando historial...
+              </div>
+            )}
 
-          {!loading && readNotifications.length === 0 && (
-            <div className="text-center py-12">
-              <Inbox className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                No hay notificaciones leídas
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                El historial aparecerá aquí cuando marques notificaciones como leídas
-              </p>
-            </div>
-          )}
+            {!loading && readNotifications.length === 0 && (
+              <div className="text-center py-12">
+                <Inbox className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  No hay notificaciones leídas
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  El historial aparecerá aquí cuando marques notificaciones como leídas
+                </p>
+              </div>
+            )}
 
-          {!loading && readNotifications.length > 0 && (
-            <>
-              {Object.entries(categorizedNotifications).map(([category, notifications]) => {
-                if (notifications.length === 0) return null;
+            {!loading && readNotifications.length > 0 && (
+              <>
+                {Object.entries(categorizedNotifications).map(([category, notifications]) => {
+                  if (notifications.length === 0) return null;
 
-                return (
-                  <div key={category}>
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                      {categoryLabels[category as keyof typeof categoryLabels]}
-                    </h2>
-                    <div className="space-y-2">
-                      {notifications.map((notification) => (
-                        <NotificationCard
-                          key={notification.id}
-                          notification={notification}
-                          onOpenRatingModal={handleOpenRatingModal}
-                        />
-                      ))}
+                  return (
+                    <div key={category}>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
+                        {categoryLabels[category as keyof typeof categoryLabels]}
+                      </h2>
+                      <div className="space-y-2">
+                        {notifications.map((notification) => (
+                          <NotificationCard
+                            key={notification.id}
+                            notification={notification}
+                            onOpenRatingModal={handleOpenRatingModal}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </>
-          )}
-        </TabsContent>
+                  );
+                })}
+              </>
+            )}
+          </TabsContent>
         </Tabs>
 
         {/* Rating Modal */}

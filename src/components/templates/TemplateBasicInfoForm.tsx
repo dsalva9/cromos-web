@@ -6,9 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Upload, Camera, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import type { TemplateBasicInfoData } from '@/lib/validations/template.schemas';
+import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
 
 interface TemplateBasicInfoFormProps {
   data: {
@@ -36,6 +37,12 @@ export function TemplateBasicInfoForm({
   const [imagePreview, setImagePreview] = useState<string | null>(
     data.image_url || null
   );
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [supportsCamera] = useState(() =>
+    typeof navigator !== 'undefined' &&
+    'mediaDevices' in navigator &&
+    'getUserMedia' in navigator.mediaDevices
+  );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -50,119 +57,149 @@ export function TemplateBasicInfoForm({
     }
   };
 
+  const handleCameraCapture = (blob: Blob) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      setImagePreview(result);
+      onChange({ image_url: result });
+    };
+    reader.readAsDataURL(blob);
+  };
+
   const handleRemoveImage = () => {
     setImagePreview(null);
     onChange({ image_url: '' });
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title */}
-      <div className="space-y-2">
-        <Label htmlFor="title">Título de la Plantilla *</Label>
-        <Input
-          id="title"
-          aria-invalid={!!errors?.title}
-          aria-describedby={errors?.title ? 'template-title-error' : undefined}
-          value={data.title}
-          onChange={e => onChange({ title: e.target.value })}
-          placeholder="Ej: Álbum Cromos Euro 2024"
-          className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white ${
-            errors?.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
-          }`}
-          required
-        />
-        {errors?.title && (
-          <p id="template-title-error" className="text-sm text-red-500">
-            {errors.title}
-          </p>
-        )}
-      </div>
+    <>
+      <div className="space-y-6">
+        {/* Title */}
+        <div className="space-y-2">
+          <Label htmlFor="title">Título de la Colección *</Label>
+          <Input
+            id="title"
+            aria-invalid={!!errors?.title}
+            aria-describedby={errors?.title ? 'template-title-error' : undefined}
+            value={data.title}
+            onChange={e => onChange({ title: e.target.value })}
+            placeholder="Ej: Álbum Cromos Euro 2024"
+            className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white ${errors?.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+              }`}
+            required
+          />
+          {errors?.title && (
+            <p id="template-title-error" className="text-sm text-red-500">
+              {errors.title}
+            </p>
+          )}
+        </div>
 
-      {/* Description */}
-      <div className="space-y-2">
-        <Label htmlFor="description">Descripción</Label>
-        <Textarea
-          id="description"
-          aria-invalid={!!errors?.description}
-          aria-describedby={
-            errors?.description ? 'template-description-error' : undefined
-          }
-          value={data.description}
-          onChange={e => onChange({ description: e.target.value })}
-          placeholder="Describe tu plantilla..."
-          rows={4}
-          className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white resize-none ${
-            errors?.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
-          }`}
-        />
-        {errors?.description && (
-          <p id="template-description-error" className="text-sm text-red-500">
-            {errors.description}
-          </p>
-        )}
-      </div>
+        {/* Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description">Descripción</Label>
+          <Textarea
+            id="description"
+            aria-invalid={!!errors?.description}
+            aria-describedby={
+              errors?.description ? 'template-description-error' : undefined
+            }
+            value={data.description}
+            onChange={e => onChange({ description: e.target.value })}
+            placeholder="Describe tu colección..."
+            rows={4}
+            className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white resize-none ${errors?.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
+              }`}
+          />
+          {errors?.description && (
+            <p id="template-description-error" className="text-sm text-red-500">
+              {errors.description}
+            </p>
+          )}
+        </div>
 
-      {/* Image */}
-      <div className="space-y-2">
-        <Label>
-          Imagen de la Plantilla <span className="text-red-500">*</span>
-        </Label>
-        {imagePreview ? (
-          <div className="relative h-48 w-full">
-            <Image
-              src={imagePreview}
-              alt="Template preview"
-              fill
-              sizes="(max-width: 768px) 100vw, 600px"
-              className="object-cover rounded-md"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleRemoveImage}
-              className="absolute top-2 right-2 bg-red-500 border-red-500 text-white hover:bg-red-600"
-            >
-              Eliminar
-            </Button>
-          </div>
-        ) : (
-          <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-md p-6">
-            <div className="text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-600 dark:text-gray-400" />
-              <div className="mt-2">
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <span className="text-[#FFC000] hover:text-[#FFD700]">
-                    Sube una imagen o toma una foto
-                  </span>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleImageUpload}
-                    className="sr-only"
-                  />
-                </label>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  PNG, JPG, GIF hasta 10MB
-                </p>
+        {/* Image */}
+        <div className="space-y-2">
+          <Label>
+            Imagen de la Colección <span className="text-red-500">*</span>
+          </Label>
+          {imagePreview ? (
+            <div className="relative h-48 w-full">
+              <Image
+                src={imagePreview}
+                alt="Template preview"
+                fill
+                sizes="(max-width: 768px) 100vw, 600px"
+                className="object-cover rounded-md"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleRemoveImage}
+                className="absolute top-2 right-2 bg-red-500 border-red-500 text-white hover:bg-red-600"
+              >
+                Eliminar
+              </Button>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-md p-6">
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                  <ImageIcon className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+                </div>
+                <div className="text-center">
+                  <p className="text-gray-900 dark:text-white font-bold mb-2">Añadir Imagen</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                    Sube una foto de tu colección
+                  </p>
+                  <div className="flex gap-2 justify-center">
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <Button
+                        type="button"
+                        className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Elegir
+                      </Button>
+                    </div>
+                    {supportsCamera && (
+                      <Button
+                        type="button"
+                        onClick={() => setCameraOpen(true)}
+                        variant="outline"
+                        className="border-2 border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black"
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        Cámara
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
+                    JPG, PNG o WebP (máx. 5MB)
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {errors?.image_url && (
-          <p className="text-sm text-red-500">{errors.image_url}</p>
-        )}
-      </div>
+          )}
+          {errors?.image_url && (
+            <p className="text-sm text-red-500">{errors.image_url}</p>
+          )}
+        </div>
 
-      {/* Public/Private */}
-      <div className="flex items-center justify-between">
+        {/* Public/Private */}
+        <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="is-public" className="text-gray-900 dark:text-white">Hacer privada</Label>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Si activas esta opción, otros usuarios no podrán ver ni copiar esta plantilla
+              Si activas esta opción, otros usuarios no podrán ver ni copiar esta colección
             </p>
           </div>
           <Switch
@@ -170,7 +207,15 @@ export function TemplateBasicInfoForm({
             checked={!data.is_public}
             onCheckedChange={(checked) => onChange({ is_public: !checked })}
           />
+        </div>
       </div>
-    </div>
+
+      <CameraCaptureModal
+        open={cameraOpen}
+        onClose={() => setCameraOpen(false)}
+        onCapture={handleCameraCapture}
+      />
+    </>
   );
 }
+

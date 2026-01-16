@@ -70,7 +70,7 @@ export function useTemplates({
           setHasMore(false);
           // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
           setError(
-            rpcError.message || 'Error al cargar las plantillas. Por favor, intenta de nuevo.'
+            rpcError.message || 'Error al cargar las colecciones. Por favor, intenta de nuevo.'
           );
           return;
         }

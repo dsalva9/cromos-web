@@ -21,7 +21,7 @@ export function useTemplateEditor(templateId: string) {
   const updateMetadata = useCallback(
     async (metadata: Partial<TemplateMetadata>) => {
       if (!user) {
-        throw new Error('Debes iniciar sesión para editar plantillas');
+        throw new Error('Debes iniciar sesión para editar colecciones');
       }
 
       setLoading(true);
@@ -36,14 +36,14 @@ export function useTemplateEditor(templateId: string) {
 
         if (error) {
           if (error.message.includes('do not have permission')) {
-            throw new Error('No tienes permiso para editar esta plantilla');
+            throw new Error('No tienes permiso para editar esta colección');
           }
           throw error;
         }
 
         setHasUnsavedChanges(false);
       } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al actualizar plantilla');
+        throw err instanceof Error ? err : new Error('Error al actualizar colección');
       } finally {
         setLoading(false);
       }
@@ -228,7 +228,7 @@ export function useTemplateEditor(templateId: string) {
   const deleteTemplate = useCallback(
     async (reason?: string) => {
       if (!user) {
-        throw new Error('Debes iniciar sesión para eliminar plantillas');
+        throw new Error('Debes iniciar sesión para eliminar colecciones');
       }
 
       setLoading(true);
@@ -240,12 +240,12 @@ export function useTemplateEditor(templateId: string) {
 
         if (error) {
           if (error.message.includes('do not have permission')) {
-            throw new Error('No tienes permiso para eliminar esta plantilla');
+            throw new Error('No tienes permiso para eliminar esta colección');
           }
           throw error;
         }
       } catch (err) {
-        throw err instanceof Error ? err : new Error('Error al eliminar plantilla');
+        throw err instanceof Error ? err : new Error('Error al eliminar colección');
       } finally {
         setLoading(false);
       }

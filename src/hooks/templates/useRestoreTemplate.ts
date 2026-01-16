@@ -37,7 +37,7 @@ export function useRestoreTemplate() {
       }
 
       // Show success toast
-      toast.success('¡Plantilla restaurada correctamente! Ahora está activa de nuevo.');
+      toast.success('¡Colección restaurada correctamente! Ahora está activa de nuevo.');
 
       return result;
     } catch (error) {
@@ -46,15 +46,15 @@ export function useRestoreTemplate() {
         console.error('Restore template error:', error);
 
         if (error.message.includes('Permission denied')) {
-          toast.error('No tienes permiso para restaurar esta plantilla');
+          toast.error('No tienes permiso para restaurar esta colección');
         } else if (error.message.includes('not deleted')) {
-          toast.error('Esta plantilla no está eliminada');
+          toast.error('Esta colección no está eliminada');
         } else if (error.message.includes('not found')) {
-          toast.error('La plantilla no fue encontrada');
+          toast.error('La colección no fue encontrada');
         } else if (error.message.includes('not authenticated')) {
-          toast.error('Debes estar autenticado para restaurar una plantilla');
+          toast.error('Debes estar autenticado para restaurar una colección');
         } else {
-          toast.error('Error al restaurar la plantilla. Por favor, inténtalo de nuevo.');
+          toast.error('Error al restaurar la colección. Por favor, inténtalo de nuevo.');
         }
       }
 

@@ -37,7 +37,7 @@ export function useTemplateProgress(copyId: string) {
         // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
         logger.error('RPC Error fetching template copies:', copyError);
         setError(
-          copyError.message || 'Error al cargar las copias de plantillas. Por favor, intenta de nuevo.'
+          copyError.message || 'Error al cargar las copias de colecciones. Por favor, intenta de nuevo.'
         );
         return;
       }
@@ -45,7 +45,7 @@ export function useTemplateProgress(copyId: string) {
       const currentCopy = copyData?.find(
         (c: { copy_id: number | string }) => c.copy_id === parseInt(copyId)
       );
-      if (!currentCopy) throw new Error('Copia de plantilla no encontrada');
+      if (!currentCopy) throw new Error('Copia de colección no encontrada');
 
       setCopy(currentCopy);
 
@@ -73,7 +73,7 @@ export function useTemplateProgress(copyId: string) {
         // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
         logger.error('RPC Error fetching template progress:', progressError);
         setError(
-          progressError.message || 'Error al cargar el progreso de la plantilla. Por favor, intenta de nuevo.'
+          progressError.message || 'Error al cargar el progreso de la colección. Por favor, intenta de nuevo.'
         );
         return;
       }
@@ -132,10 +132,10 @@ export function useTemplateProgress(copyId: string) {
           prev.map(slot =>
             slot.slot_id === slotId
               ? {
-                  ...slot,
-                  status: status as 'missing' | 'owned' | 'duplicate',
-                  count,
-                }
+                ...slot,
+                status: status as 'missing' | 'owned' | 'duplicate',
+                count,
+              }
               : slot
           )
         );
@@ -148,10 +148,10 @@ export function useTemplateProgress(copyId: string) {
           const updatedProgress = progress.map(slot =>
             slot.slot_id === slotId
               ? {
-                  ...slot,
-                  status: status as 'missing' | 'owned' | 'duplicate',
-                  count,
-                }
+                ...slot,
+                status: status as 'missing' | 'owned' | 'duplicate',
+                count,
+              }
               : slot
           );
 

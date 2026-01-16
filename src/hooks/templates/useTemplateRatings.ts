@@ -172,7 +172,7 @@ export function useTemplateRatings(templateId: string) {
         const parsedTemplateId = parseInt(templateId);
         if (isNaN(parsedTemplateId)) {
           console.error('Invalid template ID:', templateId);
-          throw new Error(`ID de plantilla inválido: "${templateId}"`);
+          throw new Error(`ID de colección inválido: "${templateId}"`);
         }
 
         // Validate rating
@@ -202,10 +202,10 @@ export function useTemplateRatings(templateId: string) {
         if (rateError) {
           console.error('Rating creation error:', rateError);
           if (rateError.message.includes('cannot rate their own')) {
-            throw new Error('No puedes valorar tus propias plantillas');
+            throw new Error('No puedes valorar tus propias colecciones');
           }
           if (rateError.message.includes('violates unique constraint')) {
-            throw new Error('Ya has valorado esta plantilla. Edita tu valoración existente.');
+            throw new Error('Ya has valorado esta colección. Edita tu valoración existente.');
           }
           throw rateError;
         }

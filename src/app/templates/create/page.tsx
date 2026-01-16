@@ -61,7 +61,7 @@ export default function CreateTemplatePage() {
               </Button>
             </Link>
             <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 dark:text-white">
-              Crear Plantilla
+              Crear Colección
             </h1>
           </div>
 

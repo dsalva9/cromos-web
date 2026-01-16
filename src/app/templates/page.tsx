@@ -31,10 +31,10 @@ export default function TemplatesPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 dark:text-white mb-2">
-              Plantillas Comunitarias
+              Colecciones Comunitarias
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Descubre y copia plantillas de colección creadas por la comunidad
+              Descubre y copia colecciones creadas por la comunidad
             </p>
           </div>
 
@@ -43,13 +43,13 @@ export default function TemplatesPage() {
               <Link href="/templates/my-templates" className="w-full sm:w-auto">
                 <Button variant="outline" className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black font-medium w-full">
                   <FolderOpen className="mr-2 h-4 w-4" />
-                  Mis Plantillas
+                  Mis Colecciones
                 </Button>
               </Link>
               <Link href="/templates/create" className="hidden md:block w-full sm:w-auto">
                 <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium w-full">
                   <Plus className="mr-2 h-4 w-4" />
-                  Crear Plantilla
+                  Crear Colección
                 </Button>
               </Link>
             </div>
@@ -67,7 +67,7 @@ export default function TemplatesPage() {
         {/* Error State */}
         {error && (
           <div className="text-red-500 text-center py-8">
-            Error al cargar plantillas: {error}
+            Error al cargar colecciones: {error}
           </div>
         )}
 
@@ -115,13 +115,13 @@ export default function TemplatesPage() {
         {!loading && templates.length === 0 && (
           <EmptyState
             icon={FolderOpen}
-            title="No se encontraron plantillas"
+            title="No se encontraron colecciones"
             description={
               searchQuery
-                ? 'No hay plantillas que coincidan con tu búsqueda. Intenta con otros términos o crea una nueva plantilla.'
-                : 'Todavía no hay plantillas comunitarias. ¡Sé el primero en crear una!'
+                ? 'No hay colecciones que coincidan con tu búsqueda. Intenta con otros términos o crea una nueva colección.'
+                : 'Todavía no hay colecciones comunitarias. ¡Sé el primero en crear una!'
             }
-            actionLabel={user ? 'Crear la primera plantilla' : undefined}
+            actionLabel={user ? 'Crear la primera colección' : undefined}
             actionHref={user ? '/templates/create' : undefined}
           />
         )}
