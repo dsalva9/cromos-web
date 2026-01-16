@@ -51,19 +51,19 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
 
   const handleProtectedClick =
     (href: string, requiresCompletion = false) =>
-    (event: MouseEvent<HTMLAnchorElement>) => {
-      if (requiresCompletion && (!isComplete || completionLoading)) {
-        event.preventDefault();
-        toast.info(
-          'Necesitas completar tu perfil para empezar a cambiar cromos!'
-        );
-        handleSetIsOpen(false);
-        router.push('/profile/completar');
-        return;
-      }
+      (event: MouseEvent<HTMLAnchorElement>) => {
+        if (requiresCompletion && (!isComplete || completionLoading)) {
+          event.preventDefault();
+          toast.info(
+            'Necesitas completar tu perfil para empezar a cambiar cromos!'
+          );
+          handleSetIsOpen(false);
+          router.push('/profile/completar');
+          return;
+        }
 
-      handleSetIsOpen(false);
-    };
+        handleSetIsOpen(false);
+      };
 
   if (!user || loading) {
     return null;
@@ -158,7 +158,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <LayoutTemplate className="h-4 w-4" />
-                <span>Plantillas</span>
+                <span>Colecciones</span>
               </Link>
 
               <Link

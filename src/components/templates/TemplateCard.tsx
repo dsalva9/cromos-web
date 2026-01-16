@@ -61,13 +61,13 @@ export function TemplateCard({
     try {
       const copyId = await copyTemplate(template.id);
       setCopied(true);
-      toast.success('¡Plantilla copiada con Éxito!');
+      toast.success('¡Colección copiada con Éxito!');
       setTimeout(() => {
         router.push(`/mis-plantillas/${copyId}`);
       }, 1000);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Error al copiar plantilla'
+        error instanceof Error ? error.message : 'Error al copiar colección'
       );
     }
   };
@@ -75,13 +75,13 @@ export function TemplateCard({
   return (
     <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
       <ModernCardContent className="p-0 flex flex-col h-full">
-          {/* Image */}
-          <Link
-            href={`/templates/${template.id}`}
-            aria-label={`Ver plantilla: ${template.title}`}
-            className="block"
-          >
-            <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800 cursor-pointer">
+        {/* Image */}
+        <Link
+          href={`/templates/${template.id}`}
+          aria-label={`Ver plantilla: ${template.title}`}
+          className="block"
+        >
+          <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800 cursor-pointer">
             {template.image_url ? (
               <Image
                 src={template.image_url}
@@ -109,11 +109,10 @@ export function TemplateCard({
               {/* Visibility Badge */}
               {showVisibility && template.is_public !== undefined && (
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
-                    template.is_public
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${template.is_public
                       ? 'bg-green-500/90 text-white'
                       : 'bg-slate-700/90 text-slate-300'
-                  }`}
+                    }`}
                 >
                   {template.is_public ? (
                     <>
@@ -129,117 +128,117 @@ export function TemplateCard({
                 </div>
               )}
             </div>
+          </div>
+        </Link>
+
+        {/* Content */}
+        <div className="p-4 flex flex-col h-full">
+          <div className="flex-grow space-y-3">
+            <Link
+              href={`/templates/${template.id}`}
+              className="block hover:text-[#FFC000] transition-colors"
+            >
+              <h3 className="font-bold text-white text-lg line-clamp-2">
+                {template.title}
+              </h3>
+            </Link>
+
+            {template.description && (
+              <p className="text-sm text-slate-400 line-clamp-2">
+                {template.description}
+              </p>
+            )}
+
+            {/* Deletion Countdown */}
+            {template.deleted_at && template.scheduled_for && (
+              <Alert className="bg-yellow-900/20 border-yellow-700 p-2">
+                <DeletionCountdown
+                  deletedAt={template.deleted_at}
+                  scheduledFor={template.scheduled_for}
+                  entityType="template"
+                  className="text-xs"
+                />
+              </Alert>
+            )}
+
+            <div className="flex items-center gap-4 text-sm text-slate-400">
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                <span className="font-bold text-white">
+                  {template.rating_avg.toFixed(1)}
+                </span>
+                <span>({template.rating_count})</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Copy className="h-4 w-4" />
+                <span>{template.copies_count}</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <FileText className="h-4 w-4" />
+                <span>
+                  {template.pages_count} páginas - {template.total_slots}{' '}
+                  cromos
+                </span>
+              </div>
             </div>
-          </Link>
 
-          {/* Content */}
-          <div className="p-4 flex flex-col h-full">
-            <div className="flex-grow space-y-3">
-              <Link
-                href={`/templates/${template.id}`}
-                className="block hover:text-[#FFC000] transition-colors"
-              >
-                <h3 className="font-bold text-white text-lg line-clamp-2">
-                  {template.title}
-                </h3>
-              </Link>
-
-              {template.description && (
-                <p className="text-sm text-slate-400 line-clamp-2">
-                  {template.description}
-                </p>
-              )}
-
-              {/* Deletion Countdown */}
-              {template.deleted_at && template.scheduled_for && (
-                <Alert className="bg-yellow-900/20 border-yellow-700 p-2">
-                  <DeletionCountdown
-                    deletedAt={template.deleted_at}
-                    scheduledFor={template.scheduled_for}
-                    entityType="template"
-                    className="text-xs"
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
+                  <User className="h-3 w-3 text-slate-400" />
+                </div>
+                <span className="line-clamp-1">
+                  por{' '}
+                  <UserLink
+                    userId={template.author_id}
+                    nickname={template.author_nickname}
+                    variant="subtle"
+                    forceSpan={true}
                   />
-                </Alert>
-              )}
-
-              <div className="flex items-center gap-4 text-sm text-slate-400">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
-                  <span className="font-bold text-white">
-                    {template.rating_avg.toFixed(1)}
-                  </span>
-                  <span>({template.rating_count})</span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <Copy className="h-4 w-4" />
-                  <span>{template.copies_count}</span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <FileText className="h-4 w-4" />
-                  <span>
-                    {template.pages_count} páginas - {template.total_slots}{' '}
-                    cromos
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center p-1">
-                    <User className="h-3 w-3 text-slate-400" />
-                  </div>
-                  <span className="line-clamp-1">
-                    por{' '}
-                    <UserLink
-                      userId={template.author_id}
-                      nickname={template.author_nickname}
-                      variant="subtle"
-                      forceSpan={true}
-                    />
-                  </span>
-                </div>
+                </span>
               </div>
             </div>
+          </div>
 
-            {showEditButton ? (
-              <Link
-                href={`/templates/${template.id}/edit`}
-                className="w-full mt-3 block"
-              >
-                <Button
-                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
-                  size="sm"
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Editar Plantilla
-                </Button>
-              </Link>
-            ) : (
+          {showEditButton ? (
+            <Link
+              href={`/templates/${template.id}/edit`}
+              className="w-full mt-3 block"
+            >
               <Button
-                onClick={handleCopy}
-                disabled={loading || copied}
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
                 size="sm"
               >
-                {copied ? (
-                  <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    ¡Copiada!
-                  </>
-                ) : loading ? (
-                  'Copiando...'
-                ) : (
-                  <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copiar Plantilla
-                  </>
-                )}
+                <Edit className="mr-2 h-4 w-4" />
+                Editar Colección
               </Button>
-            )}
-          </div>
-        </ModernCardContent>
-      </ModernCard>
+            </Link>
+          ) : (
+            <Button
+              onClick={handleCopy}
+              disabled={loading || copied}
+              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+              size="sm"
+            >
+              {copied ? (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  ¡Copiada!
+                </>
+              ) : loading ? (
+                'Copiando...'
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copiar Colección
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </ModernCardContent>
+    </ModernCard>
   );
 }

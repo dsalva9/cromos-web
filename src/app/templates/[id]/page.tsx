@@ -96,13 +96,13 @@ export default function TemplateDetailsPage() {
     try {
       const copyId = await copyTemplate(templateId);
       setCopied(true);
-      toast.success('¡Plantilla copiada con éxito!');
+      toast.success('¡Colección copiada con éxito!');
       setTimeout(() => {
         router.push(`/mis-plantillas/${copyId}`);
       }, 1000);
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : 'Error al copiar plantilla'
+        err instanceof Error ? err.message : 'Error al copiar colección'
       );
     }
   };
@@ -138,11 +138,11 @@ export default function TemplateDetailsPage() {
     setDeleting(true);
     try {
       await deleteTemplate(deleteReason || undefined);
-      toast.success('Plantilla eliminada con éxito');
+      toast.success('Colección eliminada con éxito');
       router.push('/templates');
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : 'Error al eliminar plantilla'
+        err instanceof Error ? err.message : 'Error al eliminar colección'
       );
       setDeleting(false);
     }
@@ -153,7 +153,7 @@ export default function TemplateDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-[#FFC000] animate-spin" />
-          <p className="text-slate-400">Cargando plantilla...</p>
+          <p className="text-slate-400">Cargando colección...</p>
         </div>
       </div>
     );
@@ -167,7 +167,7 @@ export default function TemplateDetailsPage() {
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
             <h2 className="text-xl font-bold text-white">Error</h2>
             <p className="text-slate-400">
-              {error?.message || 'No se pudo cargar la plantilla'}
+              {error?.message || 'No se pudo cargar la colección'}
             </p>
             <p className="text-slate-400">
               Por favor contacta con{' '}
@@ -182,7 +182,7 @@ export default function TemplateDetailsPage() {
               onClick={() => router.push('/templates')}
               className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
             >
-              Volver a Plantillas
+              Volver a Colecciones
             </Button>
           </ModernCardContent>
         </ModernCard>
@@ -203,7 +203,7 @@ export default function TemplateDetailsPage() {
             className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Volver a Plantillas
+            Volver a Colecciones
           </Link>
         </div>
 
@@ -302,10 +302,10 @@ export default function TemplateDetailsPage() {
                 <>
                   <div className="text-center space-y-2">
                     <h3 className="text-lg font-bold text-white">
-                      Gestionar Plantilla
+                      Gestionar Colección
                     </h3>
                     <p className="text-sm text-slate-400">
-                      Esta es tu plantilla. Puedes editarla o eliminarla.
+                      Esta es tu colección. Puedes editarla o eliminarla.
                     </p>
                   </div>
 
@@ -316,7 +316,7 @@ export default function TemplateDetailsPage() {
                     >
                       <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
                         <Edit className="mr-2 h-4 w-4" />
-                        Editar Plantilla
+                        Editar Colección
                       </Button>
                     </Link>
                     <Button
@@ -325,7 +325,7 @@ export default function TemplateDetailsPage() {
                       className="w-full border-red-600 text-red-500 hover:bg-red-600/10"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Eliminar Plantilla
+                      Eliminar Colección
                     </Button>
                   </div>
                 </>
@@ -333,10 +333,10 @@ export default function TemplateDetailsPage() {
                 <>
                   <div className="text-center space-y-2">
                     <h3 className="text-lg font-bold text-white">
-                      ¿Quieres esta plantilla?
+                      ¿Quieres esta colección?
                     </h3>
                     <p className="text-sm text-slate-400">
-                      Copia esta plantilla a tu colección y comienza a
+                      Copia esta colección a tu cuenta y comienza a
                       completarla
                     </p>
                   </div>
@@ -359,7 +359,7 @@ export default function TemplateDetailsPage() {
                     ) : (
                       <>
                         <Copy className="mr-2 h-5 w-5" />
-                        Copiar Plantilla
+                        Copiar Colección
                       </>
                     )}
                   </Button>
@@ -392,7 +392,7 @@ export default function TemplateDetailsPage() {
 
         {/* Pages Outline */}
         <div className="space-y-4 mb-12">
-          <h2 className="text-2xl font-bold text-white">Contenido de la Plantilla</h2>
+          <h2 className="text-2xl font-bold text-white">Contenido de la Colección</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pages.map(page => (
@@ -479,7 +479,7 @@ export default function TemplateDetailsPage() {
             <ModernCard>
               <ModernCardContent className="p-8 text-center">
                 <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400">Esta plantilla aun no tiene paginas</p>
+                <p className="text-slate-400">Esta colección aún no tiene páginas</p>
               </ModernCardContent>
             </ModernCard>
           )}
@@ -503,10 +503,10 @@ export default function TemplateDetailsPage() {
                   <div className="text-center py-8">
                     <Star className="h-16 w-16 text-slate-600 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-white mb-2">
-                      Esta plantilla aún no tiene valoraciones
+                      Esta colección aún no tiene valoraciones
                     </h3>
                     <p className="text-slate-400 mb-6">
-                      ¡Sé el primero en valorar esta plantilla!
+                      ¡Sé el primero en valorar esta colección!
                     </p>
                     {!isAuthor && (
                       <Button
@@ -514,12 +514,12 @@ export default function TemplateDetailsPage() {
                         className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium px-6"
                       >
                         <Star className="mr-2 h-4 w-4" />
-                        Valorar plantilla
+                        Valorar colección
                       </Button>
                     )}
                     {isAuthor && (
                       <div className="text-sm text-slate-400 bg-slate-800 px-4 py-3 rounded-lg border border-slate-700 inline-block">
-                        No puedes valorar tus propias plantillas
+                        No puedes valorar tus propias colecciones
                       </div>
                     )}
                   </div>
@@ -562,9 +562,9 @@ export default function TemplateDetailsPage() {
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <DialogContent className="bg-slate-800 text-white border-slate-700">
             <DialogHeader>
-              <DialogTitle>Eliminar Plantilla</DialogTitle>
+              <DialogTitle>Eliminar Colección</DialogTitle>
               <DialogDescription className="text-slate-400">
-                ¿Estás seguro de que quieres eliminar esta plantilla? Se marcará
+                ¿Estás seguro de que quieres eliminar esta colección? Se marcará
                 como eliminada y ya no será visible públicamente.
               </DialogDescription>
             </DialogHeader>
@@ -577,7 +577,7 @@ export default function TemplateDetailsPage() {
                 <Textarea
                   value={deleteReason}
                   onChange={e => setDeleteReason(e.target.value)}
-                  placeholder="¿Por qué eliminas esta plantilla?"
+                  placeholder="¿Por qué eliminas esta colección?"
                   rows={3}
                   className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 resize-none"
                 />
