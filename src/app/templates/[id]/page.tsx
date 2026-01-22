@@ -449,6 +449,7 @@ export default function TemplateDetailsPage() {
                                   if (value === undefined || value === null || value === '') return null;
                                   return (
                                     <div key={field.name} className="flex gap-2 text-[11px]">
+                                      <div className="text-[9px] text-yellow-500 uppercase font-bold absolute -top-4 -left-2 bg-black/50 px-1 rounded pointer-events-none">Debug: Meta Active</div>
                                       <span className="text-slate-500 font-medium">{field.name}:</span>
                                       <span className="text-slate-300">{String(value)}</span>
                                     </div>
