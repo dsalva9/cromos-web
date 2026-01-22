@@ -88,22 +88,20 @@ export function LeanListingCard({ listing }: LeanListingCardProps) {
                 </div>
 
                 {/* Content */}
-                <div className="p-3 flex flex-col flex-1 gap-1">
-                    <div className="flex justify-between items-start gap-2">
-                        <div>
-                            <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-[#FFC000] transition-colors">
-                                {listing.title}
-                            </h3>
-                            {listing.collection_name && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
-                                    {listing.collection_name}
-                                </p>
-                            )}
-                        </div>
+                <div className="p-3 flex flex-col flex-1 gap-2">
+                    <div className="flex flex-col items-center text-center w-full">
+                        <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-base group-hover:text-[#FFC000] transition-colors w-full">
+                            {listing.title}
+                        </h3>
+                        {listing.collection_name && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1 mt-1">
+                                {listing.collection_name}
+                            </p>
+                        )}
                     </div>
 
-                    <div className="mt-auto pt-2 flex items-center justify-between border-t border-gray-100 dark:border-gray-700">
-                        <span className="text-[10px] text-gray-400 font-medium">
+                    <div className="mt-auto pt-2 flex items-center justify-center border-t border-gray-100 dark:border-gray-700 w-full">
+                        <span className="text-xs text-gray-400 font-medium">
                             Publicado {formatDate(listing.created_at)}
                         </span>
                     </div>
