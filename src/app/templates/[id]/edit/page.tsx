@@ -91,12 +91,12 @@ export default function TemplateEditPage() {
         }
       }
 
-      toast.success('Plantilla actualizada con éxito');
+      toast.success('Colección actualizada con éxito');
       router.push(`/templates/${templateId}`);
     } catch (err) {
       console.error('Error updating template:', err);
       toast.error(
-        err instanceof Error ? err.message : 'Error al actualizar plantilla'
+        err instanceof Error ? err.message : 'Error al actualizar colección'
       );
     } finally {
       setIsSubmitting(false);
@@ -118,7 +118,7 @@ export default function TemplateEditPage() {
           <p className="text-red-400 text-xl mb-4">Error al cargar la plantilla</p>
           <Link href="/templates">
             <button className="px-4 py-2 bg-[#FFC000] text-black rounded">
-              Volver a Plantillas
+              Volver a Colecciones
             </button>
           </Link>
         </div>
@@ -137,15 +137,33 @@ export default function TemplateEditPage() {
     pages: data.pages.map(page => ({
       title: page.title,
       type: page.type as 'team' | 'special',
-      slots: page.slots.map(slot => ({
-        data: slot.data || {},
-      })),
+      slots: page.slots.map(slot => {
+        const slotData = { ...(slot.data || {}) };
+
+        // Map label to Nombre if it's missing in data but present in schema
+        const hasNombreField = data.template.item_schema?.some(f => f.name === 'Nombre' || f.name === 'nombre');
+        if (slot.label && hasNombreField && !slotData['Nombre'] && !slotData['nombre']) {
+          const fieldName = data.template.item_schema?.find(f => f.name === 'Nombre' || f.name === 'nombre')?.name || 'Nombre';
+          slotData[fieldName] = slot.label;
+        }
+
+        // Map slot_number to Número if it's missing in data but present in schema
+        const hasNumeroField = data.template.item_schema?.some(f => f.name === 'Número' || f.name === 'número' || f.name === 'Numero' || f.name === 'numero');
+        if (slot.slot_number && hasNumeroField && !slotData['Número'] && !slotData['número'] && !slotData['Numero'] && !slotData['numero']) {
+          const fieldName = data.template.item_schema?.find(f => f.name === 'Número' || f.name === 'número' || f.name === 'Numero' || f.name === 'numero')?.name || 'Número';
+          slotData[fieldName] = slot.slot_number;
+        }
+
+        return {
+          data: slotData,
+        };
+      }),
     })),
   };
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           {/* Header */}
           <Link
@@ -153,15 +171,15 @@ export default function TemplateEditPage() {
             className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver a la plantilla
+            Volver a la colección
           </Link>
 
           <div className="mb-8">
             <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
-              Editar Plantilla
+              Editar Colección
             </h1>
             <p className="text-gray-600">
-              Modifica la información, páginas y cromos de tu plantilla
+              Modifica la información, páginas y cromos de tu colección
             </p>
           </div>
 
@@ -170,6 +188,7 @@ export default function TemplateEditPage() {
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             initialData={initialData}
+            title="Editar Colección"
           />
         </div>
       </div>

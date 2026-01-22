@@ -106,7 +106,7 @@ function MyCreatedTemplatesContent() {
         setTemplates(transformedData);
       } catch (err) {
         console.error('Error fetching templates:', err);
-        setError(err instanceof Error ? err.message : 'Error al cargar plantillas');
+        setError(err instanceof Error ? err.message : 'Error al cargar colecciones');
       } finally {
         setLoading(false);
       }
@@ -116,7 +116,7 @@ function MyCreatedTemplatesContent() {
   }, [user]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <Link
@@ -124,23 +124,23 @@ function MyCreatedTemplatesContent() {
           className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver a Plantillas
+          Volver a Colecciones
         </Link>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 mb-2">
-              Mis Plantillas Creadas
+              Mis Colecciones Creadas
             </h1>
             <p className="text-gray-600">
-              Plantillas que has creado, públicas y privadas
+              Colecciones que has creado, públicas y privadas
             </p>
           </div>
 
           <Link href="/templates/create">
             <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
               <Plus className="mr-2 h-4 w-4" />
-              Crear Plantilla
+              Crear Colección
             </Button>
           </Link>
         </div>
@@ -148,7 +148,7 @@ function MyCreatedTemplatesContent() {
         {/* Error State */}
         {error && (
           <div className="text-red-500 text-center py-8">
-            Error al cargar plantillas: {error}
+            Error al cargar colecciones: {error}
           </div>
         )}
 
@@ -180,9 +180,9 @@ function MyCreatedTemplatesContent() {
         {!loading && templates.length === 0 && (
           <EmptyState
             icon={FolderOpen}
-            title="No has creado ninguna plantilla"
-            description="Crea tu primera plantilla para compartirla con la comunidad o usarla de forma privada."
-            actionLabel="Crear mi primera plantilla"
+            title="No has creado ninguna colección"
+            description="Crea tu primera colección para compartirla con la comunidad o usarla de forma privada."
+            actionLabel="Crear mi primera colección"
             actionHref="/templates/create"
           />
         )}

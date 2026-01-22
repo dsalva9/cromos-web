@@ -132,7 +132,7 @@ export function MobileBottomNav() {
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <FileText className="h-5 w-5 text-[#FFC000]" />
-              <span className="font-medium">Plantillas</span>
+              <span className="font-medium">Colecciones</span>
             </Link>
 
             <Link

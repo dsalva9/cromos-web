@@ -150,7 +150,7 @@ export default function TemplateDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 text-[#FFC000] animate-spin" />
           <p className="text-slate-400">Cargando colección...</p>
@@ -161,7 +161,7 @@ export default function TemplateDetailsPage() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center p-4">
         <ModernCard className="max-w-md w-full">
           <ModernCardContent className="p-8 text-center space-y-4">
             <AlertCircle className="w-16 h-16 text-red-500 mx-auto" />
@@ -194,7 +194,7 @@ export default function TemplateDetailsPage() {
   const totalSlots = pages.reduce((sum, page) => sum + page.slots_count, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
@@ -214,7 +214,7 @@ export default function TemplateDetailsPage() {
             <ModernCardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Image */}
-                <div className="relative w-full md:w-64 aspect-video bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="relative w-full md:w-64 aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-800 rounded-lg overflow-hidden flex-shrink-0">
                   {template.image_url ? (
                     <Image
                       src={template.image_url}
@@ -233,7 +233,7 @@ export default function TemplateDetailsPage() {
                 <div className="flex-grow space-y-4">
                   <div>
                     <div className="flex items-start gap-3 mb-2">
-                      <h1 className="text-3xl font-bold text-white flex-grow">
+                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex-grow">
                         {template.title}
                       </h1>
                       {/* Deletion Badge for Admins */}
@@ -301,7 +301,7 @@ export default function TemplateDetailsPage() {
               {isAuthor ? (
                 <>
                   <div className="text-center space-y-2">
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                       Gestionar Colección
                     </h3>
                     <p className="text-sm text-slate-400">
@@ -332,7 +332,7 @@ export default function TemplateDetailsPage() {
               ) : (
                 <>
                   <div className="text-center space-y-2">
-                    <h3 className="text-lg font-bold text-white">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                       ¿Quieres esta colección?
                     </h3>
                     <p className="text-sm text-slate-400">
@@ -392,7 +392,7 @@ export default function TemplateDetailsPage() {
 
         {/* Pages Outline */}
         <div className="space-y-4 mb-12">
-          <h2 className="text-2xl font-bold text-white">Contenido de la Colección</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contenido de la Colección</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pages.map(page => (
@@ -409,20 +409,20 @@ export default function TemplateDetailsPage() {
                             {page.type}
                           </span>
                         </div>
-                        <h3 className="font-bold text-white">{page.title}</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-white">{page.title}</h3>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-400">Cromos:</span>
-                      <span className="font-medium text-white">{page.slots_count}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{page.slots_count}</span>
                     </div>
 
                     {/* Slots list */}
                     <div className="pt-2 border-t border-slate-700">
                       <div className="space-y-2">
                         {page.slots.map(slot => (
-                          <div key={slot.id} className="bg-slate-800/50 rounded-lg p-2">
+                          <div key={slot.id} className="bg-gray-100 dark:bg-slate-800/50 rounded-lg p-2">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-slate-500 font-mono text-xs font-bold">#{slot.slot_number}</span>
                               {slot.label && (
@@ -443,7 +443,7 @@ export default function TemplateDetailsPage() {
 
                             {/* Custom fields data */}
                             {template.item_schema && template.item_schema.length > 0 && slot.data && Object.keys(slot.data).length > 0 && (
-                              <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-slate-700">
+                              <div className="mt-1.5 space-y-0.5 pl-2 border-l-2 border-gray-200 dark:border-slate-700">
                                 {template.item_schema.map(field => {
                                   const value = slot.data[field.name];
                                   if (value === undefined || value === null || value === '') return null;
@@ -487,7 +487,7 @@ export default function TemplateDetailsPage() {
 
         {/* Ratings Section */}
         <div ref={ratingSectionRef} id="valoraciones" className="space-y-6 mb-8">
-          <h2 className="text-2xl font-bold text-white">Valoraciones</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Valoraciones</h2>
           <ModernCard>
             <ModernCardContent className="p-6">
               {summary ? (
@@ -502,7 +502,7 @@ export default function TemplateDetailsPage() {
                   {/* No ratings yet - show call to action */}
                   <div className="text-center py-8">
                     <Star className="h-16 w-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                       Esta colección aún no tiene valoraciones
                     </h3>
                     <p className="text-slate-400 mb-6">
@@ -531,7 +531,7 @@ export default function TemplateDetailsPage() {
           {/* Reviews List */}
           {!ratingsLoading && ratings.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-xl font-bold text-white">Comentarios</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Comentarios</h3>
               <TemplateReviewList
                 ratings={ratings}
                 hasMore={hasMore}

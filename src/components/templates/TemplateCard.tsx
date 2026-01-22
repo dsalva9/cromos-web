@@ -73,19 +73,19 @@ export function TemplateCard({
   };
 
   return (
-    <ModernCard className="hover:scale-[1.02] hover:shadow-xl hover:shadow-slate-900/50 transition-all duration-300 h-full border border-slate-700/50 shadow-lg shadow-slate-900/30">
+    <ModernCard className="hover:scale-[1.02] hover:shadow-xl dark:hover:shadow-slate-900/50 transition-all duration-300 h-full border border-gray-200 dark:border-slate-700/50 shadow-md dark:shadow-lg dark:shadow-slate-900/30">
       <ModernCardContent className="p-0 flex flex-col h-full">
         {/* Image */}
         <Link
           href={`/templates/${template.id}`}
-          aria-label={`Ver plantilla: ${template.title}`}
+          aria-label={`Ver colección: ${template.title}`}
           className="block"
         >
-          <div className="relative aspect-video bg-gradient-to-br from-slate-600 to-slate-800 cursor-pointer">
+          <div className="relative aspect-video bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-800 cursor-pointer">
             {template.image_url ? (
               <Image
                 src={template.image_url}
-                alt={`Portada de la plantilla ${template.title}`}
+                alt={`Portada de la colección ${template.title}`}
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -110,8 +110,8 @@ export function TemplateCard({
               {showVisibility && template.is_public !== undefined && (
                 <div
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${template.is_public
-                      ? 'bg-green-500/90 text-white'
-                      : 'bg-slate-700/90 text-slate-300'
+                    ? 'bg-green-500/90 text-white'
+                    : 'bg-slate-700/90 text-slate-300'
                     }`}
                 >
                   {template.is_public ? (
@@ -138,7 +138,7 @@ export function TemplateCard({
               href={`/templates/${template.id}`}
               className="block hover:text-[#FFC000] transition-colors"
             >
-              <h3 className="font-bold text-white text-lg line-clamp-2">
+              <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-2">
                 {template.title}
               </h3>
             </Link>
@@ -164,10 +164,10 @@ export function TemplateCard({
             <div className="flex items-center gap-4 text-sm text-slate-400">
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
-                <span className="font-bold text-white">
+                <span className="font-bold text-gray-900 dark:text-white">
                   {template.rating_avg.toFixed(1)}
                 </span>
-                <span>({template.rating_count})</span>
+                <span className="text-gray-500 dark:text-slate-400">({template.rating_count})</span>
               </div>
 
               <div className="flex items-center gap-1">

@@ -33,12 +33,14 @@ interface TemplateCreationWizardProps {
   onSubmit: (data: TemplateData) => Promise<void>;
   isSubmitting: boolean;
   initialData?: TemplateData;
+  title?: string;
 }
 
 export function TemplateCreationWizard({
   onSubmit,
   isSubmitting,
   initialData,
+  title = 'Crear Colección',
 }: TemplateCreationWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [attempted, setAttempted] = useState<{ basic: boolean; schema: boolean; pages: boolean }>({
@@ -127,7 +129,7 @@ export function TemplateCreationWizard({
             const value = slot.data[fieldName];
             // Check if field is empty (undefined, null, empty string, or NaN for numbers)
             if (value === undefined || value === null || value === '' ||
-                (typeof value === 'number' && isNaN(value))) {
+              (typeof value === 'number' && isNaN(value))) {
               return false;
             }
           }
@@ -168,21 +170,19 @@ export function TemplateCreationWizard({
               <div className="flex flex-col items-center flex-1">
                 {/* Step Circle */}
                 <div
-                  className={`flex items-center justify-center rounded-full transition-all duration-300 ${
-                    index < currentStep
-                      ? 'w-12 h-12 bg-green-400'
-                      : index === currentStep
+                  className={`flex items-center justify-center rounded-full transition-all duration-300 ${index < currentStep
+                    ? 'w-12 h-12 bg-green-400'
+                    : index === currentStep
                       ? 'w-14 h-14 bg-yellow-400 animate-pulse shadow-lg shadow-yellow-400/50'
                       : 'w-10 h-10 bg-slate-600'
-                  }`}
+                    }`}
                 >
                   {index < currentStep ? (
                     <CheckCircle className="h-6 w-6 text-white" />
                   ) : (
                     <span
-                      className={`font-bold ${
-                        index === currentStep ? 'text-lg text-black' : 'text-sm text-white'
-                      }`}
+                      className={`font-bold ${index === currentStep ? 'text-lg text-black' : 'text-sm text-white'
+                        }`}
                     >
                       {index + 1}
                     </span>
@@ -192,13 +192,12 @@ export function TemplateCreationWizard({
                 {/* Step Label - Hidden on mobile, visible on desktop */}
                 <div className="mt-2 text-center hidden md:block">
                   <p
-                    className={`text-sm font-medium ${
-                      index < currentStep
-                        ? 'text-green-400'
-                        : index === currentStep
+                    className={`text-sm font-medium ${index < currentStep
+                      ? 'text-green-400'
+                      : index === currentStep
                         ? 'text-yellow-400'
                         : 'text-slate-600 dark:text-slate-400'
-                    }`}
+                      }`}
                   >
                     {step.title}
                   </p>
@@ -234,9 +233,9 @@ export function TemplateCreationWizard({
       <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>{steps[currentStep].title}</span>
+            <span>{title} - {steps[currentStep].title}</span>
             <span className="text-sm font-normal text-gray-600 dark:text-gray-400">
-              {steps[currentStep].description}
+              Paso {currentStep + 1} de {steps.length}
             </span>
           </CardTitle>
         </CardHeader>
@@ -319,7 +318,7 @@ export function TemplateCreationWizard({
                 disabled={isSubmitting || !canGoNext()}
                 className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
               >
-                {isSubmitting ? 'Creando...' : 'Crear Plantilla'}
+                {isSubmitting ? 'Creando...' : 'Crear Colección'}
                 <Check className="ml-2 h-4 w-4" />
               </Button>
             )}
