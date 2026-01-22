@@ -415,7 +415,7 @@ function CollectionContent() {
                         src={displayImage}
                         alt={`${sticker.player_name} - ${sticker.team_name}`}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         priority={isPriority}
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                       />
@@ -453,11 +453,10 @@ function CollectionContent() {
                     <div className="flex space-x-1">
                       <Button
                         size="sm"
-                        className={`w-full flex-1 text-xs rounded-md transition-all duration-200 ${
-                          sticker.count > 0
+                        className={`w-full flex-1 text-xs rounded-md transition-all duration-200 ${sticker.count > 0
                             ? 'bg-[#FFC000] text-gray-900 font-bold border border-black'
                             : 'bg-gray-300 text-gray-900 font-bold border border-gray-400'
-                        }`}
+                          }`}
                         onClick={() => updateStickerOwnership(sticker.id)}
                       >
                         {sticker.count === 0

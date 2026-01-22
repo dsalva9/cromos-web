@@ -122,13 +122,13 @@ export function TemplateReviewForm({
           {data.image_url && (
             <div className="space-y-2">
               <Label className="text-gray-900 dark:text-white">Imagen</Label>
-              <div className="relative h-48 w-full">
+              <div className="relative min-h-[250px] max-h-[500px] w-full bg-gray-50 dark:bg-gray-900 rounded-md overflow-hidden flex items-center justify-center">
                 <Image
                   src={data.image_url}
                   alt="Template preview"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
-                  className="object-cover rounded-md"
+                  className="object-contain rounded-md"
                 />
               </div>
             </div>

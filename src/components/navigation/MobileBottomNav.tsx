@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -15,6 +15,9 @@ export function MobileBottomNav() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const router = useRouter();
+
+  /* Existing hook calls... */
+  const { user } = useUser(); // Ensure useUser is imported from SupabaseProvider
 
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
@@ -27,7 +30,6 @@ export function MobileBottomNav() {
     setIsMenuOpen(false);
   };
 
-
   const { hapticImpact } = useHaptic();
 
   const handleNavClick = () => {
@@ -38,6 +40,11 @@ export function MobileBottomNav() {
     hapticImpact();
     setIsMenuOpen(true);
   };
+
+  // If user is not logged in, do not show the bottom nav
+  if (!user) {
+    return null;
+  }
 
   return (
     <>

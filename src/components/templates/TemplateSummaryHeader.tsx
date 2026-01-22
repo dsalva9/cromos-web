@@ -77,8 +77,8 @@ export function TemplateSummaryHeader({
       {/* Top Gradient Bar */}
       <div
         className={`h-1.5 w-full ${isComplete
-            ? 'bg-gradient-to-r from-green-400 to-emerald-600'
-            : 'bg-gradient-to-r from-[#FFC000] to-[#FFD700]'
+          ? 'bg-gradient-to-r from-green-400 to-emerald-600'
+          : 'bg-gradient-to-r from-[#FFC000] to-[#FFD700]'
           }`}
       />
 
@@ -95,7 +95,7 @@ export function TemplateSummaryHeader({
                     src={copy.image_url}
                     alt={copy.title}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="(max-width: 768px) 96px, 128px"
                   />
                 </div>

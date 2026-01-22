@@ -131,7 +131,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 src={listing.image_url}
                 alt={listing.title}
                 fill
-                className="object-cover rounded-md"
+                className="object-contain rounded-md"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -294,7 +294,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                   </Button>
                 </>
               )}
-              
+
               {/* Removed Reactivar button for sold/completed listings */}
               {/* Removed Eliminar button for reserved listings - no actions for reserved */}
             </div>

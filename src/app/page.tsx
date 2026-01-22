@@ -1,11 +1,8 @@
 'use client';
 
 import { useUser } from '@/components/providers/SupabaseProvider';
-import Hero from '@/components/home/Hero';
-import HowItWorks from '@/components/home/HowItWorks';
-import MarketplaceShowcase from '@/components/home/MarketplaceShowcase';
-import FeatureHighlights from '@/components/home/FeatureHighlights';
-import SiteFooter from '@/components/site-footer';
+import LandingPage from '@/components/home/LandingPage';
+// SiteFooter removed as it is in layout
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +19,13 @@ export default function Home() {
     }
   }, [router]);
 
+  // Authenticated redirect logic
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/marketplace');
+    }
+  }, [user, loading, router]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center">
@@ -30,16 +34,16 @@ export default function Home() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-gray-800 flex flex-col">
-      <main className="flex-1">
-        <Hero isAuthenticated={!!user} />
-        <HowItWorks />
-        <MarketplaceShowcase />
-        <FeatureHighlights />
-      </main>
+  // If user is authenticated, we show loading state while redirecting (or null)
+  // But typically just showing the spinner or nothing is fine to avoid flash
+  if (user) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center">
+        <div className="text-gray-900 dark:text-white text-xl font-bold">Redirigiendo...</div>
+      </div>
+    );
+  }
 
-      <SiteFooter />
-    </div>
-  );
+  // Not authenticated -> Landing Page
+  return <LandingPage />;
 }

@@ -126,7 +126,7 @@ export default function StickerTile({
             src={sticker.thumb_public_url}
             alt={altText}
             fill
-            className="object-cover"
+            className="object-contain"
             priority={isPriority}
             sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
           />
@@ -135,7 +135,7 @@ export default function StickerTile({
             src={sticker.image_public_url}
             alt={altText}
             fill
-            className="object-cover"
+            className="object-contain"
             priority={isPriority}
             sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 15vw"
           />

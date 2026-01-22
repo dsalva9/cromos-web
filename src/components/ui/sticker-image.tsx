@@ -47,7 +47,7 @@ export default function StickerImage({
         height={!fill ? height : undefined}
         priority={priority}
         sizes={sizes}
-        className={cn('object-cover', className)}
+        className={cn('object-contain', className)}
       />
     );
   }
@@ -55,11 +55,11 @@ export default function StickerImage({
   // Fallback: Initials placeholder
   const initials = playerName
     ? playerName
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
     : '?';
 
   return (

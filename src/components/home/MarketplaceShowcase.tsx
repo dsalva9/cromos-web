@@ -34,7 +34,7 @@ export default function MarketplaceShowcase() {
   const showSkeletons = !isReady || loading;
 
   return (
-    <section className="border-t-4 border-black bg-gray-50">
+    <section className="bg-transparent">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">

@@ -107,15 +107,15 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       <div className="space-y-4">
         {value ? (
           <div className="relative">
-            <ModernCard>
+            <ModernCard className="bg-white dark:bg-gray-800">
               <ModernCardContent className="p-0">
-                <div className="relative aspect-square bg-white">
+                <div className="relative min-h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden">
                   <Image
                     src={value}
                     alt="Vista previa del anuncio"
                     fill
                     sizes="(max-width: 768px) 100vw, 600px"
-                    className="object-cover"
+                    className="object-contain"
                   />
                   <Button
                     size="sm"

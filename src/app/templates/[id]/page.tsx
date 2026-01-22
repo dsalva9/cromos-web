@@ -220,7 +220,7 @@ export default function TemplateDetailsPage() {
                       src={template.image_url}
                       alt={template.title}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

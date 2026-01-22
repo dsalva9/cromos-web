@@ -87,13 +87,13 @@ export function ListingCard({ listing }: ListingCardProps) {
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-0" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
-      <div className="relative aspect-square bg-gray-100 dark:bg-gray-900 overflow-hidden">
+      <div className="relative aspect-square bg-gray-50 dark:bg-gray-900 overflow-hidden flex items-center justify-center">
         {listing.image_url ? (
           <Image
             src={listing.image_url}
             alt={listing.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-contain transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         ) : (

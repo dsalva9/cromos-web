@@ -257,14 +257,14 @@ export default function ListingDetailPage() {
           <div>
             <ModernCard>
               <ModernCardContent className="p-0">
-                <div className="relative aspect-square bg-white dark:bg-gray-800">
+                <div className="relative min-h-[400px] bg-white dark:bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden">
                   {listing.image_url ? (
                     <Image
                       src={listing.image_url}
                       alt={listing.title}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover"
+                      className="object-contain"
                       priority
                     />
                   ) : (
@@ -380,43 +380,43 @@ export default function ListingDetailPage() {
                 listing.sticker_number ||
                 listing.slot_variant ||
                 listing.global_number) && (
-                <ModernCard className="mb-6">
-                  <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-3">
-                      Detalles del Cromo
-                    </h3>
-                    <div className="space-y-2 text-sm">
-                      {(listing.page_number || listing.page_title) && (
-                        <div className="text-gray-600 dark:text-gray-400">
-                          <span className="font-bold text-gray-900 dark:text-white">Página:</span>{' '}
-                          {listing.page_number && `${listing.page_number}`}
-                          {listing.page_number &&
-                            listing.page_title &&
-                            ' - '}
-                          {listing.page_title}
-                        </div>
-                      )}
-                      {(listing.sticker_number || listing.slot_variant) && (
-                        <div className="text-gray-600 dark:text-gray-400">
-                          <span className="font-bold text-gray-900 dark:text-white">
-                            Número de cromo:
-                          </span>{' '}
-                          #{listing.sticker_number}
-                          {listing.slot_variant}
-                        </div>
-                      )}
-                      {listing.global_number && (
-                        <div className="text-gray-600 dark:text-gray-400">
-                          <span className="font-bold text-gray-900 dark:text-white">
-                            Número global:
-                          </span>{' '}
-                          #{listing.global_number}
-                        </div>
-                      )}
-                    </div>
-                  </ModernCardContent>
-                </ModernCard>
-              )}
+                  <ModernCard className="mb-6">
+                    <ModernCardContent className="p-4">
+                      <h3 className="font-bold text-gray-900 dark:text-white mb-3">
+                        Detalles del Cromo
+                      </h3>
+                      <div className="space-y-2 text-sm">
+                        {(listing.page_number || listing.page_title) && (
+                          <div className="text-gray-600 dark:text-gray-400">
+                            <span className="font-bold text-gray-900 dark:text-white">Página:</span>{' '}
+                            {listing.page_number && `${listing.page_number}`}
+                            {listing.page_number &&
+                              listing.page_title &&
+                              ' - '}
+                            {listing.page_title}
+                          </div>
+                        )}
+                        {(listing.sticker_number || listing.slot_variant) && (
+                          <div className="text-gray-600 dark:text-gray-400">
+                            <span className="font-bold text-gray-900 dark:text-white">
+                              Número de cromo:
+                            </span>{' '}
+                            #{listing.sticker_number}
+                            {listing.slot_variant}
+                          </div>
+                        )}
+                        {listing.global_number && (
+                          <div className="text-gray-600 dark:text-gray-400">
+                            <span className="font-bold text-gray-900 dark:text-white">
+                              Número global:
+                            </span>{' '}
+                            #{listing.global_number}
+                          </div>
+                        )}
+                      </div>
+                    </ModernCardContent>
+                  </ModernCard>
+                )}
 
               {/* Description */}
               {listing.description && (
@@ -517,7 +517,7 @@ export default function ListingDetailPage() {
                       {checkingConversations ? 'Cargando...' : 'Sin Conversaciones'}
                     </Button>
                   )}
-                  
+
                   <div className="flex gap-4 justify-center flex-wrap">
                     {(listing.status === 'removed' || listing.status === 'ELIMINADO') ? (
                       // Show Restaurar button for soft-deleted listings
