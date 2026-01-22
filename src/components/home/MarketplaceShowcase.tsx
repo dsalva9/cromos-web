@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ListingCard } from '@/components/marketplace/ListingCard';
+import { LeanListingCard } from '@/components/home/LeanListingCard';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { AlertCircle } from 'lucide-react';
@@ -80,7 +80,7 @@ export default function MarketplaceShowcase() {
               </>
             ) : hasListings ? (
               displayListings.slice(0, 6).map(listing => (
-                <ListingCard key={listing.id} listing={listing} />
+                <LeanListingCard key={listing.id} listing={listing} />
               ))
             ) : null}
           </div>
