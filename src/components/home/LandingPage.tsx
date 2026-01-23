@@ -34,7 +34,7 @@ export default function LandingPage() {
 
                             <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                                 <Image
-                                    src="/assets/logo.svg"
+                                    src="/assets/logo.png"
                                     alt="Logo"
                                     fill
                                     priority
@@ -99,7 +99,7 @@ export default function LandingPage() {
                                         <div className="flex items-center gap-2">
                                             <div className="relative w-6 h-6">
                                                 <Image
-                                                    src="/assets/logo.svg"
+                                                    src="/assets/logo.png"
                                                     alt="Logo"
                                                     fill
                                                     className="object-contain"
