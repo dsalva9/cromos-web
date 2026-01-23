@@ -22,11 +22,8 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
     const { user } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<SortOption>('recent');
-    const [localTemplates, setLocalTemplates] = useState<Template[]>(initialTemplates);
-    const [isUsingServerData, setIsUsingServerData] = useState(true);
 
-    // We only use the hook for subsequent fetches (search, sort, load more)
-    // Initially we display server data
+    // Pass server data as initialData - hook will skip initial fetch if filters are at defaults
     const {
         templates: fetchedTemplates,
         loading,
@@ -37,70 +34,20 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
         search: searchQuery,
         sortBy,
         limit: 12,
+        initialData: initialTemplates,
     });
 
-    // When search or sort changes, we switch to client-side data
+    // Simple handlers - hook manages all state now
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
-        setIsUsingServerData(false);
     };
 
     const handleSortChange = (value: SortOption) => {
         setSortBy(value);
-        setIsUsingServerData(false);
     };
 
-    // Decide which templates to show
-    // If we haven't touched filters, use initial server data + any loaded more data
-    // But useTemplates hook handles its own state, so simpler approach:
-    // If search/sort are default AND we haven't loaded more, favor server data to avoid hydration mismatch/flicker?
-    // Actually, useTemplates will fetch on mount. We want to avoid that double fetch if possible.
-    // BUT useTemplates has a useEffect that triggers fetch.
-    // Standard pattern: Pass initialData to hook if supported, or just let hook take over.
-    // Since useTemplates doesn't support initialData yet, we'll let it fetch but show initialData while loading.
-
-    // Revised approach:
-    // We can't easily patch useTemplates without modifying it.
-    // For now, we'll display initialTemplates until the hook finishes its first load.
-    // Better yet, modifying useTemplates to accept initialData would be cleaner, but standard migration:
-    // 1. Show initialTemplates
-    // 2. Hook wakes up, fetches same data (cache hit hopefully or fast), then updates.
-    // To avoid flicker we just sync them.
-
-    const displayTemplates = isUsingServerData && searchQuery === '' && sortBy === 'recent'
-        ? initialTemplates
-        : fetchedTemplates;
-
-    // Ideally we should sync the hook's state with initial data to avoid immediate re-fetch
-    // For this first pass, we accept the double-fetch behavior on navigation (client cache might help)
-    // or we can optimize useTemplates later.
-
-    // NOTE: A better pattern is to pass initialData to the hook.
-    // Let's rely on the hook's data once it loads.
-
-    const showLoading = loading && displayTemplates.length === 0;
-    // If we are using server data, we are "not loading" in users eyes even if hook is hydrating
-    const effectiveLoading = isUsingServerData ? false : loading;
-
-    // Sync effect: once hook loads, we switch to it?
-    // Actually, if we just render initialTemplates, the hook will eventually update `fetchedTemplates`.
-    // If they enter the page, `loading` is true initially in the hook.
-    // So we show `initialTemplates`.
-    // When hook finishes, `loading` becomes false, `fetchedTemplates` is populated.
-    // We switch to `fetchedTemplates`.
-    // If data is identical, no visual change.
-
-    const currentTemplates = (loading && displayTemplates.length === 0) ? [] : (fetchedTemplates.length > 0 ? fetchedTemplates : initialTemplates);
-
-    // Logic refinement for smooth transition:
-    // 1. Initial render: loading=true (hook), but we have initialTemplates. Show initialTemplates.
-    // 2. Hook completes: loading=false, fetchedTemplates has data. Show fetchedTemplates.
-    // 3. User fliters: loading=true, fetchedTemplates clears? or keeps old?
-    // The useTemplates hook clears on new search.
-
-    const activeTemplates = (loading && fetchedTemplates.length === 0 && searchQuery !== '')
-        ? []
-        : (fetchedTemplates.length > 0 || !isUsingServerData ? fetchedTemplates : initialTemplates);
+    // Hook now initializes with server data, so just use fetchedTemplates directly
+    // It will have initialTemplates on first render, then update on filter changes
 
     return (
         <>
@@ -139,14 +86,14 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                 onSortChange={handleSortChange}
             />
 
-            {error && !isUsingServerData && (
+            {error && (
                 <div className="text-red-500 text-center py-8">
                     Error al cargar colecciones: {error}
                 </div>
             )}
 
             {/* Loading State - only when we have NO data to show */}
-            {effectiveLoading && activeTemplates.length === 0 && (
+            {loading && fetchedTemplates.length === 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                     {Array.from({ length: 6 }).map((_, i) => (
                         <TemplateCardSkeleton key={i} />
@@ -155,9 +102,9 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             )}
 
             {/* Templates Grid */}
-            {activeTemplates.length > 0 && (
+            {fetchedTemplates.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                    {activeTemplates.map((template, index) => (
+                    {fetchedTemplates.map((template: Template, index: number) => (
                         <div
                             key={template.id}
                             className="animate-fade-in"
@@ -170,7 +117,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             )}
 
             {/* Loading More Spinner */}
-            {loading && activeTemplates.length > 0 && (
+            {loading && fetchedTemplates.length > 0 && (
                 <div className="flex justify-center py-8">
                     <Loader2 className="h-8 w-8 text-[#FFC000] animate-spin" />
                 </div>
@@ -186,7 +133,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             )}
 
             {/* Empty State */}
-            {!loading && activeTemplates.length === 0 && (
+            {!loading && fetchedTemplates.length === 0 && (
                 <EmptyState
                     icon={FolderOpen}
                     title="No se encontraron colecciones"

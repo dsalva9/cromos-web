@@ -21,20 +21,26 @@ interface UseTemplatesParams {
   search?: string;
   sortBy?: 'recent' | 'rating' | 'popular';
   limit?: number;
+  initialData?: Template[];
 }
 
 export function useTemplates({
   search = '',
   sortBy = 'recent',
   limit = 12,
+  initialData,
 }: UseTemplatesParams = {}) {
   const supabase = useSupabaseClient();
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with server data if provided
+  const [templates, setTemplates] = useState<Template[]>(initialData ?? []);
+  // If we have initial data and are using default filters, skip initial fetch
+  const [loading, setLoading] = useState(initialData ? false : true);
   const [error, setError] = useState<string | null>(null);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(initialData ? initialData.length : 0);
+  const [hasMore, setHasMore] = useState(initialData ? initialData.length === limit : true);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  // Track if this is the first render with server data
+  const isInitialRender = useRef(!!initialData);
 
   const fetchTemplates = useCallback(
     async (fetchOffset: number, isLoadMore = false) => {
@@ -100,7 +106,16 @@ export function useTemplates({
   );
 
   useEffect(() => {
-    // Debounce initial fetch on search/sort changes
+    // Skip initial fetch if we have server data and filters are at defaults
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      // Only skip if using default filters
+      if (search === '' && sortBy === 'recent') {
+        return;
+      }
+    }
+
+    // Debounce fetch on search/sort changes
     setOffset(0);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {

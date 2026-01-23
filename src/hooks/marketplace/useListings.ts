@@ -34,6 +34,7 @@ interface UseListingsParams {
   sortByDistance?: boolean;
   viewerPostcode?: string | null;
   collectionIds?: number[];
+  initialData?: Listing[];
 }
 
 /**
@@ -45,6 +46,7 @@ interface UseListingsParams {
  * @param params.sortByDistance - Sort listings by distance (requires postcode)
  * @param params.viewerPostcode - User's postcode for distance calculation
  * @param params.collectionIds - Filter by user's collection IDs (template copies)
+ * @param params.initialData - Server-fetched data to avoid double fetch on initial render
  *
  * @returns Object containing:
  * - `listings`: Array of listing objects
@@ -75,14 +77,19 @@ export function useListings({
   sortByDistance = false,
   viewerPostcode = null,
   collectionIds = [],
+  initialData,
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with server data if provided
+  const [listings, setListings] = useState<Listing[]>(initialData ?? []);
+  // If we have initial data, skip initial loading state
+  const [loading, setLoading] = useState(initialData ? false : true);
   const [error, setError] = useState<string | null>(null);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(initialData ? initialData.length : 0);
+  const [hasMore, setHasMore] = useState(initialData ? initialData.length === limit : true);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  // Track if this is the first render with server data
+  const isInitialRender = useRef(!!initialData);
 
   const fetchListings = useCallback(
     async (fetchOffset: number, isLoadMore = false) => {
@@ -160,7 +167,16 @@ export function useListings({
   );
 
   useEffect(() => {
-    // Debounce initial fetch on search change or sort/filter change
+    // Skip initial fetch if we have server data and filters are at defaults
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      // Only skip if using default filters
+      if (search === '' && !sortByDistance && collectionIds.length === 0) {
+        return;
+      }
+    }
+
+    // Debounce fetch on filter change
     setOffset(0);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -169,7 +185,7 @@ export function useListings({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, limit, sortByDistance, viewerPostcode, JSON.stringify(collectionIds)]);
 
   const loadMore = useCallback(() => {

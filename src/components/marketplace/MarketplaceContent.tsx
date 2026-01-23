@@ -25,59 +25,49 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
     const [showFilters, setShowFilters] = useState(false);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
-    const [isUsingServerData, setIsUsingServerData] = useState(true);
 
     // We use initialUserPostcode from server rendering to avoid a client-side fetch
     const hasPostcode = Boolean(initialUserPostcode);
 
+    // Pass server data as initialData - hook will skip initial fetch if filters are at defaults
     const { listings: fetchedListings, loading, error, hasMore, loadMore } = useListings({
         search: searchQuery,
         limit: 20,
         sortByDistance: sortByDistance && hasPostcode,
-        viewerPostcode: initialUserPostcode, // Pass server-fetched postcode
+        viewerPostcode: initialUserPostcode,
         collectionIds: selectedCollectionIds,
+        initialData: initialListings,
     });
 
-    // Switch to client data when filters change
+    // Simple handlers - hook manages state now
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
-        setIsUsingServerData(false);
     };
 
     const handleSortChange = () => {
         if (hasPostcode) {
             setSortByDistance(!sortByDistance);
-            setIsUsingServerData(false);
         }
     };
 
     const handleCollectionFilterChange = (ids: number[]) => {
         setSelectedCollectionIds(ids);
-        setIsUsingServerData(false);
     };
 
     const handleTypeFilterChange = (type: 'all' | 'cromo' | 'pack') => {
         setListingTypeFilter(type);
-        // Type filter is client-side only (array filter), so we don't necessarily need to trigger new fetch
-        // But logically we are interacting
     };
 
-    // Determine which listings to show
-    // Note: listingTypeFilter is applied on the result array, not RPC
-    const rawListings = (isUsingServerData && searchQuery === '' && !sortByDistance && selectedCollectionIds.length === 0)
-        ? initialListings
-        : fetchedListings;
-
+    // Hook now initializes with server data, so just use fetchedListings directly
     // Apply client-side type filter
     const listings = listingTypeFilter === 'all'
-        ? rawListings
-        : rawListings.filter(listing =>
+        ? fetchedListings
+        : fetchedListings.filter(listing =>
             listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
         );
 
-    // Loading state logic
-    const effectiveLoading = isUsingServerData ? false : loading;
-    const showSkeletons = effectiveLoading && listings.length === 0;
+    // Loading state logic - show skeletons only when we have no data
+    const showSkeletons = loading && listings.length === 0;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white pb-24 md:pb-8">
@@ -104,7 +94,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     <span className="hidden md:inline">Comunidad activa</span>
                                     <span className="md:hidden">Activa</span>
                                 </div>
-                                {!effectiveLoading && listings.length > 0 && (
+                                {!loading && listings.length > 0 && (
                                     <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                         <span className="text-base md:text-lg">⚡</span>
                                         <span className="hidden md:inline">Actualizado hoy</span>
@@ -231,7 +221,6 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     <button
                                         onClick={() => {
                                             setSortByDistance(false);
-                                            setIsUsingServerData(false);
                                         }}
                                         className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${!sortByDistance
                                             ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
@@ -258,7 +247,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 </div>
 
                 {/* Listings Grid */}
-                {error && !isUsingServerData && (
+                {error && (
                     <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 text-center">
                         <p className="font-bold text-lg mb-1">Error al cargar anuncios</p>
                         <p className="text-sm opacity-80">{error}</p>
@@ -300,7 +289,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 )}
 
                 {/* Empty State */}
-                {!effectiveLoading && listings.length === 0 && (
+                {!loading && listings.length === 0 && (
                     <div className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 border border-gray-100 dark:border-gray-700">
                         <EmptyState
                             icon={Package}
