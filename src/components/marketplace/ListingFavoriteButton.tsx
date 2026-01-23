@@ -118,7 +118,8 @@ export function ListingFavoriteButton({
       <Heart
         className={`mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`}
       />
-      {favorited ? 'En favoritos' : 'Agregar a favoritos'}
+      <span className="md:hidden">Favoritos</span>
+      <span className="hidden md:inline">{favorited ? 'En favoritos' : 'Agregar a favoritos'}</span>
     </Button>
   );
 }

@@ -127,7 +127,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                         <span className="hidden md:inline">Mis Anuncios</span>
                                     </Button>
                                 </Link>
-                                <Link href="/marketplace/create" className="flex-1 md:flex-none">
+                                <Link href="/marketplace/create" className="hidden md:flex md:flex-none">
                                     <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                                         <Plus className="mr-1 md:mr-2 h-4 w-4" />
                                         Publicar

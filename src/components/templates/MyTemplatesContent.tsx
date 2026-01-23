@@ -38,15 +38,10 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                 className="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 h-12 px-6 shadow-sm"
                             >
                                 <LayoutGrid className="mr-2 h-4 w-4" />
-                                Explorar Plantillas
+                                Explorar Colecciones
                             </Button>
                         </Link>
-                        <Link href="/templates/create" className="flex-1 md:flex-none">
-                            <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold border-none h-12 px-6 shadow-md hover:shadow-lg transition-all">
-                                <Plus className="mr-2 h-4 w-4" />
-                                Crear Plantilla
-                            </Button>
-                        </Link>
+
                     </div>
                 </div>
 

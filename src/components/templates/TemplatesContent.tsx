@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Plus, FolderOpen, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Template } from '@/lib/templates/server-templates';
 import { TemplateCardSkeleton } from '@/components/skeletons/TemplateCardSkeleton';
@@ -20,7 +21,9 @@ type SortOption = 'recent' | 'rating' | 'popular';
 
 export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
     const { user } = useUser();
-    const [searchQuery, setSearchQuery] = useState('');
+    const searchParams = useSearchParams();
+    const initialSearch = searchParams.get('search') || '';
+    const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [sortBy, setSortBy] = useState<SortOption>('recent');
 
     // Pass server data as initialData - hook will skip initial fetch if filters are at defaults

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -119,13 +120,18 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
-          ⚽
-        </div>
-        <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
-          {siteConfig.name}
-        </h1>
+        <Image
+          src="/assets/logo.svg"
+          alt="Logo"
+          width={48}
+          height={48}
+          className="object-contain"
+        />
       </div>
+      <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
+        {siteConfig.name}
+      </h1>
+
 
       {/* Login Card */}
       <div className="w-full max-w-md bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
@@ -248,7 +254,7 @@ export default function LoginPage() {
           ← Volver al inicio
         </Link>
       </div>
-    </div>
+    </div >
   );
 }
 

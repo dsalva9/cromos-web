@@ -29,7 +29,7 @@ export default function LandingPage() {
                         {/* Hero Content (Centered) */}
                         <div className="flex-1 max-w-2xl text-center space-y-6 lg:space-y-8 flex flex-col items-center">
                             <Badge className="bg-[#FFC000] text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
-                                100% Gratis • La plataforma #1
+                                La Plataforma #1 de intercambio de Cromos
                             </Badge>
 
                             <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
@@ -51,7 +51,7 @@ export default function LandingPage() {
                             </h1>
 
                             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
-                                Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa de coleccionistas.
+                                Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa en tu plataforma <span className="text-black dark:text-white font-black bg-[#FFC000]/20 dark:bg-[#FFC000]/10 px-1 rounded transform -rotate-1 inline-block border-b-2 border-[#FFC000]">totalmente gratuita</span>
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full sm:w-auto">

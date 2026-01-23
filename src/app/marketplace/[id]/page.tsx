@@ -375,7 +375,12 @@ export default function ListingDetailPage() {
                 {listing.collection_name && (
                   <div>
                     <span className="font-bold">Colección:</span>{' '}
-                    {listing.collection_name}
+                    <Link
+                      href={`/templates?search=${encodeURIComponent(listing.collection_name)}`}
+                      className="text-[#FFC000] hover:underline"
+                    >
+                      {listing.collection_name}
+                    </Link>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
@@ -502,8 +507,15 @@ export default function ListingDetailPage() {
 
               {/* Favorite Button - shown to all authenticated non-owners */}
               {user && !isOwner && (
-                <div className="mt-4">
+                <div className="mt-4 flex items-center gap-2">
                   <ListingFavoriteButton listingId={listing.id} variant="full" />
+                  <ReportButton
+                    entityType="listing"
+                    entityId={listing.id}
+                    variant="outline"
+                    size="default"
+                    className="h-10 md:h-12"
+                  />
                 </div>
               )}
 
@@ -594,16 +606,7 @@ export default function ListingDetailPage() {
               )}
 
               {/* Report Button */}
-              {user && !isOwner && (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <ReportButton
-                    entityType="listing"
-                    entityId={listing.id}
-                    variant="outline"
-                    size="sm"
-                  />
-                </div>
-              )}
+
             </div>
           </div>
         </div>

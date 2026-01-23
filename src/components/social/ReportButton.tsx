@@ -10,6 +10,7 @@ interface ReportButtonProps {
   entityId: string;
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'default' | 'sm' | 'lg';
+  className?: string; // Add className prop
 }
 
 export function ReportButton({
@@ -17,6 +18,7 @@ export function ReportButton({
   entityId,
   variant = 'outline',
   size = 'sm',
+  className, // Destructure className
 }: ReportButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -25,8 +27,9 @@ export function ReportButton({
       <Button
         variant={variant}
         size={size}
+
         onClick={() => setOpen(true)}
-        className="text-gray-400 hover:text-red-500"
+        className={`text-gray-400 hover:text-red-500 ${className}`} // Append className
       >
         <Flag className="h-4 w-4 mr-2" />
         Denunciar
