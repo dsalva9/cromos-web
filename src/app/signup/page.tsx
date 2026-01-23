@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -138,8 +139,14 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
-          ⚽
+        <div className="relative w-48 h-48 mx-auto mb-4">
+          <Image
+            src="/assets/logo.svg"
+            alt="Logo"
+            fill
+            className="object-contain drop-shadow-xl"
+            priority
+          />
         </div>
         <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
           {siteConfig.name}

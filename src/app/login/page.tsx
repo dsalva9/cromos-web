@@ -120,13 +120,15 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <Image
-          src="/assets/logo.svg"
-          alt="Logo"
-          width={48}
-          height={48}
-          className="object-contain"
-        />
+        <div className="relative w-48 h-48 mx-auto mb-4">
+          <Image
+            src="/assets/logo.svg"
+            alt="Logo"
+            fill
+            className="object-contain drop-shadow-xl"
+            priority
+          />
+        </div>
       </div>
       <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
         {siteConfig.name}

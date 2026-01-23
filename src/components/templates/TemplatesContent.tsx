@@ -69,7 +69,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                         <Link href="/templates/my-templates" className="w-full sm:w-auto">
                             <Button variant="outline" className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black font-medium w-full">
                                 <FolderOpen className="mr-2 h-4 w-4" />
-                                Mis Colecciones
+                                Mis Colecciones Creadas
                             </Button>
                         </Link>
                         <Link href="/templates/create" className="hidden md:block w-full sm:w-auto">

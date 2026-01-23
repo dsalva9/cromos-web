@@ -10,12 +10,14 @@ interface ListingFavoriteButtonProps {
   listingId: string;
   variant?: 'full' | 'icon';
   onFavoriteChange?: (isFavorited: boolean) => void;
+  className?: string;
 }
 
 export function ListingFavoriteButton({
   listingId,
   variant = 'full',
-  onFavoriteChange
+  onFavoriteChange,
+  className
 }: ListingFavoriteButtonProps) {
   const { toggleFavorite, loading, checkFavorite } = useListingFavorite();
   const [favorited, setFavorited] = useState(false);
@@ -113,7 +115,7 @@ export function ListingFavoriteButton({
       onClick={handleToggle}
       disabled={loading}
       variant={favorited ? 'default' : 'outline'}
-      className={favorited ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
+      className={`${favorited ? 'bg-red-600 hover:bg-red-700 text-white' : ''} ${className || ''}`}
     >
       <Heart
         className={`mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`}
