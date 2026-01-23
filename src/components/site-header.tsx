@@ -176,10 +176,21 @@ export default function SiteHeader() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
+            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
             onClick={closeMenu}
           >
-            {siteConfig.name}
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+              <Image
+                src="/assets/logo.svg"
+                alt="Logo"
+                fill
+                priority
+                className="object-contain"
+              />
+            </div>
+            <span className="hidden sm:block">
+              {siteConfig.name}
+            </span>
           </Link>
 
           <nav

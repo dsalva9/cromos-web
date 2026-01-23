@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MarketplaceShowcase from './MarketplaceShowcase';
@@ -30,6 +31,16 @@ export default function LandingPage() {
                             <Badge className="bg-[#FFC000] text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
                                 100% Gratis • La plataforma #1
                             </Badge>
+
+                            <div className="relative w-24 h-24 lg:w-32 lg:h-32 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                                <Image
+                                    src="/assets/logo.svg"
+                                    alt="Logo"
+                                    fill
+                                    priority
+                                    className="object-contain drop-shadow-xl"
+                                />
+                            </div>
 
                             <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
@@ -61,6 +72,16 @@ export default function LandingPage() {
                                     Explorar Mercado
                                 </Button>
                             </div>
+
+                            {/* Mobile Login Link */}
+                            <div className="lg:hidden w-full pt-2">
+                                <Link
+                                    href="/login"
+                                    className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2"
+                                >
+                                    ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Right Phone Mockup - HIDDEN ON MOBILE */}
@@ -76,7 +97,14 @@ export default function LandingPage() {
                                 <div className="flex-1 bg-gray-50 dark:bg-gray-900 pt-8 pb-4 overflow-hidden flex flex-col relative select-none">
                                     {/* App Header */}
                                     <div className="px-4 mb-4 flex justify-between items-center bg-white dark:bg-gray-900 py-2 shadow-sm">
-                                        <div className="font-black text-lg tracking-tight">CAMBIOCROMOS</div>
+                                        <div className="relative w-24 h-6">
+                                            <Image
+                                                src="/assets/logo.svg"
+                                                alt="Logo"
+                                                fill
+                                                className="object-contain object-left"
+                                            />
+                                        </div>
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
                                                 <div className="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full border border-white z-10">2</div>
