@@ -173,13 +173,13 @@ export default function SiteHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
       <div className="container mx-auto px-4">
-        <div className="flex h-16 sm:h-20 items-center justify-between">
+        <div className="flex h-20 sm:h-24 items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
             onClick={closeMenu}
           >
-            <div className="relative w-12 h-12 sm:w-16 sm:h-16 shrink-0">
+            <div className="relative w-14 h-14 sm:w-20 sm:h-20 shrink-0">
               <Image
                 src="/assets/logo.svg"
                 alt="Logo"
