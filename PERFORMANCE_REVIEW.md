@@ -28,9 +28,34 @@
    - Eliminates 1 API call per page load
 
 **Impact:**
-- Reduced profile-related API calls from 3 to 1
 - Removed ~200-500ms blocking time from SupabaseProvider
 - Faster initial page render for authenticated users
+
+### January 23, 2026 - Critical Issue 2: Templates Page Server Component
+
+**Changes Made:**
+
+1. **New Server Utility** (`src/lib/templates/server-templates.ts`)
+   - Created `getPublicTemplates` for server-side fetching
+   - Uses `createServerClient` with read-only cookie handling
+   - Replicates `list_public_templates` RPC logic
+
+2. **New Client Component** (`src/components/templates/TemplatesContent.tsx`)
+   - Handles interactivity (search, filter, sort)
+   - Accepts `initialTemplates` from server
+   - Uses hybrid approach: initial server data + client-side updates
+
+3. **Templates Page** (`src/app/templates/page.tsx`)
+   - Converted to **Async Server Component**
+   - Fetches initial 12 templates on server
+   - Renders immediately with HTML content (no loading spinner)
+   - Improved SEO with server-side metadata
+
+**Impact:**
+- **Zero CLS** (Cumulative Layout Shift) for initial load
+- **Instant Paint**: Content visible immediately after HTML download
+- **Better SEO**: Search engines can crawl template list
+- Eliminates client-side hydration delay for initial view
 
 ---
 
