@@ -176,11 +176,11 @@ BEGIN
   
   -- Delete any favourites for this listing
   DELETE FROM favourites 
-  WHERE target_type = 'listing' AND target_id = p_listing_id;
+  WHERE target_type = 'listing' AND target_id = p_listing_id::TEXT;
   
   -- Delete any reports for this listing
   DELETE FROM reports 
-  WHERE target_type = 'listing' AND target_id = p_listing_id;
+  WHERE target_type = 'listing' AND target_id = p_listing_id::TEXT;
   
   -- =====================================================
   -- 4. HANDLE MEDIA CLEANUP
