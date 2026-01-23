@@ -22,17 +22,22 @@ export function ProfileCompletionGuard({
   const hasWarnedRef = useRef(false);
   const previousCompleteRef = useRef<boolean | null>(null);
 
-  useEffect(() => {
-    if (authLoading || loading) return;
-    if (!user) return;
-
+  // Helper to check if on exempt route
+  const getIsExemptRoute = () => {
     const isOnCompletionRoute =
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
     const isAuthFlow = pathname?.startsWith('/auth');
     const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
     const isResetPassword = pathname === '/profile/reset-password';
-    const isExemptRoute = isOnCompletionRoute || isAuthFlow || isAuthPage || isResetPassword;
+    return isOnCompletionRoute || isAuthFlow || isAuthPage || isResetPassword;
+  };
+
+  useEffect(() => {
+    if (authLoading || loading) return;
+    if (!user) return;
+
+    const isExemptRoute = getIsExemptRoute();
 
     console.log('[ProfileCompletionGuard] Running check:', {
       userId: user.id,
@@ -69,26 +74,23 @@ export function ProfileCompletionGuard({
     return <>{children}</>;
   }
 
+  // CRITICAL FIX: Always render children during loading!
+  // This allows loading.tsx skeletons to show immediately.
+  // The useEffect above will handle redirects in the background.
+  if (authLoading || loading) {
+    return <>{children}</>;
+  }
+
+  // Only block rendering for CONFIRMED incomplete profiles on non-exempt routes
   if (!isComplete) {
-    if (authLoading || loading) {
+    const isExemptRoute = getIsExemptRoute();
+    if (!isExemptRoute) {
+      // Profile is confirmed incomplete and not on exempt route - block until redirect completes
       return null;
     }
-
-    const isOnCompletionRoute =
-      pathname === completionRoute ||
-      pathname?.startsWith(`${completionRoute}/`);
-    const isAuthFlow = pathname?.startsWith('/auth');
-    const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
-    const isResetPassword = pathname === '/profile/reset-password';
-    const isExemptRoute = isOnCompletionRoute || isAuthFlow || isAuthPage || isResetPassword;
-
-    if (isExemptRoute) {
-      return <>{children}</>;
-    }
-
-    return null;
   }
 
   return <>{children}</>;
 }
+
 
