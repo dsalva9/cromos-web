@@ -57,6 +57,27 @@
 - **Better SEO**: Search engines can crawl template list
 - Eliminates client-side hydration delay for initial view
 
+### January 23, 2026 - Critical Issue 2: Server Components Expansion
+
+**Changes Made:**
+
+1. **Marketplace Page** (`src/app/marketplace/page.tsx`)
+   - Converted to **Async Server Component**
+   - **Fixes High Priority Issue 6**: Postcode authentication and fetching now happens on server
+   - New `server-listings.ts` utility handles secure listing fetching
+   - Created `MarketplaceContent.tsx` to handle client-side filtering/sorting
+
+2. **My Albums Page** (`src/app/mis-plantillas/page.tsx`)
+   - Converted to **Async Server Component**
+   - Replaced client-side `AuthGuard` with server-side redirect (faster protection)
+   - New `server-my-templates.ts` utility fetches personal collections
+   - Initial load significantly faster by removing "check auth -> fetch data" waterfall
+
+**Impact:**
+- **Waterfalls Removed**: 3 major pages (Templates, Marketplace, My Albums) now fetch data in parallel with HTML generation
+- **Geosorting Optimized**: Distance calculation prep work moved to server
+- **Auth Performance**: Protected routes redirect immediately from server, no flash of loading state
+
 ---
 
 ## Executive Summary
