@@ -18,7 +18,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
             {/* Hero Section */}
-            <section className="relative overflow-hidden pt-16 pb-12 lg:pt-32 lg:pb-24">
+            <section className="relative overflow-hidden pt-8 pb-8 lg:pt-20 lg:pb-16">
                 {/* Background Decorative Shapes */}
                 <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
@@ -32,7 +32,7 @@ export default function LandingPage() {
                                 100% Gratis • La plataforma #1
                             </Badge>
 
-                            <div className="relative w-72 h-72 lg:w-96 lg:h-96 mb-4 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+                            <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                                 <Image
                                     src="/assets/logo.svg"
                                     alt="Logo"
@@ -42,12 +42,6 @@ export default function LandingPage() {
                                 />
                             </div>
 
-                            <Link
-                                href="/login"
-                                className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2 text-sm"
-                            >
-                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
-                            </Link>
 
                             <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
@@ -80,6 +74,13 @@ export default function LandingPage() {
                                 </Button>
                             </div>
 
+                            <Link
+                                href="/login"
+                                className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2 text-sm pt-2"
+                            >
+                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
+                            </Link>
+
                         </div>
 
                         {/* Right Phone Mockup - HIDDEN ON MOBILE */}
@@ -94,14 +95,17 @@ export default function LandingPage() {
 
                                 <div className="flex-1 bg-gray-50 dark:bg-gray-900 pt-8 pb-4 overflow-hidden flex flex-col relative select-none">
                                     {/* App Header */}
-                                    <div className="px-4 mb-4 flex justify-between items-center bg-white dark:bg-gray-900 py-2 shadow-sm">
-                                        <div className="relative w-24 h-6">
-                                            <Image
-                                                src="/assets/logo.svg"
-                                                alt="Logo"
-                                                fill
-                                                className="object-contain object-left"
-                                            />
+                                    <div className="px-3 mb-4 flex justify-between items-center bg-white dark:bg-gray-900 py-2 shadow-sm">
+                                        <div className="flex items-center gap-2">
+                                            <div className="relative w-6 h-6">
+                                                <Image
+                                                    src="/assets/logo.svg"
+                                                    alt="Logo"
+                                                    fill
+                                                    className="object-contain"
+                                                />
+                                            </div>
+                                            <div className="font-black text-[10px] tracking-tighter leading-none">CAMBIOCROMOS</div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <div className="relative">
