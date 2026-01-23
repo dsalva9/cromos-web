@@ -84,7 +84,7 @@ export function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-      <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-0" aria-label={`Ver anuncio: ${listing.title}`} />
+      <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
       <div className="relative aspect-square bg-gray-50 dark:bg-gray-900 overflow-hidden flex items-center justify-center">
@@ -138,35 +138,37 @@ export function ListingCard({ listing }: ListingCardProps) {
 
         {/* User Info Row */}
         <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-          <Link href={`/users/${listing.user_id}`} className="z-10 relative block shrink-0">
-            <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 ring-1 ring-gray-100 dark:ring-gray-700">
-              {avatarUrl ? (
-                <Image
-                  src={avatarUrl}
-                  alt={listing.author_nickname}
-                  fill
-                  className="object-cover"
-                  sizes="24px"
-                />
-              ) : (
-                <div
-                  className={cn(
-                    'w-full h-full flex items-center justify-center text-[10px] font-bold text-black',
-                    fallback.gradientClass
-                  )}
-                >
-                  {fallback.initial}
-                </div>
-              )}
-            </div>
-          </Link>
+          <div className="z-20 relative block shrink-0">
+            <Link href={`/users/${listing.user_id}`} className="block">
+              <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 ring-1 ring-gray-100 dark:ring-gray-700">
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={listing.author_nickname}
+                    fill
+                    className="object-cover"
+                    sizes="24px"
+                  />
+                ) : (
+                  <div
+                    className={cn(
+                      'w-full h-full flex items-center justify-center text-[10px] font-bold text-black',
+                      fallback.gradientClass
+                    )}
+                  >
+                    {fallback.initial}
+                  </div>
+                )}
+              </div>
+            </Link>
+          </div>
 
-          <div className="flex flex-col min-w-0 z-10 relative">
+          <div className="flex flex-col min-w-0 z-20 relative">
             <UserLink
               userId={listing.user_id}
               nickname={listing.author_nickname}
               variant="default"
-              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors z-10"
+              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
               forceSpan={false}
             />
             <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
@@ -190,5 +192,6 @@ export function ListingCard({ listing }: ListingCardProps) {
         </div>
       </div>
     </div>
+
   );
 }

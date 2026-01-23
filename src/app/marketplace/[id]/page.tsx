@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
+import { ImageModal } from '@/components/ui/ImageModal';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -55,6 +56,7 @@ export default function ListingDetailPage() {
   const [adminDeleteReason, setAdminDeleteReason] = useState('');
   const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
 
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id) {
@@ -257,7 +259,10 @@ export default function ListingDetailPage() {
           <div>
             <ModernCard>
               <ModernCardContent className="p-0">
-                <div className="relative min-h-[400px] bg-white dark:bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden">
+                <div
+                  className="relative min-h-[400px] bg-white dark:bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden cursor-zoom-in"
+                  onClick={() => listing.image_url && setImageModalOpen(true)}
+                >
                   {listing.image_url ? (
                     <Image
                       src={listing.image_url}
@@ -277,6 +282,15 @@ export default function ListingDetailPage() {
                 </div>
               </ModernCardContent>
             </ModernCard>
+
+            {listing.image_url && (
+              <ImageModal
+                isOpen={imageModalOpen}
+                onClose={() => setImageModalOpen(false)}
+                imageUrl={listing.image_url}
+                alt={listing.title}
+              />
+            )}
           </div>
 
           {/* Details */}

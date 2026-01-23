@@ -5,6 +5,8 @@ import { Check, X, Copy as CopyIcon, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { ImageModal } from '@/components/ui/ImageModal';
 
 interface TemplateCopy {
   copy_id: string;
@@ -33,6 +35,7 @@ export function TemplateSummaryHeader({
   copy,
   progress,
 }: TemplateSummaryHeaderProps) {
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const stats = useMemo(() => {
     // Count owned (tengo) - slots with status='owned' OR status='duplicate'
     // If you have duplicates, you still HAVE the cromo (it counts as owned)
@@ -90,15 +93,26 @@ export function TemplateSummaryHeader({
             <div className="flex gap-4 md:gap-6 mb-4">
               {/* Template Image */}
               {copy.image_url && (
-                <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900">
-                  <Image
-                    src={copy.image_url}
+                <>
+                  <div
+                    className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 cursor-zoom-in"
+                    onClick={() => setImageModalOpen(true)}
+                  >
+                    <Image
+                      src={copy.image_url}
+                      alt={copy.title}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 96px, 128px"
+                    />
+                  </div>
+                  <ImageModal
+                    isOpen={imageModalOpen}
+                    onClose={() => setImageModalOpen(false)}
+                    imageUrl={copy.image_url}
                     alt={copy.title}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 768px) 96px, 128px"
                   />
-                </div>
+                </>
               )}
 
               {/* Title & Author */}

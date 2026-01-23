@@ -38,6 +38,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageModal } from '@/components/ui/ImageModal';
 
 export default function TemplateDetailsPage() {
   const params = useParams();
@@ -67,6 +68,7 @@ export default function TemplateDetailsPage() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const ratingSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Check if user is author
@@ -214,7 +216,10 @@ export default function TemplateDetailsPage() {
             <ModernCardContent className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Image */}
-                <div className="relative w-full md:w-64 aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-800 rounded-lg overflow-hidden flex-shrink-0">
+                <div
+                  className="relative w-full md:w-64 aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-600 dark:to-slate-800 rounded-lg overflow-hidden flex-shrink-0 cursor-zoom-in"
+                  onClick={() => template.image_url && setImageModalOpen(true)}
+                >
                   {template.image_url ? (
                     <Image
                       src={template.image_url}
@@ -228,6 +233,14 @@ export default function TemplateDetailsPage() {
                     </div>
                   )}
                 </div>
+                {template.image_url && (
+                  <ImageModal
+                    isOpen={imageModalOpen}
+                    onClose={() => setImageModalOpen(false)}
+                    imageUrl={template.image_url}
+                    alt={template.title}
+                  />
+                )}
 
                 {/* Details */}
                 <div className="flex-grow space-y-4">
