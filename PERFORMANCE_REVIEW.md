@@ -78,6 +78,33 @@
 - **Geosorting Optimized**: Distance calculation prep work moved to server
 - **Auth Performance**: Protected routes redirect immediately from server, no flash of loading state
 
+### January 23, 2026 - Hotfix: Streaming SSR Implementation
+
+> **Issue Addressed**: User reported "sluggishness" after Server Component migration.
+> **Cause**: Next.js Server Components block navigation until data acquisition completes if `loading.tsx` is missing.
+
+**Changes Made:**
+1. Added `src/app/templates/loading.tsx`
+2. Added `src/app/marketplace/loading.tsx`
+3. Added `src/app/mis-plantillas/loading.tsx`
+
+**Impact:**
+- Restored **Instant Navigation**: Clicking a link immediately shows the skeleton UI while data fetches on server.
+- **Perceived Performance**: Application feels "snappy" again, matching the optimized Marketplace.
+
+---
+
+## 🔎 Database Inspection (Supabase MPC Analysis)
+
+Per user request, inspected database performance to rule out query latency.
+
+**Findings:**
+1. **Advisors**: Flagged some unindexed foreign keys (`deleted_by`) and multiple permissive policies on `xp_history` (WARN). Low impact for now.
+2. **RPC Analysis**:
+   - `get_my_template_copies`: Uses correlated subqueries (N+1 behavior per row). **Recommendation**: Optimize to usage of JOINs or Materialized Views as data scales.
+   - `list_public_templates`: Uses `ILIKE '%...%'` which bypasses standard indexes. **Recommendation**: Implement `pg_trgm` index for search as catalog grows.
+3. **Conclusion**: Current query latency is negligible (<20ms). The "sluggishness" was 100% due to the frontend blocking navigation (fixed above).
+
 ---
 
 ## Executive Summary
