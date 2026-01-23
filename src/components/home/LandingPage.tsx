@@ -18,7 +18,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
             {/* Hero Section */}
-            <section className="relative overflow-hidden pt-24 pb-2 lg:pt-32 lg:pb-4">
+            <section className="relative overflow-hidden pt-20 pb-2 lg:pt-24 lg:pb-4">
                 {/* Background Decorative Shapes */}
                 <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
