@@ -26,13 +26,13 @@ export default function LandingPage() {
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16 max-w-6xl mx-auto">
 
-                        {/* Left Content (Text) */}
-                        <div className="flex-1 max-w-xl text-center lg:text-left space-y-6 lg:space-y-8 flex flex-col items-center lg:items-start">
+                        {/* Hero Content (Centered) */}
+                        <div className="flex-1 max-w-2xl text-center space-y-6 lg:space-y-8 flex flex-col items-center">
                             <Badge className="bg-[#FFC000] text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
                                 100% Gratis • La plataforma #1
                             </Badge>
 
-                            <div className="relative w-24 h-24 lg:w-32 lg:h-32 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                            <div className="relative w-72 h-72 lg:w-96 lg:h-96 mb-4 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                                 <Image
                                     src="/assets/logo.svg"
                                     alt="Logo"
@@ -41,6 +41,13 @@ export default function LandingPage() {
                                     className="object-contain drop-shadow-xl"
                                 />
                             </div>
+
+                            <Link
+                                href="/login"
+                                className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2 text-sm"
+                            >
+                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
+                            </Link>
 
                             <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
@@ -73,15 +80,6 @@ export default function LandingPage() {
                                 </Button>
                             </div>
 
-                            {/* Mobile Login Link */}
-                            <div className="lg:hidden w-full pt-2">
-                                <Link
-                                    href="/login"
-                                    className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2"
-                                >
-                                    ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
-                                </Link>
-                            </div>
                         </div>
 
                         {/* Right Phone Mockup - HIDDEN ON MOBILE */}

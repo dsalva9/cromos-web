@@ -179,7 +179,7 @@ export default function SiteHeader() {
             className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
             onClick={closeMenu}
           >
-            <div className="relative w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+            <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
               <Image
                 src="/assets/logo.svg"
                 alt="Logo"
@@ -225,11 +225,20 @@ export default function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2 md:hidden">
-            {!loading && user && (
-              <>
-                <MobileNotificationIcon />
-                <MobileUserAvatar userId={user.id} />
-              </>
+            {!loading && (
+              user ? (
+                <>
+                  <MobileNotificationIcon />
+                  <MobileUserAvatar userId={user.id} />
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-[#FFC000] hover:text-black transition-colors"
+                >
+                  Entrar
+                </Link>
+              )
             )}
           </div>
         </div>
