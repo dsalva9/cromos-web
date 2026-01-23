@@ -181,7 +181,7 @@ export default function SiteHeader() {
           >
             <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
               <Image
-                src="/assets/logo.png"
+                src="/assets/logo.svg"
                 alt="Logo"
                 fill
                 priority
