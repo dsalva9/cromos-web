@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient, User, Session } from '@supabase/supabase-js';
 
@@ -12,59 +12,55 @@ type SupabaseContext = {
 
 const Context = createContext<SupabaseContext | undefined>(undefined);
 
+/**
+ * SupabaseProvider - Optimized for performance
+ * 
+ * Key optimization: User is set IMMEDIATELY on auth state change.
+ * Suspension check is done NON-BLOCKING in the background.
+ * If user is suspended, they get signed out asynchronously.
+ * 
+ * This removes 200-500ms of blocking time from the initial render.
+ */
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkSuspendedStatus = async (userId: string) => {
-      try {
-        // Add timeout to prevent hanging on concurrent sessions or slow queries
-        const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
-          setTimeout(() => resolve({ data: null, error: { message: 'Query timeout' } }), 5000)
-        );
+  // Non-blocking suspension check - runs in background
+  const checkSuspendedStatusAsync = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('suspended_at, deleted_at')
+        .eq('id', userId)
+        .maybeSingle();
 
-        const queryPromise = supabase
-          .from('profiles')
-          .select('suspended_at, deleted_at')
-          .eq('id', userId)
-          .maybeSingle();
-
-        const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
-
-        // If there's an error fetching profile, allow through (fail open for non-suspended users)
-        if (error) {
-          console.error('Error checking suspension status:', error.message || error);
-          return true;
-        }
-
-        // If no profile data, fail open (allow through)
-        if (!data) {
-          console.log('No profile data found for user:', userId);
-          return true;
-        }
-
-        if (data?.suspended_at || data?.deleted_at) {
-          // Sign out suspended user
-          await supabase.auth.signOut();
-          setUser(null);
-          return false; // User is suspended
-        }
-        return true; // User is not suspended
-      } catch (err) {
-        console.error('Exception checking suspension status:', err);
-        return true; // Fail open
+      // If query fails, fail open (let user through)
+      if (error) {
+        console.error('Error checking suspension status:', error.message);
+        return;
       }
-    };
 
+      // If suspended or deleted, sign out
+      if (data?.suspended_at || data?.deleted_at) {
+        console.log('User is suspended/deleted, signing out');
+        await supabase.auth.signOut();
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Exception checking suspension status:', err);
+      // Fail open - don't sign out on errors
+    }
+  }, [supabase]);
+
+  useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      async (event: string, session: Session | null) => {
+      (event: string, session: Session | null) => {
         // Handle invalid refresh token by clearing session
         if (event === 'TOKEN_REFRESHED' && !session) {
-          await supabase.auth.signOut();
+          supabase.auth.signOut();
           setUser(null);
           setLoading(false);
           return;
@@ -72,52 +68,42 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
         const currentUser = session?.user ?? null;
 
-        // Only check suspension on specific events (not during recovery/refresh)
+        // Set user IMMEDIATELY - no blocking
+        setUser(currentUser);
+        setLoading(false);
+
+        // Check suspension in background (non-blocking) on specific events
         const shouldCheckSuspension =
           event === 'SIGNED_IN' ||
           event === 'INITIAL_SESSION' ||
           event === 'USER_UPDATED';
 
-        // Check if user is suspended when they have an active session
         if (currentUser && shouldCheckSuspension) {
-          const isNotSuspended = await checkSuspendedStatus(currentUser.id);
-          if (isNotSuspended) {
-            setUser(currentUser);
-          }
-        } else if (currentUser) {
-          // For other events, just set the user without checking
-          setUser(currentUser);
-        } else {
-          setUser(currentUser);
+          // Fire and forget - don't await
+          checkSuspendedStatusAsync(currentUser.id);
         }
-
-        setLoading(false);
       }
     );
 
     // Get initial session
     supabase.auth
       .getSession()
-      .then(async ({ data: { session } }: { data: { session: Session | null } }) => {
+      .then(({ data: { session } }: { data: { session: Session | null } }) => {
         const currentUser = session?.user ?? null;
 
-        // Check if user is suspended when they have an active session
-        if (currentUser) {
-          const isNotSuspended = await checkSuspendedStatus(currentUser.id);
-          if (isNotSuspended) {
-            setUser(currentUser);
-          }
-        } else {
-          setUser(currentUser);
-        }
-
+        // Set user IMMEDIATELY
+        setUser(currentUser);
         setLoading(false);
+
+        // Check suspension in background for logged-in users
+        if (currentUser) {
+          checkSuspendedStatusAsync(currentUser.id);
+        }
       })
-      .catch(async (error) => {
+      .catch((error) => {
         // Handle invalid refresh token on initial load
         if (error?.message?.includes('refresh') || error?.message?.includes('Refresh Token')) {
-          // Clear the invalid session silently
-          await supabase.auth.signOut();
+          supabase.auth.signOut();
           setUser(null);
         }
         setLoading(false);
@@ -126,7 +112,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, checkSuspendedStatusAsync]);
 
   return (
     <Context.Provider value={{ supabase, user, loading }}>

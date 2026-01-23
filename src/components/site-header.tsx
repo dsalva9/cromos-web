@@ -88,8 +88,8 @@ export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { supabase } = useSupabase();
   const { user, loading } = useUser();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const { isComplete, loading: profileLoading } = useProfileCompletion();
+  // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
+  const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [ratingModalData, setRatingModalData] = useState<{
@@ -128,26 +128,6 @@ export default function SiteHeader() {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function checkAdmin() {
-      if (!user) {
-        setIsAdmin(false);
-        return;
-      }
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-      if (!cancelled) setIsAdmin(!!data?.is_admin && !error);
-    }
-    void checkAdmin();
-    return () => {
-      cancelled = true;
-    };
-  }, [user, supabase]);
 
   const handleProtectedNavigation =
     (requiresCompletion?: boolean) =>
