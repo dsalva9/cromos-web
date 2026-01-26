@@ -151,6 +151,21 @@ export default function UserDashboard() {
     const activeListings = useMemo(() => listings.filter(l => l.status === 'active'), [listings]);
 
 
+    // --- Profile Header Logic (Derived) ---
+    // Moved up to avoid early return hook violation
+    const displayAvatarUrl = useMemo(
+        () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
+        [profile?.avatar_url, supabase]
+    );
+
+    const locationDisplay = profile?.location_label
+        ? profile.postcode
+            ? `${profile.location_label} (${profile.postcode})`
+            : profile.location_label
+        : profile?.postcode
+            ? `CP ${profile.postcode}`
+            : null;
+
     if (profileLoading || loadingCopies) {
         return (
             <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
@@ -160,20 +175,6 @@ export default function UserDashboard() {
     }
 
     if (!profile) return null;
-
-    // --- Profile Header Logic (Derived) ---
-    const displayAvatarUrl = useMemo(
-        () => resolveAvatarUrl(profile.avatar_url ?? null, supabase),
-        [profile.avatar_url, supabase]
-    );
-
-    const locationDisplay = profile.location_label
-        ? profile.postcode
-            ? `${profile.location_label} (${profile.postcode})`
-            : profile.location_label
-        : profile.postcode
-            ? `CP ${profile.postcode}`
-            : null;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
