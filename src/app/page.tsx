@@ -41,8 +41,8 @@ export default function Home() {
 
         // Route based on authentication status
         if (user) {
-          // Redirect to marketplace if logged in
-          router.replace('/marketplace');
+          // Stay on home/dashboard if logged in
+          // (No operation needed as return renders Dashboard)
         } else {
           // Redirect to login if not logged in
           router.replace('/login');
@@ -61,12 +61,7 @@ export default function Home() {
     handleNativeApp();
   }, [isNative, user, loading, router]);
 
-  // Authenticated redirect logic for web
-  useEffect(() => {
-    if (!loading && user && isNative === false) {
-      router.push('/marketplace');
-    }
-  }, [user, loading, router, isNative]);
+
 
   // Show white screen while checking if native platform
   if (isNative === null) {
