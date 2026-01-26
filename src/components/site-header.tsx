@@ -188,7 +188,7 @@ export default function SiteHeader() {
                 className="object-contain"
               />
             </div>
-            <span className="text-lg sm:text-2xl truncate max-w-[170px] xs:max-w-[200px] sm:max-w-none hidden min-[380px]:block">
+            <span className="text-lg sm:text-2xl truncate max-w-[170px] xs:max-w-[200px] sm:max-w-none hidden min-[340px]:block">
               {siteConfig.name}
             </span>
           </Link>
