@@ -10,9 +10,7 @@
         <!-- Asset Statements for App Links Verification -->
         <meta-data android:name="asset_statements" android:value="@string/asset_statements" />
 
-        <meta-data
-            android:name="onesignal_app_id"
-            android:value="3b9eb764-f440-404d-949a-1468356afc18" />
+        <meta-data android:name="onesignal_app_id" android:value="3b9eb764-f440-404d-949a-1468356afc18" />
 
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"

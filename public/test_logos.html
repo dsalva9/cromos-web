@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .bg-white {
+            background-color: white;
+        }
+
+        .bg-dark {
+            background-color: #333;
+        }
+
+        img {
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Logo Assets Test</h1>
+    <div class="grid">
+        <div class="card bg-white">
+            <h3>logo.svg on White</h3>
+            <img src="assets/logo.svg" alt="logo.svg">
+        </div>
+        <div class="card bg-white">
+            <h3>logo.png on White</h3>
+            <img src="assets/logo.png" alt="logo.png">
+        </div>
+        <div class="card bg-dark">
+            <h3>logo.svg on Dark</h3>
+            <img src="assets/logo.svg" alt="logo.svg">
+        </div>
+        <div class="card bg-dark">
+            <h3>logo.png on Dark</h3>
+            <img src="assets/logo.png" alt="logo.png">
+        </div>
+    </div>
+</body>
+
+</html>
