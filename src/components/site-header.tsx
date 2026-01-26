@@ -38,7 +38,7 @@ function MobileUserAvatar({ userId }: { userId: string }) {
   const fallback = getAvatarFallback(profile?.nickname);
 
   return (
-    <Link href={`/users/${userId}`} className="block">
+    <Link href={`/users/${userId}`} className="block shrink-0">
       <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black dark:border-white hover:border-[#FFC000] dark:hover:border-[#FFC000] transition-colors">
         {avatarUrl ? (
           <Image
@@ -68,7 +68,7 @@ function MobileNotificationIcon() {
   const { unreadCount } = useNotifications();
 
   return (
-    <Link href="/profile/notifications" className="p-2 text-gray-700 dark:text-gray-300 hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors">
+    <Link href="/profile/notifications" className="p-2 text-gray-700 dark:text-gray-300 hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors shrink-0">
       <div className="relative">
         <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
@@ -188,7 +188,7 @@ export default function SiteHeader() {
                 className="object-contain"
               />
             </div>
-            <span className="text-lg sm:text-2xl truncate max-w-[170px] xs:max-w-[200px] sm:max-w-none">
+            <span className="text-lg sm:text-2xl truncate max-w-[170px] xs:max-w-[200px] sm:max-w-none hidden min-[380px]:block">
               {siteConfig.name}
             </span>
           </Link>
