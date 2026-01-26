@@ -182,7 +182,8 @@ export default function UserDashboard() {
 
                 {/* 1. Profile Header */}
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                    <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex flex-row gap-4 md:gap-6">
+
                         <div className="flex-shrink-0">
                             {displayAvatarUrl ? (
                                 <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={120} height={120} className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
@@ -193,74 +194,46 @@ export default function UserDashboard() {
                             )}
                         </div>
 
-                        <div className="flex-1">
-                            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
-                                <div>
-                                    <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">{profile.nickname}</h1>
-                                    {user?.email && <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium">{user.email}</p>}
-                                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                        <MapPin className="h-4 w-4 text-gray-400" />
-                                        <span>{locationDisplay || 'Sin ubicación'}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 mt-3">
-                                        <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700">
-                                            <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
-                                            <span className="text-gray-900 dark:text-white font-bold text-lg">{profile.rating_avg?.toFixed(1) || '0.0'}</span>
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">({profile.rating_count} valoraciones)</span>
-                                    </div>
-                                    {profile.is_admin && (
-                                        <div className="mt-3">
-                                            <Badge className="bg-red-50 text-red-600 border-red-100">Administrador</Badge>
-                                        </div>
-                                    )}
-                                </div>
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                            <div>
 
-                                <div>
-                                    <Link href="/profile/edit">
-                                        <Button variant="outline">
-                                            EDITAR PERFIL
-                                        </Button>
-                                    </Link>
+                                <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">{profile.nickname}</h1>
+                                {user?.email && <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium">{user.email}</p>}
+                                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                    <MapPin className="h-4 w-4 text-gray-400" />
+                                    <span>{locationDisplay || 'Sin ubicación'}</span>
                                 </div>
+                                <div className="flex items-center gap-2 mt-3">
+                                    <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700">
+                                        <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
+                                        <span className="text-gray-900 dark:text-white font-bold text-lg">{profile.rating_avg?.toFixed(1) || '0.0'}</span>
+                                    </div>
+                                    <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">({profile.rating_count} valoraciones)</span>
+                                </div>
+                                {profile.is_admin && (
+                                    <div className="mt-3">
+                                        <Badge className="bg-red-50 text-red-600 border-red-100">Administrador</Badge>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Stats Cards */}
-                            <div className="grid grid-cols-3 gap-4 mt-6">
-                                <Link href="/marketplace/my-listings" className="block transform transition hover:scale-[1.02]">
-                                    <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                                        <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                                        <p className="text-2xl font-black text-gray-900 dark:text-white">{activeListings.length}</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
-                                    </div>
+                            <div>
+                                <Link href="/ajustes">
+                                    <Button variant="outline">
+                                        EDITAR PERFIL
+                                    </Button>
                                 </Link>
-                                <Link href="/favorites" className="block transform transition hover:scale-[1.02]">
-                                    <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                                        <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                                        <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.favorites_count}</p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
-                                    </div>
-                                </Link>
-                                <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                                    <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                                    <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.rating_count}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
-                                </div>
                             </div>
                         </div>
                     </div>
-
-                    {/* Badges */}
-                    <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                        <ProfileBadgesSimple userId={user?.id || ''} isOwnProfile={true} />
-                    </div>
                 </div>
+
 
                 {/* 2. Albums (Mis Plantillas) */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Mis Álbumes</h2>
-                        <p className="text-sm text-gray-500">Gestiona tu progreso, completa tus álbumes y organiza tus cromos.</p>
+                        {/* Removed description text as requested */}
                         <Link href="/templates">
                             <Button variant="outline" size="sm" className="hidden md:flex">
                                 <LayoutGrid className="mr-2 h-4 w-4" />
@@ -336,53 +309,86 @@ export default function UserDashboard() {
                     )}
                 </div>
 
+                {/* 3. Badges */}
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <ProfileBadgesSimple userId={user?.id || ''} isOwnProfile={true} />
+                </div>
+
+                {/* 4. Stats Cards (Moved to bottom) */}
+                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <Link href="/marketplace/my-listings" className="block transform transition hover:scale-[1.02]">
+                        <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
+                            <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                            <p className="text-2xl font-black text-gray-900 dark:text-white">{activeListings.length}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
+                        </div>
+                    </Link>
+                    <Link href="/favorites" className="block transform transition hover:scale-[1.02]">
+                        <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
+                            <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                            <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.favorites_count}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
+                        </div>
+                    </Link>
+                    <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                        <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                        <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.rating_count}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
+                    </div>
+                </div>
+
+
                 {/* 3. Listings */}
-                {activeListings.length > 0 && (
-                    <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Anuncios</h2>
-                            <div className="flex gap-2">
-                                <Badge variant="secondary">ACTIVOS {activeListings.length}</Badge>
-                                <Badge variant="outline" className="text-gray-400">RESERVADOS {listings.filter(l => l.status === 'reserved').length}</Badge>
-                                <Badge variant="outline" className="text-gray-400">COMPLETADOS {listings.filter(l => l.status === 'sold').length}</Badge>
-                                <Badge variant="outline" className="text-gray-400">ELIMINADOS {listings.filter(l => l.status === 'removed').length}</Badge>
+                {
+                    activeListings.length > 0 && (
+                        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Anuncios</h2>
+                                <div className="flex gap-2">
+                                    <Badge variant="secondary">ACTIVOS {activeListings.length}</Badge>
+                                    <Badge variant="outline" className="text-gray-400">RESERVADOS {listings.filter(l => l.status === 'reserved').length}</Badge>
+                                    <Badge variant="outline" className="text-gray-400">COMPLETADOS {listings.filter(l => l.status === 'sold').length}</Badge>
+                                    <Badge variant="outline" className="text-gray-400">ELIMINADOS {listings.filter(l => l.status === 'removed').length}</Badge>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {activeListings.map(listing => (
+                                    <ListingCard key={listing.id} listing={listing} />
+                                ))}
                             </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {activeListings.map(listing => (
-                                <ListingCard key={listing.id} listing={listing} />
-                            ))}
-                        </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* 4. Ratings */}
-                {ratingSummary && ratingSummary.rating_count > 0 && (
-                    <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Valoraciones</h2>
-                        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div>
-                                    <div className="flex items-end gap-3 mb-2">
-                                        <span className="text-5xl font-black text-gray-900 dark:text-white">{ratingSummary.rating_avg.toFixed(1)}</span>
-                                        <div className="mb-2">{renderStars(Math.round(ratingSummary.rating_avg))}</div>
-                                    </div>
-                                    <p className="text-gray-500 dark:text-gray-400">Basado en {ratingSummary.rating_count} valoraciones</p>
-                                </div>
-                                <div className="space-y-2">
-                                    {['5_star', '4_star', '3_star', '2_star', '1_star'].map(key => (
-                                        <div key={key} className="flex items-center gap-2">
-                                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-16">{key.replace('_star', ' estrellas')}</span>
-                                            {renderRatingBar(ratingSummary.rating_distribution[key as keyof typeof ratingSummary.rating_distribution], ratingSummary.rating_count)}
+                {
+                    ratingSummary && ratingSummary.rating_count > 0 && (
+                        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Valoraciones</h2>
+                            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div>
+                                        <div className="flex items-end gap-3 mb-2">
+                                            <span className="text-5xl font-black text-gray-900 dark:text-white">{ratingSummary.rating_avg.toFixed(1)}</span>
+                                            <div className="mb-2">{renderStars(Math.round(ratingSummary.rating_avg))}</div>
                                         </div>
-                                    ))}
+                                        <p className="text-gray-500 dark:text-gray-400">Basado en {ratingSummary.rating_count} valoraciones</p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {['5_star', '4_star', '3_star', '2_star', '1_star'].map(key => (
+                                            <div key={key} className="flex items-center gap-2">
+                                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-16">{key.replace('_star', ' estrellas')}</span>
+                                                {renderRatingBar(ratingSummary.rating_distribution[key as keyof typeof ratingSummary.rating_distribution], ratingSummary.rating_count)}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
