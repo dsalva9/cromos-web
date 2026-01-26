@@ -27,26 +27,18 @@ export function useUserProfile(userId: string) {
     try {
       setLoading(true);
 
-      // Get profile
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Run all three queries in parallel instead of sequentially
+      const [profileResult, favCountResult, listingsResult] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+        supabase.rpc('get_favourite_count', { p_target_type: 'user', p_target_id: userId }),
+        supabase.rpc('get_user_listings', { p_user_id: userId, p_limit: 50, p_offset: 0 }),
+      ]);
 
-      if (profileError) throw profileError;
+      if (profileResult.error) throw profileResult.error;
+      if (favCountResult.error) throw favCountResult.error;
+      if (listingsResult.error) throw listingsResult.error;
 
-      // Get favorites count (how many users have favorited this user)
-      const { data: favCountData, error: favCountError } = await supabase.rpc(
-        'get_favourite_count',
-        {
-          p_target_type: 'user',
-          p_target_id: userId
-        }
-      );
-
-      if (favCountError) throw favCountError;
-
+      const profileData = profileResult.data;
       const locationLabel =
         typeof profileData?.location_label === 'string' &&
         profileData.location_label.trim().length > 0
@@ -59,7 +51,7 @@ export function useUserProfile(userId: string) {
         avatar_url: profileData.avatar_url ?? null,
         rating_avg: Number(profileData.rating_avg ?? 0),
         rating_count: Number(profileData.rating_count ?? 0),
-        favorites_count: Number(favCountData) || 0,
+        favorites_count: Number(favCountResult.data) || 0,
         is_admin: Boolean(profileData.is_admin),
         is_suspended: Boolean(profileData.is_suspended),
         deleted_at: profileData.deleted_at ?? null,
@@ -68,17 +60,7 @@ export function useUserProfile(userId: string) {
       };
 
       setProfile(normalizedProfile);
-
-      // Get user listings
-      const { data: listingsData, error: listingsError } = await supabase.rpc('get_user_listings', {
-        p_user_id: userId,
-        p_limit: 50,
-        p_offset: 0
-      });
-
-      if (listingsError) throw listingsError;
-
-      setListings(listingsData || []);
+      setListings(listingsResult.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {

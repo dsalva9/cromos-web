@@ -107,17 +107,19 @@ export default function UserDashboard() {
         fetchCopies();
     }, [user, supabase]);
 
-    // --- Fetch Ratings ---
+    // --- Fetch Ratings (parallel) ---
     useEffect(() => {
         async function fetchRatings() {
             if (!user) return;
             setLoadingRatings(true);
             try {
-                const { data: summaryData } = await supabase.rpc('get_user_rating_summary', { p_user_id: user.id });
-                if (summaryData && summaryData.length > 0) setRatingSummary(summaryData[0]);
+                const [summaryResult, ratingsResult] = await Promise.all([
+                    supabase.rpc('get_user_rating_summary', { p_user_id: user.id }),
+                    supabase.rpc('get_user_ratings', { p_user_id: user.id, p_limit: 10, p_offset: 0 }),
+                ]);
 
-                const { data: ratingsData } = await supabase.rpc('get_user_ratings', { p_user_id: user.id, p_limit: 10, p_offset: 0 });
-                setRatings(ratingsData || []);
+                if (summaryResult.data && summaryResult.data.length > 0) setRatingSummary(summaryResult.data[0]);
+                setRatings(ratingsResult.data || []);
             } catch (err) {
                 logger.error('Error fetching ratings:', err);
             } finally {
@@ -166,10 +168,30 @@ export default function UserDashboard() {
             ? `CP ${profile.postcode}`
             : null;
 
-    if (profileLoading || loadingCopies) {
+    if (profileLoading) {
         return (
-            <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
-                <div className="text-gray-900 dark:text-white text-xl font-bold">Cargando...</div>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="container mx-auto px-4 py-8 space-y-8">
+                    {/* Profile skeleton */}
+                    <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
+                        <div className="flex flex-row gap-4 md:gap-6 animate-pulse">
+                            <div className="w-[120px] h-[120px] rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
+                            <div className="flex-1 space-y-3 py-2">
+                                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48" />
+                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64" />
+                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+                            </div>
+                        </div>
+                    </div>
+                    {/* Albums skeleton */}
+                    <div className="space-y-4 animate-pulse">
+                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-40" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
@@ -241,7 +263,12 @@ export default function UserDashboard() {
                         </Link>
                     </div>
 
-                    {copies.length === 0 ? (
+                    {loadingCopies ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+                            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                            <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        </div>
+                    ) : copies.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 border-dashed">
                             <LayoutGrid className="h-10 w-10 text-gray-400 mb-3" />
                             <p className="text-gray-500 mb-4">No tienes colecciones activas</p>
