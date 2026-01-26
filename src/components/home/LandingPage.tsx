@@ -18,7 +18,7 @@ export default function LandingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
             {/* Hero Section */}
-            <section className="relative overflow-hidden pt-20 pb-2 lg:pt-24 lg:pb-4">
+            <section className="relative overflow-hidden pt-10 pb-2 lg:pt-12 lg:pb-4">
                 {/* Background Decorative Shapes */}
                 <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
@@ -274,7 +274,7 @@ export default function LandingPage() {
                             <div className="md:mt-4">
                                 <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Gestiona Albumes</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
-                                    Olvídate del papel. Marca tus faltas y repes directamente en la app.
+                                    Olvídate del papel. Marca los cromos que te faltan y repes directamente en la app.
                                 </p>
                             </div>
                         </div>
