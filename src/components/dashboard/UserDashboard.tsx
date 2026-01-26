@@ -10,34 +10,10 @@ import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart } from 'lucide-react';
+import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { logger } from '@/lib/logger';
-
-// Types for the dashboard
-interface Rating {
-    id: number;
-    rater_id: string;
-    rater_nickname: string;
-    rater_avatar_url: string | null;
-    rating: number;
-    comment: string | null;
-    context_type: string;
-    context_id: number;
-    created_at: string;
-}
-
-interface RatingSummary {
-    rating_avg: number;
-    rating_count: number;
-    rating_distribution: {
-        '5_star': number;
-        '4_star': number;
-        '3_star': number;
-        '2_star': number;
-        '1_star': number;
-    };
-}
+import { Listing } from '@/types/v1.6.0';
 
 // Reuse logic from server-my-templates but for client
 interface TemplateCopy {
@@ -67,12 +43,9 @@ export default function UserDashboard() {
     const [copies, setCopies] = useState<TemplateCopy[]>([]);
     const [loadingCopies, setLoadingCopies] = useState(true);
 
-    // 3. Ratings Data
-    const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(null);
-    const [ratings, setRatings] = useState<Rating[]>([]);
-    const [loadingRatings, setLoadingRatings] = useState(false);
-
-
+    // 3. Recent Marketplace Listings
+    const [recentListings, setRecentListings] = useState<Listing[]>([]);
+    const [loadingRecentListings, setLoadingRecentListings] = useState(true);
 
     // --- Fetch Templates ---
     useEffect(() => {
@@ -107,81 +80,67 @@ export default function UserDashboard() {
         fetchCopies();
     }, [user, supabase]);
 
-    // --- Fetch Ratings (parallel) ---
+    // --- Fetch Recent Marketplace Listings ---
     useEffect(() => {
-        async function fetchRatings() {
-            if (!user) return;
-            setLoadingRatings(true);
+        async function fetchRecentListings() {
             try {
-                const [summaryResult, ratingsResult] = await Promise.all([
-                    supabase.rpc('get_user_rating_summary', { p_user_id: user.id }),
-                    supabase.rpc('get_user_ratings', { p_user_id: user.id, p_limit: 10, p_offset: 0 }),
-                ]);
+                setLoadingRecentListings(true);
+                const { data, error } = await supabase
+                    .from('listings')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false })
+                    .limit(6);
 
-                if (summaryResult.data && summaryResult.data.length > 0) setRatingSummary(summaryResult.data[0]);
-                setRatings(ratingsResult.data || []);
-            } catch (err) {
-                logger.error('Error fetching ratings:', err);
+                if (error) throw error;
+                setRecentListings(data || []);
+            } catch (error) {
+                logger.error('Error fetching recent listings:', error);
             } finally {
-                setLoadingRatings(false);
+                setLoadingRecentListings(false);
             }
         }
-        fetchRatings();
-    }, [user, supabase]);
-
-    // --- Render Helpers ---
-    const renderStars = (rating: number) => (
-        <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map(star => (
-                <Star key={star} className={`h-4 w-4 ${star <= rating ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-200'}`} />
-            ))}
-        </div>
-    );
-
-    const renderRatingBar = (count: number, total: number) => {
-        const percentage = total > 0 ? (count / total) * 100 : 0;
-        return (
-            <div className="flex items-center gap-3 w-full">
-                <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
-                    <div className="h-full bg-[#FFC000]" style={{ width: `${percentage}%` }} />
-                </div>
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-bold min-w-[2rem] text-right">{count}</span>
-            </div>
-        );
-    };
+        fetchRecentListings();
+    }, [supabase]);
 
     const activeListings = useMemo(() => listings.filter(l => l.status === 'active'), [listings]);
 
+    // Find the album with most missing cromos for CTA
+    const mostIncompleteAlbum = useMemo(() => {
+        if (copies.length === 0) return null;
+        return copies.reduce((prev, current) => {
+            const prevMissing = prev.total_slots - prev.completed_slots;
+            const currentMissing = current.total_slots - current.completed_slots;
+            return currentMissing > prevMissing ? current : prev;
+        });
+    }, [copies]);
 
     // --- Profile Header Logic (Derived) ---
-    // Moved up to avoid early return hook violation
     const displayAvatarUrl = useMemo(
         () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
         [profile?.avatar_url, supabase]
     );
 
-    const locationDisplay = profile?.location_label
-        ? profile.postcode
-            ? `${profile.location_label} (${profile.postcode})`
-            : profile.location_label
-        : profile?.postcode
-            ? `CP ${profile.postcode}`
-            : null;
-
     if (profileLoading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <div className="container mx-auto px-4 py-8 space-y-8">
-                    {/* Profile skeleton */}
+                    {/* Compact Profile skeleton */}
                     <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                        <div className="flex flex-row gap-4 md:gap-6 animate-pulse">
-                            <div className="w-[120px] h-[120px] rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-                            <div className="flex-1 space-y-3 py-2">
-                                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48" />
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-64" />
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+                        <div className="flex items-center gap-4 animate-pulse">
+                            <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
+                            <div className="flex-1 space-y-2">
+                                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24" />
                             </div>
                         </div>
+                    </div>
+                    {/* Quick actions skeleton */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-pulse">
+                        <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-xl" />
                     </div>
                     {/* Albums skeleton */}
                     <div className="space-y-4 animate-pulse">
@@ -202,63 +161,110 @@ export default function UserDashboard() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-8 space-y-8">
 
-                {/* 1. Profile Header */}
+                {/* 1. Compact Profile Header */}
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                    <div className="flex flex-row gap-4 md:gap-6">
-
-                        <div className="flex-shrink-0">
-                            {displayAvatarUrl ? (
-                                <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={120} height={120} className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
-                            ) : (
-                                <div className="w-30 h-30 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                                    <User className="h-16 w-16 text-gray-400" />
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                            <div>
-
-                                <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">{profile.nickname}</h1>
-                                {user?.email && <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium">{user.email}</p>}
-                                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                    <MapPin className="h-4 w-4 text-gray-400" />
-                                    <span>{locationDisplay || 'Sin ubicación'}</span>
-                                </div>
-                                <div className="flex items-center gap-2 mt-3">
-                                    <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700">
-                                        <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
-                                        <span className="text-gray-900 dark:text-white font-bold text-lg">{profile.rating_avg?.toFixed(1) || '0.0'}</span>
-                                    </div>
-                                    <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">({profile.rating_count} valoraciones)</span>
-                                </div>
-                                {profile.is_admin && (
-                                    <div className="mt-3">
-                                        <Badge className="bg-red-50 text-red-600 border-red-100">Administrador</Badge>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0">
+                                {displayAvatarUrl ? (
+                                    <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={64} height={64} className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
+                                ) : (
+                                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
+                                        <User className="h-8 w-8 text-gray-400" />
                                     </div>
                                 )}
                             </div>
-
                             <div>
-                                <Link href="/ajustes">
-                                    <Button variant="outline">
-                                        EDITAR PERFIL
-                                    </Button>
-                                </Link>
+                                <div className="flex items-center gap-3">
+                                    <h1 className="text-2xl font-black text-gray-900 dark:text-white">{profile.nickname}</h1>
+                                    <div className="flex items-center gap-1">
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile.rating_avg) ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-200 dark:text-gray-600'}`} />
+                                        ))}
+                                    </div>
+                                </div>
+                                {profile.is_admin && (
+                                    <Badge className="bg-red-50 text-red-600 border-red-100 mt-2">Administrador</Badge>
+                                )}
                             </div>
                         </div>
+                        <Link href="/ajustes" className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors">
+                            Editar Perfil
+                        </Link>
                     </div>
                 </div>
 
+                {/* 2. Quick Actions Bar */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Link href="/marketplace" className="group">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
+                            <Store className="h-6 w-6 text-[#FFC000] mb-2" />
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">Explorar Marketplace</p>
+                        </div>
+                    </Link>
+                    <Link href="/marketplace/create" className="group">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
+                            <PlusCircle className="h-6 w-6 text-[#FFC000] mb-2" />
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">Publicar Anuncio</p>
+                        </div>
+                    </Link>
+                    <Link href="/templates" className="group">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
+                            <LayoutGrid className="h-6 w-6 text-[#FFC000] mb-2" />
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">Descubrir Colecciones</p>
+                        </div>
+                    </Link>
+                    <Link href="/chats" className="group">
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
+                            <MessageCircle className="h-6 w-6 text-[#FFC000] mb-2" />
+                            <p className="text-sm font-bold text-gray-900 dark:text-white">Mis Chats</p>
+                        </div>
+                    </Link>
+                </div>
 
-                {/* 2. Albums (Mis Plantillas) */}
+                {/* 3. Complete Your Collection CTA Banner */}
+                {mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
+                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Completa tu colección</p>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white">
+                                    Te faltan {mostIncompleteAlbum.total_slots - mostIncompleteAlbum.completed_slots} cromos de {mostIncompleteAlbum.title}
+                                </h3>
+                            </div>
+                            <Link href="/marketplace">
+                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                    Buscar en el Marketplace <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                ) : copies.length === 0 ? (
+                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Empieza a coleccionar</p>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white">
+                                    Comienza tu primera colección
+                                </h3>
+                            </div>
+                            <Link href="/templates">
+                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                    Explorar Colecciones <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                ) : null}
+
+                {/* 4. Albums (Mis Álbumes) */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Mis Álbumes</h2>
-                        {/* Removed description text as requested */}
                         <Link href="/templates">
                             <Button variant="outline" size="sm" className="hidden md:flex">
                                 <LayoutGrid className="mr-2 h-4 w-4" />
+                                Ver Todas
                             </Button>
                         </Link>
                     </div>
@@ -288,8 +294,6 @@ export default function UserDashboard() {
                                     <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block">
                                         <div className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-[#FFC000] transition-all hover:shadow-md p-4">
                                             <div className="flex items-start gap-4">
-                                                {/* Mini Image (Optional as requested "no image", but maybe a super small thumb or icon is good? User said "without the image". I will assume NO image at all, just data) */}
-
                                                 <div className="flex-1">
                                                     <div className="flex justify-between items-start mb-2">
                                                         <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-[#FFC000] transition-colors line-clamp-1">{copy.title}</h3>
@@ -336,27 +340,75 @@ export default function UserDashboard() {
                     )}
                 </div>
 
-                {/* 3. Badges */}
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                {/* 5. Badges */}
+                <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <ProfileBadgesSimple userId={user?.id || ''} isOwnProfile={true} />
                 </div>
 
-                {/* 4. Stats Cards (Moved to bottom) */}
+                {/* 6. Recent Marketplace Listings */}
+                {!loadingRecentListings && recentListings.length > 0 && (
+                    <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Últimos Anuncios</h2>
+                            <Link href="/marketplace" className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors flex items-center gap-1">
+                                Ver más en el Marketplace <ArrowRight className="h-4 w-4" />
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {recentListings.map(listing => (
+                                <ListingCard key={listing.id} listing={listing} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {loadingRecentListings && (
+                    <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Últimos Anuncios</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                        </div>
+                    </div>
+                )}
+
+                {/* 7. Stats/Action Cards */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <Link href="/marketplace/my-listings" className="block transform transition hover:scale-[1.02]">
-                        <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                            <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                            <p className="text-2xl font-black text-gray-900 dark:text-white">{activeListings.length}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
-                        </div>
-                    </Link>
-                    <Link href="/favorites" className="block transform transition hover:scale-[1.02]">
-                        <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                            <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                            <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.favorites_count}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
-                        </div>
-                    </Link>
+                    {activeListings.length === 0 ? (
+                        <Link href="/marketplace/create" className="block transform transition hover:scale-[1.02]">
+                            <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
+                                <PlusCircle className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                                <p className="text-sm font-black text-gray-900 dark:text-white">Publica tu primer anuncio</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <Link href="/marketplace/my-listings" className="block transform transition hover:scale-[1.02]">
+                            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
+                                <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                                <p className="text-2xl font-black text-gray-900 dark:text-white">{activeListings.length}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
+                            </div>
+                        </Link>
+                    )}
+
+                    {profile.favorites_count === 0 ? (
+                        <Link href="/marketplace" className="block transform transition hover:scale-[1.02]">
+                            <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
+                                <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                                <p className="text-sm font-black text-gray-900 dark:text-white">Guarda tus favoritos</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <Link href="/favorites" className="block transform transition hover:scale-[1.02]">
+                            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
+                                <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                                <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.favorites_count}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
+                            </div>
+                        </Link>
+                    )}
+
                     <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
                         <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
                         <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.rating_count}</p>
@@ -364,58 +416,7 @@ export default function UserDashboard() {
                     </div>
                 </div>
 
-
-                {/* 3. Listings */}
-                {
-                    activeListings.length > 0 && (
-                        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Anuncios</h2>
-                                <div className="flex gap-2">
-                                    <Badge variant="secondary">ACTIVOS {activeListings.length}</Badge>
-                                    <Badge variant="outline" className="text-gray-400">RESERVADOS {listings.filter(l => l.status === 'reserved').length}</Badge>
-                                    <Badge variant="outline" className="text-gray-400">COMPLETADOS {listings.filter(l => l.status === 'sold').length}</Badge>
-                                    <Badge variant="outline" className="text-gray-400">ELIMINADOS {listings.filter(l => l.status === 'removed').length}</Badge>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {activeListings.map(listing => (
-                                    <ListingCard key={listing.id} listing={listing} />
-                                ))}
-                            </div>
-                        </div>
-                    )
-                }
-
-                {/* 4. Ratings */}
-                {
-                    ratingSummary && ratingSummary.rating_count > 0 && (
-                        <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700 border-dashed">
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Valoraciones</h2>
-                            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    <div>
-                                        <div className="flex items-end gap-3 mb-2">
-                                            <span className="text-5xl font-black text-gray-900 dark:text-white">{ratingSummary.rating_avg.toFixed(1)}</span>
-                                            <div className="mb-2">{renderStars(Math.round(ratingSummary.rating_avg))}</div>
-                                        </div>
-                                        <p className="text-gray-500 dark:text-gray-400">Basado en {ratingSummary.rating_count} valoraciones</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {['5_star', '4_star', '3_star', '2_star', '1_star'].map(key => (
-                                            <div key={key} className="flex items-center gap-2">
-                                                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 w-16">{key.replace('_star', ' estrellas')}</span>
-                                                {renderRatingBar(ratingSummary.rating_distribution[key as keyof typeof ratingSummary.rating_distribution], ratingSummary.rating_count)}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }
-
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
