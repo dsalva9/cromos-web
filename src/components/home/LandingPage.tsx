@@ -32,7 +32,7 @@ export default function LandingPage() {
                                 La Plataforma #1 de intercambio de Cromos
                             </Badge>
 
-                            <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+                            <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 -mt-6 lg:-mt-8 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                                 <Image
                                     src="/assets/logo.svg"
                                     alt="Logo"
@@ -43,7 +43,7 @@ export default function LandingPage() {
                             </div>
 
 
-                            <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
+                            <h1 className="-mt-6 lg:-mt-8 text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC000] to-yellow-500 drop-shadow-sm">
                                     a otro nivel
