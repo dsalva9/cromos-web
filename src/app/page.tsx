@@ -2,6 +2,7 @@
 
 import { useUser } from '@/components/providers/SupabaseProvider';
 import LandingPage from '@/components/home/LandingPage';
+import UserDashboard from '@/components/dashboard/UserDashboard';
 // SiteFooter removed as it is in layout
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -94,13 +95,9 @@ export default function Home() {
     );
   }
 
-  // If user is authenticated on web, show loading state while redirecting
+  // If user is authenticated on web, render Dashboard
   if (user) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center">
-        <div className="text-gray-900 dark:text-white text-xl font-bold">Redirigiendo...</div>
-      </div>
-    );
+    return <UserDashboard />;
   }
 
   // Not authenticated on web -> Landing Page
