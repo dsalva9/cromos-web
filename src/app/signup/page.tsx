@@ -141,7 +141,7 @@ export default function SignupPage() {
       <div className="mb-8 text-center">
         <div className="relative w-48 h-48 mx-auto mb-4">
           <Image
-            src="/assets/logo.svg"
+            src="/assets/LogoBlanco.png"
             alt="Logo"
             fill
             className="object-contain drop-shadow-xl"
