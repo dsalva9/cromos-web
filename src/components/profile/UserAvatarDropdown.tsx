@@ -40,11 +40,15 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   };
 
   const handleSignOut = async () => {
+    const toastId = toast.loading('Cerrando sesión...');
     try {
       await supabase.auth.signOut();
-      router.push('/login');
+      toast.success('Sesión cerrada correctamente', { id: toastId });
+      // Use window.location.href for a full reload to ensure safe clear of all state
+      window.location.href = '/login';
     } catch (error) {
       logger.error('Sign out error:', error);
+      toast.error('Error al cerrar sesión', { id: toastId });
     }
     handleSetIsOpen(false);
   };
