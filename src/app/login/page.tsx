@@ -153,7 +153,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 py-4 sm:py-0">
+    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-start sm:justify-center px-4 pt-2 sm:pt-0 pb-8 sm:py-0">
       {/* Logo/Header */}
       <div className="mb-0 sm:mb-2 text-center">
         <div className="relative w-24 h-24 sm:w-48 sm:h-48 mx-auto">
