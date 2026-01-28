@@ -48,33 +48,64 @@ export default function AuthCallback() {
 
     const handleAuthCallback = async () => {
       try {
-        // Check for next parameter in URL
-        const params = new URLSearchParams(window.location.search);
-        const next = params.get('next');
-        const code = params.get('code');
+        // Check for next parameter in URL (search or hash)
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-        logger.info('Auth callback started', { hasCode: !!code, next });
+        const next = searchParams.get('next') || hashParams.get('next');
+        const code = searchParams.get('code') || hashParams.get('code');
+
+        // Fragments often contain the tokens directly on some mobile redirects
+        const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+
+        logger.info('Auth callback details', {
+          url: window.location.href,
+          hasCode: !!code,
+          hasAccessToken: !!accessToken,
+          next
+        });
+
+        // 1. Handle explicit code exchange (PKCE)
+        if (code) {
+          logger.info('Exchanging code for session...');
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) {
+            logger.error('Error exchanging code for session:', exchangeError);
+          } else {
+            logger.info('Code exchanged successfully');
+          }
+        }
+
+        // 2. Handle implicit tokens if present
+        if (accessToken && refreshToken) {
+          logger.info('Tokens found in URL, setting session manually...');
+          const { data: setData, error: setError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (setError) {
+            logger.error('Error setting session from tokens:', setError);
+          } else {
+            logger.info('Session set successfully from tokens', { user: setData.session?.user?.id });
+          }
+        }
 
         // Check if this is a password recovery flow
         if (next === '/profile/reset-password') {
-          // Set flag to require password reset
           sessionStorage.setItem('password_recovery_required', 'true');
-          console.log('[AuthCallback] Password recovery flag set in sessionStorage');
           logger.info('Password recovery flag set');
-        } else {
-          console.log('[AuthCallback] Not a password recovery flow, next:', next);
         }
 
-        // The @supabase/ssr client handles code exchange automatically
-        // For password recovery, it establishes the session automatically
-        // We just need to wait a moment for it to complete
-        if (code) {
-          // Wait a bit for the automatic code exchange to complete
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-
-        // Get the current session
+        // Get the current session to verify we are logged in
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+        logger.info('Final session check', {
+          hasSession: !!sessionData.session,
+          userId: sessionData.session?.user?.id,
+          error: sessionError?.message
+        });
 
         if (sessionError) {
           logger.error('Error getting session:', sessionError);
@@ -85,7 +116,7 @@ export default function AuthCallback() {
         const sessionUser = sessionData.session?.user;
 
         if (!sessionUser) {
-          logger.error('No user in session after code exchange');
+          logger.error('No authenticated user found after processing callback');
           if (mounted) router.push('/login');
           return;
         }
