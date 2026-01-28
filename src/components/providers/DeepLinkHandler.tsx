@@ -18,14 +18,20 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     // Handle deep links when app is opened from a link
     CapacitorApp.addListener('appUrlOpen', (data) => {
       console.log('Deep link received:', data.url);
-      
+
       // Extract the path from the URL
-      // Example: https://cromos-web.vercel.app/marketplace/77 -> /marketplace/77
+      // Support both HTTPS and custom schemes (com.cambiocromos.app://auth/callback)
       const url = new URL(data.url);
-      const path = url.pathname + url.search + url.hash;
-      
+      let path = url.pathname + url.search + url.hash;
+
+      // Handle custom scheme where hostname might be part of the path logically
+      // Example: com.cambiocromos.app://auth/callback -> pathname='/callback', host='auth'
+      if (url.protocol === 'com.cambiocromos.app:' && url.host) {
+        path = '/' + url.host + url.pathname + url.search + url.hash;
+      }
+
       console.log('Navigating to:', path);
-      
+
       // Navigate to the path
       router.push(path);
     }).then(handle => {

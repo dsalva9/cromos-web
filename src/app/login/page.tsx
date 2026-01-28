@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { GoogleIcon } from '@/components/ui/google-icon';
+import { Capacitor } from '@capacitor/core';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -122,10 +123,18 @@ export default function LoginPage() {
     setError('');
 
     try {
+      // Determine redirect URL based on platform
+      const isNative = Capacitor.isNativePlatform();
+      const redirectTo = isNative
+        ? 'com.cambiocromos.app://auth/callback'
+        : `${window.location.origin}/auth/callback`;
+
+      console.log('Google login redirect TO:', redirectTo);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
