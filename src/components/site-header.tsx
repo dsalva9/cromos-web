@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
+import { Capacitor } from '@capacitor/core';
 
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -232,12 +233,14 @@ export default function SiteHeader() {
                   <MobileUserAvatar userId={user.id} />
                 </>
               ) : (
-                <Link
-                  href="/login"
-                  className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-[#FFC000] hover:text-black transition-colors"
-                >
-                  Entrar
-                </Link>
+                !Capacitor.isNativePlatform() && (
+                  <Link
+                    href="/login"
+                    className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-[#FFC000] hover:text-black transition-colors"
+                  >
+                    Entrar
+                  </Link>
+                )
               )
             )}
           </div>

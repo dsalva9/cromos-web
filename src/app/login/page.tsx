@@ -155,8 +155,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
-      <div className="mb-8 text-center">
-        <div className="relative w-48 h-48 mx-auto mb-4">
+      <div className="mb-2 text-center">
+        <div className="relative w-48 h-48 mx-auto">
           <Image
             src="/assets/LogoBlanco.png"
             alt="Logo"
