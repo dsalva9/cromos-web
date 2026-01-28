@@ -153,10 +153,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 py-8 sm:py-0">
       {/* Logo/Header */}
-      <div className="mb-2 text-center">
-        <div className="relative w-48 h-48 mx-auto">
+      <div className="mb-1 sm:mb-2 text-center">
+        <div className="relative w-32 h-32 sm:w-48 sm:h-48 mx-auto">
           <Image
             src="/assets/LogoBlanco.png"
             alt="Logo"
@@ -166,26 +166,26 @@ export default function LoginPage() {
           />
         </div>
       </div>
-      <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
+      <h1 className="text-2xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white mb-2 sm:mb-2">
         {siteConfig.name}
       </h1>
 
 
       {/* Login Card */}
       <div className="w-full max-w-md bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl overflow-hidden">
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-white mb-2">
+        <div className="p-4 sm:p-8">
+          <div className="text-center mb-4 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-black uppercase text-gray-900 dark:text-white mb-1 sm:mb-2">
               Iniciar Sesión
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 font-medium">Accede a tu colección de cromos</p>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap">Accede a tu colección de cromos</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
+          <form onSubmit={handleLogin} className="space-y-3 sm:space-y-6">
+            <div className="space-y-1 sm:space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-bold uppercase text-gray-900 dark:text-white"
+                className="text-xs sm:text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
                 Email
               </label>
@@ -197,14 +197,14 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-bold uppercase text-gray-900 dark:text-white"
+                className="text-xs sm:text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
                 Contraseña
               </label>
@@ -216,7 +216,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
               />
             </div>
 
@@ -253,43 +253,43 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
+              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase h-10 sm:py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>
           </form>
 
-          <div className="relative my-8">
+          <div className="relative my-4 sm:my-8">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t-2 border-gray-200 dark:border-gray-700"></span>
             </div>
             <div className="relative flex justify-center text-sm uppercase">
-              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold">O</span>
+              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold text-xs">O</span>
             </div>
           </div>
 
           <Button
             type="button"
             variant="outline"
-            className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold py-3 rounded-md shadow-lg border-2 border-black flex items-center justify-center gap-3 transition-all duration-200"
+            className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold h-10 sm:py-3 rounded-md shadow-lg border-2 border-black flex items-center justify-center gap-3 transition-all duration-200 text-sm"
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            <GoogleIcon className="w-5 h-5" />
+            <GoogleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Continuar con Google</span>
           </Button>
 
-          <div className="mt-8 text-center space-y-4">
+          <div className="mt-4 sm:mt-8 text-center space-y-2 sm:space-y-4">
             <Link
               href="/forgot-password"
-              className="text-sm text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+              className="text-xs sm:text-sm text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
             >
               ¿Olvidaste tu contraseña?
             </Link>
 
-            <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+            <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-2 sm:pt-4">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">
                 ¿No tienes cuenta?{' '}
                 <Link
                   href="/signup"
