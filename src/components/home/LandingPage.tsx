@@ -87,9 +87,9 @@ export default function LandingPage() {
                         <div className="hidden lg:flex flex-1 justify-center relative w-full max-w-[300px] perspective-[2000px] mt-[-20px]">
 
                             {/* Phone Container - 3D Effect */}
-                            <div className="relative border-gray-900 bg-gray-900 border-[12px] rounded-[2.5rem] h-[600px] w-[300px] shadow-[30px_35px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden ring-4 ring-black/10 transform rotate-y-[-12deg] rotate-x-[0deg] hover:rotate-0 transition-all duration-700 ease-out z-10 mx-auto group/phone">
+                            <div className="relative border-gray-900 dark:border-gray-800 bg-gray-900 dark:bg-gray-800 border-[12px] rounded-[2.5rem] h-[600px] w-[300px] shadow-[30px_35px_60px_-15px_rgba(0,0,0,0.5)] dark:shadow-[30px_35px_60px_-15px_rgba(0,0,0,0.6),0_0_20px_rgba(255,192,0,0.05)] flex flex-col overflow-hidden ring-4 ring-black/10 dark:ring-[#FFC000]/10 transform rotate-y-[-12deg] rotate-x-[0deg] hover:rotate-0 transition-all duration-700 ease-out z-10 mx-auto group/phone">
                                 {/* Dynamic Island / Notch */}
-                                <div className="h-[28px] bg-gray-900 w-full absolute top-0 left-0 z-20 rounded-t-[1.5rem] flex justify-center">
+                                <div className="h-[28px] bg-gray-900 dark:bg-gray-800 w-full absolute top-0 left-0 z-20 rounded-t-[1.5rem] flex justify-center">
                                     <div className="h-[18px] w-[80px] bg-black rounded-b-xl" />
                                 </div>
 
