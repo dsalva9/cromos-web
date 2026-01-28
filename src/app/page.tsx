@@ -72,11 +72,11 @@ export default function Home() {
     );
   }
 
-  // For native apps, show white screen while redirecting
-  if (isNative === true) {
+  // For native apps, show white screen while redirecting to login
+  if (isNative === true && !user && !loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        {/* Empty - will redirect to login or marketplace */}
+        {/* Empty - will redirect to login */}
       </div>
     );
   }
@@ -90,11 +90,12 @@ export default function Home() {
     );
   }
 
-  // If user is authenticated on web, render Dashboard
+  // If user is authenticated (both web and native), render Dashboard
   if (user) {
     return <UserDashboard />;
   }
 
   // Not authenticated on web -> Landing Page
+  // Native users are already handled above (will redirect to /login)
   return <LandingPage />;
 }
