@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Funcionalidad - CambioCromos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            color: #1f2937;
+            margin-top: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #4b5563;
+            margin-top: 20px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background-color: #eff6ff;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            color: #1d4ed8;
+        }
+
+        .highlight {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+            background-color: #6b7280;
+            margin-right: 5px;
+        }
+
+        .role-user {
+            background-color: #10b981;
+        }
+
+        .role-creator {
+            background-color: #8b5cf6;
+        }
+
+        .role-admin {
+            background-color: #ef4444;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Resumen de Funcionalidad para Testers</h1>
+        <p><strong>Proyecto:</strong> CambioCromos<br>
+            <strong>Versión:</strong> 1.6.0-alpha<br>
+            <strong>Objetivo:</strong> Verificación de flujos principales de Marketplace y Comunidad.
+        </p>
+
+        <h2>🎯 Visión General</h2>
+        <p><strong>CambioCromos</strong> es una plataforma de mercado y comunidad para el intercambio de cromos
+            deportivos. El sistema permite a los usuarios gestionar sus colecciones, publicar cromos repetidos y
+            completar sus álbumes mediante compra, venta e intercambio directo.</p>
+
+        <h2>👥 Roles de Usuario</h2>
+        <ul>
+            <li><span class="role-badge role-user">Coleccionista</span> Gestiona colecciones, marca faltantes/repetidos,
+                compra y vende.</li>
+            <li><span class="role-badge role-creator">Creador</span> Crea estructuras de álbumes (plantillas) públicas.
+            </li>
+            <li><span class="role-badge role-admin">Admin</span> Modera contenido y gestiona usuarios.</li>
+        </ul>
+
+        <h2>🚀 Flujos Principales a Probar</h2>
+
+        <h3>1. Autenticación y Perfil</h3>
+        <ul>
+            <li><strong>Registro e Inicio de Sesión:</strong> Email/password y recuperación de contraseña.</li>
+            <li><strong>Gestión de Perfil:</strong>
+                <ul>
+                    <li>Cambiar avatar y datos personales.</li>
+                    <li><strong>Importante:</strong> Configurar código postal (esencial para el cálculo de distancia).
+                    </li>
+                    <li>Ver notificaciones unificadas.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>2. Gestión de Colecciones</h3>
+        <ul>
+            <li><strong>Explorador:</strong> Buscar y copiar plantillas públicas.</li>
+            <li><strong>Mis Plantillas:</strong>
+                <ul>
+                    <li>Ver progreso (% completado, faltantes).</li>
+                    <li>Marcar cromos ("Lo Tengo", "Falta", "Repe").</li>
+                    <li>Usar la entrada rápida de números.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>3. Marketplace (Compra y Venta)</h3>
+        <ul>
+            <li><strong>Publicar Anuncio:</strong>
+                <ul>
+                    <li><strong>Masivo:</strong> "Publicar Repes" desde el álbum (autocompleta datos).</li>
+                    <li><strong>Manual:</strong> Crear anuncio con foto obligatoria.</li>
+                </ul>
+            </li>
+            <li><strong>Buscar:</strong> Por texto, colección y <strong>Distancia</strong> (geolocalización).</li>
+            <li><strong>Ciclo de Vida del Anuncio:</strong>
+                <ul>
+                    <li><code>Activo</code>: Visible para todos.</li>
+                    <li><code>Reservado</code>: Bloqueado para un comprador específico.</li>
+                    <li><code>Completado</code>: Transacción finalizada (permite valoración).</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>4. Sistema Social</h3>
+        <ul>
+            <li><strong>Valoraciones:</strong> 1-5 estrellas tras completar un trato.</li>
+            <li><strong>Favoritos:</strong> Guardar anuncios y usuarios.</li>
+            <li><strong>Reportes:</strong> Moderación de contenido inapropiado.</li>
+        </ul>
+
+        <h3>5. Experiencia Móvil</h3>
+        <ul>
+            <li>Navegación por barra inferior.</li>
+            <li>Botón flotante (FAB) para acciones rápidas.</li>
+            <li>Uso de cámara nativa.</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>ℹ️ Notas Importantes</strong>
+            <p>La app utiliza un diseño "Retro-Comic" de alto contraste (Dark Mode por defecto). Por favor verificar la
+                sincronización automática: al vender un cromo desde la plantilla, el contador de repetidos debe
+                disminuir.</p>
+        </div>
+    </div>
+</body>
+
+</html>
