@@ -153,10 +153,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 py-8 sm:py-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4 py-4 sm:py-0">
       {/* Logo/Header */}
-      <div className="mb-1 sm:mb-2 text-center">
-        <div className="relative w-32 h-32 sm:w-48 sm:h-48 mx-auto">
+      <div className="mb-0 sm:mb-2 text-center">
+        <div className="relative w-24 h-24 sm:w-48 sm:h-48 mx-auto">
           <Image
             src="/assets/LogoBlanco.png"
             alt="Logo"
@@ -166,7 +166,7 @@ export default function LoginPage() {
           />
         </div>
       </div>
-      <h1 className="text-2xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white mb-2 sm:mb-2">
+      <h1 className="text-xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white mb-2 sm:mb-2">
         {siteConfig.name}
       </h1>
 
