@@ -9,6 +9,7 @@ import { useSupabase } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { GoogleIcon } from '@/components/ui/google-icon';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -111,6 +112,32 @@ export default function LoginPage() {
       }
     } catch {
       setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+      }
+    } catch {
+      setError('An unexpected error occurred during Google Sign In');
     } finally {
       setLoading(false);
     }
@@ -223,6 +250,26 @@ export default function LoginPage() {
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
             </Button>
           </form>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t-2 border-gray-200 dark:border-gray-700"></span>
+            </div>
+            <div className="relative flex justify-center text-sm uppercase">
+              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold">O</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold py-3 rounded-md shadow-lg border-2 border-black flex items-center justify-center gap-3 transition-all duration-200"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+          >
+            <GoogleIcon className="w-5 h-5" />
+            <span>Continuar con Google</span>
+          </Button>
 
           <div className="mt-8 text-center space-y-4">
             <Link
