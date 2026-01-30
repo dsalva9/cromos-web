@@ -45,6 +45,8 @@ import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 
 export default function RootLayout({
   children,
@@ -76,19 +78,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-gray-50 dark:bg-gray-900 text-foreground antialiased`}
         suppressHydrationWarning
       >
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-27DY11PMLQ"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-27DY11PMLQ');
-          `}
-        </Script>
+        <GoogleAnalytics />
         <SupabaseProvider>
           <ThemeProvider>
             <OneSignalProvider>
@@ -113,6 +103,7 @@ export default function RootLayout({
                     <MobileBottomNav />
                     <FloatingActionBtn />
                     <SiteFooter />
+                    <CookieConsentBanner />
                   </ErrorBoundary>
                   <Toaster
                     position="top-right"
