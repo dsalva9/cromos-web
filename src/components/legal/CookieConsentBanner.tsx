@@ -66,17 +66,25 @@ export function CookieConsentBanner() {
                                 <div className="flex flex-col sm:flex-row gap-2">
                                     <Button
                                         onClick={handleAccept}
-                                        className="bg-[#FFC000] hover:bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                                        className="bg-[#FFC000] hover:bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex-1"
                                     >
                                         Aceptar todas
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={handleDecline}
-                                        className="bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-bold border-2 border-black dark:border-gray-700 transition-all"
+                                        className="bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-bold border-2 border-black dark:border-gray-700 transition-all flex-1"
                                     >
-                                        Rechazar
+                                        Solo esenciales
                                     </Button>
+                                </div>
+                                <div className="mt-3 text-center">
+                                    <Link
+                                        href="/legal/cookies"
+                                        className="text-xs text-gray-500 hover:text-[#FFC000] transition-colors underline underline-offset-2"
+                                    >
+                                        Personalizar preferencias
+                                    </Link>
                                 </div>
                             </div>
                         </div>
