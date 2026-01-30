@@ -7,6 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationSettingsTab } from '@/components/settings/NotificationSettingsTab';
 import { IgnoredUsersTab } from '@/components/settings/IgnoredUsersTab';
 import { SystemSettingsTab } from '@/components/settings/SystemSettingsTab';
+import { LegalSettingsTab } from '@/components/settings/LegalSettingsTab';
+import {
+  User,
+  MapPin,
+  Camera,
+  Loader2,
+  Trash2,
+  ChevronRight,
+  Shield,
+  FileText,
+  Cookie,
+} from 'lucide-react';
+import Link from 'next/link'; // Added Link import
 
 export default function AjustesPage() {
   const router = useRouter();
@@ -61,6 +74,9 @@ export default function AjustesPage() {
               <TabsTrigger value="sistema" className="flex-1">
                 Sistema
               </TabsTrigger>
+              <TabsTrigger value="legal" className="flex-1">
+                Legal
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="notificaciones">
@@ -73,6 +89,10 @@ export default function AjustesPage() {
 
             <TabsContent value="sistema">
               <SystemSettingsTab />
+            </TabsContent>
+
+            <TabsContent value="legal">
+              <LegalSettingsTab />
             </TabsContent>
           </Tabs>
         </div>

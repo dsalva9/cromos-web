@@ -171,7 +171,7 @@ export function TradeChatPanel({
         <div className="bg-[#FFC000] border-b-2 border-black px-4 py-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs text-gray-900 dark:text-gray-900 leading-relaxed flex-1">
-              El chat de Cambiocromos.com te permite comunicarte con otros usuarios de forma privada para intercambiar o vender cromos. El contenido de los mensajes no se usa con fines comerciales, pero puede ser revisado si otro usuario reporta abuso, fraude o incumplimiento de nuestras normas. No compartas información personal sensible ni enlaces externos que puedan poner en riesgo tu seguridad. Respeta siempre a los demás usuarios. El mal uso del chat puede suponer la suspensión de tu cuenta. Al continuar, aceptas nuestras Condiciones de uso y Política de privacidad.
+              El chat es un espacio privado para intercambiar, pero <strong>Cambiocromos.com se reserva el derecho de moderación</strong> ante reportes de abuso. Este servicio es <strong>exclusivamente para mayores de 18 años</strong>. Sé respetuoso. No compartas datos sensibles. El acoso o comportamiento inapropiado resultará en la <strong>suspensión inmediata</strong> de tu cuenta. Usa el botón de "Reportar" si detectas alguna irregularidad.
             </p>
             <Button
               variant="ghost"

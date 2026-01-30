@@ -96,7 +96,11 @@
       "Bash(echo:*)",
       "Bash(done)",
       "Bash(claude mcp --help:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(test:*)",
+      "Bash(npx capacitor-assets:*)",
+      "Bash(./gradlew clean:*)",
+      "Bash(adb devices:*)"
     ],
     "deny": [],
     "ask": []

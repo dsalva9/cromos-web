@@ -152,9 +152,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-describedby={errors.title ? 'title-error' : undefined}
               {...register('title')}
               placeholder="ej. Messi Inter Miami 2024"
-              className={`bg-white border-2 text-gray-900 ${
-                errors.title ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 ${errors.title ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.title && (
               <p id="title-error" className="text-sm text-red-500">
@@ -195,9 +194,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 }
                 {...register('sticker_number')}
                 placeholder="ej. 10, 5A"
-                className={`bg-white border-2 text-gray-900 ${
-                  errors.sticker_number ? 'border-red-500' : 'border-black'
-                }`}
+                className={`bg-white border-2 text-gray-900 ${errors.sticker_number ? 'border-red-500' : 'border-black'
+                  }`}
               />
               {errors.sticker_number && (
                 <p id="sticker-error" className="text-sm text-red-500">
@@ -213,9 +211,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 aria-invalid={!!errors.slot_variant}
                 {...register('slot_variant')}
                 placeholder="ej. A, B"
-                className={`bg-white border-2 text-gray-900 ${
-                  errors.slot_variant ? 'border-red-500' : 'border-black'
-                }`}
+                className={`bg-white border-2 text-gray-900 ${errors.slot_variant ? 'border-red-500' : 'border-black'
+                  }`}
               />
               {errors.slot_variant && (
                 <p className="text-sm text-red-500">
@@ -236,9 +233,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-invalid={!!errors.global_number}
               {...register('global_number', { valueAsNumber: true })}
               placeholder="ej. 123"
-              className={`bg-white border-2 text-gray-900 ${
-                errors.global_number ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 ${errors.global_number ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.global_number && (
               <p className="text-sm text-red-500">
@@ -255,9 +251,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               aria-invalid={!!errors.page_title}
               {...register('page_title')}
               placeholder="ej. Delanteros"
-              className={`bg-white border-2 text-gray-900 ${
-                errors.page_title ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 ${errors.page_title ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.page_title && (
               <p className="text-sm text-red-500">
@@ -278,9 +273,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               {...register('description')}
               placeholder="Describe el estado del cromo, si está nuevo, usado, etc."
               rows={4}
-              className={`bg-white border-2 text-gray-900 resize-none ${
-                errors.description ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 resize-none ${errors.description ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.description && (
               <p id="description-error" className="text-sm text-red-500">
@@ -307,19 +301,19 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                   htmlFor="terms"
                   className="text-sm text-gray-700 cursor-pointer"
                 >
-                  He leído y estoy de acuerdo con los{' '}
+                  Confirmo que tengo más de 18 años, que poseo los derechos de este contenido y <strong>acepto toda la responsabilidad</strong> sobre esta publicación.{' '}
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
-                    className="text-[#FFC000] hover:text-[#FFD700] underline"
+                    className="text-[#FFC000] hover:text-[#FFD700] underline ml-1"
                   >
-                    términos de uso
+                    Ver condiciones
                   </button>
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
                 {errors.terms_accepted && (
                   <p className="text-sm text-red-500 mt-1">
-                    {errors.terms_accepted.message as string}
+                    Debes aceptar la responsabilidad sobre el contenido para publicar.
                   </p>
                 )}
               </div>
@@ -360,7 +354,15 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
           </DialogHeader>
           <div className="space-y-4 text-gray-700">
             <p>
-              Recuerda que las imágenes, descripciones o nombres que subas deben ser tuyos o contar con los derechos necesarios para usarlos. Cambiocromos.com no publica contenido por ti, solo te ofrece el espacio para compartirlo con otros coleccionistas. El usuario es el único responsable del contenido que publique. Si subes imágenes que infrinjan derechos de autor, marcas registradas o cualquier norma legal, podremos retirarlas y suspender tu cuenta. Cambiocromos.com no es propietaria de los cromos ni intermedia en las ventas o intercambios; solo pone en contacto a los usuarios. Al continuar, declaras que tienes derecho a publicar el contenido y aceptas nuestra Política de contenidos.
+              <strong>AVISO IMPORTANTE:</strong> Al hacer clic en "Publicar", declaras bajo tu exclusiva responsabilidad que:
+            </p>
+            <ul className="list-disc pl-5 mt-2 space-y-2">
+              <li>Tienes <strong>más de 18 años</strong>.</li>
+              <li>Eres el propietario legítimo de los derechos de imagen o tienes autorización para usarlos.</li>
+              <li>El contenido no infringe derechos de autor, ni contiene material ofensivo, ilegal o prohibido.</li>
+            </ul>
+            <p className="mt-4">
+              Cambiocromos.com actúa únicamente como intermediario. <strong>Tú eres el único responsable legal</strong> del contenido que subes. Nos reservamos el derecho de eliminar cualquier contenido y suspender cuentas que violen estas normas sin previo aviso.
             </p>
             <div className="pt-4">
               <Button

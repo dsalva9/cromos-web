@@ -260,7 +260,7 @@ export function TemplateCreationWizard({
           )}
           {currentStep === 3 && templateData.is_public && !templateData.terms_accepted && (
             <div className="mb-4 rounded border border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-800 dark:text-red-200" role="alert">
-              <p className="font-semibold">Debes aceptar los términos de uso para publicar una plantilla pública.</p>
+              <p className="font-semibold">Debes aceptar la responsabilidad sobre el contenido para publicar una plantilla pública.</p>
             </div>
           )}
           {currentStep === 0 && (

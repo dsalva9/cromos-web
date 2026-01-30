@@ -233,13 +233,13 @@ export function TemplateReviewForm({
                   htmlFor="template-terms"
                   className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                 >
-                  Al crear esta plantilla pública acepto los{' '}
+                  Al crear esta plantilla pública <strong>asumo la responsabilidad</strong> de su contenido y confirmo que es apto para la comunidad.{' '}
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
                     className="text-[#FFC000] hover:text-[#FFD700] underline"
                   >
-                    términos de uso
+                    Ver condiciones
                   </button>
                   <span className="text-red-500 ml-1">*</span>
                 </Label>

@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { siteConfig } from '@/config/site';
-import { LegalModal } from '@/components/legal/LegalModal';
+
 
 export function SiteFooter() {
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -15,16 +16,20 @@ export function SiteFooter() {
             <span>
               © {new Date().getFullYear()} {siteConfig.name}
             </span>
-            <button
-              onClick={() => setLegalModalOpen(true)}
-              className="text-[#FFC000] hover:text-[#FFD700] dark:hover:text-[#FFD700] underline font-medium transition-colors"
-            >
-              Información Legal
-            </button>
+            <div className="flex items-center gap-6">
+              <Link href="/legal/terms" className="hover:text-[#FFC000] transition-colors">
+                Términos
+              </Link>
+              <Link href="/legal/privacy" className="hover:text-[#FFC000] transition-colors">
+                Privacidad
+              </Link>
+              <Link href="/legal/cookies" className="hover:text-[#FFC000] transition-colors">
+                Cookies
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
-      <LegalModal open={legalModalOpen} onOpenChange={setLegalModalOpen} />
     </>
   );
 }

@@ -27,7 +27,6 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const termsErrorMessage =
     'Debes aceptar los terminos del servicio para crear tu cuenta';
   const { supabase } = useSupabase();
@@ -237,14 +236,23 @@ export default function SignupPage() {
                     Acepto los terminos del servicio
                   </label>
                   <p id="terms-helper" className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                    <button
-                      type="button"
-                      onClick={() => setTermsDialogOpen(true)}
+                    He leído y acepto los{' '}
+                    <Link
+                      href="/legal/terms"
+                      target="_blank"
                       className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
-                      Leer terminos completos
-                    </button>{' '}
-                    antes de continuar.
+                      Términos de servicio
+                    </Link>{' '}
+                    y la{' '}
+                    <Link
+                      href="/legal/privacy"
+                      target="_blank"
+                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
+                    >
+                      Política de privacidad
+                    </Link>
+                    .
                   </p>
                 </div>
               </div>
@@ -275,31 +283,6 @@ export default function SignupPage() {
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </Button>
           </form>
-
-          <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
-            <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black uppercase text-gray-900 dark:text-white">
-                  Terminos del servicio
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 text-sm leading-relaxed text-gray-900 dark:text-white">
-                <p>
-                  Al registrarte en Cambiocromos.com, aceptas nuestras Condiciones de uso y Política de privacidad. Tus datos se usarán para crear tu perfil, permitirte interactuar con otros coleccionistas y ofrecerte una experiencia personalizada. Puedes registrarte con correo o redes sociales. Si usas una red social, esta nos compartirá la información básica necesaria (nombre, email, foto, etc.), según su propia política de privacidad. Cambiocromos.com no comparte tus datos personales con otros usuarios sin tu consentimiento. Podrás editar o eliminar tu cuenta en cualquier momento. Al continuar, confirmas que eres mayor de edad o que cuentas con autorización de tus tutores legales, y aceptas nuestras condiciones.
-                </p>
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black hover:bg-gray-200 dark:hover:bg-gray-700"
-                  onClick={() => setTermsDialogOpen(false)}
-                >
-                  Cerrar
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
 
           <div className="mt-8 text-center">
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
