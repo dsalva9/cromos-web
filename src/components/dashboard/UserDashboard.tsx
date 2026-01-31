@@ -10,10 +10,11 @@ import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle } from 'lucide-react';
+import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { logger } from '@/lib/logger';
 import { Listing } from '@/types/v1.6.0';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 
 // Reuse logic from server-my-templates but for client
 interface TemplateCopy {
@@ -222,7 +223,15 @@ export default function UserDashboard() {
                     </Link>
                 </div>
 
-                {/* 3. Complete Your Collection CTA Banner */}
+                {/* 3. Contextual Tip */}
+                <ContextualTip
+                    tipId="tip-dashboard"
+                    icon={Lightbulb}
+                    title="Cómo empezar"
+                    description="Explora las Colecciones para copiar un álbum y empezar a seguir tus cromos. Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas."
+                />
+
+                {/* 4. Complete Your Collection CTA Banner */}
                 {mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
                     <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -257,7 +266,7 @@ export default function UserDashboard() {
                     </div>
                 ) : null}
 
-                {/* 4. Albums (Mis Álbumes) */}
+                {/* 5. Albums (Mis Álbumes) */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Mis Álbumes</h2>
@@ -340,12 +349,12 @@ export default function UserDashboard() {
                     )}
                 </div>
 
-                {/* 5. Badges */}
+                {/* 6. Badges */}
                 <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                     <ProfileBadgesSimple userId={user?.id || ''} isOwnProfile={true} />
                 </div>
 
-                {/* 6. Recent Marketplace Listings */}
+                {/* 7. Recent Marketplace Listings */}
                 {!loadingRecentListings && recentListings.length > 0 && (
                     <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
@@ -373,7 +382,7 @@ export default function UserDashboard() {
                     </div>
                 )}
 
-                {/* 7. Stats/Action Cards */}
+                {/* 8. Stats/Action Cards */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                     {activeListings.length === 0 ? (
                         <Link href="/marketplace/create" className="block transform transition hover:scale-[1.02]">

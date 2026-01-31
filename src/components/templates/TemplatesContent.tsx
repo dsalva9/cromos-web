@@ -6,8 +6,9 @@ import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplateFilters } from '@/components/templates/TemplateFilters';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
-import { Plus, FolderOpen, Loader2 } from 'lucide-react';
+import { Plus, FolderOpen, Loader2, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Template } from '@/lib/templates/server-templates';
@@ -87,6 +88,14 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                 onSearchChange={handleSearchChange}
                 sortBy={sortBy}
                 onSortChange={handleSortChange}
+            />
+
+            <ContextualTip
+                tipId="tip-templates"
+                icon={Lightbulb}
+                title="¿Qué son las colecciones?"
+                description="Las colecciones son plantillas creadas por la comunidad. Copia una para crear tu propio álbum y llevar el control de los cromos que tienes, los que te faltan y los repetidos."
+                className="mt-6"
             />
 
             {error && (

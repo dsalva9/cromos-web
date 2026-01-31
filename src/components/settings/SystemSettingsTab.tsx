@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { AlertTriangle, LogOut, Trash2, Loader2 } from 'lucide-react';
+import { AlertTriangle, LogOut, Trash2, Loader2, Lightbulb } from 'lucide-react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,6 +16,18 @@ export function SystemSettingsTab() {
   const { user } = useUser();
   const [signingOut, setSigningOut] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const handleReactivateTips = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('dismissed-tips');
+        toast.success('Consejos reactivados correctamente');
+      }
+    } catch (error) {
+      console.error('Error reactivating tips:', error);
+      toast.error('Error al reactivar los consejos');
+    }
+  };
 
   const handleSignOutAllDevices = async () => {
     try {
@@ -45,6 +57,32 @@ export function SystemSettingsTab() {
     <div className="space-y-4 md:space-y-6">
       {/* Theme Settings */}
       <ThemeSettingsSection />
+
+      {/* Reactivate Tips */}
+      <ModernCard className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <ModernCardContent className="p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-500 dark:border-blue-400 flex items-center justify-center">
+              <Lightbulb className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Consejos de ayuda
+              </h3>
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
+                Muestra consejos contextuales en las distintas secciones de la app para ayudarte a usar todas las funciones.
+              </p>
+              <Button
+                onClick={handleReactivateTips}
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto text-sm md:text-base"
+              >
+                <Lightbulb className="h-4 w-4 mr-2" />
+                Reactivar consejos
+              </Button>
+            </div>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
 
       {/* Sign Out All Devices */}
       <ModernCard className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

@@ -8,8 +8,9 @@ import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHea
 import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Trash2, PackagePlus } from 'lucide-react';
+import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 import {
   Dialog,
   DialogContent,
@@ -164,6 +165,15 @@ function TemplateProgressContent() {
 
         {/* Summary Header */}
         <TemplateSummaryHeader copy={copy} progress={progress} />
+
+        {/* Contextual Tip */}
+        <ContextualTip
+          tipId="tip-album-detail"
+          icon={Lightbulb}
+          title="Gestiona tu álbum"
+          description="Toca un cromo para marcarlo como 'Tengo' o 'Repetido'. Los repetidos se pueden publicar directamente en el Marketplace con el botón 'Publicar Repes'."
+          className="my-6"
+        />
 
         {/* Progress Grid */}
         <TemplateProgressGrid

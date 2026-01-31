@@ -6,8 +6,9 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 
 interface Conversation {
   listing_id: number;
@@ -64,6 +65,14 @@ function ChatsPageContent() {
             Todas tus conversaciones sobre anuncios del marketplace
           </p>
         </div>
+
+        <ContextualTip
+          tipId="tip-chats"
+          icon={Lightbulb}
+          title="Tus conversaciones"
+          description="Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
+          className="mb-6"
+        />
 
         {conversations.length === 0 ? (
           <ModernCard>

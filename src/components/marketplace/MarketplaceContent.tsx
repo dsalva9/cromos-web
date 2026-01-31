@@ -6,8 +6,9 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Filter, Package } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -245,6 +246,15 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                         </div>
                     </div>
                 </div>
+
+                {/* Contextual Tip */}
+                <ContextualTip
+                    tipId="tip-marketplace"
+                    icon={Lightbulb}
+                    title="Encuentra lo que buscas"
+                    description="Busca cromos por nombre o filtra por colección. Cuando encuentres algo que te interese, abre un chat con el vendedor para acordar un intercambio."
+                    className="mb-6"
+                />
 
                 {/* Listings Grid */}
                 {error && (
