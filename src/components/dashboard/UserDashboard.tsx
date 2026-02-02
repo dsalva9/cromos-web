@@ -228,7 +228,13 @@ export default function UserDashboard() {
                     tipId="tip-dashboard"
                     icon={Lightbulb}
                     title="Cómo empezar"
-                    description="Visita el Marketplace para ver qué hay disponible, o explora las Colecciones para copiar un álbum y empezar a seguir tus cromos. Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas."
+                    description={
+                        <ul className="list-disc pl-4 space-y-1">
+                            <li>Visita el Marketplace para encontrar esos cromos que te faltan.</li>
+                            <li>Explora las Colecciones para copiar un Álbum y empezar a seguir tus cromos.</li>
+                            <li>Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas.</li>
+                        </ul>
+                    }
                 />
 
                 {/* 4. Complete Your Collection CTA Banner */}

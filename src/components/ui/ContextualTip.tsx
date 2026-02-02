@@ -8,7 +8,7 @@ interface ContextualTipProps {
   tipId: string;
   icon: LucideIcon;
   title: string;
-  description: string;
+  description: React.ReactNode;
   className?: string;
 }
 
