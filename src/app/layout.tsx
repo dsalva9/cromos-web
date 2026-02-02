@@ -95,7 +95,7 @@ export default function RootLayout({
                       <SiteHeader />
                     </header>
                     <AccountDeletionBanner />
-                    <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(4rem + var(--sat, 0px))' }}>
+                    <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(5.5rem + var(--sat, 0px))' }}>
                       <PasswordRecoveryGuard>
                         <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
                       </PasswordRecoveryGuard>

@@ -173,6 +173,18 @@ export default function SiteHeader() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
+      {/* Beta Announcement Banner */}
+      <div className="bg-black text-[#FFC000] py-1.5 px-4 overflow-hidden border-b border-[#FFC000]/10">
+        <div className="container mx-auto flex items-center justify-center gap-2 text-center">
+          <Badge className="bg-[#FFC000] text-black border-none px-1.5 py-0 text-[9px] font-black uppercase tracking-tighter shadow-sm shrink-0">
+            BETA
+          </Badge>
+          <p className="text-[11px] sm:text-xs font-bold tracking-tight">
+            🚀 Estamos en Beta Abierta. Feedback: <a href="mailto:info@cambiocromos.com" className="text-[#FFC000] font-black hover:underline underline-offset-2">info@cambiocromos.com</a>
+          </p>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4">
         <div className="flex h-16 sm:h-20 items-center justify-between">
           <Link
