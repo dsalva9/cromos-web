@@ -391,44 +391,45 @@ export default function UserDashboard() {
                 {/* 8. Stats/Action Cards */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                     {activeListings.length === 0 ? (
-                        <Link href="/marketplace/create" className="block transform transition hover:scale-[1.02]">
-                            <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
-                                <PlusCircle className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                        <Link href="/marketplace/create" className="group block h-full transform transition hover:scale-[1.02]">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
+                                <PlusCircle className="h-6 w-6 mb-2 text-[#FFC000]" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Publica tu primer anuncio</p>
                             </div>
                         </Link>
                     ) : (
-                        <Link href="/marketplace/my-listings" className="block transform transition hover:scale-[1.02]">
-                            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                                <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                                <p className="text-2xl font-black text-gray-900 dark:text-white">{activeListings.length}</p>
+                        <Link href="/marketplace/my-listings" className="group block h-full transform transition hover:scale-[1.02]">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
+                                <Package className="h-6 w-6 mb-2 text-[#FFC000]" />
+                                <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{activeListings.length}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
                             </div>
                         </Link>
                     )}
 
                     {profile.favorites_count === 0 ? (
-                        <Link href="/marketplace" className="block transform transition hover:scale-[1.02]">
-                            <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
-                                <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                        <Link href="/marketplace" className="group block h-full transform transition hover:scale-[1.02]">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
+                                <Heart className="h-6 w-6 mb-2 text-[#FFC000]" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Guarda tus favoritos</p>
                             </div>
                         </Link>
                     ) : (
-                        <Link href="/favorites" className="block transform transition hover:scale-[1.02]">
-                            <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600">
-                                <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                                <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.favorites_count}</p>
+                        <Link href="/favorites" className="group block h-full transform transition hover:scale-[1.02]">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
+                                <Heart className="h-6 w-6 mb-2 text-[#FFC000]" />
+                                <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{profile.favorites_count}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
                             </div>
                         </Link>
                     )}
 
-                    <Link href={`/users/${user?.id}#valoraciones`} className="block transform transition hover:scale-[1.02]">
-                        <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
-                            <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                            <p className="text-sm font-black text-gray-900 dark:text-white">{profile.rating_count > 0 ? profile.rating_count : '0'}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
+                    <Link href={`/users/${user?.id}#valoraciones`} className="group block h-full transform transition hover:scale-[1.02]">
+                        <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
+                            <Star className="h-6 w-6 mb-2 text-[#FFC000]" />
+                            <p className="text-sm font-black text-gray-900 dark:text-white">
+                                {profile.rating_count} {profile.rating_count === 1 ? 'Valoración' : 'Valoraciones'}
+                            </p>
                         </div>
                     </Link>
                 </div>
