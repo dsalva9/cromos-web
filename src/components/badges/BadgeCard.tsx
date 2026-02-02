@@ -11,6 +11,11 @@ import type { UserBadge, BadgeProgress } from '@/types/badges';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface BadgeCardProps {
   badge: UserBadge | BadgeProgress;
@@ -63,10 +68,10 @@ export function BadgeCard({
 
   const styles = sizeClasses[size];
 
-  return (
+  const cardContent = (
     <div
       className={cn(
-        'rounded-lg border-2 transition-all duration-200',
+        'rounded-lg border-2 transition-all duration-200 w-full h-full',
         colors.border,
         isEarned ? colors.bg : 'bg-gray-50 opacity-60',
         isEarned && 'hover:shadow-md',
@@ -77,8 +82,8 @@ export function BadgeCard({
       style={
         isHighlighted
           ? {
-              animation: 'highlight 3s ease-in-out',
-            }
+            animation: 'highlight 3s ease-in-out',
+          }
           : undefined
       }
     >
@@ -149,4 +154,22 @@ export function BadgeCard({
       </div>
     </div>
   );
+
+  // If description is hidden, show it as a tooltip
+  if (!showDescription && badge.description_es) {
+    return (
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <div className="cursor-help h-full w-full">
+            {cardContent}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          {badge.description_es}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return cardContent;
 }
