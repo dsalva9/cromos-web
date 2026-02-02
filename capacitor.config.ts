@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'CambioCromos',
   webDir: 'public',
   server: {
-    url: 'https://cromos-web.vercel.app',
+    url: 'https://www.cambiocromos.com',
     cleartext: true,
     androidScheme: 'https'
   },

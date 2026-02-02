@@ -17,6 +17,28 @@ export default function LandingPage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+            {/* Beta Announcement Banner */}
+            <div className="bg-black text-[#FFC000] py-2 px-4 relative z-50 overflow-hidden border-b border-[#FFC000]/20">
+                <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-x-4 gap-y-1 text-center">
+                    <div className="flex items-center gap-2">
+                        <Badge className="bg-[#FFC000] text-black border-none px-2 py-0 text-[10px] font-black uppercase tracking-tighter shadow-sm animate-pulse">
+                            BETA ABIERTA
+                        </Badge>
+                        <span className="text-sm font-bold tracking-tight">🚀 ¡Estamos en Beta Abierta!</span>
+                    </div>
+                    <span className="text-sm text-yellow-100/80 hidden sm:inline">•</span>
+                    <p className="text-sm font-medium text-yellow-100/90">
+                        Ayúdanos a mejorar. Envía tu feedback a{' '}
+                        <a
+                            href="mailto:info@cambiocromos.com"
+                            className="text-[#FFC000] font-black hover:underline underline-offset-4"
+                        >
+                            info@cambiocromos.com
+                        </a>
+                    </p>
+                </div>
+            </div>
+
             {/* Hero Section */}
             <section className="relative overflow-hidden pt-5 pb-2 lg:pt-12 lg:pb-4">
                 {/* Background Decorative Shapes */}
