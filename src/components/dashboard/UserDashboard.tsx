@@ -189,7 +189,7 @@ export default function UserDashboard() {
                                 )}
                             </div>
                         </div>
-                        <Link href="/ajustes" className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors">
+                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors">
                             Editar Perfil
                         </Link>
                     </div>
@@ -424,11 +424,13 @@ export default function UserDashboard() {
                         </Link>
                     )}
 
-                    <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                        <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
-                        <p className="text-2xl font-black text-gray-900 dark:text-white">{profile.rating_count}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
-                    </div>
+                    <Link href={`/users/${user?.id}#valoraciones`} className="block transform transition hover:scale-[1.02]">
+                        <div className="text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 hover:border-[#FFC000]">
+                            <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                            <p className="text-sm font-black text-gray-900 dark:text-white">{profile.rating_count > 0 ? profile.rating_count : '0'}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
+                        </div>
+                    </Link>
                 </div>
 
             </div>

@@ -100,12 +100,13 @@
       "Bash(test:*)",
       "Bash(npx capacitor-assets:*)",
       "Bash(./gradlew clean:*)",
-      "Bash(adb devices:*)"
+      "Bash(adb devices:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": [],
     "ask": []
   },
-  "enableAllProjectMcpServers": false,
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
   ]
