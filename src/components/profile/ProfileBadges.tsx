@@ -59,7 +59,7 @@ export function ProfileBadges({
       <div className={cn('space-y-4', className)} id="badges">
         <div className="flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Insignias</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Logros</h2>
         </div>
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -109,13 +109,13 @@ export function ProfileBadges({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Insignias</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Logros</h2>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-1">
             <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span className="font-semibold text-gray-900 dark:text-white">{earnedBadges.length}</span>
-            <span className="text-gray-500 dark:text-gray-400">ganadas</span>
+            <span className="text-gray-500 dark:text-gray-400">ganados</span>
           </div>
           <div className="flex items-center gap-1">
             <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -128,9 +128,9 @@ export function ProfileBadges({
       {/* Tabs */}
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="all">Todas las insignias</TabsTrigger>
+          <TabsTrigger value="all">Todos los logros</TabsTrigger>
           <TabsTrigger value="earned">
-            Ganadas ({earnedBadges.length})
+            Ganados ({earnedBadges.length})
           </TabsTrigger>
         </TabsList>
 
@@ -173,8 +173,8 @@ export function ProfileBadges({
               <Award className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
               <p className="text-gray-500 dark:text-gray-400">
                 {isOwnProfile
-                  ? 'Aún no has ganado ninguna insignia. ¡Comienza a coleccionar!'
-                  : 'Este usuario aún no ha ganado insignias.'}
+                  ? 'Aún no has ganado ningún logro. ¡Comienza a coleccionar!'
+                  : 'Este usuario aún no ha ganado logros.'}
               </p>
             </div>
           ) : (

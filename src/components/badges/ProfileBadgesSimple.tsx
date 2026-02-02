@@ -32,7 +32,7 @@ export function ProfileBadgesSimple({
       <div className={cn('space-y-3', className)}>
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-[#FFC000]" />
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Insignias</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
         </div>
         <div className="animate-pulse">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -55,13 +55,13 @@ export function ProfileBadgesSimple({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-[#FFC000]" />
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Insignias</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
           </div>
           <Link
             href="/profile#badges"
             className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
           >
-            Ver todas las insignias
+            Ver todos los logros
           </Link>
         </div>
 
@@ -69,8 +69,8 @@ export function ProfileBadgesSimple({
           <Award className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {isOwnProfile
-              ? 'Aún no has ganado ninguna insignia'
-              : 'Sin insignias ganadas'}
+              ? 'Aún no has ganado ningún logro'
+              : 'Sin logros ganados'}
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export function ProfileBadgesSimple({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Award className="w-5 h-5 text-[#FFC000]" />
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Insignias</h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
           <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
             ({badges.length})
           </span>
@@ -99,7 +99,7 @@ export function ProfileBadgesSimple({
           href="/profile#badges"
           className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
         >
-          Ver todas
+          Ver todos
         </Link>
       </div>
 

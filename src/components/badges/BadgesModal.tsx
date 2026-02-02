@@ -41,7 +41,7 @@ export function BadgesModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Award className="w-6 h-6" />
-              Insignias
+              Logros
             </DialogTitle>
           </DialogHeader>
           <div className="animate-pulse space-y-4 py-4">
@@ -93,7 +93,7 @@ export function BadgesModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Award className="w-6 h-6" />
-            Insignias
+            Logros
           </DialogTitle>
         </DialogHeader>
 
@@ -102,7 +102,7 @@ export function BadgesModal({
           <div className="flex items-center gap-1">
             <Award className="w-4 h-4 text-green-600" />
             <span className="font-semibold">{earnedBadges.length}</span>
-            <span className="text-gray-500">ganadas</span>
+            <span className="text-gray-500">ganados</span>
           </div>
           <div className="flex items-center gap-1">
             <TrendingUp className="w-4 h-4 text-blue-600" />
@@ -114,9 +114,9 @@ export function BadgesModal({
         {/* Tabs */}
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="all">Todas las insignias</TabsTrigger>
+            <TabsTrigger value="all">Todos los logros</TabsTrigger>
             <TabsTrigger value="earned">
-              Ganadas ({earnedBadges.length})
+              Ganados ({earnedBadges.length})
             </TabsTrigger>
           </TabsList>
 
@@ -158,8 +158,8 @@ export function BadgesModal({
                 <Award className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">
                   {isOwnProfile
-                    ? 'Aún no has ganado ninguna insignia. ¡Comienza a coleccionar!'
-                    : 'Este usuario aún no ha ganado insignias.'}
+                    ? 'Aún no has ganado ningún logro. ¡Comienza a coleccionar!'
+                    : 'Este usuario aún no ha ganado logros.'}
                 </p>
               </div>
             ) : (

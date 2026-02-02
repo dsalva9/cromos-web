@@ -32,7 +32,7 @@ export function BadgeGrid({
   columns = 3,
   size = 'medium',
   className,
-  emptyMessage = 'No hay insignias para mostrar',
+  emptyMessage = 'No hay logros para mostrar',
   highlightBadgeId,
 }: BadgeGridProps) {
   if (badges.length === 0) {

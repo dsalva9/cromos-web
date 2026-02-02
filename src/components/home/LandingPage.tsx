@@ -298,7 +298,7 @@ export default function LandingPage() {
                                 <Trophy className="w-6 h-6 lg:w-7 lg:h-7 text-white" strokeWidth={3} />
                             </div>
                             <div className="md:mt-4">
-                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Gana Insignias</h3>
+                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Gana Logros</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
                                     Completa intercambios y destaca como un "Top Trader".
                                 </p>

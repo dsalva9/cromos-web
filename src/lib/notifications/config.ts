@@ -48,8 +48,8 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
   },
   {
     kind: 'badge_earned',
-    label: 'Insignia ganada',
-    description: 'Cuando obtienes una nueva insignia',
+    label: 'Logro ganado',
+    description: 'Cuando obtienes un nuevo logro',
     category: 'community',
     priority: 'high',
   },
@@ -186,7 +186,7 @@ export const CATEGORY_INFO: Record<
   },
   community: {
     label: 'Comunidad',
-    description: 'Valoraciones, insignias y colecciones',
+    description: 'Valoraciones, logros y colecciones',
     icon: 'Users',
   },
   trades: {
