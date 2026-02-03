@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Settings } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -37,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/marketplace')) return 'marketplace';
     if (pathname.includes('/admin/templates')) return 'templates';
     if (pathname.includes('/admin/testing-tools')) return 'testing-tools';
+    if (pathname.includes('/admin/settings')) return 'settings';
     return 'dashboard';
   };
 
@@ -59,7 +60,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navigation Tabs */}
             <Tabs value={getActiveTab()} className="w-full">
-              <TabsList className="grid w-full max-w-6xl grid-cols-7 bg-[#1F2937]">
+              <TabsList className="grid w-full max-w-6xl grid-cols-8 bg-[#1F2937]">
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
@@ -127,6 +128,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <FlaskConical className="h-4 w-4 mr-2" />
                     Testing Tools
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/settings">
+                  <TabsTrigger
+                    value="settings"
+                    className="w-full data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
                   </TabsTrigger>
                 </Link>
               </TabsList>
