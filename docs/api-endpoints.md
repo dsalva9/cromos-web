@@ -377,4 +377,109 @@ The following RPCs were part of the legacy collections system and have been remo
 
 ---
 
+## Email Forwarding RPCs ✅ **v1.6.0 NEW**
+
+### Admin-Only Functions
+
+- `admin_list_forwarding_addresses`
+  ```sql
+  admin_list_forwarding_addresses()
+  RETURNS TABLE (
+    id INTEGER,
+    email TEXT,
+    is_active BOOLEAN,
+    added_by UUID,
+    added_by_username TEXT,
+    added_at TIMESTAMPTZ,
+    last_used_at TIMESTAMPTZ
+  );
+  ```
+
+- `admin_add_forwarding_address`
+  ```sql
+  admin_add_forwarding_address(p_email TEXT) RETURNS INTEGER;
+  ```
+
+- `admin_remove_forwarding_address`
+  ```sql
+  admin_remove_forwarding_address(p_id INTEGER) RETURNS BOOLEAN;
+  ```
+
+- `admin_toggle_forwarding_address`
+  ```sql
+  admin_toggle_forwarding_address(p_id INTEGER, p_is_active BOOLEAN) RETURNS BOOLEAN;
+  ```
+
+- `admin_get_inbound_email_logs`
+  ```sql
+  admin_get_inbound_email_logs(p_limit INTEGER DEFAULT 25, p_offset INTEGER DEFAULT 0)
+  RETURNS TABLE (
+    id INTEGER,
+    resend_email_id TEXT,
+    from_address TEXT,
+    to_addresses TEXT[],
+    subject TEXT,
+    received_at TIMESTAMPTZ,
+    forwarded_to TEXT[],
+    forwarding_status TEXT,
+    error_details JSONB
+  );
+  ```
+
+---
+
+## Edge Functions
+
+### `send-email-notification`
+
+**Purpose**: Sends transactional email notifications to users
+
+**Trigger**: Database trigger on `notifications` table
+
+**Authentication**: Uses SERVICE_ROLE key
+
+**Environment Variables**:
+- `RESEND_API_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+**Email Types**:
+- New chat messages
+- Listing reservations
+- Transaction completions
+- Badge awards
+- System announcements
+
+**Rate Limiting**: Sequential sending with delays
+
+### `receive-inbound-email`
+
+**Purpose**: Receives inbound emails via Resend webhook and forwards to admin addresses
+
+**Trigger**: Webhook from Resend when email arrives at @cambiocromos.com
+
+**Authentication**: Webhook signature verification (svix)
+
+**Environment Variables**:
+- `RESEND_API_KEY`
+- `RESEND_WEBHOOK_SECRET`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+**Features**:
+- Webhook signature verification
+- Rate limiting (600ms delay between sends)
+- Formatted email templates
+- Comprehensive error logging
+- Status tracking (success/partial_failure/failed)
+
+**Database Operations**:
+- Fetches active addresses from `email_forwarding_addresses`
+- Logs to `inbound_email_log` table
+- Updates `last_used_at` timestamps
+
+**See**: [docs/email-systems.md](./email-systems.md) for complete email documentation.
+
+---
+
 *All RPC signatures are provided for reference; actual implementation may include additional default parameters or security definitions.*

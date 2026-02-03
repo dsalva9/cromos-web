@@ -19,6 +19,8 @@ Este documento describe la arquitectura técnica de CambioCromos, incluyendo dec
 - **Storage**: Supabase Storage
 - **API**: Supabase RPC Functions
 - **Realtime**: Supabase Realtime (para chat)
+- **Email**: Resend (via Edge Functions)
+- **Edge Functions**: Supabase Edge Functions (Deno runtime)
 
 ### DevOps & Monitoring
 - **Deployment**: Vercel
@@ -222,6 +224,40 @@ Listening clients receive update
     ↓
 UI updates automatically
 ```
+
+### 5. Email Systems
+
+#### Outbound Notifications
+
+```
+Database event (notification created)
+    ↓
+Trigger calls Edge Function
+    ↓
+send-email-notification processes
+    ↓
+Resend API sends email
+    ↓
+User receives email
+```
+
+#### Inbound Email Forwarding
+
+```
+Email to @cambiocromos.com
+    ↓
+Resend inbound processing
+    ↓
+Webhook to receive-inbound-email
+    ↓
+Fetch active forwarding addresses
+    ↓
+Forward to each address (rate limited)
+    ↓
+Log to inbound_email_log table
+```
+
+**See**: [docs/email-systems.md](./email-systems.md) for complete email documentation.
 
 ## Decisiones de Diseño
 
