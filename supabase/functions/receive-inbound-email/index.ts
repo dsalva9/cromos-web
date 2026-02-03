@@ -244,18 +244,34 @@ async function logEmail(
   errorDetails: any = null
 ) {
   try {
-    const { error } = await supabase.rpc("log_inbound_email", {
-      p_resend_email_id: emailData.id,
-      p_from_address: emailData.from,
-      p_to_addresses: emailData.to,
-      p_subject: emailData.subject || "(No Subject)",
-      p_forwarded_to: forwardedTo,
-      p_forwarding_status: status,
-      p_error_details: errorDetails,
-    });
+    // Insert log entry directly into the table
+    const { error: insertError } = await supabase
+      .from("inbound_email_log")
+      .insert({
+        resend_email_id: emailData.id,
+        from_address: emailData.from,
+        to_addresses: emailData.to,
+        subject: emailData.subject || "(No Subject)",
+        forwarded_to: forwardedTo,
+        forwarding_status: status,
+        error_details: errorDetails,
+      });
 
-    if (error) {
-      console.error("Failed to log email:", error);
+    if (insertError) {
+      console.error("Failed to insert email log:", insertError);
+      return;
+    }
+
+    // Update last_used_at for forwarded addresses
+    if (forwardedTo && forwardedTo.length > 0) {
+      const { error: updateError } = await supabase
+        .from("email_forwarding_addresses")
+        .update({ last_used_at: new Date().toISOString() })
+        .in("email", forwardedTo);
+
+      if (updateError) {
+        console.error("Failed to update last_used_at:", updateError);
+      }
     }
   } catch (err) {
     console.error("Exception logging email:", err);
