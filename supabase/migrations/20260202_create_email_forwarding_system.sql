@@ -64,7 +64,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM profiles
         WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     ) THEN
         RAISE EXCEPTION 'Only admins can access forwarding addresses';
     END IF;
@@ -75,7 +75,7 @@ BEGIN
         efa.email,
         efa.is_active,
         efa.added_by,
-        p.username as added_by_username,
+        p.nickname as added_by_username,
         efa.added_at,
         efa.last_used_at
     FROM email_forwarding_addresses efa
@@ -98,7 +98,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM profiles
         WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     ) THEN
         RAISE EXCEPTION 'Only admins can add forwarding addresses';
     END IF;
@@ -129,7 +129,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM profiles
         WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     ) THEN
         RAISE EXCEPTION 'Only admins can remove forwarding addresses';
     END IF;
@@ -153,7 +153,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM profiles
         WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     ) THEN
         RAISE EXCEPTION 'Only admins can toggle forwarding addresses';
     END IF;
@@ -188,7 +188,7 @@ BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM profiles
         WHERE profiles.id = auth.uid()
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     ) THEN
         RAISE EXCEPTION 'Only admins can access email logs';
     END IF;
