@@ -95,42 +95,44 @@ Deno.serve(async (req: Request) => {
     const forwardingAddresses = addresses.map((a) => a.email);
     console.log(`Forwarding to ${forwardingAddresses.length} addresses`);
 
-    // Forward email to each address
-    const forwardingResults = await Promise.allSettled(
-      forwardingAddresses.map(async (toEmail) => {
-        try {
-          const { data, error } = await resend.emails.send({
-            from: "CambioCromos <info@cambiocromos.com>",
-            to: toEmail,
-            subject: `[Forwarded] ${emailData.subject || "(No Subject)"}`,
-            html: generateForwardedEmailHtml(emailData),
-          });
+    // Forward email to each address sequentially with delay to respect rate limits
+    // Resend allows 2 requests per second, so we add a 600ms delay between sends
+    const forwardingResults: Array<{ toEmail: string; success: boolean; data?: any; error?: any }> = [];
 
-          if (error) {
-            console.error(`Failed to forward to ${toEmail}:`, error);
-            throw error;
-          }
+    for (let i = 0; i < forwardingAddresses.length; i++) {
+      const toEmail = forwardingAddresses[i];
 
+      // Add delay between sends (except for the first one)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 600));
+      }
+
+      try {
+        const { data, error } = await resend.emails.send({
+          from: "CambioCromos <info@cambiocromos.com>",
+          to: toEmail,
+          subject: `[Forwarded] ${emailData.subject || "(No Subject)"}`,
+          html: generateForwardedEmailHtml(emailData),
+        });
+
+        if (error) {
+          console.error(`Failed to forward to ${toEmail}:`, error);
+          forwardingResults.push({ toEmail, success: false, error });
+        } else {
           console.log(`Successfully forwarded to ${toEmail}`);
-          return { toEmail, success: true, data };
-        } catch (err) {
-          console.error(`Error forwarding to ${toEmail}:`, err);
-          return { toEmail, success: false, error: err };
+          forwardingResults.push({ toEmail, success: true, data });
         }
-      })
-    );
+      } catch (err) {
+        console.error(`Error forwarding to ${toEmail}:`, err);
+        forwardingResults.push({ toEmail, success: false, error: err });
+      }
+    }
 
     // Analyze results
-    const successfulForwards = forwardingResults.filter(
-      (r) => r.status === "fulfilled" && r.value.success
-    );
-    const failedForwards = forwardingResults.filter(
-      (r) => r.status === "rejected" || (r.status === "fulfilled" && !r.value.success)
-    );
+    const successfulForwards = forwardingResults.filter((r) => r.success);
+    const failedForwards = forwardingResults.filter((r) => !r.success);
 
-    const forwardedTo = successfulForwards.map((r) =>
-      r.status === "fulfilled" ? r.value.toEmail : ""
-    );
+    const forwardedTo = successfulForwards.map((r) => r.toEmail);
 
     let status: "success" | "partial_failure" | "failed";
     if (successfulForwards.length === forwardingAddresses.length) {
@@ -144,12 +146,8 @@ Deno.serve(async (req: Request) => {
     const errorDetails =
       failedForwards.length > 0
         ? {
-            failed_addresses: failedForwards.map((r) =>
-              r.status === "fulfilled" ? r.value.toEmail : "unknown"
-            ),
-            errors: failedForwards.map((r) =>
-              r.status === "fulfilled" ? r.value.error : r.reason
-            ),
+            failed_addresses: failedForwards.map((r) => r.toEmail),
+            errors: failedForwards.map((r) => r.error),
           }
         : null;
 
