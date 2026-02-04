@@ -1,0 +1,42 @@
+name: Database Backup
+
+on:
+  schedule:
+    # Runs at 00:00 UTC daily
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Backup Database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          pg_dump "$SUPABASE_DB_URL" -f backup.sql --clean --if-exists
+
+      - name: Push to backups branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: backups
+          force: true
+          
+      - name: Upload artifact (optional history)
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.sha }}
+          path: backup.sql
+          retention-days: 7
