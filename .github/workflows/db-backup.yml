@@ -30,6 +30,14 @@ jobs:
         run: |
           /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -f backup.sql --clean --if-exists
 
+      - name: Commit backup
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git checkout -B backups
+          git add backup.sql
+          git commit -m "daily db backup" || echo "No changes to commit"
+
       - name: Push to backups branch
         uses: ad-m/github-push-action@master
         with:
