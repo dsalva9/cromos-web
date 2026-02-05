@@ -141,9 +141,15 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             </div>
 
             <div className="container mx-auto px-4 py-6">
-                {/* Controls Bar */}
+                {/* Controls Bar with background cover to prevent content peeking through */}
                 <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + 0.5rem)' }}>
-                    <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
+                    {/* Background cover that extends behind the sticky bar to hide scrolling content */}
+                    <div
+                        className="absolute -top-8 left-0 right-0 h-8 bg-gray-50 dark:bg-gray-900 -mx-4"
+                        style={{ width: 'calc(100% + 2rem)' }}
+                        aria-hidden="true"
+                    />
+                    <div className="relative bg-white dark:bg-gray-800 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
                         <div className="flex flex-col md:flex-row gap-3">
                             {/* Search */}
                             <div className="flex-1">
