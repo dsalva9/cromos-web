@@ -101,7 +101,8 @@
       "Bash(npx capacitor-assets:*)",
       "Bash(./gradlew clean:*)",
       "Bash(adb devices:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(timeout 10 bash:*)"
     ],
     "deny": [],
     "ask": []

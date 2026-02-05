@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.name} - Intercambia cromos deportivos`,
   description: siteConfig.description,
+  alternates: {
+    canonical: './',
+  },
 };
 
 export const viewport: Viewport = {
