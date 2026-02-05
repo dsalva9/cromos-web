@@ -74,7 +74,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white pb-24 md:pb-8">
             {/* Hero Section */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <div className="container mx-auto px-4 py-6 md:py-8">
+                <div className="container mx-auto px-4 pt-4 pb-2 md:py-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1 w-full">
                             <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
@@ -140,7 +140,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-6">
+            <div className="container mx-auto px-4 pt-3 pb-6 md:py-6">
                 {/* Controls Bar with background cover to prevent content peeking through */}
                 <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + 0.5rem)' }}>
                     {/* Background cover that extends behind the sticky bar to hide scrolling content */}
