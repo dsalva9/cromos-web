@@ -2,6 +2,10 @@ import { getPublicTemplates } from '@/lib/templates/server-templates';
 import { TemplatesContent } from '@/components/templates/TemplatesContent';
 import { Metadata } from 'next';
 
+// Revalidate every 60 seconds - enables ISR caching for faster page loads
+// See: /docs/isr-page-caching.md for details
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Colecciones Comunitarias | Cambio Cromos',
   description: 'Descubre y copia miles de colecciones de cromos creadas por la comunidad. Inicia tu propia colección hoy.',
