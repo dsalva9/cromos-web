@@ -118,11 +118,11 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
       };
 
     case 'badge_earned':
-      const badgeName = notification.payload?.badge_name as string || 'una insignia';
+      const badgeName = notification.payload?.badge_name as string || 'un logro';
       const badgeId = notification.payload?.badge_id as string;
       return {
-        title: '¡Nueva insignia ganada!',
-        body: `Has ganado la insignia "${badgeName}"`,
+        title: '¡Nuevo logro conseguido!',
+        body: `Has conseguido el logro "${badgeName}"`,
         href: badgeId ? `/profile?badge=${badgeId}#badges` : `/profile#badges`,
       };
 
