@@ -142,7 +142,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
             <div className="container mx-auto px-4 py-6">
                 {/* Controls Bar */}
-                <div className="sticky top-20 md:top-24 z-30 mb-6">
+                <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + 0.5rem)' }}>
                     <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
                         <div className="flex flex-col md:flex-row gap-3">
                             {/* Search */}
