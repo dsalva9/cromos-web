@@ -17,6 +17,7 @@ import AdminGuard from '@/components/AdminGuard';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabase } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
+import { SendEmailModal } from '@/components/admin/SendEmailModal';
 
 function UserSearchContent() {
   const [query, setQuery] = useState('');
@@ -26,6 +27,7 @@ function UserSearchContent() {
 
   const { users, loading, error, refetch } = useUserSearch(debouncedQuery, status);
   const { suspendUser, unsuspendUser, loading: actionLoading } = useSuspendUser();
+  const [emailUser, setEmailUser] = useState<{ user_id: string; email: string; nickname: string } | null>(null);
 
   const handleSuspend = async (userId: string, nickname: string) => {
     const reason = prompt(`Enter reason for suspending ${nickname}:`);
@@ -289,6 +291,15 @@ function UserSearchContent() {
                             <Mail className="mr-2 h-4 w-4" />
                             Reset Password
                           </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEmailUser({ user_id: user.user_id, email: user.email, nickname: user.nickname })}
+                            className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000]/10"
+                          >
+                            <Mail className="mr-2 h-4 w-4" />
+                            Send Email
+                          </Button>
                         </>
                       )}
                     </div>
@@ -307,6 +318,12 @@ function UserSearchContent() {
           ))}
         </div>
       </div>
+
+      <SendEmailModal
+        user={emailUser}
+        open={!!emailUser}
+        onClose={() => setEmailUser(null)}
+      />
     </div>
   );
 }
