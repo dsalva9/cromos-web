@@ -103,6 +103,76 @@ notification_preferences JSONB {
 
 ---
 
+## Corporate Email System
+
+### Overview
+
+The Corporate Email System allows administrators to send direct emails to users from the admin console. These emails bypass user notification preferences and are used for important communications from the CambioCromos team.
+
+### Architecture
+
+**Flow**:
+```
+Admin Console (Users Tab)
+    ↓
+SendEmailModal Component
+    ↓
+send-corporate-email Edge Function
+    ↓
+Resend API
+    ↓
+User's Email
+```
+
+### Edge Function: `send-corporate-email`
+
+**Location**: `supabase/functions/send-corporate-email/index.ts`
+
+**Purpose**: Sends corporate emails on behalf of administrators
+
+**Environment Variables**:
+- `RESEND_API_KEY` - API key for Resend
+
+**Authorization**: Requires a valid admin session (checks `is_admin` in profiles table)
+
+**Request Body**:
+```typescript
+{
+  to_email: string;   // Recipient email address
+  subject: string;    // Email subject
+  body: string;       // Email body (plain text, rendered with pre-wrap)
+}
+```
+
+**Response**:
+- `200`: `{ success: true, result: ResendResult }`
+- `400`: Missing required fields
+- `401`: Invalid or missing authorization
+- `403`: User is not an admin
+- `500`: Resend API error
+
+**Email Template**: Uses the same CambioCromos branding as notification emails:
+- Orange gradient header with logo
+- White content area with subject as title
+- Footer with team attribution
+- Reply-to: `info@cambiocromos.com`
+
+### Admin UI
+
+**Location**: Admin Console → Users Tab → "Enviar email" button
+
+**Components**:
+- `SendEmailModal` - Modal for composing corporate emails
+
+**Features**:
+- Shows recipient info (nickname and email)
+- Subject field (required)
+- Body field (multiline textarea, required)
+- Loading state during send
+- Success/error toast feedback
+
+---
+
 ## Inbound Email Forwarding System
 
 ### Architecture

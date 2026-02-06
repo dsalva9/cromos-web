@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { SendEmailModal } from './SendEmailModal';
 
 type User = {
   user_id: string;
@@ -50,6 +51,7 @@ export default function UsersTab() {
   const [pageIndex, setPageIndex] = useState(0);
   const [actionDialog, setActionDialog] = useState<ActionDialog | null>(null);
   const [actionOpen, setActionOpen] = useState(false);
+  const [emailUser, setEmailUser] = useState<User | null>(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -360,6 +362,13 @@ export default function UsersTab() {
                       >
                         Eliminar
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setEmailUser(u)}
+                      >
+                        Enviar email
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -392,9 +401,9 @@ export default function UsersTab() {
                 <Button
                   variant={
                     dialogContent.variant as
-                      | 'default'
-                      | 'destructive'
-                      | 'secondary'
+                    | 'default'
+                    | 'destructive'
+                    | 'secondary'
                   }
                   onClick={performAction}
                 >
@@ -414,6 +423,12 @@ export default function UsersTab() {
           )}
         </DialogContent>
       </Dialog>
+
+      <SendEmailModal
+        user={emailUser}
+        open={!!emailUser}
+        onClose={() => setEmailUser(null)}
+      />
     </div>
   );
 }
