@@ -10,90 +10,102 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = 'CambioCromos <info@cambiocromos.com>';
 
+// CORS headers for browser requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 interface CorporateEmailPayload {
-    to_email: string;
-    subject: string;
-    body: string;
+  to_email: string;
+  subject: string;
+  body: string;
 }
 
 serve(async (req) => {
-    try {
-        // Only allow POST requests
-        if (req.method !== 'POST') {
-            return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-                status: 405,
-                headers: { 'Content-Type': 'application/json' },
-            });
-        }
+  // Handle CORS preflight request
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
 
-        // Check if Resend API key is configured
-        if (!RESEND_API_KEY) {
-            console.error('[send-corporate-email] Resend API key not configured');
-            return new Response(
-                JSON.stringify({ error: 'Resend not configured' }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+  try {
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-        // Get Supabase client and verify admin
-        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Check if Resend API key is configured
+    if (!RESEND_API_KEY) {
+      console.error('[send-corporate-email] Resend API key not configured');
+      return new Response(
+        JSON.stringify({ error: 'Resend not configured' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-        // Get authorization header
-        const authHeader = req.headers.get('Authorization');
-        if (!authHeader) {
-            return new Response(
-                JSON.stringify({ error: 'Missing authorization header' }),
-                { status: 401, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+    // Get Supabase client and verify admin
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        // Verify the user is an admin
-        const token = authHeader.replace('Bearer ', '');
-        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    // Get authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-        if (userError || !user) {
-            return new Response(
-                JSON.stringify({ error: 'Invalid token' }),
-                { status: 401, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+    // Verify the user is an admin
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-        // Check admin status
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .single();
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-        if (profileError || !profile?.is_admin) {
-            return new Response(
-                JSON.stringify({ error: 'Admin access required' }),
-                { status: 403, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+    // Check admin status
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
 
-        // Parse request body
-        const payload: CorporateEmailPayload = await req.json();
-        const { to_email, subject, body } = payload;
+    if (profileError || !profile?.is_admin) {
+      return new Response(
+        JSON.stringify({ error: 'Admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-        console.log('[send-corporate-email] Processing:', {
-            to_email,
-            subject,
-            admin_id: user.id,
-        });
+    // Parse request body
+    const payload: CorporateEmailPayload = await req.json();
+    const { to_email, subject, body } = payload;
 
-        // Validate required fields
-        if (!to_email || !subject || !body) {
-            return new Response(
-                JSON.stringify({ error: 'Missing required fields: to_email, subject, body' }),
-                { status: 400, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
+    console.log('[send-corporate-email] Processing:', {
+      to_email,
+      subject,
+      admin_id: user.id,
+    });
 
-        // Build email HTML with CambioCromos branding
-        const htmlContent = `
+    // Validate required fields
+    if (!to_email || !subject || !body) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: to_email, subject, body' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Build email HTML with CambioCromos branding
+    const htmlContent = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -164,49 +176,49 @@ serve(async (req) => {
       </html>
     `;
 
-        // Send email via Resend
-        console.log('[send-corporate-email] Sending to Resend:', {
-            to: to_email,
-            from: FROM_EMAIL,
-            subject,
-        });
+    // Send email via Resend
+    console.log('[send-corporate-email] Sending to Resend:', {
+      to: to_email,
+      from: FROM_EMAIL,
+      subject,
+    });
 
-        const resendResponse = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-                from: FROM_EMAIL,
-                to: to_email,
-                subject: subject,
-                html: htmlContent,
-                reply_to: 'info@cambiocromos.com',
-            }),
-        });
+    const resendResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: to_email,
+        subject: subject,
+        html: htmlContent,
+        reply_to: 'info@cambiocromos.com',
+      }),
+    });
 
-        const resendResult = await resendResponse.json();
+    const resendResult = await resendResponse.json();
 
-        if (!resendResponse.ok) {
-            console.error('[send-corporate-email] Resend error:', resendResult);
-            return new Response(
-                JSON.stringify({ error: 'Failed to send email', details: resendResult }),
-                { status: 500, headers: { 'Content-Type': 'application/json' } }
-            );
-        }
-
-        console.log('[send-corporate-email] Success:', resendResult);
-
-        return new Response(
-            JSON.stringify({ success: true, result: resendResult }),
-            { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-    } catch (error) {
-        console.error('[send-corporate-email] Unexpected error:', error);
-        return new Response(
-            JSON.stringify({ error: 'Internal server error', details: error.message }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
+    if (!resendResponse.ok) {
+      console.error('[send-corporate-email] Resend error:', resendResult);
+      return new Response(
+        JSON.stringify({ error: 'Failed to send email', details: resendResult }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    console.log('[send-corporate-email] Success:', resendResult);
+
+    return new Response(
+      JSON.stringify({ success: true, result: resendResult }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('[send-corporate-email] Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
 });
