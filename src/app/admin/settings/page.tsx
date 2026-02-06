@@ -1,6 +1,7 @@
 import { ModernCard } from '@/components/ui/modern-card';
 import EmailForwardingSettings from '@/components/admin/EmailForwardingSettings';
 import InboundEmailLogs from '@/components/admin/InboundEmailLogs';
+import NewUserSummarySettings from '@/components/admin/NewUserSummarySettings';
 
 export default function AdminSettingsPage() {
   return (
@@ -21,6 +22,14 @@ export default function AdminSettingsPage() {
         </ModernCard>
       </div>
 
+      {/* New User Summary Section */}
+      <div>
+        <h2 className="text-xl font-bold text-white mb-4">New Users Summary Email</h2>
+        <ModernCard>
+          <NewUserSummarySettings />
+        </ModernCard>
+      </div>
+
       {/* Inbound Email Logs Section */}
       <div>
         <h2 className="text-xl font-bold text-white mb-4">Recent Inbound Emails</h2>
@@ -31,3 +40,4 @@ export default function AdminSettingsPage() {
     </div>
   );
 }
+

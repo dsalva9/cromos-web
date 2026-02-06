@@ -11,6 +11,7 @@ interface ForwardingAddress {
   added_by_username: string | null;
   added_at: string;
   last_used_at: string | null;
+  summary_email_frequency: string | null;
 }
 
 interface UseEmailForwardingReturn {
