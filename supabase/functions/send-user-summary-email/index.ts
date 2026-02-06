@@ -117,11 +117,12 @@ serve(async (req) => {
         let recipients: Recipient[] = [];
 
         if (frequency === 'manual') {
-            // For manual, send to all active forwarding addresses
+            // For manual, send only to addresses that have opted in (daily or weekly)
             const { data: allRecipients } = await supabase
                 .from('email_forwarding_addresses')
                 .select('id, email')
-                .eq('is_active', true);
+                .eq('is_active', true)
+                .neq('summary_email_frequency', 'none');
             recipients = allRecipients || [];
         } else {
             const { data: freqRecipients, error: recipientsError } = await supabase.rpc(
