@@ -32,6 +32,8 @@ interface ProfileCompletionContextValue {
   loading: boolean;
   refresh: () => Promise<void>;
   updateProfile: (changes: Partial<UserProfile>) => void;
+  /** Durably lock isComplete=true for this session (prevents race-condition redirects) */
+  markComplete: () => void;
 }
 
 const ProfileCompletionContext =
@@ -92,6 +94,9 @@ export function ProfileCompletionProvider({
   const supabase = useSupabaseClient();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  // Once true, isComplete stays true for the rest of this session.
+  // This prevents transient false readings during re-fetch after profile save.
+  const [completedLock, setCompletedLock] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -100,7 +105,11 @@ export function ProfileCompletionProvider({
       return;
     }
 
-    setLoading(true);
+    // If profile is already locked as complete, skip loading=true
+    // to avoid a transient isComplete=false flicker while re-fetching.
+    if (!completedLock) {
+      setLoading(true);
+    }
 
     try {
       // Single query for ALL profile data - eliminates redundant queries
@@ -122,13 +131,21 @@ export function ProfileCompletionProvider({
         : { nickname: null, postcode: null, avatar_url: null, is_admin: false };
 
       setProfile(profileData);
+
+      // Auto-lock if fetched data confirms profile is complete
+      if (computeIsComplete(profileData)) {
+        setCompletedLock(true);
+      }
     } catch (error) {
       logger.error('Error fetching profile', error);
-      setProfile(null);
+      // Don't clear profile if locked — preserve optimistic state
+      if (!completedLock) {
+        setProfile(null);
+      }
     } finally {
       setLoading(false);
     }
-  }, [supabase, user]);
+  }, [supabase, user, completedLock]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -162,22 +179,35 @@ export function ProfileCompletionProvider({
           avatar_url: changes.avatar_url ?? prev?.avatar_url ?? null,
           is_admin: changes.is_admin ?? prev?.is_admin ?? false,
         };
+        // Auto-lock if the optimistic update makes profile complete
+        if (computeIsComplete(next)) {
+          setCompletedLock(true);
+        }
         return next;
       });
     },
     []
   );
 
+  const markComplete = useCallback(() => {
+    setCompletedLock(true);
+  }, []);
+
+  const rawIsComplete = computeIsComplete(profile);
+  // completedLock is sticky: once true, isComplete stays true
+  const isComplete = completedLock || rawIsComplete;
+
   const contextValue = useMemo<ProfileCompletionContextValue>(
     () => ({
       profile,
-      isComplete: computeIsComplete(profile),
+      isComplete,
       isAdmin: profile?.is_admin ?? false,
       loading,
       refresh: fetchProfile,
       updateProfile,
+      markComplete,
     }),
-    [fetchProfile, loading, profile, updateProfile]
+    [fetchProfile, isComplete, loading, markComplete, profile, updateProfile]
   );
 
   return (

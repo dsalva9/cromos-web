@@ -121,16 +121,33 @@ export default function AuthCallback() {
           return;
         }
 
-        // Get user profile
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
-          .eq('id', sessionUser.id)
-          .single();
+        // Get user profile (with retry for transient failures)
+        let profile = null;
+        let profileError = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const result = await supabase
+            .from('profiles')
+            .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
+            .eq('id', sessionUser.id)
+            .single();
+
+          profileError = result.error;
+          profile = result.data;
+
+          if (!profileError) break;
+
+          logger.warn(`Profile query attempt ${attempt + 1} failed:`, profileError);
+          // Wait 500ms before retrying (skip wait on last attempt)
+          if (attempt < 2) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
 
         if (profileError) {
-          logger.error('Error checking user suspension status:', profileError);
-          if (mounted) router.push(PROFILE_COMPLETION_ROUTE);
+          logger.error('All profile query attempts failed:', profileError);
+          // Redirect to home — let ProfileCompletionGuard handle it
+          // instead of blindly redirecting to profile completion
+          if (mounted) router.push('/');
           return;
         }
 

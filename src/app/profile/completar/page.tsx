@@ -19,7 +19,7 @@ function CompleteProfileContent() {
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const router = useRouter();
-  const { profile, updateProfile, refresh } = useProfileCompletion();
+  const { profile, updateProfile, refresh, markComplete } = useProfileCompletion();
 
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
@@ -185,7 +185,14 @@ function CompleteProfileContent() {
         postcode: trimmedPostcode,
         avatar_url: finalAvatarPath,
       });
-      await refresh();
+
+      // Lock isComplete=true BEFORE navigating — prevents the guard from
+      // redirecting back during the transient re-fetch period.
+      markComplete();
+
+      // Non-blocking refresh — the optimistic updateProfile + markComplete
+      // are sufficient; the DB re-fetch can settle after navigation.
+      refresh().catch(() => { /* swallow — data is already optimistic */ });
 
       toast.success('Perfil completado. ¡Bienvenido!');
       router.push('/');
