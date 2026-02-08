@@ -7,7 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/login',
         '/signup',
         '/marketplace',
-        '/proximamente',
         '/legal/cookies',
         '/legal/privacy',
         '/legal/terms',

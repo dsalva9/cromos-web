@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: `${siteConfig.name} - Intercambia cromos deportivos`,
   description: siteConfig.description,
   alternates: {
-    canonical: './',
+    canonical: siteConfig.url,
   },
 };
 

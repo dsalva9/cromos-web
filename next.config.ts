@@ -37,6 +37,26 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
+  // Redirects for legacy PHP URLs
+  async redirects() {
+    return [
+      {
+        source: '/parking.php',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/search/tsc.php',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/search/cc.php',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
