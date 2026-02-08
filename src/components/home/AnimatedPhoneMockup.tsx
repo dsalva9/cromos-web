@@ -253,7 +253,7 @@ function ChatScreen() {
     );
 }
 
-export default function AnimatedPhoneMockup() {
+export default function AnimatedPhoneMockup({ className }: { className?: string }) {
     const [currentScreen, setCurrentScreen] = useState<Screen>('marketplace');
     const [scrollY, setScrollY] = useState(0);
     const [showTapIndicator, setShowTapIndicator] = useState(false);
@@ -296,7 +296,7 @@ export default function AnimatedPhoneMockup() {
     }, []);
 
     return (
-        <div className="flex-1 justify-center relative w-full max-w-[300px] perspective-[2000px] mt-[-20px] hidden lg:flex">
+        <div className={className ?? "flex-1 justify-center relative w-full max-w-[300px] perspective-[2000px] mt-[-20px] hidden lg:flex"}>
             {/* Glow effect */}
             <motion.div
                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[620px] rounded-[3rem] opacity-50"

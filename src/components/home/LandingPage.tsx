@@ -82,9 +82,12 @@ export default function LandingPage() {
                                 ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
                             </Link>
 
+                            {/* Phone Mockup - MOBILE ONLY */}
+                            <AnimatedPhoneMockup className="flex justify-center relative w-full max-w-[260px] perspective-[2000px] mt-2 lg:hidden" />
+
                         </div>
 
-                        {/* Right Phone Mockup - HIDDEN ON MOBILE */}
+                        {/* Right Phone Mockup - DESKTOP ONLY */}
                         <AnimatedPhoneMockup />
                     </div>
                 </div>

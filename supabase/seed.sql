@@ -1,0 +1,2 @@
+-- This file is intentionally empty
+-- Test user is seeded via separate script (see .agent/workflows/local-supabase.md)
