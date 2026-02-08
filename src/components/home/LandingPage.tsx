@@ -83,7 +83,7 @@ export default function LandingPage() {
                             </Link>
 
                             {/* Phone Mockup - MOBILE ONLY */}
-                            <AnimatedPhoneMockup className="flex justify-center relative w-full max-w-[260px] perspective-[2000px] mt-2 lg:hidden" />
+                            <AnimatedPhoneMockup className="flex justify-center relative w-full max-w-[260px] perspective-[2000px] mt-2 lg:hidden" flat />
 
                         </div>
 

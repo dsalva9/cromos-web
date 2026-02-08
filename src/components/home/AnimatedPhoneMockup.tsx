@@ -253,7 +253,7 @@ function ChatScreen() {
     );
 }
 
-export default function AnimatedPhoneMockup({ className }: { className?: string }) {
+export default function AnimatedPhoneMockup({ className, flat }: { className?: string; flat?: boolean }) {
     const [currentScreen, setCurrentScreen] = useState<Screen>('marketplace');
     const [scrollY, setScrollY] = useState(0);
     const [showTapIndicator, setShowTapIndicator] = useState(false);
@@ -310,8 +310,8 @@ export default function AnimatedPhoneMockup({ className }: { className?: string 
             {/* Phone */}
             <motion.div
                 className="relative border-gray-900 dark:border-gray-800 bg-gray-900 dark:bg-gray-800 border-[12px] rounded-[2.5rem] h-[600px] w-[300px] shadow-[30px_35px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden ring-4 ring-black/10 z-10 mx-auto"
-                initial={{ rotateY: -12 }}
-                whileHover={{ rotateY: 0 }}
+                initial={{ rotateY: flat ? 0 : -12 }}
+                whileHover={flat ? undefined : { rotateY: 0 }}
                 transition={{ duration: 0.7, ease: 'easeOut' }}
             >
                 {/* Notch */}
