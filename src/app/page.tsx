@@ -6,10 +6,10 @@ import NativeRedirectHandler from '@/components/native/NativeRedirectHandler';
 export default async function Home() {
   const supabase = await createServerSupabaseClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!session?.user;
 
   return (
     <>
