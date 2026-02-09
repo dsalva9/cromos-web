@@ -81,8 +81,8 @@ export default function BulkUploadTab() {
 
 
 
-    const fetchCollections = useCallback(async () => {
-    const { data, error } = await supabase.from('collections').select('id,name').order('id');
+  const fetchCollections = useCallback(async () => {
+    const { data, error } = await (supabase as any).from('collections').select('id,name').order('id');
     if (error) return;
     setCollections(data || []);
     if ((data || []).length) setSelectedCollection(data![0].id);
@@ -148,7 +148,7 @@ export default function BulkUploadTab() {
         try {
           // Skip duplicates if overwrite is off
           if (!overwrite) {
-            const { data: exists } = await supabase
+            const { data: exists } = await (supabase as any)
               .from('stickers')
               .select('id')
               .eq('collection_id', selectedCollection)
@@ -196,7 +196,7 @@ export default function BulkUploadTab() {
             image_path_webp_300: fullPath,
             thumb_path_webp_100: thumbPath,
           };
-          const { error } = await supabase.rpc('admin_upsert_sticker', { p_sticker: payload as unknown });
+          const { error } = await (supabase as any).rpc('admin_upsert_sticker', { p_sticker: payload });
           if (error) throw error;
           newResults.push({ code, ok: true });
         } catch (e: unknown) {

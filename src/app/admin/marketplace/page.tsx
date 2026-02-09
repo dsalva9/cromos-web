@@ -175,7 +175,7 @@ function MarketplaceContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleRestore(listing.id)}
+                          onClick={() => handleRestore(String(listing.id))}
                           disabled={restoreLoading}
                           className="w-full border-green-600 text-green-500 hover:bg-green-600/10"
                         >
@@ -190,7 +190,7 @@ function MarketplaceContent() {
                             setActionDialog({
                               open: true,
                               action: 'delete',
-                              listingId: listing.id,
+                              listingId: String(listing.id),
                               listingTitle: listing.title
                             })
                           }

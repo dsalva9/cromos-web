@@ -5,11 +5,11 @@ export function useListingFavorite() {
   const supabase = useSupabaseClient();
   const [loading, setLoading] = useState(false);
 
-  const checkFavorite = useCallback(async (listingId: string): Promise<boolean> => {
+  const checkFavorite = useCallback(async (listingId: number): Promise<boolean> => {
     try {
       const { data, error } = await supabase.rpc('is_favourited', {
         p_target_type: 'listing',
-        p_target_id: listingId
+        p_target_id: String(listingId)
       });
 
       if (error) throw error;
@@ -20,13 +20,13 @@ export function useListingFavorite() {
     }
   }, [supabase]);
 
-  const toggleFavorite = useCallback(async (listingId: string): Promise<boolean> => {
+  const toggleFavorite = useCallback(async (listingId: number): Promise<boolean> => {
     try {
       setLoading(true);
 
       const { data, error } = await supabase.rpc('toggle_favourite', {
         p_target_type: 'listing',
-        p_target_id: listingId
+        p_target_id: String(listingId)
       });
 
       if (error) throw error;

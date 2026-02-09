@@ -28,10 +28,10 @@ export function useTemplateEditor(templateId: string) {
       try {
         const { error } = await supabase.rpc('update_template_metadata', {
           p_template_id: parseInt(templateId),
-          p_title: metadata.title || null,
-          p_description: metadata.description || null,
-          p_image_url: metadata.image_url || null,
-          p_is_public: metadata.is_public !== undefined ? metadata.is_public : null
+          p_title: metadata.title || undefined,
+          p_description: metadata.description || undefined,
+          p_image_url: metadata.image_url || undefined,
+          p_is_public: metadata.is_public !== undefined ? metadata.is_public : undefined
         });
 
         if (error) {
@@ -62,9 +62,9 @@ export function useTemplateEditor(templateId: string) {
       try {
         const { error } = await supabase.rpc('update_template_page', {
           p_page_id: parseInt(pageId),
-          p_title: data.title || null,
-          p_type: data.type || null,
-          p_page_number: data.page_number || null
+          p_title: data.title || undefined,
+          p_type: data.type || undefined,
+          p_page_number: data.page_number || undefined
         });
 
         if (error) throw error;
@@ -111,8 +111,8 @@ export function useTemplateEditor(templateId: string) {
       try {
         const { error } = await supabase.rpc('update_template_slot', {
           p_slot_id: parseInt(slotId),
-          p_label: data.label || null,
-          p_is_special: data.is_special !== undefined ? data.is_special : null
+          p_label: data.label || undefined,
+          p_is_special: data.is_special !== undefined ? data.is_special : undefined
         });
 
         if (error) throw error;
@@ -196,10 +196,20 @@ export function useTemplateEditor(templateId: string) {
 
         const nextSlotNumber = (slots && slots.length > 0) ? slots[0].slot_number + 1 : 1;
 
+        // Get the page's template_id
+        const { data: pageData, error: pageError } = await supabase
+          .from('template_pages')
+          .select('template_id')
+          .eq('id', parseInt(pageId))
+          .single();
+
+        if (pageError || !pageData) throw pageError || new Error('Page not found');
+
         // Insert the new slot
         const { error } = await supabase
           .from('template_slots')
           .insert({
+            template_id: pageData.template_id,
             page_id: parseInt(pageId),
             slot_number: nextSlotNumber,
             label: data.label,
@@ -235,7 +245,7 @@ export function useTemplateEditor(templateId: string) {
       try {
         const { error } = await supabase.rpc('delete_template', {
           p_template_id: parseInt(templateId),
-          p_reason: reason || null
+          p_reason: reason || undefined
         });
 
         if (error) {

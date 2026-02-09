@@ -132,7 +132,7 @@ function ListingChatPageContent() {
 
       // Combine data to match Listing interface
       const fullListing: Listing = {
-        id: listingData.id.toString(),
+        id: listingData.id,
         user_id: listingData.user_id,
         author_nickname: profileData?.nickname || 'Usuario',
         author_avatar_url: profileData?.avatar_url || null,
@@ -143,7 +143,7 @@ function ListingChatPageContent() {
         image_url: listingData.image_url,
         status: listingData.status as 'active' | 'sold' | 'removed',
         views_count: 0, // Not needed for chat view
-        created_at: listingData.created_at,
+        created_at: listingData.created_at ?? '',
       };
 
       setListing(fullListing);
@@ -204,7 +204,7 @@ function ListingChatPageContent() {
             if (buyerProfile) {
               setCounterpartyToRate({
                 id: data[0].buyer_id,
-                nickname: buyerProfile.nickname
+                nickname: buyerProfile.nickname ?? 'Usuario'
               });
             }
           }
@@ -323,7 +323,7 @@ function ListingChatPageContent() {
       const { error: reserveError } = await supabase.rpc('reserve_listing', {
         p_listing_id: listingId,
         p_buyer_id: selectedParticipant,
-        p_note: null
+        p_note: undefined
       });
 
       if (reserveError) throw reserveError;
@@ -460,7 +460,7 @@ function ListingChatPageContent() {
     const { error } = await supabase.rpc('create_user_rating', {
       p_rated_id: counterpartyToRate.id,
       p_rating: rating,
-      p_comment: comment || null,
+      p_comment: comment || undefined,
       p_context_type: 'listing',
       p_context_id: listingId
     });

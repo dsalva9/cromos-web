@@ -55,7 +55,7 @@ export function useTemplateSlots() {
 
         if (rpcError) throw rpcError;
 
-        const fetchedSlots = (data || []) as TemplateSlot[];
+        const fetchedSlots = (data || []) as unknown as TemplateSlot[];
         setSlots(fetchedSlots);
         return fetchedSlots;
       } catch (err) {

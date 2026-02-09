@@ -122,7 +122,7 @@ export default function TemplateDetailsPage() {
       // Get the rating ID from the ratings list
       const userRatingObj = ratings.find(r => r.user_id === user?.id);
       if (userRatingObj) {
-        await updateRating(userRatingObj.id, rating, comment);
+        await updateRating(String(userRatingObj.id), rating, comment);
       }
     } else {
       await rateTemplate(rating, comment);
@@ -132,7 +132,7 @@ export default function TemplateDetailsPage() {
   const handleRatingDelete = async () => {
     const userRatingObj = ratings.find(r => r.user_id === user?.id);
     if (userRatingObj) {
-      await deleteRating(userRatingObj.id);
+      await deleteRating(String(userRatingObj.id));
     }
   };
 
@@ -565,7 +565,9 @@ export default function TemplateDetailsPage() {
             ratings.find(r => r.user_id === user?.id)?.comment || null
           }
           currentRatingId={
-            ratings.find(r => r.user_id === user?.id)?.id || null
+            ratings.find(r => r.user_id === user?.id)?.id != null
+              ? String(ratings.find(r => r.user_id === user?.id)!.id)
+              : null
           }
           onSubmit={handleRatingSubmit}
           onDelete={myRating ? handleRatingDelete : undefined}

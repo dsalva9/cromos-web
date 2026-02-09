@@ -161,7 +161,7 @@ export default function SiteHeader() {
     const { error } = await supabase.rpc('create_user_rating', {
       p_rated_id: ratingModalData.userId,
       p_rating: rating,
-      p_comment: comment || null,
+      p_comment: comment || undefined,
       p_context_type: 'listing',
       p_context_id: ratingModalData.listingId
     });

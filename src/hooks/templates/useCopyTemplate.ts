@@ -14,7 +14,7 @@ export function useCopyTemplate() {
 
       const { data, error } = await supabase.rpc('copy_template', {
         p_template_id: parseInt(templateId),
-        p_custom_title: customTitle || null,
+        p_custom_title: customTitle || undefined,
       });
 
       if (error) {

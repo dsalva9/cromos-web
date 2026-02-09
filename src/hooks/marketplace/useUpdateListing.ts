@@ -21,10 +21,10 @@ export function useUpdateListing() {
       const { error } = await supabase.rpc('update_trade_listing', {
         p_listing_id: parseInt(listingId),
         p_title: data.title,
-        p_description: data.description || null,
-        p_sticker_number: data.sticker_number || null,
-        p_collection_name: data.collection_name || null,
-        p_image_url: data.image_url || null,
+        p_description: data.description || undefined,
+        p_sticker_number: data.sticker_number || undefined,
+        p_collection_name: data.collection_name || undefined,
+        p_image_url: data.image_url || undefined,
       });
 
       if (error) throw error;

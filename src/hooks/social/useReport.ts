@@ -18,7 +18,7 @@ export function useReport() {
         p_target_type: entityType,
         p_target_id: entityId, // Pass as string - function now accepts TEXT
         p_reason: reason,
-        p_description: description || null,
+        p_description: description || undefined,
       });
 
       if (error) throw error;

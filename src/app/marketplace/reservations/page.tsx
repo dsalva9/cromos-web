@@ -61,7 +61,7 @@ function ReservationsPageContent() {
             listing_title: listing?.title || 'Sin título',
             listing_image_url: listing?.image_url || null,
             seller_nickname: seller?.nickname || 'Vendedor',
-            status: item.status,
+            status: item.status as BuyerReservation['status'],
             reserved_at: item.reserved_at,
             completed_at: item.completed_at,
           };

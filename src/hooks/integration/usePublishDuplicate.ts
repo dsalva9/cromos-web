@@ -24,8 +24,8 @@ export function usePublishDuplicate() {
         p_copy_id: copyId,
         p_slot_id: slotId,
         p_title: customData?.title || 'Cromo',
-        p_description: customData?.description || null,
-        p_image_url: customData?.image_url || null
+        p_description: customData?.description || undefined,
+        p_image_url: customData?.image_url || undefined
       });
 
       if (error) throw error;
@@ -42,7 +42,7 @@ export function usePublishDuplicate() {
         const { error: updateError } = await supabase
           .from('trade_listings')
           .update(updates)
-          .eq('id', listingId);
+          .eq('id', parseInt(listingId));
 
         if (updateError) throw updateError;
       }

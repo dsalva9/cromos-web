@@ -35,7 +35,7 @@ export const useTradeFinalization = (): UseTradeFinalizationReturn => {
           throw new Error(rpcError.message || 'Error al solicitar finalización.');
         }
 
-        const result = data as FinalizationResult;
+        const result = data as unknown as FinalizationResult;
 
         if (result.status === 'completed') {
           toast.success('¡Intercambio finalizado!', {

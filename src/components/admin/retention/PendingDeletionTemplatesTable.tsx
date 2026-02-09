@@ -153,13 +153,12 @@ export function PendingDeletionTemplatesTable() {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`font-semibold ${
-                        template.days_remaining <= 7
+                      className={`font-semibold ${template.days_remaining <= 7
                           ? 'text-red-500'
                           : template.days_remaining <= 30
                             ? 'text-orange-500'
                             : 'text-gray-400'
-                      }`}
+                        }`}
                     >
                       {template.days_remaining} days
                     </span>
@@ -219,7 +218,7 @@ export function PendingDeletionTemplatesTable() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDeleteClick(template.template_id, template.title)}
+                        onClick={() => handleDeleteClick(String(template.template_id), template.title)}
                         disabled={hasLegalHold || deleteLoading}
                       >
                         <Trash2 className="h-4 w-4" />

@@ -7,7 +7,7 @@ import { useListingFavorite } from '@/hooks/marketplace/useListingFavorite';
 import { toast } from 'sonner';
 
 interface ListingFavoriteButtonProps {
-  listingId: string;
+  listingId: number;
   variant?: 'full' | 'icon';
   onFavoriteChange?: (isFavorited: boolean) => void;
   className?: string;

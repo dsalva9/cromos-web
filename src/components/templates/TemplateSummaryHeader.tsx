@@ -9,8 +9,8 @@ import { useState } from 'react';
 import { ImageModal } from '@/components/ui/ImageModal';
 
 interface TemplateCopy {
-  copy_id: string;
-  template_id: string;
+  copy_id: number;
+  template_id: number;
   title: string;
   image_url?: string | null;
   is_active: boolean;

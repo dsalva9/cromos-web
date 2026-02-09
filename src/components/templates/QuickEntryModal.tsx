@@ -15,7 +15,7 @@ interface QuickEntryModalProps {
   onOpenChange: (open: boolean) => void;
   copyTitle: string;
   slots: SlotProgress[];
-  onUpdateProgress: (slotId: string, status: 'missing' | 'owned' | 'duplicate', count?: number) => Promise<void>;
+  onUpdateProgress: (slotId: number, status: 'missing' | 'owned' | 'duplicate', count?: number) => Promise<void>;
 }
 
 export function QuickEntryModal({

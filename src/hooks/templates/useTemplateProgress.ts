@@ -4,8 +4,8 @@ import { logger } from '@/lib/logger';
 import type { SlotProgress, ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface TemplateCopy {
-  copy_id: string;
-  template_id: string;
+  copy_id: number;
+  template_id: number;
   title: string;
   image_url?: string | null;
   is_active: boolean;
@@ -14,6 +14,7 @@ interface TemplateCopy {
   original_author_id: string;
   completed_slots: number;
   total_slots: number;
+  completion_percentage?: number;
 }
 
 export function useTemplateProgress(copyId: string) {
@@ -57,8 +58,12 @@ export function useTemplateProgress(copyId: string) {
 
       if (templateError) {
         logger.error('Error fetching template details:', templateError);
-      } else if (templateDetails?.template?.item_schema) {
-        setCustomFields(templateDetails.template.item_schema);
+      } else if (templateDetails) {
+        // Access template details - RPC returns Json type
+        const details = templateDetails as unknown as { template?: { item_schema?: ItemFieldDefinition[] } };
+        if (details?.template?.item_schema) {
+          setCustomFields(details.template.item_schema);
+        }
       }
 
       // Get progress
@@ -78,7 +83,7 @@ export function useTemplateProgress(copyId: string) {
         return;
       }
 
-      setProgress(progressData || []);
+      setProgress((progressData || []) as unknown as SlotProgress[]);
 
       // Update copy with correct total slots
       if (progressData && progressData.length > 0) {
@@ -86,13 +91,13 @@ export function useTemplateProgress(copyId: string) {
           if (!prev) return prev;
 
           // Count owned + duplicates as completed
-          const completed = progressData.filter(
+          const completed = (progressData as unknown as SlotProgress[]).filter(
             (s: SlotProgress) =>
               s.status === 'owned' || s.status === 'duplicate'
           ).length;
 
           // Total slots is the total number of unique stickers
-          const totalSlots = progressData.length;
+          const totalSlots = (progressData as unknown as SlotProgress[]).length;
 
           return {
             ...prev,
@@ -113,13 +118,13 @@ export function useTemplateProgress(copyId: string) {
   }, [fetchProgress]);
 
   const updateSlotStatus = useCallback(
-    async (slotId: string, status: string, count: number) => {
+    async (slotId: number, status: string, count: number) => {
       try {
         const { error: updateError } = await supabase.rpc(
           'update_template_progress',
           {
             p_copy_id: parseInt(copyId),
-            p_slot_id: parseInt(slotId),
+            p_slot_id: slotId,
             p_status: status,
             p_count: count,
           }

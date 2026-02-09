@@ -27,17 +27,17 @@ export function useListing(listingId: string) {
           )
         `
         )
-        .eq('id', listingId)
+        .eq('id', parseInt(listingId))
         .single();
 
       if (fetchError) throw fetchError;
 
       if (data) {
         setListing({
-          id: data.id.toString(),
+          id: data.id,
           user_id: data.user_id,
-          author_nickname: data.author.nickname,
-          author_avatar_url: data.author.avatar_url,
+          author_nickname: data.author.nickname ?? '',
+          author_avatar_url: data.author.avatar_url ?? null,
           author_is_suspended: data.author.is_suspended,  // Include suspension status
           author_deleted_at: data.author.deleted_at,  // Include author deletion timestamp
           deleted_at: data.deleted_at,  // Include listing deletion timestamp
@@ -46,11 +46,11 @@ export function useListing(listingId: string) {
           sticker_number: data.sticker_number,
           collection_name: data.collection_name,
           image_url: data.image_url,
-          status: data.status,
-          views_count: data.views_count,
-          created_at: data.created_at,
-          copy_id: data.copy_id?.toString(),
-          slot_id: data.slot_id?.toString(),
+          status: data.status ?? 'active',
+          views_count: data.views_count ?? 0,
+          created_at: data.created_at ?? '',
+          copy_id: data.copy_id,
+          slot_id: data.slot_id,
           // Panini metadata
           page_number: data.page_number,
           page_title: data.page_title,
@@ -77,7 +77,7 @@ export function useListing(listingId: string) {
       await supabase
         .from('trade_listings')
         .update({ views_count: (listing?.views_count || 0) + 1 })
-        .eq('id', listingId);
+        .eq('id', parseInt(listingId));
 
       // Update local state
       setListing(prev =>

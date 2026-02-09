@@ -50,21 +50,21 @@ export default function StickersTab() {
   const [pageIndex, setPageIndex] = useState(0);
 
   const fetchCollections = useCallback(async () => {
-    const { data, error } = await supabase.from('collections').select('id,name').order('id');
+    const { data, error } = await (supabase as any).from('collections').select('id,name').order('id');
     if (error) { logger.error(error); return; }
     setCollections(data || []);
     if ((data || []).length) setSelectedCollection(data![0].id);
   }, [supabase]);
 
   const fetchTeams = useCallback(async (collectionId: number) => {
-    const { data } = await supabase.from('collection_teams').select('id,team_name').eq('collection_id', collectionId).order('team_name');
+    const { data } = await (supabase as any).from('collection_teams').select('id,team_name').eq('collection_id', collectionId).order('team_name');
     setTeams(data || []);
   }, [supabase]);
 
   const fetchStickers = useCallback(async () => {
     if (!selectedCollection) return;
     setLoading(true);
-    let query = supabase
+    let query = (supabase as any)
       .from('stickers')
       .select('id,collection_id,team_id,code,player_name,rarity,rating,sticker_number,image_path_webp_300,thumb_path_webp_100')
       .eq('collection_id', selectedCollection);
@@ -126,7 +126,7 @@ export default function StickersTab() {
       image_path_webp_300: editing.image_path_webp_300 ?? null,
       thumb_path_webp_100: editing.thumb_path_webp_100 ?? null,
     };
-    const { error } = await supabase.rpc('admin_upsert_sticker', { p_sticker: payload as unknown });
+    const { error } = await (supabase as any).rpc('admin_upsert_sticker', { p_sticker: payload });
     if (error) { logger.error(error); toast(error.message || 'No se pudo guardar', 'error'); return; }
     toast('Cromo guardado', 'success');
     setEditOpen(false);
@@ -159,7 +159,7 @@ export default function StickersTab() {
     if (!editing?.id || !imageConfirm) return;
     const type = imageConfirm.type;
     try {
-      const { error } = await supabase.rpc('admin_remove_sticker_image', { p_sticker_id: editing.id, p_type: type });
+      const { error } = await (supabase as any).rpc('admin_remove_sticker_image', { p_sticker_id: editing.id, p_type: type });
       if (error) throw error;
       const path = type === 'full' ? editing.image_path_webp_300 : editing.thumb_path_webp_100;
       if (path) {
@@ -182,7 +182,7 @@ export default function StickersTab() {
   async function performDeleteSticker() {
     if (!deleteConfirm?.id) return;
     try {
-      const { error } = await supabase.rpc('admin_delete_sticker', { p_sticker_id: deleteConfirm.id });
+      const { error } = await (supabase as any).rpc('admin_delete_sticker', { p_sticker_id: deleteConfirm.id });
       if (error) throw error;
 
       // Delete images from storage if they exist

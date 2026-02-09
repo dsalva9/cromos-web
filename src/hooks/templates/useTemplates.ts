@@ -3,7 +3,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 interface Template {
-  id: string;
+  id: number;
   author_id: string;
   author_nickname: string;
   title: string;
@@ -13,7 +13,7 @@ interface Template {
   rating_count: number;
   copies_count: number;
   pages_count: number;
-  total_slots: number;
+  total_slots?: number;
   created_at: string;
 }
 
@@ -61,7 +61,7 @@ export function useTemplates({
           {
             p_limit: parseInt(limit.toString()),
             p_offset: parseInt(currentOffset.toString()),
-            p_search: search || null,
+            p_search: search || undefined,
             p_sort_by: sortBy,
           }
         );

@@ -57,14 +57,14 @@ function getNotificationTitle(notification: Notification): string {
 
 function getCounterpartyInfo(notification: Notification) {
   const counterpartyNickname =
-    notification.proposal_from_user === notification.metadata.sender_id ||
-    notification.proposal_from_user === notification.metadata.requester_id
+    notification.proposal_from_user === notification.metadata?.sender_id ||
+      notification.proposal_from_user === notification.metadata?.requester_id
       ? notification.from_user_nickname || 'Usuario'
       : notification.to_user_nickname || 'Usuario';
 
   const counterpartyUserId =
-    notification.proposal_from_user === notification.metadata.sender_id ||
-    notification.proposal_from_user === notification.metadata.requester_id
+    notification.proposal_from_user === notification.metadata?.sender_id ||
+      notification.proposal_from_user === notification.metadata?.requester_id
       ? notification.proposal_from_user
       : notification.proposal_to_user;
 

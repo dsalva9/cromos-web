@@ -26,13 +26,13 @@ export interface PendingDeletionUser {
   scheduled_for: string;
   days_remaining: number;
   deletion_reason: string | null;
-  initiated_by_type: 'user' | 'admin' | 'system';
+  initiated_by_type: string;
   legal_hold_until: string | null;
   retention_schedule_id: number;
 }
 
 export interface PendingDeletionListing {
-  listing_id: string;
+  listing_id: number;
   title: string;
   collection_name: string | null;
   seller_id: string;
@@ -40,21 +40,21 @@ export interface PendingDeletionListing {
   deleted_at: string;
   scheduled_for: string;
   days_remaining: number;
-  deletion_type: 'user' | 'admin' | null;
+  deletion_type: string;
   deletion_reason: string | null;
   legal_hold_until: string | null;
   retention_schedule_id: number;
 }
 
 export interface PendingDeletionTemplate {
-  template_id: string;
+  template_id: number;
   title: string;
   author_id: string | null;
   author_nickname: string | null;
   deleted_at: string;
   scheduled_for: string;
   days_remaining: number;
-  deletion_type: 'user' | 'admin' | null;
+  deletion_type: string;
   deletion_reason: string | null;
   rating_avg: number | null;
   rating_count: number;

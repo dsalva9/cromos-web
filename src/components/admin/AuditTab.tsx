@@ -47,8 +47,8 @@ export default function AuditTab() {
   const fetchAudit = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase.rpc('get_audit_log', {
-      p_entity: entity || null,
-      p_action: action || null,
+      p_entity: entity || undefined,
+      p_action: action || undefined,
       p_limit: pageSize,
       p_offset: pageIndex * pageSize,
     });

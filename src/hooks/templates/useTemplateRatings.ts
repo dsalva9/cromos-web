@@ -5,12 +5,12 @@ import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/components/providers/SupabaseProvider';
 
 export interface TemplateRating {
-  id: string;
+  id: number;
   user_id: string;
   user_nickname: string;
   user_avatar_url: string | null;
   rating: number;
-  comment: string | null;
+  comment: string;
   created_at: string;
 }
 
@@ -23,7 +23,7 @@ export interface RatingDistribution {
 }
 
 export interface RatingSummary {
-  template_id: string;
+  template_id: number;
   rating_avg: number;
   rating_count: number;
   rating_distribution: RatingDistribution;
@@ -98,7 +98,7 @@ export function useTemplateRatings(templateId: string) {
         };
 
         setSummary({
-          template_id: String(rawSummary.template_id ?? templateId),
+          template_id: rawSummary.template_id ?? parseInt(templateId),
           rating_avg: Number(rawSummary.rating_avg ?? 0),
           rating_count: Number(rawSummary.rating_count ?? 0),
           rating_distribution: normalizedDistribution,
@@ -196,7 +196,7 @@ export function useTemplateRatings(templateId: string) {
         const { data: ratingData, error: rateError } = await supabase.rpc('create_template_rating', {
           p_template_id: parsedTemplateId,
           p_rating: rating,
-          p_comment: cleanComment
+          p_comment: cleanComment ?? undefined
         });
 
         if (rateError) {
@@ -250,7 +250,7 @@ export function useTemplateRatings(templateId: string) {
         const { error: updateError } = await supabase.rpc('update_template_rating', {
           p_rating_id: parseInt(ratingId),
           p_rating: rating,
-          p_comment: cleanComment
+          p_comment: cleanComment ?? undefined
         });
 
         if (updateError) throw updateError;
@@ -356,7 +356,7 @@ export function useTemplateRatings(templateId: string) {
 
     if (totalRatingsFromList > 0) {
       return {
-        template_id: String(templateId),
+        template_id: parseInt(templateId),
         rating_avg: averageFromRatings,
         rating_count: totalRatingsFromList,
         rating_distribution: distributionFromRatings,

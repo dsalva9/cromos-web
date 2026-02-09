@@ -46,7 +46,7 @@ export function RetentionQueueTable() {
         .order('scheduled_for', { ascending: true });
 
       if (error) throw error;
-      setQueue(data || []);
+      setQueue((data as unknown as RetentionQueueItem[]) || []);
     } catch (error) {
       console.error('Error loading retention queue:', error);
     } finally {

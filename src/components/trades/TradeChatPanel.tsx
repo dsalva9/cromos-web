@@ -255,8 +255,8 @@ export function TradeChatPanel({
                 {!isMine && (
                   <p className="text-xs font-bold text-gray-400 mb-1">
                     <UserLink
-                      userId={message.sender_id}
-                      nickname={message.sender_nickname}
+                      userId={message.sender_id ?? ''}
+                      nickname={message.sender_nickname ?? ''}
                       variant="subtle"
                       disabled={!message.sender_id}
                     />

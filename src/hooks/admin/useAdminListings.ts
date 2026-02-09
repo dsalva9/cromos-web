@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export interface AdminListing {
-  id: string;
+  id: number;
   title: string;
   collection_name: string;
   status: string;
-  deleted_at: string | null;
+  deleted_at: string;
   created_at: string;
   seller_id: string;
   seller_nickname: string;
@@ -34,8 +34,8 @@ export function useAdminListings(
       const { data, error: fetchError } = await supabase.rpc(
         'admin_list_marketplace_listings',
         {
-          p_status: statusFilter || null,
-          p_query: query || null,
+          p_status: statusFilter || undefined,
+          p_query: query || undefined,
           p_page: page,
           p_page_size: pageSize
         }

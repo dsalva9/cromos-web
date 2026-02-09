@@ -156,7 +156,7 @@ export default function PageName() {
 
 - Loading: "Cargando..."
 - Error: "Error", "Error desconocido"
-- Success: "�xito", "Guardado correctamente"
+- Success: "Éxito", "Guardado correctamente"
 - Empty state: "No hay elementos disponibles"
 
 ### Action Buttons
@@ -172,7 +172,7 @@ export default function PageName() {
 
 - Home: "Inicio"
 - Profile: "Perfil"
-- Collection: "Mi Colecci�n"
+- Collection: "Mi Colección"
 - Trades: "Intercambios"
 - Messages: "Mensajes"
 
@@ -192,9 +192,12 @@ export default function PageName() {
 
 ### Type Definitions
 
-- Centralized in `src/types/index.ts`
-- Extend Database types for app-specific needs
-- Use descriptive interface names
+- Auto-generated database types in `src/types/database.ts` via `supabase gen types typescript`
+- Re-exported as `Database` from `src/types/index.ts`
+- App-specific types (TemplateCopy, SlotProgress, etc.) in `src/types/v1.6.0.ts`
+- All Supabase clients use `Database` generic for full type inference
+- Use `number` for database IDs (slot_id, template_id, copy_id, etc.)
+- Convert to `string` with `String()` only when required by URL params or specific APIs
 
 ## Database Conventions
 

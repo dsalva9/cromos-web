@@ -55,9 +55,9 @@ type UserCollectionRow = {
   collection_id: number;
   is_active: boolean;
   collections:
-    | { id: number; name: string }
-    | { id: number; name: string }[]
-    | null;
+  | { id: number; name: string }
+  | { id: number; name: string }[]
+  | null;
 };
 
 const EMPTY_ALBUM_MESSAGE = 'Este album todavia no tiene paginas configuradas.';
@@ -100,7 +100,7 @@ export function useAlbumPages(
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_collections')
         .select(
           `
@@ -138,7 +138,7 @@ export function useAlbumPages(
         null;
 
       if (!activeOption && collectionId) {
-        const { data: fallback } = await supabase
+        const { data: fallback } = await (supabase as any)
           .from('collections')
           .select('id, name')
           .eq('id', collectionId)
@@ -175,8 +175,8 @@ export function useAlbumPages(
         // This RPC was removed in v1.6.0 (collections → templates pivot)
         // Migration: Use get_my_template_copies() or get_template_progress(p_copy_id)
         // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
-        const { data, error } = await supabase.rpc(
-          'get_user_collection_stats', // ⚠️ DEPRECATED v1.5.0
+        const { data, error } = await (supabase as any).rpc(
+          'get_user_collection_stats',
           {
             p_user_id: user.id,
             p_collection_id: targetCollectionId,
@@ -225,7 +225,7 @@ export function useAlbumPages(
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('collection_pages')
         .select(
           `
@@ -278,7 +278,7 @@ export function useAlbumPages(
       }
 
       try {
-        const { data: pageData, error: pageError } = await supabase
+        const { data: pageData, error: pageError } = await (supabase as any)
           .from('collection_pages')
           .select(
             `
@@ -291,7 +291,7 @@ export function useAlbumPages(
 
         if (pageError) throw pageError;
 
-        const { data: slotsData, error: slotsError } = await supabase
+        const { data: slotsData, error: slotsError } = await (supabase as any)
           .from('page_slots')
           .select(
             `
@@ -317,7 +317,7 @@ export function useAlbumPages(
           return data?.publicUrl ?? null;
         };
 
-        const processedSlots: PageSlot[] = (slotsData ?? []).map(slot => {
+        const processedSlots: PageSlot[] = (slotsData ?? []).map((slot: any) => {
           const rawSticker = Array.isArray(slot.stickers)
             ? slot.stickers[0]
             : slot.stickers;
@@ -421,12 +421,12 @@ export function useAlbumPages(
       setSwitchingCollection(true);
 
       try {
-        await supabase
+        await (supabase as any)
           .from('user_collections')
           .update({ is_active: false })
           .eq('user_id', user.id);
 
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('user_collections')
           .update({ is_active: true })
           .eq('user_id', user.id)
@@ -535,7 +535,7 @@ export function useAlbumPages(
       });
 
       try {
-        const { error } = await supabase.from('user_stickers').upsert({
+        const { error } = await (supabase as any).from('user_stickers').upsert({
           user_id: user.id,
           sticker_id: stickerId,
           count: newCount,
@@ -596,10 +596,10 @@ export function useAlbumPages(
               user_stickers:
                 newCount > 0
                   ? [
-                      {
-                        count: newCount,
-                      },
-                    ]
+                    {
+                      count: newCount,
+                    },
+                  ]
                   : null,
             },
           } as PageSlot;
@@ -643,7 +643,7 @@ export function useAlbumPages(
 
       try {
         if (newCount > 0) {
-          const { error } = await supabase.from('user_stickers').upsert({
+          const { error } = await (supabase as any).from('user_stickers').upsert({
             user_id: user.id,
             sticker_id: stickerId,
             count: newCount,
@@ -651,7 +651,7 @@ export function useAlbumPages(
 
           if (error) throw error;
         } else {
-          const { error } = await supabase
+          const { error } = await (supabase as any)
             .from('user_stickers')
             .delete()
             .eq('user_id', user.id)
@@ -772,7 +772,7 @@ export function useAlbumPages(
       // Migration: Bulk update all template slots on the page to status='owned', count=1
       // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
       try {
-        const { data, error } = await supabase.rpc('mark_team_page_complete', { // ⚠️ DEPRECATED v1.5.0
+        const { data, error } = await (supabase as any).rpc('mark_team_page_complete', {
           p_user_id: user.id,
           p_collection_id: collectionId,
           p_page_id: targetPageId,

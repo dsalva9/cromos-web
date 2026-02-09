@@ -3,18 +3,13 @@
 
 echo "🔄 Generating TypeScript types from Supabase..."
 
-# Check if SUPABASE_PROJECT_ID is set
-if [ -z "$SUPABASE_PROJECT_ID" ]; then
-  echo "❌ Error: SUPABASE_PROJECT_ID environment variable is not set"
-  echo "Please set it with: export SUPABASE_PROJECT_ID=your-project-id"
-  exit 1
-fi
+SUPABASE_PROJECT_ID="${SUPABASE_PROJECT_ID:-cuzuzitadwmrlocqhhtu}"
 
 # Generate types
-npx supabase gen types typescript --project-id "$SUPABASE_PROJECT_ID" > src/types/supabase-generated.ts
+npx supabase gen types typescript --project-id "$SUPABASE_PROJECT_ID" > src/types/database.ts
 
 if [ $? -eq 0 ]; then
-  echo "✅ Types generated successfully at src/types/supabase-generated.ts"
+  echo "✅ Types generated successfully at src/types/database.ts"
 else
   echo "❌ Failed to generate types"
   exit 1

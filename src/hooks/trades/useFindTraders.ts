@@ -47,9 +47,9 @@ export function useFindTraders() {
         const rpcParams = {
           p_user_id: userId,
           p_collection_id: collectionId,
-          p_rarity: filters.rarity || null,
-          p_team: filters.team || null,
-          p_query: filters.query || null,
+          p_rarity: filters.rarity || undefined,
+          p_team: filters.team || undefined,
+          p_query: filters.query || undefined,
           p_min_overlap: filters.minOverlap || 1,
           p_limit: limit,
           p_offset: offset,

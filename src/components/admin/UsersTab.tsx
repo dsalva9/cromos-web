@@ -56,8 +56,8 @@ export default function UsersTab() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase.rpc('admin_list_users', {
-      p_search: search || null,
-      p_filter: filter || null,
+      p_search: search || undefined,
+      p_filter: filter || undefined,
       p_limit: pageSize,
       p_offset: pageIndex * pageSize,
     });
@@ -98,7 +98,7 @@ export default function UsersTab() {
       if (type === 'admin') {
         const { error } = await supabase.rpc('admin_update_user_role', {
           p_user_id: user.user_id,
-          p_is_admin: value,
+          p_is_admin: value!,
         });
         if (error) throw error;
         toast(
@@ -110,7 +110,7 @@ export default function UsersTab() {
       } else if (type === 'suspend') {
         const { error } = await supabase.rpc('admin_suspend_user', {
           p_user_id: user.user_id,
-          p_is_suspended: value,
+          p_is_suspended: value!,
         });
         if (error) throw error;
         toast(value ? 'Usuario suspendido' : 'Suspensión levantada', 'success');

@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export interface AdminTemplate {
-  id: string;
+  id: number;
   title: string;
   status: string;
-  deleted_at: string | null;
+  deleted_at: string;
   created_at: string;
   author_id: string;
   author_nickname: string;
@@ -33,8 +33,8 @@ export function useAdminTemplates(
     setLoading(true);
     try {
       const { data, error: fetchError } = await supabase.rpc('admin_list_templates', {
-        p_status: statusFilter || null,
-        p_query: query || null,
+        p_status: statusFilter || undefined,
+        p_query: query || undefined,
         p_page: page,
         p_page_size: pageSize
       });

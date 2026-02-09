@@ -27,7 +27,7 @@ export function useAdminPermanentDelete() {
       if (rpcError) throw rpcError;
 
       toast.success(`User ${userNickname} permanently deleted`);
-      return data as PermanentDeleteUserResponse;
+      return data as unknown as PermanentDeleteUserResponse;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -54,7 +54,7 @@ export function useAdminPermanentDelete() {
       if (rpcError) throw rpcError;
 
       toast.success(`Listing "${listingTitle}" permanently deleted`);
-      return data as PermanentDeleteListingResponse;
+      return data as unknown as PermanentDeleteListingResponse;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -81,7 +81,7 @@ export function useAdminPermanentDelete() {
       if (rpcError) throw rpcError;
 
       toast.success(`Template "${templateTitle}" permanently deleted`);
-      return data as PermanentDeleteTemplateResponse;
+      return data as unknown as PermanentDeleteTemplateResponse;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);

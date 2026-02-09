@@ -2,15 +2,15 @@
 
 export interface Profile {
   id: string;
-  nickname: string;
+  nickname: string | null;
   avatar_url: string | null;
   postcode: string | null;
   rating_avg: number;
   rating_count: number;
   is_admin: boolean;
   is_suspended: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface ItemFieldDefinition {
@@ -21,12 +21,12 @@ export interface ItemFieldDefinition {
 }
 
 export interface Listing {
-  id: string;
+  id: number;
   user_id: string;
   author_nickname: string;
   author_avatar_url: string | null;
   author_postcode?: string | null;
-  author_is_suspended?: boolean;  // For admin suspension indicators
+  author_is_suspended?: boolean | null;  // For admin suspension indicators
   author_deleted_at?: string | null;  // For admin deletion indicators
   deleted_at?: string | null;  // Listing soft deletion timestamp
   title: string;
@@ -34,11 +34,11 @@ export interface Listing {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
-  status: 'active' | 'reserved' | 'completed' | 'sold' | 'removed' | 'ELIMINADO';
+  status: string;  // DB returns string; narrow at use site
   views_count: number;
   created_at: string;
-  copy_id?: string | null;
-  slot_id?: string | null;
+  copy_id?: number | null;
+  slot_id?: number | null;
   distance_km?: number | null;
   // Panini-style metadata
   page_number?: number | null;
@@ -46,51 +46,55 @@ export interface Listing {
   slot_variant?: string | null;
   global_number?: number | null;
   // New fields
-  is_group?: boolean;
-  group_count?: number;
+  is_group?: boolean | null;
+  group_count?: number | null;
 }
 
 export interface Template {
-  id: string;
+  id: number;
   author_id: string;
   author_nickname: string;
   title: string;
   description: string | null;
   image_url: string | null;
-  is_public: boolean;
+  is_public?: boolean;
   rating_avg: number;
   rating_count: number;
   copies_count: number;
   pages_count: number;
+  total_slots?: number;
   created_at: string;
   deleted_at?: string | null;
   item_schema?: ItemFieldDefinition[];
 }
 
 export interface TemplateCopy {
-  copy_id: string;
-  template_id: string;
+  copy_id: number;
+  template_id: number;
   title: string;
   is_active: boolean;
   copied_at: string;
+  original_author_id?: string;
   original_author_nickname: string;
+  image_url?: string;
+  completion_percentage?: number;
   completed_slots: number;
   total_slots: number;
 }
 
 export interface SlotProgress {
-  slot_id: string;
-  page_id: string;
+  slot_id: number;
+  page_id: number;
   page_number: number;
   page_title: string;
   slot_number: number;
-  slot_variant: string | null;
-  global_number: number | null;
-  label: string | null;
+  slot_variant: string;
+  global_number: number;
+  label: string;
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
-  data?: Record<string, string | number | boolean>;
+  data?: Record<string, string | number | boolean> | null;
 }
 
 export interface UserProfile extends Profile {

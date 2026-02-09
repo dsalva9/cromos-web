@@ -18,7 +18,7 @@ import { RotateCcw } from 'lucide-react';
 import { DeletionCountdown } from '@/components/deletion';
 
 interface MyListing {
-  listing_id: string;
+  listing_id: number;
   title: string;
   description: string | null;
   collection_name: string | null;
@@ -27,7 +27,7 @@ interface MyListing {
   status: string;
   views_count: number;
   created_at: string;
-  copy_id: string | null;
+  copy_id: number | null;
   current_count: number | null;
   needs_attention: boolean;
   // Panini metadata
@@ -58,7 +58,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
   const handleSoftDelete = async () => {
     try {
-      await softDeleteListing(listing.listing_id);
+      await softDeleteListing(String(listing.listing_id));
       onUpdate(); // Refresh listings
       // Navigate to Eliminados tab after successful soft delete
       if (onTabChange) {
@@ -72,7 +72,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
   const handleHardDelete = async () => {
     try {
-      await hardDeleteListing(listing.listing_id);
+      await hardDeleteListing(String(listing.listing_id));
       onUpdate(); // Refresh listings
     } catch (error) {
       // Error handling is done in hook
@@ -82,7 +82,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
   const handleRestore = async () => {
     try {
-      await restoreListing(listing.listing_id);
+      await restoreListing(String(listing.listing_id));
       onUpdate(); // Refresh listings
       // Navigate to Activos tab after successful restore
       if (onTabChange) {
@@ -305,7 +305,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
               onClose={() => setShowSoftDeleteModal(false)}
               onConfirm={handleSoftDelete}
               listing={{
-                id: listing.listing_id,
+                id: String(listing.listing_id),
                 title: listing.title,
                 status: listing.status,
                 hasActiveChats: false, // Could be determined from chat data if needed
@@ -320,7 +320,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
               onClose={() => setShowHardDeleteModal(false)}
               onConfirm={handleHardDelete}
               listing={{
-                id: listing.listing_id,
+                id: String(listing.listing_id),
                 title: listing.title,
                 status: listing.status,
                 hasActiveChats: false, // Could be determined from chat data if needed

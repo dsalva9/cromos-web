@@ -4,16 +4,33 @@ import { logger } from '@/lib/logger';
 
 export interface Notification {
   id: number;
-  kind: 'chat_unread' | 'proposal_accepted' | 'proposal_rejected' | 'finalization_requested';
+  kind: string;  // DB returns string
   trade_id: number;
   created_at: string;
   read_at: string | null;
-  metadata: Record<string, string | number | boolean | null>;
   proposal_from_user: string;
   proposal_to_user: string;
-  proposal_status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  proposal_status: string;  // DB returns string
   from_user_nickname: string | null;
   to_user_nickname: string | null;
+  // Additional fields from RPC
+  actor_id?: string;
+  actor_nickname?: string;
+  actor_avatar_url?: string;
+  listing_id?: number;
+  listing_title?: string;
+  listing_status?: string;
+  proposal_id?: number;
+  trade_status?: string;
+  user_id?: string;
+  sender_nickname?: string;
+  receiver_nickname?: string;
+  trade_message?: string;
+  metadata?: {
+    sender_id?: string;
+    requester_id?: string;
+    [key: string]: unknown;
+  };
 }
 
 interface UseNotificationsReturn {

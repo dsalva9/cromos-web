@@ -39,10 +39,11 @@ export function useUserProfile(userId: string) {
       if (listingsResult.error) throw listingsResult.error;
 
       const profileData = profileResult.data;
+      const rawLabel = (profileData as Record<string, unknown>)?.location_label;
       const locationLabel =
-        typeof profileData?.location_label === 'string' &&
-        profileData.location_label.trim().length > 0
-          ? profileData.location_label.trim()
+        typeof rawLabel === 'string' &&
+          rawLabel.trim().length > 0
+          ? rawLabel.trim()
           : null;
 
       const normalizedProfile: UserProfile = {

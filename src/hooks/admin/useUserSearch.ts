@@ -28,7 +28,7 @@ export function useUserSearch(query: string, status: 'all' | 'active' | 'suspend
       setLoading(true);
 
       const { data, error: rpcError } = await supabase.rpc('search_users_admin', {
-        p_query: query || null,
+        p_query: query || undefined,
         p_status: status,
         p_limit: 50,
         p_offset: 0

@@ -17,7 +17,7 @@ interface RpcListingResponse {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
-  status: 'active' | 'sold' | 'removed';
+  status: string;  // DB returns string
   views_count: number;
   created_at: string;
   copy_id: number | null;
@@ -121,7 +121,7 @@ export function useListings({
         // Transform the data to match our Listing interface
         const transformedData = (data || []).map(
           (item: RpcListingResponse) => ({
-            id: item.id.toString(),
+            id: item.id,
             user_id: item.user_id,
             author_nickname: item.author_nickname,
             author_avatar_url: item.author_avatar_url,
@@ -137,8 +137,8 @@ export function useListings({
             status: item.status,
             views_count: item.views_count,
             created_at: item.created_at,
-            copy_id: item.copy_id?.toString(),
-            slot_id: item.slot_id?.toString(),
+            copy_id: item.copy_id,
+            slot_id: item.slot_id,
             distance_km: item.distance_km,
             is_group: item.is_group,
             group_count: item.group_count,

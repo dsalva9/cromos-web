@@ -35,7 +35,7 @@ function FavoritesContent() {
     }
   };
 
-  const handleRemoveListing = async (listingId: string) => {
+  const handleRemoveListing = async (listingId: number) => {
     try {
       await toggleListingFavorite(listingId);
       toast.success('Anuncio eliminado de favoritos');
@@ -268,11 +268,10 @@ function FavoritesContent() {
                         {/* Status Badge - only show for packs when active, or for sold/removed */}
                         {(favorite.status !== 'active' || favorite.is_group) && (
                           <div className="absolute top-2 right-2 z-10">
-                            <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border ${
-                              favorite.status === 'active' && favorite.is_group
-                                ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700'
-                                : 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
-                            }`}>
+                            <span className={`px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border ${favorite.status === 'active' && favorite.is_group
+                              ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700'
+                              : 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
+                              }`}>
                               {favorite.status === 'active' && favorite.is_group ? 'Pack' : 'Vendido'}
                             </span>
                           </div>
@@ -309,7 +308,7 @@ function FavoritesContent() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleRemoveListing(favorite.listing_id)}
+                        onClick={() => handleRemoveListing(Number(favorite.listing_id))}
                         className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 text-xs"
                       >
                         <Heart className="h-3 w-3 fill-current mr-1" />

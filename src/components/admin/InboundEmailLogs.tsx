@@ -39,7 +39,7 @@ export default function InboundEmailLogs() {
 
       if (rpcError) throw rpcError;
 
-      setLogs(data || []);
+      setLogs((data as unknown as InboundEmailLog[]) || []);
       setHasMore(data && data.length === LOGS_PER_PAGE);
     } catch (err) {
       console.error('Error fetching email logs:', err);

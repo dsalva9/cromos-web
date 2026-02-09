@@ -9,8 +9,8 @@ import { useSlotListings } from '@/hooks/templates/useSlotListings';
 import { CheckCircle2, LayoutGrid } from 'lucide-react';
 
 interface SlotProgress {
-  slot_id: string;
-  page_id: string;
+  slot_id: number;
+  page_id: number;
   page_number: number;
   page_title: string;
   slot_number: number;
@@ -20,7 +20,7 @@ interface SlotProgress {
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
   count: number;
-  data?: Record<string, string | number | boolean>;
+  data?: Record<string, string | number | boolean> | null;
 }
 
 interface CustomField {
@@ -32,7 +32,7 @@ interface CustomField {
 interface TemplateProgressGridProps {
   progress: SlotProgress[];
   onUpdateSlot: (
-    slotId: string,
+    slotId: number,
     status: string,
     count: number
   ) => Promise<void>;

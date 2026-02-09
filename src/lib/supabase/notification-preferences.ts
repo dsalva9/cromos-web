@@ -31,7 +31,7 @@ export async function fetchNotificationPreferences(): Promise<GranularNotificati
     return getDefaultPreferences();
   }
 
-  return data as GranularNotificationPreferences;
+  return data as unknown as GranularNotificationPreferences;
 }
 
 /**
@@ -43,7 +43,7 @@ export async function updateNotificationPreferences(
   const supabase = createClient();
 
   const { error } = await supabase.rpc('update_notification_preferences', {
-    p_preferences: preferences,
+    p_preferences: preferences as unknown as import('@/types/database').Json,
   });
 
   if (error) {

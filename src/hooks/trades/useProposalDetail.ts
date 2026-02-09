@@ -28,7 +28,7 @@ export const useProposalDetail = (): UseProposalDetailReturn => {
 
         if (rpcError) throw new Error(rpcError.message);
 
-        setDetail(data);
+        setDetail(data as unknown as TradeProposalDetail);
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al cargar los detalles.';

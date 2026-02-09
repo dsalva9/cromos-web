@@ -134,13 +134,12 @@ export function PendingDeletionListingsTable() {
                   </TableCell>
                   <TableCell>
                     <span
-                      className={`font-semibold ${
-                        listing.days_remaining <= 7
+                      className={`font-semibold ${listing.days_remaining <= 7
                           ? 'text-red-500'
                           : listing.days_remaining <= 30
                             ? 'text-orange-500'
                             : 'text-gray-400'
-                      }`}
+                        }`}
                     >
                       {listing.days_remaining} days
                     </span>
@@ -200,7 +199,7 @@ export function PendingDeletionListingsTable() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleDeleteClick(listing.listing_id, listing.title)}
+                        onClick={() => handleDeleteClick(String(listing.listing_id), listing.title)}
                         disabled={hasLegalHold || deleteLoading}
                       >
                         <Trash2 className="h-4 w-4" />

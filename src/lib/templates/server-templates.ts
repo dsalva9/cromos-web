@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 
 export interface Template {
-    id: string;
+    id: number;
     author_id: string;
     author_nickname: string;
     title: string;
@@ -13,7 +13,7 @@ export interface Template {
     rating_count: number;
     copies_count: number;
     pages_count: number;
-    total_slots: number;
+    total_slots?: number;
     created_at: string;
     deleted_at?: string | null;
 }

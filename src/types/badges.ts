@@ -3,15 +3,11 @@
  * Defines all types for the gamification badges system
  */
 
-export type BadgeCategory =
-  | 'collector'
-  | 'creator'
-  | 'reviewer'
-  | 'completionist'
-  | 'trader'
-  | 'top_rated';
+// DB returns string; narrow at use site if needed
+export type BadgeCategory = string;
 
-export type BadgeTier = 'bronze' | 'silver' | 'gold' | 'special';
+// DB returns string; narrow at use site if needed
+export type BadgeTier = string;
 
 /**
  * Badge definition from badge_definitions table

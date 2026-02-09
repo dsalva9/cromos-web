@@ -63,8 +63,8 @@ export function useCreateTemplate() {
         'create_template',
         {
           p_title: processedData.title.trim(),
-          p_description: processedData.description.trim() || null,
-          p_image_url: processedData.image_url.trim() || null,
+          p_description: processedData.description.trim() || undefined,
+          p_image_url: processedData.image_url.trim() || undefined,
           p_is_public: processedData.is_public,
         }
       );

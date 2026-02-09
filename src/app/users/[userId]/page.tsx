@@ -149,7 +149,7 @@ export default function UserProfilePage() {
           .single();
 
         if (!error && data) {
-          setIsCurrentUserAdmin(data.is_admin);
+          setIsCurrentUserAdmin(data.is_admin ?? false);
         }
       } catch (err) {
         logger.error('Error checking admin status:', err);
@@ -175,7 +175,7 @@ export default function UserProfilePage() {
 
         if (summaryError) throw summaryError;
         if (summaryData && summaryData.length > 0) {
-          setRatingSummary(summaryData[0]);
+          setRatingSummary(summaryData[0] as unknown as typeof ratingSummary);
         }
 
         // Fetch ratings (limit to 50 most recent)

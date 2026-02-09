@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 
 interface SlotProgress {
-  slot_id: string;
+  slot_id: number;
   label: string | null;
   is_special: boolean;
   status: 'missing' | 'owned' | 'duplicate';
@@ -16,7 +16,7 @@ interface SlotProgress {
   slot_number?: number;
   slot_variant?: string | null;
   global_number?: number | null;
-  data?: Record<string, string | number | boolean>;
+  data?: Record<string, string | number | boolean> | null;
 }
 
 interface CustomField {
@@ -33,7 +33,7 @@ interface SlotListing {
 
 interface SlotTileProps {
   slot: SlotProgress;
-  onUpdate: (slotId: string, status: string, count: number) => Promise<void>;
+  onUpdate: (slotId: number, status: string, count: number) => Promise<void>;
   copyId: string;
   listing?: SlotListing;
   listingsLoading?: boolean;

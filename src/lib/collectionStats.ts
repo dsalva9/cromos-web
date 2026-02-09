@@ -1,5 +1,3 @@
-import type { Database } from '@/types';
-
 // TODO [v1.6.0 MIGRATION]: This entire file should be deprecated
 // The collections system was removed in v1.6.0 (pivot to templates)
 // Migration: Create templateStats.ts using get_my_template_copies() or get_template_progress()
@@ -14,8 +12,22 @@ export interface NormalizedCollectionStats {
 }
 
 // ⚠️ DEPRECATED v1.5.0 - RPC removed in v1.6.0
+// Standalone type (no longer derived from Database since the RPC was dropped)
 type RawCollectionStats =
-  Database['public']['Functions']['get_user_collection_stats']['Returns'];
+  | {
+    total_stickers: number;
+    owned_stickers: number;
+    completion_percentage: number;
+    duplicates: number;
+    missing: number;
+  }[]
+  | {
+    total_stickers: number;
+    owned_stickers: number;
+    completion_percentage: number;
+    duplicates: number;
+    missing: number;
+  };
 
 export function normalizeCollectionStats(
   raw: RawCollectionStats | null | undefined

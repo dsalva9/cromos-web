@@ -61,7 +61,7 @@ export default function TemplateEditPage() {
           is_public: formData.is_public,
           item_schema: formData.item_schema || [],
         })
-        .eq('id', templateId);
+        .eq('id', Number(templateId));
 
       if (metadataError) throw metadataError;
 
@@ -69,7 +69,7 @@ export default function TemplateEditPage() {
       const { error: deletePagesError } = await supabase
         .from('template_pages')
         .delete()
-        .eq('template_id', templateId);
+        .eq('template_id', Number(templateId));
 
       if (deletePagesError) throw deletePagesError;
 

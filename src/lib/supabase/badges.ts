@@ -131,7 +131,7 @@ export async function checkAndAwardBadge(
     throw error;
   }
 
-  return (data as BadgeAwardResult[])?.[0] || {
+  return (data as unknown as BadgeAwardResult[])?.[0] || {
     badge_awarded: false,
     badge_id: null,
     badge_name: null,

@@ -78,7 +78,7 @@ export default function ListingDetailPage() {
           .single();
 
         if (!error && data) {
-          setIsAdmin(data.is_admin || false);
+          setIsAdmin(data.is_admin ?? false);
         }
       } catch (err) {
         logger.error('Error checking admin status:', err);
@@ -511,7 +511,7 @@ export default function ListingDetailPage() {
                   <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12" />
                   <ReportButton
                     entityType="listing"
-                    entityId={listing.id}
+                    entityId={String(listing.id)}
                     variant="outline"
                     size="default"
                     className="h-10 md:h-12"
@@ -618,7 +618,7 @@ export default function ListingDetailPage() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleSoftDelete}
         listing={{
-          id: listing.id,
+          id: String(listing.id),
           title: listing.title,
           status: listing.status,
         }}

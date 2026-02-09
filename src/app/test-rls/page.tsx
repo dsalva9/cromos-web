@@ -126,7 +126,7 @@ export default function TestRLSPage() {
         addResult(`Error reading profile: ${error.message}`, true);
       } else {
         addResult(`SUCCESS: Can read other user's profile (this is expected)`);
-        addResult(`Nickname: ${data?.nickname}, Location: ${data?.location_code}`);
+        addResult(`Nickname: ${data?.nickname}, Location: ${data?.postcode}`);
       }
     } catch (err) {
       addResult(`Exception: ${err}`, true);
@@ -218,9 +218,8 @@ export default function TestRLSPage() {
               results.map((result, index) => (
                 <div
                   key={index}
-                  className={`mb-1 ${
-                    result.includes('❌') ? 'text-red-400' : 'text-green-400'
-                  }`}
+                  className={`mb-1 ${result.includes('❌') ? 'text-red-400' : 'text-green-400'
+                    }`}
                 >
                   {result}
                 </div>

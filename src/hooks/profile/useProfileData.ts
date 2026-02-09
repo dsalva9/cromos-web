@@ -27,7 +27,7 @@ interface Profile {
   id: string;
   nickname: string | null;
   avatar_url: string | null;
-  created_at: string;
+  created_at: string | null;
   postcode: string | null;
 }
 

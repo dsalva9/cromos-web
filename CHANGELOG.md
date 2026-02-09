@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Infrastructure
+-   **Supabase SDK Upgrade & Type System Overhaul (2026-02-09)**: ✅ COMPLETE - Upgraded Supabase SDK and replaced hand-written types with auto-generated database types.
+    -   ✅ Upgraded `@supabase/supabase-js` 2.57→2.95 and `@supabase/ssr` 0.1→0.8
+    -   ✅ Auto-generated database types via `supabase gen types typescript` into `src/types/database.ts`
+    -   ✅ Created `src/types/v1.6.0.ts` with app-specific types (TemplateCopy, SlotProgress, Template, etc.)
+    -   ✅ Passed `Database` generic to all Supabase client constructors for full type inference
+    -   ✅ Removed all `@ts-ignore` suppressions (24+ files) — errors now properly typed
+    -   ✅ Fixed 16+ type errors: ID type mismatches (`number` vs `string`), nullable fields, union status types, `Json` casting
+    -   ✅ Files fixed: `v1.6.0.ts`, `TemplateSummaryHeader`, `TemplateProgressGrid`, `SlotTile`, `QuickEntryModal`, `useTemplateProgress`, `server-templates`, `publicar/[slotId]/page`, `admin/templates/page`, `templates/[id]/page`, `templates/[id]/edit/page`, `TemplatesContent`
+
 ### Upcoming / In-Progress
 -   **Suspended User System & Settings Restructure (2025-12-02)**: ✅ COMPLETE - Comprehensive user suspension system with tabbed settings interface and account management features.
     -   ✅ Settings: Restructured `/ajustes` into tabbed interface (Notificaciones, Ignorados, Sistema)

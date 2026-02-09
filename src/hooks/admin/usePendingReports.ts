@@ -5,10 +5,10 @@ interface PendingReport {
   report_id: number;
   reporter_nickname: string;
   entity_type: string;
-  entity_id: number;
+  entity_id: string;
   entity_title: string;
   reason: string;
-  description: string | null;
+  description: string;
   created_at: string;
 }
 

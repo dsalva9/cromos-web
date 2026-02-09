@@ -181,7 +181,7 @@ function TemplatesContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleRestore(template.id)}
+                          onClick={() => handleRestore(String(template.id))}
                           disabled={restoreLoading}
                           className="w-full border-green-600 text-green-500 hover:bg-green-600/10"
                         >
@@ -196,7 +196,7 @@ function TemplatesContent() {
                             setActionDialog({
                               open: true,
                               action: 'delete',
-                              templateId: template.id,
+                              templateId: String(template.id),
                               templateTitle: template.title
                             })
                           }

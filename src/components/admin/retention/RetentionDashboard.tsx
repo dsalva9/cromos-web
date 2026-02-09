@@ -28,7 +28,7 @@ export function RetentionDashboard() {
         if (error) {
           console.error('Error loading retention stats:', error);
         } else {
-          setStats(data);
+          setStats(data as unknown as RetentionStats);
         }
       } catch (err) {
         console.error('Failed to load retention stats:', err);

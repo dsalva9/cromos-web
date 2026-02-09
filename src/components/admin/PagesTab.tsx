@@ -27,7 +27,7 @@ export default function PagesTab() {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const fetchCollections = useCallback(async () => {
-    const { data, error } = await supabase.from('collections').select('id,name').order('id');
+    const { data, error } = await (supabase as any).from('collections').select('id,name').order('id');
     if (error) { logger.error('Error fetching collections', error); toast('Error al cargar colecciones', 'error'); return; }
     setCollections(data || []);
     if ((data || []).length > 0) setSelectedCollection(data![0].id);
@@ -37,7 +37,7 @@ export default function PagesTab() {
 
   const fetchPages = useCallback(async (collectionId: number) => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('collection_pages')
       .select('id,collection_id,kind,team_id,title,order_index')
       .eq('collection_id', collectionId)
@@ -48,7 +48,7 @@ export default function PagesTab() {
   }, [supabase]);
 
   const fetchTeams = useCallback(async (collectionId: number) => {
-    const { data, error } = await supabase.from('collection_teams').select('id,team_name').eq('collection_id', collectionId).order('team_name');
+    const { data, error } = await (supabase as any).from('collection_teams').select('id,team_name').eq('collection_id', collectionId).order('team_name');
     if (error) { logger.error('Error fetching teams', error); return; }
     setTeams(data || []);
   }, [supabase]);
@@ -75,14 +75,14 @@ export default function PagesTab() {
     if (!editing.collection_id || !editing.kind || !editing.title) { toast('Completa colección, tipo y título', 'error'); return; }
     if (editing.kind === 'team' && !editing.team_id) { toast('Selecciona un equipo para páginas de tipo equipo', 'error'); return; }
     const payload = { id: editing.id ?? null, collection_id: editing.collection_id, kind: editing.kind, team_id: editing.kind === 'team' ? editing.team_id : null, title: editing.title, order_index: editing.order_index ?? 0 };
-    const { error } = await supabase.rpc('admin_upsert_page', { p_page: payload as unknown });
+    const { error } = await (supabase as any).rpc('admin_upsert_page', { p_page: payload });
     if (error) { logger.error('admin_upsert_page error', error); toast(error.message || 'No se pudo guardar', 'error'); return; }
     toast('Página guardada', 'success'); setEditOpen(false); setEditing(null); if (selectedCollection) await fetchPages(selectedCollection);
   }
 
   async function confirmDeletePage() {
     if (!deleteTarget?.id) return;
-    const { error } = await supabase.rpc('admin_delete_page', { p_page_id: deleteTarget.id });
+    const { error } = await (supabase as any).rpc('admin_delete_page', { p_page_id: deleteTarget.id });
     if (error) { logger.error('admin_delete_page error', error); toast(error.message || 'No se pudo eliminar', 'error'); return; }
     toast('Página eliminada', 'success'); setDeleteOpen(false); setDeleteTarget(null); if (selectedCollection) await fetchPages(selectedCollection);
   }

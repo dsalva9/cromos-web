@@ -1,224 +1,72 @@
-// Database types
-export interface Database {
-  public: {
-    Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          nickname: string | null;
-          avatar_url: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          nickname?: string | null;
-          avatar_url?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          nickname?: string | null;
-          avatar_url?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      collections: {
-        Row: {
-          id: number;
-          name: string;
-          competition: string;
-          year: string;
-          description: string | null;
-          image_url: string | null;
-          is_active: boolean;
-          created_at: string;
-        };
-        Insert: {
-          id?: number;
-          name: string;
-          competition: string;
-          year: string;
-          description?: string | null;
-          image_url?: string | null;
-          is_active?: boolean;
-          created_at?: string;
-        };
-        Update: {
-          id?: number;
-          name?: string;
-          competition?: string;
-          year?: string;
-          description?: string | null;
-          image_url?: string | null;
-          is_active?: boolean;
-          created_at?: string;
-        };
-      };
-      collection_teams: {
-        Row: {
-          id: number;
-          collection_id: number | null;
-          team_name: string;
-          team_code: string | null;
-          logo_url: string | null;
-          created_at: string | null;
-        };
-        Insert: {
-          id?: number;
-          collection_id?: number | null;
-          team_name: string;
-          team_code?: string | null;
-          logo_url?: string | null;
-          created_at?: string | null;
-        };
-        Update: {
-          id?: number;
-          collection_id?: number | null;
-          team_name?: string;
-          team_code?: string | null;
-          logo_url?: string | null;
-          created_at?: string | null;
-        };
-      };
-      stickers: {
-        Row: {
-          id: number;
-          collection_id: number | null;
-          team_id: number | null;
-          code: string;
-          player_name: string;
-          position: string | null;
-          nationality: string | null;
-          rating: number | null;
-          rarity: string | null;
-          image_url: string | null;
-          sticker_number: number | null;
-          image_path_webp_300: string | null;
-          thumb_path_webp_100: string | null;
-          created_at: string | null;
-        };
-        Insert: {
-          id?: number;
-          collection_id?: number | null;
-          team_id?: number | null;
-          code: string;
-          player_name: string;
-          position?: string | null;
-          nationality?: string | null;
-          rating?: number | null;
-          rarity?: string | null;
-          image_url?: string | null;
-          sticker_number?: number | null;
-          image_path_webp_300?: string | null;
-          thumb_path_webp_100?: string | null;
-          created_at?: string | null;
-        };
-        Update: {
-          id?: number;
-          collection_id?: number | null;
-          team_id?: number | null;
-          code?: string;
-          player_name?: string;
-          position?: string | null;
-          nationality?: string | null;
-          rating?: number | null;
-          rarity?: string | null;
-          image_url?: string | null;
-          sticker_number?: number | null;
-          image_path_webp_300?: string | null;
-          thumb_path_webp_100?: string | null;
-          created_at?: string | null;
-        };
-      };
-      user_collections: {
-        Row: {
-          user_id: string;
-          collection_id: number;
-          is_active: boolean | null;
-          joined_at: string | null;
-        };
-        Insert: {
-          user_id: string;
-          collection_id: number;
-          is_active?: boolean | null;
-          joined_at?: string | null;
-        };
-        Update: {
-          user_id?: string;
-          collection_id?: number;
-          is_active?: boolean | null;
-          joined_at?: string | null;
-        };
-      };
-      user_stickers: {
-        Row: {
-          user_id: string;
-          sticker_id: number;
-          count: number;
-          created_at: string | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          user_id: string;
-          sticker_id: number;
-          count: number;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          user_id?: string;
-          sticker_id?: number;
-          count?: number;
-          created_at?: string | null;
-          updated_at?: string | null;
-        };
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      // TODO [v1.6.0 MIGRATION]: Remove deprecated get_user_collection_stats type
-      // This RPC was removed in v1.6.0 - Replace with get_my_template_copies or get_template_progress
-      // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
-      get_user_collection_stats: { // ⚠️ DEPRECATED v1.5.0
-        Args: {
-          p_user_id: string;
-          p_collection_id: number;
-        };
-        Returns:
-          | {
-              total_stickers: number;
-              owned_stickers: number;
-              completion_percentage: number;
-              duplicates: number;
-              missing: number;
-            }[]
-          | {
-              total_stickers: number;
-              owned_stickers: number;
-              completion_percentage: number;
-              duplicates: number;
-              missing: number;
-            };
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-  };
+// Re-export auto-generated database types
+export type { Database, Json } from './database';
+
+// ──────────────────────────────────────────────────────────────
+// Legacy table types (v1.5.0)
+// These tables were removed in v1.6.0 (collections → templates pivot)
+// but the types are still referenced by dead code paths.
+// TODO: Remove when dead code is cleaned up (see code_review.md #4)
+// ──────────────────────────────────────────────────────────────
+
+/** @deprecated Removed in v1.6.0 — use collection_templates instead */
+export interface Collection {
+  id: number;
+  name: string;
+  competition: string;
+  year: string;
+  description: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  created_at: string;
 }
 
-// Application types
-export type Collection = Database['public']['Tables']['collections']['Row'];
-export type Profile = Database['public']['Tables']['profiles']['Row'];
-export type Sticker = Database['public']['Tables']['stickers']['Row'];
-export type UserCollection =
-  Database['public']['Tables']['user_collections']['Row'];
-export type UserSticker = Database['public']['Tables']['user_stickers']['Row'];
+/** @deprecated Removed in v1.6.0 */
+export interface Profile {
+  id: string;
+  nickname: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** @deprecated Removed in v1.6.0 */
+export interface Sticker {
+  id: number;
+  collection_id: number | null;
+  team_id: number | null;
+  code: string;
+  player_name: string;
+  position: string | null;
+  nationality: string | null;
+  rating: number | null;
+  rarity: string | null;
+  image_url: string | null;
+  sticker_number: number | null;
+  image_path_webp_300: string | null;
+  thumb_path_webp_100: string | null;
+  created_at: string | null;
+}
+
+/** @deprecated Removed in v1.6.0 */
+export interface UserCollection {
+  user_id: string;
+  collection_id: number;
+  is_active: boolean | null;
+  joined_at: string | null;
+}
+
+/** @deprecated Removed in v1.6.0 */
+export interface UserSticker {
+  user_id: string;
+  sticker_id: number;
+  count: number;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+// ──────────────────────────────────────────────────────────────
+// Application-level types (still in use)
+// ──────────────────────────────────────────────────────────────
 
 export interface CollectionWithStats extends Collection {
   stats?: {
@@ -273,7 +121,7 @@ export interface TradeProposal {
   from_user_nickname: string;
   to_user_id: string;
   to_user_nickname: string;
-  status: TradeProposalStatus;
+  status: string;  // DB returns string; use TradeProposalStatus values for comparison
   message: string | null;
   created_at: string;
   updated_at: string;
@@ -306,4 +154,3 @@ export interface TradeProposalDetail {
   proposal: TradeProposal;
   items: TradeProposalDetailItem[];
 }
-

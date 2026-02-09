@@ -78,7 +78,7 @@ export function LeanListingCard({ listing }: LeanListingCardProps) {
                             <span
                                 className={cn(
                                     "px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border",
-                                    getStatusColor(listing.status, listing.is_group)
+                                    getStatusColor(listing.status, listing.is_group ?? false)
                                 )}
                             >
                                 {getStatusLabel(listing.status)}

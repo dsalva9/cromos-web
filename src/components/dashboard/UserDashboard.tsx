@@ -86,7 +86,7 @@ export default function UserDashboard() {
         async function fetchRecentListings() {
             try {
                 setLoadingRecentListings(true);
-                const { data, error } = await supabase
+                const { data, error } = await (supabase as any)
                     .from('listings')
                     .select('*')
                     .eq('status', 'active')
@@ -94,7 +94,7 @@ export default function UserDashboard() {
                     .limit(6);
 
                 if (error) throw error;
-                setRecentListings(data || []);
+                setRecentListings((data || []) as Listing[]);
             } catch (error) {
                 logger.error('Error fetching recent listings:', error);
             } finally {

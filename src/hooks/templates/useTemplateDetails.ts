@@ -62,7 +62,7 @@ export function useTemplateDetails(templateId: string) {
 
         if (rpcError) throw rpcError;
 
-        setData(result as TemplateDetailsResponse);
+        setData(result as unknown as TemplateDetailsResponse);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch template details'));
       } finally {

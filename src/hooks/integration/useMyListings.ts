@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface MyListing {
-  id: string;
+  id: number;
   title: string;
   description: string | null;
   sticker_number: string | null;
@@ -12,7 +12,7 @@ interface MyListing {
   views_count: number;
   created_at: string;
   // Template information
-  copy_id: string | null;
+  copy_id: number | null;
   copy_title: string | null;
   template_title: string | null;
   page_number: number | null;
@@ -32,7 +32,7 @@ interface MyListing {
 }
 
 export interface MyListingWithAttention extends MyListing {
-  listing_id: string;
+  listing_id: number;
   needs_attention: boolean;
 }
 
@@ -47,7 +47,7 @@ export function useMyListings() {
       setLoading(true);
 
       const { data, error: rpcError } = await supabase.rpc('get_my_listings_with_progress', {
-        p_status: null // Get all statuses
+        p_status: undefined // Get all statuses
       });
 
       if (rpcError) throw rpcError;
@@ -55,8 +55,8 @@ export function useMyListings() {
       // Transform data to add needs_attention flag and compatibility fields
       const transformedData = (data || []).map((listing: MyListing) => ({
         ...listing,
-        id: listing.id?.toString() || '',
-        listing_id: listing.id?.toString() || '',
+        id: listing.id,
+        listing_id: listing.id,
         needs_attention:
           listing.status === 'active' &&
           listing.copy_id !== null &&

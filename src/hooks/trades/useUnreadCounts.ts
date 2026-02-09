@@ -49,7 +49,7 @@ export const useUnreadCounts = ({
     try {
       const { data, error: rpcError } = await supabase.rpc('get_unread_counts', {
         p_box: box,
-        p_trade_ids: tradeIds || null,
+        p_trade_ids: tradeIds || undefined,
       });
 
       if (rpcError) throw rpcError;

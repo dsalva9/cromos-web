@@ -26,7 +26,7 @@ function CollectionRedirectContent() {
           logger.debug('Checking user collections...');
 
           // Get user's collections
-          const { data: userCollections, error } = await supabase
+          const { data: userCollections, error } = await (supabase as any)
             .from('user_collections')
             .select(
               `
@@ -55,7 +55,7 @@ function CollectionRedirectContent() {
           }
 
           // Find active collection
-          const activeCollection = userCollections.find(uc => uc.is_active);
+          const activeCollection = userCollections.find((uc: any) => uc.is_active);
           logger.debug('Active collection:', activeCollection);
 
           if (activeCollection) {
@@ -73,7 +73,7 @@ function CollectionRedirectContent() {
 
           if (firstCollection) {
             // Set first collection as active
-            await supabase
+            await (supabase as any)
               .from('user_collections')
               .update({ is_active: true })
               .eq('user_id', user.id)

@@ -5,8 +5,8 @@ import { logger } from '@/lib/logger';
 
 export interface TradeChatMessage {
   id: number;
-  trade_id: number;
-  sender_id: string;
+  trade_id: number | null;
+  sender_id: string | null;
   message: string;
   created_at: string;
   sender_nickname?: string;
@@ -168,9 +168,9 @@ export const useTradeChat = ({
             prev.map(msg =>
               msg.id === optimisticMessage.id
                 ? {
-                    ...optimisticMessage,
-                    id: data.id,
-                  }
+                  ...optimisticMessage,
+                  id: data.id,
+                }
                 : msg
             )
           );

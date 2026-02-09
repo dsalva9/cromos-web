@@ -28,7 +28,7 @@ function PublishDuplicateContent() {
     global_number: number | null;
     page_number: number;
     page_title: string | null;
-    data: Record<string, string | number | boolean>;
+    data: Record<string, string | number | boolean> | null;
   }
 
   interface TemplateInfo {
@@ -80,7 +80,7 @@ function PublishDuplicateContent() {
 
       setTemplateInfo({
         title: currentCopy.title,
-        item_schema: templateDetails?.template?.item_schema || []
+        item_schema: (templateDetails as any)?.template?.item_schema || []
       });
 
       // Get slot info for pre-filling
@@ -94,7 +94,7 @@ function PublishDuplicateContent() {
       }
 
       // Compare slot_id as both string and number since it comes from URL params
-      const slot = progressData?.find((s: SlotData) => {
+      const slot = progressData?.find((s: any) => {
         const sIdStr = String(s.slot_id);
         return sIdStr === slotId;
       });
@@ -117,7 +117,7 @@ function PublishDuplicateContent() {
         return;
       }
 
-      setSlotData(slot);
+      setSlotData(slot as SlotData);
     } catch (err) {
       console.error('Failed to load slot data:', err);
       toast.error('Error al cargar datos del cromo');
@@ -205,7 +205,7 @@ function PublishDuplicateContent() {
               if (templateInfo?.item_schema && slotData?.data) {
                 const fields = templateInfo.item_schema
                   .map(field => {
-                    const value = slotData.data[field.name];
+                    const value = slotData.data?.[field.name];
                     return value !== undefined && value !== null && value !== ''
                       ? `${field.name}: ${value}`
                       : null;

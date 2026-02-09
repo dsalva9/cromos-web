@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface MinimalUserProfile {
-  nickname: string;
+  nickname: string | null;
   avatar_url: string | null;
 }
 

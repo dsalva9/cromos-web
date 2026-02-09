@@ -30,7 +30,7 @@ export default function TeamsTab() {
   const sorted = useMemo(() => [...teams].sort((a, b) => (a.team_name || '').localeCompare(b.team_name || '')), [teams]);
 
   const fetchCollections = useCallback(async () => {
-    const { data, error } = await supabase.from('collections').select('id,name').order('id');
+    const { data, error } = await (supabase as any).from('collections').select('id,name').order('id');
     if (error) { logger.error('Error fetching collections', error); toast('Error al cargar colecciones', 'error'); return; }
     setCollections(data || []);
     if ((data || []).length > 0) setSelectedCollection(data![0].id);
@@ -40,7 +40,7 @@ export default function TeamsTab() {
 
   const fetchTeams = useCallback(async (collectionId: number) => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('collection_teams')
       .select('id,collection_id,team_name,flag_url,primary_color,secondary_color')
       .eq('collection_id', collectionId)
@@ -82,7 +82,7 @@ export default function TeamsTab() {
       primary_color: editing.primary_color || null,
       secondary_color: editing.secondary_color || null,
     };
-    const { error } = await supabase.rpc('admin_upsert_team', { p_team: payload as unknown });
+    const { error } = await (supabase as any).rpc('admin_upsert_team', { p_team: payload });
     if (error) {
       logger.error('admin_upsert_team error', error);
       toast(error.message || 'No se pudo guardar', 'error');
@@ -95,7 +95,7 @@ export default function TeamsTab() {
 
   async function confirmDeleteTeam() {
     if (!confirmDelete?.id) return;
-    const { error } = await supabase.rpc('admin_delete_team', { p_team_id: confirmDelete.id });
+    const { error } = await (supabase as any).rpc('admin_delete_team', { p_team_id: confirmDelete.id });
     if (error) {
       logger.error('admin_delete_team error', error);
       toast(error.message || 'No se pudo eliminar', 'error');
