@@ -140,13 +140,23 @@ export async function POST(request: Request) {
     }
 
     // Log action to audit
-    await adminClient.from('audit_log').insert({
-      action_type: 'force_password_reset',
-      performed_by: user.id,
-      target_type: 'user',
-      target_id: userId,
-      metadata: { reset_link_generated: true }
+    const { error: auditError } = await adminClient.from('audit_log').insert({
+      user_id: userId,
+      admin_id: user.id,
+      entity: 'user',
+      entity_type: 'user',
+      action: 'update',
+      moderation_action_type: 'force_password_reset',
+      moderated_entity_type: 'user',
+      moderation_reason: 'Admin-initiated password reset',
+      new_values: { reset_link_generated: true },
+      occurred_at: new Date().toISOString()
     });
+
+    if (auditError) {
+      console.error('Error logging to audit:', auditError);
+      // Don't fail the request if audit logging fails
+    }
 
     return NextResponse.json({
       success: true,
