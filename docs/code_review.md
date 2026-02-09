@@ -124,12 +124,14 @@ In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/P
 
 ---
 
-### 6. Deprecated RPC Still in Use (`get_user_collection_stats`)
+### 6. ~~Deprecated RPC Still in Use (`get_user_collection_stats`)~~ ✅ RESOLVED
 **Priority: P1 — HIGH**
+
+> **Resolved 2026-02-09:** Replaced the deprecated `get_user_collection_stats` RPC call in `src/hooks/album/useAlbumPages.ts` with the v1.6.0 `get_my_template_copies` RPC. Deleted the now-unused `src/lib/collectionStats.ts` (including `normalizeCollectionStats`). The type definition had already been removed from `src/types/index.ts` in a prior fix. No other source code references to the deprecated RPC remain.
 
 The deprecated `get_user_collection_stats` RPC is still called in [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/ProfilePage.tsx#L166-L172) despite having TODO comments saying it was removed in v1.6.0. The type definition in `src/types/index.ts` also still references it.
 
-**Summary fix:** Replace with the v1.6.0 equivalent RPCs as documented in the TODO comments.
+**Summary fix:** ~~Replace with the v1.6.0 equivalent RPCs as documented in the TODO comments.~~ Done — migrated to `get_my_template_copies()` and deleted legacy normalizer.
 
 > **Agent Prompt:**
 >
@@ -142,12 +144,14 @@ The deprecated `get_user_collection_stats` RPC is still called in [ProfilePage.t
 
 ---
 
-### 7. N+1 Query Pattern in ProfilePage
+### 7. ~~N+1 Query Pattern in ProfilePage~~ ✅ RESOLVED
 **Priority: P1 — HIGH**
+
+> **Resolved 2026-02-09:** The `useProfileData` hook already uses a single `get_my_template_copies()` call (returns all template copies with stats in one request). The `useAlbumPages` hook was also migrated to use `get_my_template_copies()` instead of per-collection `get_user_collection_stats` calls. The original `ProfilePage.tsx` component (which had the N+1 pattern) was deleted as dead code in a prior cleanup.
 
 In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/ProfilePage.tsx#L151-L190), `fetchProfileData` loops over each user collection and makes an individual RPC call for stats. If a user has 10 collections, this fires 10+ sequential Supabase calls.
 
-**Summary fix:** Create a batch RPC or fetch all stats in a single query.
+**Summary fix:** ~~Create a batch RPC or fetch all stats in a single query.~~ Done — `get_my_template_copies()` returns all data in one call.
 
 > **Agent Prompt:**
 >
@@ -551,8 +555,8 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 | 3 | ~~`getSession()` instead of `getUser()`~~ | ✅ Resolved | Security |
 | 4 | Non-atomic multi-table deletions | 🔴 P1 | Data Integrity |
 | 5 | ~~Manual database types (no auto-gen)~~ | ✅ Resolved | Architecture |
-| 6 | Deprecated RPC still in use | 🟠 P1 | Tech Debt |
-| 7 | N+1 query in ProfilePage | 🟠 P1 | Performance |
+| 6 | ~~Deprecated RPC still in use~~ | ✅ Resolved | Tech Debt |
+| 7 | ~~N+1 query in ProfilePage~~ | ✅ Resolved | Performance |
 | 8 | Root page.tsx is client-only (no SSR) | 🟠 P1 | SEO/Perf |
 | 9 | Duplicate server client boilerplate | 🟠 P2 | Maintainability |
 | 10 | ~~Duplicate type definitions~~ | ✅ Partially Resolved | Code Quality |

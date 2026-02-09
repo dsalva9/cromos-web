@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
 import { Sticker } from '@/types';
-import { normalizeCollectionStats } from '@/lib/collectionStats';
+
 import { logger } from '@/lib/logger';
 
 export interface CollectionPage {
@@ -171,33 +171,34 @@ export function useAlbumPages(
       }
 
       try {
-        // TODO [v1.6.0 MIGRATION]: Replace deprecated get_user_collection_stats RPC
-        // This RPC was removed in v1.6.0 (collections → templates pivot)
-        // Migration: Use get_my_template_copies() or get_template_progress(p_copy_id)
-        // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
-        const { data, error } = await (supabase as any).rpc(
-          'get_user_collection_stats',
-          {
-            p_user_id: user.id,
-            p_collection_id: targetCollectionId,
-          }
-        );
+        // v1.6.0: Use get_my_template_copies to fetch stats for all template copies
+        const { data, error } = await supabase.rpc('get_my_template_copies');
 
         if (error) throw error;
 
-        const stats = normalizeCollectionStats(data);
+        // Find the template copy matching this collection (copy_id maps to collectionId)
+        const copies = (data ?? []) as Array<{
+          copy_id: number;
+          template_id: number;
+          total_slots: number;
+          completed_slots: number;
+          completion_percentage: number;
+        }>;
 
-        if (stats) {
-          const total = stats.total_stickers;
-          const owned = stats.owned_stickers;
-          const duplicates = stats.duplicates;
-          const missing = stats.missing;
-          const completion = stats.completion_percentage;
+        const matchingCopy = copies.find(
+          (c) => c.copy_id === targetCollectionId || c.template_id === targetCollectionId
+        );
+
+        if (matchingCopy) {
+          const total = Number(matchingCopy.total_slots) || 0;
+          const owned = Number(matchingCopy.completed_slots) || 0;
+          const missing = Math.max(total - owned, 0);
+          const completion = Number(matchingCopy.completion_percentage) || 0;
 
           setSummary({
             totalStickers: total,
             ownedUnique: owned,
-            duplicates,
+            duplicates: 0, // Aggregate duplicates not available from this RPC
             missing,
             completionPercentage: completion,
           });
