@@ -40,10 +40,11 @@ export async function POST(request: Request) {
       }
     );
     const {
-      data: { session }
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     }
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('is_admin')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (!profile?.is_admin) {
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
     // Log action to audit
     await supabase.from('audit_log').insert({
       action_type: 'force_password_reset',
-      performed_by: session.user.id,
+      performed_by: user.id,
       target_type: 'user',
       target_id: userId,
       metadata: { reset_link_generated: true }

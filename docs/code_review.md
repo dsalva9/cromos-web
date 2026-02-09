@@ -59,8 +59,10 @@ An attacker could inject malicious HTML/JS via a crafted notification payload.
 
 ---
 
-### 3. Admin API Route Uses `getSession()` Instead of `getUser()`
+### 3. ~~Admin API Route Uses `getSession()` Instead of `getUser()`~~ ✅ RESOLVED
 **Priority: P0 — CRITICAL**
+
+> **Resolved 2026-02-09:** Replaced `getSession()` with `getUser()` in `src/app/api/admin/force-reset/route.ts` to verify the JWT server-side. Updated destructuring, error handling, and all `session.user.id` references to `user.id`. Now consistent with the `delete-user` route.
 
 In [force-reset/route.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/app/api/admin/force-reset/route.ts#L42-L44), admin verification uses `getSession()` which reads from local storage/cookies and **does not verify the JWT with the Supabase server**. The `delete-user` route correctly uses `getUser()`.
 
@@ -573,7 +575,7 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 |---|-------|----------|----------|
 | 1 | ~~No Next.js middleware~~ | ✅ Resolved | Security |
 | 2 | ~~XSS in email templates~~ | ✅ Resolved | Security |
-| 3 | `getSession()` instead of `getUser()` | 🔴 P0 | Security |
+| 3 | ~~`getSession()` instead of `getUser()`~~ | ✅ Resolved | Security |
 | 4 | Non-atomic multi-table deletions | 🔴 P1 | Data Integrity |
 | 5 | Manual database types (no auto-gen) | 🟠 P1 | Architecture |
 | 6 | Deprecated RPC still in use | 🟠 P1 | Tech Debt |
