@@ -1,7 +1,12 @@
 import { createServerSupabaseClient, createSupabaseAdminClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
+  // Rate limit: max 3 admin delete-user requests per minute per IP
+  const rateLimitResponse = checkRateLimit(request, { maxRequests: 3, windowMs: 60_000 });
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { userId, reason } = await request.json();
 

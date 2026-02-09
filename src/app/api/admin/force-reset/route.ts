@@ -1,8 +1,13 @@
 import { createServerSupabaseClient, createSupabaseAdminClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
+  // Rate limit: max 3 admin force-resets per minute per IP
+  const rateLimitResponse = checkRateLimit(request, { maxRequests: 3, windowMs: 60_000 });
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     const { userId } = await request.json();
 

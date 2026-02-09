@@ -1,0 +1,69 @@
+TASK: Implement mobile UX improvements for marketplace chat
+
+FILE TO MODIFY: src/app/marketplace/[id]/chat/page.tsx
+
+CONTEXT:
+- Current chat interface has severe mobile UX issues
+- Fixed 500px height causes double-scrolling
+- Listing card + conversation selector take 70% of mobile screen
+- Chat messages only occupy 30% of viewport
+- Sellers must scroll 3-4 times to reach input
+
+IMPLEMENT THESE 5 IMPROVEMENTS:
+
+1. DYNAMIC CHAT HEIGHT
+   - Create hook: src/hooks/useResponsiveChatHeight.ts
+   - Calculate height: viewport - header(60) - card(120) - input(180) - nav(80)
+   - Mobile gets calculated height, desktop keeps 500px
+   - Replace line 634: className="h-[500px]..." with dynamic height
+
+2. COLLAPSIBLE LISTING CARD (MOBILE)
+   - Add state: const [listingCardExpanded, setListingCardExpanded] = useState(false)
+   - Mobile (< 768px): Show collapsed (80px) - thumbnail + title + chevron
+   - Click to expand shows full details + action buttons
+   - Desktop (>= 768px): Keep current layout unchanged
+   - Replace lines 478-568
+
+3. HIDE CONVERSATION SELECTOR AFTER SELECTION (MOBILE)
+   - Add state: const [showConversationList, setShowConversationList] = useState(true)
+   - Mobile: Show conversation list OR chat (not both)
+   - After selecting conversation, show back button instead of list
+   - Back button restores conversation list
+   - Desktop: Keep sidebar always visible
+   - Replace lines 573-626
+
+4. BETTER AUTO-SCROLL
+   - Scroll to bottom when messages change
+   - On mobile, ensure message container scrolls to end
+   - Scroll when conversation changes
+   - Add after line 249
+
+5. SMART MOBILE HEADER (BONUS)
+   - Sticky header showing current context
+   - Seller: Shows selected participant + listing title
+   - Buyer: Shows listing title + seller name
+   - Info button to expand listing card
+   - Add after line 476
+
+REQUIRED IMPORTS:
+import { ChevronDown, Info } from 'lucide-react';
+
+CODE STRUCTURE:
+- All mobile-specific code uses: className="md:hidden"
+- Desktop code uses: className="hidden md:block"
+- No changes to desktop layout
+- Preserve all existing functionality
+
+TESTING:
+- Mobile (375px): Chat occupies 60-70% viewport, 0-1 scrolls to input
+- Tablet (768px): Desktop layout appears
+- Desktop (1024px): Unchanged
+- Verify seller multi-conversation flow
+- Verify buyer single conversation flow
+
+EXPECTED IMPACT:
+- Chat messages: 30% → 70% of mobile viewport
+- Scrolling: 3-4 scrolls → 0-1 scroll
+- Immediate visual improvement
+
+Read the full implementation details in: docs/recommendations/CHAT_QUICK_WINS_IMPLEMENTATION_PROMPT.md

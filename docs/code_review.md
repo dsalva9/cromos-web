@@ -310,8 +310,10 @@ Several files contain corrupted Spanish characters (displayed as `�` instead o
 
 ---
 
-### 15. Dual ESLint Config Files
+### 15. ~~Dual ESLint Config Files~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Merged all custom rules from `.eslintrc.json` (`no-unused-vars`, `no-explicit-any`, `exhaustive-deps`, `no-console`) into `eslint.config.mjs` flat config format, including the `logger.ts` override. Deleted the legacy `.eslintrc.json`. ESLint 9+ now correctly enforces all strict rules.
 
 The project has both `.eslintrc.json` (flat config legacy) and `eslint.config.mjs` (new flat config format). The rules in `.eslintrc.json` (strict `no-unused-vars`, `no-explicit-any`, etc.) are **not** present in `eslint.config.mjs`, which only extends `next/core-web-vitals`. ESLint 9+ uses the flat config by default, so the stricter `.eslintrc.json` rules may be silently ignored.
 
@@ -426,8 +428,10 @@ In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/P
 
 ---
 
-### 20. Stale Root-Level Documentation Files
+### 20. ~~Stale Root-Level Documentation Files~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Moved 8 stale documentation files (`DARK_MODE_IMPLEMENTATION_PLAN.md`, `DESIGN_ANALYSIS_REPORT.md`, `IMPLEMENTATION_PROMPT*.txt`, `NOTIFICATION_SETTINGS_*.md`, `PERFORMANCE_REVIEW.md`) to `docs/archive/`. Deleted 3 SQL diagnostic files (`check_all_rating_triggers.sql`, `diagnose_chat_access.sql`, `diagnose_rating_triggers.sql`), 3 backup files (`backup.sql`, `backup.sql.gpg`, `backup_fixed.sql`), and other temp files. Updated `.gitignore` with consolidated patterns to prevent re-addition.
 
 Multiple root-level markdown files appear to be stale artifacts from past development:
 - `DARK_MODE_IMPLEMENTATION_PLAN.md` (30KB)
@@ -461,8 +465,10 @@ Multiple root-level markdown files appear to be stale artifacts from past develo
 
 ---
 
-### 21. `Supabase.getPublicUrl()` Called Per-Item in Loops
+### 21. ~~`Supabase.getPublicUrl()` Called Per-Item in Loops~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** `CollectionPage.tsx` (the sole affected file) was previously deleted as dead code — it referenced deprecated `stickers` and `collections` tables that no longer exist in the database.
 
 In [CollectionPage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/CollectionPage.tsx#L195-L201), `resolvePublicUrl()` calls `supabase.storage.from('sticker-images').getPublicUrl(path)` inside a `.map()` loop for every sticker. While `getPublicUrl` is synchronous (it constructs a URL string), the pattern is inefficient and obscures intent.
 
@@ -479,8 +485,10 @@ In [CollectionPage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/component
 
 ---
 
-### 22. Missing `<Suspense>` Boundaries for Lazy-Loaded Content
+### 22. ~~Missing `<Suspense>` Boundaries for Lazy-Loaded Content~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Added `next/dynamic` lazy loading for `UserDashboard` in `page.tsx` with a skeleton loading fallback wrapped in `<Suspense>`. `LandingPage` is kept as a regular import to preserve SSR for SEO. The `marketplace/error.tsx` and `templates/error.tsx` boundaries already exist.
 
 The app uses several dynamic imports (e.g., Capacitor modules in `page.tsx`) but doesn't wrap client-side lazy-loaded components with `<Suspense>` boundaries. This can cause waterfall loading and poor UX.
 
@@ -500,8 +508,10 @@ The app uses several dynamic imports (e.g., Capacitor modules in `page.tsx`) but
 
 ---
 
-### 23. Database Backups in Git History
+### 23. ~~Database Backups in Git History~~ ✅ RESOLVED
 **Priority: P1 — HIGH (historical)**
+
+> **Resolved 2026-02-09:** Deleted `backup.sql`, `backup.sql.gpg`, and `backup_fixed.sql` from the working directory. Updated `.gitignore` with `backup*.sql`, `backup*.sql.gpg`, and `*.sql.gpg` patterns to prevent re-addition. Note: files still exist in git history — `git filter-repo` can be used to fully purge them, but this requires force-push and team coordination.
 
 `backup.sql` (8.7MB), `backup.sql.gpg` (1.1MB), and `backup_fixed.sql` (4.3MB) are committed to the repository. Even after deletion, they remain in git history, bloating the repo and potentially exposing production data.
 
@@ -525,8 +535,10 @@ The app uses several dynamic imports (e.g., Capacitor modules in `page.tsx`) but
 
 ## 🔵 Low — Suggestions & Improvements
 
-### 24. No Rate Limiting on Admin API Routes
+### 24. ~~No Rate Limiting on Admin API Routes~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Created `src/lib/rate-limit.ts` — a sliding-window in-memory rate limiter that tracks per-IP request timestamps. Applied to both `/api/admin/force-reset` and `/api/admin/delete-user` routes with a limit of 3 requests per minute. Returns 429 with `Retry-After` header when exceeded.
 
 The `/api/admin/force-reset` and `/api/admin/delete-user` routes have no rate limiting. An authenticated admin (or compromised session) could spam destructive operations.
 
@@ -538,8 +550,10 @@ The `/api/admin/force-reset` and `/api/admin/delete-user` routes have no rate li
 
 ---
 
-### 25. Missing Error Boundaries at Route Level
+### 25. ~~Missing Error Boundaries at Route Level~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Added `error.tsx` error boundaries to 4 key route groups (`mis-plantillas`, `chats`, `admin`, `profile`). Combined with existing boundaries in `marketplace` and `templates`, all major route segments now have localized error handling with Spanish "algo salió mal" messages and retry buttons.
 
 While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.tsx`, individual route groups don't have error boundaries. A crash in the marketplace page takes down the whole app instead of showing a localized error.
 
@@ -551,8 +565,10 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 
 ---
 
-### 26. `generateId()` Uses `Math.random()` — Not Cryptographically Secure
+### 26. ~~`generateId()` Uses `Math.random()` — Not Cryptographically Secure~~ ✅ RESOLVED
 **Priority: P3 — LOW**
+
+> **Resolved 2026-02-09:** Replaced `Math.random().toString(36).substring(2, 15)` with `crypto.randomUUID()` in `src/lib/utils.ts`. No callers currently use this function, so the format change is safe. `crypto.randomUUID()` is cryptographically secure and available in all modern browsers and Node.js 16+.
 
 [src/lib/utils.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/lib/utils.ts#L79-L81) uses `Math.random()` for ID generation. If used for anything security-sensitive, this is predictable.
 
@@ -571,26 +587,26 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 | 1 | ~~No Next.js middleware~~ | ✅ Resolved | Security |
 | 2 | ~~XSS in email templates~~ | ✅ Resolved | Security |
 | 3 | ~~`getSession()` instead of `getUser()`~~ | ✅ Resolved | Security |
-| 4 | Non-atomic multi-table deletions | 🔴 P1 | Data Integrity |
+| 4 | ~~Non-atomic multi-table deletions~~ | ✅ Resolved (dead code) | Data Integrity |
 | 5 | ~~Manual database types (no auto-gen)~~ | ✅ Resolved | Architecture |
 | 6 | ~~Deprecated RPC still in use~~ | ✅ Resolved | Tech Debt |
 | 7 | ~~N+1 query in ProfilePage~~ | ✅ Resolved | Performance |
 | 8 | ~~Root page.tsx is client-only (no SSR)~~ | ✅ Resolved | SEO/Perf |
-| 9 | Duplicate server client boilerplate | 🟠 P2 | Maintainability |
+| 9 | ~~Duplicate server client boilerplate~~ | ✅ Resolved | Maintainability |
 | 10 | ~~Duplicate type definitions~~ | ✅ Partially Resolved | Code Quality |
-| 11 | Legacy/dead exports | 🟡 P2 | Tech Debt |
-| 12 | Redundant admin check in AdminGuard | 🟡 P2 | Performance |
-| 13 | Encoding corruption in Spanish strings | 🟡 P2 | Bug |
-| 14 | Locale mismatch (English dates) | 🟡 P2 | UX |
-| 15 | Dual ESLint config files | 🟡 P3 | Tooling |
+| 11 | ~~Legacy/dead exports~~ | ✅ Resolved | Tech Debt |
+| 12 | ~~Redundant admin check in AdminGuard~~ | ✅ Resolved | Performance |
+| 13 | ~~Encoding corruption in Spanish strings~~ | ✅ Resolved (dead code) | Bug |
+| 14 | ~~Locale mismatch (English dates)~~ | ✅ Resolved | UX |
+| 15 | ~~Dual ESLint config files~~ | ✅ Resolved | Tooling |
 | 16 | ~~24+ `@ts-ignore` suppressions~~ | ✅ Resolved | Code Quality |
-| 17 | Test/debug pages in production | 🟡 P2 | Security/Hygiene |
-| 18 | Deprecated Deno imports in edge functions | 🟡 P2 | Tech Debt |
-| 19 | Non-atomic setActiveCollection | 🟡 P2 | Data Integrity |
-| 20 | Stale root-level docs | 🟡 P3 | Hygiene |
-| 21 | getPublicUrl called per-item in loops | 🟡 P2 | Performance |
-| 22 | Missing Suspense boundaries | 🔵 P3 | Performance |
-| 23 | Database backups in git | 🟠 P1 | Security |
-| 24 | No rate limiting on admin routes | 🔵 P3 | Security |
-| 25 | Missing route-level error boundaries | 🔵 P3 | Resilience |
-| 26 | Math.random() for ID generation | 🔵 P3 | Security |
+| 17 | ~~Test/debug pages in production~~ | ✅ Resolved | Security/Hygiene |
+| 18 | ~~Deprecated Deno imports in edge functions~~ | ✅ Resolved | Tech Debt |
+| 19 | ~~Non-atomic setActiveCollection~~ | ✅ Resolved (dead code) | Data Integrity |
+| 20 | ~~Stale root-level docs~~ | ✅ Resolved | Hygiene |
+| 21 | ~~getPublicUrl called per-item in loops~~ | ✅ Resolved (dead code) | Performance |
+| 22 | ~~Missing Suspense boundaries~~ | ✅ Resolved | Performance |
+| 23 | ~~Database backups in git~~ | ✅ Resolved | Security |
+| 24 | ~~No rate limiting on admin routes~~ | ✅ Resolved | Security |
+| 25 | ~~Missing route-level error boundaries~~ | ✅ Resolved | Resilience |
+| 26 | ~~Math.random() for ID generation~~ | ✅ Resolved | Security |

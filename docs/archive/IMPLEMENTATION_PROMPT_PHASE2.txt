@@ -1,0 +1,437 @@
+TASK: Implement Phase 2 Chat Improvements - Advanced Mobile UX
+
+FILES TO MODIFY:
+- src/app/marketplace/[id]/chat/page.tsx (main chat page)
+- src/components/chat/FloatingActionMenu.tsx (new component)
+- src/components/chat/ChatDrawer.tsx (new component - optional)
+- src/app/marketplace/[id]/page.tsx (listing detail - for drawer integration)
+
+COMPLETED IN PHASE 1:
+✅ Dynamic chat height
+✅ Collapsible listing card
+✅ Hide conversation selector after selection
+✅ Smart mobile header
+✅ Better auto-scroll
+
+PHASE 2 GOALS:
+1. Remove action buttons from listing card entirely (mobile)
+2. Add floating action button menu for seller actions
+3. Improve button accessibility and reduce clutter
+4. (Optional) Add drawer/modal pattern for better navigation
+
+═══════════════════════════════════════════════════════════
+
+PRIORITY 1: FLOATING ACTION BUTTON MENU (HIGH IMPACT)
+
+PROBLEM:
+- Action buttons still take space in expanded listing card
+- On mobile, listing card should be ONLY for viewing info, not actions
+- Buttons like "Marcar Reservado", "Liberar Reserva" should be easily accessible without expanding card
+
+SOLUTION:
+Create a floating action button (FAB) menu in bottom-right corner (above bottom nav)
+
+STEP 1: CREATE FLOATING ACTION MENU COMPONENT
+
+Create: src/components/chat/FloatingActionMenu.tsx
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Package, X, CheckCircle, XCircle, MoreVertical } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface FloatingActionMenuProps {
+  // Seller actions
+  canReserve?: boolean;
+  canComplete?: boolean;
+  canUnreserve?: boolean;
+  onReserve?: () => void;
+  onComplete?: () => void;
+  onUnreserve?: () => void;
+  reserving?: boolean;
+  completing?: boolean;
+  unreserving?: boolean;
+
+  // Buyer actions
+  canConfirm?: boolean;
+  onConfirm?: () => void;
+  confirming?: boolean;
+
+  // Position
+  className?: string;
+}
+
+export function FloatingActionMenu({
+  canReserve,
+  canComplete,
+  canUnreserve,
+  onReserve,
+  onComplete,
+  onUnreserve,
+  reserving,
+  completing,
+  unreserving,
+  canConfirm,
+  onConfirm,
+  confirming,
+  className,
+}: FloatingActionMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Don't render if no actions available
+  if (!canReserve && !canComplete && !canUnreserve && !canConfirm) {
+    return null;
+  }
+
+  const hasMultipleActions = [canReserve, canComplete, canUnreserve, canConfirm].filter(Boolean).length > 1;
+
+  return (
+    <div className={cn('fixed bottom-24 right-4 z-40', className)}>
+      {/* Action buttons - shown when menu is open */}
+      {isOpen && hasMultipleActions && (
+        <div className="absolute bottom-16 right-0 space-y-2 mb-2">
+          {canReserve && (
+            <button
+              onClick={() => {
+                onReserve?.();
+                setIsOpen(false);
+              }}
+              disabled={reserving}
+              className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-[#FFC000]"
+            >
+              <Package className="h-5 w-5" />
+              <span className="font-bold text-sm">
+                {reserving ? 'Marcando...' : 'Marcar Reservado'}
+              </span>
+            </button>
+          )}
+
+          {canComplete && (
+            <button
+              onClick={() => {
+                onComplete?.();
+                setIsOpen(false);
+              }}
+              disabled={completing}
+              className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-green-500"
+            >
+              <CheckCircle className="h-5 w-5" />
+              <span className="font-bold text-sm">
+                {completing ? 'Completando...' : 'Marcar Completado'}
+              </span>
+            </button>
+          )}
+
+          {canUnreserve && (
+            <button
+              onClick={() => {
+                onUnreserve?.();
+                setIsOpen(false);
+              }}
+              disabled={unreserving}
+              className="flex items-center gap-2 bg-gray-800 text-white px-4 py-3 rounded-full shadow-lg hover:bg-gray-700 transition-all whitespace-nowrap border-2 border-red-500"
+            >
+              <XCircle className="h-5 w-5" />
+              <span className="font-bold text-sm">
+                {unreserving ? 'Liberando...' : 'Liberar Reserva'}
+              </span>
+            </button>
+          )}
+
+          {canConfirm && (
+            <button
+              onClick={() => {
+                onConfirm?.();
+                setIsOpen(false);
+              }}
+              disabled={confirming}
+              className="flex items-center gap-2 bg-[#FFC000] text-black px-4 py-3 rounded-full shadow-lg hover:bg-yellow-400 transition-all whitespace-nowrap border-2 border-black font-bold"
+            >
+              <CheckCircle className="h-5 w-5" />
+              <span className="font-bold text-sm">
+                {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
+              </span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Main FAB button */}
+      {hasMultipleActions ? (
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={cn(
+            'bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all',
+            isOpen && 'rotate-45'
+          )}
+        >
+          {isOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <MoreVertical className="h-6 w-6" />
+          )}
+        </button>
+      ) : (
+        // Single action - direct button
+        <>
+          {canReserve && (
+            <button
+              onClick={onReserve}
+              disabled={reserving}
+              className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+            >
+              <Package className="h-6 w-6" />
+            </button>
+          )}
+          {canComplete && (
+            <button
+              onClick={onComplete}
+              disabled={completing}
+              className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+            >
+              <CheckCircle className="h-6 w-6" />
+            </button>
+          )}
+          {canUnreserve && (
+            <button
+              onClick={onUnreserve}
+              disabled={unreserving}
+              className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+            >
+              <XCircle className="h-6 w-6" />
+            </button>
+          )}
+          {canConfirm && (
+            <button
+              onClick={onConfirm}
+              disabled={confirming}
+              className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+            >
+              <CheckCircle className="h-6 w-6" />
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+```
+
+STEP 2: INTEGRATE INTO CHAT PAGE
+
+In src/app/marketplace/[id]/chat/page.tsx:
+
+A. Add import at top:
+```tsx
+import { FloatingActionMenu } from '@/components/chat/FloatingActionMenu';
+```
+
+B. REMOVE action buttons from mobile listing card expanded state
+   Find the section where you have action buttons inside `{listingCardExpanded && (...)}`
+   Remove the entire buttons section - keep only the listing info (title, collection, status)
+
+C. REMOVE action buttons from desktop listing card too (optional, or keep them on desktop)
+   For cleaner UX, remove from desktop as well and use FAB everywhere
+
+D. ADD FloatingActionMenu before closing </div> of main container (around line 877):
+
+```tsx
+      {/* Chat Terms Dialog */}
+      <Dialog open={chatTermsDialogOpen} onOpenChange={setChatTermsDialogOpen}>
+        {/* ... existing dialog code ... */}
+      </Dialog>
+
+      {/* Floating Action Menu - Mobile Only */}
+      <div className="md:hidden">
+        <FloatingActionMenu
+          // Seller actions
+          canReserve={isOwner && listing?.status === 'active' && !transactionStatus}
+          canComplete={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
+          canUnreserve={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved'}
+          onReserve={handleReserve}
+          onComplete={handleComplete}
+          onUnreserve={handleUnreserve}
+          reserving={reserving}
+          completing={completing}
+          unreserving={unreserving}
+          // Buyer actions
+          canConfirm={isBuyer && listing?.status === 'reserved' && transactionStatus === 'pending_completion'}
+          onConfirm={handleConfirm}
+          confirming={confirming}
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+E. UPDATE handleReserve, handleComplete, handleUnreserve to check selectedParticipant earlier:
+
+```tsx
+const handleReserve = async () => {
+  if (!listing || !isOwner || !user) {
+    toast.error('Error: no se puede reservar en este momento');
+    return;
+  }
+
+  if (!selectedParticipant) {
+    toast.error('Debes seleccionar una conversación para reservar');
+    // Optionally show the conversation list
+    setShowConversationList(true);
+    return;
+  }
+
+  // ... rest of existing code
+};
+```
+
+BENEFITS:
+✅ Listing card becomes purely informational (cleaner UX)
+✅ Actions always accessible without scrolling
+✅ Follows mobile design patterns (FAB is standard)
+✅ Handles single action (direct button) vs multiple actions (menu)
+✅ Works for both sellers and buyers
+✅ Visually distinct actions with colored borders
+✅ Above bottom nav, always visible
+
+═══════════════════════════════════════════════════════════
+
+PRIORITY 2: IMPROVE LISTING CARD FURTHER (MEDIUM IMPACT)
+
+Now that actions are in FAB, make listing card even more minimal on mobile:
+
+CHANGES TO MOBILE COLLAPSED STATE:
+- Show only: thumbnail (smaller - 40px) + title + status badge
+- Remove description, collection name from collapsed view
+- Height: 60px (down from 80px)
+
+UPDATE in page.tsx, mobile collapsed button:
+
+```tsx
+<button
+  onClick={() => setListingCardExpanded(!listingCardExpanded)}
+  className="w-full flex items-center gap-2 py-2"
+>
+  {listing.image_url && (
+    <div className="relative w-10 h-10 flex-shrink-0">
+      <Image
+        src={listing.image_url}
+        alt={listing.title}
+        fill
+        className="object-cover rounded border border-gray-700"
+      />
+    </div>
+  )}
+  <div className="flex-1 min-w-0 text-left">
+    <p className="text-xs font-bold text-white truncate">
+      {listing.title}
+    </p>
+  </div>
+  <span className={cn(
+    'px-1.5 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
+    listing.status === 'active' && 'bg-green-900/30 text-green-400',
+    listing.status === 'reserved' && 'bg-yellow-900/30 text-yellow-400',
+    listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
+  )}>
+    {listing.status === 'active' && 'Activo'}
+    {listing.status === 'reserved' && 'Reservado'}
+    {listing.status === 'completed' && 'Completado'}
+  </span>
+  <ChevronDown
+    className={cn(
+      'h-4 w-4 text-gray-400 transition-transform flex-shrink-0',
+      listingCardExpanded && 'rotate-180'
+    )}
+  />
+</button>
+```
+
+EXPANDED STATE:
+Keep all details but NO action buttons (they're now in FAB)
+
+═══════════════════════════════════════════════════════════
+
+PRIORITY 3 (OPTIONAL): DRAWER PATTERN FOR BETTER NAVIGATION
+
+PROBLEM:
+- Going from /marketplace/[id] → /marketplace/[id]/chat → back creates page loads
+- User loses listing page scroll position
+- Feels disconnected
+
+SOLUTION:
+Open chat in a full-screen drawer from listing detail page
+
+This is more complex and optional. Only implement if you want a more app-like experience.
+
+STEP 1: Create ChatDrawer component (similar to FloatingActionMenu but full-screen)
+
+STEP 2: On listing detail page, replace "Iniciar Chat" button with drawer trigger
+
+STEP 3: Keep /marketplace/[id]/chat route for direct links (from notifications, /chats page)
+
+═══════════════════════════════════════════════════════════
+
+TESTING CHECKLIST:
+
+Mobile (375px):
+- [ ] FAB appears in bottom-right (above bottom nav)
+- [ ] Single action shows direct button with icon
+- [ ] Multiple actions show menu icon
+- [ ] Tapping menu shows action buttons above FAB
+- [ ] Action buttons have clear labels and colored borders
+- [ ] Tapping action closes menu and executes action
+- [ ] FAB doesn't overlap with chat input
+- [ ] Listing card collapsed state is now 60px (vs 80px before)
+- [ ] Listing card expanded shows details but NO action buttons
+- [ ] Seller can reserve/complete/unreserve from FAB
+- [ ] Buyer can confirm receipt from FAB
+- [ ] Error toast shows if trying to reserve without selecting conversation
+
+Desktop:
+- [ ] FAB doesn't appear on desktop
+- [ ] Action buttons stay in listing card (or also use FAB - your choice)
+- [ ] Everything else works as before
+
+═══════════════════════════════════════════════════════════
+
+EXPECTED IMPACT:
+
+BEFORE (after Phase 1):
+- Listing card collapsed: 80px
+- Must expand card to access actions: 280px
+- Actions mixed with listing info
+
+AFTER (Phase 2):
+- Listing card collapsed: 60px (25% smaller)
+- Actions always accessible via FAB: No expansion needed
+- Clear separation: Card = info, FAB = actions
+- More screen space for chat: +20-60px depending on usage
+
+TOTAL IMPROVEMENT FROM ORIGINAL:
+- Original: Messages = 30% of viewport
+- After Phase 1: Messages = 60-70% of viewport
+- After Phase 2: Messages = 65-75% of viewport
+- Better UX: Actions are faster and more discoverable
+
+═══════════════════════════════════════════════════════════
+
+ROLLBACK PLAN:
+
+If FAB doesn't work well:
+1. Keep FloatingActionMenu component
+2. Re-add action buttons to listing card
+3. Hide FAB with: className="hidden"
+
+═══════════════════════════════════════════════════════════
+
+NEXT AFTER THIS:
+
+Phase 3 (Future):
+- Unified ChatInterface component (refactor for reusability)
+- Real-time typing indicators
+- Message read receipts
+- Voice messages
+- Image sharing in chat

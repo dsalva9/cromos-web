@@ -72,15 +72,20 @@ android/app/build/
 android/.gradle/
 android/local.properties
 ios/App/App/GoogleService-Info.plist
+
+# Tool configs
 .kilocode/mcp.json
 .claude/settings.local.json
-.claude/settings.local.json
 .mcp.json
-.mcp.json
-.claude/settings.local.json
-.claude/settings.local.json
 
-backup.sql
-backup.sql.gpg
-backup_fixed.sql
+# Database backups and diagnostic SQL (should never be in git)
+backup*.sql
+backup*.sql.gpg
+*.sql.gpg
 *.sql.bak
+check_*.sql
+diagnose_*.sql
+
+# Temporary diagnostic files
+tsc-errors*.txt
+Test_Tracking_Template.csv
