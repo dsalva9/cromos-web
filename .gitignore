@@ -80,5 +80,7 @@ ios/App/App/GoogleService-Info.plist
 .claude/settings.local.json
 .claude/settings.local.json
 
+backup.sql
+backup.sql.gpg
 backup_fixed.sql
 *.sql.bak

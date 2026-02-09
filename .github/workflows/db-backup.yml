@@ -36,7 +36,7 @@ jobs:
         run: |
           # Use GPG to encrypt the file to avoid storing plain text secrets in the repo
           # and to bypass GitHub Secret Scanning blocking the push.
-          gpg --symmetric --cipher-algo AES256 --batch --passphrase "$PASSPHRASE" -o backup.sql.gpg backup.sql
+          gpg --symmetric --cipher-algo AES256 --batch --yes --passphrase "$PASSPHRASE" -o backup.sql.gpg backup.sql
 
       - name: Commit backup
         run: |
