@@ -90,12 +90,14 @@ const { data: { user } } = await supabase.auth.getUser();
 
 ---
 
-### 4. Non-Atomic Multi-Table Client-Side Deletions
+### 4. ~~Non-Atomic Multi-Table Client-Side Deletions~~ ✅ RESOLVED
 **Priority: P1 — HIGH**
+
+> **Resolved 2026-02-09:** Investigation revealed that `ProfilePage.tsx` was dead code — not imported by any page or component. The tables it referenced (`user_stickers`, `user_collections`, `stickers`, `collections`) were all removed during the v1.6.0 templates migration and no longer exist in production. The component, along with 3 other dead files (`CollectionPage.tsx`, `useCollectionActions.ts`, `useProposalComposerData.ts`), was deleted as part of a dead code cleanup. The barrel export in `hooks/profile/index.ts` was also updated.
 
 In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/ProfilePage.tsx#L280-L327), the `removeCollection` function performs 3 sequential Supabase calls (fetch sticker IDs → delete user_stickers → delete user_collections) without a transaction. If any intermediate step fails, the data is left in an inconsistent state.
 
-**Summary fix:** Replace with a single server-side RPC/database function that wraps all deletions in a transaction.
+**Summary fix:** ~~Replace with a single server-side RPC/database function that wraps all deletions in a transaction.~~ Dead code deleted — no fix needed.
 
 > **Agent Prompt:**
 >
