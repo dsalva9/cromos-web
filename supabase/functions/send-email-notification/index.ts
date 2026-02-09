@@ -17,6 +17,27 @@ interface NotificationPayload {
   data?: Record<string, unknown>;
 }
 
+/**
+ * Escapes HTML special characters to prevent XSS injection.
+ * Applied to all user-controlled values before embedding in the email template.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Validates that a URL uses the https:// protocol.
+ * Blocks javascript:, data:, and other dangerous protocol injections.
+ */
+function isSafeUrl(url: string): boolean {
+  return url.startsWith('https://');
+}
+
 interface UserSettings {
   user_id: string;
   email: string | null;
@@ -193,9 +214,9 @@ serve(async (req) => {
             <h1>CambioCromos</h1>
           </div>
           <div class="content">
-            <h2>${title}</h2>
-            <p>${body}</p>
-            ${data?.action_url ? `<a href="${data.action_url}" class="button">Ver ahora</a>` : ''}
+            <h2>${escapeHtml(title)}</h2>
+            <p>${escapeHtml(body)}</p>
+            ${data?.action_url && isSafeUrl(String(data.action_url)) ? `<a href="${escapeHtml(String(data.action_url))}" class="button">Ver ahora</a>` : ''}
           </div>
           <div class="footer">
             <p>Este es un mensaje automático de CambioCromos</p>

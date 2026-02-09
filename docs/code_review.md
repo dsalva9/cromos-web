@@ -31,8 +31,10 @@ There is **no `middleware.ts`** anywhere in the project. All auth protection is 
 
 ---
 
-### 2. XSS Vulnerability in Edge Function Email Templates
+### 2. ~~XSS Vulnerability in Edge Function Email Templates~~ ✅ RESOLVED
 **Priority: P0 — CRITICAL**
+
+> **Resolved 2026-02-09:** Added `escapeHtml()` utility to escape `&`, `<`, `>`, `"`, `'` in all interpolated values (`title`, `body`, `action_url`) and `isSafeUrl()` validator to allow only `https://` URLs, blocking `javascript:`, `data:`, and other dangerous protocols.
 
 In [send-email-notification/index.ts](file:///c:/Users/dsalv/Projects/cromos-web/supabase/functions/send-email-notification/index.ts#L196-L198), user-controlled values `title`, `body`, and `data.action_url` are interpolated directly into HTML with no sanitization:
 
@@ -570,7 +572,7 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 | # | Issue | Priority | Category |
 |---|-------|----------|----------|
 | 1 | ~~No Next.js middleware~~ | ✅ Resolved | Security |
-| 2 | XSS in email templates | 🔴 P0 | Security |
+| 2 | ~~XSS in email templates~~ | ✅ Resolved | Security |
 | 3 | `getSession()` instead of `getUser()` | 🔴 P0 | Security |
 | 4 | Non-atomic multi-table deletions | 🔴 P1 | Data Integrity |
 | 5 | Manual database types (no auto-gen) | 🟠 P1 | Architecture |
