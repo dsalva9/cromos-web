@@ -165,15 +165,17 @@ In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/P
 
 ---
 
-### 8. Root `page.tsx` is a Client Component — No SSR/SEO for Landing Page
+### 8. ~~Root `page.tsx` is a Client Component — No SSR/SEO for Landing Page~~ ✅ RESOLVED
 **Priority: P1 — HIGH**
+
+> **Resolved 2026-02-09:** Converted `src/app/page.tsx` from a Client Component to an async Server Component. Auth is now checked server-side via `createServerSupabaseClient()` (new utility in `src/lib/supabase/server.ts`). Unauthenticated users get the `LandingPage` fully SSR-rendered in the initial HTML response (Google can index it). Authenticated users see `UserDashboard` inline at `/`. Capacitor/native platform logic was extracted to a new `src/components/native/NativeRedirectHandler.tsx` client component that renders nothing and doesn't block SSR.
 
 [src/app/page.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/app/page.tsx#L1) has `'use client'` at the top. This means:
 - The landing page (for unauthenticated users) is not server-rendered
 - Search engines see an empty shell, severely hurting SEO
 - The app shows a blank "Cargando..." screen while hydrating
 
-**Summary fix:** Make the root page a Server Component that checks auth server-side and conditionally renders the landing page (SSR) or redirects to the dashboard.
+**Summary fix:** ~~Make the root page a Server Component that checks auth server-side and conditionally renders the landing page (SSR) or redirects to the dashboard.~~ Done — root page is now a Server Component with full SSR.
 
 > **Agent Prompt:**
 >
@@ -557,7 +559,7 @@ While there's a root `ErrorBoundary` in layout and `error.tsx` / `global-error.t
 | 5 | ~~Manual database types (no auto-gen)~~ | ✅ Resolved | Architecture |
 | 6 | ~~Deprecated RPC still in use~~ | ✅ Resolved | Tech Debt |
 | 7 | ~~N+1 query in ProfilePage~~ | ✅ Resolved | Performance |
-| 8 | Root page.tsx is client-only (no SSR) | 🟠 P1 | SEO/Perf |
+| 8 | ~~Root page.tsx is client-only (no SSR)~~ | ✅ Resolved | SEO/Perf |
 | 9 | Duplicate server client boilerplate | 🟠 P2 | Maintainability |
 | 10 | ~~Duplicate type definitions~~ | ✅ Partially Resolved | Code Quality |
 | 11 | Legacy/dead exports | 🟡 P2 | Tech Debt |

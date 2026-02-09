@@ -1,101 +1,22 @@
-'use client';
-
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import LandingPage from '@/components/home/LandingPage';
 import UserDashboard from '@/components/dashboard/UserDashboard';
-// SiteFooter removed as it is in layout
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import NativeRedirectHandler from '@/components/native/NativeRedirectHandler';
 
-export default function Home() {
-  const { user, loading } = useUser();
-  const router = useRouter();
-  const [isNative, setIsNative] = useState<boolean | null>(null);
-  const [splashHidden, setSplashHidden] = useState(false);
+export default async function Home() {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Check if running on native platform
-  useEffect(() => {
-    const checkNative = async () => {
-      const { Capacitor } = await import('@capacitor/core');
-      setIsNative(Capacitor.isNativePlatform());
-    };
-    checkNative();
-  }, []);
+  const isAuthenticated = !!user;
 
-  // Handle password recovery redirect
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes('type=recovery')) {
-      // Preserve the hash when redirecting so Supabase can process the tokens
-      router.push(`/profile/reset-password${hash}`);
-    }
-  }, [router]);
+  return (
+    <>
+      {/* Handles Capacitor native redirects & splash screen — renders nothing */}
+      <NativeRedirectHandler isAuthenticated={isAuthenticated} />
 
-  // Handle native platform routing and splash screen
-  useEffect(() => {
-    const handleNativeApp = async () => {
-      if (isNative !== true || loading) return;
-
-      try {
-        const { SplashScreen } = await import('@capacitor/splash-screen');
-
-        // Route based on authentication status
-        if (user) {
-          // Stay on home/dashboard if logged in
-          // (No operation needed as return renders Dashboard)
-        } else {
-          // Redirect to login if not logged in
-          router.replace('/login');
-        }
-
-        // Hide splash screen after a short delay to ensure navigation has started
-        setTimeout(async () => {
-          await SplashScreen.hide();
-          setSplashHidden(true);
-        }, 500);
-      } catch (e) {
-        console.error('Error in native app handling:', e);
-      }
-    };
-
-    handleNativeApp();
-  }, [isNative, user, loading, router]);
-
-
-
-  // Show white screen while checking if native platform
-  if (isNative === null) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        {/* Checking platform */}
-      </div>
-    );
-  }
-
-  // For native apps, show white screen while redirecting to login
-  if (isNative === true && !user && !loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        {/* Empty - will redirect to login */}
-      </div>
-    );
-  }
-
-  // For web: show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-800 flex items-center justify-center">
-        <div className="text-gray-900 dark:text-white text-xl font-bold">Cargando...</div>
-      </div>
-    );
-  }
-
-  // If user is authenticated (both web and native), render Dashboard
-  if (user) {
-    return <UserDashboard />;
-  }
-
-  // Not authenticated on web -> Landing Page
-  // Native users are already handled above (will redirect to /login)
-  return <LandingPage />;
+      {isAuthenticated ? <UserDashboard /> : <LandingPage />}
+    </>
+  );
 }
