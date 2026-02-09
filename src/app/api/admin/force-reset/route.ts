@@ -140,7 +140,7 @@ export async function POST(request: Request) {
     }
 
     // Log action to audit
-    await supabase.from('audit_log').insert({
+    await adminClient.from('audit_log').insert({
       action_type: 'force_password_reset',
       performed_by: user.id,
       target_type: 'user',
