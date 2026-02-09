@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
@@ -16,7 +16,6 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
   const supabase = useSupabaseClient();
   const router = useRouter();
   const pathname = usePathname();
-  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const checkRecoveryState = async () => {
@@ -32,7 +31,6 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
 
         if (recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE) {
           logger.info('Password recovery required, redirecting to reset page');
-          console.log('[PasswordRecoveryGuard] Redirecting to:', RESET_PASSWORD_ROUTE);
           router.replace(RESET_PASSWORD_ROUTE);
           return;
         }
@@ -46,31 +44,25 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           const hasRecoveryAuth = amr.some((item: any) => item.method === 'otp');
 
           if (hasRecoveryAuth && pathname !== RESET_PASSWORD_ROUTE) {
-            // Set the flag if it's not set yet
             if (recoveryRequired !== 'true') {
               sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
             }
             logger.info('Recovery session detected via AMR, redirecting to reset page');
-            console.log('[PasswordRecoveryGuard] Recovery session detected, redirecting to:', RESET_PASSWORD_ROUTE);
             router.replace(RESET_PASSWORD_ROUTE);
             return;
           }
         }
       } catch (error) {
         logger.error('Error checking recovery state:', error);
-      } finally {
-        setIsChecking(false);
       }
     };
 
     checkRecoveryState();
   }, [supabase, router, pathname]);
 
-  // Don't render children while checking
-  if (isChecking && pathname !== RESET_PASSWORD_ROUTE) {
-    return null;
-  }
-
+  // Always render children — redirect happens as a side effect above.
+  // This is critical for SSR: blocking render with `return null` would
+  // prevent server-rendered page content from appearing in the initial HTML.
   return <>{children}</>;
 }
 
