@@ -15,7 +15,7 @@ import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
 import AdminGuard from '@/components/AdminGuard';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { SendEmailModal } from '@/components/admin/SendEmailModal';
 
@@ -23,7 +23,7 @@ function UserSearchContent() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<'all' | 'active' | 'suspended' | 'pending_deletion'>('all');
   const debouncedQuery = useDebounce(query, 500);
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   const { users, loading, error, refetch } = useUserSearch(debouncedQuery, status);
   const { suspendUser, unsuspendUser, loading: actionLoading } = useSuspendUser();

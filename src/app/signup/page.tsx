@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -29,7 +29,7 @@ export default function SignupPage() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const termsErrorMessage =
     'Debes aceptar los terminos del servicio para crear tu cuenta';
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   const handleTermsToggle = (value: boolean | 'indeterminate') => {
     const nextValue = value === true;

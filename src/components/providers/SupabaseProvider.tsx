@@ -137,27 +137,3 @@ export function useUser() {
   return { user: context.user, loading: context.loading };
 }
 
-// Legacy exports for backward compatibility
-export function useSupabase() {
-  const context = useContext(Context);
-  if (context === undefined) {
-    throw new Error('useSupabase must be used inside SupabaseProvider');
-  }
-  return {
-    supabase: context.supabase,
-    user: context.user,
-    session: null, // Not used in new implementation
-    loading: context.loading,
-  };
-}
-
-export function useSession() {
-  const context = useContext(Context);
-  if (context === undefined) {
-    throw new Error('useSession must be used inside SupabaseProvider');
-  }
-  return {
-    session: context.user ? { user: context.user } : null,
-    loading: context.loading,
-  };
-}

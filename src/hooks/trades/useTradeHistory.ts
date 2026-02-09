@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 
 interface TradeHistoryItem {
   id: number;
@@ -28,7 +28,7 @@ interface UseTradeHistoryReturn {
 }
 
 export const useTradeHistory = (): UseTradeHistoryReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const [history, setHistory] = useState<TradeHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);

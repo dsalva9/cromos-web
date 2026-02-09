@@ -5,7 +5,7 @@ import { useState, useEffect, MouseEvent } from 'react';
 import Link from 'next/link';
 import NavLink from '@/components/nav-link';
 import {
-  useSupabase,
+  useSupabaseClient,
   useUser,
 } from '@/components/providers/SupabaseProvider';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,7 @@ type NavigationLink = {
 // Simplified Avatar component for mobile that links directly to profile
 function MobileUserAvatar({ userId }: { userId: string }) {
   const { profile } = useCurrentUserProfile();
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   const avatarUrl = resolveAvatarUrl(profile?.avatar_url, supabase);
   const fallback = getAvatarFallback(profile?.nickname);
@@ -87,7 +87,7 @@ function MobileNotificationIcon() {
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user, loading } = useUser();
   // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
   const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();

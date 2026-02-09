@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { logger } from '@/lib/logger';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
 interface AdminGuardProps {
   children: React.ReactNode;
@@ -15,64 +14,13 @@ export default function AdminGuard({
   redirectTo = '/',
 }: AdminGuardProps) {
   const { user, loading: authLoading } = useUser();
-  const supabase = useSupabaseClient();
+  const { isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function checkAdminStatus() {
-      if (authLoading) return;
-
-      if (!user) {
-        logger.warn('AdminGuard: No user found, redirecting to login');
-        router.push('/login');
-        return;
-      }
-
-      try {
-        // Check if user has is_admin flag and is not suspended
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('is_admin, suspended_at, deleted_at')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          logger.error('AdminGuard: Error checking admin status', { error });
-          setIsAdmin(false);
-          setLoading(false);
-          return;
-        }
-
-        // Check if user is suspended or deleted
-        if (data?.suspended_at || data?.deleted_at) {
-          logger.warn('AdminGuard: User is suspended or deleted', { userId: user.id });
-          await supabase.auth.signOut();
-          router.push('/login');
-          return;
-        }
-
-        if (!data?.is_admin) {
-          logger.warn('AdminGuard: User is not an admin', { userId: user.id });
-          setIsAdmin(false);
-        } else {
-          logger.info('AdminGuard: Admin access granted', { userId: user.id });
-          setIsAdmin(true);
-        }
-      } catch (err) {
-        logger.error('AdminGuard: Unexpected error', { error: err });
-        setIsAdmin(false);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    checkAdminStatus();
-  }, [user, authLoading, router, supabase]);
+  const loading = authLoading || profileLoading;
 
   // Show loading while checking auth or admin status
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
@@ -81,6 +29,12 @@ export default function AdminGuard({
         </div>
       </div>
     );
+  }
+
+  // Not logged in
+  if (!user) {
+    router.push('/login');
+    return null;
   }
 
   // Show access denied if not admin

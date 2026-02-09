@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { TradeProposalListItem } from '@/types';
 
 export type ProposalBox = 'inbox' | 'outbox' | 'history';
@@ -20,7 +20,7 @@ interface UseProposalsReturn {
 }
 
 export const useProposals = (): UseProposalsReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const [proposals, setProposals] = useState<TradeProposalListItem[]>([]);
   const [loading, setLoading] = useState(true);

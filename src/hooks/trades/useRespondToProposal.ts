@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 
 type ProposalAction = 'accept' | 'reject' | 'cancel';
 
@@ -14,7 +14,7 @@ interface UseRespondToProposalReturn {
 }
 
 export const useRespondToProposal = (): UseRespondToProposalReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

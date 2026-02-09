@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 interface Collection {
@@ -64,7 +64,7 @@ interface AvailableTemplateData {
 }
 
 export function useProfileData() {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user, loading: userLoading } = useUser();
 
   // Core state

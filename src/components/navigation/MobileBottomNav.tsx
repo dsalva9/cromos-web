@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from 'next/navigation';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
@@ -13,7 +13,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const router = useRouter();
 
   /* Existing hook calls... */

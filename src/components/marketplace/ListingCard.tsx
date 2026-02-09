@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Ban, Trash2 } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
-import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
@@ -17,7 +17,7 @@ interface ListingCardProps {
 
 export function ListingCard({ listing }: ListingCardProps) {
   const { user } = useUser();
-  const { supabase } = useSupabase(); // For avatar resolution if needed
+  const supabase = useSupabaseClient(); // For avatar resolution if needed
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {

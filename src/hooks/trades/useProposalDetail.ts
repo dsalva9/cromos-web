@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { TradeProposalDetail } from '@/types';
 
 interface UseProposalDetailReturn {
@@ -11,7 +11,7 @@ interface UseProposalDetailReturn {
 }
 
 export const useProposalDetail = (): UseProposalDetailReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const [detail, setDetail] = useState<TradeProposalDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

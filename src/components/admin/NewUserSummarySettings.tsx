@@ -4,14 +4,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Mail, Send, Calendar, Clock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEmailForwarding } from '@/hooks/admin/useEmailForwarding';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
 
 type SummaryFrequency = 'none' | 'daily' | 'weekly';
 
 export default function NewUserSummarySettings() {
     const { addresses, loading, fetchAddresses } = useEmailForwarding();
-    const { supabase } = useSupabase();
+    const supabase = useSupabaseClient();
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [sendingManual, setSendingManual] = useState(false);
 

@@ -4,7 +4,7 @@ import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [checkingSession, setCheckingSession] = useState(true);
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const router = useRouter();
 
   // Set recovery flag when page loads (user came from recovery link)

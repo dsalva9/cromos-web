@@ -47,7 +47,7 @@ export default function EmailForwardingSettings() {
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('es-ES', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

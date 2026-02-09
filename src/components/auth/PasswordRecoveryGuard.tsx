@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 const RESET_PASSWORD_ROUTE = '/profile/reset-password';
@@ -13,7 +13,7 @@ interface PasswordRecoveryGuardProps {
 }
 
 export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const router = useRouter();
   const pathname = usePathname();
   const [isChecking, setIsChecking] = useState(true);

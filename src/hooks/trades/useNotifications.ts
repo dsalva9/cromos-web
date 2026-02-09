@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 export interface Notification {
@@ -46,7 +46,7 @@ interface UseNotificationsReturn {
 }
 
 export const useNotifications = (): UseNotificationsReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);

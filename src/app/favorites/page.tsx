@@ -12,7 +12,7 @@ import { useFavorites } from '@/hooks/social/useFavorites';
 import { useListingFavorite } from '@/hooks/marketplace/useListingFavorite';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/AuthGuard';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 type TabType = 'users' | 'listings';
@@ -23,7 +23,7 @@ function FavoritesContent() {
   const { favorites: listingFavorites, loading: listingsLoading, refetch: refetchListings } = useMyFavoriteListings();
   const { toggleFavorite } = useFavorites();
   const { toggleFavorite: toggleListingFavorite } = useListingFavorite();
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   const handleRemoveUser = async (userId: string) => {
     try {

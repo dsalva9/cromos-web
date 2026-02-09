@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 interface TradeMatch {
@@ -24,7 +24,7 @@ interface SearchParams {
 }
 
 export function useFindTraders() {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const [matches, setMatches] = useState<TradeMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

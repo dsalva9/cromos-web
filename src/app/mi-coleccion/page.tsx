@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
 import { logger } from '@/lib/logger';
 
 function CollectionRedirectContent() {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user, loading: userLoading } = useUser();
   const router = useRouter();
   const [checking, setChecking] = useState(true);

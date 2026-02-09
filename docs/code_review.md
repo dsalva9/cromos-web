@@ -192,8 +192,10 @@ In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/P
 
 ---
 
-### 9. Duplicate Supabase Server Client Creation (Boilerplate)
+### 9. ~~Duplicate Supabase Server Client Creation (Boilerplate)~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Added `createSupabaseAdminClient()` to `src/lib/supabase/server.ts` and refactored both `force-reset/route.ts` and `delete-user/route.ts` to use shared `createServerSupabaseClient()` and `createSupabaseAdminClient()` utilities, eliminating ~50 lines of duplicated cookie boilerplate.
 
 Both admin API routes [force-reset/route.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/app/api/admin/force-reset/route.ts#L16-L41) and [delete-user/route.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/app/api/admin/delete-user/route.ts#L15-L40) contain identical 25-line copy-pasted blocks for creating a Supabase server client with cookie handling.
 
@@ -223,8 +225,10 @@ The `Collection`, `Profile`, `Sticker` interfaces were re-defined locally in mul
 
 ---
 
-### 11. Legacy/Dead Exports in SupabaseProvider
+### 11. ~~Legacy/Dead Exports in SupabaseProvider~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Migrated all ~29 consumer files from `useSupabase()` to `useSupabaseClient()` and `useUser()`. Removed `useSupabase()` and `useSession()` legacy exports from `SupabaseProvider.tsx`.
 
 [SupabaseProvider.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/providers/SupabaseProvider.tsx#L140-L163) exports `useSupabase()` and `useSession()` as "legacy exports for backward compatibility". The `useSession` hook returns a synthetic session object constructed from user, and `useSupabase` returns `session: null`.
 
@@ -242,8 +246,10 @@ The `Collection`, `Profile`, `Sticker` interfaces were re-defined locally in mul
 
 ---
 
-### 12. Redundant Admin Check in AdminGuard
+### 12. ~~Redundant Admin Check in AdminGuard~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Rewrote `AdminGuard.tsx` to use `useProfileCompletion().isAdmin` from the existing `ProfileCompletionProvider`, eliminating the redundant Supabase query and reducing the component from ~70 to ~40 lines.
 
 [AdminGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/AdminGuard.tsx#L33-L39) makes a separate Supabase query for `is_admin` even though `ProfileCompletionProvider` already fetches `is_admin` and exposes it via `useProfileCompletion().isAdmin`. The SiteHeader already uses this pattern correctly.
 
@@ -262,8 +268,10 @@ The `Collection`, `Profile`, `Sticker` interfaces were re-defined locally in mul
 
 ---
 
-### 13. Encoding Corruption in Spanish Strings
+### 13. ~~Encoding Corruption in Spanish Strings~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** `CollectionPage.tsx` (the sole affected file) was deleted as dead code referencing deprecated tables.
 
 Several files contain corrupted Spanish characters (displayed as `�` instead of `ó`, `á`, etc.):
 - [CollectionPage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/CollectionPage.tsx#L159) — lines 159, 327, 387
@@ -282,8 +290,10 @@ Several files contain corrupted Spanish characters (displayed as `�` instead o
 
 ---
 
-### 14. Locale Mismatch — Spanish App, English Dates
+### 14. ~~Locale Mismatch — Spanish App, English Dates~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Changed locale from `'en'`/`'en-US'` to `'es'`/`'es-ES'` in `src/lib/utils.ts`, `InboundEmailLogs.tsx`, and `EmailForwardingSettings.tsx`.
 
 [src/lib/utils.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/lib/utils.ts#L18) uses `'en'` locale for `Intl.RelativeTimeFormat` and `'en-US'` for `toLocaleDateString`. The app is entirely in Spanish.
 
@@ -333,8 +343,10 @@ Found 24+ files using `@ts-ignore` to suppress TypeScript errors.
 
 ---
 
-### 17. Test/Debug Pages Deployed to Production
+### 17. ~~Test/Debug Pages Deployed to Production~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Deleted all 8 test/debug files: `page_test_auth.tsx`, `test-error/`, `test-marketplace/`, `test-rls/`, `debug/`, `ui-demo/`, `AuthTest.tsx`, `SessionDebug.tsx`.
 
 Several test and debug pages exist in the `src/app/` directory that are presumably deployed:
 - `src/app/page_test_auth.tsx`
@@ -366,8 +378,10 @@ Several test and debug pages exist in the `src/app/` directory that are presumab
 
 ---
 
-### 18. Edge Functions Use Deprecated Deno Imports
+### 18. ~~Edge Functions Use Deprecated Deno Imports~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** Updated all 4 remaining edge functions (`send-email-notification`, `send-corporate-email`, `send-push-notification`, `send-user-summary-email`) to use modern `Deno.serve()`, JSR imports (`jsr:@supabase/supabase-js@2`), and edge-runtime type definitions. `receive-inbound-email` was already updated.
 
 [send-email-notification/index.ts](file:///c:/Users/dsalv/Projects/cromos-web/supabase/functions/send-email-notification/index.ts#L6-L7) uses outdated import patterns:
 ```typescript
@@ -392,8 +406,10 @@ Supabase Edge Functions now recommend using `Deno.serve()` and JSR imports.
 
 ---
 
-### 19. Non-Atomic `setActiveCollection` — Race Condition
+### 19. ~~Non-Atomic `setActiveCollection` — Race Condition~~ ✅ RESOLVED
 **Priority: P2 — MEDIUM**
+
+> **Resolved 2026-02-09:** `ProfilePage.tsx` (the affected file) was deleted as dead code referencing deprecated `user_collections` and `collections` tables.
 
 In [ProfilePage.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/ProfilePage.tsx#L330-L360), `setActiveCollection` first sets ALL collections inactive, then sets one active. If the second call fails, ALL collections are inactive.
 

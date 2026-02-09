@@ -1,6 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { createServerSupabaseClient, createSupabaseAdminClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
@@ -13,32 +11,7 @@ export async function POST(request: Request) {
     }
 
     // Verify requesting user is admin
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(name: string, value: string, options: CookieOptions) {
-            try {
-              cookieStore.set(name, value, options);
-            } catch {
-              // Cookie setting may fail in server components
-            }
-          },
-          remove(name: string, options: CookieOptions) {
-            try {
-              cookieStore.set(name, '', { ...options, maxAge: 0 });
-            } catch {
-              // Cookie removal may fail in server components
-            }
-          }
-        }
-      }
-    );
+    const supabase = await createServerSupabaseClient();
     const {
       data: { user },
       error: authError
@@ -60,25 +33,16 @@ export async function POST(request: Request) {
     }
 
     // Use service role client for admin operations
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!serviceRoleKey) {
+    let adminClient;
+    try {
+      adminClient = createSupabaseAdminClient();
+    } catch {
       console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
       return NextResponse.json(
         { error: 'Configuración del servidor incompleta' },
         { status: 500 }
       );
     }
-
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
 
     // Fetch user's email first
     const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);

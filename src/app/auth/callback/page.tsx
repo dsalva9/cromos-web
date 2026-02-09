@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
@@ -39,7 +39,7 @@ function isProfileComplete(
 }
 
 export default function AuthCallback() {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 

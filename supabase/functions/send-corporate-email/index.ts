@@ -1,11 +1,11 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 /**
  * Supabase Edge Function: send-corporate-email
  * Sends corporate emails from info@cambiocromos.com via Resend
  * Admin-only feature for direct communication with users
  */
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = 'CambioCromos <info@cambiocromos.com>';
@@ -23,7 +23,7 @@ interface CorporateEmailPayload {
   body: string;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });

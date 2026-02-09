@@ -1,10 +1,10 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 /**
  * Supabase Edge Function: send-push-notification
  * Sends push notifications via OneSignal REST API
  */
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const ONESIGNAL_REST_API_KEY = Deno.env.get('ONESIGNAL_REST_API_KEY');
 const ONESIGNAL_APP_ID = '3b9eb764-f440-404d-949a-1468356afc18';
@@ -28,7 +28,7 @@ interface UserSettings {
   };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     // Only allow POST requests
     if (req.method !== 'POST') {

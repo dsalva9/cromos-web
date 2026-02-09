@@ -1,10 +1,10 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 /**
  * Supabase Edge Function: send-email-notification
  * Sends email notifications via Resend
  */
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = 'CambioCromos <info@cambiocromos.com>';
@@ -49,7 +49,7 @@ interface UserSettings {
   };
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     // Only allow POST requests
     if (req.method !== 'POST') {

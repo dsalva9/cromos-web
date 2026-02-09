@@ -54,7 +54,7 @@ export default function InboundEmailLogs() {
   }, [currentPage]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
+    return new Date(dateString).toLocaleString('es-ES', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

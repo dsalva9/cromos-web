@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
 
 interface FinalizationResult {
@@ -17,7 +17,7 @@ interface UseTradeFinalizationReturn {
 }
 
 export const useTradeFinalization = (): UseTradeFinalizationReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

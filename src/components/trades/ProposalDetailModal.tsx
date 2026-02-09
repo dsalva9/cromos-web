@@ -17,7 +17,7 @@ import { useRespondToProposal } from '@/hooks/trades/useRespondToProposal';
 import { useTradeFinalization } from '@/hooks/trades/useTradeFinalization';
 import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { TradeProposalDetailItem } from '@/types';
-import { useUser, useSupabase } from '../providers/SupabaseProvider';
+import { useUser, useSupabaseClient } from '../providers/SupabaseProvider';
 import { TradeChatPanel } from './TradeChatPanel';
 import {
   ArrowDown,
@@ -97,7 +97,7 @@ export function ProposalDetailModal({
   onStatusChange,
 }: ProposalDetailModalProps) {
   const { user } = useUser();
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { detail, loading, error, fetchDetail, clearDetail } =
     useProposalDetail();
   const {

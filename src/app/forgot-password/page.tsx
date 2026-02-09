@@ -4,14 +4,14 @@ import { siteConfig } from '@/config/site';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();

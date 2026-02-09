@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +28,7 @@ export const useUnreadCounts = ({
   tradeIds,
   enabled = true,
 }: UseUnreadCountsParams): UseUnreadCountsReturn => {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const [counts, setCounts] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(false);

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ModernCard } from '@/components/ui/modern-card';
 import AuthGuard from '@/components/AuthGuard';
-import { useUser, useSupabase } from '@/components/providers/SupabaseProvider';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileData } from '@/hooks/profile/useProfileData';
 import { ProfileBadges } from '@/components/profile/ProfileBadges';
 import { toast } from '@/lib/toast';
@@ -23,7 +23,7 @@ import {
 
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const router = useRouter();
 
   // Profile data

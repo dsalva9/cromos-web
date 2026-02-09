@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useSupabase, useUser } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { Sticker } from '@/types';
 
 import { logger } from '@/lib/logger';
@@ -74,7 +74,7 @@ export function useAlbumPages(
   collectionId: number | null,
   pageId: string | null
 ) {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();

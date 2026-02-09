@@ -8,7 +8,7 @@ import { TemplateRating } from '@/hooks/templates/useTemplateRatings';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Image from 'next/image';
-import { useSupabase } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 interface TemplateReviewListProps {
@@ -24,7 +24,7 @@ export function TemplateReviewList({
   onLoadMore,
   loading,
 }: TemplateReviewListProps) {
-  const { supabase } = useSupabase();
+  const supabase = useSupabaseClient();
 
   if (ratings.length === 0) {
     return (
