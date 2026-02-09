@@ -1,10 +1,16 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.cambiocromos.app",
-    "sha256_cert_fingerprints": [
-      "67:7B:63:A7:BD:1C:28:BD:CB:95:09:E7:E4:67:32:10:4E:20:0F:49:61:EF:0D:08:0F:17:6B:51:19:3E:CC:CB"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.cambiocromos.app",
+      "sha256_cert_fingerprints": [
+        "67:7B:63:A7:BD:1C:28:BD:CB:95:09:E7:E4:67:32:10:4E:20:0F:49:61:EF:0D:08:0F:17:6B:51:19:3E:CC:CB",
+        "54:73:7C:4B:CB:2D:75:68:BB:AE:18:A8:54:72:C7:94:9A:6F:B0:81:88:C7:C8:3A:B4:DE:6A:84:4B:7E:18:62"
+      ]
+    }
   }
-}]
+]
