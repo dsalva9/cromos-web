@@ -74,6 +74,57 @@ export default function RootLayout({
                   }
                 } catch (e) {}
               })();
+
+              // --- TEMPORARY CLICK DEBUGGER (remove after fixing click bug) ---
+              (function() {
+                document.addEventListener('click', function(e) {
+                  var el = e.target;
+                  // Walk up to find the nearest <a> tag
+                  var anchor = null;
+                  var current = el;
+                  while (current && current !== document) {
+                    if (current.tagName === 'A') { anchor = current; break; }
+                    current = current.parentElement;
+                  }
+                  if (!anchor) return;
+
+                  console.log('[CLICK-DEBUG] Anchor clicked:', {
+                    href: anchor.getAttribute('href'),
+                    target: anchor.getAttribute('target'),
+                    tagName: el.tagName,
+                    defaultPrevented: e.defaultPrevented,
+                    cancelBubble: e.cancelBubble,
+                    eventPhase: e.eventPhase,
+                    isTrusted: e.isTrusted,
+                    anchorClasses: anchor.className.slice(0, 80),
+                    computedPointerEvents: getComputedStyle(anchor).pointerEvents,
+                    computedZIndex: getComputedStyle(anchor).zIndex,
+                    anchorRect: anchor.getBoundingClientRect(),
+                  });
+
+                  // Check for elements on top of this anchor
+                  var rect = anchor.getBoundingClientRect();
+                  var topEl = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                  if (topEl !== anchor && !anchor.contains(topEl)) {
+                    console.warn('[CLICK-DEBUG] BLOCKED! Element on top:', topEl, topEl?.tagName, topEl?.className?.slice(0, 80));
+                  }
+                }, true); // capture phase
+
+                // Also listen in bubble phase to check if defaultPrevented
+                document.addEventListener('click', function(e) {
+                  var el = e.target;
+                  var anchor = null;
+                  var current = el;
+                  while (current && current !== document) {
+                    if (current.tagName === 'A') { anchor = current; break; }
+                    current = current.parentElement;
+                  }
+                  if (!anchor) return;
+                  if (e.defaultPrevented) {
+                    console.warn('[CLICK-DEBUG] defaultPrevented=true in BUBBLE phase for:', anchor.getAttribute('href'));
+                  }
+                }, false); // bubble phase
+              })();
             `,
           }}
         />
