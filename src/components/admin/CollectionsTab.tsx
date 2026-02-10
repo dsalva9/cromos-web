@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { legacyFrom, legacyRpc } from '@/types/legacy-tables';
 
 type Collection = {
   id?: number;
@@ -31,8 +32,7 @@ export default function CollectionsTab() {
 
   const fetchCollections = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase as any)
-      .from('collections')
+    const { data, error } = await legacyFrom(supabase, 'collections')
       .select('id,name,competition,year,description,image_url,is_active')
       .order('id');
     setLoading(false);
@@ -50,7 +50,7 @@ export default function CollectionsTab() {
     if (!editing) return;
     if (!editing.name || !editing.competition || !editing.year) { toast('Completa nombre, competición y año', 'error'); return; }
     const payload = { id: editing.id ?? null, name: editing.name, competition: editing.competition, year: editing.year, description: editing.description ?? null, image_url: editing.image_url ?? null, is_active: editing.is_active ?? true };
-    const { error } = await (supabase as any).rpc('admin_upsert_collection', { p_collection: payload });
+    const { error } = await legacyRpc(supabase, 'admin_upsert_collection', { p_collection: payload });
     if (error) { logger.error('admin_upsert_collection error', error); toast(error.message || 'No se pudo guardar', 'error'); return; }
     toast('Colección guardada', 'success'); setEditing(null); await fetchCollections();
   }

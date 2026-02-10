@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { legacyFrom, legacyRpc } from '@/types/legacy-tables';
 import { convertToFullWebP, convertToThumbWebP } from '@/lib/imageUtils';
 
 type Collection = { id: number; name: string };
@@ -82,7 +83,7 @@ export default function BulkUploadTab() {
 
 
   const fetchCollections = useCallback(async () => {
-    const { data, error } = await (supabase as any).from('collections').select('id,name').order('id');
+    const { data, error } = await legacyFrom(supabase, 'collections').select('id,name').order('id');
     if (error) return;
     setCollections(data || []);
     if ((data || []).length) setSelectedCollection(data![0].id);
@@ -148,8 +149,7 @@ export default function BulkUploadTab() {
         try {
           // Skip duplicates if overwrite is off
           if (!overwrite) {
-            const { data: exists } = await (supabase as any)
-              .from('stickers')
+            const { data: exists } = await legacyFrom(supabase, 'stickers')
               .select('id')
               .eq('collection_id', selectedCollection)
               .eq('code', code)
@@ -196,7 +196,7 @@ export default function BulkUploadTab() {
             image_path_webp_300: fullPath,
             thumb_path_webp_100: thumbPath,
           };
-          const { error } = await (supabase as any).rpc('admin_upsert_sticker', { p_sticker: payload });
+          const { error } = await legacyRpc(supabase, 'admin_upsert_sticker', { p_sticker: payload });
           if (error) throw error;
           newResults.push({ code, ok: true });
         } catch (e: unknown) {

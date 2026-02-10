@@ -59,6 +59,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### H3. Admin tabs — 20+ `as any` casts on dead tables
 
+**Status**: ✅ Resolved  
+**Resolution**: Replaced all 20 `as any` casts across 5 admin files with `legacyFrom()`/`legacyRpc()` helpers from `legacy-tables.ts`. All `as any` usage is now consolidated in two helper functions.
+
 **Files**:
 - [PagesTab.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/admin/PagesTab.tsx) — lines 30, 40, 51, 78, 85
 - [StickersTab.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/admin/StickersTab.tsx) — lines 53, 60, 67, 129, 162, 185
