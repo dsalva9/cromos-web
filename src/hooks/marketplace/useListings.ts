@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Listing } from '@/types/v1.6.0';
@@ -120,6 +120,18 @@ export function useListings({
     [collectionIds]
   );
 
+  // Use a ref to keep the latest collectionIds for the queryFn,
+  // so the function identity doesn't change on every render.
+  const collectionIdsRef = useRef(collectionIds);
+  collectionIdsRef.current = collectionIds;
+
+  // Only use initialData when filters are at their defaults.
+  // When filters are active, the server data is unfiltered and would be wrong.
+  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0;
+  const effectiveInitialData = isDefaultQuery && initialData && initialData.length > 0
+    ? { initialData: { pages: [initialData], pageParams: [0] } }
+    : {};
+
   const {
     data,
     error: queryError,
@@ -131,14 +143,15 @@ export function useListings({
   } = useInfiniteQuery({
     queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey),
     queryFn: async ({ pageParam = 0 }) => {
-      const hasCollectionFilter = collectionIds && collectionIds.length > 0;
+      const currentIds = collectionIdsRef.current;
+      const hasCollectionFilter = currentIds && currentIds.length > 0;
       const rpcParams: Record<string, unknown> = {
         p_limit: limit,
         p_offset: pageParam,
         p_search: search || null,
         p_viewer_postcode: viewerPostcode,
         p_sort_by_distance: sortByDistance,
-        p_collection_ids: hasCollectionFilter ? collectionIds : null,
+        p_collection_ids: hasCollectionFilter ? currentIds : null,
       };
 
       const { data, error } = await supabase.rpc(
@@ -157,16 +170,9 @@ export function useListings({
       // Otherwise the next offset is the total number of items fetched so far
       return allPages.reduce((total, page) => total + page.length, 0);
     },
-    // If server-rendered data was provided, seed the first page
-    ...(initialData && initialData.length > 0
-      ? {
-        initialData: {
-          pages: [initialData],
-          pageParams: [0],
-        },
-      }
-      : {}),
+    ...effectiveInitialData,
   });
+
 
   // Flatten all pages into a single array
   const listings = useMemo(
