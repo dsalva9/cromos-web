@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -26,14 +25,17 @@ export function MobileBottomNav() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/login');
+    window.location.href = '/login';
     setIsMenuOpen(false);
   };
 
   const { hapticImpact } = useHaptic();
 
-  const handleNavClick = () => {
+  const handleNavClick = (href: string) => {
     hapticImpact();
+    // Hard navigation workaround — Next.js 16 client-side transitions
+    // silently hang for authenticated users, so bypass via window.location.href
+    window.location.href = href;
   };
 
   const handleMenuClick = () => {
@@ -50,9 +52,9 @@ export function MobileBottomNav() {
     <>
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex justify-around items-center h-16">
-          <Link
+          <a
             href="/marketplace"
-            onClick={handleNavClick}
+            onClick={(e) => { e.preventDefault(); handleNavClick('/marketplace'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -60,11 +62,11 @@ export function MobileBottomNav() {
             aria-label="Marketplace"
           >
             <Store className="h-6 w-6" />
-          </Link>
+          </a>
 
-          <Link
+          <a
             href="/mis-plantillas"
-            onClick={handleNavClick}
+            onClick={(e) => { e.preventDefault(); handleNavClick('/mis-plantillas'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -72,11 +74,11 @@ export function MobileBottomNav() {
             aria-label="Mis Álbumes"
           >
             <Library className="h-6 w-6" />
-          </Link>
+          </a>
 
-          <Link
+          <a
             href="/chats"
-            onClick={handleNavClick}
+            onClick={(e) => { e.preventDefault(); handleNavClick('/chats'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/chats') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -84,11 +86,11 @@ export function MobileBottomNav() {
             aria-label="Chats"
           >
             <MessageCircle className="h-6 w-6" />
-          </Link>
+          </a>
 
-          <Link
+          <a
             href="/favorites"
-            onClick={handleNavClick}
+            onClick={(e) => { e.preventDefault(); handleNavClick('/favorites'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
               isActive('/favorites') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -96,7 +98,7 @@ export function MobileBottomNav() {
             aria-label="Favoritos"
           >
             <Heart className="h-6 w-6" />
-          </Link>
+          </a>
 
           <button
             onClick={handleMenuClick}
@@ -118,41 +120,47 @@ export function MobileBottomNav() {
             <DrawerTitle className="text-center font-bold text-lg">Menú</DrawerTitle>
           </DrawerHeader>
           <div className="p-4 space-y-2">
-            <Link
+            <a
               href="/marketplace/my-listings"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                window.location.href = '/marketplace/my-listings';
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Package className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Mis Anuncios</span>
-            </Link>
+            </a>
 
-            <Link
+            <a
               href="/templates"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                window.location.href = '/templates';
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <FileText className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Colecciones</span>
-            </Link>
+            </a>
 
-            <Link
+            <a
               href="/ajustes"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                window.location.href = '/ajustes';
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Settings className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Ajustes</span>
-            </Link>
+            </a>
 
             <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
 

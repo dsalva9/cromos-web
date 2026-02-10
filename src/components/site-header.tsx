@@ -205,7 +205,7 @@ export default function SiteHeader() {
 
       <div className="container mx-auto px-4">
         <div className="flex h-16 sm:h-20 items-center justify-between">
-          <Link
+          <NavLink
             href="/"
             className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
             onClick={closeMenu}
@@ -222,7 +222,7 @@ export default function SiteHeader() {
             <span className="text-base sm:text-2xl truncate hidden min-[350px]:block">
               {siteConfig.name}
             </span>
-          </Link>
+          </NavLink>
 
           <nav
             role="navigation"
