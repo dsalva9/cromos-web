@@ -24,6 +24,12 @@ export function useUserProfile(userId: string) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
+    // Guard: don't fetch with empty userId — prevents 400 errors
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
