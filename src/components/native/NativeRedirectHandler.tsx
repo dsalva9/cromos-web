@@ -24,7 +24,8 @@ export default function NativeRedirectHandler({ isAuthenticated }: NativeRedirec
         if (hash && hash.includes('type=recovery')) {
             router.push(`/profile/reset-password${hash}`);
         }
-    }, [router]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount - router dependency causes infinite loops
 
     // Handle native platform routing and splash screen
     useEffect(() => {
@@ -48,7 +49,8 @@ export default function NativeRedirectHandler({ isAuthenticated }: NativeRedirec
         };
 
         handleNativeApp();
-    }, [isAuthenticated, router]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount - router/isAuthenticated dependencies cause re-runs
 
     return null;
 }

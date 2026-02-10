@@ -75,37 +75,53 @@ export default function RootLayout({
                 } catch (e) {}
               })();
 
-              // --- TEMPORARY CLICK DEBUGGER (remove after fixing click bug) ---
+              // --- COMPREHENSIVE ROUTER DEBUGGER ---
               (function() {
-                // Track router.push calls by intercepting Next.js router
-                window.__routerPushCalled = 0;
-                window.__routerPushArgs = [];
+                console.log('[DEBUG] Router debugger initializing...');
                 
-                // Listen for Next.js to mount and patch router
+                // Track all errors
+                window.addEventListener('error', function(e) {
+                  console.error('[ERROR-DEBUG] Uncaught error:', e.error, e.filename, e.lineno);
+                });
+                
+                window.addEventListener('unhandledrejection', function(e) {
+                  console.error('[ERROR-DEBUG] Unhandled promise rejection:', e.reason);
+                });
+                
+                // Track router.push calls (App Router might use different mechanism)
+                window.__routerPushCalled = 0;
+                
+                // Try multiple ways to intercept router
                 setTimeout(function() {
-                  try {
-                    // Access Next.js router via window.next.router
-                    var checkRouter = setInterval(function() {
-                      if (window.next && window.next.router) {
-                        var originalPush = window.next.router.push;
-                        window.next.router.push = function() {
-                          window.__routerPushCalled++;
-                          window.__routerPushArgs.push(arguments[0]);
-                          console.log('[ROUTER-DEBUG] router.push() called with:', arguments[0], 'total calls:', window.__routerPushCalled);
-                          return originalPush.apply(this, arguments);
-                        };
-                        clearInterval(checkRouter);
-                        console.log('[ROUTER-DEBUG] Router push interceptor installed');
-                      }
-                    }, 100);
-                  } catch(e) {
-                    console.error('[ROUTER-DEBUG] Failed to patch router:', e);
-                  }
-                }, 1000);
-
+                  // Method 1: Pages Router (window.next.router)
+                  var checkPagesRouter = setInterval(function() {
+                    if (window.next && window.next.router && window.next.router.push) {
+                      console.log('[ROUTER-DEBUG] Found Pages Router on window.next.router');
+                      var origPush = window.next.router.push;
+                      window.next.router.push = function() {
+                        window.__routerPushCalled++;
+                        console.log('[ROUTER-DEBUG] Pages Router push() called:', arguments[0], 'total:', window.__routerPushCalled);
+                        return origPush.apply(this, arguments);
+                      };
+                      clearInterval(checkPagesRouter);
+                    }
+                  }, 100);
+                  
+                  setTimeout(function() { clearInterval(checkPagesRouter); }, 5000);
+                  
+                  // Method 2: Try to find App Router's internal router
+                  // App Router stores router in React Fiber - harder to intercept
+                  console.log('[ROUTER-DEBUG] Checking for App Router...');
+                }, 100);
+                
+                // Track popstate for actual navigation events
+                window.addEventListener('popstate', function(e) {
+                  console.log('[ROUTER-DEBUG] popstate event:', window.location.pathname);
+                });
+                
+                // Track clicks on anchors
                 document.addEventListener('click', function(e) {
                   var el = e.target;
-                  // Walk up to find the nearest <a> tag
                   var anchor = null;
                   var current = el;
                   while (current && current !== document) {
@@ -114,30 +130,25 @@ export default function RootLayout({
                   }
                   if (!anchor) return;
 
+                  var href = anchor.getAttribute('href');
                   console.log('[CLICK-DEBUG] Anchor clicked:', {
-                    href: anchor.getAttribute('href'),
+                    href: href,
                     target: anchor.getAttribute('target'),
                     tagName: el.tagName,
                     defaultPrevented: e.defaultPrevented,
-                    cancelBubble: e.cancelBubble,
-                    eventPhase: e.eventPhase,
                     isTrusted: e.isTrusted,
-                    anchorClasses: anchor.className.slice(0, 80),
-                    computedPointerEvents: getComputedStyle(anchor).pointerEvents,
-                    computedZIndex: getComputedStyle(anchor).zIndex,
-                    anchorRect: anchor.getBoundingClientRect(),
                     totalRouterPushCalls: window.__routerPushCalled || 0
                   });
 
-                  // Check for elements on top of this anchor
+                  // Check for overlaying elements
                   var rect = anchor.getBoundingClientRect();
                   var topEl = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
                   if (topEl !== anchor && !anchor.contains(topEl)) {
-                    console.warn('[CLICK-DEBUG] BLOCKED! Element on top:', topEl, topEl?.tagName, topEl?.className?.slice(0, 80));
+                    console.warn('[CLICK-DEBUG] Element on top:', topEl?.tagName, topEl?.className?.slice(0, 80));
                   }
-                }, true); // capture phase
+                }, true);
 
-                // Also listen in bubble phase to check if defaultPrevented
+                // Bubble phase check
                 document.addEventListener('click', function(e) {
                   var el = e.target;
                   var anchor = null;
@@ -148,9 +159,11 @@ export default function RootLayout({
                   }
                   if (!anchor) return;
                   if (e.defaultPrevented) {
-                    console.warn('[CLICK-DEBUG] defaultPrevented=true in BUBBLE phase for:', anchor.getAttribute('href'));
+                    console.warn('[CLICK-DEBUG] defaultPrevented=true in BUBBLE for:', anchor.getAttribute('href'));
                   }
-                }, false); // bubble phase
+                }, false);
+                
+                console.log('[DEBUG] Router debugger initialized');
               })();
             `,
           }}
