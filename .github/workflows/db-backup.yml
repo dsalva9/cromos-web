@@ -44,7 +44,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git checkout -B backups
           # Commit the ENCRYPTED file only
-          git add backup.sql.gpg
+          git add -f backup.sql.gpg
           git commit -m "daily db backup (encrypted)" || echo "No changes to commit"
 
       - name: Push to backups branch
