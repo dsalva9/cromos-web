@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useState } from 'react';
 import { useTemplateProgress } from '@/hooks/templates/useTemplateProgress';
 import { TemplateProgressGrid } from '@/components/templates/TemplateProgressGrid';
@@ -9,7 +10,7 @@ import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import {
   Dialog,
