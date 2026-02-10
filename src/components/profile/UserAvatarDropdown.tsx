@@ -56,10 +56,9 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   const handleProtectedClick =
     (href: string, requiresCompletion = false) =>
       (event: MouseEvent<HTMLAnchorElement>) => {
-        // When profile is confirmed incomplete, redirect to completion page.
-        // Do NOT call event.preventDefault() — blocking the native <Link>
-        // click can leave the router in a stuck state if router.push() fails.
+        // Block navigation for incomplete profiles and redirect to completion page.
         if (requiresCompletion && !completionLoading && !isComplete) {
+          event.preventDefault();
           toast.info(
             'Necesitas completar tu perfil para empezar a cambiar cromos!'
           );
