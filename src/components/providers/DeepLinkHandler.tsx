@@ -44,7 +44,8 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
         listenerHandle.remove();
       }
     };
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once - router dependency causes infinite loops
 
   return <>{children}</>;
 }

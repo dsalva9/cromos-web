@@ -107,7 +107,8 @@ export function ProfileCompletionGuard({
       }
       router.replace(completionRoute);
     }
-  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, router, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps  
+  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, user]); // router removed - causes infinite loops
 
   // Always render children — the useEffect above handles redirects.
   // Never return null here: unmounting the children tree corrupts the
