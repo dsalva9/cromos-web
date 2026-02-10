@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, MouseEvent } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Settings } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';

@@ -7,7 +7,7 @@ import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
 import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';

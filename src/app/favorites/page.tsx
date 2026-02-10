@@ -6,7 +6,7 @@ import { useMyFavoriteListings } from '@/hooks/marketplace/useMyFavoriteListings
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { User, Star, Package, Heart, ShoppingBag } from 'lucide-react';
 import { useFavorites } from '@/hooks/social/useFavorites';
 import { useListingFavorite } from '@/hooks/marketplace/useListingFavorite';

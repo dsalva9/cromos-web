@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';

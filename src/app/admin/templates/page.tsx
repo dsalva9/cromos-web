@@ -26,7 +26,7 @@ import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw } from 'lucide-r
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import AdminGuard from '@/components/AdminGuard';
 import { useRestoreTemplate } from '@/hooks/templates/useRestoreTemplate';
 

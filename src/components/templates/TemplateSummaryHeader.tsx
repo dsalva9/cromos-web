@@ -3,7 +3,7 @@
 
 import { Check, X, Copy as CopyIcon, Trophy, User } from 'lucide-react';
 import { useMemo } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ImageModal } from '@/components/ui/ImageModal';

@@ -2,7 +2,7 @@
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect, MouseEvent } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import NavLink from '@/components/nav-link';
 import {
   useSupabaseClient,
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { toast } from '@/lib/toast';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { useNotifications } from '@/hooks/notifications/useNotifications';

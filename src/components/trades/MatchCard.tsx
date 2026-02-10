@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import {

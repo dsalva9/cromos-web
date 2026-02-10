@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ModernCard } from '@/components/ui/modern-card';

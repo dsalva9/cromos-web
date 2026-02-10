@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { AlertTriangle, LogOut, Trash2, Loader2, Lightbulb } from 'lucide-react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 import { DeleteAccountDialog } from '@/components/deletion';
 import { ThemeSettingsSection } from './ThemeSettingsSection';

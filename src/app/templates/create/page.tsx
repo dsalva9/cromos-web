@@ -1,11 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useCreateTemplate } from '@/hooks/templates/useCreateTemplate';
 import { TemplateCreationWizard } from '@/components/templates/TemplateCreationWizard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import AuthGuard from '@/components/AuthGuard';
 import { logger } from '@/lib/logger';
 

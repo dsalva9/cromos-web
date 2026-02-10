@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 
 export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
   const router = useRouter();

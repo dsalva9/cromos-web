@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

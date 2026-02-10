@@ -7,7 +7,7 @@ import { TemplateFilters } from '@/components/templates/TemplateFilters';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Plus, FolderOpen, Loader2, Lightbulb } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';

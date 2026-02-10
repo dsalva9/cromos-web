@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { User, Search, Ban, CheckCircle, AlertTriangle, Mail, Trash2 } from 'lucide-react';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';

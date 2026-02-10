@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
+import Link from '@/components/ui/link';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';

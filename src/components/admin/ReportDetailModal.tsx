@@ -17,7 +17,7 @@ import { useReportDetails } from '@/hooks/admin/useReportDetails';
 import { useResolveReport } from '@/hooks/admin/useResolveReport';
 import { toast } from 'sonner';
 import { AlertTriangle, X, Trash, Ban, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 
 interface ReportDetailModalProps {
   reportId: string;

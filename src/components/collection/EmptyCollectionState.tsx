@@ -3,7 +3,7 @@
 
 import { siteConfig } from '@/config/site';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Trophy, Plus } from 'lucide-react';

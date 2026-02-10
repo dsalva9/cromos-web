@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';

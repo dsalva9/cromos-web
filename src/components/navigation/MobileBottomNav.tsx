@@ -5,7 +5,7 @@ import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
 

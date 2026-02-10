@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 
 const postcodeRegex = /^\d{4,5}$/;
 

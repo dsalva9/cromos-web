@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link from '@/components/ui/link';
+import { useRouter } from '@/hooks/use-router';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useUserProfile } from '@/hooks/social/useUserProfile';
 import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';

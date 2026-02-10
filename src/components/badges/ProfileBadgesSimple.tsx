@@ -6,7 +6,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { useUserBadges } from '@/hooks/badges/useUserBadges';
 import { BadgeCard } from '@/components/badges/BadgeCard';
 import { BadgesModal } from '@/components/badges/BadgesModal';

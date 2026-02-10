@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback, CSSProperties } from 'react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { CollectionPage } from '@/hooks/album';
 import { Shield, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';

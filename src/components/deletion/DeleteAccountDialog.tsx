@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Trash2, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 
 interface DeleteAccountDialogProps {

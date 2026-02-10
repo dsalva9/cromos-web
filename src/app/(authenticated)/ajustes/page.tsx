@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationSettingsTab } from '@/components/settings/NotificationSettingsTab';
@@ -19,7 +19,7 @@ import {
   FileText,
   Cookie,
 } from 'lucide-react';
-import Link from 'next/link'; // Added Link import
+import Link from '@/components/ui/link'; // Added Link import
 
 export default function AjustesPage() {
   const router = useRouter();

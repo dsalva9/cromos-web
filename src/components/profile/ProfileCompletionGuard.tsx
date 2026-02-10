@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { toast } from '@/lib/toast';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useUser } from '@/components/providers/SupabaseProvider';

@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, User, AlertTriangle, Clock } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 
 export function SuspendedUsersTable() {
   const { users, loading, error } = useAdminSuspendedUsers();

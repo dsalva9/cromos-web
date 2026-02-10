@@ -17,7 +17,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 

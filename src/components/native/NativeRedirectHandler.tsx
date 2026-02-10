@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { Capacitor } from '@capacitor/core';
 
 // useLayoutEffect on client (runs synchronously before paint), useEffect on server (avoids SSR warning)

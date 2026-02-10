@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 
 export default function SignupPage() {

@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, Loader2, RotateCcw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 
 interface CancelDeletionDialogProps {

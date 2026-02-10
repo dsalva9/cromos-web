@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { UserLink } from '@/components/ui/user-link';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { MapPin, Ban, Trash2 } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';

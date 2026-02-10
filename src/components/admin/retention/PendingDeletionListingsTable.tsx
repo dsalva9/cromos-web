@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2, Package, AlertTriangle, Trash2, Shield, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { LegalHoldControls } from './LegalHoldControls';
 
 export function PendingDeletionListingsTable() {

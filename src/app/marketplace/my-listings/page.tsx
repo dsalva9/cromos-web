@@ -6,7 +6,7 @@ import { MyListingCard } from '@/components/integration/MyListingCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Plus, Package, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import AuthGuard from '@/components/AuthGuard';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';

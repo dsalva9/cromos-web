@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { Listing } from '@/types/v1.6.0';
 import { cn } from '@/lib/utils';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { legacyFrom } from '@/types/legacy-tables';

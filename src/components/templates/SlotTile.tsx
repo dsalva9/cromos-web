@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Minus, Plus, Upload, Check, Copy as CopyIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 
 interface SlotProgress {
   slot_id: number;

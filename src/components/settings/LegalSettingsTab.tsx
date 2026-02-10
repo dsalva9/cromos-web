@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Shield, FileText, Cookie, ChevronRight, ExternalLink } from 'lucide-react';
 
