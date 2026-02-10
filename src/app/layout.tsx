@@ -77,6 +77,32 @@ export default function RootLayout({
 
               // --- TEMPORARY CLICK DEBUGGER (remove after fixing click bug) ---
               (function() {
+                // Track router.push calls by intercepting Next.js router
+                window.__routerPushCalled = 0;
+                window.__routerPushArgs = [];
+                
+                // Listen for Next.js to mount and patch router
+                setTimeout(function() {
+                  try {
+                    // Access Next.js router via window.next.router
+                    var checkRouter = setInterval(function() {
+                      if (window.next && window.next.router) {
+                        var originalPush = window.next.router.push;
+                        window.next.router.push = function() {
+                          window.__routerPushCalled++;
+                          window.__routerPushArgs.push(arguments[0]);
+                          console.log('[ROUTER-DEBUG] router.push() called with:', arguments[0], 'total calls:', window.__routerPushCalled);
+                          return originalPush.apply(this, arguments);
+                        };
+                        clearInterval(checkRouter);
+                        console.log('[ROUTER-DEBUG] Router push interceptor installed');
+                      }
+                    }, 100);
+                  } catch(e) {
+                    console.error('[ROUTER-DEBUG] Failed to patch router:', e);
+                  }
+                }, 1000);
+
                 document.addEventListener('click', function(e) {
                   var el = e.target;
                   // Walk up to find the nearest <a> tag
@@ -100,6 +126,7 @@ export default function RootLayout({
                     computedPointerEvents: getComputedStyle(anchor).pointerEvents,
                     computedZIndex: getComputedStyle(anchor).zIndex,
                     anchorRect: anchor.getBoundingClientRect(),
+                    totalRouterPushCalls: window.__routerPushCalled || 0
                   });
 
                   // Check for elements on top of this anchor
