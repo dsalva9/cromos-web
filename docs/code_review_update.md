@@ -236,6 +236,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### M6. In-memory rate limiter doesn't work in serverless
 
+**Status**: ✅ Resolved  
+**Resolution**: Updated JSDoc in `rate-limit.ts` to clearly document the serverless limitation, explain that it's only a soft guard, and note current usage scope (admin-only routes).
+
 **File**: [rate-limit.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/lib/rate-limit.ts)  
 **Impact**: The `Map`-based store resets on every serverless cold start. On Vercel, each request may hit a different instance, so the rate limiter is effectively bypassed with enough traffic. The comment says "suitable for serverless" but that's misleading.
 

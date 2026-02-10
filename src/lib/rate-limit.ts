@@ -5,7 +5,17 @@ import { NextResponse } from 'next/server';
  * 
  * Tracks request timestamps per key (typically IP or user ID).
  * Not persistent across deployments — resets on redeploy.
- * Suitable for serverless environments with low admin traffic.
+ * 
+ * ⚠️  SERVERLESS LIMITATION: In serverless environments (e.g. Vercel),
+ * each function invocation may run in a different instance, so the
+ * in-memory Map resets on every cold start. This means the rate limiter
+ * is effectively a **soft guard** — it will catch rapid-fire abuse within
+ * a single warm instance, but not distributed abuse across instances.
+ * For hard rate limiting, use Upstash Redis, Vercel Edge Config, or
+ * Supabase's built-in rate limiting.
+ * 
+ * Current usage: admin-only API routes (/api/admin/*) where traffic is
+ * naturally low and a soft guard is sufficient.
  */
 
 interface RateLimitEntry {
