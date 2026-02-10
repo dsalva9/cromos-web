@@ -79,6 +79,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### H4. `mi-coleccion/page.tsx` — client-side redirect with `as any` casts on dead tables
 
+**Status**: ✅ Resolved  
+**Resolution**: Replaced 2 `(supabase as any)` casts with `legacyFrom(supabase, 'user_collections')` and typed the `uc: any` callback parameter. AuthGuard kept for defense-in-depth.
+
 **File**: [mi-coleccion/page.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/app/mi-coleccion/page.tsx) (lines 29, 58, 76)  
 **Impact**: This page queries `user_collections` with `as any`. If the table is dropped, the user sees an infinite spinner. Additionally, it duplicates the `AuthGuard` that the middleware already provides, and it uses `console.log` (line 43 via `logger.debug`).
 
@@ -90,6 +93,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### H5. `useProposals.ts` — over-fetching and client-side filtering
 
+**Status**: ✅ Resolved  
+**Resolution**: Replaced magic `limit + 50` with proportional `limit * 3` over-fetch. Added `serverHasMore` flag derived from unfiltered count so pagination is correct. Added TODO to move filtering server-side.
+
 **File**: [useProposals.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/hooks/trades/useProposals.ts) (line 110)  
 **Impact**: On line 110, the RPC is called with `p_limit: limit + 50` to over-fetch, then results are filtered client-side (lines 116-126) and sliced (line 129). This means: (a) the server always returns 50 extra rows that are discarded, (b) pagination is broken because `hasMore` is based on the post-filtered count, not the server's count, (c) wasted bandwidth on every load.
 
@@ -100,6 +106,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 ---
 
 ### H6. Unresolved v1.6.0 migration TODOs
+
+**Status**: ⚠️ Partially resolved  
+**Resolution**: `mark_team_page_complete` now uses `legacyRpc()` (refactored in H2). `find_mutual_traders` is properly typed — the location params are optional new features, not breaking changes. TODOs remain as migration notes.
 
 **Files**:
 - [useFindTraders.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/hooks/trades/useFindTraders.ts) — line 59: `find_mutual_traders` RPC signature changed

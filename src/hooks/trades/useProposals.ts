@@ -51,6 +51,7 @@ export const useProposals = (): UseProposalsReturn => {
 
       try {
         let data: TradeProposalListItem[] | null = null;
+        let serverHasMore = false;
 
         // History box: fetch from trades_history
         if (box === 'history') {
@@ -103,14 +104,20 @@ export const useProposals = (): UseProposalsReturn => {
               request_item_count: 0,
             };
           });
+          serverHasMore = (historyData || []).length === limit;
         } else {
           // Inbox/Outbox: use existing RPC, then filter by view
+          // Over-fetch proportionally to compensate for client-side filtering.
+          // TODO: add p_statuses param to RPC to filter server-side.
+          const fetchLimit = limit * 3;
           const { data: rpcData, error: rpcError } = await supabase.rpc(
             'list_trade_proposals',
-            { p_user_id: user.id, p_box: box, p_limit: limit + 50, p_offset: offset }
+            { p_user_id: user.id, p_box: box, p_limit: fetchLimit, p_offset: offset }
           );
 
           if (rpcError) throw new Error('Error al cargar las propuestas.');
+
+          const unfilteredCount = (rpcData || []).length;
 
           // Filter based on view
           if (view === 'active') {
@@ -127,12 +134,16 @@ export const useProposals = (): UseProposalsReturn => {
 
           // Limit to requested count after filtering
           data = data ? data.slice(0, limit) : [];
+
+          // hasMore is true if we still received a full fetch window (more rows on server)
+          // OR we had enough filtered results to fill a page
+          serverHasMore = unfilteredCount >= fetchLimit;
         }
 
         setProposals(prev =>
           offset === 0 ? data || [] : [...prev, ...(data || [])]
         );
-        setHasMore((data || []).length === limit);
+        setHasMore(serverHasMore && (data || []).length === limit);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : 'Ocurrió un error desconocido.'

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
 import { logger } from '@/lib/logger';
+import { legacyFrom } from '@/types/legacy-tables';
 
 function CollectionRedirectContent() {
   const supabase = useSupabaseClient();
@@ -26,8 +27,8 @@ function CollectionRedirectContent() {
           logger.debug('Checking user collections...');
 
           // Get user's collections
-          const { data: userCollections, error } = await (supabase as any)
-            .from('user_collections')
+          const { data: userCollections, error } = await legacyFrom(supabase, 'user_collections')
+
             .select(
               `
               collection_id,
@@ -55,7 +56,7 @@ function CollectionRedirectContent() {
           }
 
           // Find active collection
-          const activeCollection = userCollections.find((uc: any) => uc.is_active);
+          const activeCollection = userCollections.find((uc: { is_active: boolean; collection_id: number }) => uc.is_active);
           logger.debug('Active collection:', activeCollection);
 
           if (activeCollection) {
@@ -73,8 +74,7 @@ function CollectionRedirectContent() {
 
           if (firstCollection) {
             // Set first collection as active
-            await (supabase as any)
-              .from('user_collections')
+            await legacyFrom(supabase, 'user_collections')
               .update({ is_active: true })
               .eq('user_id', user.id)
               .eq('collection_id', firstCollection.collection_id);
