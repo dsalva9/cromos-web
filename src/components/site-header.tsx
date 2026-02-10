@@ -133,16 +133,15 @@ export default function SiteHeader() {
   const handleProtectedNavigation =
     (requiresCompletion?: boolean) =>
       (event: MouseEvent<HTMLAnchorElement>) => {
-        // Only block when loading is DONE and profile is confirmed incomplete.
-        // During loading, let the Link navigate normally — the
-        // ProfileCompletionGuard will redirect incomplete profiles.
+        // When profile is confirmed incomplete, redirect to completion page.
+        // Do NOT call event.preventDefault() — blocking the native <Link>
+        // click can leave the router in a stuck state if router.push() fails.
         if (
           requiresCompletion &&
           user &&
           !profileLoading &&
           !isComplete
         ) {
-          event.preventDefault();
           closeMenu();
           toast.info(
             'Necesitas completar tu perfil para empezar a cambiar cromos!'

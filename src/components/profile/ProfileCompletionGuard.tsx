@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 const completionRoute = '/profile/completar';
 
@@ -18,6 +19,17 @@ interface ProfileCompletionGuardProps {
   children: React.ReactNode;
 }
 
+/**
+ * ProfileCompletionGuard — redirect-only guard (no render blocking).
+ *
+ * IMPORTANT: This guard must ALWAYS render `{children}`.  Returning `null`
+ * would unmount the entire page tree, destroying the Next.js client-side
+ * router's internal transition state and causing all `<Link>` components
+ * to silently stop navigating (the "click blocking bug").
+ *
+ * Instead, the guard relies solely on the `useEffect` below to call
+ * `router.replace()` when the profile is confirmed incomplete.
+ */
 export function ProfileCompletionGuard({
   children,
 }: ProfileCompletionGuardProps) {
@@ -55,19 +67,6 @@ export function ProfileCompletionGuard({
     const justLeftCompletionRoute =
       previousPathname === completionRoute && pathname !== completionRoute;
 
-    console.log('[ProfileCompletionGuard] Running check:', {
-      userId: user.id,
-      pathname,
-      isComplete,
-      profile,
-      loading,
-      authLoading,
-      isExemptRoute,
-      hasWarned: hasWarnedRef.current,
-      stableIncompleteCount: stableIncompleteCountRef.current,
-      justLeftCompletionRoute,
-    });
-
     // Track state transitions to reset warning flag and stabilization counter
     if (previousCompleteRef.current === false && isComplete === true) {
       hasWarnedRef.current = false;
@@ -90,17 +89,16 @@ export function ProfileCompletionGuard({
     // Don't redirect if user just navigated away from completion page
     // (they just saved — give the provider a moment to settle)
     if (justLeftCompletionRoute) {
-      console.log('[ProfileCompletionGuard] Skipping redirect: just left completion route');
+      logger.info('[ProfileCompletionGuard] Skipping redirect: just left completion route');
       stableIncompleteCountRef.current = 0;
       return;
     }
 
     // Stabilization: require multiple consecutive incomplete checks before redirecting
     stableIncompleteCountRef.current += 1;
-    console.log('[ProfileCompletionGuard] Stable incomplete count:', stableIncompleteCountRef.current);
 
     if (stableIncompleteCountRef.current >= STABLE_INCOMPLETE_THRESHOLD) {
-      console.log('[ProfileCompletionGuard] Profile confirmed incomplete, redirecting');
+      logger.info('[ProfileCompletionGuard] Profile confirmed incomplete, redirecting');
       if (!hasWarnedRef.current) {
         hasWarnedRef.current = true;
         toast.info(
@@ -111,27 +109,8 @@ export function ProfileCompletionGuard({
     }
   }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, router, user]);
 
-  // Public/unauthenticated users should see the app normally
-  if (!user) {
-    return <>{children}</>;
-  }
-
-  // CRITICAL FIX: Always render children during loading!
-  // This allows loading.tsx skeletons to show immediately.
-  // The useEffect above will handle redirects in the background.
-  if (authLoading || loading) {
-    return <>{children}</>;
-  }
-
-  // Only block rendering for CONFIRMED incomplete profiles on non-exempt routes
-  // Also require the stabilization threshold to be met before blocking
-  if (!isComplete) {
-    const isExemptRoute = getIsExemptRoute();
-    if (!isExemptRoute && stableIncompleteCountRef.current >= STABLE_INCOMPLETE_THRESHOLD) {
-      // Profile is confirmed incomplete and not on exempt route - block until redirect completes
-      return null;
-    }
-  }
-
+  // Always render children — the useEffect above handles redirects.
+  // Never return null here: unmounting the children tree corrupts the
+  // Next.js router's internal transition state (click blocking bug).
   return <>{children}</>;
 }
