@@ -133,10 +133,14 @@ export default function SiteHeader() {
   const handleProtectedNavigation =
     (requiresCompletion?: boolean) =>
       (event: MouseEvent<HTMLAnchorElement>) => {
+        // Only block when loading is DONE and profile is confirmed incomplete.
+        // During loading, let the Link navigate normally — the
+        // ProfileCompletionGuard will redirect incomplete profiles.
         if (
           requiresCompletion &&
           user &&
-          (!isComplete || profileLoading)
+          !profileLoading &&
+          !isComplete
         ) {
           event.preventDefault();
           closeMenu();

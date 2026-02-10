@@ -56,7 +56,9 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   const handleProtectedClick =
     (href: string, requiresCompletion = false) =>
       (event: MouseEvent<HTMLAnchorElement>) => {
-        if (requiresCompletion && (!isComplete || completionLoading)) {
+        // Only block when loading is DONE and profile is confirmed incomplete.
+        // During loading, let clicks proceed — ProfileCompletionGuard enforces.
+        if (requiresCompletion && !completionLoading && !isComplete) {
           event.preventDefault();
           toast.info(
             'Necesitas completar tu perfil para empezar a cambiar cromos!'
