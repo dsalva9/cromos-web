@@ -28,16 +28,13 @@ export default async function Home() {
   const isAuthenticated = !!session?.user;
 
   return (
-    <>
-      {/* Handles Capacitor native redirects & splash screen — renders nothing */}
-      <NativeRedirectHandler isAuthenticated={isAuthenticated} />
-
+    <NativeRedirectHandler isAuthenticated={isAuthenticated}>
       {isAuthenticated ? (
         <UserDashboard />
       ) : (
         <LandingPage />
       )}
-    </>
+    </NativeRedirectHandler>
   );
 }
 

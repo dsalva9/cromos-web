@@ -1,10 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { Capacitor } from '@capacitor/core';
+
+// useLayoutEffect on client (runs synchronously before paint), useEffect on server (avoids SSR warning)
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 interface NativeRedirectHandlerProps {
     isAuthenticated: boolean;
+    children: ReactNode;
 }
 
 /**
@@ -13,10 +18,27 @@ interface NativeRedirectHandlerProps {
  * - Hides the Capacitor splash screen after routing
  * - Handles password recovery hash redirects
  *
- * This component renders nothing and does not block SSR.
+ * On native platforms, this component suppresses its children BEFORE the
+ * browser paints (via useLayoutEffect), preventing the landing page from
+ * flickering before the /login redirect.
+ *
+ * On web, children render immediately (SSR-safe).
  */
-export default function NativeRedirectHandler({ isAuthenticated }: NativeRedirectHandlerProps) {
+export default function NativeRedirectHandler({ isAuthenticated, children }: NativeRedirectHandlerProps) {
     const router = useRouter();
+    const [isNative, setIsNative] = useState<boolean | null>(null);
+
+    // Synchronously detect native platform BEFORE browser paint.
+    // Capacitor's native bridge injects window.Capacitor before page JS runs,
+    // and @capacitor/core is statically imported by DeepLinkHandler in the layout,
+    // so Capacitor.isNativePlatform() is available synchronously.
+    useIsomorphicLayoutEffect(() => {
+        try {
+            setIsNative(Capacitor.isNativePlatform());
+        } catch {
+            setIsNative(false);
+        }
+    }, []);
 
     // Handle password recovery redirect (works on both web and native)
     useEffect(() => {
@@ -27,30 +49,35 @@ export default function NativeRedirectHandler({ isAuthenticated }: NativeRedirec
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Only run once on mount - router dependency causes infinite loops
 
-    // Handle native platform routing and splash screen
+    // Handle native redirect and splash screen (async, runs after paint)
     useEffect(() => {
-        const handleNativeApp = async () => {
-            try {
-                const { Capacitor } = await import('@capacitor/core');
-                if (!Capacitor.isNativePlatform()) return;
+        if (isNative === null) return; // Wait for detection
+        if (!isNative) return; // Not native, nothing to do
 
-                if (!isAuthenticated) {
-                    router.replace('/login');
-                }
+        if (!isAuthenticated) {
+            router.replace('/login');
+        }
 
-                // Hide splash screen after a short delay to ensure navigation has started
-                const { SplashScreen } = await import('@capacitor/splash-screen');
-                setTimeout(async () => {
-                    await SplashScreen.hide();
-                }, 500);
-            } catch (e) {
-                console.error('Error in native app handling:', e);
-            }
-        };
-
-        handleNativeApp();
+        // Hide splash screen after a short delay to ensure navigation has started
+        import('@capacitor/splash-screen').then(({ SplashScreen }) => {
+            setTimeout(() => SplashScreen.hide(), 500);
+        }).catch((e) => {
+            console.error('Error hiding splash screen:', e);
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount - router/isAuthenticated dependencies cause re-runs
+    }, [isNative]); // Run once isNative is determined
 
-    return null;
+    // SSR / initial hydration render: isNative is null, show children (matches server HTML)
+    // useLayoutEffect then fires synchronously BEFORE paint → sets isNative
+    // React re-renders BEFORE paint → if native + unauthenticated, children are suppressed
+    if (isNative === null) {
+        return <>{children}</>;
+    }
+
+    if (isNative && !isAuthenticated) {
+        return null;
+    }
+
+    return <>{children}</>;
 }
+
