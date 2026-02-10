@@ -24,15 +24,9 @@ export default function AuthGuard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading, redirectTo]); // router removed - causes cascading pushes (click blocking bug)
 
-  // Show loading while checking auth
+  // Show nothing while checking auth
   if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <p>Verificando autenticación...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Always render children — returning null unmounts the page tree and corrupts
