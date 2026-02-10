@@ -45,6 +45,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### H2. `useAlbumPages.ts` — 886-line god hook with 11 `as any` casts
 
+**Status**: ✅ Resolved  
+**Resolution**: Split into 4 files: `useCollectionSwitcher.ts` (~150 lines), `useAlbumNavigation.ts` (~260 lines), `useStickerOwnership.ts` (~340 lines), and a ~110-line composition hook. Created `legacy-tables.ts` with `legacyFrom()`/`legacyRpc()` helpers that consolidate all `as any` casts into one controlled location. Same public API — no consumer changes needed.
+
 **File**: [useAlbumPages.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/hooks/album/useAlbumPages.ts) (886 lines)  
 **Impact**: This single hook manages collection switching, page navigation, sticker ownership (mark/reduce/complete), stats, and optimistic updates. It's the largest file in the codebase and is untestable. The 11 `as any` casts silently reference tables removed in v1.6.0 (`user_collections`, `user_stickers`, `collections`, `collection_pages`, `page_slots`, `stickers`). If the Supabase schema changes or these tables are dropped, the app will fail at runtime with no compile-time warning.
 
