@@ -6,6 +6,19 @@ import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
+/**
+ * The Supabase Session type doesn't include `amr`, but it's present at runtime
+ * when authentication includes recovery/OTP flows. This augments the type safely.
+ */
+interface AMREntry {
+  method: string;
+  timestamp: number;
+}
+
+interface SessionWithAMR {
+  amr?: AMREntry[];
+}
+
 const RESET_PASSWORD_ROUTE = '/profile/reset-password';
 const RECOVERY_FLAG_KEY = 'password_recovery_required';
 
@@ -35,9 +48,9 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
         // This catches cases where the flag hasn't been set yet
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          // AMR (Authentication Method Reference) is on the session, not the user
-          const amr = (session as any).amr || [];
-          const hasRecoveryAuth = amr.some((item: any) => item.method === 'otp');
+          // AMR (Authentication Method Reference) is on the session at runtime
+          const amr = (session as unknown as SessionWithAMR).amr ?? [];
+          const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
 
           if (hasRecoveryAuth && pathname !== RESET_PASSWORD_ROUTE) {
             if (recoveryRequired !== 'true') {

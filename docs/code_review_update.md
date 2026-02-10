@@ -188,6 +188,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### M3. `PasswordRecoveryGuard` — `as any` cast on session AMR
 
+**Status**: ✅ Resolved  
+**Resolution**: Created typed `SessionWithAMR` and `AMREntry` interfaces to replace both `(session as any).amr` and `(item: any)` casts. Uses `(session as unknown as SessionWithAMR)` for safe type narrowing.
+
 **File**: [PasswordRecoveryGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/auth/PasswordRecoveryGuard.tsx) — line 43  
 **Impact**: `(session as any).amr` casts the session to bypass TypeScript. If the Supabase types update and remove/rename `amr`, this silently breaks.
 
