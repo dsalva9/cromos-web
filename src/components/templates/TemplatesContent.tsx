@@ -122,7 +122,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                             className="animate-fade-in"
                             style={{ animationDelay: `${index * 50}ms` }}
                         >
-                            <TemplateCard template={template as any} />
+                            <TemplateCard template={template} />
                         </div>
                     ))}
                 </div>

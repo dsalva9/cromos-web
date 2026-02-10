@@ -15,8 +15,8 @@ import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';
 import { DeletionCountdown } from '@/components/deletion';
 
-interface Template {
-  id: string;
+export interface TemplateCardData {
+  id: string | number;
   author_id: string;
   author_nickname: string;
   title: string;
@@ -26,7 +26,7 @@ interface Template {
   rating_count: number;
   copies_count: number;
   pages_count: number;
-  total_slots: number;
+  total_slots?: number;
   created_at: string;
   is_public?: boolean;
   deleted_at?: string | null;
@@ -34,7 +34,7 @@ interface Template {
 }
 
 interface TemplateCardProps {
-  template: Template;
+  template: TemplateCardData;
   showVisibility?: boolean;
   showEditButton?: boolean;
 }
@@ -59,7 +59,7 @@ export function TemplateCard({
     }
 
     try {
-      const copyId = await copyTemplate(template.id);
+      const copyId = await copyTemplate(String(template.id));
       setCopied(true);
       toast.success('¡Colección copiada con Éxito!');
       setTimeout(() => {
@@ -178,7 +178,7 @@ export function TemplateCard({
               <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>
-                  {template.pages_count} páginas - {template.total_slots}{' '}
+                  {template.pages_count} páginas - {template.total_slots ?? 0}{' '}
                   cromos
                 </span>
               </div>

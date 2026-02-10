@@ -53,7 +53,7 @@ export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesConte
                                 style={{ animationDelay: `${index * 50}ms` }}
                             >
                                 <TemplateCard
-                                    template={template as any}
+                                    template={template}
                                     showVisibility={true}
                                     showEditButton={true}
                                 />

@@ -202,6 +202,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### M4. Duplicate `Profile` type definitions
 
+**Status**: ✅ Resolved (in M1)  
+**Resolution**: The deprecated `Profile` was removed from `types/index.ts` as part of M1. All imports now use the v1.6.0 version.
+
 **Files**:
 - [types/index.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/types/index.ts) — line 24 (`@deprecated`)
 - [types/v1.6.0.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/types/v1.6.0.ts) — line 3
@@ -215,6 +218,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 ---
 
 ### M5. Template components using `as any` for type mismatches
+
+**Status**: ✅ Resolved  
+**Resolution**: Exported `TemplateCardData` from `TemplateCard.tsx` with `id: string | number` and `total_slots?: number`. Removed `as any` casts from both consumers. Added `String()` conversion for `copyTemplate()` call and `?? 0` fallback for `total_slots` display.
 
 **Files**:
 - [MyCreatedTemplatesContent.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/templates/MyCreatedTemplatesContent.tsx) — line 56
