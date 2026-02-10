@@ -2,13 +2,12 @@
 
 import { siteConfig } from '@/config/site';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
 
@@ -18,23 +17,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const supabase = useSupabaseClient();
-  const router = useRouter();
-  const hasNavigatedRef = useRef(false);
 
   // Redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
-      if (hasNavigatedRef.current) return;
       const { data: { session } } = await supabase.auth.getSession();
-      if (session && !hasNavigatedRef.current) {
-        hasNavigatedRef.current = true;
-        router.push('/');
+      if (session) {
+        // Hard redirect — avoids App Router startTransition that gets stuck
+        window.location.href = '/';
       }
     };
 
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase]); // router removed - causes duplicate navigation (click blocking bug)
+  }, [supabase]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +49,7 @@ export default function LoginPage() {
         const userId = data?.user?.id;
 
         if (!userId) {
-          router.push('/');
+          window.location.href = '/';
           return;
         }
 
@@ -113,8 +108,8 @@ export default function LoginPage() {
           !hasPlaceholderNickname &&
           !hasPlaceholderPostcode;
 
-        hasNavigatedRef.current = true;
-        router.push(isProfileComplete ? '/' : '/profile/completar');
+        // Hard redirect — avoids App Router startTransition that gets stuck
+        window.location.href = isProfileComplete ? '/' : '/profile/completar';
       }
     } catch {
       setError('An unexpected error occurred');
