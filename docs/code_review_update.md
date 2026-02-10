@@ -23,13 +23,16 @@ The codebase is **well-organized** with a clear separation between pages, compon
 | **`console.log` files** | 15 |
 | **Unresolved TODO migrations** | 4 |
 | **Deprecated types still in use** | 5 |
-| **Hooks without caching** | ~40 |
+| **Hooks without caching** | ~40 (1 converted: `useListings`) |
 
 ---
 
 ## High Priority
 
 ### H1. No server-state caching library (React Query)
+
+**Status**: ✅ Resolved (pilot)  
+**Resolution**: Installed `@tanstack/react-query` + devtools. Created `QueryProvider.tsx` (staleTime 60s, gcTime 5min, retry 1). Added to `layout.tsx` inside `SupabaseProvider`. Converted `useListings.ts` from manual useState/useEffect/useCallback to `useInfiniteQuery` as pilot — same public API preserved. Created `src/lib/queryKeys.ts` for centralized query key factory. Remaining hooks can be converted incrementally.
 
 **Files**: All 40+ hooks in `src/hooks/`  
 **Impact**: Every page re-fetches data on mount. No request deduplication (the same data may be fetched 3× in a page). No stale-while-revalidate — users always see loading spinners. No automatic refetch on window focus. Each hook re-implements its own loading/error/pagination state (200+ lines of boilerplate per hook).
@@ -121,6 +124,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 ---
 
 ### H8. `JSON.stringify` in useEffect dependency array
+
+**Status**: ✅ Resolved  
+**Resolution**: Fixed as part of H1 React Query conversion. `useListings.ts` now uses `useMemo(() => JSON.stringify(collectionIds), [collectionIds])` to produce a stable `collectionIdsKey` used in the React Query `queryKey`. No `useEffect` dependency array remains — React Query manages reactivity via its key.
 
 **File**: [useListings.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/hooks/marketplace/useListings.ts) — line 189  
 **Impact**: `JSON.stringify(collectionIds)` in a dependency array is called on every render, always returning a new string, potentially causing the effect to re-run every render if the array reference changes (which it will unless memoized upstream).
