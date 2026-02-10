@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 export interface UserCollection {
@@ -43,7 +43,7 @@ export function useUserCollections() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCollections = async () => {
+  const fetchCollections = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -62,12 +62,11 @@ export function useUserCollections() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchCollections();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchCollections]);
 
   return {
     collections,

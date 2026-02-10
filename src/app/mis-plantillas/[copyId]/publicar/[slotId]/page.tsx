@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { usePublishDuplicate } from '@/hooks/integration/usePublishDuplicate';
@@ -46,7 +46,7 @@ function PublishDuplicateContent() {
   const [loading, setLoading] = useState(true);
   const { publishDuplicate, loading: publishing } = usePublishDuplicate();
 
-  const fetchSlotData = async () => {
+  const fetchSlotData = useCallback(async () => {
     try {
       // Get template copy info
       const { data: copyData, error: copyError } = await supabase.rpc(
@@ -125,12 +125,11 @@ function PublishDuplicateContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, copyId, slotId, router]);
 
   useEffect(() => {
     fetchSlotData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [copyId, slotId]);
+  }, [fetchSlotData]);
 
   const handlePublish = async (formData: {
     title: string;

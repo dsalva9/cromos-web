@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { SuspendedUser } from '@/types/admin';
 
@@ -8,12 +8,7 @@ export function useAdminSuspendedUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSuspendedUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchSuspendedUsers = async () => {
+  const fetchSuspendedUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -29,7 +24,11 @@ export function useAdminSuspendedUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchSuspendedUsers();
+  }, [fetchSuspendedUsers]);
 
   return { users, loading, error, refetch: fetchSuspendedUsers };
 }

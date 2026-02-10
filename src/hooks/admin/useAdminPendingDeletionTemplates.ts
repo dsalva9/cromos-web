@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { PendingDeletionTemplate } from '@/types/admin';
 
@@ -8,12 +8,7 @@ export function useAdminPendingDeletionTemplates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPendingDeletionTemplates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchPendingDeletionTemplates = async () => {
+  const fetchPendingDeletionTemplates = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -29,7 +24,11 @@ export function useAdminPendingDeletionTemplates() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchPendingDeletionTemplates();
+  }, [fetchPendingDeletionTemplates]);
 
   return { templates, loading, error, refetch: fetchPendingDeletionTemplates };
 }

@@ -229,6 +229,9 @@ export const useTradeChat = ({
       setHasMore(false);
       setError(null);
     }
+    // loadMessages is intentionally omitted — it includes oldestMessageId which
+    // changes after every fetch, causing an infinite loop.  The guard deps
+    // (tradeId, enabled, user, supabase) are sufficient for the initial load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tradeId, enabled, user, supabase]);
 

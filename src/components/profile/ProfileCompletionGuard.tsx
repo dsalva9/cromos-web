@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from '@/lib/toast';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
@@ -33,7 +33,7 @@ export function ProfileCompletionGuard({
   const previousPathnameRef = useRef<string | null>(null);
 
   // Helper to check if on exempt route
-  const getIsExemptRoute = () => {
+  const getIsExemptRoute = useCallback(() => {
     const isOnCompletionRoute =
       pathname === completionRoute ||
       pathname?.startsWith(`${completionRoute}/`);
@@ -41,7 +41,7 @@ export function ProfileCompletionGuard({
     const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
     const isResetPassword = pathname === '/profile/reset-password';
     return isOnCompletionRoute || isAuthFlow || isAuthPage || isResetPassword;
-  };
+  }, [pathname]);
 
   useEffect(() => {
     if (authLoading || loading) return;
@@ -109,8 +109,7 @@ export function ProfileCompletionGuard({
       }
       router.replace(completionRoute);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, isComplete, loading, pathname, profile, router, user]);
+  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, router, user]);
 
   // Public/unauthenticated users should see the app normally
   if (!user) {

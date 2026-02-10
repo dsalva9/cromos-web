@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface AuditLogEntry {
@@ -26,10 +26,14 @@ export function useAuditLog(actionType: string = 'all') {
   const [hasMore, setHasMore] = useState(true);
   const limit = 20;
 
+  // Use a ref for offset inside fetchLogs to avoid it as a dependency
+  const offsetRef = useRef(offset);
+  offsetRef.current = offset;
+
   const fetchLogs = useCallback(async (isLoadMore = false) => {
     try {
       setLoading(true);
-      const currentOffset = isLoadMore ? offset : 0;
+      const currentOffset = isLoadMore ? offsetRef.current : 0;
 
       // Build query - select all columns from audit_log
       let query = supabase
@@ -83,13 +87,12 @@ export function useAuditLog(actionType: string = 'all') {
     } finally {
       setLoading(false);
     }
-  }, [supabase, actionType, offset, limit]);
+  }, [supabase, actionType, limit]);
 
   useEffect(() => {
     setOffset(0);
     fetchLogs(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionType]);
+  }, [fetchLogs]);
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {

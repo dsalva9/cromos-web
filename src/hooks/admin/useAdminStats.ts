@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface AdminStats {
@@ -18,12 +18,7 @@ export function useAdminStats() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -40,7 +35,11 @@ export function useAdminStats() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   return { stats, loading, error, refetch: fetchStats };
 }

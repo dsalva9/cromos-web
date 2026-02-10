@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { PendingDeletionUser } from '@/types/admin';
 
@@ -8,12 +8,7 @@ export function useAdminPendingDeletionUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPendingDeletionUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchPendingDeletionUsers = async () => {
+  const fetchPendingDeletionUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -29,7 +24,11 @@ export function useAdminPendingDeletionUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    fetchPendingDeletionUsers();
+  }, [fetchPendingDeletionUsers]);
 
   return { users, loading, error, refetch: fetchPendingDeletionUsers };
 }

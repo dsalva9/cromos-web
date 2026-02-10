@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 
 export function useLocalStorage<T>(
@@ -6,7 +6,7 @@ export function useLocalStorage<T>(
   initialValue: T
 ): [T, (value: T) => void] {
   // Get from local storage then parse stored json or return initialValue
-  const readValue = (): T => {
+  const readValue = useCallback((): T => {
     if (typeof window === 'undefined') {
       return initialValue;
     }
@@ -18,7 +18,7 @@ export function useLocalStorage<T>(
       logger.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
-  };
+  }, [key, initialValue]);
 
   const [storedValue, setStoredValue] = useState<T>(readValue);
 
@@ -37,8 +37,7 @@ export function useLocalStorage<T>(
   // Update state if key changes
   useEffect(() => {
     setStoredValue(readValue());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [readValue]);
 
   return [storedValue, setValue];
 }

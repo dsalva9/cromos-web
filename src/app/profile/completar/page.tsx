@@ -31,8 +31,7 @@ function CompleteProfileContent() {
 
   const previewAvatarUrl = useMemo(
     () => resolveAvatarUrl(formAvatarPath, supabase),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formAvatarPath]
+    [formAvatarPath, supabase]
   );
 
   useEffect(() => {

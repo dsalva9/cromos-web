@@ -198,14 +198,12 @@ export default function UserProfilePage() {
 
   const displayAvatarUrl = useMemo(
     () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [profile?.avatar_url]
+    [profile?.avatar_url, supabase]
   );
 
   const previewAvatarUrl = useMemo(
     () => resolveAvatarUrl(formAvatarPath, supabase),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [formAvatarPath]
+    [formAvatarPath, supabase]
   );
 
   const statusCounts = useMemo(() => {

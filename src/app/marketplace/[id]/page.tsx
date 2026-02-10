@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useListing } from '@/hooks/marketplace/useListing';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -57,13 +57,14 @@ export default function ListingDetailPage() {
   const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const viewIncrementedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (listing && user?.id && user.id !== listing.user_id) {
+    if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
+      viewIncrementedRef.current = listing.id.toString();
       incrementViews();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listing?.id, user?.id]); // Only run when listing or user ID changes, incrementViews is stable
+  }, [listing, user?.id, incrementViews]);
 
   // Check if user is admin
   useEffect(() => {

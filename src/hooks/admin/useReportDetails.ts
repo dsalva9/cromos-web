@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 interface ReportDetails {
@@ -25,12 +25,7 @@ export function useReportDetails(reportId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchDetails();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reportId]);
-
-  const fetchDetails = async () => {
+  const fetchDetails = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -50,7 +45,11 @@ export function useReportDetails(reportId: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [supabase, reportId]);
+
+  useEffect(() => {
+    fetchDetails();
+  }, [fetchDetails]);
 
   return { details, loading, error };
 }

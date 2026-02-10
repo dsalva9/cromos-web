@@ -27,8 +27,7 @@ export default function MarketplaceShowcase() {
       setDisplayListings(listings);
       setIsReady(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, listings.length, isReady]);
+  }, [loading, listings, isReady]);
 
   const hasListings = displayListings.length > 0;
   const showSkeletons = !isReady || loading;

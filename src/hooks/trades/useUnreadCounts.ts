@@ -99,8 +99,7 @@ export const useUnreadCounts = ({
       setCounts(new Map());
       setError(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, user, box, tradeIds?.length, supabase]);
+  }, [fetchCounts, enabled, user]);
 
   // Realtime subscription for new messages
   useEffect(() => {
