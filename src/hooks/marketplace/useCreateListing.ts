@@ -33,8 +33,6 @@ export function useCreateListing() {
       if (!result) throw new Error('No listing ID returned');
 
       return result.toString();
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }

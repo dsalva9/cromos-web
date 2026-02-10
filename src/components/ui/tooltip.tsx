@@ -71,7 +71,7 @@ export const TooltipTrigger = React.forwardRef<
   };
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<any>, {
+    return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
       ref,
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
@@ -113,7 +113,7 @@ export const TooltipContent = React.forwardRef<
     <AnimatePresence>
       {context.open && (
         <motion.div
-          ref={ref as any}
+          ref={ref as React.Ref<HTMLDivElement>}
           initial={{ opacity: 0, scale: 0.95, y: side === 'top' ? 4 : side === 'bottom' ? -4 : 0 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: side === 'top' ? 4 : side === 'bottom' ? -4 : 0 }}
@@ -123,7 +123,7 @@ export const TooltipContent = React.forwardRef<
             sideClasses[side],
             className
           )}
-          {...props as any}
+          {...(props as React.ComponentPropsWithoutRef<typeof motion.div>)}
         >
           {children}
           {/* Subtle pointer tip */}

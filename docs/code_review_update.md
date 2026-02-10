@@ -289,6 +289,9 @@ The header manages a rating modal (lines 153-172, 280-292) which is unrelated to
 
 ### L2. `useCreateListing.ts` — empty catch block re-throws
 
+**Status**: ✅ Resolved  
+**Resolution**: Replaced `try/catch/finally` with `try/finally` since the catch block only re-threw.
+
 **File**: [useCreateListing.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/hooks/marketplace/useCreateListing.ts) — lines 36-38  
 The `catch` block just re-throws the error. The `try/catch` around lines 36-38 is pointless.
 
@@ -297,6 +300,9 @@ The `catch` block just re-throws the error. The `try/catch` around lines 36-38 i
 ---
 
 ### L3. `global-error.tsx` doesn't include Tailwind CSS
+
+**Status**: ✅ Resolved  
+**Resolution**: Added `import './globals.css'` to ensure Tailwind styles apply in the global error fallback.
 
 **File**: [global-error.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/app/global-error.tsx)  
 The global error page renders its own `<html>` and `<body>` but doesn't import `globals.css` or any stylesheet. The Tailwind classes won't be applied.
@@ -324,6 +330,9 @@ Tests exist for theme rollout, trade chat, segmented tabs, proposal highlight, e
 ---
 
 ### L6. `tooltip.tsx` — `as any` casts on ref and props
+
+**Status**: ✅ Resolved  
+**Resolution**: Replaced 3 `as any` casts with proper types: `React.ReactElement<Record<string, unknown>>`, `React.Ref<HTMLDivElement>`, and `React.ComponentPropsWithoutRef<typeof motion.div>`.
 
 **File**: [tooltip.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/ui/tooltip.tsx) — lines 116, 126
 

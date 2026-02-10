@@ -3,6 +3,7 @@
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
+import './globals.css';
 
 export default function GlobalError({
   error,
