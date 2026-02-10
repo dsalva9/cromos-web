@@ -20,7 +20,8 @@ export default function AuthGuard({
     if (!loading && !user) {
       router.push(redirectTo);
     }
-  }, [user, loading, router, redirectTo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loading, redirectTo]); // router removed - causes cascading pushes (click blocking bug)
 
   // Show loading while checking auth
   if (loading) {

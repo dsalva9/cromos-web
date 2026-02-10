@@ -23,12 +23,6 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
         // Check if there's a recovery flag in session storage
         const recoveryRequired = sessionStorage.getItem(RECOVERY_FLAG_KEY);
 
-        console.log('[PasswordRecoveryGuard] Checking recovery state:', {
-          recoveryRequired,
-          pathname,
-          shouldRedirect: recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE
-        });
-
         if (recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE) {
           logger.info('Password recovery required, redirecting to reset page');
           router.replace(RESET_PASSWORD_ROUTE);
@@ -58,7 +52,8 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
     };
 
     checkRecoveryState();
-  }, [supabase, router, pathname]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, pathname]); // router removed - causes re-triggering on router state changes (click blocking bug)
 
   // Always render children — redirect happens as a side effect above.
   // This is critical for SSR: blocking render with `return null` would

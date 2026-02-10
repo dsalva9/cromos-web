@@ -2,7 +2,7 @@
 
 import { siteConfig } from '@/config/site';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -19,18 +19,22 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const hasNavigatedRef = useRef(false);
 
   // Redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
+      if (hasNavigatedRef.current) return;
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session && !hasNavigatedRef.current) {
+        hasNavigatedRef.current = true;
         router.push('/');
       }
     };
 
     checkAuth();
-  }, [supabase, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase]); // router removed - causes duplicate navigation (click blocking bug)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +113,7 @@ export default function LoginPage() {
           !hasPlaceholderNickname &&
           !hasPlaceholderPostcode;
 
+        hasNavigatedRef.current = true;
         router.push(isProfileComplete ? '/' : '/profile/completar');
       }
     } catch {
