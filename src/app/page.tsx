@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import LandingPage from '@/components/home/LandingPage';
@@ -34,16 +33,7 @@ export default async function Home() {
       <NativeRedirectHandler isAuthenticated={isAuthenticated} />
 
       {isAuthenticated ? (
-        <Suspense fallback={
-          <div className="min-h-screen bg-gray-50 animate-pulse p-4">
-            <div className="max-w-4xl mx-auto space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-1/3" />
-              <div className="h-48 bg-gray-200 rounded" />
-            </div>
-          </div>
-        }>
-          <UserDashboard />
-        </Suspense>
+        <UserDashboard />
       ) : (
         <LandingPage />
       )}
