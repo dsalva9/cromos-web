@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 type SupabaseContext = {
   supabase: ReturnType<typeof createClient>;
@@ -37,18 +38,18 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
 
       // If query fails, fail open (let user through)
       if (error) {
-        console.error('Error checking suspension status:', error.message);
+        logger.error('Error checking suspension status:', error.message);
         return;
       }
 
       // If suspended or deleted, sign out
       if (data?.suspended_at || data?.deleted_at) {
-        console.log('User is suspended/deleted, signing out');
+        logger.info('User is suspended/deleted, signing out');
         await supabase.auth.signOut();
         setUser(null);
       }
     } catch (err) {
-      console.error('Exception checking suspension status:', err);
+      logger.error('Exception checking suspension status:', err);
       // Fail open - don't sign out on errors
     }
   }, [supabase]);

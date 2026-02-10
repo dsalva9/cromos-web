@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 export interface TemplateRating {
   id: number;
@@ -113,7 +114,7 @@ export function useTemplateRatings(templateId: string) {
         setSummary(null);
       }
     } catch (err) {
-      console.error('Error fetching rating summary:', err);
+      logger.error('Error fetching rating summary:', err);
       setError(err instanceof Error ? err : new Error('Error al cargar resumen de valoraciones'));
     }
   }, [supabase, templateId]);
@@ -142,7 +143,7 @@ export function useTemplateRatings(templateId: string) {
           setHasMore(data.length === limit);
         }
       } catch (err) {
-        console.error('Error fetching ratings:', err);
+        logger.error('Error fetching ratings:', err);
         setError(err instanceof Error ? err : new Error('Error al cargar valoraciones'));
       }
     },
@@ -171,20 +172,20 @@ export function useTemplateRatings(templateId: string) {
         // Validate templateId
         const parsedTemplateId = parseInt(templateId);
         if (isNaN(parsedTemplateId)) {
-          console.error('Invalid template ID:', templateId);
+          logger.error('Invalid template ID:', templateId);
           throw new Error(`ID de colección inválido: "${templateId}"`);
         }
 
         // Validate rating
         if (!rating || rating < 1 || rating > 5) {
-          console.error('Invalid rating:', rating);
+          logger.error('Invalid rating:', rating);
           throw new Error('La valoración debe estar entre 1 y 5');
         }
 
         // Convert empty strings to null for the comment parameter
         const cleanComment = comment && comment.trim() ? comment : null;
 
-        console.log('Creating rating with params:', {
+        logger.debug('Creating rating with params:', {
           p_template_id: parsedTemplateId,
           p_rating: rating,
           p_comment: cleanComment,
@@ -200,7 +201,7 @@ export function useTemplateRatings(templateId: string) {
         });
 
         if (rateError) {
-          console.error('Rating creation error:', rateError);
+          logger.error('Rating creation error:', rateError);
           if (rateError.message.includes('cannot rate their own')) {
             throw new Error('No puedes valorar tus propias colecciones');
           }
@@ -210,23 +211,23 @@ export function useTemplateRatings(templateId: string) {
           throw rateError;
         }
 
-        console.log('Rating created successfully with ID:', ratingData);
-        console.log('Refreshing data...');
+        logger.debug('Rating created successfully with ID:', ratingData);
+        logger.debug('Refreshing data...');
 
         // Refresh data
         try {
           await fetchSummary();
-          console.log('Summary refreshed');
+          logger.debug('Summary refreshed');
         } catch (summaryErr) {
-          console.error('Error refreshing summary:', summaryErr);
+          logger.error('Error refreshing summary:', summaryErr);
           throw summaryErr;
         }
 
         try {
           await fetchRatings(0);
-          console.log('Ratings refreshed');
+          logger.debug('Ratings refreshed');
         } catch (ratingsErr) {
-          console.error('Error refreshing ratings:', ratingsErr);
+          logger.error('Error refreshing ratings:', ratingsErr);
           throw ratingsErr;
         }
       } catch (err) {

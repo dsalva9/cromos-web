@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function Error({
   error,
@@ -13,7 +14,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Page error:', error);
+    logger.error('Page error:', error);
   }, [error]);
 
   return (

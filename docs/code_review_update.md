@@ -173,6 +173,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### M2. `console.log` usage bypassing the logger (15 files)
 
+**Status**: ✅ Resolved  
+**Resolution**: Replaced all `console.log`/`console.error`/`console.warn` calls with `logger.debug`/`logger.info`/`logger.warn`/`logger.error` in: `deep-linking.ts`, `useHaptic.ts`, `useTemplateRatings.ts`, `SupabaseProvider.tsx`, `OneSignalProvider.tsx`, `error.tsx`. The remaining 9 files were already cleaned in prior sessions. All calls now route through the centralized logger with Sentry integration.
+
 **Files**: `deep-linking.ts`, `useHaptic.ts`, `useTemplateRatings.ts`, `useUserBadges.ts`, `useBadgeProgress.ts`, `useResolveReport.ts`, `DeepLinkHandler.tsx`, `SupabaseProvider.tsx`, `ProfileCompletionGuard.tsx`, `OneSignalProvider.tsx`, `PasswordRecoveryGuard.tsx`, `login/page.tsx`, `reset-password/page.tsx`, `MarketplaceShowcase.tsx`, `error.tsx`
 
 **Impact**: `console.log` calls bypass the centralized logger and its Sentry integration. In production, `console.log` is stripped by `removeConsole` but `console.error` is not — the `error.tsx` file uses bare `console.error` (line 16) which sends nothing to Sentry.

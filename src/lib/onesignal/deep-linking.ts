@@ -5,6 +5,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import type { NotificationKind } from './config';
+import { logger } from '@/lib/logger';
 
 export interface NotificationData {
   notification_kind: NotificationKind;
@@ -93,7 +94,7 @@ export function handleNotificationClick(data: NotificationData): void {
     return;
   }
 
-  console.log('[Deep Linking] Navigating to:', deepLinkPath);
+  logger.debug('[Deep Linking] Navigating to:', deepLinkPath);
 
   // Check if running in a native app (Capacitor)
   const isNative = Capacitor.isNativePlatform();

@@ -32,11 +32,11 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
      */
     const savePlayerIdToDatabase = async (playerId: string) => {
       try {
-        console.log('[OneSignal] Calling updateOneSignalPlayerId with:', playerId);
+        logger.debug('[OneSignal] Calling updateOneSignalPlayerId with:', playerId);
         await updateOneSignalPlayerId(playerId);
-        console.log('[OneSignal] ✅ Player ID saved to database:', playerId);
+        logger.debug('[OneSignal] ✅ Player ID saved to database:', playerId);
       } catch (error) {
-        console.error('[OneSignal] ❌ Failed to save player ID:', error);
+        logger.error('[OneSignal] ❌ Failed to save player ID:', error);
       }
     };
 
@@ -86,16 +86,16 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
 
         // Get current subscription ID using Cordova plugin API
         try {
-          console.log('[OneSignal] Getting push subscription ID...');
+          logger.debug('[OneSignal] Getting push subscription ID...');
           OneSignal.User.pushSubscription.getIdAsync((id: string | null) => {
-            console.log('[OneSignal] Got subscription ID:', id);
+            logger.debug('[OneSignal] Got subscription ID:', id);
             if (id) {
-              console.log('[OneSignal] Saving player ID to database:', id);
+              logger.debug('[OneSignal] Saving player ID to database:', id);
               savePlayerIdToDatabase(id);
             }
           });
         } catch (error) {
-          console.error('[OneSignal] Error getting subscription ID:', error);
+          logger.error('[OneSignal] Error getting subscription ID:', error);
         }
 
         // Listen for subscription changes using Cordova plugin API
