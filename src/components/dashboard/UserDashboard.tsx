@@ -86,15 +86,22 @@ export default function UserDashboard() {
         async function fetchRecentListings() {
             try {
                 setLoadingRecentListings(true);
-                const { data, error } = await (supabase as any)
+                const { data, error } = await supabase
                     .from('trade_listings')
-                    .select('*')
+                    .select('*, profiles!trade_listings_user_id_fkey(nickname, avatar_url)')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(6);
 
                 if (error) throw error;
-                setRecentListings((data || []) as Listing[]);
+
+                // Map joined profile data into the flat Listing shape
+                const mapped = (data || []).map((row: any) => ({
+                    ...row,
+                    author_nickname: row.profiles?.nickname ?? 'Usuario',
+                    author_avatar_url: row.profiles?.avatar_url ?? null,
+                })) as Listing[];
+                setRecentListings(mapped);
             } catch (error) {
                 logger.error('Error fetching recent listings:', error);
             } finally {

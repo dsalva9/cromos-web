@@ -72,7 +72,6 @@ function getCounterpartyInfo(notification: Notification) {
 }
 
 function getNotificationDescriptionText(notification: Notification): string {
-  const { counterpartyNickname: _counterpartyNickname } = getCounterpartyInfo(notification); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   switch (notification.kind) {
     case 'chat_unread':

@@ -250,6 +250,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### M7. `NotificationsList.tsx` — unused variable with eslint-disable
 
+**Status**: ✅ Resolved  
+**Resolution**: Removed the unused `_counterpartyNickname` destructuring and its `eslint-disable-line` comment.
+
 **File**: [NotificationsList.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/trades/NotificationsList.tsx) — line 75  
 **Impact**: `_counterpartyNickname` is explicitly destructured and then suppressed with `eslint-disable-line`. This is dead code.
 
@@ -260,6 +263,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 ---
 
 ### M8. `UserDashboard.tsx` — `as any` on dead table
+
+**Status**: ✅ Resolved  
+**Resolution**: Replaced `(supabase as any).from('trade_listings').select('*')` with a proper join query that fetches `profiles` data alongside listings. The `as any` was hiding a real type mismatch — `Listing` requires `author_nickname` and `author_avatar_url` which raw `select('*')` doesn't provide.
 
 **File**: [UserDashboard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/dashboard/UserDashboard.tsx) — line 89  
 **Impact**: Queries a potentially dead table with `as any`.
