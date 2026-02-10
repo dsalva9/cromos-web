@@ -7,13 +7,12 @@ import { useRouter } from '@/hooks/use-router';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useUserProfile } from '@/hooks/social/useUserProfile';
 import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
-import { ListingCard } from '@/components/marketplace/ListingCard';
+
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { logger } from '@/lib/logger';
-import { Listing } from '@/types/v1.6.0';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 
 // Reuse logic from server-my-templates but for client
@@ -44,9 +43,7 @@ export default function UserDashboard() {
     const [copies, setCopies] = useState<TemplateCopy[]>([]);
     const [loadingCopies, setLoadingCopies] = useState(true);
 
-    // 3. Recent Marketplace Listings
-    const [recentListings, setRecentListings] = useState<Listing[]>([]);
-    const [loadingRecentListings, setLoadingRecentListings] = useState(true);
+
 
     // --- Fetch Templates ---
     useEffect(() => {
@@ -81,35 +78,7 @@ export default function UserDashboard() {
         fetchCopies();
     }, [user, supabase]);
 
-    // --- Fetch Recent Marketplace Listings ---
-    useEffect(() => {
-        async function fetchRecentListings() {
-            try {
-                setLoadingRecentListings(true);
-                const { data, error } = await supabase
-                    .from('trade_listings')
-                    .select('*, profiles!trade_listings_user_id_fkey(nickname, avatar_url)')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false })
-                    .limit(6);
 
-                if (error) throw error;
-
-                // Map joined profile data into the flat Listing shape
-                const mapped = (data || []).map((row: any) => ({
-                    ...row,
-                    author_nickname: row.profiles?.nickname ?? 'Usuario',
-                    author_avatar_url: row.profiles?.avatar_url ?? null,
-                })) as Listing[];
-                setRecentListings(mapped);
-            } catch (error) {
-                logger.error('Error fetching recent listings:', error);
-            } finally {
-                setLoadingRecentListings(false);
-            }
-        }
-        fetchRecentListings();
-    }, [supabase]);
 
     const activeListings = useMemo(() => listings.filter(l => l.status === 'active'), [listings]);
 
@@ -367,33 +336,7 @@ export default function UserDashboard() {
                     <ProfileBadgesSimple userId={user?.id || ''} isOwnProfile={true} />
                 </div>
 
-                {/* 7. Recent Marketplace Listings */}
-                {!loadingRecentListings && recentListings.length > 0 && (
-                    <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Últimos Anuncios</h2>
-                            <Link href="/marketplace" className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors flex items-center gap-1">
-                                Ver más en el Marketplace <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {recentListings.map(listing => (
-                                <ListingCard key={listing.id} listing={listing} />
-                            ))}
-                        </div>
-                    </div>
-                )}
 
-                {loadingRecentListings && (
-                    <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                        <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Últimos Anuncios</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
-                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
-                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
-                            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded-xl" />
-                        </div>
-                    </div>
-                )}
 
                 {/* 8. Stats/Action Cards */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
