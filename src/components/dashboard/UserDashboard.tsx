@@ -87,7 +87,7 @@ export default function UserDashboard() {
             try {
                 setLoadingRecentListings(true);
                 const { data, error } = await (supabase as any)
-                    .from('listings')
+                    .from('trade_listings')
                     .select('*')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
