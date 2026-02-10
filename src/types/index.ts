@@ -2,14 +2,11 @@
 export type { Database, Json } from './database';
 
 // ──────────────────────────────────────────────────────────────
-// Legacy table types (v1.5.0)
-// These tables were removed in v1.6.0 (collections → templates pivot)
-// but the types are still referenced by dead code paths.
-// TODO: Remove when dead code is cleaned up (see code_review.md #4)
+// Application-level types
 // ──────────────────────────────────────────────────────────────
 
-/** @deprecated Removed in v1.6.0 — use collection_templates instead */
-export interface Collection {
+/** Legacy collection shape (v1.5.0) with optional stats — used by album views */
+export interface CollectionWithStats {
   id: number;
   name: string;
   competition: string;
@@ -18,19 +15,17 @@ export interface Collection {
   image_url: string | null;
   is_active: boolean;
   created_at: string;
+  stats?: {
+    total_stickers: number;
+    owned_stickers: number;
+    completion_percentage: number;
+    duplicates: number;
+    missing: number;
+  };
 }
 
-/** @deprecated Removed in v1.6.0 */
-export interface Profile {
-  id: string;
-  nickname: string | null;
-  avatar_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-/** @deprecated Removed in v1.6.0 */
-export interface Sticker {
+/** Sticker with ownership count — used by album page views */
+export interface StickerWithOwnership {
   id: number;
   collection_id: number | null;
   team_id: number | null;
@@ -45,40 +40,6 @@ export interface Sticker {
   image_path_webp_300: string | null;
   thumb_path_webp_100: string | null;
   created_at: string | null;
-}
-
-/** @deprecated Removed in v1.6.0 */
-export interface UserCollection {
-  user_id: string;
-  collection_id: number;
-  is_active: boolean | null;
-  joined_at: string | null;
-}
-
-/** @deprecated Removed in v1.6.0 */
-export interface UserSticker {
-  user_id: string;
-  sticker_id: number;
-  count: number;
-  created_at: string | null;
-  updated_at: string | null;
-}
-
-// ──────────────────────────────────────────────────────────────
-// Application-level types (still in use)
-// ──────────────────────────────────────────────────────────────
-
-export interface CollectionWithStats extends Collection {
-  stats?: {
-    total_stickers: number;
-    owned_stickers: number;
-    completion_percentage: number;
-    duplicates: number;
-    missing: number;
-  };
-}
-
-export interface StickerWithOwnership extends Sticker {
   count: number;
   team_name?: string;
 }
@@ -92,7 +53,13 @@ export interface StickerDetailsLite {
   collection_teams: { team_name: string } | null;
 }
 
-export interface UserStickerWithDetails extends UserSticker {
+/** User's sticker with detail info — used by trade components */
+export interface UserStickerWithDetails {
+  user_id: string;
+  sticker_id: number;
+  count: number;
+  created_at: string | null;
+  updated_at: string | null;
   stickers: StickerDetailsLite | null;
   duplicates?: number;
 }

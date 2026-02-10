@@ -124,6 +124,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### H7. 25+ `eslint-disable` comments for `react-hooks/exhaustive-deps`
 
+**Status**: ✅ Resolved (17/18 fixed, 1 justified)  
+**Resolution**: Removed 17 `eslint-disable react-hooks/exhaustive-deps` comments by adding missing dependencies and wrapping functions in `useCallback`. One remaining disable in `useTradeChat.ts` is justified — the Supabase realtime subscription setup intentionally excludes reactive deps to avoid reconnection loops.
+
 **Files** (partial list):
 - `useListings.ts:188`, `useUnreadCounts.ts:102`, `useTradeChat.ts:232`
 - `useUserCollections.ts:69`, `MarketplaceShowcase.tsx:30`
@@ -155,6 +158,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 ## Medium Priority
 
 ### M1. Deprecated types still used across the codebase
+
+**Status**: ✅ Resolved  
+**Resolution**: Removed all 5 deprecated interfaces (`Collection`, `Profile`, `Sticker`, `UserCollection`, `UserSticker`) from `types/index.ts`. Inlined their fields into `CollectionWithStats`, `StickerWithOwnership`, and `UserStickerWithDetails` so they are now standalone types. Updated `ComposerHeader.tsx` to import `Profile` from `types/v1.6.0` and use a local `ComposerCollection` interface. Updated `useAlbumNavigation.ts` to use a local `StickerBase` interface. Build passes.
 
 **File**: [types/index.ts](file:///c:/Users/dsalv/Projects/cromos-web/src/types/index.ts) — lines 11-65  
 **Impact**: `Collection`, `Profile`, `Sticker`, `UserCollection`, `UserSticker` are marked `@deprecated` but still imported by `useAlbumPages.ts` (line 6), `types/index.ts` itself (`CollectionWithStats`, `StickerWithOwnership`, `UserStickerWithDetails`), and `TradeProposalItem`.

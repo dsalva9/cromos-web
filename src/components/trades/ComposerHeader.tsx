@@ -3,13 +3,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import type { Collection, Profile } from '@/types';
+import type { Profile } from '@/types/v1.6.0';
 import { ArrowRightLeft } from 'lucide-react';
+
+/** Minimal shape for the collection shown in the composer header */
+interface ComposerCollection {
+  name: string;
+}
 
 interface ComposerHeaderProps {
   fromUser: Profile | null;
   toUser: Profile;
-  collection: Collection;
+  collection: ComposerCollection;
 }
 
 /**
@@ -24,11 +29,11 @@ export function ComposerHeader({
   const supabase = useSupabaseClient();
   const fromUserAvatar = fromUser?.avatar_url
     ? supabase.storage.from('avatars').getPublicUrl(fromUser.avatar_url).data
-        .publicUrl
+      .publicUrl
     : null;
   const toUserAvatar = toUser.avatar_url
     ? supabase.storage.from('avatars').getPublicUrl(toUser.avatar_url).data
-        .publicUrl
+      .publicUrl
     : null;
 
   const getInitials = (nickname?: string | null) => {

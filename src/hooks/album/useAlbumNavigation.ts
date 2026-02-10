@@ -4,9 +4,26 @@ import { useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
-import { Sticker } from '@/types';
 import { logger } from '@/lib/logger';
 import { legacyFrom } from '@/types/legacy-tables';
+
+/** Base sticker fields matching the legacy v1.5.0 schema */
+interface StickerBase {
+    id: number;
+    collection_id: number | null;
+    team_id: number | null;
+    code: string;
+    player_name: string;
+    position: string | null;
+    nationality: string | null;
+    rating: number | null;
+    rarity: string | null;
+    image_url: string | null;
+    sticker_number: number | null;
+    image_path_webp_300: string | null;
+    thumb_path_webp_100: string | null;
+    created_at: string | null;
+}
 
 export interface CollectionPage {
     id: number;
@@ -20,7 +37,7 @@ export interface CollectionPage {
     logo_url: string | null;
 }
 
-export interface ProcessedSticker extends Sticker {
+export interface ProcessedSticker extends StickerBase {
     user_stickers: { count: number }[] | null;
     image_public_url: string | null;
     thumb_public_url: string | null;
