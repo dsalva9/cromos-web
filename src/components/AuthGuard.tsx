@@ -18,7 +18,8 @@ export default function AuthGuard({
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(redirectTo);
+      // Hard redirect — router.push gets stuck due to Next.js 16 transition bug
+      window.location.href = redirectTo;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading, redirectTo]); // router removed - causes cascading pushes (click blocking bug)
@@ -34,12 +35,9 @@ export default function AuthGuard({
     );
   }
 
-  // Show nothing while redirecting
-  if (!user) {
-    return null;
-  }
-
-  // User is authenticated, render children
+  // Always render children — returning null unmounts the page tree and corrupts
+  // the Next.js router's internal transition state (click blocking bug).
+  // The useEffect above handles the redirect.
   return <>{children}</>;
 }
 

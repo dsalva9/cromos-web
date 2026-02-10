@@ -145,7 +145,8 @@ export default function SiteHeader() {
           toast.info(
             'Necesitas completar tu perfil para empezar a cambiar cromos!'
           );
-          router.push('/profile/completar');
+          // Hard redirect — router.push gets stuck due to Next.js 16 transition bug
+          window.location.href = '/profile/completar';
           return;
         }
 

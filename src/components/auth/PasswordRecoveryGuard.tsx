@@ -25,7 +25,8 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
 
         if (recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE) {
           logger.info('Password recovery required, redirecting to reset page');
-          router.replace(RESET_PASSWORD_ROUTE);
+          // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
+          window.location.href = RESET_PASSWORD_ROUTE;
           return;
         }
 
@@ -42,7 +43,8 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
               sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
             }
             logger.info('Recovery session detected via AMR, redirecting to reset page');
-            router.replace(RESET_PASSWORD_ROUTE);
+            // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
+            window.location.href = RESET_PASSWORD_ROUTE;
             return;
           }
         }

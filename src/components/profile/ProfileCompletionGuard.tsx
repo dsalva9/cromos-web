@@ -105,7 +105,8 @@ export function ProfileCompletionGuard({
           'Necesitas completar tu perfil para empezar a cambiar cromos!'
         );
       }
-      router.replace(completionRoute);
+      // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
+      window.location.href = completionRoute;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, user]); // router removed - causes infinite loops

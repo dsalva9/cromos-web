@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
@@ -19,6 +20,13 @@ export default function AdminGuard({
 
   const loading = authLoading || profileLoading;
 
+  // Redirect unauthenticated users — must be before any early returns
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.href = '/login';
+    }
+  }, [loading, user]);
+
   // Show loading while checking auth or admin status
   if (loading) {
     return (
@@ -31,10 +39,16 @@ export default function AdminGuard({
     );
   }
 
-  // Not logged in
   if (!user) {
-    router.push('/login');
-    return null;
+    // Render loading while redirect happens (don't return null — unmounting corrupts router)
+    return (
+      <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#FFC000] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+          <p className="mt-4 text-white font-medium">Redirigiendo...</p>
+        </div>
+      </div>
+    );
   }
 
   // Show access denied if not admin
