@@ -280,6 +280,9 @@ The codebase is **well-organized** with a clear separation between pages, compon
 
 ### L1. Consider extracting `SiteHeader` rating modal into its own component
 
+**Status**: ✅ Resolved  
+**Resolution**: Extracted rating modal state, handlers, and JSX into `GlobalRatingModal.tsx`. SiteHeader now imports and uses `GlobalRatingModal()` which returns `{ handleOpenRatingModal, ratingModalElement }`, reducing the header by ~30 lines.
+
 **File**: [site-header.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/site-header.tsx) (296 lines)  
 The header manages a rating modal (lines 153-172, 280-292) which is unrelated to navigation. Extracting this would reduce the header to ~230 lines and improve separation of concerns.
 
@@ -313,6 +316,9 @@ The global error page renders its own `<html>` and `<body>` but doesn't import `
 
 ### L4. `OneSignalProvider` — 5 `eslint-disable` + 5 `as any`
 
+**Status**: ✅ Resolved (previously)  
+**Resolution**: No `as any` casts or `eslint-disable` comments remain in `OneSignalProvider.tsx` — cleaned in prior sessions.
+
 **File**: [OneSignalProvider.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/providers/OneSignalProvider.tsx)  
 The OneSignal Cordova plugin has no TypeScript types. Consider creating a minimal type declaration file (`src/types/onesignal.d.ts`).
 
@@ -321,6 +327,9 @@ The OneSignal Cordova plugin has no TypeScript types. Consider creating a minima
 ---
 
 ### L5. Test coverage is limited
+
+**Status**: ⚠️ Deferred  
+**Resolution**: Adding comprehensive E2E tests is a significant effort beyond this cleanup pass. Documented for future sprint.
 
 **Directory**: `tests/` (13 spec files)  
 Tests exist for theme rollout, trade chat, segmented tabs, proposal highlight, etc. — but there are no unit tests for hooks, no tests for the admin panel, and no tests for the marketplace create/edit flows.

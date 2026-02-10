@@ -14,7 +14,7 @@ import { NotificationDropdown } from '@/components/notifications/NotificationDro
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useRouter } from '@/hooks/use-router';
 import { toast } from '@/lib/toast';
-import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { GlobalRatingModal } from '@/components/marketplace/GlobalRatingModal';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { Capacitor } from '@capacitor/core';
 
@@ -92,13 +92,7 @@ export default function SiteHeader() {
   // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
   const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [ratingModalData, setRatingModalData] = useState<{
-    userId: string;
-    nickname: string;
-    listingId: number;
-    listingTitle: string;
-  } | null>(null);
+  const { handleOpenRatingModal, ratingModalElement } = GlobalRatingModal();
 
   const closeMenu = () => setIsMenuOpen(false);
 
@@ -153,26 +147,7 @@ export default function SiteHeader() {
         closeMenu();
       };
 
-  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
-    setRatingModalData({ userId, nickname, listingId, listingTitle });
-    setShowRatingModal(true);
-  };
 
-  const handleSubmitRating = async (rating: number, comment?: string) => {
-    if (!ratingModalData) return;
-
-    const { error } = await supabase.rpc('create_user_rating', {
-      p_rated_id: ratingModalData.userId,
-      p_rating: rating,
-      p_comment: comment || undefined,
-      p_context_type: 'listing',
-      p_context_id: ratingModalData.listingId
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-  };
 
   useEffect(() => {
     const root = document.documentElement;
@@ -280,19 +255,7 @@ export default function SiteHeader() {
 
 
       {/* Rating Modal */}
-      {ratingModalData && (
-        <UserRatingDialog
-          open={showRatingModal}
-          onOpenChange={setShowRatingModal}
-          userToRate={{
-            id: ratingModalData.userId,
-            nickname: ratingModalData.nickname
-          }}
-          listingTitle={ratingModalData.listingTitle}
-          listingId={ratingModalData.listingId}
-          onSubmit={handleSubmitRating}
-        />
-      )}
+      {ratingModalElement}
     </header>
   );
 }
