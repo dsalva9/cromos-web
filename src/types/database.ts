@@ -2323,7 +2323,7 @@ export type Database = {
       create_trade_listing: {
         Args: {
           p_collection_name: string
-          p_copy_id: number
+          p_copy_id?: number
           p_description: string
           p_global_number?: number
           p_group_count?: number
@@ -2331,7 +2331,7 @@ export type Database = {
           p_is_group?: boolean
           p_page_number?: number
           p_page_title?: string
-          p_slot_id: number
+          p_slot_id?: number
           p_slot_variant?: string
           p_sticker_number: string
           p_title: string
