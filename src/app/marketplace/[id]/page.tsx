@@ -13,6 +13,7 @@ import {
   useUser,
   useSupabaseClient,
 } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { ReportButton } from '@/components/social/ReportButton';
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import {
@@ -52,10 +53,7 @@ export default function ListingDetailPage() {
   const [hasConversations, setHasConversations] = useState(false);
   const [checkingConversations, setCheckingConversations] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showAdminDeleteDialog, setShowAdminDeleteDialog] = useState(false);
-  const [adminDeleteReason, setAdminDeleteReason] = useState('');
-  const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isAdmin } = useProfileCompletion();
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const viewIncrementedRef = useRef<string | null>(null);
 
@@ -66,30 +64,10 @@ export default function ListingDetailPage() {
     }
   }, [listing, user?.id, incrementViews]);
 
-  // Check if user is admin
-  useEffect(() => {
-    async function checkAdmin() {
-      if (!user?.id) return;
+  const [showAdminDeleteDialog, setShowAdminDeleteDialog] = useState(false);
+  const [adminDeleteReason, setAdminDeleteReason] = useState('');
+  const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
 
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data) {
-          setIsAdmin(data.is_admin ?? false);
-        }
-      } catch (err) {
-        logger.error('Error checking admin status:', err);
-      }
-    }
-
-    void checkAdmin();
-  }, [user?.id, supabase]);
-
-  // Check if listing has conversations
   useEffect(() => {
     async function checkConversations() {
       if (!listing || !user?.id || user.id !== listing.user_id) {

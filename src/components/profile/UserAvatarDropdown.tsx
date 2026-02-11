@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from '@/hooks/use-router';
 import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
+
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -23,11 +23,10 @@ interface UserAvatarDropdownProps {
 
 export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOpenChange }: UserAvatarDropdownProps) {
   const { user } = useUser();
-  const { profile, loading } = useCurrentUserProfile();
+  const { profile, isComplete, loading } = useProfileCompletion();
   const supabase = useSupabaseClient();
   const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(false);
-  const { isComplete, loading: completionLoading } = useProfileCompletion();
 
   // Use controlled state if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -57,7 +56,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
     (href: string, requiresCompletion = false) =>
       (event: MouseEvent<HTMLAnchorElement>) => {
         // Block navigation for incomplete profiles and redirect to completion page.
-        if (requiresCompletion && !completionLoading && !isComplete) {
+        if (requiresCompletion && !loading && !isComplete) {
           event.preventDefault();
           toast.info(
             'Necesitas completar tu perfil para empezar a cambiar cromos!'

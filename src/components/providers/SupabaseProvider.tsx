@@ -1,9 +1,8 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
 
 type SupabaseContext = {
   supabase: ReturnType<typeof createClient>;
@@ -27,32 +26,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Non-blocking suspension check - runs in background
-  const checkSuspendedStatusAsync = useCallback(async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('suspended_at, deleted_at')
-        .eq('id', userId)
-        .maybeSingle();
-
-      // If query fails, fail open (let user through)
-      if (error) {
-        logger.error('Error checking suspension status:', error.message);
-        return;
-      }
-
-      // If suspended or deleted, sign out
-      if (data?.suspended_at || data?.deleted_at) {
-        logger.info('User is suspended/deleted, signing out');
-        await supabase.auth.signOut();
-        setUser(null);
-      }
-    } catch (err) {
-      logger.error('Exception checking suspension status:', err);
-      // Fail open - don't sign out on errors
-    }
-  }, [supabase]);
 
   useEffect(() => {
     const {
@@ -72,17 +45,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         // Set user IMMEDIATELY - no blocking
         setUser(currentUser);
         setLoading(false);
-
-        // Check suspension in background (non-blocking) on specific events
-        const shouldCheckSuspension =
-          event === 'SIGNED_IN' ||
-          event === 'INITIAL_SESSION' ||
-          event === 'USER_UPDATED';
-
-        if (currentUser && shouldCheckSuspension) {
-          // Fire and forget - don't await
-          checkSuspendedStatusAsync(currentUser.id);
-        }
       }
     );
 
@@ -95,11 +57,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         // Set user IMMEDIATELY
         setUser(currentUser);
         setLoading(false);
-
-        // Check suspension in background for logged-in users
-        if (currentUser) {
-          checkSuspendedStatusAsync(currentUser.id);
-        }
       })
       .catch((error) => {
         // Handle invalid refresh token on initial load
@@ -113,7 +70,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, checkSuspendedStatusAsync]);
+  }, [supabase]);
 
   return (
     <Context.Provider value={{ supabase, user, loading }}>

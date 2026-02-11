@@ -115,7 +115,7 @@ export function ProfileCompletionProvider({
       // Single query for ALL profile data - eliminates redundant queries
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, postcode, avatar_url, is_admin')
+        .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -131,6 +131,13 @@ export function ProfileCompletionProvider({
         : { nickname: null, postcode: null, avatar_url: null, is_admin: false };
 
       setProfile(profileData);
+
+      // Check suspension/deletion status (merged from SupabaseProvider)
+      if (data?.suspended_at || data?.deleted_at) {
+        logger.info('User is suspended/deleted, signing out');
+        await supabase.auth.signOut();
+        return;
+      }
 
       // Auto-lock if fetched data confirms profile is complete
       if (computeIsComplete(profileData)) {

@@ -18,7 +18,7 @@ import { GlobalRatingModal } from '@/components/marketplace/GlobalRatingModal';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { Capacitor } from '@capacitor/core';
 
-import { useCurrentUserProfile } from '@/hooks/social/useCurrentUserProfile';
+
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +32,7 @@ type NavigationLink = {
 
 // Simplified Avatar component for mobile that links directly to profile
 function MobileUserAvatar({ userId }: { userId: string }) {
-  const { profile } = useCurrentUserProfile();
+  const { profile } = useProfileCompletion();
   const supabase = useSupabaseClient();
 
   const avatarUrl = resolveAvatarUrl(profile?.avatar_url, supabase);

@@ -42,7 +42,7 @@ const Link = forwardRef<HTMLAnchorElement, NextLinkProps>(function Link(
         [onClick, user, href]
     );
 
-    return <NextLink ref={ref} href={href} onClick={handleClick} {...rest} />;
+    return <NextLink ref={ref} href={href} onClick={handleClick} prefetch={user ? false : undefined} {...rest} />;
 });
 
 export default Link;

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { MapPin, Ban, Trash2 } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
@@ -18,26 +18,7 @@ interface ListingCardProps {
 export function ListingCard({ listing }: ListingCardProps) {
   const { user } = useUser();
   const supabase = useSupabaseClient(); // For avatar resolution if needed
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-
-    // Check if current user is admin
-    const checkAdmin = async () => {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabaseClient = createClient();
-      const { data } = await supabaseClient
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
-
-      setIsAdmin(data?.is_admin || false);
-    };
-
-    checkAdmin();
-  }, [user]);
+  const { isAdmin } = useProfileCompletion();
 
   const avatarUrl = resolveAvatarUrl(listing.author_avatar_url, supabase);
   const fallback = getAvatarFallback(listing.author_nickname);
