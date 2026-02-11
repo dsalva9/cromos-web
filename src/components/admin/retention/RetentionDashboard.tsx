@@ -73,7 +73,7 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-white">{stats?.pending_deletions || 0}</p>
           <p className="text-sm text-gray-400 mt-2">
-            PrÃ³xima: {formatDate(stats?.next_deletion_date || null)}
+            Próxima: {formatDate(stats?.next_deletion_date || null)}
           </p>
           <div className="mt-3 space-y-1 text-xs text-gray-500">
             <div>Cuentas: {stats?.pending_accounts || 0}</div>
@@ -94,7 +94,7 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-orange-500">{stats?.legal_holds || 0}</p>
           <p className="text-sm text-gray-400 mt-2">
-            Ã“rdenes de preservaciÃ³n activas
+            Órdenes de preservación activas
           </p>
         </ModernCardContent>
       </ModernCard>
@@ -126,7 +126,7 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-green-500">âœ“</p>
           <p className="text-sm text-gray-400 mt-2">
-            Sistema de retenciÃ³n operativo
+            Sistema de retención operativo
           </p>
         </ModernCardContent>
       </ModernCard>

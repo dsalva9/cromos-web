@@ -63,7 +63,7 @@ export default function IgnoredUsersPage() {
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'ayer';
     if (diffDays < 7)
-      return `hace ${diffDays} ${diffDays === 1 ? 'dÃ­a' : 'dÃ­as'}`;
+      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
       return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
@@ -77,11 +77,11 @@ export default function IgnoredUsersPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-900 text-xl mb-4">
-            Debes iniciar sesiÃ³n para ver esta pÃ¡gina
+            Debes iniciar sesión para ver esta página
           </p>
           <Link href="/login">
             <Button className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900">
-              Iniciar sesiÃ³n
+              Iniciar sesión
             </Button>
           </Link>
         </div>
@@ -126,7 +126,7 @@ export default function IgnoredUsersPage() {
                   No tienes usuarios bloqueados
                 </h2>
                 <p className="text-gray-700 text-lg">
-                  Cuando bloquees a usuarios, aparecerÃ¡n aquÃ­ para que puedas
+                  Cuando bloquees a usuarios, aparecerán aquí para que puedas
                   gestionarlos.
                 </p>
               </ModernCardContent>

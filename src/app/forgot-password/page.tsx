@@ -29,12 +29,12 @@ export default function ForgotPasswordPage() {
       } else {
         setMessage({
           type: 'success',
-          text: 'Si el email existe, recibirÃ¡s un enlace para recuperar tu contraseÃ±a.',
+          text: 'Si el email existe, recibirás un enlace para recuperar tu contraseña.',
         });
       }
     } catch (error) {
       logger.error('Password reset error:', error);
-      setMessage({ type: 'error', text: 'OcurriÃ³ un error inesperado. IntÃ©ntalo de nuevo.\n\nPor favor contacta con soporte@cambiocromos.com' });
+      setMessage({ type: 'error', text: 'Ocurrió un error inesperado. Inténtalo de nuevo.\n\nPor favor contacta con soporte@cambiocromos.com' });
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-white mb-2">
-              Recuperar ContraseÃ±a
+              Recuperar Contraseña
             </h2>
             <p className="text-gray-600 dark:text-gray-400 font-medium">
               Ingresa tu email y te enviaremos las instrucciones
@@ -124,7 +124,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
             >
-              â† Volver a Iniciar SesiÃ³n
+              â† Volver a Iniciar Sesión
             </Link>
           </div>
         </div>

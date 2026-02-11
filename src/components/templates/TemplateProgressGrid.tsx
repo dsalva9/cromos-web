@@ -69,7 +69,7 @@ export function TemplateProgressGrid({
     const titles: Record<number, string> = {};
     Object.entries(groups).forEach(([pageNum, slots]) => {
       if (slots.length > 0) {
-        titles[parseInt(pageNum)] = slots[0].page_title || `PÃ¡gina ${pageNum}`;
+        titles[parseInt(pageNum)] = slots[0].page_title || `Página ${pageNum}`;
       }
     });
 
@@ -134,9 +134,10 @@ export function TemplateProgressGrid({
                   hover:bg-gray-100 dark:hover:bg-gray-700
                   border border-transparent
                   data-[state=active]:border-[#FFC000]
-                  rounded-lg px-4 py-2
+                  rounded-lg px-3 py-2 text-xs sm:text-sm sm:px-4
                   transition-all duration-200
-                  flex-1 min-w-[100px] md:flex-none
+                  min-w-0 max-w-[130px] sm:max-w-[180px] md:max-w-none
+                  overflow-hidden text-ellipsis whitespace-nowrap
                 "
                 title={pageTitles[pageNum]}
               >
@@ -151,7 +152,7 @@ export function TemplateProgressGrid({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
           <LayoutGrid className="w-5 h-5" />
-          <span className="font-medium">Cromos de {pageTitles[selectedPage] || `PÃ¡gina ${selectedPage}`}</span>
+          <span className="font-medium">Cromos de {pageTitles[selectedPage] || `Página ${selectedPage}`}</span>
         </div>
 
         <Button
@@ -165,7 +166,7 @@ export function TemplateProgressGrid({
           "
         >
           <CheckCircle2 className="mr-2 h-4 w-4" />
-          Completar PÃ¡gina
+          Completar Página
         </Button>
       </div>
 
@@ -190,18 +191,18 @@ export function TemplateProgressGrid({
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <CheckCircle2 className="text-[#FFC000]" />
-              Completar toda la pÃ¡gina
+              Completar toda la página
             </DialogTitle>
             <DialogDescription className="text-gray-500 dark:text-gray-400 pt-2">
-              Â¿Quieres marcar todos los cromos faltantes de esta pÃ¡gina como conseguidos?
+              ¡Quieres marcar todos los cromos faltantes de esta página como conseguidos?
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-            <p>Esta acciÃ³n:</p>
+            <p>Esta acción:</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-gray-600 dark:text-gray-400">
-              <li>MarcarÃ¡ como <strong>&quot;Tengo&quot;</strong> todos los cromos que te faltan.</li>
-              <li>No modificarÃ¡ los cromos que ya tienes o tienes repetidos.</li>
+              <li>Marcará como <strong>&quot;Tengo&quot;</strong> todos los cromos que te faltan.</li>
+              <li>No modificará los cromos que ya tienes o tienes repetidos.</li>
             </ul>
           </div>
 

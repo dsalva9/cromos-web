@@ -39,7 +39,7 @@ export function SuspendAccountDialog({
 
   const handleSuspend = async () => {
     if (!reason.trim()) {
-      toast.error('Por favor proporciona un motivo de suspensiÃ³n');
+      toast.error('Por favor proporciona un motivo de suspensión');
       return;
     }
 
@@ -52,7 +52,7 @@ export function SuspendAccountDialog({
 
       if (error) throw error;
 
-      toast.success(`Usuario ${userNickname} suspendido (indefinido, no programado para eliminaciÃ³n)`);
+      toast.success(`Usuario ${userNickname} suspendido (indefinido, no programado para eliminación)`);
       setReason('');
       onSuccess?.();
       onClose();
@@ -83,12 +83,12 @@ export function SuspendAccountDialog({
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="reason">Motivo de suspensiÃ³n *</Label>
+            <Label htmlFor="reason">Motivo de suspensión *</Label>
             <Textarea
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="ej. ViolaciÃ³n de directrices de la comunidad, spam, acoso..."
+              placeholder="ej. Violación de directrices de la comunidad, spam, acoso..."
               rows={4}
               disabled={loading}
               className="resize-none"
@@ -98,16 +98,16 @@ export function SuspendAccountDialog({
           <Alert className="bg-blue-900/20 border-blue-700">
             <Info className="h-4 w-4 text-blue-400" />
             <AlertDescription className="text-sm text-blue-200">
-              <strong>Efectos de la suspensiÃ³n:</strong>
+              <strong>Efectos de la suspensión:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>El usuario no puede iniciar sesiÃ³n</li>
+                <li>El usuario no puede iniciar sesión</li>
                 <li>Todo el contenido oculto de usuarios normales</li>
-                <li>El usuario recibirÃ¡ un correo de notificaciÃ³n de suspensiÃ³n</li>
-                <li>Cuenta suspendida indefinidamente (NO programada para eliminaciÃ³n)</li>
+                <li>El usuario recibirá un correo de notificación de suspensión</li>
+                <li>Cuenta suspendida indefinidamente (NO programada para eliminación)</li>
               </ul>
               <p className="mt-2 text-xs">
-                DespuÃ©s de suspender, puedes usar "Mover a EliminaciÃ³n" para iniciar una cuenta
-                regresiva de 90 dÃ­as si es necesario.
+                Después de suspender, puedes usar "Mover a Eliminación" para iniciar una cuenta
+                regresiva de 90 días si es necesario.
               </p>
             </AlertDescription>
           </Alert>

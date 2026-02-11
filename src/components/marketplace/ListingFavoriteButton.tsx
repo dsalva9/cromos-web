@@ -64,7 +64,7 @@ export function ListingFavoriteButton({
       }
 
       if (isNowFavorited) {
-        toast.success('AÃ±adido a favoritos');
+        toast.success('Añadido a favoritos');
       } else {
         toast.success('Eliminado de favoritos');
       }

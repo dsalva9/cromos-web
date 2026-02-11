@@ -43,7 +43,7 @@ export function UnsuspendAccountDialog({
 
       if (error) throw error;
 
-      toast.success(`Usuario ${userNickname} reactivado con Ã©xito`);
+      toast.success(`Usuario ${userNickname} reactivado con éxito`);
       onSuccess?.();
       onClose();
     } catch (error) {
@@ -74,18 +74,18 @@ export function UnsuspendAccountDialog({
           <Alert className="bg-green-900/20 border-green-700">
             <CheckCircle className="h-4 w-4 text-green-400" />
             <AlertDescription className="text-sm text-green-200">
-              <strong>Esta acciÃ³n restaurarÃ¡ completamente la cuenta:</strong>
+              <strong>Esta acción restaurará completamente la cuenta:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>El usuario podrÃ¡ iniciar sesiÃ³n nuevamente</li>
-                <li>Todo el contenido serÃ¡ visible para otros usuarios</li>
-                <li>Se cancelarÃ¡ cualquier eliminaciÃ³n programada</li>
-                <li>La suspensiÃ³n se eliminarÃ¡ del registro del usuario</li>
+                <li>El usuario podrá iniciar sesión nuevamente</li>
+                <li>Todo el contenido será visible para otros usuarios</li>
+                <li>Se cancelará cualquier eliminación programada</li>
+                <li>La suspensión se eliminará del registro del usuario</li>
               </ul>
             </AlertDescription>
           </Alert>
 
           <p className="text-sm text-gray-400">
-            Â¿EstÃ¡s seguro de que quieres reactivar esta cuenta?
+            ¡Estás seguro de que quieres reactivar esta cuenta?
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export function UnsuspendAccountDialog({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            SÃ­, Reactivar Cuenta
+            Sí, Reactivar Cuenta
           </Button>
         </DialogFooter>
       </DialogContent>

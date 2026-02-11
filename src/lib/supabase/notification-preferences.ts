@@ -49,7 +49,7 @@ export async function updateNotificationPreferences(
 
   if (error) {
     logger.error('Error updating notification preferences:', error);
-    throw new Error('Error al actualizar las preferencias de notificaciÃ³n');
+    throw new Error('Error al actualizar las preferencias de notificación');
   }
 }
 

@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     } catch {
       logger.error('SUPABASE_SERVICE_ROLE_KEY not configured');
       return NextResponse.json(
-        { error: 'ConfiguraciÃ³n del servidor incompleta' },
+        { error: 'Configuración del servidor incompleta' },
         { status: 500 }
       );
     }
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Usuario eliminado con Ã©xito'
+      message: 'Usuario eliminado con éxito'
     });
   } catch (error) {
     logger.error('Delete user error:', error);

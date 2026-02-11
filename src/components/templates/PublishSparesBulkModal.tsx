@@ -70,7 +70,7 @@ export function PublishSparesBulkModal({
         parts.push(`(x${spare.count})`);
       }
 
-      return `â€¢ ${parts.join(' - ')}`;
+      return `• ${parts.join(' - ')}`;
     });
 
     return lines.join('\n');
@@ -114,10 +114,10 @@ export function PublishSparesBulkModal({
           <div className="bg-blue-900/20 border border-blue-900/50 rounded-lg p-4 flex gap-3">
             <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-blue-200">
-              <p className="font-semibold mb-1">Â¿CÃ³mo funciona?</p>
+              <p className="font-semibold mb-1">¡Cómo funciona?</p>
               <p>
-                Se crearÃ¡ un anuncio tipo &quot;Pack&quot; con todos tus cromos repetidos. La
-                descripciÃ³n se genera automÃ¡ticamente con los detalles de cada cromo.
+                Se creará un anuncio tipo &quot;Pack&quot; con todos tus cromos repetidos. La
+                descripción se genera automáticamente con los detalles de cada cromo.
                 Puedes editarla si lo deseas.
               </p>
             </div>
@@ -140,18 +140,18 @@ export function PublishSparesBulkModal({
           {/* Description Preview/Edit */}
           <div className="space-y-2">
             <Label htmlFor="description" className="text-gray-900 dark:text-white">
-              DescripciÃ³n del Pack
+              Descripción del Pack
             </Label>
             <Textarea
               id="description"
               value={customDescription || autoDescription}
               onChange={(e) => setCustomDescription(e.target.value)}
-              placeholder="DescripciÃ³n generada automÃ¡ticamente..."
+              placeholder="Descripción generada automáticamente..."
               rows={12}
               className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm resize-none"
             />
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              Puedes editar la descripciÃ³n antes de publicar. Se incluyen todos los
+              Puedes editar la descripción antes de publicar. Se incluyen todos los
               detalles de cada cromo.
             </p>
           </div>

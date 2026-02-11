@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     } catch {
       logger.error('SUPABASE_SERVICE_ROLE_KEY not configured');
       return NextResponse.json(
-        { error: 'ConfiguraciÃ³n del servidor incompleta' },
+        { error: 'Configuración del servidor incompleta' },
         { status: 500 }
       );
     }
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     if (!resendApiKey) {
       logger.error('RESEND_API_KEY not configured');
       return NextResponse.json(
-        { error: 'ConfiguraciÃ³n de email incompleta' },
+        { error: 'Configuración de email incompleta' },
         { status: 500 }
       );
     }
@@ -99,13 +99,13 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: 'CambioCromos <info@cambiocromos.com>',
         to: userData.user.email,
-        subject: 'Restablecer tu contraseÃ±a',
+        subject: 'Restablecer tu contraseña',
         html: `
-          <h2>Restablecimiento de contraseÃ±a</h2>
-          <p>Un administrador ha solicitado restablecer tu contraseÃ±a.</p>
-          <p>Haz clic en el siguiente enlace para restablecer tu contraseÃ±a:</p>
-          <p><a href="${linkData.properties.action_link}">Restablecer contraseÃ±a</a></p>
-          <p>Este enlace expirarÃ¡ en 24 horas.</p>
+          <h2>Restablecimiento de contraseña</h2>
+          <p>Un administrador ha solicitado restablecer tu contraseña.</p>
+          <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+          <p><a href="${linkData.properties.action_link}">Restablecer contraseña</a></p>
+          <p>Este enlace expirará en 24 horas.</p>
           <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
         `
       });

@@ -116,7 +116,7 @@ export async function markAllRead(): Promise<void> {
 
   if (error) {
     logger.error('Error marking all as read:', error);
-    throw new Error('Error al marcar notificaciones como leÃ­das');
+    throw new Error('Error al marcar notificaciones como leídas');
   }
 }
 
@@ -132,7 +132,7 @@ export async function markRead(notificationId: number): Promise<void> {
 
   if (error) {
     logger.error('Error marking notification as read:', error);
-    throw new Error('Error al marcar la notificaciÃ³n como leÃ­da');
+    throw new Error('Error al marcar la notificación como leída');
   }
 }
 
@@ -152,7 +152,7 @@ export async function markListingChatNotificationsRead(
 
   if (error) {
     logger.error('Error marking listing chat notifications as read:', error);
-    throw new Error('Error al marcar las notificaciones de chat como leÃ­das');
+    throw new Error('Error al marcar las notificaciones de chat como leídas');
   }
 }
 

@@ -68,7 +68,7 @@ export function CameraCaptureModal({
         logger.error('Camera error:', error);
         if (isMounted) {
           setPermissionDenied(true);
-          toast.error('No se pudo acceder a la cÃ¡mara. Verifica los permisos.');
+          toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
         }
       }
     }
@@ -142,17 +142,17 @@ export function CameraCaptureModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-0" aria-describedby={undefined}>
         <VisuallyHidden>
-          <DialogTitle>Capturar foto con cÃ¡mara</DialogTitle>
+          <DialogTitle>Capturar foto con cámara</DialogTitle>
         </VisuallyHidden>
         <div className="relative bg-black">
           {permissionDenied ? (
             <div className="p-8 text-center bg-white dark:bg-gray-800">
               <Camera className="h-16 w-16 text-gray-500 mx-auto mb-4" />
               <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">
-                Permiso de cÃ¡mara denegado
+                Permiso de cámara denegado
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Para usar la cÃ¡mara, habilita los permisos en la configuraciÃ³n de tu
+                Para usar la cámara, habilita los permisos en la configuración de tu
                 navegador.
               </p>
               <Button onClick={onClose}>Cerrar</Button>

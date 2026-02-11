@@ -117,7 +117,7 @@ export function useListingChat({
           id: messageId,
           sender_id: user.id,
           receiver_id: targetReceiverId,
-          sender_nickname: 'TÃº',
+          sender_nickname: 'Tú',
           message: text.trim(),
           is_read: false,
           is_system: false,

@@ -100,7 +100,7 @@ export function RetentionQueueTable() {
     return (
       <div className="text-center p-8 text-gray-400">
         <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No hay elementos programados para eliminaciÃ³n</p>
+        <p>No hay elementos programados para eliminación</p>
       </div>
     );
   }
@@ -114,7 +114,7 @@ export function RetentionQueueTable() {
               <TableHead>Tipo</TableHead>
               <TableHead>ID Entidad</TableHead>
               <TableHead>Programado Para</TableHead>
-              <TableHead>DÃ­as Restantes</TableHead>
+              <TableHead>Días Restantes</TableHead>
               <TableHead>Iniciado Por</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Acciones</TableHead>
@@ -134,7 +134,7 @@ export function RetentionQueueTable() {
                   <TableCell>{formatDate(item.scheduled_for)}</TableCell>
                   <TableCell>
                     <span className={`font-semibold ${daysRemaining <= 7 ? 'text-red-500' : daysRemaining <= 30 ? 'text-orange-500' : 'text-gray-400'}`}>
-                      {daysRemaining} dÃ­as
+                      {daysRemaining} días
                     </span>
                   </TableCell>
                   <TableCell>
@@ -150,7 +150,7 @@ export function RetentionQueueTable() {
                     {hasLegalHold ? (
                       <Badge className="bg-orange-600 hover:bg-orange-700">
                         <Shield className="h-3 w-3 mr-1" />
-                        RetenciÃ³n Legal
+                        Retención Legal
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="text-gray-400">
@@ -168,7 +168,7 @@ export function RetentionQueueTable() {
                       }}
                     >
                       <Shield className="h-4 w-4 mr-2" />
-                      RetenciÃ³n Legal
+                      Retención Legal
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -84,7 +84,7 @@ export async function sendListingMessage(
 ): Promise<{ messageId: number | null; error: Error | null }> {
   try {
     if (!message.trim()) {
-      throw new Error('El mensaje no puede estar vacÃ­o');
+      throw new Error('El mensaje no puede estar vacío');
     }
 
     if (message.length > 500) {
@@ -174,7 +174,7 @@ export async function markListingMessagesRead(
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudieron marcar los mensajes como leÃ­dos'),
+          : new Error('No se pudieron marcar los mensajes como leídos'),
     };
   }
 }

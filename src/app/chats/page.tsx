@@ -71,7 +71,7 @@ function ChatsPageContent() {
           tipId="tip-chats"
           icon={Lightbulb}
           title="Tus conversaciones"
-          description="AquÃ­ verÃ¡s todos los chats sobre anuncios del Marketplace. TambiÃ©n puedes marcar usuarios como favoritos para encontrarlos fÃ¡cilmente despuÃ©s."
+          description="Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
           className="mb-6"
         />
 

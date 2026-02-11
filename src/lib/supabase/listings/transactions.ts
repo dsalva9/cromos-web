@@ -71,7 +71,7 @@ export async function completeListingTransaction(
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudo completar la transacciÃ³n'),
+          : new Error('No se pudo completar la transacción'),
     };
   }
 }
@@ -161,7 +161,7 @@ export async function getListingTransaction(
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudo obtener la transacciÃ³n'),
+          : new Error('No se pudo obtener la transacción'),
     };
   }
 }

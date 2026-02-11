@@ -43,12 +43,12 @@ export function MoveToDeletionDialog({
 
       if (error) throw error;
 
-      toast.success(`Usuario ${userNickname} programado para eliminaciÃ³n en 90 dÃ­as`);
+      toast.success(`Usuario ${userNickname} programado para eliminación en 90 días`);
       onSuccess?.();
       onClose();
     } catch (error) {
       logger.error('Error moving to deletion:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al programar eliminaciÃ³n');
+      toast.error(error instanceof Error ? error.message : 'Error al programar eliminación');
     } finally {
       setLoading(false);
     }
@@ -64,9 +64,9 @@ export function MoveToDeletionDialog({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Mover a EliminaciÃ³n</DialogTitle>
+          <DialogTitle>Mover a Eliminación</DialogTitle>
           <DialogDescription>
-            Programar eliminaciÃ³n permanente de <strong>{userNickname}</strong>
+            Programar eliminación permanente de <strong>{userNickname}</strong>
           </DialogDescription>
         </DialogHeader>
 
@@ -74,19 +74,19 @@ export function MoveToDeletionDialog({
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Esta acciÃ³n iniciarÃ¡ una cuenta regresiva de 90 dÃ­as para eliminaciÃ³n permanente.</strong>
+              <strong>Esta acción iniciará una cuenta regresiva de 90 días para eliminación permanente.</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>El usuario permanecerÃ¡ suspendido (no puede iniciar sesiÃ³n)</li>
-                <li>DespuÃ©s de 90 dÃ­as, la cuenta y todo el contenido se eliminarÃ¡n permanentemente</li>
-                <li><strong>NO se enviarÃ¡n correos de advertencia al usuario</strong> (a diferencia de auto-eliminaciÃ³n)</li>
-                <li>El usuario NO puede cancelar esto por sÃ­ mismo</li>
-                <li>TÃº puedes reactivar la cuenta antes de los 90 dÃ­as si es necesario</li>
+                <li>El usuario permanecerá suspendido (no puede iniciar sesión)</li>
+                <li>Después de 90 días, la cuenta y todo el contenido se eliminarán permanentemente</li>
+                <li><strong>NO se enviarán correos de advertencia al usuario</strong> (a diferencia de auto-eliminación)</li>
+                <li>El usuario NO puede cancelar esto por sí mismo</li>
+                <li>Tú puedes reactivar la cuenta antes de los 90 días si es necesario</li>
               </ul>
             </AlertDescription>
           </Alert>
 
           <p className="text-sm text-gray-400">
-            Â¿EstÃ¡s seguro de que quieres programar esta cuenta para eliminaciÃ³n permanente?
+            ¡Estás seguro de que quieres programar esta cuenta para eliminación permanente?
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export function MoveToDeletionDialog({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            SÃ­, Programar EliminaciÃ³n
+            Sí, Programar Eliminación
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -63,7 +63,7 @@ export function IgnoredUsersTab() {
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'ayer';
     if (diffDays < 7)
-      return `hace ${diffDays} ${diffDays === 1 ? 'dÃ­a' : 'dÃ­as'}`;
+      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
       return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
@@ -103,7 +103,7 @@ export function IgnoredUsersTab() {
             No tienes usuarios bloqueados
           </h2>
           <p className="text-gray-600 dark:text-white/80 text-lg">
-            Cuando bloquees a usuarios, aparecerÃ¡n aquÃ­ para que puedas
+            Cuando bloquees a usuarios, aparecerán aquí para que puedas
             gestionarlos.
           </p>
         </ModernCardContent>

@@ -66,13 +66,13 @@ export function LegalHoldControls({
 
       if (error) throw error;
 
-      toast.success('RetenciÃ³n legal aplicada con Ã©xito');
+      toast.success('Retención legal aplicada con éxito');
       setHoldUntil('');
       setReason('');
       onSuccess?.();
     } catch (error) {
       logger.error('Error setting legal hold:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al aplicar retenciÃ³n legal');
+      toast.error(error instanceof Error ? error.message : 'Error al aplicar retención legal');
     } finally {
       setLoading(false);
     }
@@ -90,11 +90,11 @@ export function LegalHoldControls({
 
       if (error) throw error;
 
-      toast.success('RetenciÃ³n legal eliminada');
+      toast.success('Retención legal eliminada');
       onSuccess?.();
     } catch (error) {
       logger.error('Error removing legal hold:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al eliminar retenciÃ³n legal');
+      toast.error(error instanceof Error ? error.message : 'Error al eliminar retención legal');
     } finally {
       setLoading(false);
     }
@@ -133,7 +133,7 @@ export function LegalHoldControls({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-orange-500" />
-            Control de RetenciÃ³n Legal
+            Control de Retención Legal
           </DialogTitle>
           <DialogDescription>
             {getEntityTypeLabel(item.entity_type)} ID: {item.entity_id}
@@ -143,10 +143,10 @@ export function LegalHoldControls({
         <div className="space-y-4 py-4">
           <Alert className="bg-blue-900/20 border-blue-700">
             <AlertDescription className="text-sm text-blue-200">
-              <p><strong>Programado para eliminaciÃ³n:</strong> {formatDate(item.scheduled_for)}</p>
+              <p><strong>Programado para eliminación:</strong> {formatDate(item.scheduled_for)}</p>
               {hasActiveLegalHold && (
                 <p className="mt-2 text-orange-300">
-                  <strong>RetenciÃ³n Legal Activa hasta:</strong> {formatDate(item.legal_hold_until!)}
+                  <strong>Retención Legal Activa hasta:</strong> {formatDate(item.legal_hold_until!)}
                   <br />
                   <strong>Motivo:</strong> {item.reason}
                 </p>
@@ -158,8 +158,8 @@ export function LegalHoldControls({
             <div className="space-y-4">
               <Alert variant="destructive">
                 <AlertDescription>
-                  Este elemento tiene una retenciÃ³n legal activa. La eliminaciÃ³n estÃ¡ pausada hasta
-                  que se elimine la retenciÃ³n o expire la fecha de retenciÃ³n.
+                  Este elemento tiene una retención legal activa. La eliminación está pausada hasta
+                  que se elimine la retención o expire la fecha de retención.
                 </AlertDescription>
               </Alert>
 
@@ -171,7 +171,7 @@ export function LegalHoldControls({
               >
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 <X className="mr-2 h-4 w-4" />
-                Eliminar RetenciÃ³n Legal
+                Eliminar Retención Legal
               </Button>
             </div>
           ) : (
@@ -187,7 +187,7 @@ export function LegalHoldControls({
                   min={new Date().toISOString().slice(0, 16)}
                 />
                 <p className="text-xs text-gray-500">
-                  La eliminaciÃ³n se pausarÃ¡ hasta esta fecha
+                  La eliminación se pausará hasta esta fecha
                 </p>
               </div>
 
@@ -197,7 +197,7 @@ export function LegalHoldControls({
                   id="reason"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  placeholder="ej. InvestigaciÃ³n legal en curso, orden judicial..."
+                  placeholder="ej. Investigación legal en curso, orden judicial..."
                   rows={3}
                   disabled={loading}
                   className="resize-none"
@@ -207,8 +207,8 @@ export function LegalHoldControls({
               <Alert className="bg-orange-900/20 border-orange-700">
                 <Shield className="h-4 w-4 text-orange-400" />
                 <AlertDescription className="text-sm text-orange-200">
-                  <strong>Importante:</strong> Las retenciones legales anulan la programaciÃ³n de eliminaciÃ³n.
-                  El elemento NO se eliminarÃ¡ hasta que se elimine la retenciÃ³n o expire.
+                  <strong>Importante:</strong> Las retenciones legales anulan la programación de eliminación.
+                  El elemento NO se eliminará hasta que se elimine la retención o expire.
                 </AlertDescription>
               </Alert>
             </div>
@@ -231,7 +231,7 @@ export function LegalHoldControls({
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <Shield className="mr-2 h-4 w-4" />
-              Aplicar RetenciÃ³n Legal
+              Aplicar Retención Legal
             </Button>
           )}
         </DialogFooter>

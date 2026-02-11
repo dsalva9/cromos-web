@@ -115,7 +115,7 @@ export function AvatarPicker({
               : 'text-gray-600 hover:text-gray-900'
           )}
         >
-          GalerÃ­a
+          Galería
         </button>
         <button
           type="button"
@@ -168,7 +168,7 @@ export function AvatarPicker({
         {activeTab === 'upload' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Sube tu propia foto (serÃ¡ recortada a formato cuadrado)
+              Sube tu propia foto (será recortada a formato cuadrado)
             </p>
 
             {uploadPreview ? (
@@ -213,7 +213,7 @@ export function AvatarPicker({
                   disabled={processing || uploading}
                 />
                 <p className="text-xs text-gray-600 mt-3">
-                  JPG, PNG o WebP â€¢ MÃ¡x. 3MB
+                  JPG, PNG o WebP • Máx. 3MB
                 </p>
               </div>
             )}

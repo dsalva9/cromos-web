@@ -39,7 +39,7 @@ export function useHardDeleteListing() {
       }
 
       // Show success toast with details
-      let successMessage = 'Â¡Anuncio eliminado permanentemente!';
+      let successMessage = '¡Anuncio eliminado permanentemente!';
       
       if (result.deleted_chat_count > 0 || result.deleted_transaction_count > 0) {
         const details = [];
@@ -75,7 +75,7 @@ export function useHardDeleteListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para eliminar un anuncio');
         } else {
-          toast.error('Error al eliminar el anuncio permanentemente. Por favor, intÃ©ntalo de nuevo.');
+          toast.error('Error al eliminar el anuncio permanentemente. Por favor, inténtalo de nuevo.');
         }
       }
       

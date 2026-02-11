@@ -38,7 +38,7 @@ export function useRestoreTemplate() {
       }
 
       // Show success toast
-      toast.success('Â¡ColecciÃ³n restaurada correctamente! Ahora estÃ¡ activa de nuevo.');
+      toast.success('¡Colección restaurada correctamente! Ahora está activa de nuevo.');
 
       return result;
     } catch (error) {
@@ -47,15 +47,15 @@ export function useRestoreTemplate() {
         logger.error('Restore template error:', error);
 
         if (error.message.includes('Permission denied')) {
-          toast.error('No tienes permiso para restaurar esta colecciÃ³n');
+          toast.error('No tienes permiso para restaurar esta colección');
         } else if (error.message.includes('not deleted')) {
-          toast.error('Esta colecciÃ³n no estÃ¡ eliminada');
+          toast.error('Esta colección no está eliminada');
         } else if (error.message.includes('not found')) {
-          toast.error('La colecciÃ³n no fue encontrada');
+          toast.error('La colección no fue encontrada');
         } else if (error.message.includes('not authenticated')) {
-          toast.error('Debes estar autenticado para restaurar una colecciÃ³n');
+          toast.error('Debes estar autenticado para restaurar una colección');
         } else {
-          toast.error('Error al restaurar la colecciÃ³n. Por favor, intÃ©ntalo de nuevo.');
+          toast.error('Error al restaurar la colección. Por favor, inténtalo de nuevo.');
         }
       }
 

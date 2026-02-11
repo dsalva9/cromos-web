@@ -55,7 +55,7 @@ export function useSoftDeleteListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para eliminar un anuncio');
         } else {
-          toast.error('Error al eliminar el anuncio. Por favor, intÃ©ntalo de nuevo.');
+          toast.error('Error al eliminar el anuncio. Por favor, inténtalo de nuevo.');
         }
       }
       

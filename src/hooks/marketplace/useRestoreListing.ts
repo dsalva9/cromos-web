@@ -38,7 +38,7 @@ export function useRestoreListing() {
       }
 
       // Show success toast
-      toast.success('Â¡Anuncio restaurado correctamente! Ahora estÃ¡ activo de nuevo.');
+      toast.success('¡Anuncio restaurado correctamente! Ahora está activo de nuevo.');
 
       return result;
     } catch (error) {
@@ -55,7 +55,7 @@ export function useRestoreListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para restaurar un anuncio');
         } else {
-          toast.error('Error al restaurar el anuncio. Por favor, intÃ©ntalo de nuevo.');
+          toast.error('Error al restaurar el anuncio. Por favor, inténtalo de nuevo.');
         }
       }
 
