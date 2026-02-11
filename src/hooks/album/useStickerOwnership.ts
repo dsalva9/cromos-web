@@ -392,27 +392,32 @@ export function useStickerOwnership(
                 };
             });
 
-            // TODO [v1.6.0 MIGRATION]: Replace deprecated mark_team_page_complete RPC
-            // This RPC was removed in v1.6.0 (collections → templates pivot)
-            // Migration: Bulk update all template slots on the page to status='owned', count=1
-            // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
+            // v1.6.0 migration: Bulk update all template slots on the page
+            // (mark_team_page_complete was removed — use template_slots + update_template_progress)
             try {
-                const { data, error } = await legacyRpc(supabase, 'mark_team_page_complete', {
-                    p_user_id: user.id,
-                    p_collection_id: collectionId,
-                    p_page_id: targetPageId,
-                });
+                // 1. Get all slot IDs for this page from template_slots
+                const { data: templateSlots, error: slotsError } = await legacyFrom(supabase, 'template_slots')
+                    .select('id')
+                    .eq('page_id', targetPageId);
 
-                if (error) throw error;
+                if (slotsError) throw slotsError;
 
-                const { added_count, affected_sticker_ids } = data as {
-                    added_count: number;
-                    affected_sticker_ids: number[];
-                };
+                const slotIds = (templateSlots as { id: number }[] | null) ?? [];
+
+                // 2. Bulk update each slot to 'owned' via update_template_progress
+                await Promise.all(
+                    slotIds.map((slot) =>
+                        legacyRpc(supabase, 'update_template_progress', {
+                            p_copy_id: collectionId,
+                            p_slot_id: slot.id,
+                            p_status: 'owned',
+                            p_count: 1,
+                        })
+                    )
+                );
 
                 logger.debug(
-                    `Page complete: ${added_count} stickers added`,
-                    affected_sticker_ids
+                    `Page complete: ${missingStickerIds.length} stickers marked via bulk slot update`
                 );
 
                 await fetchCollectionStats(collectionId, { keepExisting: true });

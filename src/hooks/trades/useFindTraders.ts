@@ -8,6 +8,9 @@ interface TradeMatch {
   overlap_from_them_to_me: number;
   overlap_from_me_to_them: number;
   total_mutual_overlap: number;
+  distance_km: number | null;
+  postcode: string | null;
+  score: number | null;
 }
 
 interface SearchParams {
@@ -19,6 +22,14 @@ interface SearchParams {
     query?: string;
     minOverlap?: number;
   };
+  /** User latitude for location-based matching */
+  lat?: number | null;
+  /** User longitude for location-based matching */
+  lon?: number | null;
+  /** Search radius in km (default: no limit) */
+  radiusKm?: number;
+  /** Sort order: 'distance', 'overlap', or 'recent' */
+  sort?: 'distance' | 'overlap' | 'recent';
   limit?: number;
   offset?: number;
 }
@@ -36,6 +47,10 @@ export function useFindTraders() {
       userId,
       collectionId,
       filters,
+      lat,
+      lon,
+      radiusKm,
+      sort,
       limit = 20,
       offset = 0,
     }: SearchParams) => {
@@ -43,7 +58,7 @@ export function useFindTraders() {
         setLoading(true);
         setError(null);
 
-        // Prepare RPC parameters
+        // Prepare RPC parameters (location params only sent when coordinates are available)
         const rpcParams = {
           p_user_id: userId,
           p_collection_id: collectionId,
@@ -53,15 +68,16 @@ export function useFindTraders() {
           p_min_overlap: filters.minOverlap || 1,
           p_limit: limit,
           p_offset: offset,
+          ...(lat != null && lon != null ? {
+            p_lat: lat,
+            p_lon: lon,
+            ...(radiusKm != null ? { p_radius_km: radiusKm } : {}),
+            ...(sort ? { p_sort: sort } : {}),
+          } : {}),
         };
 
-        // Call the RPC function
-        // TODO [v1.6.0 MIGRATION]: Update find_mutual_traders RPC signature
-        // This RPC still exists but signature changed in v1.6.0
-        // Missing parameters: p_lat, p_lon, p_radius_km, p_sort (for location-based matching)
-        // See: docs/RPC_MIGRATION_GUIDE_v1.5_to_v1.6.md
         const { data, error: rpcError } = await supabase.rpc(
-          'find_mutual_traders', // ⚠️ SIGNATURE CHANGED in v1.6.0
+          'find_mutual_traders',
           rpcParams
         );
 

@@ -93,6 +93,7 @@ export function legacyFrom(
         | 'stickers'
         | 'user_stickers'
         | 'collection_teams'
+        | 'template_slots'
 ) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (supabase as any).from(table);
