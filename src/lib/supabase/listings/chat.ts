@@ -48,11 +48,25 @@ export async function getListingChats(
 
     return { data: validated, error: null };
   } catch (error) {
-    logger.error('Error fetching listing chats:', error);
+    // "Listing not found or access denied" is expected for deleted/non-existent listings
+    const isNotFound =
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof (error as { message: unknown }).message === 'string' &&
+      (error as { message: string }).message.includes('Listing not found');
+
+    if (isNotFound) {
+      logger.warn('Listing not found for chat access:', { listingId });
+    } else {
+      logger.error('Error fetching listing chats:', error);
+    }
+
     return {
       data: [],
-      error:
-        error instanceof Error
+      error: isNotFound
+        ? new Error('LISTING_NOT_FOUND')
+        : error instanceof Error
           ? error
           : new Error('No se pudieron cargar los mensajes'),
     };

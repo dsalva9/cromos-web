@@ -53,8 +53,10 @@ export function useListingChat({
 
     if (fetchError) {
       setError(fetchError.message);
-      // Don't show toast - error handling is done in the UI component
-      logger.error('Error fetching messages:', fetchError.message);
+      // "LISTING_NOT_FOUND" is already logged as warn in chat.ts - no need to re-log
+      if (fetchError.message !== 'LISTING_NOT_FOUND') {
+        logger.error('Error fetching messages:', fetchError.message);
+      }
     } else {
       setMessages(data);
 
