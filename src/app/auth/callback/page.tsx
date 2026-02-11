@@ -67,11 +67,21 @@ export default function AuthCallback() {
         });
 
         // 1. Handle explicit code exchange (PKCE)
+        let hadPkceError = false;
         if (code) {
           logger.info('Exchanging code for session...');
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) {
-            logger.error('Error exchanging code for session:', exchangeError);
+            // PKCE verifier can be lost on mobile (in-app browser switches context)
+            // or when cookies expire — downgrade to warn so it doesn't flood Sentry
+            if (exchangeError.code === 'pkce_code_verifier_not_found') {
+              logger.warn('PKCE code verifier not found, will attempt session recovery', {
+                code: exchangeError.code,
+              });
+              hadPkceError = true;
+            } else {
+              logger.error('Error exchanging code for session:', exchangeError);
+            }
           } else {
             logger.info('Code exchanged successfully');
           }
@@ -116,8 +126,18 @@ export default function AuthCallback() {
         const sessionUser = sessionData.session?.user;
 
         if (!sessionUser) {
-          logger.error('No authenticated user found after processing callback');
-          if (mounted) router.push('/login');
+          // If PKCE verifier was lost (common on mobile), show a friendly retry message
+          if (hadPkceError) {
+            logger.warn('Session recovery failed after PKCE error, redirecting to login');
+            if (mounted) {
+              setError('No se pudo completar el inicio de sesión. Por favor, inténtalo de nuevo.');
+              // Auto-redirect to login after a short delay so the user sees the message
+              setTimeout(() => { if (mounted) router.push('/login'); }, 3000);
+            }
+          } else {
+            logger.error('No authenticated user found after processing callback');
+            if (mounted) router.push('/login');
+          }
           return;
         }
 
