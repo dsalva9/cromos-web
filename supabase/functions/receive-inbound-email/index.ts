@@ -27,18 +27,19 @@ function stripHtml(html: string): string {
 
 
 interface ResendInboundEmail {
-  id: string;
+  email_id: string;
   from: string;
   to: string[];
   subject: string;
   html?: string;
   text?: string;
-  date: string;
+  created_at: string;
   headers?: Record<string, string>;
 }
 
 interface WebhookPayload {
   type: string;
+  created_at: string;
   data: ResendInboundEmail;
 }
 
@@ -48,7 +49,7 @@ function generateForwardedEmailText(emailData: ResendInboundEmail): string {
     '--- Forwarded Message ---',
     `From: ${emailData.from}`,
     `To: ${emailData.to.join(", ")}`,
-    `Date: ${new Date(emailData.date).toLocaleString()}`,
+    `Date: ${emailData.created_at}`,
     `Subject: ${emailData.subject || "(No Subject)"}`,
     '',
     body,
@@ -89,12 +90,46 @@ Deno.serve(async (req: Request) => {
     }
 
     const emailData = payload.data;
-    console.log("Received inbound email:", {
-      id: emailData.id,
+    console.log("Received inbound email webhook:", {
+      email_id: emailData.email_id,
       from: emailData.from,
       to: emailData.to,
       subject: emailData.subject,
+      has_html: !!emailData.html,
+      has_text: !!emailData.text,
     });
+
+    // Resend webhook does NOT include email body (html/text).
+    // We must fetch the full email content from the Resend API.
+    if (!emailData.html && !emailData.text) {
+      console.log("No body in webhook payload, fetching from Resend API...");
+      try {
+        const apiResponse = await fetch(
+          `https://api.resend.com/emails/${emailData.email_id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${Deno.env.get("RESEND_API_KEY")}`,
+            },
+          }
+        );
+        if (apiResponse.ok) {
+          const fullEmail = await apiResponse.json();
+          console.log("Fetched email content:", {
+            has_html: !!fullEmail.html,
+            has_text: !!fullEmail.text,
+            html_length: fullEmail.html?.length,
+            text_length: fullEmail.text?.length,
+          });
+          emailData.html = fullEmail.html;
+          emailData.text = fullEmail.text;
+        } else {
+          const errBody = await apiResponse.text();
+          console.error("Failed to fetch email content:", apiResponse.status, errBody);
+        }
+      } catch (fetchErr) {
+        console.error("Error fetching email content from Resend API:", fetchErr);
+      }
+    }
 
     // Initialize Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -259,7 +294,7 @@ function generateForwardedEmailHtml(emailData: ResendInboundEmail): string {
     <h3>Forwarded Message</h3>
     <div class="forward-info"><strong>From:</strong> ${emailData.from}</div>
     <div class="forward-info"><strong>To:</strong> ${emailData.to.join(", ")}</div>
-    <div class="forward-info"><strong>Date:</strong> ${new Date(emailData.date).toLocaleString()}</div>
+    <div class="forward-info"><strong>Date:</strong> ${emailData.created_at}</div>
     <div class="forward-info"><strong>Subject:</strong> ${emailData.subject || "(No Subject)"}</div>
   </div>
   <div class="email-content">
@@ -282,7 +317,7 @@ async function logEmail(
     const { error: insertError } = await supabase
       .from("inbound_email_log")
       .insert({
-        resend_email_id: emailData.id,
+        resend_email_id: emailData.email_id,
         from_address: emailData.from,
         to_addresses: emailData.to,
         subject: emailData.subject || "(No Subject)",
