@@ -14,8 +14,8 @@ The codebase has **improved substantially** since the first review. The previous
 
 | Metric | Pass 1 | Pass 2 (Claimed) | Pass 3 (Actual) |
 |---|---|---|---|
-| **`as any` casts** | 40+ | ~2 (in `legacy-tables.ts`) | **7** (2 legacy-tables + 4 OneSignal + 1 publicar page) |
-| **`eslint-disable` comments** | 25+ | ~2 | **16** |
+| **`as any` casts** | 40+ | ~2 (in `legacy-tables.ts`) | **2** (only in `legacy-tables.ts`) |
+| **`eslint-disable` comments** | 25+ | ~2 | **13** |
 | **`console.log` calls** | 15 files | ✅ Resolved | ✅ **Resolved** — all 16 replaced with `logger.debug` |
 | **`console.error` calls (bypassing logger)** | Not tracked | Not tracked | ✅ **Resolved** — all 68+ replaced with `logger.error`/`logger.warn` |
 | **Hooks using React Query** | 0/40 | 1/40 (pilot) | **1/40** |
@@ -54,24 +54,17 @@ The codebase has **improved substantially** since the first review. The previous
 
 ---
 
-### N2. `publicar/[slotId]/page.tsx` — `as any`, `console.error`, missing logger, implicit `any` on callback
+### N2. `publicar/[slotId]/page.tsx` — `as any`, `console.error`, missing logger, implicit `any` on callback ✅ Resolved
 
 **Severity**: Medium  
 **File**: [page.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/app/mis-plantillas/%5BcopyId%5D/publicar/%5BslotId%5D/page.tsx)
 
-**Issues**:
-- Line 83: `(templateDetails as any)?.template?.item_schema` — unchecked `as any` cast
-- Line 97: `(s: any)` — implicit any on callback parameter
-- Lines 57, 78, 92, 122: `console.error` calls (not using logger)
-- Line 3: Imports `useRouter` from `next/navigation` instead of `@/hooks/use-router` (the codebase has a custom router wrapper to handle Next.js 16 transition bugs)
-
-> **Agent prompt**: Fix type safety and logging in `src/app/mis-plantillas/[copyId]/publicar/[slotId]/page.tsx`.
->
-> 1. **Line 3**: Change `import { useParams, useRouter } from 'next/navigation';` to `import { useParams } from 'next/navigation';` and add `import { useRouter } from '@/hooks/use-router';`. The custom `use-router` hook handles Next.js 16 transition bugs that cause click blocking.
-> 2. **Line 83**: `(templateDetails as any)?.template?.item_schema` — The `get_template_details` RPC returns a structured object. Create a local interface for the RPC response shape: `interface TemplateDetailsResponse { template?: { item_schema?: Array<{ name: string; type: string; label: string; required: boolean; }> } }`. Then cast: `(templateDetails as TemplateDetailsResponse)?.template?.item_schema || []`. Remove the `as any`.
-> 3. **Line 97**: `(s: any)` — Replace with a typed parameter. The `get_template_progress` RPC returns `SlotData`-shaped rows. Use: `(s: { slot_id: string | number })` or define a type alias for the RPC response row.
-> 4. **Lines 57, 78, 92, 122**: Replace all `console.error(...)` with `logger.error(...)`. Add `import { logger } from '@/lib/logger';` at the top.
-> 5. Run `npm run type-check` and `npm run lint` to verify.
+**Resolution**:
+- Changed `useRouter` import from `next/navigation` to `@/hooks/use-router` (custom wrapper handling Next.js 16 transition bugs).
+- Replaced `(templateDetails as any)?.template?.item_schema` with a properly typed intermediate variable: `const details = templateDetails as { template?: { item_schema?: TemplateInfo['item_schema'] } } | null`.
+- Replaced `(s: any)` callback parameter with `(s: { slot_id: string | number })`.
+- `console.error` calls were already replaced with `logger.error` in a previous pass.
+- Verified: `tsc --noEmit` (exit 0), ESLint (clean), `next build` (exit 0).
 
 ---
 
@@ -136,84 +129,16 @@ Added `import { logger } from '@/lib/logger'` where missing. Also replaced 3 `co
 
 ---
 
-### L4. `OneSignalProvider` — Marked ✅ but still has 4 `as any` + 3 `eslint-disable`
+### L4. `OneSignalProvider` — Marked ✅ but still has 4 `as any` + 3 `eslint-disable` ✅ Resolved
 
-**Actual state**:
-- Lines 51, 52, 56, 60: `(window as any).plugins` — 4 casts remain
-- Lines 14, 16, 55: `eslint-disable @typescript-eslint/no-explicit-any` — 3 disables remain
-- The global type declarations on lines 14-17 use `any` for both `OneSignalDeferred` and `plugins`
-
-The previous review's recommended fix (create `src/types/onesignal.d.ts`) was never implemented.
-
-> **Agent prompt**: Create proper type declarations for the OneSignal Cordova plugin to eliminate all `as any` casts and `eslint-disable` comments from `src/components/providers/OneSignalProvider.tsx`.
->
-> **Step 1**: Create `src/types/onesignal.d.ts` with the following content:
-> ```typescript
-> /**
->  * Type declarations for OneSignal Cordova/Capacitor plugin.
->  * Used by OneSignalProvider.tsx for native (Capacitor) integration.
->  */
->
-> interface OneSignalPushSubscription {
->   id: string | null;
->   getIdAsync: (callback: (id: string | null) => void) => void;
->   addEventListener: (event: 'change', callback: (change: { current: { id: string } }) => void) => void;
-> }
->
-> interface OneSignalNotifications {
->   addEventListener: (event: 'click', callback: (event: { notification: { additionalData?: unknown } }) => void) => void;
->   requestPermission: (fallbackToSettings: boolean) => Promise<boolean>;
-> }
->
-> interface OneSignalUser {
->   pushSubscription: OneSignalPushSubscription;
->   PushSubscription: {
->     id: string | null;
->     addEventListener: (event: string, callback: (change: { current: { id: string } }) => void) => void;
->   };
-> }
->
-> interface OneSignalPlugin {
->   initialize: (appId: string) => void;
->   login: (userId: string) => void;
->   User: OneSignalUser;
->   Notifications: OneSignalNotifications;
-> }
->
-> interface OneSignalWebSDK {
->   init: (config: unknown) => Promise<void>;
->   login: (userId: string) => Promise<void>;
->   User: OneSignalUser;
->   Notifications: {
->     addEventListener: (event: string, callback: (event: { data?: unknown }) => void) => void;
->   };
-> }
->
-> interface OneSignalPlugins {
->   OneSignal?: OneSignalPlugin;
->   [key: string]: unknown;
-> }
->
-> declare global {
->   interface Window {
->     OneSignalDeferred?: Array<(oneSignal: OneSignalWebSDK) => Promise<void>>;
->     plugins?: OneSignalPlugins;
->   }
-> }
->
-> export {};
-> ```
->
-> **Step 2**: In `src/components/providers/OneSignalProvider.tsx`:
-> - Remove the `declare global` block (lines 12-19) — it's now in `onesignal.d.ts`.
-> - Remove the 3 `eslint-disable-next-line @typescript-eslint/no-explicit-any` comments (lines 14, 16, 55).
-> - Replace all 4 `(window as any).plugins` casts (lines 51, 52, 56, 60) with just `window.plugins`. TypeScript will now know the shape.
-> - Update line 56: `const OneSignal = window.plugins?.OneSignal;` (no cast needed).
-> - Update the `initializeWeb` function's inline type annotation for `OneSignalDeferred.push(async (OneSignal: {...})` (lines 190-202) — simplify to `async (OneSignal: OneSignalWebSDK)` since the type is now declared globally.
->
-> **Step 3**: Add `"src/types/onesignal.d.ts"` to the `include` array in `tsconfig.json` if `src/types` is not already covered by a glob.
->
-> Run `npm run type-check` and `npm run lint` to verify all `as any` and `eslint-disable` are gone.
+**Resolution**:
+- Created `src/types/onesignal.d.ts` with proper type declarations for `OneSignalPlugin`, `OneSignalWebSDK`, `OneSignalUser`, `OneSignalNotifications`, `OneSignalPushSubscription`, and `OneSignalPlugins`.
+- Augmented the global `Window` interface in the `.d.ts` file to type `OneSignalDeferred` and `plugins`.
+- Removed the inline `declare global` block from `OneSignalProvider.tsx`.
+- Removed all 3 `eslint-disable-next-line @typescript-eslint/no-explicit-any` comments.
+- Replaced all 4 `(window as any).plugins` casts with typed `window.plugins`.
+- Simplified the Web SDK inline type annotation from a 13-line inline object type to `OneSignalWebSDK`.
+- Verified: `tsc --noEmit` (exit 0), ESLint (clean on affected files), `next build` (exit 0).
 
 ---
 
@@ -277,9 +202,9 @@ These were already flagged and the user has stated they will address them:
 | 1 | **N3-N6**. Add justification comments to `eslint-disable` lines | ~10min | Documentation-only. No code changes, zero risk. Covers `NativeRedirectHandler.tsx`, `ProfileCompletionGuard.tsx`, `PasswordRecoveryGuard.tsx`, `AuthGuard.tsx`. |
 | 2 | **N7**. Extract `composeProviders` for `layout.tsx` | ~15min | Single new utility file + one layout refactor. Readability win. |
 | 3 | ~~**M2**. Replace 16 `console.log` → `logger.debug`~~ | ✅ Done | |
-| 4 | **N2**. Fix `publicar/[slotId]/page.tsx` | ~30min | Single file: fix `as any`, wrong router import. `console.error` already fixed. |
+| 4 | ~~**N2**. Fix `publicar/[slotId]/page.tsx`~~ | ✅ Done | |
 | 5 | ~~**N1**. Replace 68+ `console.error` → `logger.error` + tighten ESLint~~ | ✅ Done | |
-| 6 | **L4**. Create `onesignal.d.ts` types | ~1h | New type file + update `OneSignalProvider.tsx`. Removes 4 `as any` + 3 `eslint-disable`. |
+| 6 | ~~**L4**. Create `onesignal.d.ts` types~~ | ✅ Done | |
 | 7 | **H1**. React Query migration (5 hooks) | ~1-2 days | Most complex — requires understanding each hook's data flow, adding query keys, and preserving public APIs. Do one hook at a time, verify between each. |
 
 > [!TIP]
@@ -294,8 +219,8 @@ These were already flagged and the user has stated they will address them:
 | ✅ Done | N1. Replace 68+ `console.error` with `logger.error` + tighten ESLint rule | — | All errors now visible in Sentry |
 | 🔴 High | H1. Continue React Query migration (top 5 hooks: `useProposals`, `useTemplates`, `useNotifications`, `useTradeChat`, `useUserCollections`) | 1-2d | Caching, dedup, no loading spinners on re-mount |
 | ✅ Done | M2 fix. Replace 16 remaining `console.log` with `logger.debug` | — | Clean ESLint output |
-| 🟡 Medium | N2. Fix `publicar/[slotId]/page.tsx` — `as any`, wrong router import | 30min | Type safety |
-| 🟡 Medium | L4 fix. Create `onesignal.d.ts` types for `OneSignalProvider` | 1h | Remove 4 `as any` + 3 `eslint-disable` |
+| ✅ Done | N2. Fix `publicar/[slotId]/page.tsx` — `as any`, wrong router import | — | Type safety |
+| ✅ Done | L4 fix. Create `onesignal.d.ts` types for `OneSignalProvider` | — | Removed 4 `as any` + 3 `eslint-disable` |
 | 🟢 Low | N3-N5. Audit remaining `eslint-disable exhaustive-deps` (3 files) | 30min | Prevent stale closure bugs |
 | 🟢 Low | N7. Extract `composeProviders` utility for layout.tsx | 15min | Readability |
 | ⚪ Deferred | H6. Complete v1.6.0 migration TODOs | 2-4h | Remove `legacy-tables.ts` entirely |

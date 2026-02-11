@@ -8,15 +8,6 @@ import { ONESIGNAL_CONFIG } from '@/lib/onesignal/config';
 import { handleNotificationClick, parseNotificationData } from '@/lib/onesignal/deep-linking';
 import { logger } from '@/lib/logger';
 
-// Declare OneSignal types for window
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    OneSignalDeferred?: any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    plugins?: any;
-  }
-}
 
 export function OneSignalProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
@@ -48,16 +39,15 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
         logger.info('[OneSignal] Native initOneSignal called');
         logger.info('[OneSignal] Checking for plugins...', {
           hasWindow: typeof window !== 'undefined',
-          hasPlugins: !!(window as any).plugins,
-          pluginKeys: (window as any).plugins ? Object.keys((window as any).plugins) : [],
+          hasPlugins: !!window.plugins,
+          pluginKeys: window.plugins ? Object.keys(window.plugins) : [],
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const OneSignal = (window as any).plugins?.OneSignal;
+        const OneSignal = window.plugins?.OneSignal;
 
         if (!OneSignal) {
           logger.error('[OneSignal] Plugin not found on window.plugins');
-          logger.error('[OneSignal] Available plugins:', (window as any).plugins);
+          logger.error('[OneSignal] Available plugins:', window.plugins);
           return;
         }
 
@@ -187,19 +177,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
 
       // Initialize when SDK is ready
       window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push(async (OneSignal: {
-        init: (config: unknown) => Promise<void>;
-        login: (userId: string) => Promise<void>;
-        User: {
-          PushSubscription: {
-            id: string | null;
-            addEventListener: (event: string, callback: (change: { current: { id: string } }) => void) => void;
-          };
-        };
-        Notifications: {
-          addEventListener: (event: string, callback: (event: { data?: unknown }) => void) => void;
-        };
-      }) => {
+      window.OneSignalDeferred.push(async (OneSignal: OneSignalWebSDK) => {
         try {
           await OneSignal.init({
             appId: ONESIGNAL_CONFIG.appId,

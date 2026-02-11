@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useEffect, useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
@@ -79,9 +80,11 @@ function PublishDuplicateContent() {
         logger.error('Error fetching template details:', templateError);
       }
 
+      // The RPC returns { template?: { item_schema?: ... } }
+      const details = templateDetails as { template?: { item_schema?: TemplateInfo['item_schema'] } } | null;
       setTemplateInfo({
         title: currentCopy.title,
-        item_schema: (templateDetails as any)?.template?.item_schema || []
+        item_schema: details?.template?.item_schema || []
       });
 
       // Get slot info for pre-filling
@@ -95,7 +98,7 @@ function PublishDuplicateContent() {
       }
 
       // Compare slot_id as both string and number since it comes from URL params
-      const slot = progressData?.find((s: any) => {
+      const slot = progressData?.find((s: { slot_id: string | number }) => {
         const sIdStr = String(s.slot_id);
         return sIdStr === slotId;
       });
