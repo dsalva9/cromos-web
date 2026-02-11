@@ -100,12 +100,12 @@ export function TemplateRatingDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-800 text-white border-slate-700 max-w-md">
+      <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 max-w-md">
         {showDeleteConfirm ? (
           <>
             <DialogHeader>
               <DialogTitle>Confirmar eliminación</DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription className="text-gray-500 dark:text-gray-400">
                 ¿Estás seguro de que quieres eliminar tu valoración? Esta acción no se puede deshacer.
               </DialogDescription>
             </DialogHeader>
@@ -114,7 +114,7 @@ export function TemplateRatingDialog({
                 variant="outline"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={loading}
-                className="border-slate-600 text-white hover:bg-slate-700"
+                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancelar
               </Button>
@@ -143,7 +143,7 @@ export function TemplateRatingDialog({
               <DialogTitle>
                 {isEditing ? 'Actualizar valoración' : 'Valorar plantilla'}
               </DialogTitle>
-              <DialogDescription className="text-slate-400">
+              <DialogDescription className="text-gray-500 dark:text-gray-400">
                 {templateTitle}
               </DialogDescription>
             </DialogHeader>
@@ -151,7 +151,7 @@ export function TemplateRatingDialog({
             <div className="space-y-4 py-4">
               {/* Star Rating Selector */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Tu valoración <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-2 justify-center py-4">
@@ -165,17 +165,16 @@ export function TemplateRatingDialog({
                       className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#FFC000] rounded"
                     >
                       <Star
-                        className={`h-10 w-10 transition-colors ${
-                          star <= (hoveredStar || rating)
+                        className={`h-10 w-10 transition-colors ${star <= (hoveredStar || rating)
                             ? 'fill-[#FFC000] text-[#FFC000]'
-                            : 'text-slate-600'
-                        }`}
+                            : 'text-gray-300 dark:text-gray-600'
+                          }`}
                       />
                     </button>
                   ))}
                 </div>
                 {rating > 0 && (
-                  <p className="text-center text-sm text-slate-400">
+                  <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                     {rating === 1 && 'Muy mala'}
                     {rating === 2 && 'Mala'}
                     {rating === 3 && 'Aceptable'}
@@ -187,7 +186,7 @@ export function TemplateRatingDialog({
 
               {/* Comment */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Comentario (opcional)
                 </label>
                 <Textarea
@@ -196,9 +195,9 @@ export function TemplateRatingDialog({
                   placeholder="Comparte tu opinión sobre esta plantilla..."
                   maxLength={280}
                   rows={4}
-                  className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 resize-none"
+                  className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
                 />
-                <p className="text-xs text-slate-500 text-right">
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-right">
                   {comment.length}/280 caracteres
                 </p>
               </div>
@@ -220,7 +219,7 @@ export function TemplateRatingDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={loading}
-                className="border-slate-600 text-white hover:bg-slate-700"
+                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Cancelar
               </Button>
