@@ -47,12 +47,15 @@ export default function UserDashboard() {
 
     // --- Fetch Templates ---
     useEffect(() => {
+        let cancelled = false;
+
         async function fetchCopies() {
             if (!user) return;
             try {
                 setLoadingCopies(true);
                 const { data, error } = await supabase.rpc('get_my_template_copies');
 
+                if (cancelled) return;
                 if (error) throw error;
 
                 const processedCopies = (data || []).map((copy: any) => {
@@ -69,13 +72,22 @@ export default function UserDashboard() {
                     };
                 });
                 setCopies(processedCopies);
-            } catch (error) {
+            } catch (error: any) {
+                // Ignore fetch aborts caused by navigating away from the page
+                const message = error?.message || error?.details || '';
+                if (cancelled || message.includes('Failed to fetch') || message.includes('AbortError')) {
+                    return;
+                }
                 logger.error('Error fetching copies:', error);
             } finally {
-                setLoadingCopies(false);
+                if (!cancelled) {
+                    setLoadingCopies(false);
+                }
             }
         }
         fetchCopies();
+
+        return () => { cancelled = true; };
     }, [user, supabase]);
 
 

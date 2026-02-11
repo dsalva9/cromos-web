@@ -27,7 +27,12 @@ export function useBadgeProgress(userId: string | undefined) {
       setIsError(false);
       const data = await getBadgeProgress(userId);
       setProgress(data);
-    } catch (err) {
+    } catch (err: any) {
+      // Ignore fetch aborts caused by navigating away from the page
+      const message = err?.message || err?.details || '';
+      if (message.includes('Failed to fetch') || message.includes('AbortError')) {
+        return;
+      }
       logger.error('Error fetching badge progress:', err);
       setIsError(true);
       setError(err as Error);

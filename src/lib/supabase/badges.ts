@@ -43,6 +43,11 @@ export async function getBadgeProgress(
   });
 
   if (error) {
+    // Ignore fetch aborts caused by navigating away from the page
+    const details = (error as any)?.details || (error as any)?.message || '';
+    if (details.includes('Failed to fetch') || details.includes('AbortError')) {
+      return [];
+    }
     logger.error('Error fetching badge progress:', error);
     throw error;
   }
