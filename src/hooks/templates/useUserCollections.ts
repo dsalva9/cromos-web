@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { QUERY_KEYS } from '@/lib/queryKeys';
 
 export interface UserCollection {
   copy_id: number;
@@ -10,8 +11,11 @@ export interface UserCollection {
 }
 
 /**
- * Hook for fetching user's template copies (collections)
- * Used for collection filter and listing form dropdowns
+ * Hook for fetching user's template copies (collections).
+ * Used for collection filter and listing form dropdowns.
+ *
+ * Powered by React Query — provides automatic caching,
+ * deduplication, and stale-while-revalidate.
  *
  * @returns Object containing:
  * - `collections`: Array of user's collection copies
@@ -39,15 +43,15 @@ export interface UserCollection {
  */
 export function useUserCollections() {
   const supabase = useSupabaseClient();
-  const [collections, setCollections] = useState<UserCollection[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchCollections = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
+  const {
+    data,
+    error: queryError,
+    isLoading,
+  } = useQuery({
+    queryKey: QUERY_KEYS.userCollections(),
+    queryFn: async () => {
       const { data, error: rpcError } = await supabase.rpc(
         'get_user_collections',
         {}
@@ -55,23 +59,23 @@ export function useUserCollections() {
 
       if (rpcError) throw rpcError;
 
-      setCollections(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      setCollections([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [supabase]);
+      return (data || []) as UserCollection[];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes — collections rarely change
+  });
 
-  useEffect(() => {
-    fetchCollections();
-  }, [fetchCollections]);
+  const collections = data ?? [];
+  const loading = isLoading;
+  const error = queryError
+    ? (queryError instanceof Error ? queryError.message : 'Unknown error')
+    : null;
 
   return {
     collections,
     loading,
     error,
-    refetch: fetchCollections,
+    refetch: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userCollections() });
+    },
   };
 }

@@ -1,7 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { QUERY_KEYS } from '@/lib/queryKeys';
 
 export interface TradeChatMessage {
   id: number;
@@ -31,96 +33,154 @@ interface UseTradeChatReturn {
 const INITIAL_LOAD_LIMIT = 50;
 const LOAD_MORE_LIMIT = 50;
 
+/**
+ * Hook for trade chat messages with realtime updates.
+ *
+ * Powered by React Query for the initial fetch. Realtime inserts and
+ * optimistic sends update the query cache directly via setQueryData.
+ * Load-more (older messages) prepends to the cache via cursor pagination.
+ */
 export const useTradeChat = ({
   tradeId,
   enabled = true,
 }: UseTradeChatParams): UseTradeChatReturn => {
   const supabase = useSupabaseClient();
   const { user } = useUser();
-  const [messages, setMessages] = useState<TradeChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(false);
-  const [oldestMessageId, setOldestMessageId] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   const channelRef = useRef<RealtimeChannel | null>(null);
   const markAsReadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const oldestMessageIdRef = useRef<number | null>(null);
+  const hasMoreRef = useRef(false);
 
-  // Load initial messages
-  const loadMessages = useCallback(
-    async (initial = true) => {
-      if (!tradeId || !enabled || !user) return;
+  const queryKey = QUERY_KEYS.tradeChat(tradeId);
 
-      setLoading(true);
-      setError(null);
+  // ── Initial fetch ──
+  const {
+    data,
+    error: queryError,
+    isLoading,
+  } = useQuery({
+    queryKey,
+    queryFn: async (): Promise<TradeChatMessage[]> => {
+      if (!tradeId || !user) return [];
 
-      try {
-        let query = supabase
-          .from('trade_chats')
-          .select(
-            `
-            id,
-            trade_id,
-            sender_id,
-            message,
-            created_at,
-            profiles!trade_chats_sender_id_fkey (nickname)
+      const { data, error: fetchError } = await supabase
+        .from('trade_chats')
+        .select(
           `
-          )
-          .eq('trade_id', tradeId)
-          .order('created_at', { ascending: false });
+          id,
+          trade_id,
+          sender_id,
+          message,
+          created_at,
+          profiles!trade_chats_sender_id_fkey (nickname)
+        `
+        )
+        .eq('trade_id', tradeId)
+        .order('created_at', { ascending: false })
+        .limit(INITIAL_LOAD_LIMIT);
 
-        if (initial) {
-          query = query.limit(INITIAL_LOAD_LIMIT);
-        } else if (oldestMessageId) {
-          query = query.lt('id', oldestMessageId).limit(LOAD_MORE_LIMIT);
-        }
+      if (fetchError) throw fetchError;
 
-        const { data, error: fetchError } = await query;
+      const transformed: TradeChatMessage[] =
+        data?.map((msg) => ({
+          id: msg.id,
+          trade_id: msg.trade_id,
+          sender_id: msg.sender_id,
+          message: msg.message,
+          created_at: msg.created_at,
+          sender_nickname:
+            (msg.profiles as { nickname?: string } | null)?.nickname ||
+            'Usuario',
+        })) || [];
 
-        if (fetchError) throw fetchError;
+      // Reverse to show oldest first
+      const reversed = transformed.reverse();
 
-        // Transform data to include sender nickname
-        const transformedMessages: TradeChatMessage[] =
-          data?.map(msg => ({
-            id: msg.id,
-            trade_id: msg.trade_id,
-            sender_id: msg.sender_id,
-            message: msg.message,
-            created_at: msg.created_at,
-            sender_nickname: (msg.profiles as { nickname?: string } | null)?.nickname || 'Usuario',
-          })) || [];
-
-        // Reverse to show oldest first
-        const reversedMessages = transformedMessages.reverse();
-
-        setMessages(prev =>
-          initial ? reversedMessages : [...reversedMessages, ...prev]
+      // Track oldest for load-more cursor
+      if (transformed.length > 0) {
+        oldestMessageIdRef.current = Math.min(
+          ...transformed.map((m) => m.id)
         );
-
-        setHasMore(transformedMessages.length === (initial ? INITIAL_LOAD_LIMIT : LOAD_MORE_LIMIT));
-
-        if (transformedMessages.length > 0) {
-          setOldestMessageId(Math.min(...transformedMessages.map(m => m.id)));
-        }
-      } catch (err) {
-        logger.error('Error loading messages:', err);
-        setError(
-          err instanceof Error ? err.message : 'Error al cargar mensajes'
-        );
-      } finally {
-        setLoading(false);
       }
+      hasMoreRef.current = transformed.length === INITIAL_LOAD_LIMIT;
+
+      return reversed;
     },
-    [supabase, tradeId, enabled, user, oldestMessageId]
-  );
+    enabled: !!tradeId && enabled && !!user,
+  });
 
-  // Load more (older) messages
+  const messages = useMemo(() => data ?? [], [data]);
+  const loading = isLoading;
+  const error = queryError
+    ? queryError instanceof Error
+      ? queryError.message
+      : 'Error al cargar mensajes'
+    : null;
+  const hasMore = hasMoreRef.current;
+
+  // ── Load more (older messages) ──
   const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
-    await loadMessages(false);
-  }, [loading, hasMore, loadMessages]);
+    if (loading || !hasMoreRef.current || !tradeId || !user) return;
 
-  // Send message
+    const currentOldest = oldestMessageIdRef.current;
+    if (!currentOldest) return;
+
+    try {
+      const query = supabase
+        .from('trade_chats')
+        .select(
+          `
+          id,
+          trade_id,
+          sender_id,
+          message,
+          created_at,
+          profiles!trade_chats_sender_id_fkey (nickname)
+        `
+        )
+        .eq('trade_id', tradeId)
+        .lt('id', currentOldest)
+        .order('created_at', { ascending: false })
+        .limit(LOAD_MORE_LIMIT);
+
+      const { data: olderData, error: fetchError } = await query;
+      if (fetchError) throw fetchError;
+
+      const olderMsgs: TradeChatMessage[] =
+        olderData?.map((msg) => ({
+          id: msg.id,
+          trade_id: msg.trade_id,
+          sender_id: msg.sender_id,
+          message: msg.message,
+          created_at: msg.created_at,
+          sender_nickname:
+            (msg.profiles as { nickname?: string } | null)?.nickname ||
+            'Usuario',
+        })) || [];
+
+      // Reverse to oldest-first, then prepend
+      const reversed = olderMsgs.reverse();
+
+      hasMoreRef.current = olderMsgs.length === LOAD_MORE_LIMIT;
+
+      if (olderMsgs.length > 0) {
+        oldestMessageIdRef.current = Math.min(
+          ...olderMsgs.map((m) => m.id)
+        );
+      }
+
+      // Prepend to cache
+      queryClient.setQueryData<TradeChatMessage[]>(queryKey, (old) => [
+        ...reversed,
+        ...(old ?? []),
+      ]);
+    } catch (err) {
+      logger.error('Error loading older messages:', err);
+    }
+  }, [loading, tradeId, user, supabase, queryClient, queryKey]);
+
+  // ── Send message (optimistic) ──
   const sendMessage = useCallback(
     async (text: string) => {
       if (!tradeId || !user || !text.trim()) return;
@@ -130,21 +190,23 @@ export const useTradeChat = ({
         throw new Error('El mensaje no puede superar los 500 caracteres');
       }
 
-      // Create optimistic message
       const optimisticMessage: TradeChatMessage = {
         id: Date.now(), // Temporary ID
         trade_id: tradeId,
         sender_id: user.id,
         message: trimmedText,
         created_at: new Date().toISOString(),
-        sender_nickname: 'Tú', // Will be replaced by realtime
+        sender_nickname: 'Tú',
       };
 
-      // Add optimistically to UI
-      setMessages(prev => [...prev, optimisticMessage]);
+      // Optimistic append
+      queryClient.setQueryData<TradeChatMessage[]>(queryKey, (old) => [
+        ...(old ?? []),
+        optimisticMessage,
+      ]);
 
       try {
-        const { data, error: insertError } = await supabase
+        const { data: insertedData, error: insertError } = await supabase
           .from('trade_chats')
           .insert({
             trade_id: tradeId,
@@ -156,49 +218,41 @@ export const useTradeChat = ({
 
         if (insertError) {
           logger.error('Supabase insert error:', insertError);
-          logger.error('Insert error code:', insertError.code);
-          logger.error('Insert error message:', insertError.message);
-          logger.error('Insert error details:', insertError.details);
           throw insertError;
         }
 
-        // Replace optimistic message with real one (has correct ID)
-        if (data) {
-          setMessages(prev =>
-            prev.map(msg =>
+        // Replace optimistic message with real one
+        if (insertedData) {
+          queryClient.setQueryData<TradeChatMessage[]>(queryKey, (old) =>
+            (old ?? []).map((msg) =>
               msg.id === optimisticMessage.id
-                ? {
-                  ...optimisticMessage,
-                  id: data.id,
-                }
+                ? { ...optimisticMessage, id: insertedData.id }
                 : msg
             )
           );
         }
       } catch (err) {
         logger.error('Error sending message:', err);
-        logger.error('Error details:', JSON.stringify(err, null, 2));
         // Remove optimistic message on error
-        setMessages(prev =>
-          prev.filter(msg => msg.id !== optimisticMessage.id)
+        queryClient.setQueryData<TradeChatMessage[]>(queryKey, (old) =>
+          (old ?? []).filter((msg) => msg.id !== optimisticMessage.id)
         );
-        const errorMessage = err instanceof Error ? err.message : 'Error al enviar mensaje';
+        const errorMessage =
+          err instanceof Error ? err.message : 'Error al enviar mensaje';
         throw new Error(errorMessage);
       }
     },
-    [supabase, tradeId, user]
+    [supabase, tradeId, user, queryClient, queryKey]
   );
 
-  // Mark as read (debounced)
+  // ── Mark as read (debounced) ──
   const markAsRead = useCallback(async () => {
     if (!tradeId || !user) return;
 
-    // Clear existing timeout
     if (markAsReadTimeoutRef.current) {
       clearTimeout(markAsReadTimeoutRef.current);
     }
 
-    // Debounce mark as read by 400ms
     markAsReadTimeoutRef.current = setTimeout(async () => {
       try {
         const { error: markError } = await supabase.rpc('mark_trade_read', {
@@ -214,28 +268,14 @@ export const useTradeChat = ({
     }, 400);
   }, [supabase, tradeId, user]);
 
-  // Refresh messages (full reload)
+  // ── Refresh (full reload) ──
   const refresh = useCallback(async () => {
-    setOldestMessageId(null);
-    await loadMessages(true);
-  }, [loadMessages]);
+    oldestMessageIdRef.current = null;
+    hasMoreRef.current = false;
+    await queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
 
-  // Initial load
-  useEffect(() => {
-    if (tradeId && enabled && user) {
-      loadMessages(true);
-    } else {
-      setMessages([]);
-      setHasMore(false);
-      setError(null);
-    }
-    // loadMessages is intentionally omitted — it includes oldestMessageId which
-    // changes after every fetch, causing an infinite loop.  The guard deps
-    // (tradeId, enabled, user, supabase) are sufficient for the initial load.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tradeId, enabled, user, supabase]);
-
-  // Realtime subscription
+  // ── Realtime subscription ──
   useEffect(() => {
     if (!tradeId || !enabled || !user) return;
 
@@ -255,7 +295,7 @@ export const useTradeChat = ({
           table: 'trade_chats',
           filter: `trade_id=eq.${tradeId}`,
         },
-        async payload => {
+        async (payload) => {
           // Fetch the new message with sender profile
           const { data: newMsgData } = await supabase
             .from('trade_chats')
@@ -280,12 +320,14 @@ export const useTradeChat = ({
               message: newMsgData.message,
               created_at: newMsgData.created_at,
               sender_nickname:
-                (newMsgData.profiles as { nickname?: string } | null)?.nickname || 'Usuario',
+                (newMsgData.profiles as { nickname?: string } | null)
+                  ?.nickname || 'Usuario',
             };
 
             // Only add if not already in messages (avoid duplicates from optimistic updates)
-            setMessages(prev => {
-              const exists = prev.some(msg => msg.id === newMessage.id);
+            queryClient.setQueryData<TradeChatMessage[]>(queryKey, (old) => {
+              const prev = old ?? [];
+              const exists = prev.some((msg) => msg.id === newMessage.id);
               if (exists) return prev;
               return [...prev, newMessage];
             });
@@ -300,7 +342,7 @@ export const useTradeChat = ({
       channel.unsubscribe();
       channelRef.current = null;
     };
-  }, [supabase, tradeId, enabled, user]);
+  }, [supabase, tradeId, enabled, user, queryClient, queryKey]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

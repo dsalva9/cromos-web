@@ -19,4 +19,24 @@ export const QUERY_KEYS = {
         ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey }] as const,
 
     listingsAll: () => ['listings'] as const,
+
+    /* ─── templates ─── */
+    templates: (search: string, sortBy: string) =>
+        ['templates', { search, sortBy }] as const,
+    templatesAll: () => ['templates'] as const,
+
+    /* ─── user collections ─── */
+    userCollections: () => ['userCollections'] as const,
+
+    /* ─── proposals ─── */
+    proposals: (box: string, view: string) =>
+        ['proposals', { box, view }] as const,
+    proposalsAll: () => ['proposals'] as const,
+
+    /* ─── notifications ─── */
+    notifications: () => ['notifications'] as const,
+    notificationPreferences: () => ['notificationPreferences'] as const,
+
+    /* ─── trade chat ─── */
+    tradeChat: (tradeId: number | null) => ['tradeChat', tradeId] as const,
 } as const;

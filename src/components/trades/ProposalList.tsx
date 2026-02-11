@@ -24,8 +24,8 @@ export function ProposalList({
   highlightProposalId,
   readOnly = false,
 }: ProposalListProps) {
-  const { proposals, loading, error, fetchProposals, clearProposals } =
-    useProposals();
+  const { proposals, loading, error } =
+    useProposals({ box, view });
   const [optimisticProposals, setOptimisticProposals] = useState<
     TradeProposalListItem[]
   >([]);
@@ -81,15 +81,8 @@ export function ProposalList({
     refreshUnreadCounts();
   };
 
-  useEffect(() => {
-    // Fetch on mount and when box/view changes
-    fetchProposals({ box, view, limit: 20, offset: 0 });
-
-    // Cleanup on unmount
-    return () => {
-      clearProposals();
-    };
-  }, [box, view, fetchProposals, clearProposals]);
+  // React Query handles fetching on mount & refetching when box/view change.
+  // No manual fetch or cleanup needed.
 
   if (loading) {
     return (

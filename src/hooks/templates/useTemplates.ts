@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { logger } from '@/lib/logger';
+import { QUERY_KEYS } from '@/lib/queryKeys';
 
 interface Template {
   id: number;
@@ -24,6 +25,14 @@ interface UseTemplatesParams {
   initialData?: Template[];
 }
 
+/**
+ * Hook for fetching and managing template listings with pagination.
+ *
+ * Powered by React Query (`useInfiniteQuery`) — provides automatic caching,
+ * deduplication, stale-while-revalidate, and background refetching.
+ *
+ * Search input is debounced by 250ms to avoid excessive API calls.
+ */
 export function useTemplates({
   search = '',
   sortBy = 'recent',
@@ -31,106 +40,73 @@ export function useTemplates({
   initialData,
 }: UseTemplatesParams = {}) {
   const supabase = useSupabaseClient();
-  // Initialize with server data if provided
-  const [templates, setTemplates] = useState<Template[]>(initialData ?? []);
-  // If we have initial data and are using default filters, skip initial fetch
-  const [loading, setLoading] = useState(initialData ? false : true);
-  const [error, setError] = useState<string | null>(null);
-  const [offset, setOffset] = useState(initialData ? initialData.length : 0);
-  const [hasMore, setHasMore] = useState(initialData ? initialData.length === limit : true);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  // Track if this is the first render with server data
-  const isInitialRender = useRef(!!initialData);
 
-  const fetchTemplates = useCallback(
-    async (fetchOffset: number, isLoadMore = false) => {
-      try {
-        setLoading(true);
-        const currentOffset = isLoadMore ? fetchOffset : 0;
-
-        // Debug logging
-        logger.debug('Fetching templates with params:', {
-          p_limit: parseInt(limit.toString()),
-          p_offset: parseInt(currentOffset.toString()),
-          p_search: search || null,
-          p_sort_by: sortBy,
-        });
-
-        const { data, error: rpcError } = await supabase.rpc(
-          'list_public_templates',
-          {
-            p_limit: parseInt(limit.toString()),
-            p_offset: parseInt(currentOffset.toString()),
-            p_search: search || undefined,
-            p_sort_by: sortBy,
-          }
-        );
-
-        // Debug logging
-        logger.debug('RPC response:', { data, error: rpcError });
-
-        if (rpcError) {
-          // Handle RPC errors gracefully and display actual error message
-          logger.error('RPC Error:', rpcError);
-          setTemplates([]);
-          setHasMore(false);
-          // Fixed: Removed hardcoded Sprint 9 message, now showing actual RPC errors
-          setError(
-            rpcError.message || 'Error al cargar las colecciones. Por favor, intenta de nuevo.'
-          );
-          return;
-        }
-
-        if (isLoadMore) {
-          setTemplates(prev => [...prev, ...(data || [])]);
-        } else {
-          setTemplates(data || []);
-        }
-
-        setHasMore((data || []).length === limit);
-        if (isLoadMore) {
-          setOffset(prev => prev + limit);
-        } else {
-          setOffset(limit);
-        }
-      } catch (err: unknown) {
-        if (typeof err === 'object' && err !== null && (err as { name?: string }).name === 'AbortError') {
-          return; // ignore aborted fetches
-        }
-        setError(err instanceof Error ? err.message : 'Error desconocido');
-      } finally {
-        setLoading(false);
-      }
-    },
-    [supabase, search, sortBy, limit]
-  );
+  // Debounce search input by 250ms
+  const [deferredSearch, setDeferredSearch] = useState(search);
 
   useEffect(() => {
-    // Skip initial fetch if we have server data and filters are at defaults
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      // Only skip if using default filters
-      if (search === '' && sortBy === 'recent') {
-        return;
-      }
-    }
-
-    // Debounce fetch on search/sort changes
-    setOffset(0);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchTemplates(0, false);
+    const timer = setTimeout(() => {
+      setDeferredSearch(search);
     }, 250);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [search, sortBy, limit, fetchTemplates]);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Only use initialData when filters are at their defaults
+  const isDefaultQuery = deferredSearch === '' && sortBy === 'recent';
+  const effectiveInitialData = isDefaultQuery && initialData && initialData.length > 0
+    ? { initialData: { pages: [initialData], pageParams: [0] } }
+    : {};
+
+  const {
+    data,
+    error: queryError,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: QUERY_KEYS.templates(deferredSearch, sortBy),
+    queryFn: async ({ pageParam = 0 }) => {
+      const { data, error: rpcError } = await supabase.rpc(
+        'list_public_templates',
+        {
+          p_limit: limit,
+          p_offset: pageParam,
+          p_search: deferredSearch || undefined,
+          p_sort_by: sortBy,
+        }
+      );
+
+      if (rpcError) throw rpcError;
+
+      return (data || []) as Template[];
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < limit) return undefined;
+      return allPages.reduce((total, page) => total + page.length, 0);
+    },
+    ...effectiveInitialData,
+  });
+
+  // Flatten all pages into a single array
+  const templates = useMemo(
+    () => data?.pages.flat() ?? [],
+    [data]
+  );
+
+  const loading = isLoading || isFetchingNextPage;
+  const error = queryError
+    ? (queryError instanceof Error ? queryError.message : 'Error desconocido')
+    : null;
+  const hasMore = hasNextPage ?? false;
 
   const loadMore = useCallback(() => {
     if (!loading && hasMore) {
-      fetchTemplates(offset, true);
+      fetchNextPage();
     }
-  }, [loading, hasMore, fetchTemplates, offset]);
+  }, [loading, hasMore, fetchNextPage]);
 
   return {
     templates,
@@ -138,6 +114,6 @@ export function useTemplates({
     error,
     hasMore,
     loadMore,
-    refetch: () => fetchTemplates(0, false),
+    refetch: () => { refetch(); },
   };
 }
