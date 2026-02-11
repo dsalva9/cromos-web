@@ -1,6 +1,7 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { markListingChatNotificationsRead } from '@/lib/supabase/notifications';
+import { logger } from '@/lib/logger';
 
 // Schemas for runtime validation
 const listingChatMessageSchema = z.object({
@@ -47,7 +48,7 @@ export async function getListingChats(
 
     return { data: validated, error: null };
   } catch (error) {
-    console.error('Error fetching listing chats:', error);
+    logger.error('Error fetching listing chats:', error);
     return {
       data: [],
       error:
@@ -69,7 +70,7 @@ export async function sendListingMessage(
 ): Promise<{ messageId: number | null; error: Error | null }> {
   try {
     if (!message.trim()) {
-      throw new Error('El mensaje no puede estar vacío');
+      throw new Error('El mensaje no puede estar vacÃ­o');
     }
 
     if (message.length > 500) {
@@ -86,7 +87,7 @@ export async function sendListingMessage(
 
     return { messageId: data as number, error: null };
   } catch (error) {
-    console.error('Error sending listing message:', error);
+    logger.error('Error sending listing message:', error);
     return {
       messageId: null,
       error:
@@ -115,7 +116,7 @@ export async function getListingChatParticipants(
 
     return { data: validated, error: null };
   } catch (error) {
-    console.error('Error fetching chat participants:', error);
+    logger.error('Error fetching chat participants:', error);
     return {
       data: [],
       error:
@@ -148,18 +149,18 @@ export async function markListingMessagesRead(
       await markListingChatNotificationsRead(listingId, senderId);
     } catch (notifError) {
       // Log but don't fail if notification marking fails
-      console.warn('Failed to mark chat notifications as read:', notifError);
+      logger.warn('Failed to mark chat notifications as read:', notifError);
     }
 
     return { count: (data as number) || 0, error: null };
   } catch (error) {
-    console.error('Error marking messages as read:', error);
+    logger.error('Error marking messages as read:', error);
     return {
       count: 0,
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudieron marcar los mensajes como leídos'),
+          : new Error('No se pudieron marcar los mensajes como leÃ­dos'),
     };
   }
 }

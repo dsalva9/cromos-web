@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getUserBadges, getTopUserBadges } from '@/lib/supabase/badges';
 import { createClient } from '@/lib/supabase/client';
 import type { UserBadge } from '@/types/badges';
+import { logger } from '@/lib/logger';
 
 export function useUserBadges(userId: string | undefined) {
   const [badges, setBadges] = useState<UserBadge[]>([]);
@@ -27,7 +28,7 @@ export function useUserBadges(userId: string | undefined) {
       const data = await getUserBadges(userId);
       setBadges(data);
     } catch (err) {
-      console.error('Error fetching user badges:', err);
+      logger.error('Error fetching user badges:', err);
       setIsError(true);
       setError(err as Error);
     } finally {
@@ -56,7 +57,7 @@ export function useUserBadges(userId: string | undefined) {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('New badge earned:', payload);
+          logger.debug('New badge earned:', payload);
           // Refetch badges
           fetchBadges();
         }
@@ -98,7 +99,7 @@ export function useTopUserBadges(userId: string | undefined, limit: number = 3) 
         const data = await getTopUserBadges(userId, limit);
         setBadges(data);
       } catch (err) {
-        console.error('Error fetching top user badges:', err);
+        logger.error('Error fetching top user badges:', err);
         setIsError(true);
       } finally {
         setIsLoading(false);

@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { getAllBadgeDefinitions, getBadgesByCategory } from '@/lib/supabase/badges';
 import type { BadgeDefinition } from '@/types/badges';
+import { logger } from '@/lib/logger';
 
 export function useBadgeDefinitions() {
   const [definitions, setDefinitions] = useState<BadgeDefinition[]>([]);
@@ -22,7 +23,7 @@ export function useBadgeDefinitions() {
         const data = await getAllBadgeDefinitions();
         setDefinitions(data);
       } catch (err) {
-        console.error('Error fetching badge definitions:', err);
+        logger.error('Error fetching badge definitions:', err);
         setIsError(true);
         setError(err as Error);
       } finally {
@@ -57,7 +58,7 @@ export function useBadgeDefinitionsByCategory(category: string) {
         const data = await getBadgesByCategory(category);
         setDefinitions(data);
       } catch (err) {
-        console.error('Error fetching badge definitions by category:', err);
+        logger.error('Error fetching badge definitions by category:', err);
         setIsError(true);
       } finally {
         setIsLoading(false);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 export function useResolveReport() {
   const supabase = useSupabaseClient();
@@ -19,7 +20,7 @@ export function useResolveReport() {
         throw new Error(`Invalid report ID: ${reportId}`);
       }
 
-      console.log('Resolving report with params:', {
+      logger.debug('Resolving report with params:', {
         p_report_id: parsedId,
         p_action: action,
         p_admin_notes: adminNotes
@@ -32,13 +33,13 @@ export function useResolveReport() {
       });
 
       if (error) {
-        console.error('RPC Error:', error);
+        logger.error('RPC Error:', error);
         throw error;
       }
 
-      console.log('Report resolved successfully:', data);
+      logger.debug('Report resolved successfully:', data);
     } catch (error) {
-      console.error('Failed to resolve report:', error);
+      logger.error('Failed to resolve report:', error);
       throw error;
     } finally {
       setLoading(false);

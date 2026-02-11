@@ -6,6 +6,7 @@ import {
   PermanentDeleteListingResponse,
   PermanentDeleteTemplateResponse,
 } from '@/types/admin';
+import { logger } from '@/lib/logger';
 
 export function useAdminPermanentDelete() {
   const supabase = useSupabaseClient();
@@ -32,7 +33,7 @@ export function useAdminPermanentDelete() {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
       toast.error(`Failed to delete user: ${errorMessage}`);
-      console.error('Error permanently deleting user:', err);
+      logger.error('Error permanently deleting user:', err);
       return null;
     } finally {
       setLoading(false);
@@ -59,7 +60,7 @@ export function useAdminPermanentDelete() {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
       toast.error(`Failed to delete listing: ${errorMessage}`);
-      console.error('Error permanently deleting listing:', err);
+      logger.error('Error permanently deleting listing:', err);
       return null;
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ export function useAdminPermanentDelete() {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
       toast.error(`Failed to delete template: ${errorMessage}`);
-      console.error('Error permanently deleting template:', err);
+      logger.error('Error permanently deleting template:', err);
       return null;
     } finally {
       setLoading(false);

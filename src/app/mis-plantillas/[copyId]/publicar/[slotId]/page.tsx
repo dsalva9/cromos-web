@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 function PublishDuplicateContent() {
   const params = useParams();
@@ -54,7 +55,7 @@ function PublishDuplicateContent() {
       );
 
       if (copyError) {
-        console.error('RPC error fetching copies:', copyError);
+        logger.error('RPC error fetching copies:', copyError);
         throw copyError;
       }
 
@@ -75,7 +76,7 @@ function PublishDuplicateContent() {
       );
 
       if (templateError) {
-        console.error('Error fetching template details:', templateError);
+        logger.error('Error fetching template details:', templateError);
       }
 
       setTemplateInfo({
@@ -89,7 +90,7 @@ function PublishDuplicateContent() {
       });
 
       if (error) {
-        console.error('RPC error:', error);
+        logger.error('RPC error:', error);
         throw error;
       }
 
@@ -119,7 +120,7 @@ function PublishDuplicateContent() {
 
       setSlotData(slot as SlotData);
     } catch (err) {
-      console.error('Failed to load slot data:', err);
+      logger.error('Failed to load slot data:', err);
       toast.error('Error al cargar datos del cromo');
       router.back();
     } finally {

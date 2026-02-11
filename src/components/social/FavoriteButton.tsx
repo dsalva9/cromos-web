@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '@/hooks/social/useFavorites';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface FavoriteButtonProps {
   userId: string;
@@ -61,7 +62,7 @@ export function FavoriteButton({ userId, onFavoriteDelta }: FavoriteButtonProps)
       if (onFavoriteDelta) {
         onFavoriteDelta(-(optimistic ? 1 : -1));
       }
-      console.error('Favorite toggle error:', error);
+      logger.error('Favorite toggle error:', error);
       toast.error('No se pudo actualizar el favorito');
     }
   };

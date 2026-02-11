@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { EyeOff, Eye } from 'lucide-react';
 import { useIgnore } from '@/hooks/social/useIgnore';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface IgnoreButtonProps {
   userId: string;
@@ -36,7 +37,7 @@ export function IgnoreButton({
         const ignored = await isUserIgnored(userId);
         setIsIgnored(ignored);
       } catch (error) {
-        console.error('Error checking ignored status:', error);
+        logger.error('Error checking ignored status:', error);
       } finally {
         setChecking(false);
       }

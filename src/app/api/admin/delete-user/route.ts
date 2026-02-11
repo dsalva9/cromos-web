@@ -1,6 +1,7 @@
 import { createServerSupabaseClient, createSupabaseAdminClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   // Rate limit: max 3 admin delete-user requests per minute per IP
@@ -41,9 +42,9 @@ export async function POST(request: Request) {
     try {
       adminClient = createSupabaseAdminClient();
     } catch {
-      console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
+      logger.error('SUPABASE_SERVICE_ROLE_KEY not configured');
       return NextResponse.json(
-        { error: 'Configuración del servidor incompleta' },
+        { error: 'ConfiguraciÃ³n del servidor incompleta' },
         { status: 500 }
       );
     }
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     });
 
     if (purgeError) {
-      console.error('Error purging user data:', purgeError);
+      logger.error('Error purging user data:', purgeError);
       return NextResponse.json(
         { error: `Error purging user data: ${purgeError.message}` },
         { status: 500 }
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
     );
 
     if (deleteError) {
-      console.error('Error deleting user:', deleteError);
+      logger.error('Error deleting user:', deleteError);
       return NextResponse.json(
         { error: 'Error al eliminar usuario' },
         { status: 500 }
@@ -91,16 +92,16 @@ export async function POST(request: Request) {
     });
 
     if (auditError) {
-      console.error('Error logging to audit:', auditError);
+      logger.error('Error logging to audit:', auditError);
       // Don't fail the request if audit logging fails
     }
 
     return NextResponse.json({
       success: true,
-      message: 'Usuario eliminado con éxito'
+      message: 'Usuario eliminado con Ã©xito'
     });
   } catch (error) {
-    console.error('Delete user error:', error);
+    logger.error('Delete user error:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

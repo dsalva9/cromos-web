@@ -10,6 +10,7 @@ import type {
   NotificationKind,
 } from '@/types/notifications';
 import { getDefaultPreferences } from '@/lib/notifications/config';
+import { logger } from '@/lib/logger';
 
 // Legacy interface for backward compatibility
 export interface NotificationPreferences {
@@ -26,7 +27,7 @@ export async function fetchNotificationPreferences(): Promise<GranularNotificati
   const { data, error } = await supabase.rpc('get_notification_preferences');
 
   if (error) {
-    console.error('Error fetching notification preferences:', error);
+    logger.error('Error fetching notification preferences:', error);
     // Return defaults on error
     return getDefaultPreferences();
   }
@@ -47,8 +48,8 @@ export async function updateNotificationPreferences(
   });
 
   if (error) {
-    console.error('Error updating notification preferences:', error);
-    throw new Error('Error al actualizar las preferencias de notificación');
+    logger.error('Error updating notification preferences:', error);
+    throw new Error('Error al actualizar las preferencias de notificaciÃ³n');
   }
 }
 
@@ -128,7 +129,7 @@ export async function updateOneSignalPlayerId(playerId: string): Promise<void> {
   });
 
   if (error) {
-    console.error('Error updating OneSignal player ID:', error);
+    logger.error('Error updating OneSignal player ID:', error);
     throw new Error('Error al actualizar el ID de notificaciones push');
   }
 }

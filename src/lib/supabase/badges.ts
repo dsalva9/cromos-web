@@ -10,6 +10,7 @@ import type {
   BadgeProgress,
   BadgeAwardResult,
 } from '@/types/badges';
+import { logger } from '@/lib/logger';
 
 /**
  * Get all badges earned by a user
@@ -22,7 +23,7 @@ export async function getUserBadges(userId: string): Promise<UserBadge[]> {
   });
 
   if (error) {
-    console.error('Error fetching user badges:', error);
+    logger.error('Error fetching user badges:', error);
     throw error;
   }
 
@@ -42,7 +43,7 @@ export async function getBadgeProgress(
   });
 
   if (error) {
-    console.error('Error fetching badge progress:', error);
+    logger.error('Error fetching badge progress:', error);
     throw error;
   }
 
@@ -61,7 +62,7 @@ export async function getAllBadgeDefinitions(): Promise<BadgeDefinition[]> {
     .order('sort_order', { ascending: true });
 
   if (error) {
-    console.error('Error fetching badge definitions:', error);
+    logger.error('Error fetching badge definitions:', error);
     throw error;
   }
 
@@ -83,7 +84,7 @@ export async function getBadgesByCategory(
     .order('threshold', { ascending: true });
 
   if (error) {
-    console.error('Error fetching badges by category:', error);
+    logger.error('Error fetching badges by category:', error);
     throw error;
   }
 
@@ -105,7 +106,7 @@ export async function getBadgeById(
     .single();
 
   if (error) {
-    console.error('Error fetching badge by ID:', error);
+    logger.error('Error fetching badge by ID:', error);
     return null;
   }
 
@@ -127,7 +128,7 @@ export async function checkAndAwardBadge(
   });
 
   if (error) {
-    console.error('Error checking/awarding badge:', error);
+    logger.error('Error checking/awarding badge:', error);
     throw error;
   }
 
@@ -187,7 +188,7 @@ export async function userHasBadge(
 
   if (error && error.code !== 'PGRST116') {
     // PGRST116 is "not found" error
-    console.error('Error checking user badge:', error);
+    logger.error('Error checking user badge:', error);
     return false;
   }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Mail, ChevronDown, ChevronUp, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 const supabase = createClient();
 
@@ -42,7 +43,7 @@ export default function InboundEmailLogs() {
       setLogs((data as unknown as InboundEmailLog[]) || []);
       setHasMore(data && data.length === LOGS_PER_PAGE);
     } catch (err) {
-      console.error('Error fetching email logs:', err);
+      logger.error('Error fetching email logs:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch logs');
     } finally {
       setLoading(false);

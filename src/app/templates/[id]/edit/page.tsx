@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export default function TemplateEditPage() {
   const params = useParams();
@@ -86,7 +87,7 @@ export default function TemplateEditPage() {
         );
 
         if (pageError) {
-          console.error(`Error creating page ${pageIndex}:`, pageError);
+          logger.error(`Error creating page ${pageIndex}:`, pageError);
           throw pageError;
         }
       }
@@ -94,7 +95,7 @@ export default function TemplateEditPage() {
       toast.success('Colección actualizada con éxito');
       router.push(`/templates/${templateId}`);
     } catch (err) {
-      console.error('Error updating template:', err);
+      logger.error('Error updating template:', err);
       toast.error(
         err instanceof Error ? err.message : 'Error al actualizar colección'
       );

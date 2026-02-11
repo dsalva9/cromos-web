@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface DeletionStatus {
   isScheduled: boolean;
@@ -75,7 +76,7 @@ export function useAccountDeletionStatus() {
           });
         }
       } catch (error) {
-        console.error('Error checking deletion status:', error);
+        logger.error('Error checking deletion status:', error);
       } finally {
         setLoading(false);
       }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface AdminListing {
   id: number;
@@ -47,7 +48,7 @@ export function useAdminListings(
       // For now, we don't have total count - could add another RPC
       setTotalCount(data?.length || 0);
     } catch (err) {
-      console.error('Error fetching admin listings:', err);
+      logger.error('Error fetching admin listings:', err);
       setError(err instanceof Error ? err : new Error('Error al cargar listados'));
     } finally {
       setLoading(false);

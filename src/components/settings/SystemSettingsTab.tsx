@@ -9,6 +9,7 @@ import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 import { DeleteAccountDialog } from '@/components/deletion';
 import { ThemeSettingsSection } from './ThemeSettingsSection';
+import { logger } from '@/lib/logger';
 
 export function SystemSettingsTab() {
   const supabase = useSupabaseClient();
@@ -24,7 +25,7 @@ export function SystemSettingsTab() {
         toast.success('Consejos reactivados correctamente');
       }
     } catch (error) {
-      console.error('Error reactivating tips:', error);
+      logger.error('Error reactivating tips:', error);
       toast.error('Error al reactivar los consejos');
     }
   };
@@ -38,14 +39,14 @@ export function SystemSettingsTab() {
 
       if (error) throw error;
 
-      toast.success('Se ha cerrado sesión en todos los dispositivos');
+      toast.success('Se ha cerrado sesiÃ³n en todos los dispositivos');
       router.push('/login');
     } catch (error) {
-      console.error('Error signing out from all devices:', error);
+      logger.error('Error signing out from all devices:', error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al cerrar sesión en todos los dispositivos'
+          : 'Error al cerrar sesiÃ³n en todos los dispositivos'
       );
     } finally {
       setSigningOut(false);
@@ -93,11 +94,11 @@ export function SystemSettingsTab() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Cerrar sesión en todos los dispositivos
+                Cerrar sesiÃ³n en todos los dispositivos
               </h3>
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-                Cierra tu sesión en todos los dispositivos donde hayas iniciado
-                sesión, incluyendo este. Tendrás que volver a iniciar sesión.
+                Cierra tu sesiÃ³n en todos los dispositivos donde hayas iniciado
+                sesiÃ³n, incluyendo este. TendrÃ¡s que volver a iniciar sesiÃ³n.
               </p>
               <Button
                 onClick={handleSignOutAllDevices}
@@ -107,13 +108,13 @@ export function SystemSettingsTab() {
                 {signingOut ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Cerrando sesión...
+                    Cerrando sesiÃ³n...
                   </>
                 ) : (
                   <>
                     <LogOut className="h-4 w-4 mr-2" />
-                    <span className="sm:hidden">Cerrar sesión en todos</span>
-                    <span className="hidden sm:inline">Cerrar sesión en todos los dispositivos</span>
+                    <span className="sm:hidden">Cerrar sesiÃ³n en todos</span>
+                    <span className="hidden sm:inline">Cerrar sesiÃ³n en todos los dispositivos</span>
                   </>
                 )}
               </Button>
@@ -134,8 +135,8 @@ export function SystemSettingsTab() {
                 Eliminar mi cuenta
               </h3>
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-                Esta acción programará tu cuenta para eliminación permanente en 90 días.
-                Durante este período puedes cancelar la eliminación. Perderás:
+                Esta acciÃ³n programarÃ¡ tu cuenta para eliminaciÃ³n permanente en 90 dÃ­as.
+                Durante este perÃ­odo puedes cancelar la eliminaciÃ³n. PerderÃ¡s:
               </p>
               <ul className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4 list-disc list-inside space-y-1">
                 <li>Todos tus datos de usuario</li>
@@ -148,7 +149,7 @@ export function SystemSettingsTab() {
               <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-500 dark:border-red-400 rounded-lg p-3 md:p-4 mb-4">
                 <p className="text-sm md:text-base text-red-600 dark:text-red-400 font-bold flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                  Esta acción es irreversible
+                  Esta acciÃ³n es irreversible
                 </p>
               </div>
               <Button

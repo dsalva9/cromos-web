@@ -18,6 +18,7 @@ import { useResolveReport } from '@/hooks/admin/useResolveReport';
 import { toast } from 'sonner';
 import { AlertTriangle, X, Trash, Ban, ExternalLink } from 'lucide-react';
 import Link from '@/components/ui/link';
+import { logger } from '@/lib/logger';
 
 interface ReportDetailModalProps {
   reportId: string;
@@ -54,7 +55,7 @@ export function ReportDetailModal({
       onResolved();
       onClose();
     } catch (error) {
-      console.error('Error resolving report:', error);
+      logger.error('Error resolving report:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       toast.error(`Failed to resolve report: ${errorMessage}`);
@@ -196,7 +197,7 @@ export function ReportDetailModal({
                   {typeof content.rating_avg === 'number'
                     ? content.rating_avg.toFixed(1)
                     : '0.0'}{' '}
-                  ⭐
+                  â­
                 </p>
                 {content.is_suspended && (
                   <Badge className="bg-red-600 text-white">Suspended</Badge>
@@ -247,7 +248,7 @@ export function ReportDetailModal({
                   {typeof content.rating_avg === 'number'
                     ? content.rating_avg.toFixed(1)
                     : '0.0'}{' '}
-                  ⭐
+                  â­
                 </p>
                 <p className="text-gray-600 dark:text-gray-300">
                   <span className="text-gray-600 dark:text-gray-400">Public:</span>{' '}

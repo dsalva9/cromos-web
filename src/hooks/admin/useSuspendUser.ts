@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 export function useSuspendUser() {
   const supabase = useSupabaseClient();
@@ -15,11 +16,11 @@ export function useSuspendUser() {
       });
 
       if (error) {
-        console.error('Suspend user error:', error);
+        logger.error('Suspend user error:', error);
         throw error;
       }
     } catch (error) {
-      console.error('Suspend user catch:', error);
+      logger.error('Suspend user catch:', error);
       throw error;
     } finally {
       setLoading(false);

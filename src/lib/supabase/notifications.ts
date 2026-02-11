@@ -6,6 +6,7 @@
 import { createClient } from '@/lib/supabase/client';
 import type { AppNotification, RawNotification, NotificationKind } from '@/types/notifications';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 /**
  * Zod schema for validating raw notification data
@@ -76,7 +77,7 @@ export async function fetchNotifications(): Promise<AppNotification[]> {
   const { data, error } = await supabase.rpc('get_notifications');
 
   if (error) {
-    console.error('Error fetching notifications:', error);
+    logger.error('Error fetching notifications:', error);
     throw new Error('Error al cargar las notificaciones');
   }
 
@@ -98,7 +99,7 @@ export async function fetchUnreadCount(): Promise<number> {
   const { data, error } = await supabase.rpc('get_notification_count');
 
   if (error) {
-    console.error('Error fetching unread count:', error);
+    logger.error('Error fetching unread count:', error);
     return 0;
   }
 
@@ -114,8 +115,8 @@ export async function markAllRead(): Promise<void> {
   const { error } = await supabase.rpc('mark_all_notifications_read');
 
   if (error) {
-    console.error('Error marking all as read:', error);
-    throw new Error('Error al marcar notificaciones como leídas');
+    logger.error('Error marking all as read:', error);
+    throw new Error('Error al marcar notificaciones como leÃ­das');
   }
 }
 
@@ -130,8 +131,8 @@ export async function markRead(notificationId: number): Promise<void> {
   });
 
   if (error) {
-    console.error('Error marking notification as read:', error);
-    throw new Error('Error al marcar la notificación como leída');
+    logger.error('Error marking notification as read:', error);
+    throw new Error('Error al marcar la notificaciÃ³n como leÃ­da');
   }
 }
 
@@ -150,8 +151,8 @@ export async function markListingChatNotificationsRead(
   });
 
   if (error) {
-    console.error('Error marking listing chat notifications as read:', error);
-    throw new Error('Error al marcar las notificaciones de chat como leídas');
+    logger.error('Error marking listing chat notifications as read:', error);
+    throw new Error('Error al marcar las notificaciones de chat como leÃ­das');
   }
 }
 
@@ -182,7 +183,7 @@ export function subscribeToNotifications(
           const notification = transformNotification(validated);
           onNotification(notification);
         } catch (error) {
-          console.error('Error processing realtime notification:', error);
+          logger.error('Error processing realtime notification:', error);
         }
       }
     )

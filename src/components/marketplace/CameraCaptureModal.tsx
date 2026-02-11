@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { logger } from '@/lib/logger';
 
 interface CameraCaptureModalProps {
   open: boolean;
@@ -64,10 +65,10 @@ export function CameraCaptureModal({
           videoRef.current.srcObject = mediaStream;
         }
       } catch (error) {
-        console.error('Camera error:', error);
+        logger.error('Camera error:', error);
         if (isMounted) {
           setPermissionDenied(true);
-          toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
+          toast.error('No se pudo acceder a la cÃ¡mara. Verifica los permisos.');
         }
       }
     }
@@ -130,7 +131,7 @@ export function CameraCaptureModal({
       onCapture(result.blob, fileName);
       onClose();
     } catch (error) {
-      console.error('Processing error:', error);
+      logger.error('Processing error:', error);
       toast.error('Error al procesar la foto');
     } finally {
       setProcessing(false);
@@ -141,17 +142,17 @@ export function CameraCaptureModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-0" aria-describedby={undefined}>
         <VisuallyHidden>
-          <DialogTitle>Capturar foto con cámara</DialogTitle>
+          <DialogTitle>Capturar foto con cÃ¡mara</DialogTitle>
         </VisuallyHidden>
         <div className="relative bg-black">
           {permissionDenied ? (
             <div className="p-8 text-center bg-white dark:bg-gray-800">
               <Camera className="h-16 w-16 text-gray-500 mx-auto mb-4" />
               <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">
-                Permiso de cámara denegado
+                Permiso de cÃ¡mara denegado
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Para usar la cámara, habilita los permisos en la configuración de tu
+                Para usar la cÃ¡mara, habilita los permisos en la configuraciÃ³n de tu
                 navegador.
               </p>
               <Button onClick={onClose}>Cerrar</Button>

@@ -9,6 +9,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { MessageCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
+import { logger } from '@/lib/logger';
 
 interface Conversation {
   listing_id: number;
@@ -37,7 +38,7 @@ function ChatsPageContent() {
       const { data, error } = await supabase.rpc('get_user_conversations');
 
       if (error) {
-        console.error('Error fetching conversations:', error);
+        logger.error('Error fetching conversations:', error);
       } else if (data) {
         setConversations(data);
       }
@@ -70,7 +71,7 @@ function ChatsPageContent() {
           tipId="tip-chats"
           icon={Lightbulb}
           title="Tus conversaciones"
-          description="Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
+          description="AquÃ­ verÃ¡s todos los chats sobre anuncios del Marketplace. TambiÃ©n puedes marcar usuarios como favoritos para encontrarlos fÃ¡cilmente despuÃ©s."
           className="mb-6"
         />
 

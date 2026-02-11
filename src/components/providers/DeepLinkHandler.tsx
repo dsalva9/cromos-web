@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
 import { useRouter } from '@/hooks/use-router';
+import { logger } from '@/lib/logger';
 
 export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -17,7 +18,7 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
 
     // Handle deep links when app is opened from a link
     CapacitorApp.addListener('appUrlOpen', (data) => {
-      console.log('Deep link received:', data.url);
+      logger.debug('Deep link received:', data.url);
 
       // Extract the path from the URL
       // Support both HTTPS and custom schemes (com.cambiocromos.app://auth/callback)
@@ -30,7 +31,7 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
         path = '/' + url.host + url.pathname + url.search + url.hash;
       }
 
-      console.log('Navigating to:', path);
+      logger.debug('Navigating to:', path);
 
       // Navigate to the path
       router.push(path);

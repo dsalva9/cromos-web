@@ -2,6 +2,7 @@ import { createServerSupabaseClient, createSupabaseAdminClient } from '@/lib/sup
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   // Rate limit: max 3 admin force-resets per minute per IP
@@ -42,9 +43,9 @@ export async function POST(request: Request) {
     try {
       adminClient = createSupabaseAdminClient();
     } catch {
-      console.error('SUPABASE_SERVICE_ROLE_KEY not configured');
+      logger.error('SUPABASE_SERVICE_ROLE_KEY not configured');
       return NextResponse.json(
-        { error: 'Configuración del servidor incompleta' },
+        { error: 'ConfiguraciÃ³n del servidor incompleta' },
         { status: 500 }
       );
     }
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
     const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);
 
     if (userError || !userData?.user?.email) {
-      console.error('Error fetching user:', userError);
+      logger.error('Error fetching user:', userError);
       return NextResponse.json(
         { error: 'Usuario no encontrado' },
         { status: 404 }
@@ -75,7 +76,7 @@ export async function POST(request: Request) {
     });
 
     if (error || !linkData) {
-      console.error('Error generating reset link:', error);
+      logger.error('Error generating reset link:', error);
       return NextResponse.json(
         { error: 'Error al generar enlace de restablecimiento' },
         { status: 500 }
@@ -85,9 +86,9 @@ export async function POST(request: Request) {
     // Send email using Resend
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
-      console.error('RESEND_API_KEY not configured');
+      logger.error('RESEND_API_KEY not configured');
       return NextResponse.json(
-        { error: 'Configuración de email incompleta' },
+        { error: 'ConfiguraciÃ³n de email incompleta' },
         { status: 500 }
       );
     }
@@ -98,18 +99,18 @@ export async function POST(request: Request) {
       await resend.emails.send({
         from: 'CambioCromos <info@cambiocromos.com>',
         to: userData.user.email,
-        subject: 'Restablecer tu contraseña',
+        subject: 'Restablecer tu contraseÃ±a',
         html: `
-          <h2>Restablecimiento de contraseña</h2>
-          <p>Un administrador ha solicitado restablecer tu contraseña.</p>
-          <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-          <p><a href="${linkData.properties.action_link}">Restablecer contraseña</a></p>
-          <p>Este enlace expirará en 24 horas.</p>
+          <h2>Restablecimiento de contraseÃ±a</h2>
+          <p>Un administrador ha solicitado restablecer tu contraseÃ±a.</p>
+          <p>Haz clic en el siguiente enlace para restablecer tu contraseÃ±a:</p>
+          <p><a href="${linkData.properties.action_link}">Restablecer contraseÃ±a</a></p>
+          <p>Este enlace expirarÃ¡ en 24 horas.</p>
           <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
         `
       });
     } catch (emailError) {
-      console.error('Error sending email:', emailError);
+      logger.error('Error sending email:', emailError);
       return NextResponse.json(
         { error: 'Error al enviar el correo' },
         { status: 500 }
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
     });
 
     if (auditError) {
-      console.error('Error logging to audit:', auditError);
+      logger.error('Error logging to audit:', auditError);
       // Don't fail the request if audit logging fails
     }
 
@@ -140,7 +141,7 @@ export async function POST(request: Request) {
       message: 'Correo de restablecimiento enviado'
     });
   } catch (error) {
-    console.error('Force reset error:', error);
+    logger.error('Force reset error:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

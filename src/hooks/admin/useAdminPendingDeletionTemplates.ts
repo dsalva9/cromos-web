@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { PendingDeletionTemplate } from '@/types/admin';
+import { logger } from '@/lib/logger';
 
 export function useAdminPendingDeletionTemplates() {
   const supabase = useSupabaseClient();
@@ -20,7 +21,7 @@ export function useAdminPendingDeletionTemplates() {
       setTemplates(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error fetching pending deletion templates:', err);
+      logger.error('Error fetching pending deletion templates:', err);
     } finally {
       setLoading(false);
     }

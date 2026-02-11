@@ -7,6 +7,7 @@ import { LeanListingCard } from '@/components/home/LeanListingCard';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { AlertCircle } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function MarketplaceShowcase() {
   const { listings, loading, error } = useListings({ limit: 6 });
@@ -14,7 +15,7 @@ export default function MarketplaceShowcase() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    console.log('MarketplaceShowcase render:', {
+    logger.debug('MarketplaceShowcase render:', {
       loading,
       listingsCount: listings.length,
       displayListingsCount: displayListings.length,
@@ -23,7 +24,7 @@ export default function MarketplaceShowcase() {
 
     // Only update display listings when we actually have data and not loading
     if (!loading && listings.length > 0 && !isReady) {
-      console.log('Setting display listings');
+      logger.debug('Setting display listings');
       setDisplayListings(listings);
       setIsReady(true);
     }

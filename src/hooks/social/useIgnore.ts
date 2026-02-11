@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export function useIgnore() {
   const supabase = useSupabaseClient();
@@ -20,7 +21,7 @@ export function useIgnore() {
         toast.success('Usuario bloqueado correctamente');
         return true;
       } catch (error) {
-        console.error('Error ignoring user:', error);
+        logger.error('Error ignoring user:', error);
         toast.error(
           error instanceof Error ? error.message : 'Error al bloquear usuario'
         );
@@ -46,7 +47,7 @@ export function useIgnore() {
         toast.success('Usuario desbloqueado correctamente');
         return true;
       } catch (error) {
-        console.error('Error unignoring user:', error);
+        logger.error('Error unignoring user:', error);
         toast.error(
           error instanceof Error
             ? error.message
@@ -72,7 +73,7 @@ export function useIgnore() {
 
         return Boolean(data);
       } catch (error) {
-        console.error('Error checking if user is ignored:', error);
+        logger.error('Error checking if user is ignored:', error);
         return false;
       }
     },
@@ -115,7 +116,7 @@ export function useIgnoredUsers() {
 
         setIgnoredUsers(data || []);
       } catch (err) {
-        console.error('Error fetching ignored users:', err);
+        logger.error('Error fetching ignored users:', err);
         setError(
           err instanceof Error
             ? err.message
@@ -136,7 +137,7 @@ export function useIgnoredUsers() {
 
       return Number(data) || 0;
     } catch (err) {
-      console.error('Error getting ignored users count:', err);
+      logger.error('Error getting ignored users count:', err);
       return 0;
     }
   }, [supabase]);

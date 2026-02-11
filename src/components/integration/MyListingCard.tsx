@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { DeletionCountdown } from '@/components/deletion';
+import { logger } from '@/lib/logger';
 
 interface MyListing {
   listing_id: number;
@@ -66,7 +67,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       }
     } catch (error) {
       // Error handling is done in hook
-      console.error('Soft delete failed:', error);
+      logger.error('Soft delete failed:', error);
     }
   };
 
@@ -76,7 +77,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       onUpdate(); // Refresh listings
     } catch (error) {
       // Error handling is done in hook
-      console.error('Hard delete failed:', error);
+      logger.error('Hard delete failed:', error);
     }
   };
 
@@ -90,7 +91,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       }
     } catch (error) {
       // Error handling is done in hook
-      console.error('Restore failed:', error);
+      logger.error('Restore failed:', error);
     }
   };
 
@@ -196,7 +197,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             {listing.copy_id && (
               <div className="flex items-center gap-2 text-sm">
                 <Badge variant="outline" className="bg-blue-100 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-200">
-                  Sincronizado con Colección
+                  Sincronizado con ColecciÃ³n
                 </Badge>
                 {listing.current_count !== null && (
                   <span className="text-gray-600">
@@ -211,7 +212,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
               <div className="text-xs text-gray-600 space-y-1">
                 {(listing.page_number || listing.page_title) && (
                   <div>
-                    <span className="font-bold text-gray-900">Página:</span>{' '}
+                    <span className="font-bold text-gray-900">PÃ¡gina:</span>{' '}
                     {listing.page_number && `${listing.page_number}`}
                     {listing.page_number && listing.page_title && ' - '}
                     {listing.page_title}
@@ -219,13 +220,13 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 )}
                 {(listing.sticker_number || listing.slot_variant) && (
                   <div>
-                    <span className="font-bold text-gray-900">Número de cromo:</span>{' '}
+                    <span className="font-bold text-gray-900">NÃºmero de cromo:</span>{' '}
                     #{listing.sticker_number}{listing.slot_variant}
                   </div>
                 )}
                 {listing.global_number && (
                   <div>
-                    <span className="font-bold text-gray-900">Número global:</span>{' '}
+                    <span className="font-bold text-gray-900">NÃºmero global:</span>{' '}
                     #{listing.global_number}
                   </div>
                 )}
@@ -238,7 +239,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 <Eye className="h-4 w-4" />
                 {listing.views_count} vistas
               </div>
-              <span>•</span>
+              <span>â€¢</span>
               <span>Creado el {formatDate(listing.created_at)}</span>
             </div>
 

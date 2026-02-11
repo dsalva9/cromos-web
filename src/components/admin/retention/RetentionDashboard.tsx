@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent, ModernCardHeader } from '@/components/ui/modern-card';
 import { Loader2, Clock, Shield, Trash2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface RetentionStats {
   pending_deletions: number;
@@ -26,12 +27,12 @@ export function RetentionDashboard() {
         const { data, error } = await supabase.rpc('admin_get_retention_stats');
 
         if (error) {
-          console.error('Error loading retention stats:', error);
+          logger.error('Error loading retention stats:', error);
         } else {
           setStats(data as unknown as RetentionStats);
         }
       } catch (err) {
-        console.error('Failed to load retention stats:', err);
+        logger.error('Failed to load retention stats:', err);
       } finally {
         setLoading(false);
       }
@@ -72,7 +73,7 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-white">{stats?.pending_deletions || 0}</p>
           <p className="text-sm text-gray-400 mt-2">
-            Próxima: {formatDate(stats?.next_deletion_date || null)}
+            PrÃ³xima: {formatDate(stats?.next_deletion_date || null)}
           </p>
           <div className="mt-3 space-y-1 text-xs text-gray-500">
             <div>Cuentas: {stats?.pending_accounts || 0}</div>
@@ -93,7 +94,7 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-orange-500">{stats?.legal_holds || 0}</p>
           <p className="text-sm text-gray-400 mt-2">
-            Órdenes de preservación activas
+            Ã“rdenes de preservaciÃ³n activas
           </p>
         </ModernCardContent>
       </ModernCard>
@@ -123,9 +124,9 @@ export function RetentionDashboard() {
           </div>
         </ModernCardHeader>
         <ModernCardContent>
-          <p className="text-3xl font-bold text-green-500">✓</p>
+          <p className="text-3xl font-bold text-green-500">âœ“</p>
           <p className="text-sm text-gray-400 mt-2">
-            Sistema de retención operativo
+            Sistema de retenciÃ³n operativo
           </p>
         </ModernCardContent>
       </ModernCard>

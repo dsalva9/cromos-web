@@ -11,6 +11,7 @@ import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { logger } from '@/lib/logger';
 
 export default function IgnoredUsersPage() {
   const { user } = useUser();
@@ -42,7 +43,7 @@ export default function IgnoredUsersPage() {
       toast.success(`${nickname} ha sido eliminado de tu lista de bloqueados`);
       removeFromIgnoredList(userId);
     } catch (error) {
-      console.error('Error unignoring user:', error);
+      logger.error('Error unignoring user:', error);
       toast.error(
         error instanceof Error
           ? error.message
@@ -62,7 +63,7 @@ export default function IgnoredUsersPage() {
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'ayer';
     if (diffDays < 7)
-      return `hace ${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+      return `hace ${diffDays} ${diffDays === 1 ? 'dÃ­a' : 'dÃ­as'}`;
     if (diffDays < 30) {
       const weeks = Math.floor(diffDays / 7);
       return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
@@ -76,11 +77,11 @@ export default function IgnoredUsersPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-900 text-xl mb-4">
-            Debes iniciar sesión para ver esta página
+            Debes iniciar sesiÃ³n para ver esta pÃ¡gina
           </p>
           <Link href="/login">
             <Button className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900">
-              Iniciar sesión
+              Iniciar sesiÃ³n
             </Button>
           </Link>
         </div>
@@ -125,7 +126,7 @@ export default function IgnoredUsersPage() {
                   No tienes usuarios bloqueados
                 </h2>
                 <p className="text-gray-700 text-lg">
-                  Cuando bloquees a usuarios, aparecerán aquí para que puedas
+                  Cuando bloquees a usuarios, aparecerÃ¡n aquÃ­ para que puedas
                   gestionarlos.
                 </p>
               </ModernCardContent>

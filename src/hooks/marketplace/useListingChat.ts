@@ -12,6 +12,7 @@ import {
   ChatParticipant,
 } from '@/lib/supabase/listings/chat';
 import { toast } from '@/lib/toast';
+import { logger } from '@/lib/logger';
 
 interface UseListingChatOptions {
   listingId: number;
@@ -53,7 +54,7 @@ export function useListingChat({
     if (fetchError) {
       setError(fetchError.message);
       // Don't show toast - error handling is done in the UI component
-      console.error('Error fetching messages:', fetchError.message);
+      logger.error('Error fetching messages:', fetchError.message);
     } else {
       setMessages(data);
 
@@ -114,7 +115,7 @@ export function useListingChat({
           id: messageId,
           sender_id: user.id,
           receiver_id: targetReceiverId,
-          sender_nickname: 'Tú',
+          sender_nickname: 'TÃº',
           message: text.trim(),
           is_read: false,
           is_system: false,

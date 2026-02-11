@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface SlotListing {
   id: number;
@@ -47,7 +48,7 @@ export function useSlotListings(copyId: string) {
 
         setSlotListings(listingsMap);
       } catch (error) {
-        console.error('Error fetching slot listings:', error);
+        logger.error('Error fetching slot listings:', error);
         setSlotListings({});
       } finally {
         setLoading(false);

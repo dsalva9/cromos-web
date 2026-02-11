@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface HardDeleteListingResponse {
   success: boolean;
@@ -38,7 +39,7 @@ export function useHardDeleteListing() {
       }
 
       // Show success toast with details
-      let successMessage = '¡Anuncio eliminado permanentemente!';
+      let successMessage = 'Â¡Anuncio eliminado permanentemente!';
       
       if (result.deleted_chat_count > 0 || result.deleted_transaction_count > 0) {
         const details = [];
@@ -63,7 +64,7 @@ export function useHardDeleteListing() {
     } catch (error) {
       // Show specific error messages based on common scenarios
       if (error instanceof Error) {
-        console.error('Hard delete listing error:', error);
+        logger.error('Hard delete listing error:', error);
         
         if (error.message.includes('Permission denied')) {
           toast.error('No tienes permiso para eliminar este anuncio');
@@ -74,7 +75,7 @@ export function useHardDeleteListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para eliminar un anuncio');
         } else {
-          toast.error('Error al eliminar el anuncio permanentemente. Por favor, inténtalo de nuevo.');
+          toast.error('Error al eliminar el anuncio permanentemente. Por favor, intÃ©ntalo de nuevo.');
         }
       }
       

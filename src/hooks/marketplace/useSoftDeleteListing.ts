@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface SoftDeleteListingResponse {
   success: boolean;
@@ -43,7 +44,7 @@ export function useSoftDeleteListing() {
     } catch (error) {
       // Show specific error messages based on common scenarios
       if (error instanceof Error) {
-        console.error('Soft delete listing error:', error);
+        logger.error('Soft delete listing error:', error);
         
         if (error.message.includes('Permission denied')) {
           toast.error('No tienes permiso para eliminar este anuncio');
@@ -54,7 +55,7 @@ export function useSoftDeleteListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para eliminar un anuncio');
         } else {
-          toast.error('Error al eliminar el anuncio. Por favor, inténtalo de nuevo.');
+          toast.error('Error al eliminar el anuncio. Por favor, intÃ©ntalo de nuevo.');
         }
       }
       

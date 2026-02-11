@@ -23,6 +23,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { FloatingActionMenu } from '@/components/chat/FloatingActionMenu';
+import { logger } from '@/lib/logger';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -92,14 +93,14 @@ function ListingChatPageContent() {
         .maybeSingle();
 
       if (listingError) {
-        console.error('Error fetching listing:', listingError);
+        logger.error('Error fetching listing:', listingError);
         setListingAccessDenied(true);
         // Don't return - we can still show chat even if listing fetch fails
         return;
       }
 
       if (!listingData) {
-        console.warn('Listing not found or access denied - continuing with chat only');
+        logger.warn('Listing not found or access denied - continuing with chat only');
         setListingAccessDenied(true);
         // Don't return or show error - user may still have chat access
         // The chat will work, but listing card won't show
@@ -337,7 +338,7 @@ function ListingChatPageContent() {
         window.location.reload();
       }, 500);
     } catch (error) {
-      console.error('Error reserving listing:', error);
+      logger.error('Error reserving listing:', error);
       toast.error('Error al reservar el anuncio');
     } finally {
       setReserving(false);
@@ -376,7 +377,7 @@ function ListingChatPageContent() {
         window.location.reload();
       }, 500);
     } catch (error) {
-      console.error('Error unreserving listing:', error);
+      logger.error('Error unreserving listing:', error);
       toast.error('Error al liberar la reserva');
     } finally {
       setUnreserving(false);
@@ -413,7 +414,7 @@ function ListingChatPageContent() {
         window.location.reload();
       }, 500);
     } catch (error) {
-      console.error('Error completing transaction:', error);
+      logger.error('Error completing transaction:', error);
       toast.error('Error al completar el intercambio');
     } finally {
       setCompleting(false);
@@ -447,7 +448,7 @@ function ListingChatPageContent() {
       // Show rating modal immediately
       setShowRatingModal(true);
     } catch (error) {
-      console.error('Error confirming transaction:', error);
+      logger.error('Error confirming transaction:', error);
       toast.error('Error al confirmar la transacción');
     } finally {
       setConfirming(false);

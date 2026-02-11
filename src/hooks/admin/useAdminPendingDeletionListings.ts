@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { PendingDeletionListing } from '@/types/admin';
+import { logger } from '@/lib/logger';
 
 export function useAdminPendingDeletionListings() {
   const supabase = useSupabaseClient();
@@ -20,7 +21,7 @@ export function useAdminPendingDeletionListings() {
       setListings(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error fetching pending deletion listings:', err);
+      logger.error('Error fetching pending deletion listings:', err);
     } finally {
       setLoading(false);
     }

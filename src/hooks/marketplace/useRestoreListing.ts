@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface RestoreListingResponse {
   success: boolean;
@@ -37,13 +38,13 @@ export function useRestoreListing() {
       }
 
       // Show success toast
-      toast.success('¡Anuncio restaurado correctamente! Ahora está activo de nuevo.');
+      toast.success('Â¡Anuncio restaurado correctamente! Ahora estÃ¡ activo de nuevo.');
 
       return result;
     } catch (error) {
       // Show specific error messages based on common scenarios
       if (error instanceof Error) {
-        console.error('Restore listing error:', error);
+        logger.error('Restore listing error:', error);
 
         if (error.message.includes('Permission denied')) {
           toast.error('No tienes permiso para restaurar este anuncio');
@@ -54,7 +55,7 @@ export function useRestoreListing() {
         } else if (error.message.includes('not authenticated')) {
           toast.error('Debes estar autenticado para restaurar un anuncio');
         } else {
-          toast.error('Error al restaurar el anuncio. Por favor, inténtalo de nuevo.');
+          toast.error('Error al restaurar el anuncio. Por favor, intÃ©ntalo de nuevo.');
         }
       }
 

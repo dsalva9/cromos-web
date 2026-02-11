@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useEmailForwarding } from '@/hooks/admin/useEmailForwarding';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 
 type SummaryFrequency = 'none' | 'daily' | 'weekly';
 
@@ -32,7 +33,7 @@ export default function NewUserSummarySettings() {
             toast.success('Preferencia actualizada');
             await fetchAddresses();
         } catch (err) {
-            console.error('Error updating frequency:', err);
+            logger.error('Error updating frequency:', err);
             toast.error('Error al actualizar preferencia');
         } finally {
             setUpdatingId(null);
@@ -44,7 +45,7 @@ export default function NewUserSummarySettings() {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                throw new Error('No hay sesión activa');
+                throw new Error('No hay sesiÃ³n activa');
             }
 
             const response = await fetch(
@@ -72,7 +73,7 @@ export default function NewUserSummarySettings() {
                 `Resumen enviado a ${result.sent_count} destinatarios (${result.new_users_count} usuarios nuevos)`
             );
         } catch (err) {
-            console.error('Error sending manual summary:', err);
+            logger.error('Error sending manual summary:', err);
             toast.error(err instanceof Error ? err.message : 'Error al enviar resumen');
         } finally {
             setSendingManual(false);

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { SuspendedUser } from '@/types/admin';
+import { logger } from '@/lib/logger';
 
 export function useAdminSuspendedUsers() {
   const supabase = useSupabaseClient();
@@ -20,7 +21,7 @@ export function useAdminSuspendedUsers() {
       setUsers(data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error fetching suspended users:', err);
+      logger.error('Error fetching suspended users:', err);
     } finally {
       setLoading(false);
     }

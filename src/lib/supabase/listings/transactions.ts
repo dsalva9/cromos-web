@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Schemas
 const listingTransactionSchema = z.object({
@@ -37,7 +38,7 @@ export async function reserveListing(
 
     return { transactionId: data as number, error: null };
   } catch (error) {
-    console.error('Error reserving listing:', error);
+    logger.error('Error reserving listing:', error);
     return {
       transactionId: null,
       error:
@@ -64,13 +65,13 @@ export async function completeListingTransaction(
 
     return { success: !!data, error: null };
   } catch (error) {
-    console.error('Error completing transaction:', error);
+    logger.error('Error completing transaction:', error);
     return {
       success: false,
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudo completar la transacción'),
+          : new Error('No se pudo completar la transacciÃ³n'),
     };
   }
 }
@@ -93,7 +94,7 @@ export async function cancelListingTransaction(
 
     return { success: !!data, error: null };
   } catch (error) {
-    console.error('Error cancelling transaction:', error);
+    logger.error('Error cancelling transaction:', error);
     return {
       success: false,
       error:
@@ -120,7 +121,7 @@ export async function unreserveListing(
 
     return { success: !!data, error: null };
   } catch (error) {
-    console.error('Error unreserving listing:', error);
+    logger.error('Error unreserving listing:', error);
     return {
       success: false,
       error:
@@ -154,13 +155,13 @@ export async function getListingTransaction(
 
     return { transaction: validated, error: null };
   } catch (error) {
-    console.error('Error fetching transaction:', error);
+    logger.error('Error fetching transaction:', error);
     return {
       transaction: null,
       error:
         error instanceof Error
           ? error
-          : new Error('No se pudo obtener la transacción'),
+          : new Error('No se pudo obtener la transacciÃ³n'),
     };
   }
 }

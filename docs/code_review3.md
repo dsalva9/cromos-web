@@ -16,8 +16,8 @@ The codebase has **improved substantially** since the first review. The previous
 |---|---|---|---|
 | **`as any` casts** | 40+ | ~2 (in `legacy-tables.ts`) | **7** (2 legacy-tables + 4 OneSignal + 1 publicar page) |
 | **`eslint-disable` comments** | 25+ | ~2 | **16** |
-| **`console.log` calls** | 15 files | ✅ Resolved | **16 calls still present** |
-| **`console.error` calls (bypassing logger)** | Not tracked | Not tracked | **68+ calls** |
+| **`console.log` calls** | 15 files | ✅ Resolved | ✅ **Resolved** — all 16 replaced with `logger.debug` |
+| **`console.error` calls (bypassing logger)** | Not tracked | Not tracked | ✅ **Resolved** — all 68+ replaced with `logger.error`/`logger.warn` |
 | **Hooks using React Query** | 0/40 | 1/40 (pilot) | **1/40** |
 | **Migration TODOs** | 4 | ~2 remaining | **4 remaining** |
 | **Test spec files** | 13 | 13 | **8 spec files** (5 are PDFs/images/assets) |
@@ -37,8 +37,8 @@ The codebase has **improved substantially** since the first review. The previous
 
 ### Weaknesses (-)
 - **Stalled React Query Migration**: 39/40 hooks still use manual `useState`/`useEffect`/`useCallback`. This is the single biggest quality issue — no caching, no deduplication, loading spinners on every navigation.
-- **Logger Bypass**: 68+ `console.error` calls across `lib/supabase/` and `hooks/` bypass the centralized logger. These won't send errors to Sentry.
-- **Incomplete Previous Resolutions**: Several issues marked "✅ Resolved" in the last review still show up in code (`console.log` in 7+ files, `as any` in OneSignal).
+- ~~**Logger Bypass**: 68+ `console.error` calls across `lib/supabase/` and `hooks/` bypass the centralized logger. These won't send errors to Sentry.~~ ✅ **Resolved** — all `console.error`/`console.warn` replaced with `logger.error`/`logger.warn`. ESLint `no-console` rule tightened to `'error'`.
+- ~~**Incomplete Previous Resolutions**: Several issues marked "✅ Resolved" in the last review still show up in code (`console.log` in 7+ files, `as any` in OneSignal).~~ Partially resolved — `console.log` and `console.error` are now fixed. `as any` in OneSignal remains open (L4).
 - **Low Test Coverage**: Only 8 Playwright spec files, no unit tests, no component tests.
 - **Migration Debt**: 4 TODO markers for v1.6.0 migration remain open.
 
@@ -46,67 +46,11 @@ The codebase has **improved substantially** since the first review. The previous
 
 ## New Issues Found
 
-### N1. `console.error` calls bypass centralized logger (68+ occurrences)
+### N1. `console.error` calls bypass centralized logger (68+ occurrences) ✅ Resolved
 
 **Severity**: Medium-High  
-**Impact**: Errors logged with `console.error` in production are NOT stripped (the `removeConsole` config intentionally keeps `console.error`), but they also don't go through the `logger` which integrates with Sentry. This means **production errors in these 68+ locations are visible in the browser console but invisible in Sentry**.
 
-**Key Affected Files**:
-| File | Count |
-|---|---|
-| `lib/supabase/badges.ts` | 7 |
-| `lib/supabase/notifications.ts` | 6 |
-| `lib/supabase/listings/transactions.ts` | 5 |
-| `lib/supabase/listings/chat.ts` | 4 |
-| `lib/supabase/notification-preferences.ts` | 3 |
-| `hooks/admin/useEmailForwarding.ts` | 4 |
-| `hooks/admin/useAdminPermanentDelete.ts` | 3 |
-| `hooks/social/useIgnore.ts` | 5 |
-| ... and 30+ more files | |
-
-**Fix**: Replace all `console.error(...)` with `logger.error(...)`. Update the ESLint `no-console` rule to disallow `console.error` as well:
-
-```diff
--'no-console': ['warn', { allow: ['warn', 'error'] }],
-+'no-console': ['error'],
-```
-
-Then fix all resulting lint errors by migrating to `logger.*`. The `logger.ts` already wraps `console.error` internally.
-
-> **Agent prompt**: Migrate all `console.error` calls to the centralized `logger.error` from `@/lib/logger`. This is a systematic find-and-replace across the entire `src/` directory.
->
-> **Step 1** — Tighten ESLint: In `eslint.config.mjs` (root), change the `no-console` rule on line 28 from `['warn', { allow: ['warn', 'error'] }]` to `['error']`. This will make ALL `console.*` calls (including `console.error` and `console.warn`) a lint error, except in `src/lib/logger.ts` which already has `'no-console': 'off'`.
->
-> **Step 2** — Run `npm run lint` to see every violation. There will be 68+ `console.error` hits and some `console.warn` hits.
->
-> **Step 3** — For each file, add `import { logger } from '@/lib/logger';` if not already imported, then replace:
-> - `console.error('...',` → `logger.error('...',`
-> - `console.warn('...',` → `logger.warn('...',`
-> - `console.log('...',` → `logger.debug('...',` (or `logger.info` for important informational messages)
->
-> Key files (in priority order, by count):
-> - `src/lib/supabase/badges.ts` (7 `console.error`)
-> - `src/lib/supabase/notifications.ts` (6 `console.error`)
-> - `src/lib/supabase/listings/transactions.ts` (5 `console.error`)
-> - `src/lib/supabase/listings/chat.ts` (4 `console.error`)
-> - `src/hooks/social/useIgnore.ts` (5 `console.error`)
-> - `src/hooks/admin/useEmailForwarding.ts` (4 `console.error`)
-> - `src/hooks/admin/useAdminPermanentDelete.ts` (3 `console.error`)
-> - `src/lib/supabase/notification-preferences.ts` (3 `console.error`)
-> - `src/hooks/admin/useSuspendUser.ts` (2 `console.error`)
-> - `src/hooks/admin/useResolveReport.ts` (2 `console.error` + 2 `console.log`)
-> - `src/hooks/admin/useAdminTemplates.ts`, `useAdminSuspendedUsers.ts`, `useAdminPendingDeletionUsers.ts`, `useAdminPendingDeletionTemplates.ts`, `useAdminPendingDeletionListings.ts` (1 each)
-> - `src/hooks/templates/useRestoreTemplate.ts`, `useSlotListings.ts` (1 each)
-> - `src/hooks/social/useCurrentUserProfile.ts` (1)
-> - `src/components/native/NativeRedirectHandler.tsx` line 65
-> - `src/app/mis-plantillas/[copyId]/publicar/[slotId]/page.tsx` lines 57, 78, 92, 122
-> - Plus ~20 more files in `src/lib/supabase/`, `src/hooks/`, and `src/components/`
->
-> **Do NOT modify** `src/lib/logger.ts` — it legitimately uses `console.error` / `console.warn` / `console.debug` / `console.info` internally and has `'no-console': 'off'` in the ESLint config.
->
-> **Step 4** — Run `npm run lint` and confirm zero `no-console` violations remain.
-> **Step 5** — Run `npm run type-check` to confirm no TypeScript errors.
-> **Step 6** — Run `npm run build` as a final sanity check.
+**Resolution**: All 68+ `console.error` → `logger.error` and all `console.warn` → `logger.warn` replacements completed across 47+ files. ESLint `no-console` rule tightened from `['warn', { allow: ['warn', 'error'] }]` to `'error'` (line 28 of `eslint.config.mjs`). Only `src/lib/logger.ts` retains `console.*` calls (has `'no-console': 'off'` override). Verified: zero `no-console` ESLint violations, build succeeds.
 
 ---
 
@@ -178,30 +122,17 @@ Then fix all resulting lint errors by migrating to `logger.*`. The `logger.ts` a
 
 ## Previously Reported Issues — Status Corrections
 
-### M2. `console.log` usage — Marked ✅ but NOT fully resolved
+### M2. `console.log` usage ✅ Resolved
 
-**Actual state**: 16 `console.log` calls remain in:
-- `hooks/badges/useUserBadges.ts` (line 59)
-- `hooks/badges/useBadgeProgress.ts` (line 59)
-- `hooks/admin/useResolveReport.ts` (lines 22, 39)
-- `components/providers/DeepLinkHandler.tsx` (lines 20, 33)
-- `app/profile/reset-password/page.tsx` (lines 34, 49, 61)
-- `components/home/MarketplaceShowcase.tsx` (lines 17, 26)
-- `app/login/page.tsx` (lines 64, 68, 77, 86, 132)
+**Resolution**: All 16 `console.log` calls replaced with `logger.debug` across 7 files:
+- `hooks/badges/useUserBadges.ts`, `hooks/badges/useBadgeProgress.ts`
+- `hooks/admin/useResolveReport.ts`
+- `components/providers/DeepLinkHandler.tsx`
+- `app/profile/reset-password/page.tsx`
+- `components/home/MarketplaceShowcase.tsx`
+- `app/login/page.tsx`
 
-These are `console.log` calls, not `logger.debug`. The ESLint `no-console` rule is set to `warn` and allows `error`/`warn`, so these produce warnings but don't block builds.
-
-> **Agent prompt**: Replace all remaining `console.log` calls with `logger.debug` or `logger.info` from `@/lib/logger`. There are 16 occurrences across 7 files:
->
-> 1. `src/hooks/badges/useUserBadges.ts` line 59: `console.log('New badge earned:', payload)` → `logger.debug('New badge earned:', payload)`. Add `import { logger } from '@/lib/logger';`.
-> 2. `src/hooks/badges/useBadgeProgress.ts` line 59: `console.log('Badge progress updated:', payload)` → `logger.debug('Badge progress updated:', payload)`. Add `import { logger } from '@/lib/logger';`.
-> 3. `src/hooks/admin/useResolveReport.ts` lines 22 and 39: Replace both `console.log` calls with `logger.debug`. Check if logger is already imported.
-> 4. `src/components/providers/DeepLinkHandler.tsx` lines 20 and 33: `console.log('Deep link received:', ...)` and `console.log('Navigating to:', ...)` → `logger.debug(...)`. Add `import { logger } from '@/lib/logger';`.
-> 5. `src/app/profile/reset-password/page.tsx` lines 34, 49, 61: Three `console.log` calls with `[ResetPassword]` prefix → `logger.debug(...)`. Add `import { logger } from '@/lib/logger';`.
-> 6. `src/components/home/MarketplaceShowcase.tsx` lines 17 and 26: Two `console.log` calls → `logger.debug(...)`. Check if logger is already imported.
-> 7. `src/app/login/page.tsx` lines 64, 68, 77, 86, 132: Five `console.log` calls related to login flow → `logger.debug(...)`. Add `import { logger } from '@/lib/logger';`.
->
-> After all changes, run `npm run lint` — there should be zero `no-console` warnings for `console.log`. Run `npm run type-check` to confirm.
+Added `import { logger } from '@/lib/logger'` where missing. Also replaced 3 `console.error` calls in the same files with `logger.error`. Verified: zero `no-console` ESLint violations.
 
 ---
 
@@ -345,9 +276,9 @@ These were already flagged and the user has stated they will address them:
 |---|---|---|---|
 | 1 | **N3-N6**. Add justification comments to `eslint-disable` lines | ~10min | Documentation-only. No code changes, zero risk. Covers `NativeRedirectHandler.tsx`, `ProfileCompletionGuard.tsx`, `PasswordRecoveryGuard.tsx`, `AuthGuard.tsx`. |
 | 2 | **N7**. Extract `composeProviders` for `layout.tsx` | ~15min | Single new utility file + one layout refactor. Readability win. |
-| 3 | **M2**. Replace 16 `console.log` → `logger.debug` | ~20min | Mechanical find-and-replace across 7 files. No logic changes. |
-| 4 | **N2**. Fix `publicar/[slotId]/page.tsx` | ~30min | Single file: fix `as any`, wrong router import, `console.error`. Self-contained. |
-| 5 | **N1**. Replace 68+ `console.error` → `logger.error` + tighten ESLint | ~2-3h | Same pattern as M2 but larger scope. Do M2 first to practice the pattern. **Highest ROI fix** — all errors become visible in Sentry. |
+| 3 | ~~**M2**. Replace 16 `console.log` → `logger.debug`~~ | ✅ Done | |
+| 4 | **N2**. Fix `publicar/[slotId]/page.tsx` | ~30min | Single file: fix `as any`, wrong router import. `console.error` already fixed. |
+| 5 | ~~**N1**. Replace 68+ `console.error` → `logger.error` + tighten ESLint~~ | ✅ Done | |
 | 6 | **L4**. Create `onesignal.d.ts` types | ~1h | New type file + update `OneSignalProvider.tsx`. Removes 4 `as any` + 3 `eslint-disable`. |
 | 7 | **H1**. React Query migration (5 hooks) | ~1-2 days | Most complex — requires understanding each hook's data flow, adding query keys, and preserving public APIs. Do one hook at a time, verify between each. |
 
@@ -360,10 +291,10 @@ These were already flagged and the user has stated they will address them:
 
 | Priority | Item | Effort | Impact |
 |---|---|---|---|
-| 🔴 High | N1. Replace 68+ `console.error` with `logger.error` + tighten ESLint rule | 2-3h | Errors become visible in Sentry |
+| ✅ Done | N1. Replace 68+ `console.error` with `logger.error` + tighten ESLint rule | — | All errors now visible in Sentry |
 | 🔴 High | H1. Continue React Query migration (top 5 hooks: `useProposals`, `useTemplates`, `useNotifications`, `useTradeChat`, `useUserCollections`) | 1-2d | Caching, dedup, no loading spinners on re-mount |
-| 🟡 Medium | M2 fix. Replace 16 remaining `console.log` with `logger.debug` | 30min | Clean ESLint output |
-| 🟡 Medium | N2. Fix `publicar/[slotId]/page.tsx` — `as any`, wrong router import, `console.error` | 30min | Type safety + Sentry coverage |
+| ✅ Done | M2 fix. Replace 16 remaining `console.log` with `logger.debug` | — | Clean ESLint output |
+| 🟡 Medium | N2. Fix `publicar/[slotId]/page.tsx` — `as any`, wrong router import | 30min | Type safety |
 | 🟡 Medium | L4 fix. Create `onesignal.d.ts` types for `OneSignalProvider` | 1h | Remove 4 `as any` + 3 `eslint-disable` |
 | 🟢 Low | N3-N5. Audit remaining `eslint-disable exhaustive-deps` (3 files) | 30min | Prevent stale closure bugs |
 | 🟢 Low | N7. Extract `composeProviders` utility for layout.tsx | 15min | Readability |
@@ -374,4 +305,4 @@ These were already flagged and the user has stated they will address them:
 
 ## Summary
 
-The codebase is in **good shape architecturally** — the separation of concerns, auth security model, and error handling infrastructure are all solid. The previous review round made real progress on the `as any` and deprecated type issues. The main gap is **operational observability**: 68+ error paths bypass Sentry because they use `console.error` directly. Fixing N1 is the single highest-ROI change right now — it's mechanical (find-and-replace) and immediately improves production debugging. After that, continuing the React Query migration for the top 5 most-used hooks would eliminate the biggest performance and UX issue in the app.
+The codebase is in **good shape architecturally** — the separation of concerns, auth security model, and error handling infrastructure are all solid. The previous review round made real progress on the `as any` and deprecated type issues. ~~The main gap is **operational observability**: 68+ error paths bypass Sentry because they use `console.error` directly.~~ **N1 and M2 are now resolved** — all `console.*` calls use the centralized `logger`, ESLint `no-console` is set to `'error'`, and all errors are now routed to Sentry. The biggest remaining gap is the **React Query migration** (1/40 hooks) — continuing this for the top 5 hooks would eliminate the performance and UX issues caused by missing caching and deduplication.

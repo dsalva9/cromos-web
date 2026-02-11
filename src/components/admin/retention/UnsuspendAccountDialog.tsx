@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UnsuspendAccountDialogProps {
   userId: string;
@@ -42,11 +43,11 @@ export function UnsuspendAccountDialog({
 
       if (error) throw error;
 
-      toast.success(`Usuario ${userNickname} reactivado con éxito`);
+      toast.success(`Usuario ${userNickname} reactivado con Ã©xito`);
       onSuccess?.();
       onClose();
     } catch (error) {
-      console.error('Error unsuspending account:', error);
+      logger.error('Error unsuspending account:', error);
       toast.error(error instanceof Error ? error.message : 'Error al reactivar cuenta');
     } finally {
       setLoading(false);
@@ -73,18 +74,18 @@ export function UnsuspendAccountDialog({
           <Alert className="bg-green-900/20 border-green-700">
             <CheckCircle className="h-4 w-4 text-green-400" />
             <AlertDescription className="text-sm text-green-200">
-              <strong>Esta acción restaurará completamente la cuenta:</strong>
+              <strong>Esta acciÃ³n restaurarÃ¡ completamente la cuenta:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>El usuario podrá iniciar sesión nuevamente</li>
-                <li>Todo el contenido será visible para otros usuarios</li>
-                <li>Se cancelará cualquier eliminación programada</li>
-                <li>La suspensión se eliminará del registro del usuario</li>
+                <li>El usuario podrÃ¡ iniciar sesiÃ³n nuevamente</li>
+                <li>Todo el contenido serÃ¡ visible para otros usuarios</li>
+                <li>Se cancelarÃ¡ cualquier eliminaciÃ³n programada</li>
+                <li>La suspensiÃ³n se eliminarÃ¡ del registro del usuario</li>
               </ul>
             </AlertDescription>
           </Alert>
 
           <p className="text-sm text-gray-400">
-            ¿Estás seguro de que quieres reactivar esta cuenta?
+            Â¿EstÃ¡s seguro de que quieres reactivar esta cuenta?
           </p>
         </div>
 
@@ -102,7 +103,7 @@ export function UnsuspendAccountDialog({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sí, Reactivar Cuenta
+            SÃ­, Reactivar Cuenta
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface AdminTemplate {
   id: number;
@@ -44,7 +45,7 @@ export function useAdminTemplates(
       setTemplates(data || []);
       setTotalCount(data?.length || 0);
     } catch (err) {
-      console.error('Error fetching admin templates:', err);
+      logger.error('Error fetching admin templates:', err);
       setError(err instanceof Error ? err : new Error('Error al cargar plantillas'));
     } finally {
       setLoading(false);

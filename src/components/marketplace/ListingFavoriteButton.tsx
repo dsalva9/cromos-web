@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Heart } from 'lucide-react';
 import { useListingFavorite } from '@/hooks/marketplace/useListingFavorite';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface ListingFavoriteButtonProps {
   listingId: number;
@@ -63,7 +64,7 @@ export function ListingFavoriteButton({
       }
 
       if (isNowFavorited) {
-        toast.success('Añadido a favoritos');
+        toast.success('AÃ±adido a favoritos');
       } else {
         toast.success('Eliminado de favoritos');
       }
@@ -73,7 +74,7 @@ export function ListingFavoriteButton({
       if (onFavoriteChange) {
         onFavoriteChange(previous);
       }
-      console.error('Favorite toggle error:', error);
+      logger.error('Favorite toggle error:', error);
       toast.error('No se pudo actualizar el favorito');
     }
   };

@@ -10,6 +10,7 @@ import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/lib/logger';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -61,11 +62,11 @@ export default function LoginPage() {
           .eq('id', userId)
           .maybeSingle();
 
-        console.log('Profile data:', profileData, 'Error:', profileError);
+        logger.debug('Profile data:', profileData, 'Error:', profileError);
 
         // If no profile data returned (null), user might have been signed out or doesn't exist
         if (!profileData && !profileError) {
-          console.log('No profile data, user may be suspended and already signed out');
+          logger.debug('No profile data, user may be suspended and already signed out');
           await supabase.auth.signOut();
           setLoading(false);
           setError('suspended');
@@ -74,7 +75,7 @@ export default function LoginPage() {
 
         // If profile query failed, it might be because user is suspended and can't access data
         if (profileError) {
-          console.log('Profile error detected, signing out');
+          logger.debug('Profile error detected, signing out');
           await supabase.auth.signOut();
           setLoading(false);
           setError('suspended');
@@ -83,7 +84,7 @@ export default function LoginPage() {
 
         // If user is suspended, sign them out and show error
         if (profileData?.is_suspended) {
-          console.log('User is suspended, signing out');
+          logger.debug('User is suspended, signing out');
           await supabase.auth.signOut();
           setLoading(false);
           setError('suspended');
@@ -129,7 +130,7 @@ export default function LoginPage() {
         ? 'com.cambiocromos.app://auth/callback'
         : `${window.location.origin}/auth/callback`;
 
-      console.log('Google login redirect TO:', redirectTo);
+      logger.debug('Google login redirect TO:', redirectTo);
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getBadgeProgress } from '@/lib/supabase/badges';
 import { createClient } from '@/lib/supabase/client';
 import type { BadgeProgress } from '@/types/badges';
+import { logger } from '@/lib/logger';
 
 export function useBadgeProgress(userId: string | undefined) {
   const [progress, setProgress] = useState<BadgeProgress[]>([]);
@@ -27,7 +28,7 @@ export function useBadgeProgress(userId: string | undefined) {
       const data = await getBadgeProgress(userId);
       setProgress(data);
     } catch (err) {
-      console.error('Error fetching badge progress:', err);
+      logger.error('Error fetching badge progress:', err);
       setIsError(true);
       setError(err as Error);
     } finally {
@@ -56,7 +57,7 @@ export function useBadgeProgress(userId: string | undefined) {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('Badge progress updated:', payload);
+          logger.debug('Badge progress updated:', payload);
           // Refetch progress
           fetchProgress();
         }

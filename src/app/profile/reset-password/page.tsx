@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import { useRouter } from '@/hooks/use-router';
+import { logger } from '@/lib/logger';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -31,7 +32,7 @@ export default function ResetPasswordPage() {
 
         // If we have recovery tokens, set the session
         if (accessToken && type === 'recovery') {
-          console.log('[ResetPassword] Found recovery tokens, setting session...');
+          logger.debug('[ResetPassword] Found recovery tokens, setting session...');
 
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -39,14 +40,14 @@ export default function ResetPasswordPage() {
           });
 
           if (error) {
-            console.error('[ResetPassword] Error setting session:', error);
+            logger.error('[ResetPassword] Error setting session:', error);
             setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
             setCheckingSession(false);
             return;
           }
 
           if (data.session) {
-            console.log('[ResetPassword] Session established successfully');
+            logger.debug('[ResetPassword] Session established successfully');
             sessionStorage.setItem('password_recovery_required', 'true');
             setCheckingSession(false);
             return;
@@ -58,14 +59,14 @@ export default function ResetPasswordPage() {
 
         if (session) {
           sessionStorage.setItem('password_recovery_required', 'true');
-          console.log('[ResetPassword] Existing session found');
+          logger.debug('[ResetPassword] Existing session found');
         } else {
           setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
         }
 
         setCheckingSession(false);
       } catch (err) {
-        console.error('[ResetPassword] Exception:', err);
+        logger.error('[ResetPassword] Exception:', err);
         setError('Error al procesar la recuperación. Por favor, intenta nuevamente.');
         setCheckingSession(false);
       }
@@ -109,7 +110,7 @@ export default function ResetPasswordPage() {
         }, 2000);
       }
     } catch (error) {
-      console.error('Reset password error:', error);
+      logger.error('Reset password error:', error);
       setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setLoading(false);

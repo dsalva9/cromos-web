@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface MinimalUserProfile {
   nickname: string | null;
@@ -39,7 +40,7 @@ export function useCurrentUserProfile() {
 
         setProfile(data);
       } catch (error) {
-        console.error('Error fetching user profile:', error);
+        logger.error('Error fetching user profile:', error);
         // Fallback to email-based nickname
         setProfile({
           nickname: user.email?.split('@')[0] || 'Usuario',

@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 function TemplateProgressContent() {
   const params = useParams();
@@ -41,7 +42,7 @@ function TemplateProgressContent() {
       router.push('/mis-plantillas');
     } catch (err) {
       toast.error('Error al eliminar la colección');
-      console.error('Delete error:', err);
+      logger.error('Delete error:', err);
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);

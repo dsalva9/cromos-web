@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 const supabase = createClient();
 
@@ -39,7 +40,7 @@ export function useEmailForwarding(): UseEmailForwardingReturn {
 
       setAddresses(data || []);
     } catch (err) {
-      console.error('Error fetching forwarding addresses:', err);
+      logger.error('Error fetching forwarding addresses:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch addresses');
     } finally {
       setLoading(false);
@@ -57,7 +58,7 @@ export function useEmailForwarding(): UseEmailForwardingReturn {
 
       await fetchAddresses();
     } catch (err) {
-      console.error('Error adding forwarding address:', err);
+      logger.error('Error adding forwarding address:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to add address';
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -75,7 +76,7 @@ export function useEmailForwarding(): UseEmailForwardingReturn {
 
       await fetchAddresses();
     } catch (err) {
-      console.error('Error removing forwarding address:', err);
+      logger.error('Error removing forwarding address:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to remove address';
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -94,7 +95,7 @@ export function useEmailForwarding(): UseEmailForwardingReturn {
 
       await fetchAddresses();
     } catch (err) {
-      console.error('Error toggling forwarding address:', err);
+      logger.error('Error toggling forwarding address:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to toggle address';
       setError(errorMessage);
       throw new Error(errorMessage);

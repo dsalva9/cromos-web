@@ -9,6 +9,7 @@ import { Upload, X } from 'lucide-react';
 import { toast } from '@/lib/toast';
 import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export type AvatarSelection =
   | { type: 'preset'; value: string }
@@ -82,7 +83,7 @@ export function AvatarPicker({
 
       toast.success('Imagen procesada correctamente');
     } catch (error) {
-      console.error('Error processing image:', error);
+      logger.error('Error processing image:', error);
       toast.error(
         error instanceof Error ? error.message : 'Error al procesar la imagen'
       );
@@ -114,7 +115,7 @@ export function AvatarPicker({
               : 'text-gray-600 hover:text-gray-900'
           )}
         >
-          Galería
+          GalerÃ­a
         </button>
         <button
           type="button"
@@ -167,7 +168,7 @@ export function AvatarPicker({
         {activeTab === 'upload' && (
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Sube tu propia foto (será recortada a formato cuadrado)
+              Sube tu propia foto (serÃ¡ recortada a formato cuadrado)
             </p>
 
             {uploadPreview ? (
@@ -212,7 +213,7 @@ export function AvatarPicker({
                   disabled={processing || uploading}
                 />
                 <p className="text-xs text-gray-600 mt-3">
-                  JPG, PNG o WebP • Máx. 3MB
+                  JPG, PNG o WebP â€¢ MÃ¡x. 3MB
                 </p>
               </div>
             )}
