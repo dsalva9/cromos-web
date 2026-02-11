@@ -6,6 +6,26 @@ import { Webhook } from "npm:svix@1.40.0";
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const webhookSecret = Deno.env.get("RESEND_WEBHOOK_SECRET");
 
+/** Strips HTML tags and decodes common entities to produce a plain-text fallback */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/h[1-6]>/gi, '\n\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+
 interface ResendInboundEmail {
   id: string;
   from: string;
@@ -20,6 +40,19 @@ interface ResendInboundEmail {
 interface WebhookPayload {
   type: string;
   data: ResendInboundEmail;
+}
+
+function generateForwardedEmailText(emailData: ResendInboundEmail): string {
+  const body = emailData.text || (emailData.html ? stripHtml(emailData.html) : "No content");
+  return [
+    '--- Forwarded Message ---',
+    `From: ${emailData.from}`,
+    `To: ${emailData.to.join(", ")}`,
+    `Date: ${new Date(emailData.date).toLocaleString()}`,
+    `Subject: ${emailData.subject || "(No Subject)"}`,
+    '',
+    body,
+  ].join('\n');
 }
 
 Deno.serve(async (req: Request) => {
@@ -108,11 +141,14 @@ Deno.serve(async (req: Request) => {
       }
 
       try {
+        const forwardedHtml = generateForwardedEmailHtml(emailData);
+        const forwardedText = generateForwardedEmailText(emailData);
         const { data, error } = await resend.emails.send({
           from: "CambioCromos <info@cambiocromos.com>",
           to: toEmail,
           subject: `[Forwarded] ${emailData.subject || "(No Subject)"}`,
-          html: generateForwardedEmailHtml(emailData),
+          html: forwardedHtml,
+          text: forwardedText,
         });
 
         if (error) {
@@ -146,9 +182,9 @@ Deno.serve(async (req: Request) => {
     const errorDetails =
       failedForwards.length > 0
         ? {
-            failed_addresses: failedForwards.map((r) => r.toEmail),
-            errors: failedForwards.map((r) => r.error),
-          }
+          failed_addresses: failedForwards.map((r) => r.toEmail),
+          errors: failedForwards.map((r) => r.error),
+        }
         : null;
 
     // Log the forwarding attempt
