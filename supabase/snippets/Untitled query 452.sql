@@ -1,0 +1,1 @@
+SELECT utc.id AS copy_id, utc.template_id, utc.title, utc.is_active, t.title AS template_title _await_responseFROM user_template_copies utc _await_responseLEFT JOIN sticker_album_templates t ON t.id = utc.template_id _await_responseWHERE utc.user_id = (SELECT id FROM auth.users LIMIT 1) _await_responseORDER BY ut

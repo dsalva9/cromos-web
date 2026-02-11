@@ -144,6 +144,7 @@ function PublishDuplicateContent() {
           title: formData.title,
           description: formData.description,
           image_url: formData.image_url,
+          collection_name: templateInfo?.title || undefined,
         }
       );
 
