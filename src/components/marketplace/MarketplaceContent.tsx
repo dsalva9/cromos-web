@@ -156,7 +156,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 <SearchBar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    placeholder="Buscar por título, colección..."
+                                    placeholder="Buscar por nombre, colección..."
                                     className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
                                 />
                             </div>
