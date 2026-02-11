@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { useRouter } from '@/hooks/use-router';
 import { Capacitor } from '@capacitor/core';
+import { logger } from '@/lib/logger';
 
 // useLayoutEffect on client (runs synchronously before paint), useEffect on server (avoids SSR warning)
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
@@ -46,8 +47,8 @@ export default function NativeRedirectHandler({ isAuthenticated, children }: Nat
         if (hash && hash.includes('type=recovery')) {
             router.push(`/profile/reset-password${hash}`);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount - router dependency causes infinite loops
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded to prevent infinite loops (Next.js 16 transition bug)
+    }, []); // Only run once on mount
 
     // Handle native redirect and splash screen (async, runs after paint)
     useEffect(() => {
@@ -62,10 +63,10 @@ export default function NativeRedirectHandler({ isAuthenticated, children }: Nat
         import('@capacitor/splash-screen').then(({ SplashScreen }) => {
             setTimeout(() => SplashScreen.hide(), 500);
         }).catch((e) => {
-            console.error('Error hiding splash screen:', e);
+            logger.error('Error hiding splash screen:', e);
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isNative]); // Run once isNative is determined
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded (Next.js 16 transition bug)
+    }, [isNative, isAuthenticated]);
 
     // SSR / initial hydration render: isNative is null, show children (matches server HTML)
     // useLayoutEffect then fires synchronously BEFORE paint → sets isNative

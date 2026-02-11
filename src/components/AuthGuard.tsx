@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from '@/hooks/use-router';
 import { useUser } from '@/components/providers/SupabaseProvider';
 
 interface AuthGuardProps {
@@ -14,15 +13,13 @@ export default function AuthGuard({
   redirectTo = '/login',
 }: AuthGuardProps) {
   const { user, loading } = useUser();
-  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      // Hard redirect — router.push gets stuck due to Next.js 16 transition bug
+      // TODO: Remove window.location.href workaround when Next.js fixes transition state bug
       window.location.href = redirectTo;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, loading, redirectTo]); // router removed - causes cascading pushes (click blocking bug)
+  }, [user, loading, redirectTo]);
 
   // Show nothing while checking auth
   if (loading) {

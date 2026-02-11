@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import '@/styles/highlight-animation.css';
@@ -11,6 +10,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { ProfileCompletionProvider } from '@/components/providers/ProfileCompletionProvider';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { siteConfig } from '@/config/site';
+import { composeProviders } from '@/lib/composeProviders';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -52,6 +52,20 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 
+/**
+ * Compose all top-level providers into a single wrapper to reduce nesting depth.
+ * Order matters: outermost provider is first in the array.
+ */
+const Providers = composeProviders([
+  [SupabaseProvider],
+  [QueryProvider],
+  [ThemeProvider],
+  [OneSignalProvider],
+  [DeepLinkHandler],
+  [ProfileCompletionProvider],
+  [ErrorBoundary],
+]);
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -83,50 +97,39 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <GoogleAnalytics />
-        <SupabaseProvider>
-          <QueryProvider>
-            <ThemeProvider>
-              <OneSignalProvider>
-                <DeepLinkHandler>
-                  <ProfileCompletionProvider>
-                    <ErrorBoundary>
-                      <a
-                        href="#main-content"
-                        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
-                      >
-                        Saltar al contenido principal
-                      </a>
-                      <header role="banner">
-                        <SiteHeader />
-                      </header>
-                      <AccountDeletionBanner />
-                      <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
-                        <PasswordRecoveryGuard>
-                          <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
-                        </PasswordRecoveryGuard>
-                      </main>
-                      <MobileBottomNav />
-                      <FloatingActionBtn />
-                      <SiteFooter />
-                      <CookieConsentBanner />
-                    </ErrorBoundary>
-                    <Toaster
-                      position="top-right"
-                      richColors
-                      closeButton
-                      expand={false}
-                      duration={3000}
-                      toastOptions={{
-                        className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
-                      }}
-                    />
-                  </ProfileCompletionProvider>
-                </DeepLinkHandler>
-              </OneSignalProvider>
-            </ThemeProvider>
-          </QueryProvider>
-        </SupabaseProvider>
+        <Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
+          >
+            Saltar al contenido principal
+          </a>
+          <header role="banner">
+            <SiteHeader />
+          </header>
+          <AccountDeletionBanner />
+          <main id="main-content" role="main" className="min-h-screen pb-20 md:pb-0" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
+            <PasswordRecoveryGuard>
+              <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
+            </PasswordRecoveryGuard>
+          </main>
+          <MobileBottomNav />
+          <FloatingActionBtn />
+          <SiteFooter />
+          <CookieConsentBanner />
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            expand={false}
+            duration={3000}
+            toastOptions={{
+              className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
+            }}
+          />
+        </Providers>
       </body>
     </html>
   );
 }
+

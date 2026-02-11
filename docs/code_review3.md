@@ -131,99 +131,48 @@ Then fix all resulting lint errors by migrating to `logger.*`. The `logger.ts` a
 
 ---
 
-### N3. `NativeRedirectHandler.tsx` — 2 unjustified `eslint-disable` for `exhaustive-deps`
+### N3. `NativeRedirectHandler.tsx` — 2 unjustified `eslint-disable` for `exhaustive-deps` ✅ Resolved
 
 **Severity**: Low-Medium  
-**File**: [NativeRedirectHandler.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/native/NativeRedirectHandler.tsx) — lines 49, 67
+**File**: [NativeRedirectHandler.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/native/NativeRedirectHandler.tsx)
 
-Two `eslint-disable-next-line react-hooks/exhaustive-deps` without justification comments. These may be hiding stale closure bugs.
-
-> **Agent prompt**: Audit and fix the two `eslint-disable-next-line react-hooks/exhaustive-deps` in `src/components/native/NativeRedirectHandler.tsx`.
->
-> **Line 49** (inside the password recovery useEffect, line 44-50): The deps are `[]` but `router` is used inside. The comment says "Only run once on mount - router dependency causes infinite loops". This is the same Next.js 16 `router` workaround seen elsewhere. **Keep the disable but add a justification comment**: `// eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded to prevent infinite loops (Next.js 16 transition bug)`
->
-> **Line 67** (inside the native redirect useEffect, line 53-68): The deps are `[isNative]` but `router`, `isAuthenticated` are used inside. The comment says "Run once isNative is determined". `isAuthenticated` should probably be in the deps (if auth state changes, the redirect logic should re-run). **Add `isAuthenticated` to the deps array and add a justification for excluding `router`**: change the deps to `[isNative, isAuthenticated]` and update comment to `// eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded (Next.js 16 transition bug)`.
->
-> Also: **Line 65** has a bare `console.error` — replace with `logger.error` and add `import { logger } from '@/lib/logger';`.
->
-> Run `npm run lint` and `npm run type-check` to verify.
+**Resolution**: Added justification comments to both `eslint-disable` directives explaining the Next.js 16 router transition bug. Added `isAuthenticated` to the second useEffect's dependency array so redirect logic re-runs on auth state changes. Replaced `console.error` on line 65 with `logger.error` and added `import { logger } from '@/lib/logger'`.
 
 ---
 
-### N4. `ProfileCompletionGuard.tsx` — unjustified `eslint-disable` for `exhaustive-deps`
+### N4. `ProfileCompletionGuard.tsx` — unjustified `eslint-disable` for `exhaustive-deps` ✅ Resolved
 
 **Severity**: Low-Medium  
-**File**: [ProfileCompletionGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/profile/ProfileCompletionGuard.tsx) — line 112
+**File**: [ProfileCompletionGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/profile/ProfileCompletionGuard.tsx)
 
-> **Agent prompt**: Fix the `eslint-disable` on line 112 of `src/components/profile/ProfileCompletionGuard.tsx`. The comment on line 113 explains: `router removed - causes infinite loops`. This is the standard Next.js 16 `router` exclusion workaround used throughout the codebase. **Keep the disable but add a proper justification**: change line 112 to `// eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded to prevent infinite loops (Next.js 16 transition bug)`. Also note that `window.location.href = completionRoute` on line 110 is used as a hard redirect workaround — this is consistent with `AuthGuard.tsx` and `PasswordRecoveryGuard.tsx`. No functional change needed. Run `npm run lint` to verify.
+**Resolution**: Removed the unused `router` variable and `use-router` import entirely — the component uses `window.location.href` for redirects, so `router` was dead code. This eliminated the need for the `eslint-disable` directive. Added an explanatory comment about the Next.js 16 transition bug workaround.
 
 ---
 
-### N5. `PasswordRecoveryGuard.tsx` — unjustified `eslint-disable` for `exhaustive-deps`
+### N5. `PasswordRecoveryGuard.tsx` — unjustified `eslint-disable` for `exhaustive-deps` ✅ Resolved
 
 **Severity**: Low  
-**File**: [PasswordRecoveryGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/auth/PasswordRecoveryGuard.tsx) — line 71
+**File**: [PasswordRecoveryGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/auth/PasswordRecoveryGuard.tsx)
 
-> **Agent prompt**: Fix the `eslint-disable` on line 71 of `src/components/auth/PasswordRecoveryGuard.tsx`. The comment on line 72 explains: `router removed - causes re-triggering on router state changes (click blocking bug)`. This is the same Next.js 16 workaround. **Keep the disable but add a proper justification**: change line 71 to `// eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded to prevent re-triggering (Next.js 16 click blocking bug)`. No functional change needed. Run `npm run lint` to verify.
+**Resolution**: Removed the unused `router` variable and `use-router` import entirely — the component uses `window.location.href` for redirects, so `router` was dead code. This eliminated the need for the `eslint-disable` directive.
 
 ---
 
-### N6. `AuthGuard.tsx` — `eslint-disable` with partial justification, `window.location.href` for redirect
+### N6. `AuthGuard.tsx` — `eslint-disable` with partial justification, `window.location.href` for redirect ✅ Resolved
 
 **Severity**: Low  
 **File**: [AuthGuard.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/components/AuthGuard.tsx)
 
-The `eslint-disable` has a comment explaining the click-blocking bug workaround — this is justified but should be tracked for removal when Next.js 16 resolves the transition bug. The `window.location.href` redirect is a full page reload rather than a client-side navigation — acceptable as a workaround but costly for UX.
-
-> **Agent prompt**: In `src/components/AuthGuard.tsx`, the `eslint-disable` on line 24 is already justified with a comment on line 25. **Improve the disable comment** to be more explicit: change line 24 to `// eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded to prevent cascading pushes (Next.js 16 click blocking bug, see PR #XX)`. Also add a `// TODO: Remove window.location.href workaround when Next.js fixes transition state bug` comment above line 22. No functional change needed — this is documentation-only.
+**Resolution**: Removed the unused `router` variable and `use-router` import entirely — the component uses `window.location.href` for redirects, so `router` was dead code. This eliminated the need for the `eslint-disable` directive. Added a `TODO` comment to track removing the `window.location.href` workaround when Next.js fixes the transition state bug.
 
 ---
 
-### N7. Provider nesting depth in `layout.tsx` — 8 levels deep
+### N7. Provider nesting depth in `layout.tsx` — 8 levels deep ✅ Resolved
 
 **Severity**: Low (cosmetic / maintainability)  
 **File**: [layout.tsx](file:///c:/Users/dsalv/Projects/cromos-web/src/app/layout.tsx)
 
-The provider tree is:
-```
-SupabaseProvider > QueryProvider > ThemeProvider > OneSignalProvider > DeepLinkHandler > ProfileCompletionProvider > ErrorBoundary > (children)
-```
-
-This is manageable but approaching the point where a `composeProviders` utility would improve readability.
-
-> **Agent prompt**: Create a `composeProviders` utility to flatten the 8-level provider nesting in `src/app/layout.tsx`.
->
-> **Step 1**: Create `src/lib/composeProviders.tsx`:
-> ```tsx
-> import React from 'react';
->
-> type ProviderWithProps = [React.ComponentType<{ children: React.ReactNode }>, Record<string, unknown>?];
->
-> export function composeProviders(providers: ProviderWithProps[]) {
->   return function ComposedProviders({ children }: { children: React.ReactNode }) {
->     return providers.reduceRight(
->       (acc, [Provider, props = {}]) => <Provider {...props}>{acc}</Provider>,
->       children
->     );
->   };
-> }
-> ```
->
-> **Step 2**: In `src/app/layout.tsx`, replace the deeply nested JSX (lines 86-132) with:
-> ```tsx
-> const Providers = composeProviders([
->   [SupabaseProvider],
->   [QueryProvider],
->   [ThemeProvider],
->   [OneSignalProvider],
->   [DeepLinkHandler],
->   [ProfileCompletionProvider],
->   [ErrorBoundary],
-> ]);
-> ```
-> Then use `<Providers>{/* header + main + footer */}</Providers>` in the JSX. Note: `ErrorBoundary` may need a slightly different pattern if it has non-children props.
->
-> Run `npm run type-check` and `npm run build` to verify. This is a readability-only change — no behavior changes.
+**Resolution**: Created `src/lib/composeProviders.tsx` utility that accepts an array of `[Provider, props?]` tuples and composes them via `reduceRight`. Refactored `layout.tsx` to use `const Providers = composeProviders([...])` replacing 7-level deep nesting with a flat, readable array. Also removed unused `next/script` import. No behavior changes — readability improvement only.
 
 ---
 

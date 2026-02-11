@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +27,6 @@ interface PasswordRecoveryGuardProps {
 
 export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) {
   const supabase = useSupabaseClient();
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -68,8 +66,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
     };
 
     checkRecoveryState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, pathname]); // router removed - causes re-triggering on router state changes (click blocking bug)
+  }, [supabase, pathname]);
 
   // Always render children — redirect happens as a side effect above.
   // This is critical for SSR: blocking render with `return null` would

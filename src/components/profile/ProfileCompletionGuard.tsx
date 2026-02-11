@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { useRouter } from '@/hooks/use-router';
 import { toast } from '@/lib/toast';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useUser } from '@/components/providers/SupabaseProvider';
@@ -36,7 +35,6 @@ export function ProfileCompletionGuard({
 }: ProfileCompletionGuardProps) {
   const { isComplete, loading, profile } = useProfileCompletion();
   const { user, loading: authLoading } = useUser();
-  const router = useRouter();
   const pathname = usePathname();
   const hasWarnedRef = useRef(false);
   const previousCompleteRef = useRef<boolean | null>(null);
@@ -109,8 +107,8 @@ export function ProfileCompletionGuard({
       // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
       window.location.href = completionRoute;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps  
-  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, user]); // router removed - causes infinite loops
+    // router intentionally excluded — using window.location.href for redirect (Next.js 16 transition bug)
+  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, user]);
 
   // Always render children — the useEffect above handles redirects.
   // Never return null here: unmounting the children tree corrupts the
