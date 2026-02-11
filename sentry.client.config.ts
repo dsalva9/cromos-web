@@ -2,6 +2,9 @@ import * as Sentry from '@sentry/nextjs';
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
+// eslint-disable-next-line no-console
+console.log('[Sentry] DSN available:', !!SENTRY_DSN, SENTRY_DSN ? SENTRY_DSN.substring(0, 20) + '...' : 'NOT SET');
+
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
@@ -18,7 +21,7 @@ if (SENTRY_DSN) {
     // Note: if you want to override the automatic release value, do not set a
     // `release` value here - use the environment variable `SENTRY_RELEASE`, so
     // that it will also get attached to your source maps
-    debug: false,
+    debug: true, // TEMPORARY: enable to diagnose initialization issues
 
     integrations: [
       Sentry.replayIntegration({
