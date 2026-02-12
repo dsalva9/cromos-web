@@ -22,5 +22,14 @@ if (SENTRY_DSN) {
                 blockAllMedia: true,
             }),
         ],
+
+        // Filter out noise from aborted fetches during navigation
+        beforeSend(event) {
+            const message = event.exception?.values?.[0]?.value || '';
+            if (message.includes('Failed to fetch') || message.includes('AbortError')) {
+                return null; // Drop the event
+            }
+            return event;
+        },
     });
 }
