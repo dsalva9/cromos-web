@@ -158,7 +158,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 pt-3 pb-6 md:py-6">
+            <div className="container mx-auto px-4 pt-5 pb-6 md:py-6">
                 {/* Controls Bar with background cover to prevent content peeking through */}
                 <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + 0.5rem)' }}>
                     {/* Background cover that extends behind the sticky bar to hide scrolling content */}
