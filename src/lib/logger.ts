@@ -53,7 +53,30 @@ export const logger = {
    * Automatically sends to Sentry in production
    */
   error: (...args: unknown[]) => {
+    // Check if this is a navigation-abort "Failed to fetch" error (not a real error)
+    const isAbortError = args.some((arg) => {
+      if (typeof arg === 'string') {
+        return arg.includes('Failed to fetch') || arg.includes('AbortError');
+      }
+      if (arg && typeof arg === 'object') {
+        const obj = arg as Record<string, unknown>;
+        const details = String(obj.details || '');
+        const message = String(obj.message || '');
+        return (
+          details.includes('Failed to fetch') ||
+          details.includes('AbortError') ||
+          message.includes('Failed to fetch') ||
+          message.includes('AbortError')
+        );
+      }
+      return false;
+    });
+
+    // Always log to console for dev visibility
     console.error('[ERROR]', ...args);
+
+    // Skip Sentry for abort errors caused by navigation
+    if (isAbortError) return;
 
     // Send errors to Sentry in production
     if (isSentryEnabled) {
