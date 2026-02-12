@@ -17,6 +17,11 @@ export function SearchBar({ value, onChange, placeholder, className }: SearchBar
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 500);
 
+  // Sync when external value changes (e.g. from URL params)
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   useEffect(() => {
     onChange(debouncedValue);
   }, [debouncedValue, onChange]);
