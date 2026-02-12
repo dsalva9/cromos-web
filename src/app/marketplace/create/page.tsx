@@ -7,7 +7,7 @@ import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListin
 import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
-import { CreateListingForm } from '@/types/v1.6.0';
+import { CreateListingForm, PackItem } from '@/types/v1.6.0';
 import { logger } from '@/lib/logger';
 import { ArrowLeft } from 'lucide-react';
 import { useMemo } from 'react';
@@ -23,6 +23,7 @@ function CreateListingContent() {
     const description = searchParams.get('description');
     const collection = searchParams.get('collection');
     const isGroup = searchParams.get('isGroup') === 'true';
+    const groupCount = searchParams.get('groupCount');
 
     if (!title) return undefined;
 
@@ -31,15 +32,33 @@ function CreateListingContent() {
       description: description || '',
       collection_name: collection || '',
       is_group: isGroup,
+      group_count: groupCount ? parseInt(groupCount) : undefined,
     };
   }, [searchParams]);
 
-  // Get back URL from query parameters (for navigation from album page)
+  // Get back URL and template ID from query parameters
   const backUrl = searchParams.get('from') || '/marketplace';
+  const templateId = searchParams.get('templateId');
 
   const handleSubmit = async (data: CreateListingForm) => {
     try {
-      const listingId = await createListing(data);
+      // Read structured pack items from sessionStorage if available
+      let packItems: PackItem[] | undefined;
+      try {
+        const stored = sessionStorage.getItem('pending_pack_items');
+        if (stored) {
+          packItems = JSON.parse(stored) as PackItem[];
+          sessionStorage.removeItem('pending_pack_items');
+        }
+      } catch {
+        // Ignore sessionStorage errors
+      }
+
+      const listingId = await createListing({
+        ...data,
+        template_id: templateId ? parseInt(templateId) : undefined,
+        pack_items: packItems,
+      });
       toast.success('¡Anuncio publicado con éxito!');
       router.push(`/marketplace/${listingId}`);
     } catch (error) {

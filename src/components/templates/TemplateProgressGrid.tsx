@@ -39,6 +39,7 @@ interface TemplateProgressGridProps {
   ) => Promise<void>;
   copyId: string;
   customFields?: CustomField[];
+  marketplaceSlotIds?: Set<number>;
 }
 
 export function TemplateProgressGrid({
@@ -46,6 +47,7 @@ export function TemplateProgressGrid({
   onUpdateSlot,
   copyId,
   customFields = [],
+  marketplaceSlotIds,
 }: TemplateProgressGridProps) {
   const [selectedPage, setSelectedPage] = useState<number>(1);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -181,6 +183,7 @@ export function TemplateProgressGrid({
             listing={slotListings[slot.slot_id]}
             listingsLoading={listingsLoading}
             customFields={customFields}
+            inMarketplace={marketplaceSlotIds?.has(slot.slot_id) ?? false}
           />
         ))}
       </div>

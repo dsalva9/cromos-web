@@ -149,9 +149,20 @@ export interface CreateListingForm {
   page_title?: string;
   slot_variant?: string;
   global_number?: number;
-  // New fields
+  // Pack fields
   is_group?: boolean;
   group_count?: number;
+  template_id?: number;
+  /** Structured pack items — inserted into listing_pack_items after creation */
+  pack_items?: PackItem[];
+}
+
+export interface PackItem {
+  template_id: number;
+  slot_number: number;
+  slot_variant?: string | null;
+  page_title?: string;
+  label?: string | null;
 }
 
 export interface CreateTemplateForm {

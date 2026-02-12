@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
+import { useMarketplaceAvailabilitySlots } from '@/hooks/marketplace/useMarketplaceAvailability';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +34,9 @@ function TemplateProgressContent() {
 
   const { copy, progress, customFields, loading, error, updateSlotStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
+
+  const { slotIds: marketplaceSlotIds, totalAvailable: marketplaceCount } =
+    useMarketplaceAvailabilitySlots(copyId ? Number(copyId) : undefined);
 
   const handleDelete = async () => {
     try {
@@ -76,12 +80,24 @@ function TemplateProgressContent() {
 
     const description = `Pack de ${spares.length} cromos repetidos de la colección ${copy.title}:\n\n${sparesList}`;
 
+    // Store structured pack items in sessionStorage for the create page
+    const packItems = spares.map(slot => ({
+      template_id: copy.template_id,
+      slot_number: slot.slot_number,
+      slot_variant: slot.slot_variant || null,
+      page_title: slot.page_title || null,
+      label: slot.label || null,
+    }));
+    sessionStorage.setItem('pending_pack_items', JSON.stringify(packItems));
+
     // Navigate to create page with pre-populated data
     const queryParams = new URLSearchParams({
       title: `Pack de Repes - ${copy.title}`,
       description,
       collection: copy.title,
       isGroup: 'true',
+      groupCount: spares.length.toString(),
+      templateId: copy.template_id.toString(),
       from: `/mis-plantillas/${copyId}`, // Add back navigation
     });
 
@@ -166,7 +182,7 @@ function TemplateProgressContent() {
         </div>
 
         {/* Summary Header */}
-        <TemplateSummaryHeader copy={copy} progress={progress} />
+        <TemplateSummaryHeader copy={copy} progress={progress} marketplaceCount={marketplaceCount} />
 
         {/* Contextual Tip */}
         <ContextualTip
@@ -183,6 +199,7 @@ function TemplateProgressContent() {
           onUpdateSlot={updateSlotStatus}
           copyId={copyId}
           customFields={customFields}
+          marketplaceSlotIds={marketplaceSlotIds}
         />
 
         {/* Mobile Delete Button */}

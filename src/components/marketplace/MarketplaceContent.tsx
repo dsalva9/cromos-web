@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
@@ -26,6 +27,19 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
     const [showFilters, setShowFilters] = useState(false);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
+    const searchParams = useSearchParams();
+
+    // Auto-apply collection filter from URL param (e.g. /marketplace?collection=123)
+    useEffect(() => {
+        const collectionParam = searchParams.get('collection');
+        if (collectionParam) {
+            const collectionId = parseInt(collectionParam);
+            if (!isNaN(collectionId)) {
+                setSelectedCollectionIds([collectionId]);
+                setShowFilters(true);
+            }
+        }
+    }, [searchParams]);
 
     // We use initialUserPostcode from server rendering to avoid a client-side fetch
     const hasPostcode = Boolean(initialUserPostcode);

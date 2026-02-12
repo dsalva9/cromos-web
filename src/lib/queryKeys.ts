@@ -39,4 +39,9 @@ export const QUERY_KEYS = {
 
     /* ─── trade chat ─── */
     tradeChat: (tradeId: number | null) => ['tradeChat', tradeId] as const,
+
+    /* ─── marketplace availability (album ↔ marketplace bridge) ─── */
+    marketplaceAvailability: () => ['marketplaceAvailability'] as const,
+    marketplaceAvailabilitySlots: (copyId: number) =>
+        ['marketplaceAvailability', 'slots', copyId] as const,
 } as const;

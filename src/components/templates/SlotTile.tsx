@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Minus, Plus, Upload, Check, Copy as CopyIcon } from 'lucide-react';
+import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from '@/components/ui/link';
@@ -38,9 +38,10 @@ interface SlotTileProps {
   listing?: SlotListing;
   listingsLoading?: boolean;
   customFields?: CustomField[];
+  inMarketplace?: boolean;
 }
 
-export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [] }: SlotTileProps) {
+export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [], inMarketplace = false }: SlotTileProps) {
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
 
@@ -200,6 +201,15 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
         </div>
 
         <div className="mt-auto space-y-3">
+          {/* Marketplace Indicator for Missing Stickers */}
+          {slot.status === 'missing' && inMarketplace && (
+            <Link href={`/marketplace?slot=${slot.slot_id}`} className="block">
+              <div className="w-full bg-[#FFC000]/10 border border-[#FFC000]/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-[#FFC000] hover:bg-[#FFC000]/20 transition-colors cursor-pointer font-bold">
+                <ShoppingBag className="w-3 h-3" />
+                <span>EN MARKETPLACE</span>
+              </div>
+            </Link>
+          )}
           {/* Status Button */}
           <button
             onClick={handleStatusClick}

@@ -1,7 +1,7 @@
 'use client';
 
 
-import { Check, X, Copy as CopyIcon, Trophy, User } from 'lucide-react';
+import { Check, X, Copy as CopyIcon, Trophy, User, ShoppingBag } from 'lucide-react';
 import { useMemo } from 'react';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -29,11 +29,13 @@ interface SlotProgress {
 interface TemplateSummaryHeaderProps {
   copy: TemplateCopy;
   progress: SlotProgress[];
+  marketplaceCount?: number;
 }
 
 export function TemplateSummaryHeader({
   copy,
   progress,
+  marketplaceCount = 0,
 }: TemplateSummaryHeaderProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const stats = useMemo(() => {
@@ -165,7 +167,7 @@ export function TemplateSummaryHeader({
           </div>
 
           {/* Right Column: Stats Grid */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full md:w-auto">
+          <div className={`grid ${marketplaceCount > 0 ? 'grid-cols-4' : 'grid-cols-3'} gap-2 sm:gap-3 w-full md:w-auto`}>
             {/* Owned */}
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-600 transition-colors group">
               <div className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-950 rounded-lg mb-1 sm:mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900 transition-colors">
@@ -192,6 +194,19 @@ export function TemplateSummaryHeader({
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.missing}</span>
               <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Faltan</span>
             </div>
+
+            {/* Marketplace Availability */}
+            {marketplaceCount > 0 && (
+              <Link href={`/marketplace?collection=${copy.copy_id}`} className="block">
+                <div className="bg-[#FFC000]/5 dark:bg-[#FFC000]/10 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-[#FFC000]/30 hover:border-[#FFC000] transition-colors group h-full cursor-pointer">
+                  <div className="p-1.5 sm:p-2 bg-[#FFC000]/20 dark:bg-[#FFC000]/30 rounded-lg mb-1 sm:mb-2 group-hover:bg-[#FFC000]/30 dark:group-hover:bg-[#FFC000]/40 transition-colors">
+                    <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFC000]" />
+                  </div>
+                  <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{marketplaceCount}</span>
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold text-[#FFC000] tracking-wider">En Venta</span>
+                </div>
+              </Link>
+            )}
           </div>
 
         </div>

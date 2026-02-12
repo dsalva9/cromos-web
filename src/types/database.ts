@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -403,6 +403,61 @@ export type Database = {
           to_addresses?: string[]
         }
         Relationships: []
+      }
+      listing_pack_items: {
+        Row: {
+          created_at: string | null
+          id: number
+          label: string | null
+          listing_id: number
+          page_title: string | null
+          slot_number: number | null
+          slot_variant: string | null
+          template_id: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          label?: string | null
+          listing_id: number
+          page_title?: string | null
+          slot_number?: number | null
+          slot_variant?: string | null
+          template_id?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          label?: string | null
+          listing_id?: number
+          page_title?: string | null
+          slot_number?: number | null
+          slot_variant?: string | null
+          template_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_pack_items_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_with_template_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_pack_items_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "trade_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_pack_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "collection_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listing_transactions: {
         Row: {
@@ -2170,11 +2225,11 @@ export type Database = {
         Returns: Json
       }
       admin_purge_user:
-      | { Args: { p_user_id: string }; Returns: undefined }
-      | {
-        Args: { p_admin_id?: string; p_user_id: string }
-        Returns: undefined
-      }
+        | { Args: { p_user_id: string }; Returns: undefined }
+        | {
+            Args: { p_admin_id?: string; p_user_id: string }
+            Returns: undefined
+          }
       admin_remove_forwarding_address: {
         Args: { p_id: number }
         Returns: boolean
@@ -2533,6 +2588,10 @@ export type Database = {
           seller_nickname: string
           status: string
         }[]
+      }
+      get_marketplace_availability: {
+        Args: { p_copy_id?: number }
+        Returns: Json
       }
       get_moderation_activity: {
         Args: { p_limit?: number }
@@ -2924,8 +2983,8 @@ export type Database = {
         Returns: undefined
       }
       is_admin:
-      | { Args: never; Returns: boolean }
-      | { Args: { user_uuid: string }; Returns: boolean }
+        | { Args: never; Returns: boolean }
+        | { Args: { user_uuid: string }; Returns: boolean }
       is_admin_user: { Args: never; Returns: boolean }
       is_favourited: {
         Args: { p_target_id: string; p_target_type: string }
@@ -2999,51 +3058,51 @@ export type Database = {
         }[]
       }
       list_trade_listings:
-      | {
-        Args: { p_limit?: number; p_offset?: number; p_search?: string }
-        Returns: {
-          author_nickname: string
-          collection_name: string
-          copy_id: number
-          created_at: string
-          description: string
-          id: number
-          image_url: string
-          slot_id: number
-          status: string
-          sticker_number: string
-          title: string
-          updated_at: string
-          user_id: string
-          views_count: number
-        }[]
-      }
-      | {
-        Args: {
-          p_limit?: number
-          p_offset?: number
-          p_search?: string
-          p_sort_by_distance?: boolean
-          p_viewer_postcode?: string
-        }
-        Returns: {
-          author_nickname: string
-          collection_name: string
-          copy_id: number
-          created_at: string
-          description: string
-          distance_km: number
-          id: number
-          image_url: string
-          slot_id: number
-          status: string
-          sticker_number: string
-          title: string
-          updated_at: string
-          user_id: string
-          views_count: number
-        }[]
-      }
+        | {
+            Args: { p_limit?: number; p_offset?: number; p_search?: string }
+            Returns: {
+              author_nickname: string
+              collection_name: string
+              copy_id: number
+              created_at: string
+              description: string
+              id: number
+              image_url: string
+              slot_id: number
+              status: string
+              sticker_number: string
+              title: string
+              updated_at: string
+              user_id: string
+              views_count: number
+            }[]
+          }
+        | {
+            Args: {
+              p_limit?: number
+              p_offset?: number
+              p_search?: string
+              p_sort_by_distance?: boolean
+              p_viewer_postcode?: string
+            }
+            Returns: {
+              author_nickname: string
+              collection_name: string
+              copy_id: number
+              created_at: string
+              description: string
+              distance_km: number
+              id: number
+              image_url: string
+              slot_id: number
+              status: string
+              sticker_number: string
+              title: string
+              updated_at: string
+              user_id: string
+              views_count: number
+            }[]
+          }
       list_trade_listings_filtered: {
         Args: { p_limit?: number; p_offset?: number; p_search?: string }
         Returns: {
@@ -3411,116 +3470,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

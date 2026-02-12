@@ -10,10 +10,11 @@ import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb } from 'lucide-react';
+import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb, ShoppingBag } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { logger } from '@/lib/logger';
 import { ContextualTip } from '@/components/ui/ContextualTip';
+import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
 
 // Reuse logic from server-my-templates but for client
 interface TemplateCopy {
@@ -94,7 +95,46 @@ export default function UserDashboard() {
 
     const activeListings = useMemo(() => listings.filter(l => l.status === 'active'), [listings]);
 
-    // Find the album with most missing cromos for CTA
+    // Marketplace availability counts per album
+    const { counts: availabilityCounts } = useMarketplaceAvailabilityCounts();
+
+    // Build a lookup: copy_id → missing_in_marketplace count
+    const availabilityMap = useMemo(() => {
+        const map = new Map<number, number>();
+        for (const entry of availabilityCounts) {
+            map.set(entry.copy_id, entry.missing_in_marketplace);
+        }
+        return map;
+    }, [availabilityCounts]);
+
+    // Albums with marketplace availability, sorted by count descending
+    const albumsWithAvailability = useMemo(() => {
+        return copies
+            .filter(c => {
+                const count = availabilityMap.get(Number(c.copy_id)) ?? 0;
+                return count > 0 && c.completion_percentage < 100;
+            })
+            .sort((a, b) => {
+                const aCount = availabilityMap.get(Number(a.copy_id)) ?? 0;
+                const bCount = availabilityMap.get(Number(b.copy_id)) ?? 0;
+                return bCount - aCount;
+            });
+    }, [copies, availabilityMap]);
+
+    // Rotation state for CTA banner
+    const [ctaIndex, setCtaIndex] = useState(0);
+    useEffect(() => {
+        if (albumsWithAvailability.length <= 1) return;
+        const interval = setInterval(() => {
+            setCtaIndex(prev => (prev + 1) % albumsWithAvailability.length);
+        }, 6000);
+        return () => clearInterval(interval);
+    }, [albumsWithAvailability.length]);
+
+    const ctaAlbum = albumsWithAvailability[ctaIndex % Math.max(albumsWithAvailability.length, 1)] ?? null;
+    const ctaCount = ctaAlbum ? (availabilityMap.get(Number(ctaAlbum.copy_id)) ?? 0) : 0;
+
+    // Fallback: album with most missing stickers (for when no marketplace data)
     const mostIncompleteAlbum = useMemo(() => {
         if (copies.length === 0) return null;
         return copies.reduce((prev, current) => {
@@ -226,7 +266,32 @@ export default function UserDashboard() {
                 />
 
                 {/* 4. Complete Your Collection CTA Banner */}
-                {mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
+                {ctaAlbum && ctaCount > 0 ? (
+                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6 transition-all duration-500">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1 flex items-center gap-2">
+                                    <ShoppingBag className="w-4 h-4 text-[#FFC000]" />
+                                    Disponible en Marketplace
+                                    {albumsWithAvailability.length > 1 && (
+                                        <span className="text-xs text-gray-400">({ctaIndex + 1}/{albumsWithAvailability.length})</span>
+                                    )}
+                                </p>
+                                <h3 className="text-2xl font-black text-gray-900 dark:text-white">
+                                    {ctaCount} {ctaCount === 1 ? 'cromo' : 'cromos'} de {ctaAlbum.title} disponibles
+                                </h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                    Te faltan {ctaAlbum.total_slots - ctaAlbum.completed_slots} cromos en total
+                                </p>
+                            </div>
+                            <Link href={`/marketplace?collection=${ctaAlbum.copy_id}`}>
+                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                    Ver en Marketplace <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                ) : mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
                     <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>

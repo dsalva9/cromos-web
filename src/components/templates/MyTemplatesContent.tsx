@@ -1,22 +1,37 @@
+'use client';
+
 import Link from '@/components/ui/link';
 import Image from 'next/image';
+import { useMemo } from 'react';
 import {
     LayoutGrid,
-    Plus,
     Check,
     X,
     User,
     Trophy,
-    ArrowRight
+    ArrowRight,
+    ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TemplateCopy } from '@/lib/templates/server-my-templates';
+import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
 
 interface MyTemplatesContentProps {
     copies: TemplateCopy[];
 }
 
 export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
+    const { counts: availabilityCounts } = useMarketplaceAvailabilityCounts();
+
+    // Build a lookup: copy_id → missing_in_marketplace count
+    const availabilityMap = useMemo(() => {
+        const map = new Map<number, number>();
+        for (const entry of availabilityCounts) {
+            map.set(entry.copy_id, entry.missing_in_marketplace);
+        }
+        return map;
+    }, [availabilityCounts]);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
             <div className="container mx-auto px-4 py-8 md:py-12">
@@ -66,6 +81,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                         {copies.map(copy => {
                             const percentage = copy.completion_percentage;
                             const isComplete = percentage === 100;
+                            const marketplaceCount = availabilityMap.get(Number(copy.copy_id)) ?? 0;
 
                             return (
                                 <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block h-full">
@@ -154,7 +170,21 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                             </div>
 
                                             {/* Action */}
-                                            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                                            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700 space-y-3">
+                                                {/* Marketplace CTA */}
+                                                {!isComplete && marketplaceCount > 0 && (
+                                                    <Link
+                                                        href={`/marketplace?collection=${copy.copy_id}`}
+                                                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                                        className="flex items-center gap-2 bg-[#FFC000]/10 dark:bg-[#FFC000]/5 border border-[#FFC000]/30 rounded-xl px-3 py-2 hover:bg-[#FFC000]/20 transition-colors group/cta"
+                                                    >
+                                                        <ShoppingBag className="w-4 h-4 text-[#FFC000]" />
+                                                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                                            {marketplaceCount} {marketplaceCount === 1 ? 'falta' : 'faltan'} en Marketplace
+                                                        </span>
+                                                        <ArrowRight className="w-3.5 h-3.5 ml-auto text-[#FFC000] transform group-hover/cta:translate-x-1 transition-transform" />
+                                                    </Link>
+                                                )}
                                                 <div className="flex items-center justify-between text-sm font-black uppercase tracking-wide text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">
                                                     <span>Gestionar Colección</span>
                                                     <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
