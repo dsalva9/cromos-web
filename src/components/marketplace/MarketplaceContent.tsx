@@ -163,7 +163,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + 0.5rem)' }}>
                     {/* Background cover that extends behind the sticky bar to hide scrolling content */}
                     <div
-                        className="absolute -top-8 left-0 right-0 h-8 bg-gray-50 dark:bg-gray-900 -mx-4"
+                        className="absolute -top-4 left-0 right-0 h-4 bg-gray-50 dark:bg-gray-900 -mx-4"
                         style={{ width: 'calc(100% + 2rem)' }}
                         aria-hidden="true"
                     />
