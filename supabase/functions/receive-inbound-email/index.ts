@@ -90,19 +90,17 @@ Deno.serve(async (req: Request) => {
     }
 
     const emailData = payload.data;
-    console.log("Received inbound email webhook:", {
+    console.log("Received inbound email:", {
       email_id: emailData.email_id,
       from: emailData.from,
       to: emailData.to,
       subject: emailData.subject,
-      has_html: !!emailData.html,
-      has_text: !!emailData.text,
     });
 
     // Resend webhook does NOT include email body (html/text).
-    // We must fetch the full email content from the Resend API.
+    // We must fetch the full content from the Resend API.
     if (!emailData.html && !emailData.text) {
-      console.log("No body in webhook payload, fetching from Resend API...");
+      console.log("Fetching email body from Resend API...");
       try {
         const apiResponse = await fetch(
           `https://api.resend.com/emails/receiving/${emailData.email_id}`,
@@ -114,14 +112,12 @@ Deno.serve(async (req: Request) => {
         );
         if (apiResponse.ok) {
           const fullEmail = await apiResponse.json();
-          console.log("Fetched email content:", {
-            has_html: !!fullEmail.html,
-            has_text: !!fullEmail.text,
-            html_length: fullEmail.html?.length,
-            text_length: fullEmail.text?.length,
-          });
           emailData.html = fullEmail.html;
           emailData.text = fullEmail.text;
+          console.log("Fetched email content:", {
+            has_html: !!emailData.html,
+            has_text: !!emailData.text,
+          });
         } else {
           const errBody = await apiResponse.text();
           console.error("Failed to fetch email content:", apiResponse.status, errBody);
