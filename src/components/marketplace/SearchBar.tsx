@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SearchBarProps {
@@ -16,15 +16,25 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, placeholder, className }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 500);
+  const isExternalSync = useRef(false);
 
   // Sync when external value changes (e.g. from URL params)
   useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
+    if (value !== localValue) {
+      isExternalSync.current = true;
+      setLocalValue(value);
+    }
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    // Skip calling onChange when the change came from an external prop sync
+    // to avoid a race condition that resets the value
+    if (isExternalSync.current) {
+      isExternalSync.current = false;
+      return;
+    }
     onChange(debouncedValue);
-  }, [debouncedValue, onChange]);
+  }, [debouncedValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="relative">
@@ -32,7 +42,10 @@ export function SearchBar({ value, onChange, placeholder, className }: SearchBar
       <Input
         type="text"
         value={localValue}
-        onChange={e => setLocalValue(e.target.value)}
+        onChange={e => {
+          isExternalSync.current = false;
+          setLocalValue(e.target.value);
+        }}
         placeholder={placeholder || 'Search...'}
         className={cn(
           "pl-10 bg-white border-2 border-black text-gray-900 placeholder:text-gray-600",
