@@ -13,6 +13,15 @@ import {
   useUser,
 } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { isProfileComplete } from '@/lib/profile/isProfileComplete';
+
+/**
+ * localStorage key used to persist the "profile completed" flag across
+ * full-page navigations (window.location.href).  Without this, the
+ * in-memory React state resets on every hard nav, creating a race window
+ * where `isComplete` reads `false` before the DB query returns.
+ */
+const COMPLETED_LOCK_KEY = 'profile_completed';
 
 /**
  * Extended profile type - now includes is_admin to eliminate
@@ -30,6 +39,8 @@ interface ProfileCompletionContextValue {
   isComplete: boolean;
   isAdmin: boolean;
   loading: boolean;
+  /** Whether the initial profile fetch has completed at least once */
+  initialFetchDone: boolean;
   refresh: () => Promise<void>;
   updateProfile: (changes: Partial<UserProfile>) => void;
   /** Durably lock isComplete=true for this session (prevents race-condition redirects) */
@@ -39,41 +50,35 @@ interface ProfileCompletionContextValue {
 const ProfileCompletionContext =
   createContext<ProfileCompletionContextValue | null>(null);
 
-function normalizeProfile(profile: UserProfile | null) {
-  if (!profile) return null;
-  const nickname =
-    typeof profile.nickname === 'string' ? profile.nickname.trim() : null;
-  const postcode =
-    typeof profile.postcode === 'string' ? profile.postcode.trim() : null;
-  const avatarUrl =
-    typeof profile.avatar_url === 'string' ? profile.avatar_url.trim() : null;
-  return {
-    nickname: nickname && nickname.length > 0 ? nickname : null,
-    postcode: postcode && postcode.length > 0 ? postcode : null,
-    avatar_url: avatarUrl && avatarUrl.length > 0 ? avatarUrl : null,
-    is_admin: profile.is_admin ?? false,
-  };
+function computeIsComplete(profile: UserProfile | null) {
+  if (!profile) return false;
+  return isProfileComplete(
+    profile.nickname,
+    profile.postcode,
+    profile.avatar_url
+  );
 }
 
-function computeIsComplete(profile: UserProfile | null) {
-  const normalized = normalizeProfile(profile);
-  if (!normalized) return false;
+/** Read the persisted completion lock from localStorage. */
+function readCompletedLock(): boolean {
+  try {
+    return localStorage.getItem(COMPLETED_LOCK_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
 
-  const nickname = normalized.nickname;
-  const postcode = normalized.postcode;
-  const avatarUrl = normalized.avatar_url;
-
-  if (!nickname || !postcode || !avatarUrl) return false;
-  const nicknameLower = nickname.toLowerCase();
-  const postcodeLower = postcode.toLowerCase();
-
-  const hasPlaceholderNickname =
-    nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
-  const hasPlaceholderPostcode = postcodeLower === 'pending';
-
-  if (hasPlaceholderNickname || hasPlaceholderPostcode) return false;
-
-  return true;
+/** Persist the completion lock to localStorage. */
+function writeCompletedLock(value: boolean) {
+  try {
+    if (value) {
+      localStorage.setItem(COMPLETED_LOCK_KEY, 'true');
+    } else {
+      localStorage.removeItem(COMPLETED_LOCK_KEY);
+    }
+  } catch {
+    // localStorage unavailable (SSR, private mode) — non-critical
+  }
 }
 
 /**
@@ -96,7 +101,22 @@ export function ProfileCompletionProvider({
   const [loading, setLoading] = useState(true);
   // Once true, isComplete stays true for the rest of this session.
   // This prevents transient false readings during re-fetch after profile save.
-  const [completedLock, setCompletedLock] = useState(false);
+  // Initialise from localStorage so the flag survives full-page navigations.
+  const [completedLock, setCompletedLock] = useState(() => readCompletedLock());
+  /** Track whether the first profile fetch has resolved. */
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
+
+  /** Helper to durably set the completed lock (state + localStorage). */
+  const lockComplete = useCallback(() => {
+    setCompletedLock(true);
+    writeCompletedLock(true);
+  }, []);
+
+  /** Helper to clear the completed lock (sign-out / profile genuinely incomplete). */
+  const unlockComplete = useCallback(() => {
+    setCompletedLock(false);
+    writeCompletedLock(false);
+  }, []);
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -135,13 +155,17 @@ export function ProfileCompletionProvider({
       // Check suspension/deletion status (merged from SupabaseProvider)
       if (data?.suspended_at || data?.deleted_at) {
         logger.info('User is suspended/deleted, signing out');
+        unlockComplete();
         await supabase.auth.signOut();
         return;
       }
 
       // Auto-lock if fetched data confirms profile is complete
       if (computeIsComplete(profileData)) {
-        setCompletedLock(true);
+        lockComplete();
+      } else {
+        // Profile is genuinely incomplete — clear any stale lock
+        unlockComplete();
       }
     } catch (error) {
       logger.error('Error fetching profile', error);
@@ -151,8 +175,9 @@ export function ProfileCompletionProvider({
       }
     } finally {
       setLoading(false);
+      setInitialFetchDone(true);
     }
-  }, [supabase, user, completedLock]);
+  }, [supabase, user, completedLock, lockComplete, unlockComplete]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -164,6 +189,9 @@ export function ProfileCompletionProvider({
       if (!user) {
         setProfile(null);
         setLoading(false);
+        // Clear the persisted lock when the user signs out
+        unlockComplete();
+        setInitialFetchDone(false);
         return;
       }
 
@@ -175,7 +203,7 @@ export function ProfileCompletionProvider({
     };
 
     void loadProfile();
-  }, [authLoading, fetchProfile, user]);
+  }, [authLoading, fetchProfile, user, unlockComplete]);
 
   const updateProfile = useCallback(
     (changes: Partial<UserProfile>) => {
@@ -188,17 +216,17 @@ export function ProfileCompletionProvider({
         };
         // Auto-lock if the optimistic update makes profile complete
         if (computeIsComplete(next)) {
-          setCompletedLock(true);
+          lockComplete();
         }
         return next;
       });
     },
-    []
+    [lockComplete]
   );
 
   const markComplete = useCallback(() => {
-    setCompletedLock(true);
-  }, []);
+    lockComplete();
+  }, [lockComplete]);
 
   const rawIsComplete = computeIsComplete(profile);
   // completedLock is sticky: once true, isComplete stays true
@@ -210,11 +238,12 @@ export function ProfileCompletionProvider({
       isComplete,
       isAdmin: profile?.is_admin ?? false,
       loading,
+      initialFetchDone,
       refresh: fetchProfile,
       updateProfile,
       markComplete,
     }),
-    [fetchProfile, isComplete, loading, markComplete, profile, updateProfile]
+    [fetchProfile, initialFetchDone, isComplete, loading, markComplete, profile, updateProfile]
   );
 
   return (

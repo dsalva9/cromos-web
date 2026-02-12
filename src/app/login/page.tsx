@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
+import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -91,26 +92,14 @@ export default function LoginPage() {
           return;
         }
 
-        const nickname = profileData?.nickname?.trim() ?? '';
-        const postcode = profileData?.postcode?.trim() ?? '';
-        const avatarUrl = profileData?.avatar_url?.trim() ?? '';
-
-        const nicknameLower = nickname.toLowerCase();
-        const postcodeLower = postcode.toLowerCase();
-
-        const hasPlaceholderNickname =
-          nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
-        const hasPlaceholderPostcode = postcodeLower === 'pending';
-
-        const isProfileComplete =
-          !!nickname &&
-          !!postcode &&
-          !!avatarUrl &&
-          !hasPlaceholderNickname &&
-          !hasPlaceholderPostcode;
+        const profileIsComplete = isProfileComplete(
+          profileData?.nickname,
+          profileData?.postcode,
+          profileData?.avatar_url
+        );
 
         // Hard redirect — avoids App Router startTransition that gets stuck
-        window.location.href = isProfileComplete ? '/' : '/profile/completar';
+        window.location.href = profileIsComplete ? '/' : '/profile/completar';
       }
     } catch {
       setError('An unexpected error occurred');

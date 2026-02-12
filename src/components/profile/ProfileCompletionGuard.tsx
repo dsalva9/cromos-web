@@ -12,8 +12,9 @@ const completionRoute = '/profile/completar';
 /**
  * Number of consecutive stable "incomplete" checks required before redirecting.
  * This prevents redirects on transient isComplete=false readings during re-fetch.
+ * Increased from 2 → 3 for extra safety against rehydration false-positives.
  */
-const STABLE_INCOMPLETE_THRESHOLD = 2;
+const STABLE_INCOMPLETE_THRESHOLD = 3;
 
 interface ProfileCompletionGuardProps {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ interface ProfileCompletionGuardProps {
 export function ProfileCompletionGuard({
   children,
 }: ProfileCompletionGuardProps) {
-  const { isComplete, loading, profile } = useProfileCompletion();
+  const { isComplete, loading, profile, initialFetchDone } = useProfileCompletion();
   const { user, loading: authLoading } = useUser();
   const pathname = usePathname();
   const hasWarnedRef = useRef(false);
@@ -57,6 +58,12 @@ export function ProfileCompletionGuard({
   useEffect(() => {
     if (authLoading || loading) return;
     if (!user) return;
+
+    // CRITICAL: Don't redirect until the provider has completed its first
+    // profile fetch from the database.  Before that, `profile` is null and
+    // `isComplete` may be false solely due to missing data — NOT because
+    // the profile is genuinely incomplete.
+    if (!initialFetchDone) return;
 
     const isExemptRoute = getIsExemptRoute();
     const previousPathname = previousPathnameRef.current;
@@ -108,7 +115,7 @@ export function ProfileCompletionGuard({
       window.location.href = completionRoute;
     }
     // router intentionally excluded — using window.location.href for redirect (Next.js 16 transition bug)
-  }, [authLoading, getIsExemptRoute, isComplete, loading, pathname, profile, user]);
+  }, [authLoading, getIsExemptRoute, initialFetchDone, isComplete, loading, pathname, profile, user]);
 
   // Always render children — the useEffect above handles redirects.
   // Never return null here: unmounting the children tree corrupts the

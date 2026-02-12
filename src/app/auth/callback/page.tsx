@@ -4,39 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
-
-function isProfileComplete(
-  nickname: string | null,
-  postcode: string | null,
-  avatarUrl: string | null
-) {
-  const safeNickname = nickname?.trim() ?? '';
-  const safePostcode = postcode?.trim() ?? '';
-  const safeAvatar = avatarUrl?.trim() ?? '';
-
-  const nicknameLower = safeNickname.toLowerCase();
-  const postcodeLower = safePostcode.toLowerCase();
-
-  const hasPlaceholderNickname =
-    nicknameLower === 'sin nombre' || nicknameLower.startsWith('pending_');
-  const hasPlaceholderPostcode = postcodeLower === 'pending';
-
-  if (!safeNickname || hasPlaceholderNickname) {
-    return false;
-  }
-
-  if (!safePostcode || hasPlaceholderPostcode) {
-    return false;
-  }
-
-  if (!safeAvatar) {
-    return false;
-  }
-
-  return true;
-}
 
 export default function AuthCallback() {
   const supabase = useSupabaseClient();
