@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb, ShoppingBag } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
+import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
@@ -273,9 +274,6 @@ export default function UserDashboard() {
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1 flex items-center gap-2">
                                     <ShoppingBag className="w-4 h-4 text-[#FFC000]" />
                                     Disponible en Marketplace
-                                    {albumsWithAvailability.length > 1 && (
-                                        <span className="text-xs text-gray-400">({ctaIndex + 1}/{albumsWithAvailability.length})</span>
-                                    )}
                                 </p>
                                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">
                                     {ctaCount} {ctaCount === 1 ? 'cromo' : 'cromos'} de {ctaAlbum.title} disponibles
@@ -290,6 +288,23 @@ export default function UserDashboard() {
                                 </Button>
                             </Link>
                         </div>
+                        {albumsWithAvailability.length > 1 && (
+                            <div className="flex items-center justify-center gap-2 mt-4">
+                                {albumsWithAvailability.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCtaIndex(i)}
+                                        className={cn(
+                                            "w-2 h-2 rounded-full transition-all duration-300",
+                                            i === ctaIndex
+                                                ? "bg-[#FFC000] w-4"
+                                                : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
+                                        )}
+                                        aria-label={`Ver álbum ${i + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) : mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
                     <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">

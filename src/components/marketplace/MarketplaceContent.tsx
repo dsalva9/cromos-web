@@ -29,7 +29,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
     const searchParams = useSearchParams();
 
-    // Auto-apply collection filter from URL param (e.g. /marketplace?collection=123)
+    // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet)
     useEffect(() => {
         const collectionParam = searchParams.get('collection');
         if (collectionParam) {
@@ -38,6 +38,10 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 setSelectedCollectionIds([collectionId]);
                 setShowFilters(true);
             }
+        }
+        const searchParam = searchParams.get('search');
+        if (searchParam) {
+            setSearchQuery(searchParam);
         }
     }, [searchParams]);
 

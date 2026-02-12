@@ -203,7 +203,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
         <div className="mt-auto space-y-3">
           {/* Marketplace Indicator for Missing Stickers */}
           {slot.status === 'missing' && inMarketplace && (
-            <Link href={`/marketplace?slot=${slot.slot_id}`} className="block">
+            <Link href={`/marketplace?search=${encodeURIComponent(slot.label || `#${slot.slot_number}`)}&collection=${copyId}`} className="block">
               <div className="w-full bg-[#FFC000]/10 border border-[#FFC000]/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-[#FFC000] hover:bg-[#FFC000]/20 transition-colors cursor-pointer font-bold">
                 <ShoppingBag className="w-3 h-3" />
                 <span>EN MARKETPLACE</span>
