@@ -34,44 +34,15 @@ function CompleteProfileContent() {
     [formAvatarPath, supabase]
   );
 
+  // Seed form fields from ProfileCompletionProvider context (no extra query needed)
   useEffect(() => {
-    if (!user) return;
+    if (!user || !profile) return;
 
-    let cancelled = false;
-
-    const loadProfile = async () => {
-      try {
-        setLoadingProfile(true);
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('nickname, postcode, avatar_url')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (cancelled) return;
-
-        if (error) throw error;
-
-        setFormNickname(data?.nickname ?? profile?.nickname ?? '');
-        setFormPostcode(data?.postcode ?? profile?.postcode ?? '');
-        setFormAvatarPath(data?.avatar_url ?? null);
-      } catch (error) {
-        if (!cancelled) {
-          logger.error('Error loading profile for completion', error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoadingProfile(false);
-        }
-      }
-    };
-
-    void loadProfile();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profile?.nickname, profile?.postcode, supabase, user]);
+    setFormNickname(profile.nickname ?? '');
+    setFormPostcode(profile.postcode ?? '');
+    setFormAvatarPath(profile.avatar_url ?? null);
+    setLoadingProfile(false);
+  }, [user, profile]);
 
   const handleAvatarSelection = (selection: AvatarSelection) => {
     if (selection.type === 'preset') {

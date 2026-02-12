@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
 interface DeletionStatus {
   isScheduled: boolean;
@@ -11,41 +12,38 @@ interface DeletionStatus {
 }
 
 export function useAccountDeletionStatus() {
+  const { profile, loading: profileLoading } = useProfileCompletion();
   const [status, setStatus] = useState<DeletionStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function checkStatus() {
-      const supabase = createClient();
+    // Wait for ProfileCompletionProvider to finish loading
+    if (profileLoading) return;
 
+    const deletedAt = profile?.deleted_at ?? null;
+
+    if (!deletedAt) {
+      setStatus({
+        isScheduled: false,
+        scheduledFor: null,
+        deletedAt: null,
+        daysRemaining: 0,
+        reason: null
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Only query retention_schedule if deletion is actually scheduled
+    async function fetchSchedule() {
+      const supabase = createClient();
       try {
-        // Get current user
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           setLoading(false);
           return;
         }
 
-        // Check if user has deleted_at set
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('deleted_at')
-          .eq('id', user.id)
-          .single();
-
-        if (!profile?.deleted_at) {
-          setStatus({
-            isScheduled: false,
-            scheduledFor: null,
-            deletedAt: null,
-            daysRemaining: 0,
-            reason: null
-          });
-          setLoading(false);
-          return;
-        }
-
-        // Check retention_schedule for deletion date
         const { data: schedule } = await supabase
           .from('retention_schedule')
           .select('scheduled_for, reason')
@@ -62,7 +60,7 @@ export function useAccountDeletionStatus() {
           setStatus({
             isScheduled: true,
             scheduledFor: schedule.scheduled_for,
-            deletedAt: profile.deleted_at,
+            deletedAt,
             daysRemaining: Math.max(0, daysRemaining),
             reason: schedule.reason
           });
@@ -70,7 +68,7 @@ export function useAccountDeletionStatus() {
           setStatus({
             isScheduled: false,
             scheduledFor: null,
-            deletedAt: profile.deleted_at,
+            deletedAt,
             daysRemaining: 0,
             reason: null
           });
@@ -82,8 +80,8 @@ export function useAccountDeletionStatus() {
       }
     }
 
-    checkStatus();
-  }, []);
+    fetchSchedule();
+  }, [profile?.deleted_at, profileLoading]);
 
   return { status, loading };
 }
