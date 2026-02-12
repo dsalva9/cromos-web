@@ -92,7 +92,7 @@ export function ReportModal({
             <RadioGroup value={reason} onValueChange={setReason}>
               {REPORT_REASONS.map(option => (
                 <div key={option.value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={option.value} />
+                  <RadioGroupItem value={option.value} id={option.value} className="border-gray-400 text-gray-900 dark:border-white dark:text-white" />
                   <Label
                     htmlFor={option.value}
                     className="text-gray-600 dark:text-gray-400 cursor-pointer"
