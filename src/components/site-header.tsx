@@ -88,7 +88,7 @@ function MobileNotificationIcon() {
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = useSupabaseClient();
-  const { user, loading } = useUser();
+  const { user, loading, wasAuthed } = useUser();
   // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
   const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
@@ -108,7 +108,11 @@ export default function SiteHeader() {
     { href: '/signup', label: 'Registrarse' },
   ];
 
-  const navigationLinks = user ? baseLinks : unauthenticatedLinks;
+  // While loading + wasAuthed, render authenticated links (CSS hides them via auth-dependent)
+  // Once loading resolves, show correct links based on actual auth state
+  const navigationLinks = loading
+    ? (wasAuthed ? baseLinks : [])
+    : (user ? baseLinks : unauthenticatedLinks);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -151,16 +155,16 @@ export default function SiteHeader() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (!user && !loading) {
+    if (!user && !loading && !wasAuthed) {
       root.style.setProperty('--header-height', '7.5rem');
     } else {
       root.style.setProperty('--header-height', '4rem');
     }
-  }, [user, loading]);
+  }, [user, loading, wasAuthed]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
-      {/* Beta Announcement Banner - Only visible for unauthenticated users */}
+      {/* Beta Announcement Banner - Only visible for confirmed unauthenticated users */}
       {!user && !loading && (
         <div className="bg-black text-[#FFC000] py-2.5 px-4 overflow-hidden border-b border-[#FFC000]/20 shadow-inner">
           <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-0.5 text-center">
@@ -202,7 +206,7 @@ export default function SiteHeader() {
           <nav
             role="navigation"
             aria-label="Main navigation"
-            className="hidden md:flex md:items-center md:space-x-2"
+            className="hidden md:flex md:items-center md:space-x-2 auth-dependent"
           >
             <ul className="flex items-center space-x-2">
               {navigationLinks.map(link => (
@@ -230,8 +234,11 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          <div className="flex items-center gap-2 md:hidden">
-            {!loading && (
+          <div className="flex items-center gap-2 md:hidden auth-dependent">
+            {loading ? (
+              /* Invisible spacer to prevent layout shift while auth loads */
+              <div className="w-10 h-10" />
+            ) : (
               user ? (
                 <>
                   <MobileNotificationIcon />

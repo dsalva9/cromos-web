@@ -16,7 +16,7 @@ export function MobileBottomNav() {
   const router = useRouter();
 
   /* Existing hook calls... */
-  const { user } = useUser(); // Ensure useUser is imported from SupabaseProvider
+  const { user, wasAuthed } = useUser(); // Ensure useUser is imported from SupabaseProvider
 
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
@@ -43,8 +43,8 @@ export function MobileBottomNav() {
     setIsMenuOpen(true);
   };
 
-  // If user is not logged in, do not show the bottom nav
-  if (!user) {
+  // If user is not logged in (and wasn't previously authed), do not show the bottom nav
+  if (!user && !wasAuthed) {
     return null;
   }
 

@@ -80,11 +80,19 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  const theme = localStorage.getItem('theme') || 'light';
-                  const root = document.documentElement;
+                  var root = document.documentElement;
+                  var theme = localStorage.getItem('theme') || 'light';
 
                   if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     root.classList.add('dark');
+                  }
+
+                  // Auth hint: set before first paint so the navbar doesn't flash unauthenticated UI
+                  if (localStorage.getItem('cc-was-authed') === '1') {
+                    root.setAttribute('data-was-authed', '1');
+                    root.style.setProperty('--header-height', '4rem');
+                  } else {
+                    root.style.setProperty('--header-height', '7.5rem');
                   }
                 } catch (e) {}
               })();

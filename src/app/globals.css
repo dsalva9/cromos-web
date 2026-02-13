@@ -270,3 +270,27 @@ textarea,
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Auth-aware navbar: prevent flicker during hard navigation.
+   The inline script in layout.tsx sets [data-was-authed] on <html>
+   BEFORE first paint. React sets [data-auth-ready] once auth resolves.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* While auth is loading for a previously-authed user, hide the
+   auth-dependent areas (nav links, avatar, notifications) but keep
+   their layout space so nothing jumps. */
+html[data-was-authed]:not([data-auth-ready]) .auth-dependent {
+  visibility: hidden;
+}
+
+/* Once auth resolves, fade the content in smoothly */
+.auth-dependent {
+  transition: opacity 0.15s ease-in;
+}
+html[data-was-authed]:not([data-auth-ready]) .auth-dependent {
+  opacity: 0;
+}
+html[data-auth-ready] .auth-dependent {
+  opacity: 1;
+}
