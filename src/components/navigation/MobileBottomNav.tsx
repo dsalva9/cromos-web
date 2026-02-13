@@ -179,6 +179,35 @@ export function MobileBottomNav() {
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Cerrar Sesión</span>
             </button>
+
+            {/* Legal links — especially important on native where footer is hidden */}
+            <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
+            <div className="flex flex-wrap items-center justify-center gap-3 px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
+              <a
+                href="/legal/terms"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/terms'; }}
+                className="hover:text-[#FFC000] transition-colors"
+              >
+                Términos
+              </a>
+              <span>·</span>
+              <a
+                href="/legal/privacy"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/privacy'; }}
+                className="hover:text-[#FFC000] transition-colors"
+              >
+                Privacidad
+              </a>
+              <span>·</span>
+              <a
+                href="/legal/cookies"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/cookies'; }}
+                className="hover:text-[#FFC000] transition-colors"
+              >
+                Cookies
+              </a>
+            </div>
+            <p className="text-center text-[10px] text-gray-300 dark:text-gray-600 pb-1">v1.0 Beta</p>
           </div>
         </DrawerContent>
       </Drawer>

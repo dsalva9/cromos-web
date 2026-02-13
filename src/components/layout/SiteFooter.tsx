@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from '@/components/ui/link';
 import { siteConfig } from '@/config/site';
+import { Capacitor } from '@capacitor/core';
 
 
 export function SiteFooter() {
   const [legalModalOpen, setLegalModalOpen] = useState(false);
 
+  // Defer Capacitor check to avoid SSR hydration mismatch
+  const [isNative, setIsNative] = useState(false);
+  useEffect(() => { setIsNative(Capacitor.isNativePlatform()); }, []);
+
+  // Hide footer entirely on native apps — legal links live in the More drawer
+  if (isNative) return null;
+
   return (
     <>
-      <footer role="contentinfo" className="border-t block bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+      <footer role="contentinfo" className="border-t block bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 pb-24 md:pb-0">
         <div className="container mx-auto px-4 py-6 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <span>
