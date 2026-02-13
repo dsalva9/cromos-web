@@ -163,11 +163,18 @@ export default function SiteHeader() {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (!user && !loading && !wasAuthed) {
-      root.style.setProperty('--header-height', '7.5rem');
-    } else {
-      root.style.setProperty('--header-height', '4rem');
-    }
+    const mq = window.matchMedia('(min-width: 640px)');
+    const update = () => {
+      const isSm = mq.matches;
+      if (!user && !loading && !wasAuthed) {
+        root.style.setProperty('--header-height', isSm ? '8.5rem' : '7.5rem');
+      } else {
+        root.style.setProperty('--header-height', isSm ? '5rem' : '4rem');
+      }
+    };
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
   }, [user, loading, wasAuthed]);
 
   return (

@@ -88,11 +88,13 @@ export default function RootLayout({
                   }
 
                   // Auth hint: set before first paint so the navbar doesn't flash unauthenticated UI
+                  // Header is h-16 (4rem) on mobile, sm:h-20 (5rem) on 640px+
+                  var isSm = window.matchMedia('(min-width: 640px)').matches;
                   if (localStorage.getItem('cc-was-authed') === '1') {
                     root.setAttribute('data-was-authed', '1');
-                    root.style.setProperty('--header-height', '4rem');
+                    root.style.setProperty('--header-height', isSm ? '5rem' : '4rem');
                   } else {
-                    root.style.setProperty('--header-height', '7.5rem');
+                    root.style.setProperty('--header-height', isSm ? '8.5rem' : '7.5rem');
                   }
                 } catch (e) {}
               })();
