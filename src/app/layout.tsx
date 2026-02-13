@@ -103,7 +103,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-dvh bg-gray-50 dark:bg-gray-900 text-foreground antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-dvh bg-gray-50 dark:bg-gray-900 text-foreground antialiased`}
         suppressHydrationWarning
       >
         <GoogleAnalytics />
@@ -118,7 +118,7 @@ export default function RootLayout({
             <SiteHeader />
           </header>
           <AccountDeletionBanner />
-          <main id="main-content" role="main" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
+          <main id="main-content" role="main" className="flex-1" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
             <PasswordRecoveryGuard>
               <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
             </PasswordRecoveryGuard>
