@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'CambioCromos',
   webDir: 'public',
   server: {
-    url: 'https://www.cambiocromos.com',
+    url: 'https://cambiocromos.com',
     cleartext: true,
     androidScheme: 'https'
   },
