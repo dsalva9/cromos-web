@@ -193,8 +193,8 @@ export default function UserDashboard() {
 
                 {/* 1. Compact Profile Header */}
                 <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-4 min-w-0">
                             <div className="flex-shrink-0">
                                 {displayAvatarUrl ? (
                                     <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={64} height={64} className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
@@ -204,10 +204,10 @@ export default function UserDashboard() {
                                     </div>
                                 )}
                             </div>
-                            <div>
-                                <div className="flex items-center gap-3">
-                                    <h1 className="text-2xl font-black text-gray-900 dark:text-white">{profile.nickname}</h1>
-                                    <div className="flex items-center gap-1">
+                            <div className="min-w-0">
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                    <h1 className="text-2xl font-black text-gray-900 dark:text-white truncate">{profile.nickname}</h1>
+                                    <div className="flex items-center gap-1 flex-shrink-0">
                                         {[1, 2, 3, 4, 5].map(star => (
                                             <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile.rating_avg) ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-200 dark:text-gray-600'}`} />
                                         ))}
@@ -218,7 +218,7 @@ export default function UserDashboard() {
                                 )}
                             </div>
                         </div>
-                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors">
+                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors flex-shrink-0">
                             Editar Perfil
                         </Link>
                     </div>
