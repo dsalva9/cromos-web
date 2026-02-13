@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -17,6 +17,10 @@ export function MobileBottomNav() {
 
   /* Existing hook calls... */
   const { user, wasAuthed } = useUser(); // Ensure useUser is imported from SupabaseProvider
+
+  // Defer client-only checks to avoid SSR hydration mismatch (React #418)
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => { setHasMounted(true); }, []);
 
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
@@ -44,7 +48,8 @@ export function MobileBottomNav() {
   };
 
   // If user is not logged in (and wasn't previously authed), do not show the bottom nav
-  if (!user && !wasAuthed) {
+  // Before mount, always return null to match SSR output and avoid hydration mismatch
+  if (!hasMounted || (!user && !wasAuthed)) {
     return null;
   }
 

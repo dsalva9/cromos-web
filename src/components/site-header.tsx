@@ -1,7 +1,7 @@
 'use client';
 
 import { siteConfig } from '@/config/site';
-import { useState, useEffect, MouseEvent } from 'react';
+import { useState, useEffect, useRef, MouseEvent } from 'react';
 import Link from '@/components/ui/link';
 import NavLink from '@/components/nav-link';
 import {
@@ -94,6 +94,11 @@ export default function SiteHeader() {
   const router = useRouter();
   const { handleOpenRatingModal, ratingModalElement } = GlobalRatingModal();
 
+  // Defer client-only values to avoid SSR hydration mismatch (React #418)
+  const mounted = useRef(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => { mounted.current = true; setHasMounted(true); }, []);
+
   const closeMenu = () => setIsMenuOpen(false);
 
   const baseLinks: NavigationLink[] = [
@@ -110,9 +115,12 @@ export default function SiteHeader() {
 
   // While loading + wasAuthed, render authenticated links (CSS hides them via auth-dependent)
   // Once loading resolves, show correct links based on actual auth state
-  const navigationLinks = loading
-    ? (wasAuthed ? baseLinks : [])
-    : (user ? baseLinks : unauthenticatedLinks);
+  // Before mount, always render [] to match SSR output and avoid hydration mismatch
+  const navigationLinks = !hasMounted
+    ? []
+    : loading
+      ? (wasAuthed ? baseLinks : [])
+      : (user ? baseLinks : unauthenticatedLinks);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -165,7 +173,7 @@ export default function SiteHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
       {/* Beta Announcement Banner - Only visible for confirmed unauthenticated users */}
-      {!user && !loading && (
+      {hasMounted && !user && !loading && (
         <div className="bg-black text-[#FFC000] py-2.5 px-4 overflow-hidden border-b border-[#FFC000]/20 shadow-inner">
           <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-0.5 text-center">
             <div className="flex items-center gap-2">
@@ -235,7 +243,7 @@ export default function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2 md:hidden auth-dependent">
-            {loading ? (
+            {!hasMounted || loading ? (
               /* Invisible spacer to prevent layout shift while auth loads */
               <div className="w-10 h-10" />
             ) : (
@@ -245,7 +253,7 @@ export default function SiteHeader() {
                   <MobileUserAvatar userId={user.id} />
                 </>
               ) : (
-                !Capacitor.isNativePlatform() && (
+                !(hasMounted && Capacitor.isNativePlatform()) && (
                   <Link
                     href="/login"
                     className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-[#FFC000] hover:text-black transition-colors"
