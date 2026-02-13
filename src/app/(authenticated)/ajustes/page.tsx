@@ -23,16 +23,16 @@ import Link from '@/components/ui/link'; // Added Link import
 
 export default function AjustesPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, loading } = useUser();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push('/login');
       return;
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
-  if (!user) {
+  if (loading || !user) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
