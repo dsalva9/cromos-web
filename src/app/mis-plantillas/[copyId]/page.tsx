@@ -132,7 +132,7 @@ function TemplateProgressContent() {
   const spares = progress.filter(slot => slot.status === 'duplicate' && slot.count > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Back and Quick Entry */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

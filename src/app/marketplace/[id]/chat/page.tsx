@@ -773,7 +773,7 @@ function ListingChatPageContent() {
         )}
 
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 md:h-auto pb-20 md:pb-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 md:h-auto">
           {/* Participants sidebar (seller only) */}
           {isOwner && participants.length > 0 && (
             <>

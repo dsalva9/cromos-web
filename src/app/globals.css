@@ -197,15 +197,6 @@ textarea,
   }
 }
 
-/* On mobile, <main> already has min-h-screen + pb-20.
-   Page components adding their own min-h-screen stacks to 100vh + 80px,
-   creating a grey empty band below the content.
-   Neutralize the duplicate min-height on all descendants. */
-@media (max-width: 767px) {
-  #main-content * {
-    min-height: auto !important;
-  }
-}
 
 /* Override any default card borders */
 .card-no-border {

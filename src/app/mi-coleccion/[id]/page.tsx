@@ -88,7 +88,7 @@ function AlbumView() {
           }}
         />
 
-        <div className="container mx-auto px-4 py-8 pb-24">
+        <div className="container mx-auto px-4 py-8">
           <AlbumPageGrid
             page={currentPage}
             onMarkOwned={markStickerOwned}

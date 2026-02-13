@@ -89,7 +89,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const showSkeletons = loading && listings.length === 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white pb-24 md:pb-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
             {/* Hero Section */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div className="container mx-auto px-4 pt-4 pb-2 md:py-8">

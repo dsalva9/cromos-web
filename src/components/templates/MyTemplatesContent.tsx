@@ -33,7 +33,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
     }, [availabilityCounts]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-8 md:py-12">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">

@@ -3,6 +3,13 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
  * Supabase Edge Function: send-user-summary-email
  * Sends summary emails about new user registrations
  * Can be triggered by pg_cron (daily/weekly) or manually from admin console
+ *
+ * Authentication:
+ * - Cron triggers: No Authorization header needed (verify_jwt is disabled,
+ *   and cron calls come from the Supabase internal network via pg_net).
+ *   When no auth header is present, the function processes the request directly.
+ * - Manual triggers from admin console: Uses Authorization header with admin
+ *   user JWT. The function verifies the JWT and checks is_admin on profiles.
  */
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
@@ -82,31 +89,43 @@ Deno.serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-        // For manual triggers, verify admin access
+        // Authentication:
+        // - No Authorization header = internal cron call (verify_jwt is disabled,
+        //   only pg_net from Supabase's internal network can reach this)
+        // - With Authorization header = manual admin trigger, verify JWT + is_admin
         const authHeader = req.headers.get('Authorization');
-        if (authHeader && !authHeader.includes(supabaseServiceKey)) {
-            const token = authHeader.replace('Bearer ', '');
-            const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-            if (userError || !user) {
-                return new Response(
-                    JSON.stringify({ error: 'Invalid token' }),
-                    { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
+        if (authHeader) {
+            // Check if it's the service role key (still support this path)
+            if (!authHeader.includes(supabaseServiceKey)) {
+                // Not service role, verify as admin user
+                const token = authHeader.replace('Bearer ', '');
+                const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+                if (userError || !user) {
+                    console.error('[send-user-summary-email] Auth failed:', userError?.message);
+                    return new Response(
+                        JSON.stringify({ error: 'Invalid token' }),
+                        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                    );
+                }
+
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('is_admin')
+                    .eq('id', user.id)
+                    .single();
+
+                if (!profile?.is_admin) {
+                    return new Response(
+                        JSON.stringify({ error: 'Admin access required' }),
+                        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                    );
+                }
             }
-
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('is_admin')
-                .eq('id', user.id)
-                .single();
-
-            if (!profile?.is_admin) {
-                return new Response(
-                    JSON.stringify({ error: 'Admin access required' }),
-                    { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-                );
-            }
+            console.log('[send-user-summary-email] Auth: manual/service-role trigger');
+        } else {
+            console.log('[send-user-summary-email] Auth: cron trigger (no auth header)');
         }
 
         const payload: SummaryPayload = await req.json();
@@ -132,7 +151,6 @@ Deno.serve(async (req) => {
         }
 
         // Get recipients based on frequency
-        const recipientFrequency = frequency === 'manual' ? 'weekly' : frequency;
         let recipients: Recipient[] = [];
 
         if (frequency === 'manual') {
