@@ -180,7 +180,7 @@ export function MobileBottomNav() {
               <span className="font-medium">Cerrar Sesión</span>
             </button>
 
-            {/* Legal links — especially important on native where footer is hidden */}
+            {/* Legal links — footer is hidden on mobile, these are the mobile equivalent */}
             <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
             <div className="flex flex-wrap items-center justify-center gap-3 px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
               <a
