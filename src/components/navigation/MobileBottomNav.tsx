@@ -1,13 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut } from 'lucide-react';
+import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -34,6 +35,7 @@ export function MobileBottomNav() {
   };
 
   const { hapticImpact } = useHaptic();
+  const { isAdmin } = useProfileCompletion();
 
   const handleNavClick = (href: string) => {
     hapticImpact();
@@ -166,6 +168,22 @@ export function MobileBottomNav() {
               <Settings className="h-5 w-5 text-[#FFC000]" />
               <span className="font-medium">Ajustes</span>
             </a>
+
+            {isAdmin && (
+              <a
+                href="/admin/dashboard"
+                onClick={(e) => {
+                  e.preventDefault();
+                  hapticImpact();
+                  setIsMenuOpen(false);
+                  window.location.href = '/admin/dashboard';
+                }}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                <Shield className="h-5 w-5 text-red-500" />
+                <span className="font-medium">Admin Panel</span>
+              </a>
+            )}
 
             <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
 
