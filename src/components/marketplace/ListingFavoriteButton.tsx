@@ -96,16 +96,16 @@ export function ListingFavoriteButton({
         className={`
           p-2 rounded-full
           transition-all duration-200
-          ${favorited
-            ? 'bg-red-500/80 hover:bg-red-600/90 text-white shadow-lg'
-            : 'bg-white/70 hover:bg-white/90 text-gray-600 shadow-md'
-          }
-          ${loading || checkingStatus ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}
+          bg-transparent
+          ${loading || checkingStatus ? 'opacity-50 cursor-not-allowed' : 'hover:scale-115'}
         `}
         aria-label={favorited ? 'Eliminar de favoritos' : 'Agregar a favoritos'}
       >
         <Heart
-          className={`h-5 w-5 ${favorited ? 'fill-current' : ''}`}
+          className={`h-5 w-5 transition-all duration-200 ${favorited
+              ? 'fill-red-500 text-red-500 drop-shadow-[0_1px_4px_rgba(239,68,68,0.5)]'
+              : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]'
+            }`}
         />
       </button>
     );

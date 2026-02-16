@@ -64,11 +64,11 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_12px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_6px_16px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_2px_6px_rgba(0,0,0,0.4),0_12px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1">
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
-      <div className="relative aspect-square bg-gray-50 dark:bg-gray-900 overflow-hidden flex items-center justify-center">
+      <div className="relative aspect-square bg-[#faf8f5] dark:bg-gray-900 overflow-hidden flex items-center justify-center">
         {listing.image_url ? (
           <Image
             src={listing.image_url}
