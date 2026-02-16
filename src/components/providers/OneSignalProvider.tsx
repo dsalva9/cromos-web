@@ -19,15 +19,30 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
     }
 
     /**
-     * Save player ID to Supabase database
+     * Save player ID to Supabase database with retry logic.
+     * This is non-critical — if all retries fail, we just warn and move on.
+     * The next login/subscription change will try again.
      */
     const savePlayerIdToDatabase = async (playerId: string) => {
-      try {
-        logger.debug('[OneSignal] Calling updateOneSignalPlayerId with:', playerId);
-        await updateOneSignalPlayerId(playerId);
-        logger.debug('[OneSignal] ✅ Player ID saved to database:', playerId);
-      } catch (error) {
-        logger.error('[OneSignal] ❌ Failed to save player ID:', error);
+      const MAX_RETRIES = 3;
+      const RETRY_DELAYS = [2000, 4000]; // delays before 2nd and 3rd attempt
+
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          logger.debug(`[OneSignal] Saving player ID (attempt ${attempt}/${MAX_RETRIES}):`, playerId);
+          await updateOneSignalPlayerId(playerId);
+          logger.debug('[OneSignal] ✅ Player ID saved to database:', playerId);
+          return; // success — exit early
+        } catch (error) {
+          if (attempt < MAX_RETRIES) {
+            const delay = RETRY_DELAYS[attempt - 1];
+            logger.debug(`[OneSignal] Attempt ${attempt} failed, retrying in ${delay}ms...`);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          } else {
+            // All retries exhausted — warn, don't error (non-critical)
+            logger.warn('[OneSignal] ⚠️ Failed to save player ID after all retries (will retry on next login):', error);
+          }
+        }
       }
     };
 

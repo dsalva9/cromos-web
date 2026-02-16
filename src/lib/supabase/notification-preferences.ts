@@ -11,6 +11,7 @@ import type {
 } from '@/types/notifications';
 import { getDefaultPreferences } from '@/lib/notifications/config';
 import { logger } from '@/lib/logger';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 // Legacy interface for backward compatibility
 export interface NotificationPreferences {
@@ -129,7 +130,11 @@ export async function updateOneSignalPlayerId(playerId: string): Promise<void> {
   });
 
   if (error) {
-    logger.error('Error updating OneSignal player ID:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Network error updating OneSignal player ID (will retry on next login):', error);
+    } else {
+      logger.error('Error updating OneSignal player ID:', error);
+    }
     throw new Error('Error al actualizar el ID de notificaciones push');
   }
 }
