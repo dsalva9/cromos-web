@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 /**
  * The Supabase Session type doesn't include `amr`, but it's present at runtime
@@ -61,7 +62,11 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           }
         }
       } catch (error) {
-        logger.error('Error checking recovery state:', error);
+        if (isTransientNetworkError(error)) {
+          logger.info('Recovery state check aborted (navigation):', error);
+        } else {
+          logger.error('Error checking recovery state:', error);
+        }
       }
     };
 

@@ -11,11 +11,19 @@ import { logger } from '@/lib/logger';
 /**
  * Check if a Supabase error is a transient network error
  * (e.g. "TypeError: Load failed" on Safari, "TypeError: Failed to fetch" on Chrome)
+ * or an AbortError (fetch cancelled during navigation/unmount).
  */
 export function isTransientNetworkError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
-  const message = String((error as Record<string, unknown>).message || '');
-  return message.includes('Load failed') || message.includes('Failed to fetch');
+  const err = error as Record<string, unknown>;
+  const message = String(err.message || '');
+  const name = String(err.name || '');
+  return (
+    message.includes('Load failed') ||
+    message.includes('Failed to fetch') ||
+    name === 'AbortError' ||
+    message.includes('signal is aborted')
+  );
 }
 
 /**

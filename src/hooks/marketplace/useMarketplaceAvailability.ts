@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { QUERY_KEYS } from '@/lib/queryKeys';
 import { logger } from '@/lib/logger';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 // ─── Types ───────────────────────────────────────────────────────────────
 
@@ -43,7 +44,11 @@ export function useMarketplaceAvailabilityCounts() {
             );
 
             if (rpcError) {
-                logger.error('[useMarketplaceAvailabilityCounts] RPC error:', rpcError);
+                if (isTransientNetworkError(rpcError)) {
+                    logger.info('[useMarketplaceAvailabilityCounts] RPC aborted (navigation):', rpcError);
+                } else {
+                    logger.error('[useMarketplaceAvailabilityCounts] RPC error:', rpcError);
+                }
                 throw rpcError;
             }
 
@@ -87,7 +92,11 @@ export function useMarketplaceAvailabilitySlots(copyId: number | undefined) {
             );
 
             if (rpcError) {
-                logger.error('[useMarketplaceAvailabilitySlots] RPC error:', rpcError);
+                if (isTransientNetworkError(rpcError)) {
+                    logger.info('[useMarketplaceAvailabilitySlots] RPC aborted (navigation):', rpcError);
+                } else {
+                    logger.error('[useMarketplaceAvailabilitySlots] RPC error:', rpcError);
+                }
                 throw rpcError;
             }
 
