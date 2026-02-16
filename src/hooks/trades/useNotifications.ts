@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 export interface Notification {
   id: number;
@@ -91,7 +92,11 @@ export const useNotifications = (): UseNotificationsReturn => {
 
       setUnreadCount(data || 0);
     } catch (err) {
-      logger.error('Error fetching unread count:', err);
+      if (isTransientNetworkError(err)) {
+        logger.warn('Transient network error fetching unread count:', err);
+      } else {
+        logger.error('Error fetching unread count:', err);
+      }
       // Don't set error state for background count fetches
     }
   }, [supabase, user]);
@@ -113,9 +118,11 @@ export const useNotifications = (): UseNotificationsReturn => {
       setError(
         err instanceof Error ? err.message : 'Ocurrió un error desconocido.'
       );
-      // Refresh to get actual state
-      await fetchNotifications();
-      await fetchUnreadCount();
+      // Only refresh on non-network errors; network errors keep optimistic state
+      if (!isTransientNetworkError(err)) {
+        await fetchNotifications();
+        await fetchUnreadCount();
+      }
     }
   }, [supabase, user, fetchNotifications, fetchUnreadCount]);
 
@@ -144,10 +151,16 @@ export const useNotifications = (): UseNotificationsReturn => {
       // Refresh unread count
       await fetchUnreadCount();
     } catch (err) {
-      logger.error('Error marking notification as read:', err);
-      // Refresh to get actual state
-      await fetchNotifications();
-      await fetchUnreadCount();
+      if (isTransientNetworkError(err)) {
+        logger.warn('Transient network error marking notification as read:', err);
+      } else {
+        logger.error('Error marking notification as read:', err);
+      }
+      // Only refresh on non-network errors; network errors keep optimistic state
+      if (!isTransientNetworkError(err)) {
+        await fetchNotifications();
+        await fetchUnreadCount();
+      }
     }
   }, [supabase, user, fetchNotifications, fetchUnreadCount]);
 

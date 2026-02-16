@@ -53,21 +53,17 @@ export const logger = {
    * Automatically sends to Sentry in production
    */
   error: (...args: unknown[]) => {
-    // Check if this is a navigation-abort "Failed to fetch" error (not a real error)
-    const isAbortError = args.some((arg) => {
+    // Check if this is a transient network error (not a real application error)
+    const NETWORK_ERROR_PATTERNS = ['Failed to fetch', 'AbortError', 'Load failed'];
+    const isNetworkError = args.some((arg) => {
       if (typeof arg === 'string') {
-        return arg.includes('Failed to fetch') || arg.includes('AbortError');
+        return NETWORK_ERROR_PATTERNS.some((p) => arg.includes(p));
       }
       if (arg && typeof arg === 'object') {
         const obj = arg as Record<string, unknown>;
         const details = String(obj.details || '');
         const message = String(obj.message || '');
-        return (
-          details.includes('Failed to fetch') ||
-          details.includes('AbortError') ||
-          message.includes('Failed to fetch') ||
-          message.includes('AbortError')
-        );
+        return NETWORK_ERROR_PATTERNS.some((p) => details.includes(p) || message.includes(p));
       }
       return false;
     });
@@ -75,8 +71,8 @@ export const logger = {
     // Always log to console for dev visibility
     console.error('[ERROR]', ...args);
 
-    // Skip Sentry for abort errors caused by navigation
-    if (isAbortError) return;
+    // Skip Sentry for transient network errors
+    if (isNetworkError) return;
 
     // Send errors to Sentry in production
     if (isSentryEnabled) {

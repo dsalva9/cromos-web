@@ -19,6 +19,7 @@ import {
   markAllRead,
   markRead,
   markListingChatNotificationsRead,
+  isTransientNetworkError,
 } from '@/lib/supabase/notifications';
 import { formatNotification, groupNotificationsByCategory } from '@/lib/notifications/formatter';
 import { fetchNotificationPreferences, checkNotificationEnabled } from '@/lib/supabase/notification-preferences';
@@ -143,8 +144,10 @@ export function useNotifications(): UseNotificationsReturn {
       const errorMessage =
         err instanceof Error ? err.message : 'Error al marcar como leídas';
       logger.error('Error marking all as read:', errorMessage);
-      // Rollback by refetching
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+      // Only rollback on non-network errors; network errors keep the optimistic update
+      if (!isTransientNetworkError(err)) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+      }
     }
   }, [user, queryClient]);
 
@@ -171,7 +174,10 @@ export function useNotifications(): UseNotificationsReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar como leída';
         logger.error('Error marking notification as read:', errorMessage);
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        // Only rollback on non-network errors; network errors keep the optimistic update
+        if (!isTransientNetworkError(err)) {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        }
       }
     },
     [user, queryClient]
@@ -204,7 +210,10 @@ export function useNotifications(): UseNotificationsReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar chat como leído';
         logger.error('Error marking listing chat as read:', errorMessage);
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        // Only rollback on non-network errors; network errors keep the optimistic update
+        if (!isTransientNetworkError(err)) {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        }
       }
     },
     [user, queryClient]

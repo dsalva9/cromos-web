@@ -9,6 +9,16 @@ import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 /**
+ * Check if a Supabase error is a transient network error
+ * (e.g. "TypeError: Load failed" on Safari, "TypeError: Failed to fetch" on Chrome)
+ */
+export function isTransientNetworkError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const message = String((error as Record<string, unknown>).message || '');
+  return message.includes('Load failed') || message.includes('Failed to fetch');
+}
+
+/**
  * Zod schema for validating raw notification data
  */
 const rawNotificationSchema = z.object({
@@ -50,10 +60,10 @@ function transformNotification(raw: RawNotification): AppNotification {
     ratingId: raw.rating_id ?? null,
     actor: raw.actor_id
       ? {
-          id: raw.actor_id,
-          nickname: raw.actor_nickname || 'Usuario desconocido',
-          avatarUrl: raw.actor_avatar_url ?? null,
-        }
+        id: raw.actor_id,
+        nickname: raw.actor_nickname || 'Usuario desconocido',
+        avatarUrl: raw.actor_avatar_url ?? null,
+      }
       : null,
     payload: raw.payload,
     proposalFromUser: raw.proposal_from_user ?? null,
@@ -77,7 +87,11 @@ export async function fetchNotifications(): Promise<AppNotification[]> {
   const { data, error } = await supabase.rpc('get_notifications');
 
   if (error) {
-    logger.error('Error fetching notifications:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error fetching notifications:', error);
+    } else {
+      logger.error('Error fetching notifications:', error);
+    }
     throw new Error('Error al cargar las notificaciones');
   }
 
@@ -99,7 +113,11 @@ export async function fetchUnreadCount(): Promise<number> {
   const { data, error } = await supabase.rpc('get_notification_count');
 
   if (error) {
-    logger.error('Error fetching unread count:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error fetching unread count:', error);
+    } else {
+      logger.error('Error fetching unread count:', error);
+    }
     return 0;
   }
 
@@ -115,7 +133,11 @@ export async function markAllRead(): Promise<void> {
   const { error } = await supabase.rpc('mark_all_notifications_read');
 
   if (error) {
-    logger.error('Error marking all as read:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error marking all as read:', error);
+    } else {
+      logger.error('Error marking all as read:', error);
+    }
     throw new Error('Error al marcar notificaciones como leídas');
   }
 }
@@ -131,7 +153,11 @@ export async function markRead(notificationId: number): Promise<void> {
   });
 
   if (error) {
-    logger.error('Error marking notification as read:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error marking notification as read:', error);
+    } else {
+      logger.error('Error marking notification as read:', error);
+    }
     throw new Error('Error al marcar la notificación como leída');
   }
 }
@@ -151,7 +177,11 @@ export async function markListingChatNotificationsRead(
   });
 
   if (error) {
-    logger.error('Error marking listing chat notifications as read:', error);
+    if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error marking listing chat notifications as read:', error);
+    } else {
+      logger.error('Error marking listing chat notifications as read:', error);
+    }
     throw new Error('Error al marcar las notificaciones de chat como leídas');
   }
 }
