@@ -17,6 +17,11 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
     let listenerHandle: PluginListenerHandle | undefined;
 
     // Handle deep links when app is opened from a link
+    if (!Capacitor.isPluginAvailable('App')) {
+      logger.debug('App plugin not available, skipping deep link listener');
+      return;
+    }
+
     CapacitorApp.addListener('appUrlOpen', (data) => {
       logger.debug('Deep link received:', data.url);
 

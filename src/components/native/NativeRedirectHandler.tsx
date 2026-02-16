@@ -61,9 +61,14 @@ export default function NativeRedirectHandler({ isAuthenticated, children }: Nat
 
         // Hide splash screen after a short delay to ensure navigation has started
         import('@capacitor/splash-screen').then(({ SplashScreen }) => {
-            setTimeout(() => SplashScreen.hide(), 500);
-        }).catch((e) => {
-            logger.error('Error hiding splash screen:', e);
+            if (Capacitor.isPluginAvailable('SplashScreen')) {
+                setTimeout(() => SplashScreen.hide(), 500);
+            } else {
+                logger.debug('SplashScreen plugin not available, skipping hide');
+            }
+        }).catch(() => {
+            // Plugin not installed — not an error, just skip
+            logger.debug('SplashScreen plugin not installed');
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps -- router excluded (Next.js 16 transition bug)
     }, [isNative, isAuthenticated]);
