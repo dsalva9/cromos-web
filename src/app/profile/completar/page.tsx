@@ -13,7 +13,8 @@ import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { useRouter } from '@/hooks/use-router';
 
-const postcodeRegex = /^\d{4,5}$/;
+// Spanish postcodes: 01000–52999 (5 digits, provinces 01–52)
+const SPANISH_POSTCODE_REGEX = /^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$/;
 
 function CompleteProfileContent() {
   const { user } = useUser();
@@ -39,7 +40,9 @@ function CompleteProfileContent() {
     if (!user || !profile) return;
 
     setFormNickname(profile.nickname ?? '');
-    setFormPostcode(profile.postcode ?? '');
+    // Clear default/placeholder postcode so new users must enter their own
+    const isDefaultPostcode = !profile.postcode || profile.postcode === '28001';
+    setFormPostcode(isDefaultPostcode ? '' : (profile.postcode ?? ''));
     setFormAvatarPath(profile.avatar_url ?? null);
     setLoadingProfile(false);
   }, [user, profile]);
@@ -74,13 +77,18 @@ function CompleteProfileContent() {
       return;
     }
 
+    if (trimmedNickname.toLowerCase().startsWith('pending_')) {
+      setErrorMessage('Elige un nombre de usuario personalizado.');
+      return;
+    }
+
     if (!trimmedPostcode) {
       setErrorMessage('El campo Código postal es obligatorio.');
       return;
     }
 
-    if (!postcodeRegex.test(trimmedPostcode)) {
-      setErrorMessage('Introduce un código postal válido de 4 o 5 dígitos.');
+    if (!SPANISH_POSTCODE_REGEX.test(trimmedPostcode)) {
+      setErrorMessage('Introduce un código postal español válido (5 dígitos).');
       return;
     }
 
