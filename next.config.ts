@@ -3,6 +3,11 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   images: {
+    // Disable Vercel Image Optimization to stay within free tier.
+    // All Supabase images are already pre-optimized (WebP, sized thumbnails).
+    // next/image still handles lazy loading, layout, srcset — just skips the
+    // /_next/image proxy that counts as billable transformations.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -24,9 +29,6 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
-    formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // Compiler options
   compiler: {

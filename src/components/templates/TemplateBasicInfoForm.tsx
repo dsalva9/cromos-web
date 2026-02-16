@@ -10,6 +10,8 @@ import { Upload, Camera, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import type { TemplateBasicInfoData } from '@/lib/validations/template.schemas';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
+import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { toast } from 'sonner';
 
 interface TemplateBasicInfoFormProps {
   data: {
@@ -44,16 +46,28 @@ export function TemplateBasicInfoForm({
     'getUserMedia' in navigator.mediaDevices
   );
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    try {
+      // Compress and convert to WebP before setting as preview
+      const result = await processImageBeforeUpload(file, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 1600,
+        convertToWebP: true,
+        quality: 0.85,
+      });
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setImagePreview(result);
-        onChange({ image_url: result });
+        const dataUrl = reader.result as string;
+        setImagePreview(dataUrl);
+        onChange({ image_url: dataUrl });
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(result.blob);
+    } catch (error) {
+      toast.error('Error al procesar la imagen');
     }
   };
 

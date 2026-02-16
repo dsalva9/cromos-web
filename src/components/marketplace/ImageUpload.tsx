@@ -51,17 +51,17 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     try {
       setUploading(true);
 
-      // Process if not already processed
-      let fileToUpload: Blob = file;
-      if (file instanceof File && file.size > 2 * 1024 * 1024) {
-        const result = await processImageBeforeUpload(file, {
-          maxSizeMB: 2,
-          maxWidthOrHeight: 1600,
-          convertToWebP: true,
-          quality: 0.85,
-        });
-        fileToUpload = result.blob;
-      }
+      // Always compress and convert to WebP before upload
+      const fileToProcess = file instanceof File
+        ? file
+        : new File([file], 'upload.jpg', { type: file.type || 'image/jpeg' });
+      const result = await processImageBeforeUpload(fileToProcess, {
+        maxSizeMB: 2,
+        maxWidthOrHeight: 1600,
+        convertToWebP: true,
+        quality: 0.85,
+      });
+      const fileToUpload = result.blob;
 
       // Generate unique filename
       const finalFileName =
