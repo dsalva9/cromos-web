@@ -1,9 +1,28 @@
 # IP-Safe Template Deletion: Technical Analysis & Solution
 
-> **Status**: Research / Pre-implementation  
-> **Priority**: Medium — not urgent until a real takedown request is received, but should be addressed proactively  
-> **Date**: 2026-02-13  
+> **Status**: ✅ **Implemented & Deployed** (2026-02-16)  
+> **Priority**: Medium — proactive protection against IP takedown requests  
+> **Date**: 2026-02-13 (analysis) → 2026-02-16 (deployed)  
 > **Author**: Automated analysis  
+
+---
+
+## Deployment History
+
+| Date | Migration | Description |
+|---|---|---|
+| 2026-02-13 | `safety_net_fk_prevent_cascade_deletion` | FK changed from CASCADE → SET NULL on `template_slots` and `template_pages` |
+| 2026-02-16 | `fix_hard_delete_preserve_slots` | Added `original_template_id` column + trigger. Fixed `admin_permanently_delete_template` and `admin_permanently_delete_user` for conditional slot/page deletion |
+| 2026-02-16 | `fix_marketplace_availability_orphaned` | Fixed `get_marketplace_availability` to work with orphaned álbumes via LEFT JOIN + COALESCE |
+
+## Glossary
+
+| Term | DB Table | Page | Description |
+|---|---|---|---|
+| **Colección** (template) | `collection_templates` | `/templates/my-templates` | Public template a user creates |
+| **Álbum** (copy/instance) | `user_template_copies` | `/mis-plantillas` | User's personal copy of a colección |
+
+**Takedown target** = the Colección. After takedown, álbumes keep working.
 
 ---
 
@@ -25,7 +44,7 @@ CambioCromos uses a **User-Generated Content (UGC)** model where users create "C
 
 However, if a rights holder (e.g., Panini) issues a takedown request for a user-created collection that uses their IP, we need to be able to remove the public template **without breaking the experience for users who have already copied it**.
 
-The current system has **critical bugs** in the template deletion flow that would either destroy user data or cause the deletion to fail entirely.
+The system previously had **critical bugs** in the template deletion flow that have now been **fixed** (see [Deployment History](#deployment-history)).
 
 ---
 
