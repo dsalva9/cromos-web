@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
@@ -12,8 +12,12 @@ export default function AuthCallback() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     let mounted = true;
 
     const handleAuthCallback = async () => {
@@ -45,7 +49,7 @@ export default function AuthCallback() {
             // PKCE verifier can be lost on mobile (in-app browser switches context)
             // or when cookies expire — downgrade to warn so it doesn't flood Sentry
             if (exchangeError.code === 'pkce_code_verifier_not_found') {
-              logger.warn('PKCE code verifier not found, will attempt session recovery', {
+              logger.info('PKCE code verifier not found, will attempt session recovery', {
                 code: exchangeError.code,
               });
               hadPkceError = true;
@@ -54,6 +58,12 @@ export default function AuthCallback() {
             }
           } else {
             logger.info('Code exchanged successfully');
+            // Clear the code from URL to prevent re-exchange on refresh
+            if (typeof window !== 'undefined') {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('code');
+              window.history.replaceState({}, '', url.toString());
+            }
           }
         }
 
@@ -98,15 +108,18 @@ export default function AuthCallback() {
         if (!sessionUser) {
           // If PKCE verifier was lost (common on mobile), show a friendly retry message
           if (hadPkceError) {
-            logger.warn('Session recovery failed after PKCE error, redirecting to login');
+            logger.info('Session recovery failed after PKCE error, redirecting to login');
             if (mounted) {
               setError('No se pudo completar el inicio de sesión. Por favor, inténtalo de nuevo.');
               // Auto-redirect to login after a short delay so the user sees the message
               setTimeout(() => { if (mounted) router.push('/login'); }, 3000);
             }
           } else {
-            logger.error('No authenticated user found after processing callback');
-            if (mounted) router.push('/login');
+            logger.warn('No authenticated user found after processing callback');
+            if (mounted) {
+              setError('El enlace ha expirado o ya fue utilizado. Por favor, inicia sesión de nuevo.');
+              setTimeout(() => { if (mounted) router.push('/login'); }, 3000);
+            }
           }
           return;
         }
