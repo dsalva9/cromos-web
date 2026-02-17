@@ -83,8 +83,8 @@ export default function LandingPage() {
                                 ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
                             </Link>
 
-                            {/* Download Section */}
-                            <div className="flex flex-col items-center gap-3 pt-4">
+                            {/* Download Section — mobile only */}
+                            <div className="flex flex-col items-center gap-3 pt-4 md:hidden">
                                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
                                     Disponible en:
                                 </p>
