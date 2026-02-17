@@ -89,3 +89,7 @@ diagnose_*.sql
 # Temporary diagnostic files
 tsc-errors*.txt
 Test_Tracking_Template.csv
+
+# Serwist (generated service worker)
+public/sw*
+public/swe-worker*

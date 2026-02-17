@@ -24,10 +24,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
   title: `${siteConfig.name} - Intercambia cromos deportivos`,
   description: siteConfig.description,
   alternates: {
     canonical: siteConfig.url,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: siteConfig.name,
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -48,6 +57,7 @@ import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGu
 import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
 import { SiteFooter } from '@/components/layout/SiteFooter';
+import PWASplashScreen from '@/components/pwa/PWASplashScreen';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
@@ -75,6 +85,8 @@ export default function RootLayout({
   return (
     <html lang="es" data-theme="light" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -108,35 +120,37 @@ export default function RootLayout({
       >
         <GoogleAnalytics />
         <Providers>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
-          >
-            Saltar al contenido principal
-          </a>
-          <header role="banner">
-            <SiteHeader />
-          </header>
-          <AccountDeletionBanner />
-          <main id="main-content" role="main" className="flex-1 pb-20 md:pb-0" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
-            <PasswordRecoveryGuard>
-              <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
-            </PasswordRecoveryGuard>
-          </main>
-          <MobileBottomNav />
-          <FloatingActionBtn />
-          <SiteFooter />
-          <CookieConsentBanner />
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            expand={false}
-            duration={3000}
-            toastOptions={{
-              className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
-            }}
-          />
+          <PWASplashScreen>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#FFC000] focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white"
+            >
+              Saltar al contenido principal
+            </a>
+            <header role="banner">
+              <SiteHeader />
+            </header>
+            <AccountDeletionBanner />
+            <main id="main-content" role="main" className="flex-1 pb-20 md:pb-0" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
+              <PasswordRecoveryGuard>
+                <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
+              </PasswordRecoveryGuard>
+            </main>
+            <MobileBottomNav />
+            <FloatingActionBtn />
+            <SiteFooter />
+            <CookieConsentBanner />
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              expand={false}
+              duration={3000}
+              toastOptions={{
+                className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
+              }}
+            />
+          </PWASplashScreen>
         </Providers>
       </body>
     </html>

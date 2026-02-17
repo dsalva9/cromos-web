@@ -1,5 +1,17 @@
+import { spawnSync } from 'node:child_process';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
+import withSerwistInit from '@serwist/next';
+
+// Revision for service worker precache versioning
+const revision = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf-8' }).stdout?.trim() ?? crypto.randomUUID();
+
+const withSerwist = withSerwistInit({
+  additionalPrecacheEntries: [{ url: '/~offline', revision }],
+  swSrc: 'src/sw.ts',
+  swDest: 'public/sw.js',
+  disable: process.env.NODE_ENV === 'development',
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -62,9 +74,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSerwist(withSentryConfig(nextConfig, {
   // Suppresses source map upload logs during build
   silent: true,
   // Prevent Sentry from wrapping console methods (we handle this via logger.ts)
   disableLogger: true,
-});
+}));

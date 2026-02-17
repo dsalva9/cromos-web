@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MarketplaceShowcase from './MarketplaceShowcase';
 import AnimatedPhoneMockup from './AnimatedPhoneMockup';
+import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 import { ArrowRight, Check, Search, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
@@ -81,6 +82,28 @@ export default function LandingPage() {
                             >
                                 ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
                             </Link>
+
+                            {/* Download Section */}
+                            <div className="flex flex-col items-center gap-3 pt-4">
+                                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                                    Disponible en:
+                                </p>
+                                <div className="flex flex-row items-center gap-4">
+                                    <PWAInstallButton />
+                                    <div className="relative group">
+                                        <Image
+                                            src="/icons/google-play-badge.png"
+                                            alt="Disponible en Google Play"
+                                            width={160}
+                                            height={48}
+                                            className="h-12 w-auto opacity-40 grayscale"
+                                        />
+                                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-300 bg-white/60 dark:bg-gray-900/60 rounded">
+                                            Próximamente
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Phone Mockup - MOBILE ONLY */}
                             <AnimatedPhoneMockup className="flex justify-center relative w-full max-w-[260px] perspective-[2000px] mt-2 lg:hidden" flat />
