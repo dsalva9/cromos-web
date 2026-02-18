@@ -20,6 +20,10 @@ interface EditListingFormInitialData {
   image_url: string;
   collection_name?: string;
   sticker_number?: string;
+  slot_variant?: string;
+  page_number?: number | null;
+  page_title?: string;
+  global_number?: number | null;
   listing_type?: 'intercambio' | 'venta' | 'ambos';
   price?: number;
 }
@@ -119,19 +123,35 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             )}
           </div>
 
-          {/* Read-only Collection & Sticker Number */}
-          {(initialData.collection_name || initialData.sticker_number) && (
+          {/* Read-only Cromo Details — mirrors the detail page "Detalles del Cromo" card */}
+          {(initialData.collection_name || initialData.sticker_number || initialData.page_number || initialData.global_number) && (
             <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-4 space-y-2">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-sm">Detalles del Cromo</h3>
               {initialData.collection_name && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Colección:</span>
-                  <span className="text-gray-900 dark:text-white">{initialData.collection_name}</span>
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-bold text-gray-900 dark:text-white">Colección:</span>{' '}
+                  {initialData.collection_name}
                 </div>
               )}
-              {initialData.sticker_number && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300">Número de cromo:</span>
-                  <span className="text-gray-900 dark:text-white">#{initialData.sticker_number}</span>
+              {(initialData.page_number || initialData.page_title) && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-bold text-gray-900 dark:text-white">Página:</span>{' '}
+                  {initialData.page_number && `${initialData.page_number}`}
+                  {initialData.page_number && initialData.page_title && ' - '}
+                  {initialData.page_title}
+                </div>
+              )}
+              {(initialData.sticker_number || initialData.slot_variant) && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-bold text-gray-900 dark:text-white">Número de cromo:</span>{' '}
+                  #{initialData.sticker_number}
+                  {initialData.slot_variant && initialData.slot_variant}
+                </div>
+              )}
+              {initialData.global_number && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="font-bold text-gray-900 dark:text-white">Número global:</span>{' '}
+                  #{initialData.global_number}
                 </div>
               )}
             </div>

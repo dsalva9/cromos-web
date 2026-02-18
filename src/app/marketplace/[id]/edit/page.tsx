@@ -123,6 +123,10 @@ function EditListingContent() {
             image_url: listing.image_url || '',
             collection_name: listing.collection_name || '',
             sticker_number: listing.sticker_number || '',
+            slot_variant: listing.slot_variant || '',
+            page_number: listing.page_number,
+            page_title: listing.page_title || '',
+            global_number: listing.global_number,
             listing_type: listing.listing_type || 'intercambio',
             price: listing.price ?? undefined,
           }}
