@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
+import Image from 'next/image';
 import { logger } from '@/lib/logger';
 
 export default function ForgotPasswordPage() {
@@ -43,11 +44,17 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
-      <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
-          âš½
+      <div className="mb-2 text-center">
+        <div className="relative w-24 h-24 sm:w-48 sm:h-48 mx-auto">
+          <Image
+            src="/assets/LogoBlanco.png"
+            alt="Logo"
+            fill
+            className="object-contain drop-shadow-xl"
+            priority
+          />
         </div>
-        <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
+        <h1 className="text-xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
           {siteConfig.name}
         </h1>
       </div>
@@ -123,7 +130,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
             >
-              â† Volver a Iniciar Sesión
+              ← Volver a Iniciar Sesión
             </Link>
           </div>
         </div>

@@ -52,6 +52,13 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
+        // Handle password recovery: redirect to reset page immediately
+        if (event === 'PASSWORD_RECOVERY') {
+          sessionStorage.setItem('password_recovery_required', 'true');
+          window.location.href = '/profile/reset-password';
+          return;
+        }
+
         const currentUser = session?.user ?? null;
 
         // Set user IMMEDIATELY - no blocking
