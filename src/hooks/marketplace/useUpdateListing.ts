@@ -13,6 +13,8 @@ export function useUpdateListing() {
       sticker_number?: string;
       collection_name?: string;
       image_url?: string;
+      listing_type?: 'intercambio' | 'venta' | 'ambos';
+      price?: number;
     }
   ): Promise<void> => {
     try {
@@ -25,6 +27,8 @@ export function useUpdateListing() {
         p_sticker_number: data.sticker_number || undefined,
         p_collection_name: data.collection_name || undefined,
         p_image_url: data.image_url || undefined,
+        p_listing_type: data.listing_type || undefined,
+        p_price: data.price || undefined,
       });
 
       if (error) throw error;

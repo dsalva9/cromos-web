@@ -299,6 +299,18 @@ export default function ListingDetailPage() {
                     {listing.is_group ? 'Pack de cromos' : 'Cromo individual'}
                   </Badge>
 
+                  {/* Listing Type Badges */}
+                  {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
+                    <Badge className="bg-[#FFC000] text-black border-2 border-black">
+                      🔄 Intercambio
+                    </Badge>
+                  )}
+                  {(listing.listing_type === 'venta' || listing.listing_type === 'ambos') && (
+                    <Badge className="bg-green-600 text-white border-2 border-black">
+                      💰 {listing.price != null ? `${Number(listing.price).toFixed(2)} €` : 'Venta'}
+                    </Badge>
+                  )}
+
                   {/* Suspension Badge - Only visible to admins, hidden if author deleted or listing removed */}
                   {isAdmin && listing.author_is_suspended && !listing.author_deleted_at && listing.status !== 'removed' && (
                     <Badge className="bg-red-900 text-red-200 border-2 border-red-700 flex items-center gap-1">

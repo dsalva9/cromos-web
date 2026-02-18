@@ -23,9 +23,19 @@ const simplifiedListingSchema = z.object({
   image_url: z.string().min(1, 'La imagen es obligatoria'),
   collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),
+  listing_type: z.enum(['intercambio', 'venta', 'ambos']),
+  price: z.number().positive('El precio debe ser mayor que 0').max(99999).optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: 'Debes aceptar los términos de uso',
   }),
+}).superRefine((data, ctx) => {
+  if ((data.listing_type === 'venta' || data.listing_type === 'ambos') && (!data.price || data.price <= 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'El precio es obligatorio cuando el anuncio incluye venta',
+      path: ['price'],
+    });
+  }
 });
 
 type SimplifiedListingFormData = z.infer<typeof simplifiedListingSchema>;
@@ -62,6 +72,8 @@ export function SimplifiedListingForm({
       image_url: initialData?.image_url || '',
       collection_name: initialData?.collection_name || '',
       is_group: initialData?.is_group || false,
+      listing_type: (initialData as any)?.listing_type || 'intercambio',
+      price: (initialData as any)?.price || undefined,
       terms_accepted: false,
     },
     mode: 'onChange',
@@ -84,6 +96,23 @@ export function SimplifiedListingForm({
   const imageUrl = watch('image_url');
   const termsAccepted = watch('terms_accepted');
   const isGroup = watch('is_group');
+  const listingType = watch('listing_type');
+
+  // Derive checkbox states from listing_type
+  const isForExchange = listingType === 'intercambio' || listingType === 'ambos';
+  const isForSale = listingType === 'venta' || listingType === 'ambos';
+
+  const handleListingTypeChange = (exchange: boolean, sale: boolean) => {
+    let newType: 'intercambio' | 'venta' | 'ambos' = 'intercambio';
+    if (exchange && sale) newType = 'ambos';
+    else if (sale) newType = 'venta';
+    else if (exchange) newType = 'intercambio';
+    else return;
+    setValue('listing_type', newType, { shouldValidate: true });
+    if (!sale) {
+      setValue('price', undefined, { shouldValidate: true });
+    }
+  };
 
   const submitHandler = async (data: SimplifiedListingFormData) => {
     const payload: CreateListingForm = {
@@ -93,7 +122,9 @@ export function SimplifiedListingForm({
       collection_name: data.collection_name || '',
       image_url: data.image_url,
       is_group: data.is_group,
-      group_count: data.is_group ? 1 : undefined, // Will be set properly for bulk listings
+      group_count: data.is_group ? 1 : undefined,
+      listing_type: data.listing_type || 'intercambio',
+      price: data.price || undefined,
     };
     await onSubmit(payload);
   };
@@ -110,11 +141,10 @@ export function SimplifiedListingForm({
                 <button
                   type="button"
                   onClick={() => setValue('is_group', false, { shouldValidate: true })}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    !isGroup
+                  className={`p-4 rounded-lg border-2 transition-all ${!isGroup
                       ? 'border-[#FFC000] bg-[#FFC000]/10'
                       : 'border-gray-200 bg-white'
-                  }`}
+                    }`}
                 >
                   <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
                   <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
@@ -124,11 +154,10 @@ export function SimplifiedListingForm({
                 <button
                   type="button"
                   onClick={() => setValue('is_group', true, { shouldValidate: true })}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    isGroup
+                  className={`p-4 rounded-lg border-2 transition-all ${isGroup
                       ? 'border-[#FFC000] bg-[#FFC000]/10'
                       : 'border-gray-200 bg-white'
-                  }`}
+                    }`}
                 >
                   <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
                   <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
@@ -170,9 +199,8 @@ export function SimplifiedListingForm({
               id="title"
               {...register('title')}
               placeholder={isGroup ? "ej. Pack de 10 cromos de la Liga" : "ej. Messi Inter Miami 2024"}
-              className={`bg-white border-2 text-gray-900 ${
-                errors.title ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 ${errors.title ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.title && (
               <p className="text-sm text-red-500">{errors.title.message}</p>
@@ -203,6 +231,62 @@ export function SimplifiedListingForm({
             </p>
           </div>
 
+          {/* Listing Type - Exchange / Sale */}
+          <div className="space-y-3">
+            <Label>Tipo de Anuncio <span className="text-red-500">*</span></Label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => handleListingTypeChange(!isForExchange, isForSale)}
+                className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForExchange
+                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    : 'border-gray-200 bg-white'
+                  }`}
+              >
+                <span className="text-xl">🔄</span>
+                <span className={`text-sm font-semibold ${isForExchange ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                  Intercambio
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleListingTypeChange(isForExchange, !isForSale)}
+                className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForSale
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 bg-white'
+                  }`}
+              >
+                <span className="text-xl">💰</span>
+                <span className={`text-sm font-semibold ${isForSale ? 'text-green-600' : 'text-gray-700'}`}>
+                  Venta
+                </span>
+              </button>
+            </div>
+
+            {isForSale && (
+              <div className="space-y-2">
+                <Label htmlFor="price">Precio (€) <span className="text-red-500">*</span></Label>
+                <div className="relative">
+                  <Input
+                    id="price"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0.01"
+                    {...register('price', { valueAsNumber: true })}
+                    placeholder="ej. 5.00"
+                    className={`bg-white border-2 text-gray-900 pl-8 ${errors.price ? 'border-red-500' : 'border-black'
+                      }`}
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
+                </div>
+                {errors.price && (
+                  <p className="text-sm text-red-500">{errors.price.message}</p>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">
@@ -217,9 +301,8 @@ export function SimplifiedListingForm({
                   : "Describe el cromo, su estado, características especiales, etc."
               }
               rows={6}
-              className={`bg-white border-2 text-gray-900 resize-none ${
-                errors.description ? 'border-red-500' : 'border-black'
-              }`}
+              className={`bg-white border-2 text-gray-900 resize-none ${errors.description ? 'border-red-500' : 'border-black'
+                }`}
             />
             {errors.description && (
               <p className="text-sm text-red-500">{errors.description.message}</p>

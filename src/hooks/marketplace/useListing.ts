@@ -59,6 +59,9 @@ export function useListing(listingId: string) {
           // Pack/individual listing type
           is_group: data.is_group,
           group_count: data.group_count,
+          // Listing type (exchange/sale/both) — cast through any until DB types are regenerated
+          listing_type: (data as any).listing_type || 'intercambio',
+          price: (data as any).price,
         });
       }
     } catch (err) {

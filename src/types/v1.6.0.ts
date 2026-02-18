@@ -48,6 +48,9 @@ export interface Listing {
   // New fields
   is_group?: boolean | null;
   group_count?: number | null;
+  // Listing type
+  listing_type?: 'intercambio' | 'venta' | 'ambos';
+  price?: number | null;
 }
 
 export interface Template {
@@ -155,6 +158,9 @@ export interface CreateListingForm {
   template_id?: number;
   /** Structured pack items — inserted into listing_pack_items after creation */
   pack_items?: PackItem[];
+  // Listing type
+  listing_type?: 'intercambio' | 'venta' | 'ambos';
+  price?: number;
 }
 
 export interface PackItem {

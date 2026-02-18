@@ -149,6 +149,8 @@ function PublishDuplicateContent() {
           description: formData.description,
           image_url: formData.image_url,
           collection_name: templateInfo?.title || undefined,
+          listing_type: (formData as any).listing_type || 'intercambio',
+          price: (formData as any).price || undefined,
         }
       );
 

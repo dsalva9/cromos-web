@@ -123,6 +123,8 @@ function EditListingContent() {
             sticker_number: listing.sticker_number || '',
             collection_name: listing.collection_name || '',
             image_url: listing.image_url || '',
+            listing_type: listing.listing_type || 'intercambio',
+            price: listing.price ?? undefined,
           }}
         />
       </div>

@@ -36,6 +36,8 @@ export function useCreateListing() {
           p_global_number: data.global_number || undefined,
           p_is_group: data.is_group || false,
           p_group_count: data.group_count || 1,
+          p_listing_type: data.listing_type || 'intercambio',
+          p_price: data.price || undefined,
         }
       );
 

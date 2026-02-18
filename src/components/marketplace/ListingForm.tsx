@@ -58,6 +58,8 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       page_title: initialData?.page_title || '',
       slot_variant: initialData?.slot_variant || '',
       global_number: initialData?.global_number,
+      listing_type: (initialData as any)?.listing_type || 'intercambio',
+      price: (initialData as any)?.price || undefined,
       terms_accepted: false,
     },
     mode: 'onChange',
@@ -66,6 +68,25 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
   const imageUrl = watch('image_url');
   const termsAccepted = watch('terms_accepted');
   const collectionName = watch('collection_name');
+  const listingType = watch('listing_type');
+
+  // Derive checkbox states from listing_type
+  const isForExchange = listingType === 'intercambio' || listingType === 'ambos';
+  const isForSale = listingType === 'venta' || listingType === 'ambos';
+
+  const handleListingTypeChange = (exchange: boolean, sale: boolean) => {
+    let newType: 'intercambio' | 'venta' | 'ambos' = 'intercambio';
+    if (exchange && sale) newType = 'ambos';
+    else if (sale) newType = 'venta';
+    else if (exchange) newType = 'intercambio';
+    // At least one must be selected — if both unchecked, keep current
+    else return;
+    setValue('listing_type', newType, { shouldValidate: true });
+    // Clear price when not for sale
+    if (!sale) {
+      setValue('price', undefined, { shouldValidate: true });
+    }
+  };
 
   // Handle collection selection from combobox
   const handleCollectionSelect = async (copyId: number, title: string) => {
@@ -121,6 +142,9 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
       page_title: data.page_title || undefined,
       slot_variant: data.slot_variant || undefined,
       global_number: data.global_number || undefined,
+      // Listing type fields
+      listing_type: data.listing_type || 'intercambio',
+      price: data.price || undefined,
     };
     await onSubmit(payload);
   };
@@ -258,6 +282,70 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
               <p className="text-sm text-red-500">
                 {errors.page_title.message as string}
               </p>
+            )}
+          </div>
+
+          {/* Listing Type - Exchange / Sale */}
+          <div className="space-y-3">
+            <Label>Tipo de Anuncio <span className="text-red-500">*</span></Label>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Intercambio checkbox */}
+              <button
+                type="button"
+                onClick={() => handleListingTypeChange(!isForExchange, isForSale)}
+                className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForExchange
+                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    : 'border-gray-200 bg-white'
+                  }`}
+              >
+                <span className="text-xl">🔄</span>
+                <span className={`text-sm font-semibold ${isForExchange ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                  Intercambio
+                </span>
+              </button>
+
+              {/* Venta checkbox */}
+              <button
+                type="button"
+                onClick={() => handleListingTypeChange(isForExchange, !isForSale)}
+                className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForSale
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 bg-white'
+                  }`}
+              >
+                <span className="text-xl">💰</span>
+                <span className={`text-sm font-semibold ${isForSale ? 'text-green-600' : 'text-gray-700'}`}>
+                  Venta
+                </span>
+              </button>
+            </div>
+
+            {/* Price input - visible when sale is selected */}
+            {isForSale && (
+              <div className="space-y-2">
+                <Label htmlFor="price">Precio (€) <span className="text-red-500">*</span></Label>
+                <div className="relative">
+                  <Input
+                    id="price"
+                    type="number"
+                    inputMode="decimal"
+                    step="0.01"
+                    min="0.01"
+                    {...register('price', { valueAsNumber: true })}
+                    placeholder="ej. 5.00"
+                    className={`bg-white border-2 text-gray-900 pl-8 ${errors.price ? 'border-red-500' : 'border-black'
+                      }`}
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
+                </div>
+                {errors.price && (
+                  <p className="text-sm text-red-500">{errors.price.message as string}</p>
+                )}
+              </div>
+            )}
+
+            {errors.listing_type && (
+              <p className="text-sm text-red-500">{errors.listing_type.message as string}</p>
             )}
           </div>
 

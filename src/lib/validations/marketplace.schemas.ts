@@ -57,11 +57,29 @@ export const listingSchema = z.object({
     .positive()
     .optional(),
 
+  // Listing type fields
+  listing_type: z.enum(['intercambio', 'venta', 'ambos']),
+
+  price: z
+    .number()
+    .positive('El precio debe ser mayor que 0')
+    .max(99999, 'El precio no puede exceder 99.999 €')
+    .optional(),
+
   terms_accepted: z
     .boolean()
     .refine((val) => val === true, {
       message: 'Debes aceptar los términos de uso',
     }),
+}).superRefine((data, ctx) => {
+  // Price is required when listing includes sale
+  if ((data.listing_type === 'venta' || data.listing_type === 'ambos') && (!data.price || data.price <= 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'El precio es obligatorio cuando el anuncio incluye venta',
+      path: ['price'],
+    });
+  }
 });
 
 /**

@@ -14,6 +14,8 @@ export function usePublishDuplicate() {
       sticker_number?: string;
       collection_name?: string;
       image_url?: string;
+      listing_type?: 'intercambio' | 'venta' | 'ambos';
+      price?: number;
     }
   ): Promise<string> => {
     try {
@@ -25,7 +27,9 @@ export function usePublishDuplicate() {
         p_slot_id: slotId,
         p_title: customData?.title || 'Cromo',
         p_description: customData?.description || undefined,
-        p_image_url: customData?.image_url || undefined
+        p_image_url: customData?.image_url || undefined,
+        p_listing_type: customData?.listing_type || 'intercambio',
+        p_price: customData?.price || undefined,
       });
 
       if (error) throw error;
