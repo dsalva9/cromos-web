@@ -33,11 +33,13 @@ export const listingSchema = z.object({
     .url('La URL de la imagen no es válida'),
 
   // New Panini-style fields - all optional
+  // z.nan() handles empty number inputs with valueAsNumber: true
   page_number: z
     .number()
     .int()
     .positive()
-    .optional(),
+    .optional()
+    .or(z.nan().transform(() => undefined)),
 
   page_title: z
     .string()
@@ -55,7 +57,8 @@ export const listingSchema = z.object({
     .number()
     .int()
     .positive()
-    .optional(),
+    .optional()
+    .or(z.nan().transform(() => undefined)),
 
   // Listing type fields
   listing_type: z.enum(['intercambio', 'venta', 'ambos']),

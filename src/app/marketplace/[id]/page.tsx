@@ -307,7 +307,7 @@ export default function ListingDetailPage() {
                   )}
                   {(listing.listing_type === 'venta' || listing.listing_type === 'ambos') && (
                     <Badge className="bg-green-600 text-white border-2 border-black">
-                      💰 {listing.price != null ? `${Number(listing.price).toFixed(2)} €` : 'Venta'}
+                      💰 Venta
                     </Badge>
                   )}
 
@@ -439,6 +439,38 @@ export default function ListingDetailPage() {
                   </ModernCardContent>
                 </ModernCard>
               )}
+
+              {/* Listing Type Info Card */}
+              <ModernCard className="mb-6">
+                <ModernCardContent className="p-4">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Tipo de Anuncio</h3>
+                  <div className="space-y-2">
+                    {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FFC000]/15">
+                          <span className="text-base">🔄</span>
+                        </span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Disponible para <span className="font-semibold text-[#FFC000]">intercambio</span> con otros cromos
+                        </span>
+                      </div>
+                    )}
+                    {(listing.listing_type === 'venta' || listing.listing_type === 'ambos') && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30">
+                          <span className="text-base">💰</span>
+                        </span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          En venta por{' '}
+                          <span className="font-bold text-green-600 dark:text-green-400 text-base">
+                            {listing.price != null ? `${Number(listing.price).toFixed(2)} €` : '—'}
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </ModernCardContent>
+              </ModernCard>
 
               {/* Seller */}
               <ModernCard className="mb-6">
