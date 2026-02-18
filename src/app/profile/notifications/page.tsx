@@ -53,7 +53,7 @@ function NotificationsCenterContent() {
     try {
       await markAllAsRead();
     } catch (err) {
-      logger.error('Error marking all as read:', err);
+      logger.warn('Error marking all as read:', err);
     }
   };
 
@@ -61,7 +61,7 @@ function NotificationsCenterContent() {
     try {
       await markAsRead(id);
     } catch (err) {
-      logger.error('Error marking notification as read:', err);
+      logger.warn('Error marking notification as read:', err);
     }
   };
 
