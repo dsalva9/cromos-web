@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/profile/reset-password`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/profile/reset-password`,
       });
 
       if (error) {
@@ -86,9 +86,8 @@ export default function ForgotPasswordPage() {
 
             {message && (
               <div
-                className={`border-2 border-black rounded-md p-4 ${
-                  message.type === 'success' ? 'bg-green-600' : 'bg-[#E84D4D]'
-                }`}
+                className={`border-2 border-black rounded-md p-4 ${message.type === 'success' ? 'bg-green-600' : 'bg-[#E84D4D]'
+                  }`}
               >
                 <p className="text-sm text-white font-bold whitespace-pre-line">
                   {message.text.split('soporte@cambiocromos.com').map((part, index, array) => (
