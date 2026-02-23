@@ -56,6 +56,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/proximamente',
+        destination: '/',
+        permanent: true,
+      },
+      {
         source: '/parking.php',
         destination: '/',
         permanent: true,

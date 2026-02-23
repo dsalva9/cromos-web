@@ -75,17 +75,6 @@ function isProtectedApiRoute(pathname: string): boolean {
 
 export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
-    const hostname = request.headers.get('host') || '';
-
-    // --- Coming Soon Mode ---
-    const isComingSoonMode = process.env.NEXT_PUBLIC_COMING_SOON === 'true';
-    const isProductionDomain = hostname.includes('cambiocromos.com');
-
-    if (isComingSoonMode && isProductionDomain) {
-        if (!pathname.startsWith('/proximamente')) {
-            return NextResponse.redirect(new URL('/proximamente', request.url));
-        }
-    }
 
     // --- Supabase Session Refresh & Auth Protection ---
     // Always refresh the session to keep tokens fresh and sync cookies.
