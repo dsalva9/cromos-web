@@ -25,8 +25,15 @@ if (SENTRY_DSN) {
 
         // Filter out noise from aborted fetches during navigation
         beforeSend(event) {
-            const message = event.exception?.values?.[0]?.value || '';
-            if (message.includes('Failed to fetch') || message.includes('AbortError')) {
+            const exception = event.exception?.values?.[0];
+            const message = exception?.value || '';
+            const type = exception?.type || '';
+            if (
+                message.includes('Failed to fetch') ||
+                message.includes('AbortError') ||
+                message.includes('signal is aborted') ||
+                type === 'AbortError'
+            ) {
                 return null; // Drop the event
             }
             return event;
