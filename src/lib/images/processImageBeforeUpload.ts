@@ -38,120 +38,119 @@ export async function processImageBeforeUpload(
 
   const originalSize = file.size;
 
-  return new Promise((resolve, reject) => {
+  // Use object URL instead of data URL to avoid base64 encoding overhead
+  // (data URLs are ~33% larger, which can cause OOM on low-memory Android devices)
+  const objectUrl = URL.createObjectURL(file);
+
+  return new Promise<ProcessImageResult>((resolve, reject) => {
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
     const img = new window.Image();
-    const reader = new FileReader();
 
-    reader.onload = e => {
-      const dataUrl = e.target?.result as string;
-      if (!dataUrl) {
-        reject(new Error('No se pudo leer el archivo'));
-        return;
-      }
+    img.onload = () => {
+      try {
+        let targetWidth = img.width;
+        let targetHeight = img.height;
 
-      img.onload = () => {
-        try {
-          let targetWidth = img.width;
-          let targetHeight = img.height;
-
-          // Apply square constraint if needed
-          if (forceSquare) {
-            const size = Math.min(img.width, img.height);
-            targetWidth = size;
-            targetHeight = size;
-          }
-
-          // Scale down if exceeds max dimension
-          const maxDim = Math.max(targetWidth, targetHeight);
-          if (maxDim > maxWidthOrHeight) {
-            const scale = maxWidthOrHeight / maxDim;
-            targetWidth = Math.round(targetWidth * scale);
-            targetHeight = Math.round(targetHeight * scale);
-          }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = targetWidth;
-          canvas.height = targetHeight;
-
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            reject(new Error('No se pudo crear el contexto del canvas'));
-            return;
-          }
-
-          // Handle square cropping
-          if (forceSquare) {
-            const sourceSize = Math.min(img.width, img.height);
-            const sourceX = (img.width - sourceSize) / 2;
-            const sourceY = (img.height - sourceSize) / 2;
-
-            ctx.drawImage(
-              img,
-              sourceX,
-              sourceY,
-              sourceSize,
-              sourceSize,
-              0,
-              0,
-              targetWidth,
-              targetHeight
-            );
-          } else {
-            // Standard resize
-            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-          }
-
-          // Determine output format
-          const outputFormat = convertToWebP ? 'image/webp' : file.type;
-
-          canvas.toBlob(
-            blob => {
-              if (!blob) {
-                reject(new Error('No se pudo convertir el canvas a blob'));
-                return;
-              }
-
-              const processedSize = blob.size;
-              const sizeMB = processedSize / (1024 * 1024);
-
-              // Check if result is within size limit
-              if (sizeMB > maxSizeMB) {
-                reject(
-                  new Error(
-                    `La imagen procesada (${sizeMB.toFixed(1)}MB) excede el límite de ${maxSizeMB}MB`
-                  )
-                );
-                return;
-              }
-
-              resolve({
-                blob,
-                width: targetWidth,
-                height: targetHeight,
-                originalSize,
-                processedSize,
-              });
-            },
-            outputFormat,
-            quality
-          );
-        } catch (error) {
-          reject(error);
+        // Apply square constraint if needed
+        if (forceSquare) {
+          const size = Math.min(img.width, img.height);
+          targetWidth = size;
+          targetHeight = size;
         }
-      };
 
-      img.onerror = () => {
-        reject(new Error('No se pudo cargar la imagen'));
-      };
+        // Scale down if exceeds max dimension
+        const maxDim = Math.max(targetWidth, targetHeight);
+        if (maxDim > maxWidthOrHeight) {
+          const scale = maxWidthOrHeight / maxDim;
+          targetWidth = Math.round(targetWidth * scale);
+          targetHeight = Math.round(targetHeight * scale);
+        }
 
-      img.src = dataUrl;
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          cleanup();
+          reject(new Error('No se pudo crear el contexto del canvas'));
+          return;
+        }
+
+        // Handle square cropping
+        if (forceSquare) {
+          const sourceSize = Math.min(img.width, img.height);
+          const sourceX = (img.width - sourceSize) / 2;
+          const sourceY = (img.height - sourceSize) / 2;
+
+          ctx.drawImage(
+            img,
+            sourceX,
+            sourceY,
+            sourceSize,
+            sourceSize,
+            0,
+            0,
+            targetWidth,
+            targetHeight
+          );
+        } else {
+          // Standard resize
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+        }
+
+        cleanup();
+
+        // Determine output format
+        const outputFormat = convertToWebP ? 'image/webp' : file.type;
+
+        canvas.toBlob(
+          blob => {
+            if (!blob) {
+              reject(new Error('No se pudo convertir el canvas a blob'));
+              return;
+            }
+
+            const processedSize = blob.size;
+            const sizeMB = processedSize / (1024 * 1024);
+
+            // Check if result is within size limit
+            if (sizeMB > maxSizeMB) {
+              reject(
+                new Error(
+                  `La imagen procesada (${sizeMB.toFixed(1)}MB) excede el límite de ${maxSizeMB}MB`
+                )
+              );
+              return;
+            }
+
+            resolve({
+              blob,
+              width: targetWidth,
+              height: targetHeight,
+              originalSize,
+              processedSize,
+            });
+          },
+          outputFormat,
+          quality
+        );
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     };
 
-    reader.onerror = () => {
-      reject(new Error('Error al leer el archivo'));
+    img.onerror = () => {
+      cleanup();
+      reject(
+        new Error(
+          `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+        )
+      );
     };
 
-    reader.readAsDataURL(file);
+    img.src = objectUrl;
   });
 }
 

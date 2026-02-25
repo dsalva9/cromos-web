@@ -88,7 +88,9 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       toast.success('Imagen subida con éxito');
     } catch (error) {
       logger.error('Upload error:', error);
-      toast.error('Error al subir la imagen');
+      const message =
+        error instanceof Error ? error.message : 'Error al subir la imagen';
+      toast.error(message);
     } finally {
       setUploading(false);
     }
