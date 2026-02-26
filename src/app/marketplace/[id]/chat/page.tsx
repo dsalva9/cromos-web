@@ -507,7 +507,7 @@ function ListingChatPageContent() {
 
         {/* Mobile sticky header with context */}
         {(!isOwner || selectedParticipant) && (
-          <div className="md:hidden flex-none bg-gray-50 dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-700 z-20 mb-4 -mx-4 px-4 py-3">
+          <div className="md:hidden flex-none bg-gray-50 dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-700 z-20 -mx-4 px-4 py-3">
             <div className="flex items-center gap-3">
               {isOwner && selectedParticipant ? (
                 <>
@@ -563,6 +563,55 @@ function ListingChatPageContent() {
                 </>
               ) : null}
             </div>
+            {/* Mobile action buttons */}
+            {listing && (
+              <div className="flex gap-2 mt-2">
+                {isOwner && listing.status === 'active' && !transactionStatus && (
+                  <Button
+                    onClick={handleReserve}
+                    disabled={reserving || !selectedParticipant}
+                    size="sm"
+                    className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                  >
+                    <Package className="h-3.5 w-3.5 mr-1" />
+                    {reserving ? 'Marcando...' : 'Reservar'}
+                  </Button>
+                )}
+                {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
+                  <>
+                    <Button
+                      onClick={handleComplete}
+                      disabled={completing}
+                      size="sm"
+                      className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                    >
+                      <Package className="h-3.5 w-3.5 mr-1" />
+                      {completing ? 'Completando...' : 'Completar'}
+                    </Button>
+                    <Button
+                      onClick={handleUnreserve}
+                      disabled={unreserving}
+                      size="sm"
+                      variant="outline"
+                      className="text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 font-bold text-xs flex-1"
+                    >
+                      {unreserving ? 'Liberando...' : 'Liberar'}
+                    </Button>
+                  </>
+                )}
+                {isBuyer && listing.status === 'reserved' && transactionStatus === 'pending_completion' && (
+                  <Button
+                    onClick={handleConfirm}
+                    disabled={confirming}
+                    size="sm"
+                    className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                  >
+                    <Package className="h-3.5 w-3.5 mr-1" />
+                    {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -613,13 +662,9 @@ function ListingChatPageContent() {
 
                 {listingCardExpanded && (
                   <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
                     </p>
-                    {/* Action buttons REMOVED - now in FloatingActionMenu */}
-                    <div className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      Usa el botón flotante para gestionar el anuncio
-                    </div>
                   </div>
                 )}
               </div>
