@@ -22,7 +22,7 @@ import { Listing } from '@/types/v1.6.0';
 import Link from 'next/link';
 import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
-import { FloatingActionMenu } from '@/components/chat/FloatingActionMenu';
+
 import { logger } from '@/lib/logger';
 
 function ListingChatPageContent() {
@@ -490,7 +490,7 @@ function ListingChatPageContent() {
   }
 
   return (
-    <div className="h-[calc(100dvh-var(--header-height,4rem)-5rem)] md:h-[calc(100vh-var(--header-height,5rem)-3.5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4">
+    <div className="h-[calc(100dvh-var(--header-height,4rem)-5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100vh-var(--header-height,5rem)-3.5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4">
       <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col min-h-0">
         {/* Header */}
         <div className="mb-4 hidden md:flex items-center gap-4 flex-none">
@@ -1248,25 +1248,7 @@ function ListingChatPageContent() {
           </DialogContent>
         </Dialog>
 
-        {/* Floating Action Menu - Mobile Only */}
-        <div className="md:hidden">
-          <FloatingActionMenu
-            // Seller actions
-            canReserve={isOwner && listing?.status === 'active' && !transactionStatus}
-            canComplete={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved' && transaction?.buyer_id === selectedParticipant}
-            canUnreserve={isOwner && listing?.status === 'reserved' && transactionStatus === 'reserved' && transaction?.buyer_id === selectedParticipant}
-            onReserve={handleReserve}
-            onComplete={handleComplete}
-            onUnreserve={handleUnreserve}
-            reserving={reserving}
-            completing={completing}
-            unreserving={unreserving}
-            // Buyer actions
-            canConfirm={isBuyer && listing?.status === 'reserved' && transactionStatus === 'pending_completion'}
-            onConfirm={handleConfirm}
-            confirming={confirming}
-          />
-        </div>
+
       </div>
     </div>
   );
