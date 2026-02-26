@@ -622,7 +622,7 @@ export default function UserProfilePage() {
                           </DialogTrigger>
 
                           <DialogContent className="max-w-2xl p-0 max-h-[calc(100dvh-6rem)]">
-                            <div className="p-6 pb-4">
+                            <div className="p-6 pb-4 flex-shrink-0">
                               <DialogHeader>
                                 <DialogTitle>Editar perfil</DialogTitle>
                                 <DialogDescription>
@@ -676,7 +676,7 @@ export default function UserProfilePage() {
                               </div>
                             </div>
 
-                            <div className="p-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <div className="p-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
                               <DialogFooter className="sm:justify-between">
                                 <Button
                                   variant="outline"

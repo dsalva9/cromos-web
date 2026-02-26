@@ -166,36 +166,16 @@ export default function SiteHeader() {
     const mq = window.matchMedia('(min-width: 640px)');
     const update = () => {
       const isSm = mq.matches;
-      if (!user && !loading && !wasAuthed) {
-        root.style.setProperty('--header-height', isSm ? '8.5rem' : '7.5rem');
-      } else {
-        root.style.setProperty('--header-height', isSm ? '5rem' : '4rem');
-      }
+      root.style.setProperty('--header-height', isSm ? '5rem' : '4rem');
     };
     update();
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
-  }, [user, loading, wasAuthed]);
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
-      {/* Beta Announcement Banner - Only visible for confirmed unauthenticated users */}
-      {hasMounted && !user && !loading && (
-        <div className="bg-black text-[#FFC000] py-2.5 px-4 overflow-hidden border-b border-[#FFC000]/20 shadow-inner">
-          <div className="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-x-3 gap-y-0.5 text-center">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-[#FFC000] text-black border-none px-2 py-0.5 text-[10px] sm:text-[11px] font-black uppercase tracking-tighter shadow-sm shrink-0 animate-pulse">
-                BETA ABIERTA
-              </Badge>
-              <span className="text-[12px] sm:text-sm font-black tracking-tight">🚀 ¡Estamos en Beta Abierta!</span>
-            </div>
-            <span className="text-[#FFC000]/40 hidden sm:inline">|</span>
-            <p className="text-[11px] sm:text-xs font-bold tracking-tight text-white/90">
-              Dinos qué mejorar en <a href="mailto:info@cambiocromos.com" className="text-[#FFC000] font-black hover:underline underline-offset-4 decoration-2">info@cambiocromos.com</a>
-            </p>
-          </div>
-        </div>
-      )}
+
 
       <div className="container mx-auto px-4">
         <div className="flex h-16 sm:h-20 items-center justify-between">
