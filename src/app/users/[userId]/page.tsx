@@ -621,7 +621,7 @@ export default function UserProfilePage() {
                             </Button>
                           </DialogTrigger>
 
-                          <DialogContent className="max-w-2xl p-0">
+                          <DialogContent className="max-w-2xl p-0 max-h-[calc(100dvh-6rem)]">
                             <div className="p-6 pb-4">
                               <DialogHeader>
                                 <DialogTitle>Editar perfil</DialogTitle>

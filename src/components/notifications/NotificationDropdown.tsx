@@ -74,7 +74,7 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-96 max-w-[calc(100vw-2rem)]">
+      <DropdownMenuContent align="end" className="w-96 max-w-[calc(100vw-2rem)] z-[101]">
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notificaciones</span>
           {unreadCount > 0 && (
