@@ -24,6 +24,7 @@ import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 
 import { logger } from '@/lib/logger';
+import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -489,8 +490,13 @@ function ListingChatPageContent() {
     );
   }
 
+  const nativeHeight = useChatViewportHeight();
+
   return (
-    <div className="h-[calc(100dvh-var(--header-height,4rem)-5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100vh-var(--header-height,5rem)-3.5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4">
+    <div
+      className="h-[calc(100dvh-var(--header-height,4rem)-5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100vh-var(--header-height,5rem)-3.5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4"
+      style={nativeHeight ? { height: nativeHeight } : undefined}
+    >
       <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col min-h-0">
         {/* Header */}
         <div className="mb-4 hidden md:flex items-center gap-4 flex-none">
