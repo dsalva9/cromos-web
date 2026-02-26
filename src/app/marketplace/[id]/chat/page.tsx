@@ -480,7 +480,7 @@ function ListingChatPageContent() {
     }, 500);
   };
 
-
+  const nativeHeight = useChatViewportHeight();
 
   if (loading && messages.length === 0) {
     return (
@@ -490,7 +490,6 @@ function ListingChatPageContent() {
     );
   }
 
-  const nativeHeight = useChatViewportHeight();
 
   return (
     <div
