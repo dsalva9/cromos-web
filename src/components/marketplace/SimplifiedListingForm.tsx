@@ -82,6 +82,7 @@ export function SimplifiedListingForm({
   const [selectedSlot, setSelectedSlot] = useState<TemplateSlot | null>(null);
   const [loadingPages, setLoadingPages] = useState(false);
   const [slotPickerExpanded, setSlotPickerExpanded] = useState(false);
+  const [expandedPageId, setExpandedPageId] = useState<number | null>(null);
 
   const {
     register,
@@ -365,12 +366,22 @@ export function SimplifiedListingForm({
                       ) : (
                         templatePages.map(page => (
                           <div key={page.id}>
-                            {/* Page header */}
-                            <div className="px-3 py-2 bg-gray-100 text-xs font-bold text-gray-600 uppercase tracking-wider sticky top-0">
-                              {page.title} ({page.slots_count} cromos)
-                            </div>
-                            {/* Slots */}
-                            {page.slots?.map(slot => (
+                            {/* Page header - collapsible */}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedPageId(expandedPageId === page.id ? null : page.id)}
+                              className="w-full px-3 py-2.5 bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-between border-b border-gray-200"
+                            >
+                              <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                {page.title} ({page.slots_count})
+                              </span>
+                              {expandedPageId === page.id
+                                ? <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+                                : <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                              }
+                            </button>
+                            {/* Slots - shown only when page is expanded */}
+                            {expandedPageId === page.id && page.slots?.map(slot => (
                               <button
                                 key={slot.id}
                                 type="button"
