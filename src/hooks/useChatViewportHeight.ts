@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 
 /**
- * Returns the correct chat container height for the current platform.
+ * Returns the correct chat container height using window.innerHeight.
  *
- * Uses `window.innerHeight` to compute the available height, subtracting
- * the header and bottom padding. This avoids CSS `100dvh` issues across
- * all platforms (Capacitor WebView, mobile web, desktop).
+ * Since the chat page sets body/html overflow:hidden and removes main's
+ * pb-20, the available height is simply:
+ *   window.innerHeight - headerHeight - (footer on desktop)
  *
- * - Mobile: subtracts header + main pb-20 (bottom nav space)
- * - Desktop: subtracts header + footer (~3.5rem) + md:py-4 padding
+ * On mobile, the bottom nav is position:fixed so it doesn't affect layout flow,
+ * but we still need to reserve space for it (4rem).
  */
 export function useChatViewportHeight() {
     const [height, setHeight] = useState<string | undefined>(undefined);
@@ -20,7 +20,7 @@ export function useChatViewportHeight() {
             const rootStyles = getComputedStyle(document.documentElement);
             const remPx = parseFloat(rootStyles.fontSize) || 16;
 
-            // --header-height is "4rem" (mobile) or "5rem" (desktop sm+)
+            // --header-height: "4rem" mobile / "5rem" desktop
             const headerRem = parseFloat(
                 rootStyles.getPropertyValue('--header-height').trim() || '4'
             );
@@ -30,10 +30,12 @@ export function useChatViewportHeight() {
 
             let subtract: number;
             if (isMobile) {
-                // <main> has pb-20 (5rem) for the mobile bottom nav
-                subtract = headerPx + 5 * remPx;
+                // Bottom nav is fixed, h-16 (4rem) + safe-area-inset-bottom
+                // We read the actual safe area since the bottom nav sits on it
+                const sab = parseFloat(rootStyles.getPropertyValue('--sab').trim()) || 0;
+                subtract = headerPx + 4 * remPx + sab;
             } else {
-                // Desktop: footer is ~3.5rem, plus md:py-4 (2rem top+bottom padding)
+                // Desktop: footer (~3.5rem) + md:py-4 (2rem total vertical padding)
                 subtract = headerPx + 3.5 * remPx + 2 * remPx;
             }
 

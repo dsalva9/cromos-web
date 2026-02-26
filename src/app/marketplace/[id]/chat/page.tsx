@@ -482,6 +482,29 @@ function ListingChatPageContent() {
 
   const nativeHeight = useChatViewportHeight();
 
+  // Lock outer scroll — the chat page manages its own internal scroll
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const main = document.getElementById('main-content');
+
+    // Save original values
+    const origHtmlOverflow = html.style.overflow;
+    const origBodyOverflow = body.style.overflow;
+    const origMainPb = main?.style.paddingBottom;
+
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    // Remove main's pb-20 on this page — chat manages its own spacing
+    if (main) main.style.paddingBottom = '0';
+
+    return () => {
+      html.style.overflow = origHtmlOverflow;
+      body.style.overflow = origBodyOverflow;
+      if (main) main.style.paddingBottom = origMainPb || '';
+    };
+  }, []);
+
   if (loading && messages.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
