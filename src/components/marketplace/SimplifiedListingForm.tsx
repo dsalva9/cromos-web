@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,8 +13,9 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { PackagePlus, FileText, Library } from 'lucide-react';
+import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 // Simplified schema - only title, description, and images (mandatory)
 const simplifiedListingSchema = z.object({
@@ -56,7 +57,31 @@ export function SimplifiedListingForm({
   const supabase = useSupabaseClient();
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false);
-  const [templates, setTemplates] = useState<Array<{ id: string; title: string }>>([]);
+  const [templates, setTemplates] = useState<Array<{ copy_id: number; template_id: number; title: string }>>([]);
+
+  // Slot picker state
+  interface TemplateSlot {
+    id: number;
+    slot_number: number;
+    slot_variant: string | null;
+    global_number: number | null;
+    label: string | null;
+    is_special: boolean;
+  }
+  interface TemplatePage {
+    id: number;
+    page_number: number;
+    title: string;
+    type: string;
+    slots_count: number;
+    slots: TemplateSlot[];
+  }
+  const [selectedCopy, setSelectedCopy] = useState<{ copy_id: number; template_id: number; title: string } | null>(null);
+  const [templatePages, setTemplatePages] = useState<TemplatePage[]>([]);
+  const [selectedPage, setSelectedPage] = useState<TemplatePage | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<TemplateSlot | null>(null);
+  const [loadingPages, setLoadingPages] = useState(false);
+  const [slotPickerExpanded, setSlotPickerExpanded] = useState(false);
 
   const {
     register,
@@ -84,14 +109,58 @@ export function SimplifiedListingForm({
     const fetchTemplates = async () => {
       const { data } = await supabase.rpc('get_my_template_copies');
       if (data) {
-        setTemplates(data.map((t: { copy_id: number; title: string }) => ({
-          id: String(t.copy_id),
+        setTemplates(data.map((t: { copy_id: number; template_id: number; title: string }) => ({
+          copy_id: t.copy_id,
+          template_id: t.template_id,
           title: t.title
         })));
       }
     };
     fetchTemplates();
   }, [supabase]);
+
+  // Fetch template pages/slots when a template copy is selected
+  const fetchTemplatePages = useCallback(async (templateId: number) => {
+    setLoadingPages(true);
+    try {
+      const { data, error } = await supabase.rpc('get_template_details', { p_template_id: templateId });
+      if (error) throw error;
+      const result = data as { pages?: TemplatePage[] } | null;
+      setTemplatePages(result?.pages || []);
+    } catch (err) {
+      logger.error('Error fetching template pages:', err);
+      setTemplatePages([]);
+    } finally {
+      setLoadingPages(false);
+    }
+  }, [supabase]);
+
+  // Handle template selection from dialog
+  const handleTemplateSelect = useCallback((template: { copy_id: number; template_id: number; title: string }) => {
+    setSelectedCopy(template);
+    setValue('collection_name', template.title, { shouldValidate: true });
+    setTemplatesDialogOpen(false);
+    setSelectedPage(null);
+    setSelectedSlot(null);
+    setSlotPickerExpanded(true);
+    fetchTemplatePages(template.template_id);
+  }, [setValue, fetchTemplatePages]);
+
+  // Handle slot selection
+  const handleSlotSelect = useCallback((page: TemplatePage, slot: TemplateSlot) => {
+    setSelectedPage(page);
+    setSelectedSlot(slot);
+    setSlotPickerExpanded(false);
+  }, []);
+
+  // Clear slot link
+  const handleClearSlotLink = useCallback(() => {
+    setSelectedCopy(null);
+    setSelectedPage(null);
+    setSelectedSlot(null);
+    setTemplatePages([]);
+    setSlotPickerExpanded(false);
+  }, []);
 
   const imageUrl = watch('image_url');
   const termsAccepted = watch('terms_accepted');
@@ -118,13 +187,24 @@ export function SimplifiedListingForm({
     const payload: CreateListingForm = {
       title: data.title,
       description: data.description,
-      sticker_number: '', // Not used anymore
+      sticker_number: selectedSlot
+        ? `${selectedSlot.slot_number}${selectedSlot.slot_variant || ''}`
+        : '',
       collection_name: data.collection_name || '',
       image_url: data.image_url,
       is_group: data.is_group,
       group_count: data.is_group ? 1 : undefined,
       listing_type: data.listing_type || 'intercambio',
       price: data.price || undefined,
+      // Slot metadata (when linked to an album slot)
+      ...(selectedSlot && selectedCopy && selectedPage ? {
+        copy_id: selectedCopy.copy_id,
+        slot_id: selectedSlot.id,
+        page_number: selectedPage.page_number,
+        page_title: selectedPage.title,
+        slot_variant: selectedSlot.slot_variant || undefined,
+        global_number: selectedSlot.global_number || undefined,
+      } : {}),
     };
     await onSubmit(payload);
   };
@@ -142,8 +222,8 @@ export function SimplifiedListingForm({
                   type="button"
                   onClick={() => setValue('is_group', false, { shouldValidate: true })}
                   className={`p-4 rounded-lg border-2 transition-all ${!isGroup
-                      ? 'border-[#FFC000] bg-[#FFC000]/10'
-                      : 'border-gray-200 bg-white'
+                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    : 'border-gray-200 bg-white'
                     }`}
                 >
                   <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
@@ -155,8 +235,8 @@ export function SimplifiedListingForm({
                   type="button"
                   onClick={() => setValue('is_group', true, { shouldValidate: true })}
                   className={`p-4 rounded-lg border-2 transition-all ${isGroup
-                      ? 'border-[#FFC000] bg-[#FFC000]/10'
-                      : 'border-gray-200 bg-white'
+                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    : 'border-gray-200 bg-white'
                     }`}
                 >
                   <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
@@ -231,6 +311,92 @@ export function SimplifiedListingForm({
             </p>
           </div>
 
+          {/* Slot Picker - shown when a template copy is selected and it's individual */}
+          {selectedCopy && !isGroup && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-1.5">
+                  <LinkIcon className="h-3.5 w-3.5" />
+                  Vincular a cromo del álbum
+                </Label>
+                <button
+                  type="button"
+                  onClick={handleClearSlotLink}
+                  className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+                >
+                  Desvincular
+                </button>
+              </div>
+
+              {selectedSlot && selectedPage ? (
+                /* Selected slot display */
+                <div className="flex items-center gap-2 bg-green-50 border-2 border-green-200 rounded-lg p-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-green-800">
+                      #{selectedSlot.slot_number}{selectedSlot.slot_variant || ''} — {selectedSlot.label || `Cromo ${selectedSlot.slot_number}`}
+                    </p>
+                    <p className="text-xs text-green-600">{selectedPage.title}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedSlot(null); setSelectedPage(null); setSlotPickerExpanded(true); }}
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                /* Page/slot picker */
+                <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setSlotPickerExpanded(!slotPickerExpanded)}
+                    className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors text-sm text-gray-700"
+                  >
+                    <span>Seleccionar cromo de <strong>{selectedCopy.title}</strong></span>
+                    {slotPickerExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  </button>
+                  {slotPickerExpanded && (
+                    <div className="max-h-64 overflow-y-auto border-t border-gray-200">
+                      {loadingPages ? (
+                        <div className="p-4 text-center text-gray-500 text-sm">Cargando páginas...</div>
+                      ) : templatePages.length === 0 ? (
+                        <div className="p-4 text-center text-gray-500 text-sm">No se encontraron páginas</div>
+                      ) : (
+                        templatePages.map(page => (
+                          <div key={page.id}>
+                            {/* Page header */}
+                            <div className="px-3 py-2 bg-gray-100 text-xs font-bold text-gray-600 uppercase tracking-wider sticky top-0">
+                              {page.title} ({page.slots_count} cromos)
+                            </div>
+                            {/* Slots */}
+                            {page.slots?.map(slot => (
+                              <button
+                                key={slot.id}
+                                type="button"
+                                onClick={() => handleSlotSelect(page, slot)}
+                                className="w-full text-left px-3 py-2 hover:bg-[#FFC000]/10 transition-colors flex items-center gap-2 text-sm border-b border-gray-100 last:border-b-0"
+                              >
+                                <span className="font-mono text-xs text-gray-400 w-8 text-right shrink-0">#{slot.slot_number}</span>
+                                <span className="text-gray-900 truncate">{slot.label || `Cromo ${slot.slot_number}`}</span>
+                                {slot.is_special && (
+                                  <span className="text-[9px] bg-purple-100 text-purple-600 px-1 rounded font-bold shrink-0">ESP</span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              <p className="text-xs text-gray-500">
+                Opcional: vincular a un cromo específico mejora la visibilidad en los álbumes de otros usuarios
+              </p>
+            </div>
+          )}
+
           {/* Listing Type - Exchange / Sale */}
           <div className="space-y-3">
             <Label>Tipo de Anuncio <span className="text-red-500">*</span></Label>
@@ -239,8 +405,8 @@ export function SimplifiedListingForm({
                 type="button"
                 onClick={() => handleListingTypeChange(!isForExchange, isForSale)}
                 className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForExchange
-                    ? 'border-[#FFC000] bg-[#FFC000]/10'
-                    : 'border-gray-200 bg-white'
+                  ? 'border-[#FFC000] bg-[#FFC000]/10'
+                  : 'border-gray-200 bg-white'
                   }`}
               >
                 <span className="text-xl">🔄</span>
@@ -252,8 +418,8 @@ export function SimplifiedListingForm({
                 type="button"
                 onClick={() => handleListingTypeChange(isForExchange, !isForSale)}
                 className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForSale
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-200 bg-white'
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-200 bg-white'
                   }`}
               >
                 <span className="text-xl">💰</span>
@@ -381,12 +547,9 @@ export function SimplifiedListingForm({
               <div className="space-y-2">
                 {templates.map((template) => (
                   <button
-                    key={template.id}
+                    key={template.copy_id}
                     type="button"
-                    onClick={() => {
-                      setValue('collection_name', template.title, { shouldValidate: true });
-                      setTemplatesDialogOpen(false);
-                    }}
+                    onClick={() => handleTemplateSelect(template)}
                     className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 hover:border-[#FFC000]"
                   >
                     <p className="text-gray-900 font-medium">{template.title}</p>
