@@ -632,7 +632,7 @@ export default function UserProfilePage() {
                               </DialogHeader>
                             </div>
 
-                            <div className="px-6 space-y-6 overflow-y-auto flex-1">
+                            <div className="px-6 pb-6 space-y-6 overflow-y-auto flex-1 min-h-0">
                               <div className="space-y-3">
                                 <Label>Avatar</Label>
                                 <AvatarPicker
