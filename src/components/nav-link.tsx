@@ -21,9 +21,15 @@ export default function NavLink({ href, children, className, onClick }: NavLinkP
   const pathname = usePathname();
 
   // Special handling for home route - only exact match
+  // Chat pages live under /marketplace/[id]/chat but belong to the "Chats" section
+  const isChatPage = pathname.endsWith('/chat');
   const isActive = href === '/'
     ? pathname === '/'
-    : pathname.startsWith(href);
+    : href === '/chats'
+      ? pathname.startsWith('/chats') || isChatPage
+      : href === '/marketplace'
+        ? pathname.startsWith('/marketplace') && !isChatPage
+        : pathname.startsWith(href);
 
   return (
     <Link

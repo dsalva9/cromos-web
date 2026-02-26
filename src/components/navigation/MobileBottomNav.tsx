@@ -26,7 +26,13 @@ export function MobileBottomNav() {
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
 
-  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
+  // Chat pages live under /marketplace/[id]/chat — treat as "chats"
+  const isChatPage = pathname?.endsWith('/chat');
+  const isActive = (path: string) => {
+    if (path === '/chats') return pathname === '/chats' || pathname?.startsWith('/chats/') || !!isChatPage;
+    if (path === '/marketplace') return (pathname === '/marketplace' || pathname?.startsWith('/marketplace/')) && !isChatPage;
+    return pathname === path || pathname?.startsWith(path + '/');
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
