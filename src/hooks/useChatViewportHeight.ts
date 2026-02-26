@@ -5,12 +5,11 @@ import { useState, useEffect } from 'react';
 /**
  * Returns the correct chat container height using window.innerHeight.
  *
- * Since the chat page sets body/html overflow:hidden and removes main's
- * pb-20, the available height is simply:
- *   window.innerHeight - headerHeight - (footer on desktop)
- *
- * On mobile, the bottom nav is position:fixed so it doesn't affect layout flow,
- * but we still need to reserve space for it (4rem).
+ * Subtracts:
+ * - Header height (--header-height CSS var)
+ * - Safe area top (--sat CSS var, status bar on Capacitor)
+ * - Mobile: bottom nav (4rem) + safe area bottom
+ * - Desktop: footer (~3.5rem) + padding (2rem)
  */
 export function useChatViewportHeight() {
     const [height, setHeight] = useState<string | undefined>(undefined);
@@ -26,17 +25,19 @@ export function useChatViewportHeight() {
             );
             const headerPx = headerRem * remPx;
 
+            // Safe area top (status bar on Capacitor/notch devices)
+            const sat = parseFloat(rootStyles.getPropertyValue('--sat').trim()) || 0;
+
             const isMobile = window.matchMedia('(max-width: 767px)').matches;
 
             let subtract: number;
             if (isMobile) {
-                // Bottom nav is fixed, h-16 (4rem) + safe-area-inset-bottom
-                // We read the actual safe area since the bottom nav sits on it
+                // Bottom nav: h-16 (4rem) + safe area bottom
                 const sab = parseFloat(rootStyles.getPropertyValue('--sab').trim()) || 0;
-                subtract = headerPx + 4 * remPx + sab;
+                subtract = headerPx + sat + 4 * remPx + sab;
             } else {
-                // Desktop: footer (~3.5rem) + md:py-4 (2rem total vertical padding)
-                subtract = headerPx + 3.5 * remPx + 2 * remPx;
+                // Desktop: footer (~3.5rem) + md:py-4 (2rem total)
+                subtract = headerPx + sat + 3.5 * remPx + 2 * remPx;
             }
 
             const available = window.innerHeight - subtract;
