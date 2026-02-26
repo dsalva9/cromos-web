@@ -480,7 +480,7 @@ function ListingChatPageContent() {
     }, 500);
   };
 
-  const nativeHeight = useChatViewportHeight();
+  const { height, isDesktop } = useChatViewportHeight();
 
   // Lock outer scroll — the chat page manages its own internal scroll
   useEffect(() => {
@@ -516,8 +516,21 @@ function ListingChatPageContent() {
 
   return (
     <div
-      className="h-[calc(100dvh-var(--header-height,4rem)-5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100vh-var(--header-height,5rem)-3.5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4"
-      style={nativeHeight ? { height: nativeHeight } : undefined}
+      className={cn(
+        "bg-gray-50 dark:bg-gray-900 flex flex-col",
+        // Mobile: fixed between header and bottom nav
+        "fixed inset-x-0 z-10",
+        // Desktop: back to normal flow
+        "md:relative md:inset-auto md:z-auto md:py-4"
+      )}
+      style={
+        isDesktop
+          ? { position: 'relative', top: 'auto', bottom: 'auto', height: height || undefined }
+          : {
+            top: 'calc(var(--header-height, 4rem) + var(--sat, 0px))',
+            bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))',
+          }
+      }
     >
       <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col min-h-0">
         {/* Header */}
