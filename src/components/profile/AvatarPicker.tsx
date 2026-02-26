@@ -132,7 +132,7 @@ export function AvatarPicker({
       </div>
 
       {/* Tab Content */}
-      <div className="max-h-[50vh] md:max-h-[400px] overflow-y-auto pr-2">
+      <div className="max-h-[30vh] md:max-h-[280px] overflow-y-auto pr-2">
         {activeTab === 'gallery' && (
           <div>
             <div className="grid grid-cols-4 gap-3 pb-2">
