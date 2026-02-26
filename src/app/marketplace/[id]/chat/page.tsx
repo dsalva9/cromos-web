@@ -479,12 +479,7 @@ function ListingChatPageContent() {
     }, 500);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      void handleSend();
-    }
-  };
+
 
   if (loading && messages.length === 0) {
     return (
@@ -495,10 +490,10 @@ function ListingChatPageContent() {
   }
 
   return (
-    <div className="h-[calc(100dvh-9rem)] md:h-auto md:min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col md:block pb-0 md:py-8">
-      <div className="container mx-auto px-4 max-w-5xl flex-1 md:flex-none flex flex-col md:block min-h-0">
+    <div className="h-[calc(100dvh-9rem)] md:h-[calc(100vh-5rem)] bg-gray-50 dark:bg-gray-900 flex flex-col pb-0 md:py-4">
+      <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="mb-6 hidden md:flex items-center gap-4 pt-4 md:pt-0">
+        <div className="mb-4 hidden md:flex items-center gap-4 flex-none">
           <Button
             variant="ghost"
             size="sm"
@@ -573,7 +568,7 @@ function ListingChatPageContent() {
 
         {/* Listing Info Card */}
         {listing && (
-          <ModernCard className="mb-6 hidden md:block">
+          <ModernCard className="mb-4 hidden md:block flex-none">
             <ModernCardContent className="p-4">
               {/* Mobile: Collapsible - REDESIGNED for Phase 2 */}
               <div className="md:hidden">
@@ -773,7 +768,7 @@ function ListingChatPageContent() {
         )}
 
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0 md:h-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 min-h-0">
           {/* Participants sidebar (seller only) */}
           {isOwner && participants.length > 0 && (
             <>
@@ -838,7 +833,7 @@ function ListingChatPageContent() {
               </div>
 
               {/* Desktop: Always show sidebar */}
-              <div className="hidden md:block md:col-span-1">
+              <div className="hidden md:block md:col-span-1 overflow-y-auto min-h-0">
                 <ModernCard>
                   <ModernCardContent className="p-4">
                     <h3 className="font-bold text-gray-900 dark:text-white mb-3">
@@ -902,8 +897,8 @@ function ListingChatPageContent() {
             // On mobile, if owner and no selected participant, hide chat (show list instead)
             isOwner && !selectedParticipant ? 'hidden md:block' : 'flex'
           )}>
-            <ModernCard className="flex flex-col flex-1 min-h-0 border-0 md:border-2">
-              <ModernCardContent className="p-0 flex flex-col flex-1 min-h-0">
+            <ModernCard className="flex flex-col flex-1 min-h-0 overflow-hidden border-0 md:border-2">
+              <ModernCardContent className="p-0 flex flex-col flex-1 min-h-0 overflow-hidden">
                 {/* Messages */}
                 <div
                   ref={chatContainerRef}
@@ -1035,7 +1030,7 @@ function ListingChatPageContent() {
                 </div>
 
                 {/* Composer */}
-                <div className="border-t-2 border-gray-200 dark:border-gray-700 p-4">
+                <div className="border-t-2 border-gray-200 dark:border-gray-700 p-4 flex-none">
                   {/* Logic for chat disabling */}
                   {(() => {
                     const isReserved = listing?.status === 'reserved';
@@ -1146,7 +1141,7 @@ function ListingChatPageContent() {
                           <textarea
                             value={messageText}
                             onChange={e => setMessageText(e.target.value)}
-                            onKeyDown={handleKeyDown}
+
                             placeholder="Escribe un mensaje..."
                             maxLength={500}
                             rows={2}

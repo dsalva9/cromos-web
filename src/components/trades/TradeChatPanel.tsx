@@ -120,12 +120,7 @@ export function TradeChatPanel({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -305,7 +300,6 @@ export function TradeChatPanel({
             ref={textareaRef}
             value={messageText}
             onChange={e => setMessageText(e.target.value)}
-            onKeyDown={handleKeyDown}
             placeholder={
               isProposalActive
                 ? `Mensaje para ${counterpartyNickname}…`
