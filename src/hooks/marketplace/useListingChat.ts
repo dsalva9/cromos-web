@@ -136,13 +136,15 @@ export function useListingChat({
     [supabase, listingId, user, messages, participantId, fetchMessages]
   );
 
-  // Auto-scroll to bottom (mobile only)
+  // Auto-scroll to bottom on all platforms
   const scrollToBottom = useCallback(() => {
-    // Only auto-scroll on mobile devices
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
+
+  // Mark messages from a specific sender as read
+  const markAsRead = useCallback(async (senderId: string) => {
+    await markListingMessagesRead(supabase, listingId, senderId);
+  }, [supabase, listingId]);
 
   // Initial fetch
   useEffect(() => {
@@ -192,5 +194,6 @@ export function useListingChat({
     fetchParticipants,
     refetch: fetchMessages,
     messagesEndRef,
+    markAsRead,
   };
 }

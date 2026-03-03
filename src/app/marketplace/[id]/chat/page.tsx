@@ -68,6 +68,7 @@ function ListingChatPageContent() {
     sendMessage,
     fetchParticipants,
     messagesEndRef,
+    markAsRead,
   } = useListingChat({
     listingId,
     participantId: selectedParticipant || undefined,
@@ -259,25 +260,48 @@ function ListingChatPageContent() {
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Improve auto-scroll behavior
+  // Improve auto-scroll behavior — use rAF to ensure DOM is painted
   useEffect(() => {
-    // Scroll to bottom when messages change
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    if (chatContainerRef.current && messages.length > 0) {
+      requestAnimationFrame(() => {
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+      });
     }
   }, [messages]);
 
   // Also scroll when conversation changes
   useEffect(() => {
     if (selectedParticipant) {
-      // Small timeout to allow render
+      // Small timeout to allow render + rAF for paint
       setTimeout(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
+        requestAnimationFrame(() => {
+          if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+          }
+        });
       }, 100);
     }
   }, [selectedParticipant]);
+
+  // Mark messages as read when chat is opened
+  useEffect(() => {
+    if (loading || messages.length === 0 || !user) return;
+
+    const hasUnread = messages.some(
+      msg => msg.receiver_id === user.id && !msg.is_read
+    );
+    if (!hasUnread) return;
+
+    if (!isOwner && listingOwner) {
+      // Buyer: mark messages from the seller as read
+      void markAsRead(listingOwner);
+    } else if (isOwner && selectedParticipant) {
+      // Seller: mark messages from the selected buyer as read
+      void markAsRead(selectedParticipant);
+    }
+  }, [loading, messages, user, isOwner, listingOwner, selectedParticipant, markAsRead]);
 
   const handleSend = async () => {
     if (!messageText.trim() || sending) return;
