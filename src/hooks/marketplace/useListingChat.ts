@@ -177,12 +177,8 @@ export function useListingChat({
     };
   }, [supabase, listingId, enableRealtime, user, fetchMessages]);
 
-  // Scroll to bottom when messages change (mobile only)
-  useEffect(() => {
-    if (messages.length > 0) {
-      setTimeout(scrollToBottom, 100);
-    }
-  }, [messages, scrollToBottom]);
+  // Note: auto-scroll is handled by the page component which owns the
+  // chat container ref. messagesEndRef is still available for manual use.
 
   return {
     messages,

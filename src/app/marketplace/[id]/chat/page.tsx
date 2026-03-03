@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -260,30 +260,38 @@ function ListingChatPageContent() {
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Improve auto-scroll behavior — use rAF to ensure DOM is painted
-  useEffect(() => {
-    if (chatContainerRef.current && messages.length > 0) {
-      requestAnimationFrame(() => {
-        if (chatContainerRef.current) {
-          chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-      });
-    }
-  }, [messages]);
+  // Scroll chat to bottom — two-phase for reliability across all platforms
+  const scrollChatToBottom = useCallback(() => {
+    const el = chatContainerRef.current;
+    if (!el) return;
+    // Phase 1: immediate scroll after next paint
+    requestAnimationFrame(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    });
+    // Phase 2: delayed scroll to catch layout shifts (images, flex settling, Capacitor WebView)
+    setTimeout(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    }, 300);
+  }, []);
 
-  // Also scroll when conversation changes
+  // Scroll when messages load or change
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollChatToBottom();
+    }
+  }, [messages, scrollChatToBottom]);
+
+  // Also scroll when conversation changes (seller switching participants)
   useEffect(() => {
     if (selectedParticipant) {
-      // Small timeout to allow render + rAF for paint
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-          }
-        });
-      }, 100);
+      // Extra delay for participant switch to allow content swap
+      setTimeout(scrollChatToBottom, 150);
     }
-  }, [selectedParticipant]);
+  }, [selectedParticipant, scrollChatToBottom]);
 
   // Mark messages as read when chat is opened
   useEffect(() => {
