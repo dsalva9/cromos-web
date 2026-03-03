@@ -53,8 +53,8 @@ export function useListingChat({
 
     if (fetchError) {
       setError(fetchError.message);
-      // "LISTING_NOT_FOUND" is already logged as warn in chat.ts - no need to re-log
-      if (fetchError.message !== 'LISTING_NOT_FOUND') {
+      // "LISTING_NOT_FOUND" and "NETWORK_ERROR" are already logged as warn in chat.ts - no need to re-log
+      if (fetchError.message !== 'LISTING_NOT_FOUND' && fetchError.message !== 'NETWORK_ERROR') {
         logger.error('Error fetching messages:', fetchError.message);
       }
     } else {

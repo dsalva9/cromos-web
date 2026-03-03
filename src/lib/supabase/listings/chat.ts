@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
-import { markListingChatNotificationsRead } from '@/lib/supabase/notifications';
+import { markListingChatNotificationsRead, isTransientNetworkError } from '@/lib/supabase/notifications';
 import { logger } from '@/lib/logger';
 
 // Schemas for runtime validation
@@ -58,6 +58,8 @@ export async function getListingChats(
 
     if (isNotFound) {
       logger.warn('Listing not found for chat access:', { listingId });
+    } else if (isTransientNetworkError(error)) {
+      logger.warn('Transient network error fetching listing chats:', error);
     } else {
       logger.error('Error fetching listing chats:', error);
     }
@@ -66,9 +68,11 @@ export async function getListingChats(
       data: [],
       error: isNotFound
         ? new Error('LISTING_NOT_FOUND')
-        : error instanceof Error
-          ? error
-          : new Error('No se pudieron cargar los mensajes'),
+        : isTransientNetworkError(error)
+          ? new Error('NETWORK_ERROR')
+          : error instanceof Error
+            ? error
+            : new Error('No se pudieron cargar los mensajes'),
     };
   }
 }
