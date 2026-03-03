@@ -258,6 +258,8 @@ function ListingChatPageContent() {
     void fetchRatings();
   }, [listing, listingId, supabase, user]);
 
+  const { height, isDesktop } = useChatViewportHeight();
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Scroll chat to bottom — two-phase for reliability across all platforms
@@ -278,12 +280,12 @@ function ListingChatPageContent() {
     }, 300);
   }, []);
 
-  // Scroll when messages load or change
+  // Scroll when messages load/change or when viewport layout settles
   useEffect(() => {
     if (messages.length > 0) {
       scrollChatToBottom();
     }
-  }, [messages, scrollChatToBottom]);
+  }, [messages, height, scrollChatToBottom]);
 
   // Also scroll when conversation changes (seller switching participants)
   useEffect(() => {
@@ -512,7 +514,7 @@ function ListingChatPageContent() {
     }, 500);
   };
 
-  const { height, isDesktop } = useChatViewportHeight();
+  // height and isDesktop are now computed above with the other hooks
 
   // Lock outer scroll — the chat page manages its own internal scroll
   useEffect(() => {
