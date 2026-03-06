@@ -2,23 +2,18 @@ import { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const authRoutes = ['/login', '/signup', '/forgot-password'];
-
     const routes = [
-        '',
-        '/login',
-        '/signup',
-        '/forgot-password',
-        '/marketplace',
-        '/legal/cookies',
-        '/legal/privacy',
-        '/legal/terms',
-    ].map((route) => ({
-        url: `${siteConfig.url}${route}`,
-        lastModified: new Date(),
-        changeFrequency: (authRoutes.includes(route) ? 'monthly' : 'daily') as 'monthly' | 'daily',
-        priority: route === '' ? 1 : authRoutes.includes(route) ? 0.5 : 0.8,
-    }));
+        { path: '', changeFrequency: 'daily' as const, priority: 1 },
+        { path: '/marketplace', changeFrequency: 'daily' as const, priority: 0.8 },
+        { path: '/legal/cookies', changeFrequency: 'monthly' as const, priority: 0.3 },
+        { path: '/legal/privacy', changeFrequency: 'monthly' as const, priority: 0.3 },
+        { path: '/legal/terms', changeFrequency: 'monthly' as const, priority: 0.3 },
+    ];
 
-    return routes;
+    return routes.map((route) => ({
+        url: `${siteConfig.url}${route.path}`,
+        lastModified: new Date(),
+        changeFrequency: route.changeFrequency,
+        priority: route.priority,
+    }));
 }
