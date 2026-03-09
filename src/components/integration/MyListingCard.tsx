@@ -174,9 +174,9 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
             {/* Alert if needs attention */}
             {listing.needs_attention && (
-              <Alert className="bg-red-900/20 border-red-700">
-                <AlertTriangle className="h-4 w-4 text-red-400" />
-                <AlertDescription className="text-red-200">
+              <Alert className="bg-red-100 dark:bg-red-900/20 border-red-300 dark:border-red-700">
+                <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-red-800 dark:text-red-200">
                   Ya no tienes repetidos de este cromo. Considera eliminar este anuncio.
                 </AlertDescription>
               </Alert>
