@@ -216,7 +216,7 @@ function UserSearchContent() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-sm">
                       <div>
                         <p className="text-gray-400">Rating</p>
                         <p className="text-white font-bold">
@@ -226,6 +226,18 @@ function UserSearchContent() {
                       <div>
                         <p className="text-gray-400">Active Listings</p>
                         <p className="text-white font-bold">{user.active_listings_count}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400">Msgs Sent</p>
+                        <p className="text-white font-bold">{user.messages_sent}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400">Msgs Received</p>
+                        <p className="text-white font-bold">{user.messages_received}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400">Albums</p>
+                        <p className="text-white font-bold">{user.albums_count}</p>
                       </div>
                       <div>
                         <p className="text-gray-400">Reports Received</p>

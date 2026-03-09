@@ -15,6 +15,9 @@ interface AdminUser {
   active_listings_count: number;
   reports_received_count: number;
   created_at: string;
+  messages_sent: number;
+  messages_received: number;
+  albums_count: number;
 }
 
 export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended' | 'pending_deletion') {
@@ -36,7 +39,7 @@ export function useUserSearch(query: string, status: 'all' | 'active' | 'suspend
 
       if (rpcError) throw rpcError;
 
-      setUsers(data || []);
+      setUsers((data as AdminUser[]) || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
