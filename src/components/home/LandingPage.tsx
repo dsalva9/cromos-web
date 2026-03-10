@@ -169,6 +169,20 @@ export default function LandingPage() {
                 <MarketplaceShowcase />
             </div>
 
+            {/* SEO Context Paragraph */}
+            <section className="py-12 lg:py-16">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-3xl mx-auto text-center space-y-4">
+                        <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-gray-900 dark:text-white">
+                            Tu destino para el intercambio de cromos
+                        </h2>
+                        <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colección. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de fútbol del Mundial y cualquier otra colección deportiva. Gestiona tus álbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda España — todo en una sola plataforma gratuita.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
             {/* Final CTA */}
             <section className="py-24 bg-[#FFC000] relative overflow-hidden">
                 {/* Pattern Overlay */}
