@@ -54,7 +54,7 @@ export const logger = {
    */
   error: (...args: unknown[]) => {
     // Check if this is a transient network error (not a real application error)
-    const NETWORK_ERROR_PATTERNS = ['Failed to fetch', 'AbortError', 'Load failed'];
+    const NETWORK_ERROR_PATTERNS = ['Failed to fetch', 'AbortError', 'Load failed', 'ChunkLoadError', 'Failed to load chunk'];
     const isNetworkError = args.some((arg) => {
       if (typeof arg === 'string') {
         return NETWORK_ERROR_PATTERNS.some((p) => arg.includes(p));

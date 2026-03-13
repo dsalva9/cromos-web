@@ -14,6 +14,25 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    // ChunkLoadError happens after deployments when stale tabs reference old chunks.
+    // Auto-reload once to pick up the new assets.
+    const isChunkError =
+      error?.name === 'ChunkLoadError' ||
+      error?.message?.includes('Failed to load chunk');
+
+    if (isChunkError) {
+      const key = 'chunk_error_reload';
+      const lastReload = sessionStorage.getItem(key);
+      const now = Date.now();
+
+      // Only auto-reload if we haven't done so in the last 10 seconds (prevents loops)
+      if (!lastReload || now - Number(lastReload) > 10_000) {
+        sessionStorage.setItem(key, String(now));
+        window.location.reload();
+        return;
+      }
+    }
+
     logger.error('Page error:', error);
   }, [error]);
 
