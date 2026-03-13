@@ -89,19 +89,20 @@ export default function LandingPage() {
                                     Disponible en:
                                 </p>
                                 <div className="flex flex-row items-center gap-4">
-                                    <PWAInstallButton />
-                                    <div className="relative group">
+                                    <a
+                                        href="https://play.google.com/store/apps/details?id=com.cambiocromos.app"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         <Image
                                             src="/icons/google-play-badge.png"
                                             alt="Disponible en Google Play"
                                             width={160}
                                             height={48}
-                                            className="h-12 w-auto opacity-40 grayscale"
+                                            className="h-12 w-auto hover:opacity-80 transition-opacity"
                                         />
-                                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-300 bg-white/60 dark:bg-gray-900/60 rounded">
-                                            Próximamente
-                                        </span>
-                                    </div>
+                                    </a>
+                                    <PWAInstallButton />
                                 </div>
                             </div>
 
