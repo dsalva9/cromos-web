@@ -99,7 +99,7 @@ export default function LandingPage() {
                                             alt="Disponible en Google Play"
                                             width={160}
                                             height={48}
-                                            className="h-[40px] w-auto hover:opacity-80 transition-opacity"
+                                            className="h-[48px] w-auto rounded-lg hover:opacity-80 transition-opacity"
                                         />
                                     </a>
                                     <PWAInstallButton />

@@ -85,7 +85,7 @@ export default function PWAInstallButton() {
         <div className="relative">
             <button
                 onClick={handleInstallClick}
-                className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-[8px] px-4 h-[40px] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors cursor-pointer"
             >
                 {/* Apple-style icon */}
                 <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
