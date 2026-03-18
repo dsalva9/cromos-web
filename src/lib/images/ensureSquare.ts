@@ -14,6 +14,13 @@ export async function ensureSquare(
   file: File,
   maxDimension = 512
 ): Promise<EnsureSquareResult> {
+  // Reject empty files early with a clear error
+  if (file.size === 0) {
+    throw new Error(
+      `La imagen está vacía (type=${file.type}, size=0KB). Intenta seleccionar otra imagen.`
+    );
+  }
+
   // Use object URL instead of data URL to avoid base64 encoding overhead
   const objectUrl = URL.createObjectURL(file);
 

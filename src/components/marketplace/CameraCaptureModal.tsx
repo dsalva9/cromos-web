@@ -90,6 +90,12 @@ export function CameraCaptureModal({
 
     if (!context) return;
 
+    // Guard: video must have produced at least one frame
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      toast.error('La cámara aún no está lista. Espera un momento.');
+      return;
+    }
+
     // Set canvas dimensions to video dimensions
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -111,12 +117,27 @@ export function CameraCaptureModal({
   const handleConfirm = async () => {
     if (!capturedImage) return;
 
+    // Guard: reject empty data URLs (e.g. from 0x0 canvas)
+    if (capturedImage === 'data:,' || capturedImage.length < 50) {
+      toast.error('La imagen capturada está vacía. Intenta repetir la foto.');
+      setCapturedImage(null);
+      return;
+    }
+
     setProcessing(true);
 
     try {
       // Convert data URL to blob
       const response = await fetch(capturedImage);
       const blob = await response.blob();
+
+      // Guard: reject empty blobs
+      if (blob.size === 0) {
+        toast.error('La imagen capturada está vacía. Intenta repetir la foto.');
+        setCapturedImage(null);
+        return;
+      }
+
       const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
 
       // Process image
