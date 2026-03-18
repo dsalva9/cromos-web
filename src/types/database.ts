@@ -2787,12 +2787,16 @@ export type Database = {
         Returns: {
           count: number
           data: Json
+          global_number: number
+          is_special: boolean
+          label: string
           page_id: number
           page_number: number
           page_title: string
           page_type: string
           slot_id: number
           slot_number: number
+          slot_variant: string
           status: string
         }[]
       }

@@ -174,7 +174,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
         {/* Header Info */}
         <div className="text-center mb-3">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">#{slot.slot_number}</span>
+            <span className="text-xs font-mono text-gray-500 dark:text-gray-400">#{slot.slot_number}{slot.slot_variant || ''}</span>
             {slot.is_special && (
               <span className="text-[10px] bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 px-1 rounded border border-purple-200 dark:border-purple-700 font-bold">SPECIAL</span>
             )}

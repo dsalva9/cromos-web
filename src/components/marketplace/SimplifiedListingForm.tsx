@@ -388,7 +388,7 @@ export function SimplifiedListingForm({
                                 onClick={() => handleSlotSelect(page, slot)}
                                 className="w-full text-left px-3 py-2 hover:bg-[#FFC000]/10 transition-colors flex items-center gap-2 text-sm border-b border-gray-100 last:border-b-0"
                               >
-                                <span className="font-mono text-xs text-gray-400 w-8 text-right shrink-0">#{slot.slot_number}</span>
+                                <span className="font-mono text-xs text-gray-400 w-8 text-right shrink-0">#{slot.slot_number}{slot.slot_variant || ''}</span>
                                 <span className="text-gray-900 truncate">{slot.label || `Cromo ${slot.slot_number}`}</span>
                                 {slot.is_special && (
                                   <span className="text-[9px] bg-purple-100 text-purple-600 px-1 rounded font-bold shrink-0">ESP</span>

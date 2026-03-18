@@ -128,7 +128,7 @@ export function SlotSelectionModal({
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="font-bold text-sm">
-                          #{slot.slot_number}
+                          #{slot.slot_number}{slot.slot_variant || ''}
                         </span>
                         <Badge
                           variant="secondary"
