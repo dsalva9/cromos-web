@@ -8,9 +8,11 @@ import { Badge } from '@/components/ui/badge';
 
 interface LeanListingCardProps {
     listing: Listing;
+    /** Where the card links to. Defaults to /signup (landing showcase). */
+    href?: string;
 }
 
-export function LeanListingCard({ listing }: LeanListingCardProps) {
+export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardProps) {
 
     const getStatusColor = (status: string, isPack: boolean = false) => {
         switch (status) {
@@ -53,7 +55,7 @@ export function LeanListingCard({ listing }: LeanListingCardProps) {
     };
 
     return (
-        <Link href="/signup" className="group block h-full">
+        <Link href={href} className="group block h-full">
             <div className="h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
 
                 {/* Image Container */}

@@ -57,7 +57,7 @@ export default function MarketplaceShowcase() {
               size="lg"
               className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black shadow-xl"
             >
-              <Link href="/marketplace">Ir al marketplace</Link>
+              <Link href="/explorar">Ir al marketplace</Link>
             </Button>
           </div>
 

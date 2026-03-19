@@ -10,12 +10,7 @@ import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 import { ArrowRight, Check, Search, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
-    const scrollToMarketplace = () => {
-        const element = document.getElementById('marketplace');
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
+
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
@@ -67,12 +62,12 @@ export default function LandingPage() {
                                     </Link>
                                 </Button>
                                 <Button
+                                    asChild
                                     size="lg"
                                     variant="outline"
-                                    onClick={scrollToMarketplace}
                                     className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm text-black dark:text-white font-bold text-lg h-14 px-8 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 active:translate-y-0 active:shadow-none rounded-xl cursor-pointer"
                                 >
-                                    Explorar Mercado
+                                    <Link href="/explorar">Explorar Mercado</Link>
                                 </Button>
                             </div>
 
