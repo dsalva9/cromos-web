@@ -39,7 +39,9 @@ export const logger = {
    * Use for recoverable issues and deprecation warnings
    */
   warn: (...args: unknown[]) => {
-    console.warn('[WARN]', ...args);
+    if (isDev) {
+      console.warn('[WARN]', ...args);
+    }
 
     // Send warnings to Sentry in production
     if (isSentryEnabled) {
@@ -68,8 +70,10 @@ export const logger = {
       return false;
     });
 
-    // Always log to console for dev visibility
-    console.error('[ERROR]', ...args);
+    // Only log to console in development — production errors go to Sentry
+    if (isDev) {
+      console.error('[ERROR]', ...args);
+    }
 
     // Skip Sentry for transient network errors
     if (isNetworkError) return;

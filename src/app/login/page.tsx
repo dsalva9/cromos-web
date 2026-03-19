@@ -134,10 +134,11 @@ export default function LoginPage() {
 
       if (error) {
         setError(error.message);
+        setLoading(false);
       }
+      // On success: don't reset loading — browser will redirect away
     } catch {
       setError('An unexpected error occurred during Google Sign In');
-    } finally {
       setLoading(false);
     }
   };

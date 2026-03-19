@@ -176,7 +176,20 @@ function CompleteProfileContent() {
       router.push('/');
     } catch (error) {
       logger.error('Error completing profile', error);
-      setErrorMessage('profile_save_error');
+
+      // Extract user-friendly error from Supabase DB errors
+      if (error && typeof error === 'object' && 'code' in error) {
+        const dbError = error as { code: string; message?: string };
+        if (dbError.code === 'P0001' && dbError.message?.toLowerCase().includes('postcode')) {
+          setErrorMessage('El código postal introducido no es válido. Por favor, comprueba que es un código postal español real.');
+        } else if (dbError.code === '23505') {
+          setErrorMessage('Ese usuario ya está en uso. Prueba con otro.');
+        } else {
+          setErrorMessage('profile_save_error');
+        }
+      } else {
+        setErrorMessage('profile_save_error');
+      }
     } finally {
       setSaving(false);
     }
