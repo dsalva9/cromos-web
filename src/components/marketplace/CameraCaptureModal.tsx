@@ -152,7 +152,7 @@ export function CameraCaptureModal({
       onCapture(result.blob, fileName);
       onClose();
     } catch (error) {
-      logger.error('Processing error:', error);
+      logger.info('Processing error:', error);
       toast.error('Error al procesar la foto');
     } finally {
       setProcessing(false);
