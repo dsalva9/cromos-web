@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -417,7 +417,7 @@ export default function UserProfilePage() {
           errorMessage.includes('codigo postal') ||
           errorMessage.includes('postcode')
         ) {
-          toast.error(errorMessage);
+          toast.error('El código postal introducido no es válido. Por favor, comprueba que es un código postal español real.');
           return;
         }
       }
