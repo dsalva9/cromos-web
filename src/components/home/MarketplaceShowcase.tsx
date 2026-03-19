@@ -80,7 +80,7 @@ export default function MarketplaceShowcase() {
               </>
             ) : hasListings ? (
               displayListings.slice(0, 6).map(listing => (
-                <LeanListingCard key={listing.id} listing={listing} />
+                <LeanListingCard key={listing.id} listing={listing} href={`/explorar/${listing.id}`} />
               ))
             ) : null}
           </div>

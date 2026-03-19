@@ -141,7 +141,7 @@ export function useListings({
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey),
+    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit),
     queryFn: async ({ pageParam = 0 }) => {
       const currentIds = collectionIdsRef.current;
       const hasCollectionFilter = currentIds && currentIds.length > 0;
