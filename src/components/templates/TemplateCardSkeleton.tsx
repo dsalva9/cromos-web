@@ -5,10 +5,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function TemplateCardSkeleton() {
   return (
-    <ModernCard className="h-full">
+    <ModernCard className="h-full border border-gray-200/60 dark:border-slate-700/50 shadow-sm">
       <ModernCardContent className="p-0">
         {/* Image Skeleton */}
-        <div className="relative aspect-video bg-slate-700 animate-pulse" />
+        <div className="relative aspect-video bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-800 animate-pulse" />
 
         {/* Content */}
         <div className="p-4 space-y-3">

@@ -73,7 +73,7 @@ export function TemplateCard({
   };
 
   return (
-    <ModernCard className="hover:scale-[1.02] hover:shadow-xl dark:hover:shadow-slate-900/50 transition-all duration-300 h-full border border-gray-200 dark:border-slate-700/50 shadow-md dark:shadow-lg dark:shadow-slate-900/30">
+    <ModernCard className="hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 h-full border border-gray-200/60 dark:border-slate-700/50 shadow-sm dark:shadow-md">
       <ModernCardContent className="p-0 flex flex-col h-full">
         {/* Image */}
         <Link
@@ -81,7 +81,7 @@ export function TemplateCard({
           aria-label={`Ver colección: ${template.title}`}
           className="block"
         >
-          <div className="relative aspect-video bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-600 dark:to-slate-800 cursor-pointer">
+          <div className="relative aspect-video bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-800 cursor-pointer">
             {template.image_url ? (
               <Image
                 src={template.image_url}
@@ -92,7 +92,7 @@ export function TemplateCard({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Layout className="w-16 h-16 text-slate-400/50" />
+                <Layout className="w-16 h-16 text-amber-200/60 dark:text-slate-500/50" />
               </div>
             )}
 
@@ -100,7 +100,7 @@ export function TemplateCard({
             <div className="absolute top-2 right-2 flex flex-col gap-2">
               {/* Deletion Badge (always show if deleted) */}
               {template.deleted_at && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/90 text-white">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/80 backdrop-blur-sm text-white shadow-sm">
                   <FileText className="h-3 w-3" />
                   Eliminada
                 </div>
@@ -109,9 +109,9 @@ export function TemplateCard({
               {/* Visibility Badge */}
               {showVisibility && template.is_public !== undefined && (
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${template.is_public
-                    ? 'bg-green-500/90 text-white'
-                    : 'bg-slate-700/90 text-slate-300'
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-sm shadow-sm ${template.is_public
+                    ? 'bg-green-500/80 text-white'
+                    : 'bg-slate-700/80 text-slate-300'
                     }`}
                 >
                   {template.is_public ? (

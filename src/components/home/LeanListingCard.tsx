@@ -56,10 +56,10 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
 
     return (
         <Link href={href} className="group block h-full">
-            <div className="h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+            <div className="h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
 
                 {/* Image Container */}
-                <div className="relative aspect-square bg-gray-50 dark:bg-gray-900 overflow-hidden flex items-center justify-center">
+                <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center">
                     {listing.image_url ? (
                         <Image
                             src={listing.image_url}
@@ -69,8 +69,10 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-300 dark:text-gray-400 font-bold text-6xl">
-                            {listing.title.charAt(0).toUpperCase()}
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100/80 dark:from-gray-800 dark:to-gray-900">
+                            <span className="text-5xl font-black text-amber-300/60 dark:text-gray-600 select-none">
+                                {listing.title.charAt(0).toUpperCase()}
+                            </span>
                         </div>
                     )}
 
@@ -79,7 +81,7 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
                         {getStatusLabel(listing.status) && (
                             <span
                                 className={cn(
-                                    "px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border",
+                                    "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm",
                                     getStatusColor(listing.status, listing.is_group ?? false)
                                 )}
                             >

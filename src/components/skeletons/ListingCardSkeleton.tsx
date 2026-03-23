@@ -3,10 +3,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function ListingCardSkeleton() {
   return (
-    <ModernCard>
+    <ModernCard className="border border-gray-200/60 dark:border-gray-700/50 shadow-sm">
       <ModernCardContent className="p-0">
         {/* Image Skeleton */}
-        <Skeleton className="aspect-square w-full" />
+        <Skeleton className="aspect-square w-full rounded-none" />
 
         {/* Content */}
         <div className="p-4 space-y-3">
@@ -27,6 +27,9 @@ export function ListingCardSkeleton() {
 
           {/* Date */}
           <Skeleton className="h-3 w-20" />
+
+          {/* CTA Button */}
+          <Skeleton className="h-10 w-full rounded-xl" />
         </div>
       </ModernCardContent>
     </ModernCard>

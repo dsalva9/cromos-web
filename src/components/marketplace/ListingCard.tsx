@@ -64,11 +64,11 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06),0_6px_16px_rgba(0,0,0,0.06)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.08),0_12px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3),0_6px_16px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_2px_6px_rgba(0,0,0,0.4),0_12px_24px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1">
+    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
-      <div className="relative aspect-square bg-[#faf8f5] dark:bg-gray-900 overflow-hidden flex items-center justify-center">
+      <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center">
         {listing.image_url ? (
           <Image
             src={listing.image_url}
@@ -78,8 +78,10 @@ export function ListingCard({ listing }: ListingCardProps) {
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-300 dark:text-gray-400 font-bold text-6xl">
-            {listing.title.charAt(0).toUpperCase()}
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100/80 dark:from-gray-800 dark:to-gray-900">
+            <span className="text-5xl font-black text-amber-300/60 dark:text-gray-600 select-none">
+              {listing.title.charAt(0).toUpperCase()}
+            </span>
           </div>
         )}
 
@@ -93,7 +95,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           {getStatusLabel(listing.status) && (
             <span
               className={cn(
-                "px-2 py-1 rounded text-[10px] font-black uppercase tracking-wider border",
+                "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider backdrop-blur-sm shadow-sm",
                 getStatusColor(listing.status, listing.is_group ?? false)
               )}
             >
@@ -166,7 +168,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         {/* Action Button */}
         <div className="mt-2 z-20 relative">
           <Link href={`/marketplace/${listing.id}`} className="block w-full">
-            <button className="w-full bg-[#FFC000] hover:bg-[#FFD700] text-black font-black text-xs uppercase py-2.5 rounded-lg transition-colors shadow-sm">
+            <button className="w-full bg-[#FFC000] hover:bg-[#FFD700] text-black font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
               Ver Detalles
             </button>
           </Link>
