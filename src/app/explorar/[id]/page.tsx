@@ -87,32 +87,47 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const listing = await getListingById(id);
+  // Normalize URL: strip www for consistent canonical URLs
+  const baseUrl = siteConfig.url.replace('://www.', '://');
 
   if (!listing) {
     return {
       title: 'Anuncio no encontrado | Cambio Cromos',
       description: 'Este anuncio puede haber sido eliminado o ya no está disponible.',
       alternates: {
-        canonical: `${siteConfig.url}/explorar/${id}`,
+        canonical: `${baseUrl}/explorar/${id}`,
       },
     };
   }
 
-  const title = `${listing.title} | Cambio Cromos`;
-  const description = listing.description
-    ? listing.description.slice(0, 160)
-    : `${listing.title}${listing.collection_name ? ` de la colección ${listing.collection_name}` : ''} — disponible en Cambio Cromos.`;
+  // Build a rich title: "Cromo Name - Collection Name | Cambio Cromos"
+  const titleParts = [listing.title];
+  if (listing.collection_name) titleParts.push(listing.collection_name);
+  const title = `${titleParts.join(' - ')} | Cambio Cromos`;
+
+  // Build a structured description for SEO
+  const descParts: string[] = [];
+  if (listing.collection_name) descParts.push(`Cromo de la colección ${listing.collection_name}`);
+  if (listing.sticker_number) descParts.push(`número #${listing.sticker_number}${listing.slot_variant || ''}`);
+  const listingTypeLabel = listing.listing_type === 'venta' ? 'en venta' :
+    listing.listing_type === 'ambos' ? 'disponible para intercambio y venta' : 'disponible para intercambio';
+  descParts.push(listingTypeLabel);
+  if (listing.price != null && (listing.listing_type === 'venta' || listing.listing_type === 'ambos')) {
+    descParts.push(`por ${Number(listing.price).toFixed(2)} €`);
+  }
+  descParts.push('en Cambio Cromos, la comunidad de coleccionistas de cromos.');
+  const description = descParts.join(' — ');
 
   return {
     title,
     description,
     alternates: {
-      canonical: `${siteConfig.url}/explorar/${id}`,
+      canonical: `${baseUrl}/explorar/${id}`,
     },
     openGraph: {
       title,
       description,
-      url: `${siteConfig.url}/explorar/${id}`,
+      url: `${baseUrl}/explorar/${id}`,
       siteName: siteConfig.name,
       type: 'website',
       ...(listing.image_url ? { images: [{ url: listing.image_url }] } : {}),
