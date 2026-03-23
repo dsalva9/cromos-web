@@ -116,7 +116,7 @@ export default function LandingPage() {
             </section>
 
             {/* Features Section - Condensed on Mobile */}
-            <section className="py-4 lg:py-6 relative">
+            <section className="py-4 lg:py-6 relative bg-gradient-to-b from-transparent via-transparent to-yellow-50/40 dark:to-yellow-900/5">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 max-w-6xl mx-auto">
 
@@ -164,12 +164,14 @@ export default function LandingPage() {
             </section>
 
             {/* Marketplace Preview */}
-            <div id="marketplace">
+            <div id="marketplace" className="relative">
+                {/* Subtle warm background tint for marketplace section */}
+                <div className="absolute inset-0 bg-gradient-to-b from-yellow-50/30 via-orange-50/20 to-transparent dark:from-yellow-900/5 dark:via-orange-900/5 dark:to-transparent pointer-events-none" />
                 <MarketplaceShowcase />
             </div>
 
             {/* SEO Context Paragraph */}
-            <section className="py-12 lg:py-16">
+            <section className="py-12 lg:py-16 bg-gradient-to-b from-transparent via-gray-50/50 to-transparent dark:via-gray-800/30">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center space-y-4">
                         <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-gray-900 dark:text-white">

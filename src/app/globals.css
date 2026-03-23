@@ -197,6 +197,25 @@ textarea,
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Noise texture overlay — adds subtle grain for visual depth.
+   Uses a tiny SVG feTurbulence filter for seamless tiling.
+   ═══════════════════════════════════════════════════════════════ */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/textures/noise.svg');
+  background-repeat: repeat;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.dark body::after {
+  opacity: 0.05;
+}
+
 /* Hide scrollbar but keep scroll functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
