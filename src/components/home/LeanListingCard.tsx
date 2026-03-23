@@ -4,6 +4,7 @@ import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { Listing } from '@/types/v1.6.0';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 
 interface LeanListingCardProps {
@@ -56,7 +57,11 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
 
     return (
         <Link href={href} className="group block h-full">
-            <div className="h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/50 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+            <motion.div
+                whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                className="h-full flex flex-col bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/50 rounded-xl overflow-hidden shadow-sm transition-colors duration-300"
+            >
 
                 {/* Image Container */}
                 <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center">
@@ -110,7 +115,7 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
                         </span>
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </Link>
     );
 }

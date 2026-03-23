@@ -10,6 +10,7 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface ListingCardProps {
   listing: Listing;
@@ -64,7 +65,11 @@ export function ListingCard({ listing }: ListingCardProps) {
   };
 
   return (
-    <div className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm hover:shadow-lg dark:shadow-md dark:hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+    <motion.div
+      whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm dark:shadow-md transition-colors duration-300"
+    >
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
@@ -174,7 +179,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           </Link>
         </div>
       </div>
-    </div>
+    </motion.div>
 
   );
 }

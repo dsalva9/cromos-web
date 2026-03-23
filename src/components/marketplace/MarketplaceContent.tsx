@@ -14,6 +14,7 @@ import { useUser } from '@/components/providers/SupabaseProvider';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 interface MarketplaceContentProps {
     initialListings: Listing[];
@@ -295,11 +296,11 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                         ))}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                    <AnimatedList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                         {listings.map((listing: Listing) => (
                             <ListingCard key={listing.id} listing={listing} />
                         ))}
-                    </div>
+                    </AnimatedList>
                 )}
 
                 {/* Load More */}

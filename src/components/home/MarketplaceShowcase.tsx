@@ -8,6 +8,7 @@ import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton'
 import { useListings } from '@/hooks/marketplace/useListings';
 import { AlertCircle } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { AnimatedList } from '@/components/ui/AnimatedList';
 
 export default function MarketplaceShowcase() {
   const { listings, loading, error } = useListings({ limit: 6 });
@@ -68,22 +69,22 @@ export default function MarketplaceShowcase() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {showSkeletons ? (
-              <>
-                <ListingCardSkeleton />
-                <ListingCardSkeleton />
-                <ListingCardSkeleton />
-                <ListingCardSkeleton />
-                <ListingCardSkeleton />
-                <ListingCardSkeleton />
-              </>
-            ) : hasListings ? (
-              displayListings.slice(0, 6).map(listing => (
+          {showSkeletons ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <ListingCardSkeleton />
+              <ListingCardSkeleton />
+              <ListingCardSkeleton />
+              <ListingCardSkeleton />
+              <ListingCardSkeleton />
+              <ListingCardSkeleton />
+            </div>
+          ) : hasListings ? (
+            <AnimatedList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayListings.slice(0, 6).map(listing => (
                 <LeanListingCard key={listing.id} listing={listing} href={`/explorar/${listing.id}`} />
-              ))
-            ) : null}
-          </div>
+              ))}
+            </AnimatedList>
+          ) : null}
 
           {!showSkeletons && !hasListings && !error && (
             <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-100 dark:bg-gray-800 px-6 py-12 text-center">
