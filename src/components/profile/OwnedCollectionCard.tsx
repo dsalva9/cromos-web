@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Star, CheckCircle, Copy, X, Trash2 } from 'lucide-react';
 import type { UserCollection } from '@/types/collections';
@@ -47,17 +47,14 @@ export function OwnedCollectionCard({
           </div>
           <div className="flex flex-col items-end gap-2">
             {collection.is_user_active ? (
-              <Badge className="bg-green-500 text-white shadow-lg ring-1 ring-green-500/20">
-                <Star className="w-3 h-3 mr-1" />
+              <StatusBadge variant="success" size="sm">
+                <Star className="w-3 h-3" />
                 Activa
-              </Badge>
+              </StatusBadge>
             ) : (
-              <Badge
-                variant="outline"
-                className="text-gray-600 border-gray-300 bg-white/50"
-              >
+              <StatusBadge variant="neutral" size="sm">
                 Inactiva
-              </Badge>
+              </StatusBadge>
             )}
             {collection.stats && (
               <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">

@@ -48,11 +48,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
   const getStatusStyles = () => {
     switch (slot.status) {
       case 'owned':
-        return 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-700 hover:border-green-400 dark:hover:border-green-500 shadow-sm';
+        return 'slot-owned shadow-sm';
       case 'duplicate':
-        return 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-700 hover:border-yellow-400 dark:hover:border-yellow-500 shadow-sm';
+        return 'slot-duplicate shadow-sm';
       default: // missing
-        return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md';
+        return 'slot-missing';
     }
   };
 
@@ -159,6 +159,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
     <div
       className={cn(
         'relative rounded-xl border transition-all duration-200 group flex flex-col h-full overflow-hidden',
+        'hover:-translate-y-0.5 hover:shadow-md',
         getStatusStyles()
       )}
     >
@@ -166,7 +167,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
       <div
         className="absolute top-0 left-0 right-0 h-1 transition-colors duration-300"
         style={{
-          background: slot.status === 'owned' ? '#22c55e' : slot.status === 'duplicate' ? '#EAB308' : 'transparent'
+          background: slot.status === 'owned'
+            ? 'var(--slot-owned-bar)'
+            : slot.status === 'duplicate'
+              ? 'var(--slot-dup-bar)'
+              : 'transparent'
         }}
       />
 
@@ -216,9 +221,9 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
             disabled={updating}
             className={cn(
               "w-full py-1.5 px-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center shadow-sm",
-              slot.status === 'missing' && "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-black dark:hover:text-white",
-              slot.status === 'owned' && "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900",
-              slot.status === 'duplicate' && "bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900"
+              slot.status === 'missing' && 'slot-btn-missing',
+              slot.status === 'owned' && 'slot-btn-owned',
+              slot.status === 'duplicate' && 'slot-btn-duplicate'
             )}
           >
             {getStatusIcon()}
@@ -229,21 +234,28 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           {(slot.status === 'owned' || slot.status === 'duplicate') && (
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
               {/* Counter */}
-              <div className="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 shadow-sm">
+              <div className="flex items-center justify-between rounded-lg p-1 shadow-sm"
+                style={{
+                  background: 'var(--surface-0)',
+                  border: '1px solid var(--border)',
+                }}
+              >
                 <button
                   onClick={() => handleCountChange(-1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded transition-colors"
+                  style={{ color: 'var(--muted)' }}
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="text-sm font-bold text-gray-900 dark:text-white font-mono">
+                <span className="text-sm font-bold font-mono" style={{ color: 'var(--foreground)' }}>
                   {slot.status === 'owned' ? '1' : localCount}
                 </span>
                 <button
                   onClick={() => handleCountChange(1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+                  className="w-6 h-6 flex items-center justify-center rounded transition-colors"
+                  style={{ color: 'var(--muted)' }}
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -261,7 +273,21 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 <div className="w-full h-6 bg-gray-100 dark:bg-gray-700 animate-pulse rounded-lg" />
               ) : slot.status === 'duplicate' && localCount >= 2 ? (
                 <Link href={`/mis-plantillas/${copyId}/publicar/${slot.slot_id}`} className="block">
-                  <button className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white rounded-lg py-1 px-2 text-[10px] font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                  <button className="w-full rounded-lg py-1 px-2 text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                    style={{
+                      backgroundColor: 'var(--brand)',
+                      color: 'var(--brand-foreground)',
+                      border: '1px solid color-mix(in srgb, var(--brand) 80%, black)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.filter = 'brightness(1.08)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.filter = 'brightness(1)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
                     <Upload className="w-3 h-3" />
                     <span>CREAR ANUNCIO</span>
                   </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { SlotTile } from '@/components/templates/SlotTile';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,16 @@ export function TemplateProgressGrid({
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [isCompletingPage, setIsCompletingPage] = useState(false);
   const { slotListings, loading: listingsLoading } = useSlotListings(copyId);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll active tab into view
+  useEffect(() => {
+    const container = tabsContainerRef.current;
+    if (!container) return;
+    const activeBtn = container.querySelector<HTMLElement>('[data-state="active"]');
+    if (!activeBtn) return;
+    activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [selectedPage]);
 
   // Group slots by page and extract page titles
   const { pageGroups, pageTitles } = useMemo(() => {
@@ -116,37 +126,52 @@ export function TemplateProgressGrid({
   return (
     <div className="space-y-8">
       {/* Page Tabs */}
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-2 shadow-sm">
+      <div
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-2 shadow-sm relative"
+        >
         <Tabs
           value={selectedPage.toString()}
           onValueChange={v => setSelectedPage(Number(v))}
           className="w-full"
         >
-          <TabsList className="w-full flex-wrap h-auto bg-transparent gap-2 justify-start p-0">
-            {pageNumbers.map(pageNum => (
-              <TabsTrigger
-                key={pageNum}
-                value={pageNum.toString()}
-                className="
-                  data-[state=active]:bg-[#FFC000]
-                  data-[state=active]:text-black
-                  data-[state=active]:font-bold
-                  text-gray-500 dark:text-gray-400
-                  hover:text-black dark:hover:text-white
-                  hover:bg-gray-100 dark:hover:bg-gray-700
-                  border border-transparent
-                  data-[state=active]:border-[#FFC000]
-                  rounded-lg px-3 py-2 text-xs sm:text-sm sm:px-4
-                  transition-all duration-200
-                  min-w-0 max-w-[130px] sm:max-w-[180px] md:max-w-none
-                  overflow-hidden text-ellipsis whitespace-nowrap
-                "
-                title={pageTitles[pageNum]}
-              >
-                {pageTitles[pageNum]}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          {/* Scrollable tabs container with edge-fade masks */}
+          <div
+            ref={tabsContainerRef}
+            className="overflow-x-auto scrollbar-hide"
+            style={{
+              maskImage:
+                'linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%)',
+            }}
+          >
+            <TabsList className="w-max flex h-auto bg-transparent gap-2 justify-start p-0 px-1">
+              {pageNumbers.map(pageNum => (
+                <TabsTrigger
+                  key={pageNum}
+                  value={pageNum.toString()}
+                  className="
+                    flex-shrink-0
+                    data-[state=active]:bg-[#FFC000]
+                    data-[state=active]:text-black
+                    data-[state=active]:font-bold
+                    text-gray-500 dark:text-gray-400
+                    hover:text-black dark:hover:text-white
+                    hover:bg-gray-100 dark:hover:bg-gray-700
+                    border border-transparent
+                    data-[state=active]:border-[#FFC000]
+                    rounded-lg px-3 py-2 text-xs sm:text-sm sm:px-4
+                    transition-all duration-200
+                    max-w-[160px] sm:max-w-[200px]
+                    overflow-hidden text-ellipsis whitespace-nowrap
+                  "
+                  title={pageTitles[pageNum]}
+                >
+                  {pageTitles[pageNum]}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
         </Tabs>
       </div>
 

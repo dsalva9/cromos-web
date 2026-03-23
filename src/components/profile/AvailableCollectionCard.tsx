@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Plus } from 'lucide-react';
 import type { Collection } from '@/types/collections';
@@ -38,10 +38,10 @@ export function AvailableCollectionCard({
               {collection.competition} {collection.year}
             </p>
           </div>
-          <Badge className="bg-yellow-100 text-yellow-800 shadow-lg ring-1 ring-yellow-200">
-            <Plus className="w-3 h-3 mr-1" />
+          <StatusBadge variant="warning" size="sm">
+            <Plus className="w-3 h-3" />
             Nueva
-          </Badge>
+          </StatusBadge>
         </div>
 
         {collection.description && (

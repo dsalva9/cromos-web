@@ -22,7 +22,7 @@
 
 ## Tasks
 
-### 1. [ ] Fix Image Handling in Marketplace Cards
+### 1. [x] Fix Image Handling in Marketplace Cards
 
 **Priority:** Critical — Trust  
 **Impact:** The single most impactful visual fix. Rotated, oddly-cropped, and inconsistent-aspect-ratio user photos make the marketplace grid look broken.
@@ -125,7 +125,7 @@
 
 ---
 
-### 4. [ ] Add Motion & Animations
+### 4. [x] Add Motion & Animations
 
 **Priority:** High — Premium Feel  
 **Impact:** The site feels completely static. Adding staggered reveals and micro-interactions elevates perceived quality dramatically.
@@ -177,7 +177,7 @@
 
 ---
 
-### 5. [ ] Add Background Textures & Depth
+### 5. [x] Add Background Textures & Depth
 
 **Priority:** Medium — Visual Depth  
 **Impact:** Removes the flat "template" feel. Adds atmosphere to the collectibles theme.

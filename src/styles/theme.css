@@ -36,6 +36,47 @@
   --error: #ef4444;
   --info: #3b82f6;
 
+  /* Badge / Status tokens */
+  --badge-success-bg: #dcfce7;
+  --badge-success-text: #15803d;
+  --badge-success-border: #bbf7d0;
+  --badge-warning-bg: #fef9c3;
+  --badge-warning-text: #a16207;
+  --badge-warning-border: #fde68a;
+  --badge-error-bg: #fee2e2;
+  --badge-error-text: #b91c1c;
+  --badge-error-border: #fecaca;
+  --badge-info-bg: #dbeafe;
+  --badge-info-text: #1d4ed8;
+  --badge-info-border: #bfdbfe;
+  --badge-neutral-bg: #f3f4f6;
+  --badge-neutral-text: #6b7280;
+  --badge-neutral-border: #e5e7eb;
+
+  /* Slot status tokens */
+  --slot-owned-bg: #f0fdf4;
+  --slot-owned-border: #bbf7d0;
+  --slot-owned-border-hover: #4ade80;
+  --slot-owned-bar: #22c55e;
+  --slot-owned-btn-bg: #dcfce7;
+  --slot-owned-btn-text: #15803d;
+  --slot-owned-btn-hover: #bbf7d0;
+
+  --slot-dup-bg: #fefce8;
+  --slot-dup-border: #fde68a;
+  --slot-dup-border-hover: #facc15;
+  --slot-dup-bar: #eab308;
+  --slot-dup-btn-bg: #fef9c3;
+  --slot-dup-btn-text: #a16207;
+  --slot-dup-btn-hover: #fde68a;
+
+  --slot-missing-bg: #ffffff;
+  --slot-missing-border: #e5e7eb;
+  --slot-missing-border-hover: #9ca3af;
+  --slot-missing-btn-bg: #f3f4f6;
+  --slot-missing-btn-text: #6b7280;
+  --slot-missing-btn-hover: #e5e7eb;
+
   /* Border & Interaction */
   --border: #e5e7eb;
   --border-hover: #d1d5db;
@@ -83,6 +124,47 @@
   --warning: #fbbf24;
   --error: #f87171;
   --info: #60a5fa;
+
+  /* Badge / Status tokens (dark) */
+  --badge-success-bg: #052e16;
+  --badge-success-text: #86efac;
+  --badge-success-border: #14532d;
+  --badge-warning-bg: #422006;
+  --badge-warning-text: #fde68a;
+  --badge-warning-border: #713f12;
+  --badge-error-bg: #450a0a;
+  --badge-error-text: #fca5a5;
+  --badge-error-border: #7f1d1d;
+  --badge-info-bg: #172554;
+  --badge-info-text: #93c5fd;
+  --badge-info-border: #1e3a8a;
+  --badge-neutral-bg: #1f2937;
+  --badge-neutral-text: #9ca3af;
+  --badge-neutral-border: #374151;
+
+  /* Slot status tokens (dark) */
+  --slot-owned-bg: #052e16;
+  --slot-owned-border: #14532d;
+  --slot-owned-border-hover: #166534;
+  --slot-owned-bar: #22c55e;
+  --slot-owned-btn-bg: #052e16;
+  --slot-owned-btn-text: #86efac;
+  --slot-owned-btn-hover: #14532d;
+
+  --slot-dup-bg: #422006;
+  --slot-dup-border: #713f12;
+  --slot-dup-border-hover: #854d0e;
+  --slot-dup-bar: #eab308;
+  --slot-dup-btn-bg: #422006;
+  --slot-dup-btn-text: #fde68a;
+  --slot-dup-btn-hover: #713f12;
+
+  --slot-missing-bg: #1f2937;
+  --slot-missing-border: #374151;
+  --slot-missing-border-hover: #4b5563;
+  --slot-missing-btn-bg: #374151;
+  --slot-missing-btn-text: #9ca3af;
+  --slot-missing-btn-hover: #4b5563;
 
   /* Border & Interaction */
   --border: #374151;
@@ -159,4 +241,126 @@
     background-color: var(--surface-50);
     border-color: var(--border-hover);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Badge utility classes — consume badge tokens.
+   ═══════════════════════════════════════════════════════════════ */
+.badge-success {
+  background-color: var(--badge-success-bg);
+  color: var(--badge-success-text);
+  border: 1px solid var(--badge-success-border);
+}
+
+.badge-warning {
+  background-color: var(--badge-warning-bg);
+  color: var(--badge-warning-text);
+  border: 1px solid var(--badge-warning-border);
+}
+
+.badge-error {
+  background-color: var(--badge-error-bg);
+  color: var(--badge-error-text);
+  border: 1px solid var(--badge-error-border);
+}
+
+.badge-info {
+  background-color: var(--badge-info-bg);
+  color: var(--badge-info-text);
+  border: 1px solid var(--badge-info-border);
+}
+
+.badge-neutral {
+  background-color: var(--badge-neutral-bg);
+  color: var(--badge-neutral-text);
+  border: 1px solid var(--badge-neutral-border);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Slot tile status classes — consume slot tokens.
+   ═══════════════════════════════════════════════════════════════ */
+.slot-owned {
+  background-color: var(--slot-owned-bg);
+  border-color: var(--slot-owned-border);
+}
+
+@media (hover: hover) {
+  .slot-owned:hover {
+    border-color: var(--slot-owned-border-hover);
+  }
+}
+
+.slot-duplicate {
+  background-color: var(--slot-dup-bg);
+  border-color: var(--slot-dup-border);
+}
+
+@media (hover: hover) {
+  .slot-duplicate:hover {
+    border-color: var(--slot-dup-border-hover);
+  }
+}
+
+.slot-missing {
+  background-color: var(--slot-missing-bg);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 6px,
+    color-mix(in srgb, var(--slot-missing-border) 35%, transparent) 6px,
+    color-mix(in srgb, var(--slot-missing-border) 35%, transparent) 7px
+  );
+  border-color: var(--slot-missing-border);
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+@media (hover: hover) {
+  .slot-missing:hover {
+    border-color: var(--slot-missing-border-hover);
+    box-shadow: var(--shadow);
+    opacity: 1;
+  }
+}
+
+.slot-btn-owned {
+  background-color: var(--slot-owned-btn-bg);
+  color: var(--slot-owned-btn-text);
+}
+
+@media (hover: hover) {
+  .slot-btn-owned:hover {
+    background-color: var(--slot-owned-btn-hover);
+  }
+}
+
+.slot-btn-duplicate {
+  background-color: var(--slot-dup-btn-bg);
+  color: var(--slot-dup-btn-text);
+}
+
+@media (hover: hover) {
+  .slot-btn-duplicate:hover {
+    background-color: var(--slot-dup-btn-hover);
+  }
+}
+
+.slot-btn-missing {
+  background-color: var(--slot-missing-btn-bg);
+  color: var(--slot-missing-btn-text);
+}
+
+@media (hover: hover) {
+  .slot-btn-missing:hover {
+    background-color: var(--slot-missing-btn-hover);
+  }
+}
+
+/* Hide scrollbar but keep scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
