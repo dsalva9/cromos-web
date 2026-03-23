@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     // for a session before redirecting to the reset-password page.
     // Without this, middleware sees an unauthenticated user hitting /profile/*
     // and redirects to /login.
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.cambiocromos.com';
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cambiocromos.com';
     const { data: linkData, error } = await adminClient.auth.admin.generateLink({
       type: 'recovery',
       email: userData.user.email,
