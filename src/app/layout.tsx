@@ -61,6 +61,7 @@ import PWASplashScreen from '@/components/pwa/PWASplashScreen';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
+import { NotificationPromptBanner } from '@/components/notifications/NotificationPromptBanner';
 
 /**
  * Compose all top-level providers into a single wrapper to reduce nesting depth.
@@ -140,6 +141,7 @@ export default function RootLayout({
             <FloatingActionBtn />
             <SiteFooter />
             <CookieConsentBanner />
+            <NotificationPromptBanner />
             <Toaster
               position="top-right"
               richColors

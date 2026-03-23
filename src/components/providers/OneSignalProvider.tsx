@@ -201,7 +201,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
             autoRegister: ONESIGNAL_CONFIG.autoRegister,
             serviceWorkerPath: ONESIGNAL_CONFIG.serviceWorkerPath,
             serviceWorkerUpdaterPath: ONESIGNAL_CONFIG.serviceWorkerUpdaterPath,
-            promptOptions: ONESIGNAL_CONFIG.promptOptions,
+            // No promptOptions — custom NotificationPromptBanner handles prompting
           });
 
           logger.info('[OneSignal] Web SDK initialized');
@@ -264,4 +264,22 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   return <>{children}</>;
+}
+
+/**
+ * Request push notification permission via OneSignal's web SDK.
+ * Called from the custom NotificationPromptBanner when the user clicks "Activar".
+ */
+export function requestPushPermission() {
+  if (typeof window === 'undefined') return;
+
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async (OneSignal: OneSignalWebSDK) => {
+    try {
+      await OneSignal.Slidedown.promptPush();
+      logger.info('[OneSignal] Push permission requested via custom banner');
+    } catch (error) {
+      logger.error('[OneSignal] Error requesting push permission:', error);
+    }
+  });
 }

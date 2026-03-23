@@ -36,6 +36,9 @@ interface OneSignalWebSDK {
     Notifications: {
         addEventListener: (event: string, callback: (event: { data?: unknown }) => void) => void;
     };
+    Slidedown: {
+        promptPush: () => Promise<void>;
+    };
 }
 
 interface OneSignalPlugins {

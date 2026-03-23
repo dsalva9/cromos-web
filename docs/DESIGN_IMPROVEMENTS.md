@@ -55,7 +55,7 @@
 
 ---
 
-### 2. [ ] Tame the OneSignal Notification Popup
+### 2. [x] Tame the OneSignal Notification Popup
 
 **Priority:** Critical — UX  
 **Impact:** The popup covers ~40% of mobile viewport on first visit, feels aggressive and unstyled.

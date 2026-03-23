@@ -17,15 +17,8 @@ export const ONESIGNAL_CONFIG = {
   serviceWorkerPath: '/OneSignalSDKWorker.js',
   serviceWorkerUpdaterPath: '/OneSignalSDKUpdaterWorker.js',
   
-  // Prompt settings
-  promptOptions: {
-    slidedown: {
-      enabled: true,
-      actionMessage: '¿Quieres recibir notificaciones de nuevos mensajes y actividad?',
-      acceptButtonText: 'Permitir',
-      cancelButtonText: 'Ahora no',
-    },
-  },
+  // Prompt settings — native slidedown is disabled.
+  // We use a custom in-app NotificationPromptBanner instead.
 } as const;
 
 /**
