@@ -27,7 +27,6 @@ const organizationJsonLd = {
   name: siteConfig.name,
   url: siteConfig.url,
   logo: `${siteConfig.url}/assets/LogoBlanco.png`,
-  sameAs: [],
 };
 
 // Lazy-load UserDashboard — heavy client component only shown to authenticated users

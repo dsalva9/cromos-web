@@ -7,6 +7,14 @@ export const metadata: Metadata = {
     alternates: {
         canonical: `${siteConfig.url}/legal/terms`,
     },
+    openGraph: {
+        title: 'Términos de Servicio | Cambiocromos',
+        description: 'Condiciones de uso, normas de la comunidad y políticas de contenido para usuarios de Cambiocromos.com',
+        url: `${siteConfig.url}/legal/terms`,
+        siteName: siteConfig.name,
+        locale: 'es_ES',
+        type: 'website',
+    },
 };
 
 export default function TermsPage() {

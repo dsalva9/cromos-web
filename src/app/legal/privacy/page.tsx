@@ -7,6 +7,14 @@ export const metadata: Metadata = {
     alternates: {
         canonical: `${siteConfig.url}/legal/privacy`,
     },
+    openGraph: {
+        title: 'Política de Privacidad | Cambiocromos',
+        description: 'Cómo recopilamos, usamos y protegemos tus datos personales en cumplimiento con el RGPD.',
+        url: `${siteConfig.url}/legal/privacy`,
+        siteName: siteConfig.name,
+        locale: 'es_ES',
+        type: 'website',
+    },
 };
 
 export default function PrivacyPage() {

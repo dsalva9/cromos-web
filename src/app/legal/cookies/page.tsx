@@ -7,6 +7,14 @@ export const metadata: Metadata = {
     alternates: {
         canonical: `${siteConfig.url}/legal/cookies`,
     },
+    openGraph: {
+        title: 'Política de Cookies | Cambiocromos',
+        description: 'Información sobre el uso de cookies y tecnologías similares en Cambiocromos.com',
+        url: `${siteConfig.url}/legal/cookies`,
+        siteName: siteConfig.name,
+        locale: 'es_ES',
+        type: 'website',
+    },
 };
 
 export default function CookiesPage() {
