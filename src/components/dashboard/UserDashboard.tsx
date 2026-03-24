@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from '@/components/ui/link';
@@ -10,7 +10,7 @@ import { ProfileBadgesSimple } from '@/components/badges/ProfileBadgesSimple';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb, ShoppingBag } from 'lucide-react';
+import { Star, User, Trophy, LayoutGrid, Check, X, ArrowRight, Package, Heart, Store, PlusCircle, MessageCircle, Lightbulb, ShoppingBag, Sparkles } from 'lucide-react';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -191,65 +191,61 @@ export default function UserDashboard() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-8 space-y-8">
 
-                {/* 1. Compact Profile Header */}
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-6">
-                    <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-4 min-w-0">
-                            <div className="flex-shrink-0">
-                                {displayAvatarUrl ? (
-                                    <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={64} height={64} className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
-                                ) : (
-                                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                                        <User className="h-8 w-8 text-gray-400" />
-                                    </div>
-                                )}
-                            </div>
-                            <div className="min-w-0">
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                    <h1 className="text-2xl font-black text-gray-900 dark:text-white truncate">{profile.nickname}</h1>
-                                    <div className="flex items-center gap-1 flex-shrink-0">
-                                        {[1, 2, 3, 4, 5].map(star => (
-                                            <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile.rating_avg) ? 'fill-gold text-gold' : 'text-gray-200 dark:text-gray-600'}`} />
-                                        ))}
-                                    </div>
+                {/* 1. Profile Header — gradient accent with gold shimmer */}
+                <div className="relative rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+                    {/* Subtle gold gradient strip at the top */}
+                    <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-gold via-gold-light to-gold" />
+                    <div className="p-6 pt-7">
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-4 min-w-0">
+                                <div className="flex-shrink-0 relative">
+                                    {displayAvatarUrl ? (
+                                        <Image src={displayAvatarUrl} alt={profile.nickname || 'Avatar'} width={64} height={64} className="rounded-full border-2 border-gold/30 object-cover shadow-sm bg-gray-50 dark:bg-gray-800" />
+                                    ) : (
+                                        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-gold/30 flex items-center justify-center">
+                                            <User className="h-8 w-8 text-gray-400" />
+                                        </div>
+                                    )}
                                 </div>
-                                {profile.is_admin && (
-                                    <Badge className="bg-red-50 text-red-600 border-red-100 mt-2">Administrador</Badge>
-                                )}
+                                <div className="min-w-0">
+                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                        <h1 className="text-2xl font-black text-gray-900 dark:text-white truncate">{profile.nickname}</h1>
+                                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <Star key={star} className={`h-4 w-4 transition-colors ${star <= Math.round(profile.rating_avg) ? 'fill-gold text-gold' : 'text-gray-200 dark:text-gray-600'}`} />
+                                            ))}
+                                            {profile.rating_count > 0 && (
+                                                <span className="ml-1 text-xs text-gray-400">({profile.rating_count})</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {profile.is_admin && (
+                                        <Badge className="bg-red-50 text-red-600 border-red-100 mt-2">Administrador</Badge>
+                                    )}
+                                </div>
                             </div>
+                            <Link href={`/users/${user?.id}`} className="text-sm font-bold text-gold hover:text-gold-light transition-colors flex-shrink-0">
+                                Editar Perfil
+                            </Link>
                         </div>
-                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-gold hover:text-gold-light transition-colors flex-shrink-0">
-                            Editar Perfil
-                        </Link>
                     </div>
                 </div>
 
-                {/* 2. Quick Actions Bar */}
+                {/* 2. Quick Actions Bar — with subtle hover glow */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Link href="/marketplace" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
-                            <Store className="h-6 w-6 text-gold mb-2" />
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">Explorar Marketplace</p>
-                        </div>
-                    </Link>
-                    <Link href="/marketplace/create" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
-                            <PlusCircle className="h-6 w-6 text-gold mb-2" />
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">Publicar Anuncio</p>
-                        </div>
-                    </Link>
-                    <Link href="/templates" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
-                            <LayoutGrid className="h-6 w-6 text-gold mb-2" />
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">Descubrir Colecciones</p>
-                        </div>
-                    </Link>
-                    <Link href="/chats" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
-                            <MessageCircle className="h-6 w-6 text-gold mb-2" />
-                            <p className="text-sm font-bold text-gray-900 dark:text-white">Mis Chats</p>
-                        </div>
-                    </Link>
+                    {[
+                        { href: '/marketplace', icon: Store, label: 'Explorar Marketplace' },
+                        { href: '/marketplace/create', icon: PlusCircle, label: 'Publicar Anuncio' },
+                        { href: '/templates', icon: LayoutGrid, label: 'Descubrir Colecciones' },
+                        { href: '/chats', icon: MessageCircle, label: 'Mis Chats' },
+                    ].map(({ href, icon: Icon, label }) => (
+                        <Link key={href} href={href} className="group">
+                            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-all duration-200 hover:border-gold hover:shadow-[0_0_0_1px_var(--gold),0_4px_12px_rgba(0,0,0,0.08)]">
+                                <Icon className="h-6 w-6 text-gold mb-2 transition-transform duration-200 group-hover:scale-110" />
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">{label}</p>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
                 {/* 3. Contextual Tip */}
@@ -268,7 +264,9 @@ export default function UserDashboard() {
 
                 {/* 4. Complete Your Collection CTA Banner */}
                 {ctaAlbum && ctaCount > 0 ? (
-                    <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6 transition-all duration-500">
+                    <div className="relative bg-gradient-to-r from-gold/10 via-gold-light/5 to-gold/10 dark:from-gold/5 dark:via-gold-light/3 dark:to-gold/5 border-2 border-gold rounded-2xl p-6 transition-all duration-500 overflow-hidden">
+                        {/* Decorative sparkle */}
+                        <Sparkles className="absolute top-4 right-4 w-5 h-5 text-gold/30 hidden md:block" />
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1 flex items-center gap-2">
@@ -283,7 +281,7 @@ export default function UserDashboard() {
                                 </p>
                             </div>
                             <Link href={`/marketplace?collection=${ctaAlbum.copy_id}`}>
-                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
                                     Ver en Marketplace <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -316,7 +314,7 @@ export default function UserDashboard() {
                                 </h3>
                             </div>
                             <Link href="/marketplace">
-                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
                                     Buscar en el Marketplace <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -332,7 +330,7 @@ export default function UserDashboard() {
                                 </h3>
                             </div>
                             <Link href="/templates">
-                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
                                     Explorar Colecciones <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -372,16 +370,22 @@ export default function UserDashboard() {
                             {copies.map(copy => {
                                 const percentage = copy.completion_percentage;
                                 const isComplete = percentage === 100;
+                                const missing = copy.total_slots - copy.completed_slots;
 
                                 return (
                                     <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block">
-                                        <div className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-gold transition-all hover:shadow-md p-4">
+                                        <div className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden transition-all duration-200 hover:border-gold hover:shadow-[0_0_0_1px_var(--gold),0_4px_16px_rgba(0,0,0,0.08)] p-4">
+                                            {/* Completion trophy indicator */}
+                                            {isComplete && (
+                                                <div className="absolute top-3 right-3">
+                                                    <div className="bg-green-50 dark:bg-green-900/20 rounded-full p-1.5">
+                                                        <Trophy className="w-4 h-4 text-green-500" />
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="flex items-start gap-4">
                                                 <div className="flex-1">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-gold transition-colors line-clamp-1">{copy.title}</h3>
-                                                        {isComplete && <Trophy className="w-5 h-5 text-green-500" />}
-                                                    </div>
+                                                    <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-gold transition-colors line-clamp-1 pr-8">{copy.title}</h3>
 
                                                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
                                                         <User className="w-3 h-3" />
@@ -393,27 +397,30 @@ export default function UserDashboard() {
                                                             <span>Progreso</span>
                                                             <span className={isComplete ? "text-green-600" : "text-gold"}>{percentage}%</span>
                                                         </div>
-                                                        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                            <div className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-gold'}`} style={{ width: `${percentage}%` }} />
+                                                        <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                            <div
+                                                                className={`h-full rounded-full transition-all duration-700 ease-out ${isComplete ? 'bg-green-500' : 'bg-gradient-to-r from-gold to-gold-light'}`}
+                                                                style={{ width: `${percentage}%` }}
+                                                            />
                                                         </div>
                                                         <p className="text-xs text-right text-gray-400">{copy.completed_slots} / {copy.total_slots} cromos</p>
                                                     </div>
 
-                                                    <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                                        <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/10 px-2 py-1 rounded text-xs font-bold text-green-700 dark:text-green-400">
+                                                    <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                                        <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/10 px-2.5 py-1 rounded-md text-xs font-bold text-green-700 dark:text-green-400">
                                                             <Check className="w-3 h-3" />
                                                             <span>TENGO {copy.completed_slots}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-900/10 px-2 py-1 rounded text-xs font-bold text-red-700 dark:text-red-400">
+                                                        <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-900/10 px-2.5 py-1 rounded-md text-xs font-bold text-red-700 dark:text-red-400">
                                                             <X className="w-3 h-3" />
-                                                            <span>FALTAN {copy.total_slots - copy.completed_slots}</span>
+                                                            <span>FALTAN {missing}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="mt-4 flex items-center justify-end text-xs font-black uppercase text-gray-400 group-hover:text-gold transition-colors">
                                                 <span>Gestionar Colección</span>
-                                                <ArrowRight className="w-3 h-3 ml-1" />
+                                                <ArrowRight className="w-3 h-3 ml-1 transition-transform duration-200 group-hover:translate-x-0.5" />
                                             </div>
                                         </div>
                                     </Link>
@@ -430,45 +437,45 @@ export default function UserDashboard() {
 
 
 
-                {/* 8. Stats/Action Cards */}
+                {/* 8. Stats/Action Cards — enhanced with micro-interactions */}
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                     {activeListings.length === 0 ? (
-                        <Link href="/marketplace/create" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
-                                <PlusCircle className="h-6 w-6 mb-2 text-gold" />
+                        <Link href="/marketplace/create" className="group block h-full">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
+                                <PlusCircle className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Publica tu primer anuncio</p>
                             </div>
                         </Link>
                     ) : (
-                        <Link href="/marketplace/my-listings" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
+                        <Link href="/marketplace/my-listings" className="group block h-full">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gold/50 transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <Package className="h-6 w-6 mb-2 text-gold" />
-                                <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{activeListings.length}</p>
+                                <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{activeListings.length}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
                             </div>
                         </Link>
                     )}
 
                     {profile.favorites_count === 0 ? (
-                        <Link href="/marketplace" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
-                                <Heart className="h-6 w-6 mb-2 text-gold" />
+                        <Link href="/marketplace" className="group block h-full">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
+                                <Heart className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Guarda tus favoritos</p>
                             </div>
                         </Link>
                     ) : (
-                        <Link href="/favorites" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
+                        <Link href="/favorites" className="group block h-full">
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gold/50 transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <Heart className="h-6 w-6 mb-2 text-gold" />
-                                <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{profile.favorites_count}</p>
+                                <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{profile.favorites_count}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
                             </div>
                         </Link>
                     )}
 
-                    <Link href={`/users/${user?.id}#valoraciones`} className="group block h-full transform transition hover:scale-[1.02]">
-                        <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
-                            <Star className="h-6 w-6 mb-2 text-gold" />
+                    <Link href={`/users/${user?.id}#valoraciones`} className="group block h-full">
+                        <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
+                            <Star className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
                             <p className="text-sm font-black text-gray-900 dark:text-white">
                                 {profile.rating_count} {profile.rating_count === 1 ? 'Valoración' : 'Valoraciones'}
                             </p>
