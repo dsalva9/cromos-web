@@ -1,8 +1,12 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
+import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
-    title: 'Política de Cookies - Cambiocromos.com',
+    title: 'Política de Cookies',
     description: 'Información sobre el uso de cookies y tecnologías similares en Cambiocromos.com',
+    alternates: {
+        canonical: `${siteConfig.url}/legal/cookies`,
+    },
 };
 
 export default function CookiesPage() {

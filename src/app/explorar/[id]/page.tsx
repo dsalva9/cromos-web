@@ -92,7 +92,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!listing) {
     return {
-      title: 'Anuncio no encontrado | Cambio Cromos',
+      title: 'Anuncio no encontrado',
       description: 'Este anuncio puede haber sido eliminado o ya no está disponible.',
       alternates: {
         canonical: `${baseUrl}/explorar/${id}`,
@@ -103,7 +103,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   // Build a rich title: "Cromo Name - Collection Name | Cambio Cromos"
   const titleParts = [listing.title];
   if (listing.collection_name) titleParts.push(listing.collection_name);
-  const title = `${titleParts.join(' - ')} | Cambio Cromos`;
+  const title = titleParts.join(' - ');
 
   // Build a structured description for SEO
   const descParts: string[] = [];
@@ -143,5 +143,40 @@ export default async function PublicListingDetailPage({ params }: PageProps) {
     return <ListingDetailContent listing={null} error="Anuncio no encontrado" />;
   }
 
-  return <ListingDetailContent listing={listing} />;
+  const baseUrl = siteConfig.url.replace('://www.', '://');
+
+  // Build Product JSON-LD for rich results
+  const productJsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: listing.title,
+    url: `${baseUrl}/explorar/${id}`,
+    description: listing.description || `Cromo ${listing.title}${listing.collection_name ? ` de ${listing.collection_name}` : ''}`,
+    ...(listing.image_url ? { image: listing.image_url } : {}),
+    ...(listing.collection_name ? { category: listing.collection_name } : {}),
+    ...(listing.sticker_number ? { sku: `${listing.sticker_number}${listing.slot_variant || ''}` } : {}),
+  };
+
+  // Add Offer when the listing has a price
+  if (listing.price != null && (listing.listing_type === 'venta' || listing.listing_type === 'ambos')) {
+    productJsonLd.offers = {
+      '@type': 'Offer',
+      price: Number(listing.price).toFixed(2),
+      priceCurrency: 'EUR',
+      availability: listing.status === 'active'
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/SoldOut',
+      url: `${baseUrl}/explorar/${id}`,
+    };
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <ListingDetailContent listing={listing} />
+    </>
+  );
 }

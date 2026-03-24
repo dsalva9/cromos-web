@@ -1,4 +1,4 @@
-﻿import type { Metadata, Viewport } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import '@/styles/highlight-animation.css';
@@ -25,10 +25,41 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
-  title: `${siteConfig.name} - Intercambia cromos deportivos`,
+  title: {
+    default: `${siteConfig.name} — Intercambia cromos deportivos`,
+    template: `%s | ${siteConfig.name}`,
+  },
   description: siteConfig.description,
   alternates: {
     canonical: siteConfig.url,
+  },
+  openGraph: {
+    title: {
+      default: `${siteConfig.name} — Intercambia cromos deportivos`,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    locale: 'es_ES',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — Intercambia cromos deportivos`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: {
+      default: `${siteConfig.name} — Intercambia cromos deportivos`,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: siteConfig.description,
+    images: ['/og-image.png'],
   },
   appleWebApp: {
     capable: true,
@@ -43,8 +74,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
   themeColor: '#FFFFFF',
 };

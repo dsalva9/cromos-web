@@ -1,15 +1,19 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
+import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
-    title: 'Política de Privacidad - Cambiocromos.com',
+    title: 'Política de Privacidad',
     description: 'Cómo recopilamos, usamos y protegemos tus datos personales en cumplimiento con el RGPD.',
+    alternates: {
+        canonical: `${siteConfig.url}/legal/privacy`,
+    },
 };
 
 export default function PrivacyPage() {
     return (
         <div className="prose dark:prose-invert max-w-none">
             <h1 className="text-3xl font-black uppercase mb-6 text-gold">Política de Privacidad</h1>
-            <p className="text-sm text-gray-500 mb-8">Última actualización: {new Date().toLocaleDateString('es-ES')}</p>
+            <p className="text-sm text-gray-500 mb-8">Última actualización: marzo de 2026</p>
 
             <p>
                 En Cambiocromos.com, nos tomamos muy en serio tu privacidad. Esta política describe cómo recopilamos, utilizamos y protegemos tu información personal, en cumplimiento con el Reglamento General de Protección de Datos (RGPD) y la LOPDGDD.

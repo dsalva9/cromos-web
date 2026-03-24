@@ -1,15 +1,19 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
+import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
-    title: 'Términos de Servicio y Condiciones de Uso - Cambiocromos.com',
+    title: 'Términos de Servicio',
     description: 'Condiciones de uso, normas de la comunidad y políticas de contenido para usuarios de Cambiocromos.com',
+    alternates: {
+        canonical: `${siteConfig.url}/legal/terms`,
+    },
 };
 
 export default function TermsPage() {
     return (
         <div className="prose dark:prose-invert max-w-none">
             <h1 className="text-3xl font-black uppercase mb-6 text-gold">Términos de Servicio</h1>
-            <p className="text-sm text-gray-500 mb-8">Última actualización: {new Date().toLocaleDateString('es-ES')}</p>
+            <p className="text-sm text-gray-500 mb-8">Última actualización: marzo de 2026</p>
 
             <h2>1. Aceptación de los Términos</h2>
             <p>
