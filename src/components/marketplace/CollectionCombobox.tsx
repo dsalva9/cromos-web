@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -109,7 +109,7 @@ export function CollectionCombobox({
                     onClick={() => {
                       handleSelect(inputValue);
                     }}
-                    className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                    className="bg-gold text-black hover:bg-gold-light"
                   >
                     Usar &quot;{inputValue}&quot;
                   </Button>

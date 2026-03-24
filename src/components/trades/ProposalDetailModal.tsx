@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import {
@@ -78,7 +78,7 @@ function ItemList({
               </div>
               <Badge
                 variant="secondary"
-                className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold"
+                className="bg-gold text-gray-900 border-2 border-black font-bold"
               >
                 x{item.quantity}
               </Badge>
@@ -273,11 +273,11 @@ export function ProposalDetailModal({
           {detail && (
             <DialogDescription className="text-gray-600 dark:text-gray-400">
               Propuesta de{' '}
-              <strong className="text-[#FFC000]">
+              <strong className="text-gold">
                 {detail.proposal.from_user_nickname}
               </strong>{' '}
               para{' '}
-              <strong className="text-[#FFC000]">
+              <strong className="text-gold">
                 {detail.proposal.to_user_nickname}
               </strong>
               .
@@ -362,8 +362,8 @@ export function ProposalDetailModal({
                         )}
 
                         {userRequestedFinalization && (
-                          <div className="bg-[#FFC000] bg-opacity-20 border-2 border-[#FFC000] rounded-md p-3">
-                            <p className="text-sm font-bold text-[#FFC000]">
+                          <div className="bg-gold bg-opacity-20 border-2 border-gold rounded-md p-3">
+                            <p className="text-sm font-bold text-gold">
                               ⏳ Has solicitado la finalización
                             </p>
                             <p className="text-xs text-gray-900 dark:text-white mt-1">

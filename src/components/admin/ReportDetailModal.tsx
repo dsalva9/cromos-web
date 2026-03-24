@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -76,7 +76,7 @@ export function ReportDetailModal({
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
           </div>
         </DialogContent>
       </Dialog>
@@ -158,7 +158,7 @@ export function ReportDetailModal({
                 <Link
                   href={`/users/${report.entity_id}`}
                   target="_blank"
-                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                  className="text-gold hover:text-gold-light flex items-center gap-1 text-sm"
                 >
                   View Profile <ExternalLink className="h-4 w-4" />
                 </Link>
@@ -167,7 +167,7 @@ export function ReportDetailModal({
                 <Link
                   href={`/marketplace/${report.entity_id}`}
                   target="_blank"
-                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                  className="text-gold hover:text-gold-light flex items-center gap-1 text-sm"
                 >
                   View Listing <ExternalLink className="h-4 w-4" />
                 </Link>
@@ -176,7 +176,7 @@ export function ReportDetailModal({
                 <Link
                   href={`/templates/${report.entity_id}`}
                   target="_blank"
-                  className="text-[#FFC000] hover:text-[#FFD700] flex items-center gap-1 text-sm"
+                  className="text-gold hover:text-gold-light flex items-center gap-1 text-sm"
                 >
                   View Template <ExternalLink className="h-4 w-4" />
                 </Link>

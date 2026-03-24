@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -69,7 +69,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="ring-offset-white dark:ring-offset-gray-800 focus:ring-[#FFC000] absolute top-4 right-4 rounded-full p-1 opacity-70 transition-all hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
+            className="ring-offset-white dark:ring-offset-gray-800 focus:ring-gold absolute top-4 right-4 rounded-full p-1 opacity-70 transition-all hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
           >
             <XIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
             <span className="sr-only">Close</span>

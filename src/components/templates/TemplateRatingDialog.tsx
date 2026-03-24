@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { Star, Loader2, Trash2 } from 'lucide-react';
@@ -162,11 +162,11 @@ export function TemplateRatingDialog({
                       onClick={() => setRating(star)}
                       onMouseEnter={() => setHoveredStar(star)}
                       onMouseLeave={() => setHoveredStar(0)}
-                      className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-[#FFC000] rounded"
+                      className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gold rounded"
                     >
                       <Star
                         className={`h-10 w-10 transition-colors ${star <= (hoveredStar || rating)
-                            ? 'fill-[#FFC000] text-[#FFC000]'
+                            ? 'fill-gold text-gold'
                             : 'text-gray-300 dark:text-gray-600'
                           }`}
                       />
@@ -226,7 +226,7 @@ export function TemplateRatingDialog({
               <Button
                 onClick={handleSubmit}
                 disabled={loading || rating === 0}
-                className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="bg-gold text-black hover:bg-gold-light"
               >
                 {loading ? (
                   <>

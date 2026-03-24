@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,7 @@ export function TemplateRatingSummary({
                   key={star}
                   className={`h-5 w-5 ${
                     star <= Math.round(summary.rating_avg)
-                      ? 'fill-[#FFC000] text-[#FFC000]'
+                      ? 'fill-gold text-gold'
                       : 'text-slate-600'
                   }`}
                 />
@@ -66,11 +66,11 @@ export function TemplateRatingSummary({
             <div key={star.value} className="flex items-center gap-2 text-sm">
               <div className="flex items-center gap-1 w-24 text-slate-400">
                 <span>{star.value}</span>
-                <Star className="h-3 w-3 fill-[#FFC000] text-[#FFC000]" />
+                <Star className="h-3 w-3 fill-gold text-gold" />
               </div>
               <div className="flex-grow bg-slate-700 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-[#FFC000] h-full transition-all duration-300"
+                  className="bg-gold h-full transition-all duration-300"
                   style={{ width: `${getPercentage(star.count)}%` }}
                 />
               </div>
@@ -88,7 +88,7 @@ export function TemplateRatingSummary({
           ) : (
             <Button
               onClick={onRateClick}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium px-6"
+              className="bg-gold text-black hover:bg-gold-light font-medium px-6"
             >
               <Star className="mr-2 h-4 w-4" />
               {hasUserRated ? 'Actualizar valoración' : 'Valorar plantilla'}

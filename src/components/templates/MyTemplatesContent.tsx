@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -71,7 +71,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                             Empieza explorando las plantillas disponibles o crea tu propia colección desde cero.
                         </p>
                         <Link href="/templates">
-                            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-12 px-8 text-lg shadow-md">
+                            <Button className="bg-gold text-black hover:bg-gold-light font-bold h-12 px-8 text-lg shadow-md">
                                 Explorar Colecciones
                             </Button>
                         </Link>
@@ -85,7 +85,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
 
                             return (
                                 <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block h-full">
-                                    <div className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden hover:border-[#FFC000] transition-all duration-300 hover:shadow-xl hover:shadow-black/5 h-full flex flex-col">
+                                    <div className="group relative bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden hover:border-gold transition-all duration-300 hover:shadow-xl hover:shadow-black/5 h-full flex flex-col">
                                         {/* Image */}
                                         {copy.image_url && (
                                             <div className="relative aspect-[16/9] bg-gray-100 dark:bg-gray-900 overflow-hidden">
@@ -102,13 +102,13 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                         )}
 
                                         {/* Top Gradient Bar */}
-                                        <div className={`h-1.5 w-full ${isComplete ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-[#FFC000] to-[#FFD700]'}`} />
+                                        <div className={`h-1.5 w-full ${isComplete ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 'bg-gradient-to-r from-gold to-gold-light'}`} />
 
                                         <div className="p-6 flex flex-col flex-grow">
                                             {/* Header */}
                                             <div className="mb-6">
                                                 <div className="flex justify-between items-start mb-2 gap-2">
-                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-black dark:group-hover:text-[#FFC000] transition-colors line-clamp-1 leading-tight">
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-black dark:group-hover:text-gold transition-colors line-clamp-1 leading-tight">
                                                         {copy.title}
                                                     </h3>
                                                     {isComplete && (
@@ -136,7 +136,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                 </div>
                                                 <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
                                                     <div
-                                                        className={`h-full rounded-full transition-all duration-500 ease-out relative ${isComplete ? 'bg-green-500' : 'bg-[#FFC000]'}`}
+                                                        className={`h-full rounded-full transition-all duration-500 ease-out relative ${isComplete ? 'bg-green-500' : 'bg-gold'}`}
                                                         style={{ width: `${percentage}%` }}
                                                     >
                                                     </div>
@@ -176,13 +176,13 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                     <Link
                                                         href={`/marketplace?collection=${copy.copy_id}`}
                                                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                                        className="flex items-center gap-2 bg-[#FFC000]/10 dark:bg-[#FFC000]/5 border border-[#FFC000]/30 rounded-xl px-3 py-2 hover:bg-[#FFC000]/20 transition-colors group/cta"
+                                                        className="flex items-center gap-2 bg-gold/10 dark:bg-gold/5 border border-gold/30 rounded-xl px-3 py-2 hover:bg-gold/20 transition-colors group/cta"
                                                     >
-                                                        <ShoppingBag className="w-4 h-4 text-[#FFC000]" />
+                                                        <ShoppingBag className="w-4 h-4 text-gold" />
                                                         <span className="text-sm font-bold text-gray-900 dark:text-white">
                                                             {marketplaceCount} {marketplaceCount === 1 ? 'falta' : 'faltan'} en Marketplace
                                                         </span>
-                                                        <ArrowRight className="w-3.5 h-3.5 ml-auto text-[#FFC000] transform group-hover/cta:translate-x-1 transition-transform" />
+                                                        <ArrowRight className="w-3.5 h-3.5 ml-auto text-gold transform group-hover/cta:translate-x-1 transition-transform" />
                                                     </Link>
                                                 )}
                                                 <div className="flex items-center justify-between text-sm font-black uppercase tracking-wide text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">

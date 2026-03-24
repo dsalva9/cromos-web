@@ -1,20 +1,20 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-bold uppercase transition-all active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-50 dark:focus-visible:ring-offset-gray-900 border-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-bold uppercase transition-all active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-gray-50 dark:focus-visible:ring-offset-gray-900 border-2",
   {
     variants: {
       variant: {
-        default: 'bg-[#FFC000] text-black hover:bg-[#FFD700] border-black',
+        default: 'bg-gold text-black hover:bg-gold-light border-black',
         destructive: 'bg-red-600 text-white hover:bg-red-700 border-black',
         outline: 'border-black dark:border-white bg-transparent text-gray-900 dark:text-white hover:bg-white dark:hover:bg-gray-800',
         ghost: 'hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white border-transparent',
         secondary: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 border-black dark:border-white',
-        link: 'text-[#FFC000] underline-offset-4 hover:underline border-transparent',
+        link: 'text-gold underline-offset-4 hover:underline border-transparent',
       },
       size: {
         default: 'h-10 px-4 py-2 has-[>svg]:px-3',

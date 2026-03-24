@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useAuditLog } from '@/hooks/admin/useAuditLog';
@@ -82,7 +82,7 @@ function AuditLogContent() {
         {/* Loading State */}
         {loading && logs.length === 0 && (
           <div className="flex justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
           </div>
         )}
 
@@ -171,7 +171,7 @@ function AuditLogContent() {
         {/* Loading More */}
         {loading && logs.length > 0 && (
           <div className="flex justify-center mt-8">
-            <div className="animate-spin h-6 w-6 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            <div className="animate-spin h-6 w-6 border-4 border-gold border-r-transparent rounded-full" />
           </div>
         )}
       </div>

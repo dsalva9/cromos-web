@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -134,7 +134,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
           <Button
             onClick={addPage}
             disabled={!newPageTitle.trim()}
-            className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+            className="bg-gold text-black hover:bg-gold-light"
           >
             <Plus className="mr-2 h-4 w-4" />
             Añadir Página

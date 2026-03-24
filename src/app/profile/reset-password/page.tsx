@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
@@ -121,7 +121,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       {/* Logo/Header */}
       <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
+        <div className="w-20 h-20 bg-gold rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
           ⚽
         </div>
         <h1 className="text-3xl font-black uppercase text-gray-900 mb-2">
@@ -177,7 +177,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
                 />
               </div>
 
@@ -197,7 +197,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                  className="rounded-md bg-gray-50 border-2 border-black text-gray-900 placeholder-gray-500 focus:border-gold focus:ring-gold"
                 />
               </div>
 
@@ -209,7 +209,7 @@ export default function ResetPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
+                className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
                 disabled={loading}
               >
                 {loading ? 'Actualizando...' : 'Cambiar Contraseña'}
@@ -221,7 +221,7 @@ export default function ResetPasswordPage() {
             <div className="mt-8 text-center">
               <Link
                 href="/login"
-                className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+                className="text-gold hover:text-yellow-400 font-bold hover:underline"
               >
                 ← Volver a Iniciar Sesión
               </Link>

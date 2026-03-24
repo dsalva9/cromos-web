@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -81,7 +81,7 @@ export function CollectionFilter({
             variant="outline"
             size="sm"
             className={`border-2 border-black text-gray-900 hover:bg-gray-50 font-bold ${
-              hasActiveFilters ? 'bg-[#FFC000] text-black hover:bg-[#FFD700]' : ''
+              hasActiveFilters ? 'bg-gold text-black hover:bg-gold-light' : ''
             }`}
           >
             <Filter className="mr-2 h-4 w-4" />
@@ -112,7 +112,7 @@ export function CollectionFilter({
                     variant="ghost"
                     size="sm"
                     onClick={selectAll}
-                    className="h-auto p-1 text-xs text-[#FFC000] hover:text-[#FFD700] hover:bg-gray-100"
+                    className="h-auto p-1 text-xs text-gold hover:text-gold-light hover:bg-gray-100"
                   >
                     Todas
                   </Button>
@@ -160,7 +160,7 @@ export function CollectionFilter({
                       onCheckedChange={() =>
                         toggleCollection(collection.copy_id)
                       }
-                      className="mt-0.5 border-gray-300 data-[state=checked]:bg-[#FFC000] data-[state=checked]:border-[#FFC000] data-[state=checked]:text-black"
+                      className="mt-0.5 border-gray-300 data-[state=checked]:bg-gold data-[state=checked]:border-gold data-[state=checked]:text-black"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">

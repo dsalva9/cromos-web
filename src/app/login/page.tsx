@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -207,7 +207,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="h-10 sm:h-12 rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -244,7 +244,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase h-10 sm:py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
+              className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase h-10 sm:py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
@@ -274,7 +274,7 @@ export default function LoginPage() {
           <div className="mt-4 sm:mt-8 text-center space-y-2 sm:space-y-4">
             <Link
               href="/forgot-password"
-              className="text-xs sm:text-sm text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+              className="text-xs sm:text-sm text-gold hover:text-yellow-400 font-bold hover:underline"
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -284,7 +284,7 @@ export default function LoginPage() {
                 ¿No tienes cuenta?{' '}
                 <Link
                   href="/signup"
-                  className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+                  className="text-gold hover:text-yellow-400 font-bold hover:underline"
                 >
                   Crear cuenta
                 </Link>

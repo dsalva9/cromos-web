@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import AuthGuard from '@/components/AuthGuard';
@@ -276,7 +276,7 @@ function CompleteProfileContent() {
 
               <div className="flex justify-end">
                 <Button
-                  className="bg-[#FFC000] text-gray-900 border-2 border-black hover:bg-yellow-400"
+                  className="bg-gold text-gray-900 border-2 border-black hover:bg-yellow-400"
                   onClick={handleSave}
                   disabled={saving}
                 >

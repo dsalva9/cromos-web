@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from '@/hooks/use-router';
@@ -165,7 +165,7 @@ function ProfileContent() {
           <p>{error}</p>
           <Button
             onClick={() => window.location.reload()}
-            className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase"
+            className="bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase"
           >
             Reintentar
           </Button>
@@ -190,7 +190,7 @@ function ProfileContent() {
               variant="outline"
               size="sm"
               onClick={() => router.push('/profile/ignored')}
-              className="border-2 border-black dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 hover:bg-[#FFC000] hover:text-gray-900"
+              className="border-2 border-black dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 hover:bg-gold hover:text-gray-900"
             >
               <EyeOff className="w-4 h-4 mr-2" />
               Usuarios Ignorados
@@ -223,7 +223,7 @@ function ProfileContent() {
                           value={tempNickname}
                           onChange={e => setTempNickname(e.target.value)}
                           placeholder="Tu nombre de usuario"
-                          className="bg-gray-50 border-2 border-black text-gray-900 focus:border-[#FFC000] focus:ring-[#FFC000] flex-1"
+                          className="bg-gray-50 border-2 border-black text-gray-900 focus:border-gold focus:ring-gold flex-1"
                           onKeyDown={handleKeyDown}
                           ref={inputRef}
                           disabled={actionLoading['nick-user']}
@@ -233,7 +233,7 @@ function ProfileContent() {
                         <Button
                           size="sm"
                           onClick={handleSaveNickname}
-                          className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase"
+                          className="bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase"
                           disabled={actionLoading['nick-user']}
                           type="button"
                         >

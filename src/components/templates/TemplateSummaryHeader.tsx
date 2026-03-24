@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { Check, X, Copy as CopyIcon, Trophy, User, ShoppingBag } from 'lucide-react';
@@ -83,7 +83,7 @@ export function TemplateSummaryHeader({
       <div
         className={`h-1.5 w-full ${isComplete
           ? 'bg-gradient-to-r from-green-400 to-emerald-600'
-          : 'bg-gradient-to-r from-[#FFC000] to-[#FFD700]'
+          : 'bg-gradient-to-r from-gold to-gold-light'
           }`}
       />
 
@@ -135,7 +135,7 @@ export function TemplateSummaryHeader({
                     por{' '}
                     <Link
                       href={`/users/${copy.original_author_id}`}
-                      className="hover:text-[#FFC000] transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
+                      className="hover:text-gold transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
                     >
                       {copy.original_author_nickname}
                     </Link>
@@ -154,7 +154,7 @@ export function TemplateSummaryHeader({
               </div>
               <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
                 <div
-                  className={`h-full rounded-full transition-all duration-1000 ease-out relative ${isComplete ? 'bg-green-500' : 'bg-[#FFC000]'
+                  className={`h-full rounded-full transition-all duration-1000 ease-out relative ${isComplete ? 'bg-green-500' : 'bg-gold'
                     }`}
                   style={{ width: `${stats.completionPercentage}%` }}
                 >
@@ -178,8 +178,8 @@ export function TemplateSummaryHeader({
             </div>
 
             {/* Duplicates */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-[#FFC000] transition-colors group">
-              <div className="p-1.5 sm:p-2 bg-[#FFC000]/10 dark:bg-[#FFC000]/20 rounded-lg mb-1 sm:mb-2 group-hover:bg-[#FFC000]/20 dark:group-hover:bg-[#FFC000]/30 transition-colors">
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-gold transition-colors group">
+              <div className="p-1.5 sm:p-2 bg-gold/10 dark:bg-gold/20 rounded-lg mb-1 sm:mb-2 group-hover:bg-gold/20 dark:group-hover:bg-gold/30 transition-colors">
                 <CopyIcon className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-700 dark:text-yellow-500" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.duplicates}</span>
@@ -198,12 +198,12 @@ export function TemplateSummaryHeader({
             {/* Marketplace Availability */}
             {marketplaceCount > 0 && (
               <Link href={`/marketplace?collection=${copy.copy_id}`} className="block">
-                <div className="bg-[#FFC000]/5 dark:bg-[#FFC000]/10 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-[#FFC000]/30 hover:border-[#FFC000] transition-colors group h-full cursor-pointer">
-                  <div className="p-1.5 sm:p-2 bg-[#FFC000]/20 dark:bg-[#FFC000]/30 rounded-lg mb-1 sm:mb-2 group-hover:bg-[#FFC000]/30 dark:group-hover:bg-[#FFC000]/40 transition-colors">
-                    <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFC000]" />
+                <div className="bg-gold/5 dark:bg-gold/10 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gold/30 hover:border-gold transition-colors group h-full cursor-pointer">
+                  <div className="p-1.5 sm:p-2 bg-gold/20 dark:bg-gold/30 rounded-lg mb-1 sm:mb-2 group-hover:bg-gold/30 dark:group-hover:bg-gold/40 transition-colors">
+                    <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-gold" />
                   </div>
                   <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{marketplaceCount}</span>
-                  <span className="text-[9px] sm:text-[10px] uppercase font-bold text-[#FFC000] tracking-wider">En Venta</span>
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gold tracking-wider">En Venta</span>
                 </div>
               </Link>
             )}

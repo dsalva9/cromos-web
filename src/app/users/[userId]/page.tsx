@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -247,7 +247,7 @@ export default function UserProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -261,7 +261,7 @@ export default function UserProfilePage() {
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
-              className="text-[#FFC000] hover:text-yellow-600 underline font-bold"
+              className="text-gold hover:text-yellow-600 underline font-bold"
             >
               soporte@cambiocromos.com
             </a>
@@ -448,7 +448,7 @@ export default function UserProfilePage() {
     return (
       <Link
         href={href}
-        className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-transform hover:scale-[1.02]"
+        className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-transform hover:scale-[1.02]"
       >
         {card}
       </Link>
@@ -461,7 +461,7 @@ export default function UserProfilePage() {
         {[1, 2, 3, 4, 5].map(star => (
           <Star
             key={star}
-            className={`h-5 w-5 ${star <= rating ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-200'
+            className={`h-5 w-5 ${star <= rating ? 'fill-gold text-gold' : 'text-gray-200'
               }`}
           />
         ))}
@@ -475,7 +475,7 @@ export default function UserProfilePage() {
       <div className="flex items-center gap-3 w-full">
         <div className="flex-1 h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
           <div
-            className="h-full bg-[#FFC000] transition-all"
+            className="h-full bg-gold transition-all"
             style={{ width: `${percentage}%` }}
           />
         </div>
@@ -548,7 +548,7 @@ export default function UserProfilePage() {
                           }}
                         >
                           <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-lg border border-gray-100 dark:border-gray-700">
-                            <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
+                            <Star className="h-5 w-5 fill-gold text-gold" />
                             <span className="text-gray-900 dark:text-white font-bold text-lg">
                               {profile.rating_avg.toFixed(1)}
                             </span>
@@ -688,7 +688,7 @@ export default function UserProfilePage() {
                                   Cancelar
                                 </Button>
                                 <Button
-                                  className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                                  className="bg-gold text-black hover:bg-gold-light font-bold"
                                   onClick={handleSaveProfile}
                                   type="button"
                                   disabled={savingProfile || uploadingAvatar}
@@ -708,14 +708,14 @@ export default function UserProfilePage() {
                   {/* Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                     {renderStatCard(
-                      <Package className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />,
+                      <Package className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       statusCounts.active,
                       'Anuncios activos',
                       isOwnProfile ? '/marketplace/my-listings' : undefined
                     )}
 
                     {renderStatCard(
-                      <Heart className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />,
+                      <Heart className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       profile.favorites_count,
                       'Favoritos',
                       isOwnProfile ? '/favorites' : undefined
@@ -729,10 +729,10 @@ export default function UserProfilePage() {
                           .getElementById('valoraciones')
                           ?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-transform hover:scale-[1.02]"
+                      className="block rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-transform hover:scale-[1.02]"
                     >
                       <div className="text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
-                        <Star className="h-6 w-6 mx-auto mb-2 text-[#FFC000]" />
+                        <Star className="h-6 w-6 mx-auto mb-2 text-gold" />
                         <p className="text-2xl font-black text-gray-900 dark:text-white">
                           {profile.rating_count}
                         </p>
@@ -758,7 +758,7 @@ export default function UserProfilePage() {
 
           {loadingRatings ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+              <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
             </div>
           ) : ratingSummary && ratingSummary.rating_count > 0 ? (
             <>
@@ -771,7 +771,7 @@ export default function UserProfilePage() {
                       <span className="text-5xl font-black text-gray-900 dark:text-white">
                         {ratingSummary.rating_avg.toFixed(1)}
                       </span>
-                      <Star className="h-8 w-8 fill-[#FFC000] text-[#FFC000]" />
+                      <Star className="h-8 w-8 fill-gold text-gold" />
                     </div>
                     <p className="text-gray-500 dark:text-gray-400">
                       Basado en {ratingSummary.rating_count}{' '}

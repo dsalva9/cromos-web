@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+﻿import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Política de Cookies - Cambiocromos.com',
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function CookiesPage() {
     return (
         <div className="prose dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-black uppercase mb-6 text-[#FFC000]">Política de Cookies</h1>
+            <h1 className="text-3xl font-black uppercase mb-6 text-gold">Política de Cookies</h1>
 
             <p>
                 Cambiocromos.com utiliza cookies y tecnologías similares para mejorar tu experiencia, garantizar la seguridad del sitio y analizar cómo se utiliza nuestra plataforma.

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -94,7 +94,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                         {/* Register CTA */}
                         <div className="flex gap-2 md:gap-3 w-full md:w-auto shrink-0">
                             <Link href="/signup" className="w-full md:w-auto">
-                                <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
+                                <Button className="w-full bg-gold text-black hover:bg-gold-light font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                                     Registrarse para Intercambiar
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
@@ -120,7 +120,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                     placeholder="Buscar por nombre, colección..."
-                                    className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
+                                    className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
                                 />
                             </div>
 
@@ -129,7 +129,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                 <Button
                                     onClick={() => setShowFilters(!showFilters)}
                                     variant="outline"
-                                    className={`flex-1 ${showFilters ? 'bg-[#FFC000]/10 text-black dark:text-white border-[#FFC000]/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
+                                    className={`flex-1 ${showFilters ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                                 >
                                     <Filter className="mr-2 h-4 w-4" />
                                     Filtros
@@ -210,7 +210,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                 {/* Loading Spinner for Load More */}
                 {loading && listings.length > 0 && (
                     <div className="flex justify-center py-12">
-                        <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+                        <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
                     </div>
                 )}
 
@@ -235,7 +235,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
 
                 {/* Registration CTA Banner */}
                 {!loading && listings.length > 0 && (
-                    <div className="mt-12 bg-[#FFC000] rounded-2xl p-8 text-center relative overflow-hidden">
+                    <div className="mt-12 bg-gold rounded-2xl p-8 text-center relative overflow-hidden">
                         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
                         <div className="relative z-10">
                             <h2 className="text-2xl md:text-3xl font-black uppercase text-black mb-3">

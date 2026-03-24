@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect, useRef, MouseEvent } from 'react';
@@ -40,7 +40,7 @@ function MobileUserAvatar({ userId }: { userId: string }) {
 
   return (
     <Link href={`/users/${userId}`} className="block shrink-0">
-      <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black dark:border-white hover:border-[#FFC000] dark:hover:border-[#FFC000] transition-colors">
+      <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black dark:border-white hover:border-gold dark:hover:border-gold transition-colors">
         {avatarUrl ? (
           <Image
             src={avatarUrl}
@@ -69,7 +69,7 @@ function MobileNotificationIcon() {
   const { unreadCount } = useNotifications();
 
   return (
-    <Link href="/profile/notifications" className="p-2 text-gray-700 dark:text-gray-300 hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors shrink-0">
+    <Link href="/profile/notifications" className="p-2 text-gray-700 dark:text-gray-300 hover:text-gold dark:hover:text-gold transition-colors shrink-0">
       <div className="relative">
         <Bell className="h-6 w-6" />
         {unreadCount > 0 && (
@@ -181,7 +181,7 @@ export default function SiteHeader() {
         <div className="flex h-16 sm:h-20 items-center justify-between">
           <NavLink
             href="/"
-            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
+            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
             onClick={closeMenu}
           >
             <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
@@ -210,9 +210,9 @@ export default function SiteHeader() {
                     href={link.href}
                     className={cn(
                       'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
-                      'focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900',
-                      'data-[current=page]:bg-[#FFC000] data-[current=page]:text-black data-[current=page]:dark:text-black',
-                      'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#FFC000] dark:hover:text-[#FFC000]'
+                      'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900',
+                      'data-[current=page]:bg-gold data-[current=page]:text-black data-[current=page]:dark:text-black',
+                      'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gold dark:hover:text-gold'
                     )}
                     onClick={handleProtectedNavigation(link.requiresCompletion)}
                   >
@@ -243,7 +243,7 @@ export default function SiteHeader() {
                 !(hasMounted && Capacitor.isNativePlatform()) && (
                   <Link
                     href="/login"
-                    className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-[#FFC000] hover:text-black transition-colors"
+                    className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-gold hover:text-black transition-colors"
                   >
                     Entrar
                   </Link>

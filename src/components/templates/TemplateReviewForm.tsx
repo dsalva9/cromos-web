@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -80,7 +80,7 @@ export function TemplateReviewForm({
               variant="ghost"
               size="sm"
               onClick={() => toggleEdit('title')}
-              className="text-[#FFC000] hover:text-[#FFD700]"
+              className="text-gold hover:text-gold-light"
             >
               <Edit className="h-4 w-4" />
             </Button>
@@ -172,13 +172,13 @@ export function TemplateReviewForm({
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-[#FFC000]">
+              <div className="text-2xl font-bold text-gold">
                 {data.pages.length}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Páginas</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-[#FFC000]">
+              <div className="text-2xl font-bold text-gold">
                 {totalSlots}
               </div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Cromos Totales</div>
@@ -237,7 +237,7 @@ export function TemplateReviewForm({
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
-                    className="text-[#FFC000] hover:text-[#FFD700] underline"
+                    className="text-gold hover:text-gold-light underline"
                   >
                     Ver condiciones
                   </button>
@@ -288,7 +288,7 @@ export function TemplateReviewForm({
             <div className="pt-4">
               <Button
                 onClick={() => setTermsDialogOpen(false)}
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="w-full bg-gold text-black hover:bg-gold-light"
               >
                 Cerrar
               </Button>

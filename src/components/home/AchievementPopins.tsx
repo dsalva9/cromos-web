@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { Trophy, Star, Medal, Award, Zap } from 'lucide-react';

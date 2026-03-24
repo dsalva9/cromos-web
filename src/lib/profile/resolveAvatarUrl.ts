@@ -1,4 +1,4 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+﻿import { SupabaseClient } from '@supabase/supabase-js';
 import { isPresetAvatar } from '@/constants/avatars';
 
 /**
@@ -41,7 +41,7 @@ export function getAvatarFallback(nickname: string | null | undefined): {
   // Generate consistent gradient based on first character
   const charCode = initial.charCodeAt(0);
   const gradients = [
-    'bg-gradient-to-br from-[#FFC000] to-[#FF8C00]',
+    'bg-gradient-to-br from-gold to-[#FF8C00]',
     'bg-gradient-to-br from-[#FF6B6B] to-[#C92A2A]',
     'bg-gradient-to-br from-[#4ECDC4] to-[#1A535C]',
     'bg-gradient-to-br from-[#95E1D3] to-[#38A3A5]',

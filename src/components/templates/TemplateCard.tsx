@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -136,7 +136,7 @@ export function TemplateCard({
           <div className="flex-grow space-y-3">
             <Link
               href={`/templates/${template.id}`}
-              className="block hover:text-[#FFC000] transition-colors"
+              className="block hover:text-gold transition-colors"
             >
               <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-2">
                 {template.title}
@@ -163,7 +163,7 @@ export function TemplateCard({
 
             <div className="flex items-center gap-4 text-sm text-slate-400">
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                <Star className="h-4 w-4 fill-gold text-gold" />
                 <span className="font-bold text-gray-900 dark:text-white">
                   {template.rating_avg.toFixed(1)}
                 </span>
@@ -208,7 +208,7 @@ export function TemplateCard({
               className="w-full mt-3 block"
             >
               <Button
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300"
+                className="w-full bg-gold text-black hover:bg-gold-light font-medium relative overflow-hidden transition-all duration-300"
                 size="sm"
               >
                 <Edit className="mr-2 h-4 w-4" />
@@ -219,7 +219,7 @@ export function TemplateCard({
             <Button
               onClick={handleCopy}
               disabled={loading || copied}
-              className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium relative overflow-hidden transition-all duration-300 mt-3"
+              className="w-full bg-gold text-black hover:bg-gold-light font-medium relative overflow-hidden transition-all duration-300 mt-3"
               size="sm"
             >
               {copied ? (

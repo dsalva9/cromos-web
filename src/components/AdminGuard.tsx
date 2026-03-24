@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from '@/hooks/use-router';
@@ -32,7 +32,7 @@ export default function AdminGuard({
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#FFC000] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gold border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
           <p className="mt-4 text-white font-medium">Verificando permisos...</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export default function AdminGuard({
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#FFC000] border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gold border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
           <p className="mt-4 text-white font-medium">Redirigiendo...</p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function AdminGuard({
           </p>
           <button
             onClick={() => router.push(redirectTo)}
-            className="w-full bg-[#FFC000] hover:bg-[#FFD700] text-black font-bold py-3 px-6 rounded-lg border-4 border-black transition-colors"
+            className="w-full bg-gold hover:bg-gold-light text-black font-bold py-3 px-6 rounded-lg border-4 border-black transition-colors"
           >
             Volver al Inicio
           </button>

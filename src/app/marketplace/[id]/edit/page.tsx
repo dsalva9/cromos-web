@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useListing } from '@/hooks/marketplace/useListing';
@@ -39,7 +39,7 @@ function EditListingContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -59,13 +59,13 @@ function EditListingContent() {
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
-              className="text-[#FFC000] hover:text-yellow-400 underline"
+              className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com
             </a>
           </p>
           <Link href="/marketplace">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver al Marketplace
             </Button>
           </Link>
@@ -86,7 +86,7 @@ function EditListingContent() {
             Solo puedes editar tus propios anuncios
           </p>
           <Link href={`/marketplace/${listingId}`}>
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver al Anuncio
             </Button>
           </Link>

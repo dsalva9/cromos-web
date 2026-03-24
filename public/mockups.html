@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CambioCromos — Design Mockups (Tasks 6, 7, 8)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0f0f14; color: #e5e5e5; }
+  
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+  
+  h1 { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 8px; background: linear-gradient(135deg, #FFC000, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { text-align: center; color: #888; margin-bottom: 56px; font-size: 1.1rem; }
+  
+  .task-section { margin-bottom: 80px; }
+  .task-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .task-number { background: #FFC000; color: #000; font-weight: 800; font-size: 1.2rem; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .task-title { font-size: 1.5rem; font-weight: 700; color: #fff; }
+  .task-desc { color: #999; font-size: 0.95rem; margin-top: 4px; }
+  
+  .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 800px) { .comparison { grid-template-columns: 1fr; } }
+  
+  .panel { background: #1a1a22; border-radius: 16px; overflow: hidden; border: 1px solid #2a2a35; }
+  .panel-label { padding: 12px 20px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .panel-label.before { background: #2a1a1a; color: #ff6b6b; }
+  .panel-label.after { background: #1a2a1a; color: #51cf66; }
+  .panel-content { padding: 24px; }
+  
+  /* === TASK 6: BADGES === */
+  .badge-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+  
+  /* Before badges — inconsistent */
+  .badge-before-1 { background: #22c55e; color: #fff; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; }
+  .badge-before-2 { background: #1e293b; color: #fff; font-size: 0.8rem; padding: 6px 16px; border-radius: 9999px; border: 2px solid #000; }
+  .badge-before-3 { background: #3b82f6; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; }
+  .badge-before-4 { background: #ec4899; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 0.65rem; }
+  .badge-before-5 { background: #9ca3af; color: #fff; padding: 5px 14px; border-radius: 9999px; font-size: 0.8rem; }
+  .badge-before-6 { background: #f97316; color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; border: 1px solid #000; }
+  .badge-before-7 { background: #FFC000; color: #000; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; border: 3px solid #000; }
+  .badge-before-8 { background: #e5e7eb; color: #6b7280; padding: 3px 10px; border-radius: 6px; font-size: 0.7rem; }
+
+  /* After badges — harmonized */
+  .badge-success { background: #10b981; color: #fff; border: 2px solid #000; }
+  .badge-warning { background: #f59e0b; color: #000; border: 2px solid #000; }
+  .badge-info { background: #0ea5e9; color: #fff; border: 2px solid #000; }
+  .badge-neutral { background: #6b7280; color: #fff; border: 2px solid #000; }
+  .badge-destructive { background: #ef4444; color: #fff; border: 2px solid #000; }
+  .badge-brand { background: #FFC000; color: #000; border: 2px solid #000; }
+  
+  .badge-group { margin-bottom: 16px; }
+  .badge-group-label { font-size: 0.7rem; color: #666; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* === TASK 7: SLOT CARDS === */
+  .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 600px) { .slots-grid { grid-template-columns: repeat(2, 1fr); } }
+  
+  .slot-card { background: #fff; border-radius: 8px; padding: 14px; color: #1a1a2e; position: relative; overflow: hidden; }
+  .slot-card .slot-num { font-size: 0.7rem; color: #999; font-weight: 600; }
+  .slot-card .slot-name { font-size: 0.85rem; font-weight: 700; margin: 4px 0; color: #1a1a2e; }
+  .slot-card .slot-status { font-size: 0.7rem; font-weight: 600; margin-top: 6px; }
+  
+  /* Before slots — flat */
+  .slot-flat { border: 1px solid #d1d5db; border-radius: 4px; }
+  .slot-flat .slot-status.falta { color: #9ca3af; }
+  .slot-flat .slot-status.tengo { color: #22c55e; }
+  .slot-flat .slot-status.repe { color: #000; }
+  .slot-flat .repe-controls { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .slot-flat .repe-controls button { width: 24px; height: 24px; border: 1px solid #999; background: #eee; font-size: 0.8rem; cursor: pointer; font-family: monospace; }
+  .slot-flat .repe-controls span { font-size: 0.8rem; font-weight: 600; }
+  
+  /* After slots — physical */
+  .slot-physical { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb; transition: all 0.2s ease; }
+  .slot-physical:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+  .slot-physical.state-falta { background: repeating-linear-gradient(135deg, #fff, #fff 8px, #f9fafb 8px, #f9fafb 16px); opacity: 0.75; }
+  .slot-physical.state-falta .slot-status { display: inline-block; background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; }
+  .slot-physical.state-tengo { border-left: 4px solid #10b981; }
+  .slot-physical.state-tengo .slot-status { color: #10b981; display: flex; align-items: center; gap: 4px; }
+  .slot-physical.state-tengo .slot-status::before { content: '✓'; font-weight: 800; }
+  .slot-physical.state-repe { border-left: 4px solid #FFC000; }
+  .slot-physical .repe-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .slot-physical .repe-controls button { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #000; background: #FFC000; font-size: 0.9rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #000; }
+  .slot-physical .repe-controls button:hover { background: #FFD700; }
+  .slot-physical .repe-controls span { font-size: 0.85rem; font-weight: 700; }
+  .slot-physical .repe-badge { display: inline-block; background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; border: 2px solid #000; }
+  .slot-physical .crear-btn { display: block; width: 100%; margin-top: 10px; padding: 6px; background: #FFC000; color: #000; border: 2px solid #000; border-radius: 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; text-transform: uppercase; text-align: center; }
+  .slot-physical .crear-btn:hover { background: #FFD700; }
+
+  /* === TASK 8: TABS === */
+  .tabs-demo { background: #f3f4f6; border-radius: 12px; padding: 20px; }
+  
+  /* Before tabs — wrapping */
+  .tabs-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: #fff; border: 2px solid #000; border-radius: 8px; }
+  .tab { padding: 6px 14px; font-size: 0.8rem; font-weight: 600; border-radius: 6px; white-space: nowrap; cursor: pointer; color: #1a1a2e; background: transparent; border: none; }
+  .tab.active { background: #FFC000; color: #000; }
+  .tab:hover:not(.active) { background: #f3f4f6; }
+  
+  /* After tabs — single row scroll */
+  .tabs-scroll-wrapper { position: relative; }
+  .tabs-scroll { display: flex; flex-wrap: nowrap; gap: 6px; padding: 8px; background: #fff; border: 2px solid #000; border-radius: 8px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .tabs-scroll::-webkit-scrollbar { display: none; }
+  .tabs-scroll .tab { flex-shrink: 0; }
+  .tabs-scroll-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 60px; background: linear-gradient(to right, transparent, #f3f4f6); pointer-events: none; border-radius: 0 8px 8px 0; }
+  
+  .placeholder-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+  .placeholder-card { background: #e5e7eb; border-radius: 8px; height: 80px; }
+  .placeholder-text { text-align: center; color: #9ca3af; font-size: 0.8rem; padding-top: 16px; }
+  
+  hr { border: none; border-top: 1px solid #2a2a35; margin: 0 0 32px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Design Mockups</h1>
+  <p class="subtitle">Before / After — Tasks 6, 7, and 8</p>
+
+  <!-- TASK 6 -->
+  <div class="task-section">
+    <div class="task-header">
+      <div class="task-number">6</div>
+      <div>
+        <div class="task-title">Harmonize the Badge & Color System</div>
+        <div class="task-desc">Unify ~8 inconsistent badge styles into 5 semantic variants</div>
+      </div>
+    </div>
+    <div class="comparison">
+      <div class="panel">
+        <div class="panel-label before">Before — Inconsistent</div>
+        <div class="panel-content">
+          <div class="badge-grid">
+            <span class="badge badge-before-1">DISPONIBLE</span>
+            <span class="badge badge-before-2">CROMO INDIVIDUAL</span>
+            <span class="badge badge-before-3">INTERCAMBIO</span>
+            <span class="badge badge-before-4">EN MARKETPLACE</span>
+            <span class="badge badge-before-5">VENDIDO</span>
+            <span class="badge badge-before-6">PACK</span>
+            <span class="badge badge-before-7">REPE</span>
+            <span class="badge badge-before-8">FALTA</span>
+          </div>
+          <p style="margin-top: 16px; font-size: 0.8rem; color: #666;">
+            ⚠ Different sizes, colors, paddings, border-radius, and borders. No consistent system.
+          </p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-label after">After — Semantic System</div>
+        <div class="panel-content">
+          <div class="badge-group">
+            <div class="badge-group-label">✅ Success — have / available</div>
+            <div class="badge-grid"><span class="badge badge-success">DISPONIBLE</span> <span class="badge badge-success">TENGO</span> <span class="badge badge-success">COMPLETADO</span></div>
+          </div>
+          <div class="badge-group">
+            <div class="badge-group-label">⚠️ Warning — duplicates / attention</div>
+            <div class="badge-grid"><span class="badge badge-warning">REPE</span> <span class="badge badge-warning">RESERVADO</span></div>
+          </div>
+          <div class="badge-group">
+            <div class="badge-group-label">ℹ️ Info — marketplace / trade type</div>
+            <div class="badge-grid"><span class="badge badge-info">EN MARKETPLACE</span> <span class="badge badge-info">INTERCAMBIO</span></div>
+          </div>
+          <div class="badge-group">
+            <div class="badge-group-label">🔴 Destructive — missing / errors</div>
+            <div class="badge-grid"><span class="badge badge-destructive">FALTA</span> <span class="badge badge-destructive">ELIMINADO</span></div>
+          </div>
+          <div class="badge-group">
+            <div class="badge-group-label">⚫ Neutral — inactive / sold</div>
+            <div class="badge-grid"><span class="badge badge-neutral">VENDIDO</span> <span class="badge badge-neutral">CANCELADO</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 7 -->
+  <div class="task-section">
+    <div class="task-header">
+      <div class="task-number">7</div>
+      <div>
+        <div class="task-title">Make Collection Cards Feel Physical</div>
+        <div class="task-desc">Add shadows, hover lift, state-specific visuals, and branded controls</div>
+      </div>
+    </div>
+    <div class="comparison">
+      <div class="panel">
+        <div class="panel-label before">Before — Flat & Lifeless</div>
+        <div class="panel-content">
+          <div class="slots-grid">
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#23</div>
+              <div class="slot-name">Pedri</div>
+              <div class="slot-status falta">FALTA</div>
+            </div>
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#24</div>
+              <div class="slot-name">Gavi</div>
+              <div class="slot-status tengo">TENGO</div>
+            </div>
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#25</div>
+              <div class="slot-name">De Jong</div>
+              <div class="slot-status repe">REPE</div>
+              <div class="repe-controls">
+                <button>−</button>
+                <span>2</span>
+                <button>+</button>
+              </div>
+            </div>
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#26</div>
+              <div class="slot-name">Lewandowski</div>
+              <div class="slot-status falta">FALTA</div>
+            </div>
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#27</div>
+              <div class="slot-name">Raphinha</div>
+              <div class="slot-status tengo">TENGO</div>
+            </div>
+            <div class="slot-card slot-flat">
+              <div class="slot-num">#28</div>
+              <div class="slot-name">Araujo</div>
+              <div class="slot-status repe">REPE</div>
+              <div class="repe-controls">
+                <button>−</button>
+                <span>3</span>
+                <button>+</button>
+              </div>
+            </div>
+          </div>
+          <p style="margin-top: 12px; font-size: 0.8rem; color: #666;">
+            ⚠ No shadows, no hover, browser-default +/- buttons, all states look the same.
+          </p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-label after">After — Physical & Interactive</div>
+        <div class="panel-content">
+          <p style="font-size: 0.75rem; color: #888; margin-bottom: 12px;">↕ Hover over cards to see the lift effect</p>
+          <div class="slots-grid">
+            <div class="slot-card slot-physical state-falta">
+              <div class="slot-num">#23</div>
+              <div class="slot-name">Pedri</div>
+              <div class="slot-status">FALTA</div>
+            </div>
+            <div class="slot-card slot-physical state-tengo">
+              <div class="slot-num">#24</div>
+              <div class="slot-name">Gavi</div>
+              <div class="slot-status">TENGO</div>
+            </div>
+            <div class="slot-card slot-physical state-repe">
+              <div class="slot-num">#25</div>
+              <div class="slot-name">De Jong</div>
+              <span class="repe-badge">REPE ×2</span>
+              <div class="repe-controls">
+                <button>−</button>
+                <span>2</span>
+                <button>+</button>
+              </div>
+            </div>
+            <div class="slot-card slot-physical state-falta">
+              <div class="slot-num">#26</div>
+              <div class="slot-name">Lewandowski</div>
+              <div class="slot-status">FALTA</div>
+            </div>
+            <div class="slot-card slot-physical state-tengo">
+              <div class="slot-num">#27</div>
+              <div class="slot-name">Raphinha</div>
+              <div class="slot-status">TENGO</div>
+              <button class="crear-btn">Crear Anuncio</button>
+            </div>
+            <div class="slot-card slot-physical state-repe">
+              <div class="slot-num">#28</div>
+              <div class="slot-name">Araujo</div>
+              <span class="repe-badge">REPE ×3</span>
+              <div class="repe-controls">
+                <button>−</button>
+                <span>3</span>
+                <button>+</button>
+              </div>
+              <button class="crear-btn">Crear Anuncio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 8 -->
+  <div class="task-section">
+    <div class="task-header">
+      <div class="task-number">8</div>
+      <div>
+        <div class="task-title">Fix Team Tabs Overflow</div>
+        <div class="task-desc">Replace wrapping 3-row tabs with a single scrollable row</div>
+      </div>
+    </div>
+    <div class="comparison">
+      <div class="panel">
+        <div class="panel-label before">Before — Tabs Wrap Into 3 Rows</div>
+        <div class="panel-content">
+          <div class="tabs-demo">
+            <div class="tabs-wrap">
+              <button class="tab">Todos</button>
+              <button class="tab active">Athletic Club</button>
+              <button class="tab">Atlético de Madrid</button>
+              <button class="tab">FC Barcelona</button>
+              <button class="tab">Real Betis</button>
+              <button class="tab">Celta de Vigo</button>
+              <button class="tab">Getafe CF</button>
+              <button class="tab">Girona FC</button>
+              <button class="tab">CD Leganés</button>
+              <button class="tab">RCD Mallorca</button>
+              <button class="tab">CA Osasuna</button>
+              <button class="tab">Rayo Vallecano</button>
+              <button class="tab">Real Madrid</button>
+              <button class="tab">Real Sociedad</button>
+              <button class="tab">Sevilla FC</button>
+              <button class="tab">UD Las Palmas</button>
+              <button class="tab">Valencia CF</button>
+              <button class="tab">Real Valladolid</button>
+              <button class="tab">Villarreal CF</button>
+              <button class="tab">Dep. Alavés</button>
+            </div>
+            <p class="placeholder-text" style="color: #ef4444;">↓ Content pushed far below</p>
+            <div class="placeholder-grid">
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-label after">After — Single Scrollable Row</div>
+        <div class="panel-content">
+          <div class="tabs-demo">
+            <p style="font-size: 0.75rem; color: #888; margin-bottom: 8px;">← Scroll horizontally →</p>
+            <div class="tabs-scroll-wrapper">
+              <div class="tabs-scroll">
+                <button class="tab">Todos</button>
+                <button class="tab active">Athletic Club</button>
+                <button class="tab">Atlético de Madrid</button>
+                <button class="tab">FC Barcelona</button>
+                <button class="tab">Real Betis</button>
+                <button class="tab">Celta de Vigo</button>
+                <button class="tab">Getafe CF</button>
+                <button class="tab">Girona FC</button>
+                <button class="tab">CD Leganés</button>
+                <button class="tab">RCD Mallorca</button>
+                <button class="tab">CA Osasuna</button>
+                <button class="tab">Rayo Vallecano</button>
+                <button class="tab">Real Madrid</button>
+                <button class="tab">Real Sociedad</button>
+                <button class="tab">Sevilla FC</button>
+                <button class="tab">UD Las Palmas</button>
+                <button class="tab">Valencia CF</button>
+                <button class="tab">Real Valladolid</button>
+                <button class="tab">Villarreal CF</button>
+                <button class="tab">Dep. Alavés</button>
+              </div>
+            </div>
+            <p class="placeholder-text" style="color: #22c55e;">↓ Content immediately visible</p>
+            <div class="placeholder-grid">
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+              <div class="placeholder-card"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

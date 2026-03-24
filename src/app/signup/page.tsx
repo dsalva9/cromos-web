@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -82,7 +82,7 @@ export default function SignupPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center px-4">
         {/* Logo/Header */}
         <div className="mb-8 text-center">
-          <div className="w-20 h-20 bg-[#FFC000] rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
+          <div className="w-20 h-20 bg-gold rounded-md mx-auto mb-4 flex items-center justify-center text-4xl border-2 border-black shadow-xl">
             📧
           </div>
           <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
@@ -113,7 +113,7 @@ export default function SignupPage() {
               </p>
 
               <Link href="/login">
-                <Button className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200">
+                <Button className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200">
                   Ir a iniciar sesión
                 </Button>
               </Link>
@@ -179,7 +179,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -197,7 +197,7 @@ export default function SignupPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function SignupPage() {
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -240,7 +240,7 @@ export default function SignupPage() {
                     <Link
                       href="/legal/terms"
                       target="_blank"
-                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
+                      className="font-semibold text-gold hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
                       Términos de servicio
                     </Link>{' '}
@@ -248,7 +248,7 @@ export default function SignupPage() {
                     <Link
                       href="/legal/privacy"
                       target="_blank"
-                      className="font-semibold text-[#FFC000] hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
+                      className="font-semibold text-gold hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
                       Política de privacidad
                     </Link>
@@ -277,7 +277,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
+              className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
@@ -290,7 +290,7 @@ export default function SignupPage() {
                 ¿Ya tienes cuenta?{' '}
                 <Link
                   href="/login"
-                  className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+                  className="text-gold hover:text-yellow-400 font-bold hover:underline"
                 >
                   Iniciar sesión
                 </Link>

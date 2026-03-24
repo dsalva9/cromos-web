@@ -99,7 +99,7 @@ export function NotificationPromptBanner() {
           width: calc(100% - 2rem);
           max-width: 420px;
           padding: 0.875rem 1rem;
-          background: #FFC000;
+          background: var(--gold);
           color: #1a1a1a;
           border-radius: 0.75rem;
           box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
@@ -139,7 +139,7 @@ export function NotificationPromptBanner() {
         .notification-prompt-banner__cta {
           padding: 0.375rem 0.875rem;
           background: #1a1a1a;
-          color: #FFC000;
+          color: var(--gold);
           border: none;
           border-radius: 0.5rem;
           font-weight: 600;

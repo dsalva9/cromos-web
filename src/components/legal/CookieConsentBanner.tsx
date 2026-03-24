@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from '@/components/ui/link';
@@ -44,7 +44,7 @@ export function CookieConsentBanner() {
                 >
                     <div className="bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-700 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,192,0,0.2)] p-6 rounded-lg">
                         <div className="flex items-start gap-4">
-                            <div className="flex-shrink-0 w-10 h-10 bg-[#FFC000] rounded-full flex items-center justify-center border-2 border-black">
+                            <div className="flex-shrink-0 w-10 h-10 bg-gold rounded-full flex items-center justify-center border-2 border-black">
                                 <Cookie className="w-5 h-5 text-black" />
                             </div>
                             <div className="flex-1">
@@ -59,14 +59,14 @@ export function CookieConsentBanner() {
                                 </h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
                                     Utilizamos cookies para analizar el tráfico y mejorar tu experiencia. Al aceptar, nos ayudas a optimizar la plataforma. Consulta nuestra{' '}
-                                    <Link href="/legal/cookies" className="text-[#FFC000] hover:underline font-bold">
+                                    <Link href="/legal/cookies" className="text-gold hover:underline font-bold">
                                         Política de Cookies
                                     </Link> para más detalles.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-2">
                                     <Button
                                         onClick={handleAccept}
-                                        className="bg-[#FFC000] hover:bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex-1"
+                                        className="bg-gold hover:bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex-1"
                                     >
                                         Aceptar todas
                                     </Button>
@@ -81,7 +81,7 @@ export function CookieConsentBanner() {
                                 <div className="mt-3 text-center">
                                     <Link
                                         href="/legal/cookies"
-                                        className="text-xs text-gray-500 hover:text-[#FFC000] transition-colors underline underline-offset-2"
+                                        className="text-xs text-gray-500 hover:text-gold transition-colors underline underline-offset-2"
                                     >
                                         Personalizar preferencias
                                     </Link>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -17,7 +17,7 @@ export function LegalSettingsTab() {
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
-                                    <FileText className="w-5 h-5 text-[#FFC000]" />
+                                    <FileText className="w-5 h-5 text-gold" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white">Términos de Servicio</h3>
@@ -26,7 +26,7 @@ export function LegalSettingsTab() {
                                     </p>
                                 </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#FFC000] transition-colors" />
+                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gold transition-colors" />
                         </Link>
 
                         {/* Privacy */}

@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+﻿import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Términos de Servicio y Condiciones de Uso - Cambiocromos.com',
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
     return (
         <div className="prose dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-black uppercase mb-6 text-[#FFC000]">Términos de Servicio</h1>
+            <h1 className="text-3xl font-black uppercase mb-6 text-gold">Términos de Servicio</h1>
             <p className="text-sm text-gray-500 mb-8">Última actualización: {new Date().toLocaleDateString('es-ES')}</p>
 
             <h2>1. Aceptación de los Términos</h2>

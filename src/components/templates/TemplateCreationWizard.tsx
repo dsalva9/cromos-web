@@ -307,7 +307,7 @@ export function TemplateCreationWizard({
               <Button
                 onClick={handleNext}
                 disabled={!canGoNext()}
-                className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="bg-gold text-black hover:bg-gold-light"
               >
                 Siguiente
                 <ChevronRight className="ml-2 h-4 w-4" />
@@ -316,7 +316,7 @@ export function TemplateCreationWizard({
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !canGoNext()}
-                className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="bg-gold text-black hover:bg-gold-light"
               >
                 {isSubmitting ? 'Creando...' : 'Crear Colección'}
                 <Check className="ml-2 h-4 w-4" />

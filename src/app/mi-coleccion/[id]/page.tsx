@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Suspense, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -109,7 +109,7 @@ function AlbumView() {
                   value={activeCollection?.id ?? ''}
                   onChange={e => switchCollection(Number(e.target.value))}
                   disabled={switchingCollection}
-                  className="bg-white text-gray-900 text-sm font-bold px-4 py-2 rounded-md shadow-xl focus:outline-none focus:ring-2 focus:ring-[#FFC000] border-2 border-black"
+                  className="bg-white text-gray-900 text-sm font-bold px-4 py-2 rounded-md shadow-xl focus:outline-none focus:ring-2 focus:ring-gold border-2 border-black"
                 >
                   {collections.map(option => (
                     <option key={option.id} value={option.id}>

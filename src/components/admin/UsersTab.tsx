@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -293,7 +293,7 @@ export default function UsersTab() {
                   <td className="px-3 py-2 border-b border-black">
                     <div className="flex gap-1 flex-wrap">
                       {u.is_admin && (
-                        <span className="bg-[#FFC000] text-black px-2 py-0.5 rounded text-xs font-bold">
+                        <span className="bg-gold text-black px-2 py-0.5 rounded text-xs font-bold">
                           ADMIN
                         </span>
                       )}

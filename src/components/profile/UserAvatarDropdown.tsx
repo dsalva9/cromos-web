@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, MouseEvent } from 'react';
 import Link from '@/components/ui/link';
@@ -84,8 +84,8 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
         onClick={() => handleSetIsOpen(!isOpen)}
         className={cn(
           'flex items-center gap-2 rounded-full border-2 border-black transition-all',
-          'hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-50',
-          isOpen && 'border-[#FFC000]'
+          'hover:border-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-gray-50',
+          isOpen && 'border-gold'
         )}
         aria-expanded={isOpen}
         aria-label="Menú de perfil"
@@ -180,7 +180,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                   <Link
                     href="/admin/dashboard"
                     onClick={handleProtectedClick('/admin/dashboard')}
-                    className="flex items-center gap-3 px-4 py-2 text-[#FFC000] hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-bold"
+                    className="flex items-center gap-3 px-4 py-2 text-gold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-bold"
                   >
                     <span>Admin Panel</span>
                   </Link>

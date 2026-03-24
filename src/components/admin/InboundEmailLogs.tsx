@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { Mail, ChevronDown, ChevronUp, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
@@ -112,7 +112,7 @@ export default function InboundEmailLogs() {
   if (loading && logs.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFC000]"></div>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
         <p className="text-zinc-400 mt-4">Loading email logs...</p>
       </div>
     );

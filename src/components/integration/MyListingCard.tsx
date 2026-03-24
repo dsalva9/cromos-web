@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -149,7 +149,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             <div className="flex items-start justify-between gap-4">
               <div>
                 <Link href={`/marketplace/${listing.listing_id}`}>
-                  <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-[#FFC000] transition-colors">
+                  <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-gold transition-colors">
                     {listing.title}
                   </h3>
                 </Link>

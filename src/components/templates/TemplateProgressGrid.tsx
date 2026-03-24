@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { SlotTile } from '@/components/templates/SlotTile';
@@ -152,14 +152,14 @@ export function TemplateProgressGrid({
                   value={pageNum.toString()}
                   className="
                     flex-shrink-0
-                    data-[state=active]:bg-[#FFC000]
+                    data-[state=active]:bg-gold
                     data-[state=active]:text-black
                     data-[state=active]:font-bold
                     text-gray-500 dark:text-gray-400
                     hover:text-black dark:hover:text-white
                     hover:bg-gray-100 dark:hover:bg-gray-700
                     border border-transparent
-                    data-[state=active]:border-[#FFC000]
+                    data-[state=active]:border-gold
                     rounded-lg px-3 py-2 text-xs sm:text-sm sm:px-4
                     transition-all duration-200
                     max-w-[160px] sm:max-w-[200px]
@@ -186,8 +186,8 @@ export function TemplateProgressGrid({
           onClick={() => setConfirmDialogOpen(true)}
           variant="outline"
           className="
-            border-[#FFC000] text-[#FFC000] 
-            hover:bg-[#FFC000] hover:text-black
+            border-gold text-gold 
+            hover:bg-gold hover:text-black
             transition-all duration-300
             font-bold
           "
@@ -218,7 +218,7 @@ export function TemplateProgressGrid({
         <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 shadow-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <CheckCircle2 className="text-[#FFC000]" />
+              <CheckCircle2 className="text-gold" />
               Completar toda la página
             </DialogTitle>
             <DialogDescription className="text-gray-500 dark:text-gray-400 pt-2">
@@ -246,7 +246,7 @@ export function TemplateProgressGrid({
             <Button
               onClick={handleCompleteAllPage}
               disabled={isCompletingPage}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+              className="bg-gold text-black hover:bg-gold-light font-bold"
             >
               {isCompletingPage ? 'Completando...' : 'Confirmar Completado'}
             </Button>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { LayoutTemplate, Store, MessageSquare } from 'lucide-react';
@@ -41,12 +41,12 @@ export default function HowItWorks() {
                 className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
               >
                 <ModernCardContent className="p-6 text-center space-y-5">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFC000] text-gray-900 font-extrabold text-xl border-2 border-black rounded-lg shadow-lg">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gold text-gray-900 font-extrabold text-xl border-2 border-black rounded-lg shadow-lg">
                     {index + 1}
                   </div>
 
                   <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-lg border-2 border-black bg-gray-100 dark:bg-gray-700 shadow-lg">
-                    <Icon className="h-8 w-8 text-[#FFC000]" />
+                    <Icon className="h-8 w-8 text-gold" />
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white uppercase">

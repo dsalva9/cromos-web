@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ProfileBadgesSimple Component
  * Simplified badges display for profile pages - shows only earned badges
  */
@@ -31,7 +31,7 @@ export function ProfileBadgesSimple({
     return (
       <div className={cn('space-y-3', className)}>
         <div className="flex items-center gap-2">
-          <Award className="w-5 h-5 text-[#FFC000]" />
+          <Award className="w-5 h-5 text-gold" />
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
         </div>
         <div className="animate-pulse">
@@ -54,12 +54,12 @@ export function ProfileBadgesSimple({
       <div className={cn('space-y-3', className)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-[#FFC000]" />
+            <Award className="w-5 h-5 text-gold" />
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
           </div>
           <Link
             href="/profile#badges"
-            className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
+            className="text-xs text-gold hover:text-yellow-600 font-bold underline"
           >
             Ver todos los logros
           </Link>
@@ -89,7 +89,7 @@ export function ProfileBadgesSimple({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Award className="w-5 h-5 text-[#FFC000]" />
+          <Award className="w-5 h-5 text-gold" />
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">Logros</h3>
           <span className="text-xs text-gray-500 dark:text-gray-400 font-semibold">
             ({badges.length})
@@ -97,7 +97,7 @@ export function ProfileBadgesSimple({
         </div>
         <Link
           href="/profile#badges"
-          className="text-xs text-[#FFC000] hover:text-yellow-600 font-bold underline"
+          className="text-xs text-gold hover:text-yellow-600 font-bold underline"
         >
           Ver todos
         </Link>

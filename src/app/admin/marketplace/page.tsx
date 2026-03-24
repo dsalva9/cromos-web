@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useAdminListings } from '@/hooks/admin/useAdminListings';
@@ -131,7 +131,7 @@ function MarketplaceContent() {
         {/* Listings Table */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-[#FFC000]" />
+            <Loader2 className="h-8 w-8 animate-spin text-gold" />
           </div>
         ) : (
           <div className="space-y-4">

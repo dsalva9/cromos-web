@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import { cn } from '@/lib/utils';
@@ -37,9 +37,9 @@ export function UserLink({
 
   // Variant-specific styles
   const variantStyles = {
-    default: 'text-gray-900 dark:text-white hover:text-[#FFC000] hover:underline',
-    subtle: 'text-gray-600 dark:text-gray-300 hover:text-[#FFC000] hover:underline',
-    bold: 'font-bold text-gray-900 dark:text-white hover:text-[#FFC000] hover:underline',
+    default: 'text-gray-900 dark:text-white hover:text-gold hover:underline',
+    subtle: 'text-gray-600 dark:text-gray-300 hover:text-gold hover:underline',
+    bold: 'font-bold text-gray-900 dark:text-white hover:text-gold hover:underline',
     muted: 'text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:underline',
   };
 

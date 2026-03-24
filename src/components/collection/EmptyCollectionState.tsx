@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -20,7 +20,7 @@ export default function EmptyCollectionState() {
       <div className="container mx-auto px-4 max-w-2xl">
         <ModernCard className="bg-white border-2 border-gray-200 shadow-xl">
           <ModernCardContent className="p-12 text-center">
-            <Trophy className="w-20 h-20 text-[#FFC000] mx-auto mb-6" />
+            <Trophy className="w-20 h-20 text-gold mx-auto mb-6" />
             <h1 className="text-3xl font-black uppercase text-gray-900 mb-4">
               ¡Bienvenido a {siteConfig.name}!
             </h1>
@@ -37,7 +37,7 @@ export default function EmptyCollectionState() {
               <Button
                 onClick={handleGoToProfile}
                 size="lg"
-                className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 px-8 py-3 text-lg font-black uppercase rounded-md shadow-xl border-2 border-black transition-all duration-200"
+                className="bg-gold hover:bg-yellow-400 text-gray-900 px-8 py-3 text-lg font-black uppercase rounded-md shadow-xl border-2 border-black transition-all duration-200"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Seguir una Colección

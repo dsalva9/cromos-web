@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 
@@ -209,7 +209,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           {/* Marketplace Indicator for Missing Stickers */}
           {slot.status === 'missing' && inMarketplace && (
             <Link href={`/marketplace?search=${encodeURIComponent(slot.label || `#${slot.slot_number}`)}`} className="block">
-              <div className="w-full bg-[#FFC000]/10 border border-[#FFC000]/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-[#FFC000] hover:bg-[#FFC000]/20 transition-colors cursor-pointer font-bold">
+              <div className="w-full bg-gold/10 border border-gold/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-gold hover:bg-gold/20 transition-colors cursor-pointer font-bold">
                 <ShoppingBag className="w-3 h-3" />
                 <span>EN MARKETPLACE</span>
               </div>
@@ -310,7 +310,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
       {/* Loading Overlay */}
       {updating && (
         <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-[1px] flex items-center justify-center z-10">
-          <div className="animate-spin h-5 w-5 border-2 border-[#FFC000] border-r-transparent rounded-full" />
+          <div className="animate-spin h-5 w-5 border-2 border-gold border-r-transparent rounded-full" />
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import Link from '@/components/ui/link';
+﻿import Link from '@/components/ui/link';
 import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import {
@@ -29,14 +29,14 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
   return (
     <Link
       href={composeHref}
-      className="block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]"
+      className="block rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F2937]"
       aria-label={`Crear propuesta de intercambio con ${displayName}`}
     >
-      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black transition-all duration-200 hover:border-[#FFC000] hover:shadow-2xl cursor-pointer">
+      <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black transition-all duration-200 hover:border-gold hover:shadow-2xl cursor-pointer">
         <ModernCardContent className="p-6">
           {/* User Header */}
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-[#FFC000] border-2 border-black rounded-md flex items-center justify-center">
+            <div className="w-10 h-10 bg-gold border-2 border-black rounded-md flex items-center justify-center">
               <User className="w-5 h-5 text-gray-900" />
             </div>
             <div className="flex-1 min-w-0">
@@ -96,7 +96,7 @@ export function MatchCard({ match, collectionId }: MatchCardProps) {
           </div>
 
           {/* Total Mutual Benefit */}
-          <div className="flex items-center justify-center p-3 bg-[#FFC000] border-2 border-black rounded-md">
+          <div className="flex items-center justify-center p-3 bg-gold border-2 border-black rounded-md">
             <TrendingUp className="w-4 h-4 text-gray-900 mr-2" />
             <span className="text-sm font-black uppercase text-gray-900">
               {match.total_mutual_overlap} intercambios mutuos

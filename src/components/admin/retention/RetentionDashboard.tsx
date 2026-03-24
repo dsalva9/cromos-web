@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -55,7 +55,7 @@ export function RetentionDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FFC000]" />
+        <Loader2 className="h-8 w-8 animate-spin text-gold" />
       </div>
     );
   }
@@ -66,7 +66,7 @@ export function RetentionDashboard() {
       <ModernCard>
         <ModernCardHeader>
           <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-[#FFC000]" />
+            <Clock className="h-5 w-5 text-gold" />
             <h3 className="text-lg font-semibold text-white">Eliminaciones Pendientes</h3>
           </div>
         </ModernCardHeader>

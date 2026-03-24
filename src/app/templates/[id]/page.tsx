@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useTemplateDetails } from '@/hooks/templates/useTemplateDetails';
@@ -154,7 +154,7 @@ export default function TemplateDetailsPage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-[#FFC000] animate-spin" />
+          <Loader2 className="w-12 h-12 text-gold animate-spin" />
           <p className="text-slate-400">Cargando colección...</p>
         </div>
       </div>
@@ -175,14 +175,14 @@ export default function TemplateDetailsPage() {
               Por favor contacta con{' '}
               <a
                 href="mailto:soporte@cambiocromos.com"
-                className="text-[#FFC000] hover:text-yellow-400 underline"
+                className="text-gold hover:text-yellow-400 underline"
               >
                 soporte@cambiocromos.com
               </a>
             </p>
             <Button
               onClick={() => router.push('/templates')}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              className="bg-gold text-black hover:bg-gold-light"
             >
               Volver a Colecciones
             </Button>
@@ -267,9 +267,9 @@ export default function TemplateDetailsPage() {
                       type="button"
                       onClick={scrollToRatings}
                       aria-label="Ir a la sección de valoraciones"
-                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] rounded"
+                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded"
                     >
-                      <Star className="h-5 w-5 fill-[#FFC000] text-[#FFC000]" />
+                      <Star className="h-5 w-5 fill-gold text-gold" />
                       <span className="font-bold text-white text-base">
                         {template.rating_avg.toFixed(1)}
                       </span>
@@ -297,7 +297,7 @@ export default function TemplateDetailsPage() {
                       por{' '}
                       <Link
                         href={`/users/${template.author_id}`}
-                        className="text-[#FFC000] hover:text-[#FFD700] transition-colors underline"
+                        className="text-gold hover:text-gold-light transition-colors underline"
                       >
                         {template.author_nickname}
                       </Link>
@@ -327,7 +327,7 @@ export default function TemplateDetailsPage() {
                       href={`/templates/${templateId}/edit`}
                       className="block"
                     >
-                      <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
+                      <Button className="w-full bg-gold text-black hover:bg-gold-light font-medium">
                         <Edit className="mr-2 h-4 w-4" />
                         Editar Colección
                       </Button>
@@ -357,7 +357,7 @@ export default function TemplateDetailsPage() {
                   <Button
                     onClick={handleCopy}
                     disabled={copying || copied}
-                    className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium py-6 text-lg"
+                    className="w-full bg-gold text-black hover:bg-gold-light font-medium py-6 text-lg"
                   >
                     {copied ? (
                       <>
@@ -409,13 +409,13 @@ export default function TemplateDetailsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pages.map(page => (
-              <ModernCard key={page.id} className="hover:border-[#FFC000]/50 transition-colors">
+              <ModernCard key={page.id} className="hover:border-gold/50 transition-colors">
                 <ModernCardContent className="p-4">
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-bold text-[#FFC000] bg-[#FFC000]/10 px-2 py-0.5 rounded">
+                          <span className="text-xs font-bold text-gold bg-gold/10 px-2 py-0.5 rounded">
                             Pagina {page.page_number}
                           </span>
                           <span className="text-xs font-medium text-slate-500 bg-slate-700 px-2 py-0.5 rounded capitalize">
@@ -524,7 +524,7 @@ export default function TemplateDetailsPage() {
                     {!isAuthor && (
                       <Button
                         onClick={handleRateClick}
-                        className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium px-6"
+                        className="bg-gold text-black hover:bg-gold-light font-medium px-6"
                       >
                         <Star className="mr-2 h-4 w-4" />
                         Valorar colección

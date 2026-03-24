@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Package, X, CheckCircle, XCircle, MoreVertical } from 'lucide-react';
@@ -61,7 +61,7 @@ export function FloatingActionMenu({
                                 setIsOpen(false);
                             }}
                             disabled={reserving}
-                            className="flex items-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full shadow-lg hover:bg-gray-100 transition-all whitespace-nowrap border-2 border-[#FFC000]"
+                            className="flex items-center gap-2 bg-white text-gray-900 px-4 py-3 rounded-full shadow-lg hover:bg-gray-100 transition-all whitespace-nowrap border-2 border-gold"
                         >
                             <Package className="h-5 w-5" />
                             <span className="font-bold text-sm">
@@ -109,7 +109,7 @@ export function FloatingActionMenu({
                                 setIsOpen(false);
                             }}
                             disabled={confirming}
-                            className="flex items-center gap-2 bg-[#FFC000] text-black px-4 py-3 rounded-full shadow-lg hover:bg-yellow-400 transition-all whitespace-nowrap border-2 border-black font-bold"
+                            className="flex items-center gap-2 bg-gold text-black px-4 py-3 rounded-full shadow-lg hover:bg-yellow-400 transition-all whitespace-nowrap border-2 border-black font-bold"
                         >
                             <CheckCircle className="h-5 w-5" />
                             <span className="font-bold text-sm">
@@ -125,7 +125,7 @@ export function FloatingActionMenu({
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={cn(
-                        'bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all',
+                        'bg-gold text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all',
                         isOpen && 'rotate-45'
                     )}
                 >
@@ -142,7 +142,7 @@ export function FloatingActionMenu({
                         <button
                             onClick={onReserve}
                             disabled={reserving}
-                            className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+                            className="bg-gold text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
                         >
                             <Package className="h-6 w-6" />
                         </button>
@@ -151,7 +151,7 @@ export function FloatingActionMenu({
                         <button
                             onClick={onComplete}
                             disabled={completing}
-                            className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+                            className="bg-gold text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
                         >
                             <CheckCircle className="h-6 w-6" />
                         </button>
@@ -160,7 +160,7 @@ export function FloatingActionMenu({
                         <button
                             onClick={onUnreserve}
                             disabled={unreserving}
-                            className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+                            className="bg-gold text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
                         >
                             <XCircle className="h-6 w-6" />
                         </button>
@@ -169,7 +169,7 @@ export function FloatingActionMenu({
                         <button
                             onClick={onConfirm}
                             disabled={confirming}
-                            className="bg-[#FFC000] text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
+                            className="bg-gold text-black rounded-full p-4 shadow-lg hover:bg-yellow-400 transition-all"
                         >
                             <CheckCircle className="h-6 w-6" />
                         </button>

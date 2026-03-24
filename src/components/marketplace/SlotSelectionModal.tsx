@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   Dialog,
@@ -78,13 +78,13 @@ export function SlotSelectionModal({
             Seleccionar Cromo a Publicar
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400">
-            Colección: <span className="text-[#FFC000]">{collectionTitle}</span>
+            Colección: <span className="text-gold">{collectionTitle}</span>
           </DialogDescription>
         </DialogHeader>
 
         {loading && (
           <div className="py-8 text-center">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full mx-auto" />
+            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full mx-auto" />
             <p className="text-gray-600 dark:text-gray-400 mt-4">Cargando cromos...</p>
           </div>
         )}
@@ -124,7 +124,7 @@ export function SlotSelectionModal({
                         onClose();
                       }}
                       variant="outline"
-                      className="h-auto p-3 flex flex-col items-start gap-2 border-2 border-black bg-gray-50 dark:bg-gray-800 hover:bg-[#FFC000] hover:text-black hover:border-[#FFC000] transition-colors"
+                      className="h-auto p-3 flex flex-col items-start gap-2 border-2 border-black bg-gray-50 dark:bg-gray-800 hover:bg-gold hover:text-black hover:border-gold transition-colors"
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="font-bold text-sm">

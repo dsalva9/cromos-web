@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -47,7 +47,7 @@ export function ProposalSummary({
         <div className="space-y-4 text-sm">
           <div className="flex justify-between items-center bg-gray-50 p-3 rounded-md border-2 border-black">
             <p className="font-bold text-gray-900 dark:text-white uppercase">Tu Oferta:</p>
-            <p className="font-bold text-[#FFC000]">
+            <p className="font-bold text-gold">
               {offerCount} cromo{offerCount !== 1 ? 's' : ''}
             </p>
           </div>
@@ -55,7 +55,7 @@ export function ProposalSummary({
             <p className="font-bold text-gray-900 dark:text-white uppercase">
               Tu Pedido a {targetUserNickname}:
             </p>
-            <p className="font-bold text-[#FFC000]">
+            <p className="font-bold text-gold">
               {requestCount} cromo{requestCount !== 1 ? 's' : ''}
             </p>
           </div>
@@ -67,7 +67,7 @@ export function ProposalSummary({
             value={message}
             onChange={e => onMessageChange(e.target.value)}
             maxLength={MAX_MESSAGE_LENGTH}
-            className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-[#FFC000]"
+            className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-gold"
           />
           <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 text-right font-bold">
             {message.length} / {MAX_MESSAGE_LENGTH}
@@ -78,7 +78,7 @@ export function ProposalSummary({
           onClick={onSubmit}
           disabled={disabled || loading}
           size="lg"
-          className="w-full bg-[#FFC000] hover:bg-yellow-500 text-gray-900 border-2 border-black font-bold uppercase shadow-xl"
+          className="w-full bg-gold hover:bg-yellow-500 text-gray-900 border-2 border-black font-bold uppercase shadow-xl"
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {loading ? 'Enviando...' : 'Enviar Propuesta'}

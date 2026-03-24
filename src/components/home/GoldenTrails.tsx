@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 
@@ -89,7 +89,7 @@ export default function GoldenTrails() {
             {[...Array(8)].map((_, i) => (
                 <motion.div
                     key={i}
-                    className="absolute w-2 h-2 rounded-full bg-[#FFC000]"
+                    className="absolute w-2 h-2 rounded-full bg-gold"
                     style={{
                         left: `${20 + Math.random() * 60}%`,
                         top: `${20 + Math.random() * 60}%`,

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
@@ -46,7 +46,7 @@ export default function FeatureHighlights() {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#FFC000]">
+            <p className="text-sm font-semibold uppercase tracking-wider text-gold">
               ¿Por qué CambioCromos?
             </p>
             <h2 className="text-3xl md:text-4xl font-extrabold uppercase text-gray-900 dark:text-white">
@@ -66,13 +66,13 @@ export default function FeatureHighlights() {
                 className="border-2 border-black bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
               >
                 <ModernCardContent className="p-6 space-y-4">
-                  <Badge className="bg-[#FFC000] text-gray-900 font-bold border-2 border-black w-fit">
+                  <Badge className="bg-gold text-gray-900 font-bold border-2 border-black w-fit">
                     {badge}
                   </Badge>
 
                   <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-black bg-gray-100 dark:bg-gray-700 shadow-lg">
-                      <Icon className="h-6 w-6 text-[#FFC000]" />
+                      <Icon className="h-6 w-6 text-gold" />
                     </div>
                     <h3 className="text-xl font-bold uppercase text-gray-900 dark:text-white">
                       {title}

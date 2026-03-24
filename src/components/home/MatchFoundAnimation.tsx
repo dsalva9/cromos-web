@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
@@ -64,14 +64,14 @@ export default function MatchFoundAnimation() {
                         ease: 'easeOut',
                     }}
                 >
-                    <Sparkles className="w-8 h-8 text-[#FFC000]" />
+                    <Sparkles className="w-8 h-8 text-gold" />
                 </motion.div>
 
                 {/* Particles exploding outward */}
                 {[...Array(8)].map((_, i) => (
                     <motion.div
                         key={i}
-                        className="absolute w-2 h-2 rounded-full bg-[#FFC000]"
+                        className="absolute w-2 h-2 rounded-full bg-gold"
                         style={{
                             left: 0,
                             top: 0,
@@ -102,7 +102,7 @@ export default function MatchFoundAnimation() {
                         ease: [0.34, 1.56, 0.64, 1],
                     }}
                 >
-                    <span className="text-sm font-black text-[#FFC000] bg-black px-3 py-1 rounded-full border-2 border-[#FFC000] shadow-lg">
+                    <span className="text-sm font-black text-gold bg-black px-3 py-1 rounded-full border-2 border-gold shadow-lg">
                         ¡MATCH!
                     </span>
                 </motion.div>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef, useEffect } from 'react';
 import { AlbumSummary } from '@/hooks/album';
@@ -46,19 +46,19 @@ export default function AlbumSummaryHeader({
         <div className="flex flex-wrap justify-start gap-x-6 gap-y-2 items-center text-sm">
           <div className="font-black">
             <span className="text-gray-900">TENGO</span>{' '}
-            <span className="text-[#FFC000]">
+            <span className="text-gold">
               {owned !== null ? owned : '--'}
             </span>
           </div>
           <div className="font-black">
             <span className="text-gray-900">FALTAN</span>{' '}
-            <span className="text-[#FFC000]">
+            <span className="text-gold">
               {missing !== null ? missing : '--'}
             </span>
           </div>
           <div className="font-black">
             <span className="text-gray-900">REPES</span>{' '}
-            <span className="text-[#FFC000]">
+            <span className="text-gold">
               {duplicates !== null ? duplicates : '--'}
             </span>
           </div>

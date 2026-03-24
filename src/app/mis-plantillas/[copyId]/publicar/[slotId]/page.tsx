@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -164,7 +164,7 @@ function PublishDuplicateContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
@@ -88,7 +88,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <div className="flex gap-3">
               <Button
                 onClick={() => this.setState({ hasError: false, error: null })}
-                className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                className="flex-1 bg-gold text-black hover:bg-gold-light font-bold"
               >
                 Intentar de Nuevo
               </Button>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import CollectionsTab from '@/components/admin/CollectionsTab';
@@ -42,7 +42,7 @@ export default function AdminPage() {
                 onClick={() => setActiveTab(tab.value)}
                 className={`px-4 py-2 font-semibold text-sm rounded-md border-2 border-black transition-colors ${
                   activeTab === tab.value
-                    ? 'bg-[#FFC000] text-black'
+                    ? 'bg-gold text-black'
                     : 'bg-gray-800 text-white hover:bg-gray-700'
                 }`}
               >

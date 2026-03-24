@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -85,7 +85,7 @@ export function QuickEntryModal({
       <DialogContent className="max-w-3xl bg-white text-gray-900 border-gray-200 max-h-[80vh] flex flex-col shadow-xl">
         <DialogHeader className="border-b border-gray-100 pb-4">
           <DialogTitle className="flex items-center gap-3 text-xl">
-            <div className="bg-[#FFC000]/20 p-2 rounded-lg">
+            <div className="bg-gold/20 p-2 rounded-lg">
               <Hash className="w-5 h-5 text-yellow-700" />
             </div>
             <div>
@@ -109,13 +109,13 @@ export function QuickEntryModal({
                   value={checklistInput}
                   onChange={(e) => setChecklistInput(e.target.value)}
                   placeholder="Ej: 45, 123, 773..."
-                  className="bg-gray-50 border-gray-200 text-gray-900 h-12 text-lg pl-4 focus:ring-[#FFC000] focus:border-[#FFC000] placeholder:text-gray-400"
+                  className="bg-gray-50 border-gray-200 text-gray-900 h-12 text-lg pl-4 focus:ring-gold focus:border-gold placeholder:text-gray-400"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono border border-gray-200 rounded px-1.5 py-0.5 bg-white">
                   ENTER
                 </div>
               </div>
-              <Button type="submit" className="bg-[#FFC000] text-black hover:bg-[#FFD700] h-12 px-6 font-bold shadow-sm">
+              <Button type="submit" className="bg-gold text-black hover:bg-gold-light h-12 px-6 font-bold shadow-sm">
                 <Check className="w-5 h-5 mr-2" />
                 Marcar
               </Button>

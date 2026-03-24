@@ -1,4 +1,4 @@
-import Link from '@/components/ui/link';
+﻿import Link from '@/components/ui/link';
 import { siteConfig } from '@/config/site';
 
 export function SiteFooter() {
@@ -10,13 +10,13 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {siteConfig.name}
           </span>
           <div className="flex flex-wrap items-center gap-4 md:gap-6">
-            <Link href="/legal/terms" className="hover:text-[#FFC000] transition-colors">
+            <Link href="/legal/terms" className="hover:text-gold transition-colors">
               Términos
             </Link>
-            <Link href="/legal/privacy" className="hover:text-[#FFC000] transition-colors">
+            <Link href="/legal/privacy" className="hover:text-gold transition-colors">
               Privacidad
             </Link>
-            <Link href="/legal/cookies" className="hover:text-[#FFC000] transition-colors">
+            <Link href="/legal/cookies" className="hover:text-gold transition-colors">
               Cookies
             </Link>
           </div>

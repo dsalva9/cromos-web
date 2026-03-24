@@ -1,4 +1,4 @@
-import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+﻿import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -108,7 +108,7 @@ function StickerList({
                   </div>
 
                   {sticker.count > 1 && (
-                    <Badge variant="outline" className="ml-2 border-2 border-black bg-[#FFC000] text-gray-900 font-bold">
+                    <Badge variant="outline" className="ml-2 border-2 border-black bg-gold text-gray-900 font-bold">
                       x{sticker.count}
                     </Badge>
                   )}

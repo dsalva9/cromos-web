@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { ModernCard, ModernCardContent, ModernCardHeader } from '@/components/ui/modern-card';
@@ -28,7 +28,7 @@ function AdminDashboardContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -69,7 +69,7 @@ function AdminDashboardContent() {
                     {stats.total_users}
                   </p>
                 </div>
-                <Users className="h-12 w-12 text-[#FFC000]" />
+                <Users className="h-12 w-12 text-gold" />
               </div>
             </ModernCardContent>
           </ModernCard>
@@ -173,7 +173,7 @@ function AdminDashboardContent() {
           <ModernCard>
             <ModernCardHeader>
               <div className="flex items-center gap-2">
-                <Shield className="h-6 w-6 text-[#FFC000]" />
+                <Shield className="h-6 w-6 text-gold" />
                 <div>
                   <h2 className="text-xl font-bold text-white">Gestión de Retención de Datos</h2>
                   <p className="text-sm text-gray-400 mt-1">
@@ -224,13 +224,13 @@ function AdminDashboardContent() {
           <ModernCardContent className="pt-4">
             <Tabs defaultValue="users" className="w-full">
               <TabsList className="grid w-full grid-cols-3 bg-[#2D3748]">
-                <TabsTrigger value="users" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                <TabsTrigger value="users" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Users
                 </TabsTrigger>
-                <TabsTrigger value="listings" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                <TabsTrigger value="listings" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Listings
                 </TabsTrigger>
-                <TabsTrigger value="templates" className="data-[state=active]:bg-[#FFC000] data-[state=active]:text-black">
+                <TabsTrigger value="templates" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Templates
                 </TabsTrigger>
               </TabsList>

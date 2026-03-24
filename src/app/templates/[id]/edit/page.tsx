@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useTemplateDetails } from '@/hooks/templates/useTemplateDetails';
@@ -107,7 +107,7 @@ export default function TemplateEditPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-[#FFC000] animate-spin" />
+        <Loader2 className="h-8 w-8 text-gold animate-spin" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function TemplateEditPage() {
         <div className="text-center">
           <p className="text-red-400 text-xl mb-4">Error al cargar la plantilla</p>
           <Link href="/templates">
-            <button className="px-4 py-2 bg-[#FFC000] text-black rounded">
+            <button className="px-4 py-2 bg-gold text-black rounded">
               Volver a Colecciones
             </button>
           </Link>
@@ -169,7 +169,7 @@ export default function TemplateEditPage() {
           {/* Header */}
           <Link
             href={`/templates/${templateId}`}
-            className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
+            className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver a la colección

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { useTradeChat } from '@/hooks/trades/useTradeChat';
@@ -163,7 +163,7 @@ export function TradeChatPanel({
 
       {/* Chat Disclaimer Banner */}
       {showChatDisclaimer && (
-        <div className="bg-[#FFC000] border-b-2 border-black px-4 py-3 flex-shrink-0">
+        <div className="bg-gold border-b-2 border-black px-4 py-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs text-gray-900 dark:text-gray-900 leading-relaxed flex-1">
               El chat es un espacio privado para intercambiar, pero <strong>Cambiocromos.com se reserva el derecho de moderación</strong> ante reportes de abuso. Este servicio es <strong>exclusivamente para mayores de 18 años</strong>. Sé respetuoso. No compartas datos sensibles. El acoso o comportamiento inapropiado resultará en la <strong>suspensión inmediata</strong> de tu cuenta. Usa el botón de "Reportar" si detectas alguna irregularidad.
@@ -211,7 +211,7 @@ export function TradeChatPanel({
         {/* Loading state */}
         {loading && messages.length === 0 && (
           <div className="flex items-center justify-center h-32">
-            <Loader2 className="h-6 w-6 animate-spin text-[#FFC000]" />
+            <Loader2 className="h-6 w-6 animate-spin text-gold" />
           </div>
         )}
 
@@ -243,7 +243,7 @@ export function TradeChatPanel({
                 className={cn(
                   'max-w-[70%] rounded-lg p-3 border-2 border-black shadow-md',
                   isMine
-                    ? 'bg-[#FFC000] text-gray-900'
+                    ? 'bg-gold text-gray-900'
                     : 'bg-gray-800 text-white'
                 )}
               >
@@ -285,7 +285,7 @@ export function TradeChatPanel({
           <Button
             size="sm"
             onClick={scrollToBottom}
-            className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900 border-2 border-black font-bold uppercase shadow-lg"
+            className="bg-gold hover:bg-[#FFD633] text-gray-900 border-2 border-black font-bold uppercase shadow-lg"
           >
             <ChevronDown className="mr-1 h-4 w-4" />
             Nuevos mensajes
@@ -322,7 +322,7 @@ export function TradeChatPanel({
             <Button
               onClick={handleSendMessage}
               disabled={!messageText.trim() || sending || !isProposalActive}
-              className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900 border-2 border-black font-bold uppercase disabled:opacity-50"
+              className="bg-gold hover:bg-[#FFD633] text-gray-900 border-2 border-black font-bold uppercase disabled:opacity-50"
               size="sm"
             >
               {sending ? (

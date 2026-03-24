@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { usePathname } from 'next/navigation';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield } from 'lucide-react';
@@ -70,7 +70,7 @@ export function MobileBottomNav() {
             onClick={(e) => { e.preventDefault(); handleNavClick('/marketplace'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/marketplace') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isActive('/marketplace') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
             aria-label="Marketplace"
           >
@@ -82,7 +82,7 @@ export function MobileBottomNav() {
             onClick={(e) => { e.preventDefault(); handleNavClick('/mis-plantillas'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/mis-plantillas') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isActive('/mis-plantillas') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
             aria-label="Mis Álbumes"
           >
@@ -94,7 +94,7 @@ export function MobileBottomNav() {
             onClick={(e) => { e.preventDefault(); handleNavClick('/chats'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/chats') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isActive('/chats') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
             aria-label="Chats"
           >
@@ -106,7 +106,7 @@ export function MobileBottomNav() {
             onClick={(e) => { e.preventDefault(); handleNavClick('/favorites'); }}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isActive('/favorites') ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isActive('/favorites') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
             aria-label="Favoritos"
           >
@@ -117,7 +117,7 @@ export function MobileBottomNav() {
             onClick={handleMenuClick}
             className={cn(
               "flex items-center justify-center w-full h-full",
-              isMenuOpen ? "text-[#FFC000]" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isMenuOpen ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
             aria-label="Menú"
           >
@@ -143,7 +143,7 @@ export function MobileBottomNav() {
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              <Package className="h-5 w-5 text-[#FFC000]" />
+              <Package className="h-5 w-5 text-gold" />
               <span className="font-medium">Mis Anuncios</span>
             </a>
 
@@ -157,7 +157,7 @@ export function MobileBottomNav() {
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              <FileText className="h-5 w-5 text-[#FFC000]" />
+              <FileText className="h-5 w-5 text-gold" />
               <span className="font-medium">Colecciones</span>
             </a>
 
@@ -171,7 +171,7 @@ export function MobileBottomNav() {
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              <Settings className="h-5 w-5 text-[#FFC000]" />
+              <Settings className="h-5 w-5 text-gold" />
               <span className="font-medium">Ajustes</span>
             </a>
 
@@ -210,7 +210,7 @@ export function MobileBottomNav() {
               <a
                 href="/legal/terms"
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/terms'; }}
-                className="hover:text-[#FFC000] transition-colors"
+                className="hover:text-gold transition-colors"
               >
                 Términos
               </a>
@@ -218,7 +218,7 @@ export function MobileBottomNav() {
               <a
                 href="/legal/privacy"
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/privacy'; }}
-                className="hover:text-[#FFC000] transition-colors"
+                className="hover:text-gold transition-colors"
               >
                 Privacidad
               </a>
@@ -226,7 +226,7 @@ export function MobileBottomNav() {
               <a
                 href="/legal/cookies"
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/cookies'; }}
-                className="hover:text-[#FFC000] transition-colors"
+                className="hover:text-gold transition-colors"
               >
                 Cookies
               </a>

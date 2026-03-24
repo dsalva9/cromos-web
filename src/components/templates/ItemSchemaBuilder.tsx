@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -124,7 +124,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
         <Button
           onClick={addField}
           disabled={editingField !== null}
-          className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+          className="bg-gold text-black hover:bg-gold-light"
         >
           <Plus className="h-4 w-4 mr-2" />
           Añadir Campo
@@ -258,7 +258,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
               <Button
                 onClick={saveField}
                 disabled={!editingField.name.trim()}
-                className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="bg-gold text-black hover:bg-gold-light"
               >
                 Guardar Campo
               </Button>

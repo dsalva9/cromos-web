@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -99,7 +99,7 @@ export function FindTradersFilters({
             onClick={() =>
               setIsCollectionDropdownOpen(!isCollectionDropdownOpen)
             }
-            className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white transition-colors text-gray-900 font-medium"
+            className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white transition-colors text-gray-900 font-medium"
             aria-haspopup="listbox"
             aria-expanded={isCollectionDropdownOpen}
           >
@@ -112,7 +112,7 @@ export function FindTradersFilters({
             {selectedCollection?.is_user_active && (
               <Badge
                 variant="secondary"
-                className="ml-2 bg-[#FFC000] text-gray-900 border border-black font-bold"
+                className="ml-2 bg-gold text-gray-900 border border-black font-bold"
               >
                 Activa
               </Badge>
@@ -141,7 +141,7 @@ export function FindTradersFilters({
                     {collection.is_user_active && (
                       <Badge
                         variant="secondary"
-                        className="ml-2 bg-[#FFC000] text-gray-900 border border-black font-bold text-xs"
+                        className="ml-2 bg-gold text-gray-900 border border-black font-bold text-xs"
                       >
                         Activa
                       </Badge>
@@ -166,7 +166,7 @@ export function FindTradersFilters({
             placeholder="Nombre del jugador..."
             value={localFilters.query}
             onChange={e => handleFilterUpdate('query', e.target.value)}
-            className="pl-10 bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
+            className="pl-10 bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold rounded-md"
           />
         </div>
       </div>
@@ -178,7 +178,7 @@ export function FindTradersFilters({
           variant="outline"
           size="sm"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-[#FFC000] border-2 border-black font-bold uppercase text-xs rounded-md"
+          className="text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-gold border-2 border-black font-bold uppercase text-xs rounded-md"
         >
           <Filter className="w-4 h-4 mr-2" />
           Filtros avanzados
@@ -212,7 +212,7 @@ export function FindTradersFilters({
             <div className="relative">
               <button
                 onClick={() => setIsRarityDropdownOpen(!isRarityDropdownOpen)}
-                className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-[#FFC000] focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 transition-colors text-gray-900 dark:text-white font-medium"
+                className="w-full bg-gray-50 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between hover:border-gold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 transition-colors text-gray-900 dark:text-white font-medium"
                 aria-haspopup="listbox"
                 aria-expanded={isRarityDropdownOpen}
               >
@@ -255,7 +255,7 @@ export function FindTradersFilters({
               placeholder="Nombre del equipo..."
               value={localFilters.team}
               onChange={e => handleFilterUpdate('team', e.target.value)}
-              className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000] rounded-md"
+              className="bg-gray-50 border-2 border-black text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold rounded-md"
             />
           </div>
 
@@ -276,7 +276,7 @@ export function FindTradersFilters({
                   onClick={() => handleFilterUpdate('minOverlap', value)}
                   className={
                     localFilters.minOverlap === value
-                      ? 'bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold rounded-md'
+                      ? 'bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold rounded-md'
                       : 'text-gray-900 dark:text-white hover:text-white bg-gray-50 hover:bg-gray-700 border-2 border-black font-bold rounded-md'
                   }
                 >
@@ -295,7 +295,7 @@ export function FindTradersFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
           {localFilters.rarity && (
-            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
+            <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Rareza:{' '}
               {RARITY_OPTIONS.find(r => r.value === localFilters.rarity)?.label}
               <button
@@ -308,7 +308,7 @@ export function FindTradersFilters({
             </Badge>
           )}
           {localFilters.team && (
-            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
+            <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Equipo: {localFilters.team}
               <button
                 onClick={() => handleFilterUpdate('team', '')}
@@ -320,7 +320,7 @@ export function FindTradersFilters({
             </Badge>
           )}
           {localFilters.query && (
-            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
+            <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Jugador: {localFilters.query}
               <button
                 onClick={() => handleFilterUpdate('query', '')}
@@ -332,7 +332,7 @@ export function FindTradersFilters({
             </Badge>
           )}
           {localFilters.minOverlap > 1 && (
-            <Badge variant="secondary" className="bg-[#FFC000] text-gray-900 border-2 border-black font-bold flex items-center gap-1">
+            <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1">
               Min. {localFilters.minOverlap} coincidencias
               <button
                 onClick={() => handleFilterUpdate('minOverlap', 1)}

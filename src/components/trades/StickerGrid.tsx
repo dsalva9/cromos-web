@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useMemo } from 'react';
 import { CheckCircle2 } from 'lucide-react';
@@ -81,13 +81,13 @@ export function StickerGrid({
             className={cn(
               'transition-all duration-200 border-2 shadow-xl',
               selectedQuantity > 0
-                ? 'border-[#FFC000] shadow-yellow-500/20'
+                ? 'border-gold shadow-yellow-500/20'
                 : 'border-black'
             )}
           >
             <ModernCardContent className="p-2 relative bg-white dark:bg-gray-800">
               {selectedQuantity > 0 && (
-                <CheckCircle2 className="absolute top-2 right-2 h-6 w-6 text-[#FFC000] bg-gray-50 rounded-full p-0.5 z-10 border-2 border-black" />
+                <CheckCircle2 className="absolute top-2 right-2 h-6 w-6 text-gold bg-gray-50 rounded-full p-0.5 z-10 border-2 border-black" />
               )}
               <div className="aspect-[3/4] w-full relative rounded-md overflow-hidden mb-2 border-2 border-black bg-gray-50">
                 {imageUrl ? (

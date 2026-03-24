@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -199,7 +199,7 @@ export function CameraCaptureModal({
                 </Button>
                 <Button
                   onClick={handleConfirm}
-                  className="flex-1 bg-[#FFC000] text-black hover:bg-yellow-400"
+                  className="flex-1 bg-gold text-black hover:bg-yellow-400"
                   disabled={processing}
                 >
                   {processing ? 'Procesando...' : 'Usar foto'}
@@ -224,7 +224,7 @@ export function CameraCaptureModal({
                 </Button>
                 <Button
                   onClick={handleCapture}
-                  className="flex-1 bg-[#FFC000] text-black hover:bg-yellow-400"
+                  className="flex-1 bg-gold text-black hover:bg-yellow-400"
                 >
                   <Camera className="h-4 w-4 mr-2" />
                   Capturar

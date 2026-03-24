@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -139,7 +139,7 @@ export default function ListingDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -162,13 +162,13 @@ export default function ListingDetailPage() {
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
-              className="text-[#FFC000] hover:text-yellow-400 underline"
+              className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com
             </a>
           </p>
           <Link href="/marketplace">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver al Marketplace
             </Button>
           </Link>
@@ -198,13 +198,13 @@ export default function ListingDetailPage() {
             Por favor contacta con{' '}
             <a
               href="mailto:soporte@cambiocromos.com"
-              className="text-[#FFC000] hover:text-yellow-400 underline"
+              className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com
             </a>
           </p>
           <Link href="/marketplace">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver al Marketplace
             </Button>
           </Link>
@@ -301,7 +301,7 @@ export default function ListingDetailPage() {
 
                   {/* Listing Type Badges */}
                   {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
-                    <Badge className="bg-[#FFC000] text-black border-2 border-black">
+                    <Badge className="bg-gold text-black border-2 border-black">
                       🔄 Intercambio
                     </Badge>
                   )}
@@ -368,7 +368,7 @@ export default function ListingDetailPage() {
                     <span className="font-bold">Colección:</span>{' '}
                     <Link
                       href={`/templates?search=${encodeURIComponent(listing.collection_name)}`}
-                      className="text-[#FFC000] hover:underline"
+                      className="text-gold hover:underline"
                     >
                       {listing.collection_name}
                     </Link>
@@ -447,11 +447,11 @@ export default function ListingDetailPage() {
                   <div className="space-y-2">
                     {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FFC000]/15">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gold/15">
                           <span className="text-base">🔄</span>
                         </span>
                         <span className="text-gray-700 dark:text-gray-300">
-                          Disponible para <span className="font-semibold text-[#FFC000]">intercambio</span> con otros cromos
+                          Disponible para <span className="font-semibold text-gold">intercambio</span> con otros cromos
                         </span>
                       </div>
                     )}
@@ -518,7 +518,7 @@ export default function ListingDetailPage() {
               {canContact && (
                 <Button
                   size="lg"
-                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                  className="w-full bg-gold text-black hover:bg-gold-light font-bold"
                   asChild
                 >
                   <Link href={`/marketplace/${listing.id}/chat`}>
@@ -548,7 +548,7 @@ export default function ListingDetailPage() {
                   {hasConversations ? (
                     <Button
                       size="lg"
-                      className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                      className="w-full bg-gold text-black hover:bg-gold-light font-bold"
                       asChild
                     >
                       <Link href={`/marketplace/${listing.id}/chat`}>
@@ -619,7 +619,7 @@ export default function ListingDetailPage() {
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
                     <Link
                       href="/login"
-                      className="text-[#FFC000] hover:underline"
+                      className="text-gold hover:underline"
                     >
                       Iniciar Sesión
                     </Link>{' '}

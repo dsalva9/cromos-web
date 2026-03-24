@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -53,7 +53,7 @@ export default function Error({
               Por favor contacta con{' '}
               <a
                 href="mailto:soporte@cambiocromos.com"
-                className="text-[#FFC000] hover:text-yellow-400 underline"
+                className="text-gold hover:text-yellow-400 underline"
               >
                 soporte@cambiocromos.com
               </a>
@@ -74,7 +74,7 @@ export default function Error({
           <div className="flex gap-3">
             <Button
               onClick={reset}
-              className="flex-1 bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+              className="flex-1 bg-gold text-black hover:bg-gold-light font-bold"
             >
               Intentar de Nuevo
             </Button>

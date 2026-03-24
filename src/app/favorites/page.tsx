@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useMyFavorites } from '@/hooks/social/useMyFavorites';
@@ -50,7 +50,7 @@ function FavoritesContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -81,7 +81,7 @@ function FavoritesContent() {
               className={`
                 pb-4 px-2 font-bold transition-colors relative
                 ${activeTab === 'users'
-                  ? 'text-[#FFC000]'
+                  ? 'text-gold'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }
               `}
@@ -96,7 +96,7 @@ function FavoritesContent() {
                 )}
               </div>
               {activeTab === 'users' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FFC000]" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
               )}
             </button>
 
@@ -105,7 +105,7 @@ function FavoritesContent() {
               className={`
                 pb-4 px-2 font-bold transition-colors relative
                 ${activeTab === 'listings'
-                  ? 'text-[#FFC000]'
+                  ? 'text-gold'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }
               `}
@@ -120,7 +120,7 @@ function FavoritesContent() {
                 )}
               </div>
               {activeTab === 'listings' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FFC000]" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold" />
               )}
             </button>
           </div>
@@ -137,7 +137,7 @@ function FavoritesContent() {
               Visita perfiles de usuarios y anuncios del marketplace para agregarlos a tus favoritos
             </p>
             <Link href="/marketplace">
-              <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">
+              <Button className="bg-gold text-black hover:bg-gold-light">
                 Explorar el marketplace
               </Button>
             </Link>
@@ -185,7 +185,7 @@ function FavoritesContent() {
                               className="rounded-full border-2 border-black hover:scale-105 transition-transform"
                             />
                           ) : (
-                            <div className="w-20 h-20 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center hover:scale-105 transition-transform">
+                            <div className="w-20 h-20 rounded-full bg-gold border-2 border-black flex items-center justify-center hover:scale-105 transition-transform">
                               <User className="h-10 w-10 text-black" />
                             </div>
                           )}
@@ -193,7 +193,7 @@ function FavoritesContent() {
 
                         {/* Name */}
                         <Link href={`/users/${favorite.favorite_user_id}`}>
-                          <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-[#FFC000] transition-colors">
+                          <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-gold transition-colors">
                             {favorite.nickname}
                           </h3>
                         </Link>
@@ -205,7 +205,7 @@ function FavoritesContent() {
                             <span>{favorite.active_listings_count}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                            <Star className="h-4 w-4 fill-gold text-gold" />
                             <span className="text-gray-900 dark:text-white font-bold">
                               {favorite.rating_avg?.toFixed(1) || '0.0'}
                             </span>
@@ -281,7 +281,7 @@ function FavoritesContent() {
                       {/* Content */}
                       <div className="p-3 flex flex-col flex-1 gap-2">
                         <div className="min-h-[3rem]">
-                          <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-[#FFC000] transition-colors">
+                          <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-gold transition-colors">
                             {favorite.title}
                           </h3>
                           {favorite.collection_name && (
@@ -294,7 +294,7 @@ function FavoritesContent() {
                         <div className="mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
                           <Link
                             href={`/users/${favorite.author_id}`}
-                            className="text-xs text-gray-600 dark:text-gray-400 hover:text-[#FFC000] dark:hover:text-[#FFC000] transition-colors truncate block z-10 relative"
+                            className="text-xs text-gray-600 dark:text-gray-400 hover:text-gold dark:hover:text-gold transition-colors truncate block z-10 relative"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {favorite.author_nickname}

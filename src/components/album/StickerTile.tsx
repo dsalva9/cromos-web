@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 import { Shield, User, Shirt, Check } from 'lucide-react';
@@ -116,7 +116,7 @@ export default function StickerTile({
         onClick={handleIncrease}
         disabled={disabledIncrease}
         className={cn(
-          'aspect-[3/4] w-full relative rounded-md overflow-hidden bg-white border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed transition-all',
+          'aspect-[3/4] w-full relative rounded-md overflow-hidden bg-white border-2 border-black shadow-xl group focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed transition-all',
           ownedCount === 0 && 'grayscale hover:grayscale-0'
         )}
         aria-label={`Añadir ${sticker?.player_name ?? 'cromo'}`}
@@ -210,7 +210,7 @@ export default function StickerTile({
           <div className="grid grid-cols-2 gap-2">
             <Button
               size="sm"
-              className="hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 bg-white text-gray-900 font-bold border-2 border-black hover:bg-gray-100 focus:ring-[#FFC000] relative"
+              className="hidden sm:flex flex-1 text-xs rounded-md transition-all duration-200 bg-white text-gray-900 font-bold border-2 border-black hover:bg-gray-100 focus:ring-gold relative"
               onClick={handleIncrease}
               disabled={disabledIncrease}
             >
@@ -227,7 +227,7 @@ export default function StickerTile({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="w-full text-lg font-bold border-2 border-black bg-[#E84D4D] text-white hover:bg-red-600 focus:ring-[#FFC000]"
+                  className="w-full text-lg font-bold border-2 border-black bg-[#E84D4D] text-white hover:bg-red-600 focus:ring-gold"
                   onClick={handleDecrease}
                   disabled={disabledDecrease}
                   aria-label="Quitar uno"

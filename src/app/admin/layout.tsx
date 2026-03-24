@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
@@ -64,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     Dashboard
@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/reports">
                   <TabsTrigger
                     value="reports"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <AlertTriangle className="h-4 w-4 mr-2" />
                     Reports
@@ -84,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/users">
                   <TabsTrigger
                     value="users"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Users
@@ -94,7 +94,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/marketplace">
                   <TabsTrigger
                     value="marketplace"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Marketplace
@@ -104,7 +104,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/templates">
                   <TabsTrigger
                     value="templates"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <BookTemplate className="h-4 w-4 mr-2" />
                     Plantillas
@@ -114,7 +114,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/audit">
                   <TabsTrigger
                     value="audit"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Audit Log
@@ -124,7 +124,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/testing-tools">
                   <TabsTrigger
                     value="testing-tools"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <FlaskConical className="h-4 w-4 mr-2" />
                     Testing Tools
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href="/admin/settings">
                   <TabsTrigger
                     value="settings"
-                    className="w-full shrink-0 data-[state=active]:bg-[#FFC000] data-[state=active]:text-black"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <Settings className="h-4 w-4 mr-2" />
                     Settings

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -39,7 +39,7 @@ function MarketplaceScreen({ onTapCard, scrollY }: { onTapCard: () => void; scro
                         <div className={`aspect-[3/4] bg-gradient-to-br ${card.color} rounded-lg relative overflow-hidden`}>
                             {index === 0 && (
                                 <motion.div
-                                    className="absolute inset-0 bg-[#FFC000]/30 rounded-lg"
+                                    className="absolute inset-0 bg-gold/30 rounded-lg"
                                     animate={{ opacity: [0, 0.5, 0] }}
                                     transition={{ duration: 1, repeat: Infinity }}
                                 />
@@ -80,7 +80,7 @@ function DetailScreen({ onTapProfile }: { onTapProfile: () => void }) {
                     <path d="M50 80 L30 95" stroke="black" strokeWidth="4" strokeLinecap="round" />
                     <path d="M50 80 L70 95" stroke="black" strokeWidth="4" strokeLinecap="round" />
                 </svg>
-                <div className="absolute top-2 left-2 bg-[#FFC000] text-black text-[8px] font-black px-2 py-0.5 rounded">
+                <div className="absolute top-2 left-2 bg-gold text-black text-[8px] font-black px-2 py-0.5 rounded">
                     ESPECIAL
                 </div>
             </div>
@@ -128,7 +128,7 @@ function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
         >
             {/* Profile header */}
             <div className="bg-white p-4 text-center border-b">
-                <div className="w-16 h-16 rounded-full bg-[#D97757] overflow-hidden mx-auto mb-2 border-2 border-[#FFC000]">
+                <div className="w-16 h-16 rounded-full bg-[#D97757] overflow-hidden mx-auto mb-2 border-2 border-gold">
                     <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" />
                 </div>
                 <div className="font-black text-sm">Carlos_Collector</div>
@@ -154,7 +154,7 @@ function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
             {/* Chat button */}
             <div className="p-3">
                 <motion.button
-                    className="w-full bg-[#FFC000] text-black font-bold text-[10px] py-2.5 rounded-lg flex items-center justify-center gap-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    className="w-full bg-gold text-black font-bold text-[10px] py-2.5 rounded-lg flex items-center justify-center gap-2 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                     onClick={onTapChat}
                     whileTap={{ scale: 0.98, y: 2, boxShadow: '0px 0px 0px 0px rgba(0,0,0,1)' }}
                     animate={{ scale: [1, 1.02, 1] }}
@@ -220,7 +220,7 @@ function ChatScreen() {
                                 ¡Hola! Vi que tienes el cromo de Messi. ¿Lo intercambias?
                             </motion.div>
                             <motion.div
-                                className="bg-[#FFC000] rounded-lg p-2 max-w-[80%] text-[11px] shadow-sm ml-auto"
+                                className="bg-gold rounded-lg p-2 max-w-[80%] text-[11px] shadow-sm ml-auto"
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.8 }}
@@ -245,7 +245,7 @@ function ChatScreen() {
                 <div className="flex-1 bg-gray-100 rounded-full px-3 py-1.5 text-[11px] text-gray-400">
                     Escribe un mensaje...
                 </div>
-                <div className="w-7 h-7 bg-[#FFC000] rounded-full flex items-center justify-center">
+                <div className="w-7 h-7 bg-gold rounded-full flex items-center justify-center">
                     <Send className="w-3 h-3 text-black" />
                 </div>
             </div>
@@ -383,11 +383,11 @@ export default function AnimatedPhoneMockup({ className, flat }: { className?: s
                                 exit={{ opacity: 0, scale: 0 }}
                             >
                                 <motion.div
-                                    className="w-10 h-10 rounded-full bg-white/80 border-2 border-[#FFC000] flex items-center justify-center shadow-lg"
+                                    className="w-10 h-10 rounded-full bg-white/80 border-2 border-gold flex items-center justify-center shadow-lg"
                                     animate={{ scale: [1, 0.9, 1] }}
                                     transition={{ duration: 0.5, repeat: Infinity }}
                                 >
-                                    <User className="w-4 h-4 text-[#FFC000]" />
+                                    <User className="w-4 h-4 text-gold" />
                                 </motion.div>
                             </motion.div>
                         )}

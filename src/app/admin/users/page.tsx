@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useUserSearch } from '@/hooks/admin/useUserSearch';
@@ -151,7 +151,7 @@ function UserSearchContent() {
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
           </div>
         )}
 
@@ -184,7 +184,7 @@ function UserSearchContent() {
                           className="rounded-full border-2 border-black"
                         />
                       ) : (
-                        <div className="w-16 h-16 rounded-full bg-[#FFC000] border-2 border-black flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-gold border-2 border-black flex items-center justify-center">
                           <User className="h-8 w-8 text-black" />
                         </div>
                       );
@@ -198,7 +198,7 @@ function UserSearchContent() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <Link href={`/users/${user.user_id}`}>
-                            <h3 className="font-bold text-white text-lg hover:text-[#FFC000] transition-colors">
+                            <h3 className="font-bold text-white text-lg hover:text-gold transition-colors">
                               {user.nickname}
                             </h3>
                           </Link>
@@ -307,7 +307,7 @@ function UserSearchContent() {
                             size="sm"
                             variant="outline"
                             onClick={() => setEmailUser({ user_id: user.user_id, email: user.email, nickname: user.nickname })}
-                            className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000]/10"
+                            className="border-gold text-gold hover:bg-gold/10"
                           >
                             <Mail className="mr-2 h-4 w-4" />
                             Send Email

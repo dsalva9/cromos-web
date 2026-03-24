@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Mail, Send, Calendar, Clock, Loader2 } from 'lucide-react';
@@ -111,7 +111,7 @@ export default function NewUserSummarySettings() {
                 <Button
                     onClick={handleSendManualSummary}
                     disabled={sendingManual || addresses.length === 0}
-                    className="bg-[#FFC000] text-black font-semibold hover:bg-[#FFD54F] disabled:opacity-50"
+                    className="bg-gold text-black font-semibold hover:bg-[#FFD54F] disabled:opacity-50"
                 >
                     {sendingManual ? (
                         <>
@@ -137,7 +137,7 @@ export default function NewUserSummarySettings() {
             {/* Addresses Table */}
             {loading ? (
                 <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFC000]"></div>
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
                     <p className="text-zinc-400 mt-4">Loading addresses...</p>
                 </div>
             ) : addresses.length === 0 ? (

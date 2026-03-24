@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -17,15 +17,15 @@ export default function LandingPage() {
             {/* Hero Section */}
             <section className="relative overflow-hidden pt-5 pb-2 lg:pt-12 lg:pb-4">
                 {/* Background Decorative Shapes */}
-                <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-[#FFC000]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[800px] h-[800px] bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[600px] h-[600px] bg-gold/10 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-16 max-w-6xl mx-auto">
 
                         {/* Hero Content (Centered) */}
                         <div className="flex-1 max-w-2xl text-center space-y-6 lg:space-y-8 flex flex-col items-center">
-                            <Badge className="bg-[#FFC000] text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
+                            <Badge className="bg-gold text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
                                 La Plataforma #1 de intercambio de Cromos
                             </Badge>
 
@@ -42,20 +42,20 @@ export default function LandingPage() {
 
                             <h1 className="-mt-6 lg:-mt-8 text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFC000] to-yellow-500 drop-shadow-sm">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-yellow-500 drop-shadow-sm">
                                     a otro nivel
                                 </span>
                             </h1>
 
                             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
-                                Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa en tu plataforma <span className="text-black dark:text-white font-black bg-[#FFC000]/20 dark:bg-[#FFC000]/10 px-1 rounded transform -rotate-1 inline-block border-b-2 border-[#FFC000]">totalmente gratuita</span>
+                                Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa en tu plataforma <span className="text-black dark:text-white font-black bg-gold/20 dark:bg-gold/10 px-1 rounded transform -rotate-1 inline-block border-b-2 border-gold">totalmente gratuita</span>
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full sm:w-auto">
                                 <Button
                                     asChild
                                     size="lg"
-                                    className="bg-[#FFC000] hover:bg-yellow-400 text-black font-black text-lg h-14 px-8 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 active:translate-y-0 active:shadow-none rounded-xl"
+                                    className="bg-gold hover:bg-yellow-400 text-black font-black text-lg h-14 px-8 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 active:translate-y-0 active:shadow-none rounded-xl"
                                 >
                                     <Link href="/signup">
                                         Empezar a Intercambiar
@@ -73,9 +73,9 @@ export default function LandingPage() {
 
                             <Link
                                 href="/login"
-                                className="text-gray-600 dark:text-gray-400 font-bold hover:text-[#FFC000] transition-colors flex items-center justify-center gap-2 text-sm pt-2"
+                                className="text-gray-600 dark:text-gray-400 font-bold hover:text-gold transition-colors flex items-center justify-center gap-2 text-sm pt-2"
                             >
-                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-[#FFC000]">Inicia Sesión</span>
+                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-gold">Inicia Sesión</span>
                             </Link>
 
                             {/* Download Section — mobile only */}
@@ -121,8 +121,8 @@ export default function LandingPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 max-w-6xl mx-auto">
 
                         {/* Feature 1 */}
-                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-[#FFC000] transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
-                            <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-[#FFC000] flex items-center justify-center shadow-lg shrink-0">
+                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-gold transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                            <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gold flex items-center justify-center shadow-lg shrink-0">
                                 <Check className="w-6 h-6 lg:w-8 lg:h-8 text-black" strokeWidth={3} />
                             </div>
                             <div className="md:mt-4">
@@ -134,7 +134,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Feature 2 */}
-                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-[#FFC000] transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-gold transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
                             <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-black dark:bg-white flex items-center justify-center shadow-lg shrink-0">
                                 <Search className="w-6 h-6 lg:w-7 lg:h-7 text-white dark:text-black" strokeWidth={3} />
                             </div>
@@ -147,7 +147,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-[#FFC000] transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
+                        <div className="group p-4 lg:p-6 rounded-2xl lg:rounded-3xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-transparent hover:border-gold transition-all duration-300 flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-0">
                             <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shrink-0">
                                 <Trophy className="w-6 h-6 lg:w-7 lg:h-7 text-white" strokeWidth={3} />
                             </div>
@@ -185,7 +185,7 @@ export default function LandingPage() {
             </section>
 
             {/* Final CTA */}
-            <section className="py-24 bg-[#FFC000] relative overflow-hidden">
+            <section className="py-24 bg-gold relative overflow-hidden">
                 {/* Pattern Overlay */}
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 

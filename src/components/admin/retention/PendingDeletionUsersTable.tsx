@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useAdminPendingDeletionUsers } from '@/hooks/admin/useAdminPendingDeletionUsers';
@@ -65,7 +65,7 @@ export function PendingDeletionUsersTable() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FFC000]" />
+        <Loader2 className="h-8 w-8 animate-spin text-gold" />
       </div>
     );
   }

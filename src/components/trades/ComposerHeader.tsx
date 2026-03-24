@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -61,7 +61,7 @@ export function ComposerHeader({
           </div>
 
           <ArrowRightLeft
-            className="h-8 w-8 text-[#FFC000] shrink-0"
+            className="h-8 w-8 text-gold shrink-0"
             aria-label="Intercambiando con"
           />
 

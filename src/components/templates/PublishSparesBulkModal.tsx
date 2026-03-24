@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import {
@@ -97,8 +97,8 @@ export function PublishSparesBulkModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-gray-900 dark:text-white text-2xl flex items-center gap-3">
-            <div className="bg-[#FFC000]/10 p-2 rounded-lg">
-              <PackagePlus className="w-6 h-6 text-[#FFC000]" />
+            <div className="bg-gold/10 p-2 rounded-lg">
+              <PackagePlus className="w-6 h-6 text-gold" />
             </div>
             Publicar Pack de Repes
           </DialogTitle>
@@ -126,7 +126,7 @@ export function PublishSparesBulkModal({
           {/* Spares Count */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
-              <span className="text-[#FFC000] font-bold text-lg">
+              <span className="text-gold font-bold text-lg">
                 {spares.length}
               </span>{' '}
               {spares.length === 1 ? 'cromo repetido' : 'cromos repetidos'}
@@ -169,7 +169,7 @@ export function PublishSparesBulkModal({
           <Button
             onClick={handlePublish}
             disabled={isPublishing || spares.length === 0}
-            className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+            className="bg-gold text-black hover:bg-gold-light font-bold"
           >
             {isPublishing ? 'Publicando...' : `Publicar Pack (${spares.length})`}
           </Button>

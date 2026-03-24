@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from '@/components/ui/link';
@@ -40,7 +40,7 @@ export default function MarketplaceShowcase() {
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-[#FFC000]">
+              <p className="text-sm font-semibold uppercase tracking-wider text-gold">
                 Marketplace en vivo
               </p>
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white uppercase">
@@ -56,7 +56,7 @@ export default function MarketplaceShowcase() {
             <Button
               asChild
               size="lg"
-              className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black shadow-xl"
+              className="bg-gold hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black shadow-xl"
             >
               <Link href="/explorar">Ir al marketplace</Link>
             </Button>

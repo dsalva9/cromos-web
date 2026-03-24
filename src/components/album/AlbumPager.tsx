@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef, useState, useEffect, useCallback, CSSProperties } from 'react';
 import Link from '@/components/ui/link';
@@ -98,10 +98,10 @@ export default function AlbumPager({
         key={page.id}
         href={`/mi-coleccion/${collectionId}?page=${page.id}`}
         className={cn(
-          'flex items-center gap-3 px-4 py-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#FFC000]',
+          'flex items-center gap-3 px-4 py-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-gold',
           'whitespace-nowrap text-sm',
           isActive
-            ? 'bg-[#FFC000] text-gray-900 font-black border-2 border-black uppercase'
+            ? 'bg-gold text-gray-900 font-black border-2 border-black uppercase'
             : 'bg-white text-gray-600 border-2 border-black hover:bg-gray-100 font-bold'
         )}
         aria-current={isActive ? 'page' : undefined}

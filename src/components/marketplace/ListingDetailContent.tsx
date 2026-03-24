@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
             {error || 'Este anuncio puede haber sido eliminado o ya no está disponible'}
           </p>
           <Link href="/explorar">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver a Explorar
             </Button>
           </Link>
@@ -68,7 +68,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
             Este anuncio ya no está disponible
           </p>
           <Link href="/explorar">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+            <Button className="bg-gold text-black hover:bg-gold-light font-bold">
               Volver a Explorar
             </Button>
           </Link>
@@ -94,7 +94,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
         {/* Back link */}
         <Link
           href="/explorar"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#FFC000] transition-colors mb-6"
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gold transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver al listado
@@ -164,7 +164,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
                 </Badge>
 
                 {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
-                  <Badge className="bg-[#FFC000] text-black border-2 border-black">
+                  <Badge className="bg-gold text-black border-2 border-black">
                     🔄 Intercambio
                   </Badge>
                 )}
@@ -184,7 +184,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
                 {listing.collection_name && (
                   <div>
                     <span className="font-bold">Colección:</span>{' '}
-                    <span className="text-[#FFC000]">{listing.collection_name}</span>
+                    <span className="text-gold">{listing.collection_name}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-1">
@@ -254,11 +254,11 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
                   <div className="space-y-2">
                     {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#FFC000]/15">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gold/15">
                           <span className="text-base">🔄</span>
                         </span>
                         <span className="text-gray-700 dark:text-gray-300">
-                          Disponible para <span className="font-semibold text-[#FFC000]">intercambio</span> con otros cromos
+                          Disponible para <span className="font-semibold text-gold">intercambio</span> con otros cromos
                         </span>
                       </div>
                     )}
@@ -280,7 +280,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
               </ModernCard>
 
               {/* Registration CTA */}
-              <div className="bg-[#FFC000] rounded-xl p-6 text-center">
+              <div className="bg-gold rounded-xl p-6 text-center">
                 <h3 className="text-xl font-black uppercase text-black mb-2">
                   ¿Te interesa este cromo?
                 </h3>

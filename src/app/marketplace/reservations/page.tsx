@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/ui/link';
@@ -78,7 +78,7 @@ function ReservationsPageContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -95,7 +95,7 @@ function ReservationsPageContent() {
                 No tienes ninguna reserva activa
               </p>
               <Link href="/marketplace">
-                <Button className="bg-[#FFC000] text-black hover:bg-yellow-400">
+                <Button className="bg-gold text-black hover:bg-yellow-400">
                   Explorar Marketplace
                 </Button>
               </Link>
@@ -118,7 +118,7 @@ function ReservationsPageContent() {
                     {/* Details */}
                     <div className="flex-1">
                       <Link href={`/marketplace/${reservation.listing_id}`}>
-                        <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-[#FFC000] transition-colors">
+                        <h3 className="font-bold text-gray-900 dark:text-white text-lg hover:text-gold transition-colors">
                           {reservation.listing_title}
                         </h3>
                       </Link>

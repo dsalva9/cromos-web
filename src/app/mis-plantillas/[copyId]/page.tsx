@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -107,7 +107,7 @@ function TemplateProgressContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ function TemplateProgressContent() {
         <div className="text-center">
           <p className="text-gray-900 dark:text-white text-xl mb-4">Colección no encontrada</p>
           <Link href="/mis-plantillas">
-            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700]">Volver a Mis Álbumes</Button>
+            <Button className="bg-gold text-black hover:bg-gold-light">Volver a Mis Álbumes</Button>
           </Link>
         </div>
       </div>
@@ -151,7 +151,7 @@ function TemplateProgressContent() {
             {hasGlobalNumbers && (
               <Button
                 onClick={() => setQuickEntryOpen(true)}
-                className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold w-full sm:w-auto shadow-sm hover:shadow-md transition-all hover:scale-105"
+                className="bg-gold text-black hover:bg-gold-light font-bold w-full sm:w-auto shadow-sm hover:shadow-md transition-all hover:scale-105"
               >
                 <Zap className="mr-2 h-4 w-4" />
                 Entrada Rápida

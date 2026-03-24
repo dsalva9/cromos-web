@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import { TemplateCard } from '@/components/templates/TemplateCard';
@@ -19,7 +19,7 @@ export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesConte
                 {/* Header */}
                 <Link
                     href="/templates"
-                    className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
+                    className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Volver a Colecciones
@@ -36,7 +36,7 @@ export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesConte
                     </div>
 
                     <Link href="/templates/create">
-                        <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium">
+                        <Button className="bg-gold text-black hover:bg-gold-light font-medium">
                             <Plus className="mr-2 h-4 w-4" />
                             Crear Colección
                         </Button>

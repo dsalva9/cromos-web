@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NotificationCard Component
  * Sprint 15: Notifications System
  * Displays individual notifications with actions
@@ -151,7 +151,7 @@ export function NotificationCard({
                 <Button
                   variant="default"
                   size="sm"
-                  className="text-xs bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                  className="text-xs bg-gold text-black hover:bg-gold-light"
                   onClick={handleRateUser}
                 >
                   <Star className="h-3 w-3 mr-1" />

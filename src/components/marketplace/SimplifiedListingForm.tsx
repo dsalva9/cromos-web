@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -223,12 +223,12 @@ export function SimplifiedListingForm({
                   type="button"
                   onClick={() => setValue('is_group', false, { shouldValidate: true })}
                   className={`p-4 rounded-lg border-2 transition-all ${!isGroup
-                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    ? 'border-gold bg-gold/10'
                     : 'border-gray-200 bg-white'
                     }`}
                 >
-                  <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
-                  <p className={`text-sm font-semibold ${!isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                  <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-gold' : 'text-gray-600'}`} />
+                  <p className={`text-sm font-semibold ${!isGroup ? 'text-gold' : 'text-gray-700'}`}>
                     Cromo Individual
                   </p>
                 </button>
@@ -236,12 +236,12 @@ export function SimplifiedListingForm({
                   type="button"
                   onClick={() => setValue('is_group', true, { shouldValidate: true })}
                   className={`p-4 rounded-lg border-2 transition-all ${isGroup
-                    ? 'border-[#FFC000] bg-[#FFC000]/10'
+                    ? 'border-gold bg-gold/10'
                     : 'border-gray-200 bg-white'
                     }`}
                 >
-                  <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-[#FFC000]' : 'text-gray-600'}`} />
-                  <p className={`text-sm font-semibold ${isGroup ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                  <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-gold' : 'text-gray-600'}`} />
+                  <p className={`text-sm font-semibold ${isGroup ? 'text-gold' : 'text-gray-700'}`}>
                     Pack de Cromos
                   </p>
                 </button>
@@ -386,7 +386,7 @@ export function SimplifiedListingForm({
                                 key={slot.id}
                                 type="button"
                                 onClick={() => handleSlotSelect(page, slot)}
-                                className="w-full text-left px-3 py-2 hover:bg-[#FFC000]/10 transition-colors flex items-center gap-2 text-sm border-b border-gray-100 last:border-b-0"
+                                className="w-full text-left px-3 py-2 hover:bg-gold/10 transition-colors flex items-center gap-2 text-sm border-b border-gray-100 last:border-b-0"
                               >
                                 <span className="font-mono text-xs text-gray-400 w-8 text-right shrink-0">#{slot.slot_number}{slot.slot_variant || ''}</span>
                                 <span className="text-gray-900 truncate">{slot.label || `Cromo ${slot.slot_number}`}</span>
@@ -416,12 +416,12 @@ export function SimplifiedListingForm({
                 type="button"
                 onClick={() => handleListingTypeChange(!isForExchange, isForSale)}
                 className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForExchange
-                  ? 'border-[#FFC000] bg-[#FFC000]/10'
+                  ? 'border-gold bg-gold/10'
                   : 'border-gray-200 bg-white'
                   }`}
               >
                 <span className="text-xl">🔄</span>
-                <span className={`text-sm font-semibold ${isForExchange ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                <span className={`text-sm font-semibold ${isForExchange ? 'text-gold' : 'text-gray-700'}`}>
                   Intercambio
                 </span>
               </button>
@@ -502,7 +502,7 @@ export function SimplifiedListingForm({
                     shouldValidate: true,
                   })
                 }
-                className="mt-1 border-2 border-gray-400 dark:border-gray-300 data-[state=checked]:bg-[#FFC000] data-[state=checked]:border-[#FFC000]"
+                className="mt-1 border-2 border-gray-400 dark:border-gray-300 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
               />
               <div className="flex-1">
                 <Label
@@ -513,7 +513,7 @@ export function SimplifiedListingForm({
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
-                    className="text-[#FFC000] hover:text-[#FFD700] underline"
+                    className="text-gold hover:text-gold-light underline"
                   >
                     términos de uso
                   </button>
@@ -533,7 +533,7 @@ export function SimplifiedListingForm({
             <Button
               type="submit"
               disabled={loading || isSubmitting}
-              className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+              className="bg-gold text-black hover:bg-gold-light"
             >
               {loading || isSubmitting ? 'Publicando...' : 'Publicar'}
             </Button>
@@ -561,7 +561,7 @@ export function SimplifiedListingForm({
                     key={template.copy_id}
                     type="button"
                     onClick={() => handleTemplateSelect(template)}
-                    className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 hover:border-[#FFC000]"
+                    className="w-full text-left p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 hover:border-gold"
                   >
                     <p className="text-gray-900 font-medium">{template.title}</p>
                   </button>
@@ -595,7 +595,7 @@ export function SimplifiedListingForm({
             <div className="pt-4">
               <Button
                 onClick={() => setTermsDialogOpen(false)}
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                className="w-full bg-gold text-black hover:bg-gold-light"
               >
                 Cerrar
               </Button>

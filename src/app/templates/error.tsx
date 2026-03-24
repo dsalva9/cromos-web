@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Button } from '@/components/ui/button';
 
@@ -22,7 +22,7 @@ export default function Error({
         Por favor contacta con{' '}
         <a
           href="mailto:soporte@cambiocromos.com"
-          className="text-[#FFC000] hover:text-yellow-400 underline"
+          className="text-gold hover:text-yellow-400 underline"
         >
           soporte@cambiocromos.com
         </a>

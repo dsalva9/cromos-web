@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Image from 'next/image';
 
@@ -21,7 +21,7 @@ export default function OfflinePage() {
             </p>
             <button
                 onClick={() => window.location.reload()}
-                className="mt-8 bg-[#FFC000] hover:bg-yellow-400 text-black font-bold px-8 py-3 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
+                className="mt-8 bg-gold hover:bg-yellow-400 text-black font-bold px-8 py-3 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 active:translate-y-0 active:shadow-none"
             >
                 Reintentar
             </button>

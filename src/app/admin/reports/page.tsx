@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { usePendingReports } from '@/hooks/admin/usePendingReports';
@@ -30,7 +30,7 @@ function ReportsQueueContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#1F2937] flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -122,7 +122,7 @@ function ReportsQueueContent() {
                       <Button
                         size="sm"
                         onClick={() => setSelectedReportId(String(report.report_id))}
-                        className="bg-[#FFC000] text-black hover:bg-[#FFD700]"
+                        className="bg-gold text-black hover:bg-gold-light"
                       >
                         <Eye className="mr-2 h-4 w-4" />
                         Review Report

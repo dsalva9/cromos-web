@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -33,17 +33,17 @@ export function ThemeSettingsSection() {
               className={cn(
                 'flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all',
                 theme === value
-                  ? 'border-[#FFC000] bg-[#FFC000]/10'
+                  ? 'border-gold bg-gold/10'
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
               )}
             >
               <Icon className={cn(
                 'h-6 w-6',
-                theme === value ? 'text-[#FFC000]' : 'text-gray-600 dark:text-gray-400'
+                theme === value ? 'text-gold' : 'text-gray-600 dark:text-gray-400'
               )} />
               <span className={cn(
                 'text-sm font-medium',
-                theme === value ? 'text-[#FFC000]' : 'text-gray-900 dark:text-white'
+                theme === value ? 'text-gold' : 'text-gray-900 dark:text-white'
               )}>
                 {label}
               </span>

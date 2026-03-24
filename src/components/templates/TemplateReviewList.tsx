@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { User, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ export function TemplateReviewList({
                               key={star}
                               className={`h-4 w-4 ${
                                 star <= rating.rating
-                                  ? 'fill-[#FFC000] text-[#FFC000]'
+                                  ? 'fill-gold text-gold'
                                   : 'text-slate-600'
                               }`}
                             />

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -74,7 +74,7 @@ function CreateListingContent() {
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Link
           href={backUrl}
-          className="inline-flex items-center text-[#FFC000] hover:text-[#FFD700] mb-6 transition-colors"
+          className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {backUrl.includes('/mis-plantillas/') ? 'Volver al Álbum' : 'Volver al Marketplace'}

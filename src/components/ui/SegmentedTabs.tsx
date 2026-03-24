@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 
 export interface SegmentedTab {
   value: string;
@@ -78,7 +78,7 @@ export function SegmentedTabs({
               relative inline-flex items-center justify-center px-4 py-2
               font-bold text-sm uppercase w-full rounded-md
               transition-all duration-200
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC000] focus-visible:ring-inset
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset
               ${isActive
                 ? 'bg-white dark:bg-gray-900 text-black dark:text-white shadow-sm'
                 : 'bg-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'

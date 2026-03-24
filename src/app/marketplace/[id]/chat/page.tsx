@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -542,7 +542,7 @@ function ListingChatPageContent() {
   if (loading && messages.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -646,7 +646,7 @@ function ListingChatPageContent() {
                     onClick={handleReserve}
                     disabled={reserving || !selectedParticipant}
                     size="sm"
-                    className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                    className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                   >
                     <Package className="h-3.5 w-3.5 mr-1" />
                     {reserving ? 'Marcando...' : 'Reservar'}
@@ -658,7 +658,7 @@ function ListingChatPageContent() {
                       onClick={handleComplete}
                       disabled={completing}
                       size="sm"
-                      className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                      className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                     >
                       <Package className="h-3.5 w-3.5 mr-1" />
                       {completing ? 'Completando...' : 'Completar'}
@@ -679,7 +679,7 @@ function ListingChatPageContent() {
                     onClick={handleConfirm}
                     disabled={confirming}
                     size="sm"
-                    className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold text-xs flex-1"
+                    className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                   >
                     <Package className="h-3.5 w-3.5 mr-1" />
                     {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
@@ -760,7 +760,7 @@ function ListingChatPageContent() {
                     )}
                     <div className="flex-1 min-w-0">
                       <Link href={`/marketplace/${listingId}`}>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-[#FFC000] transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">
                           {listing.title}
                         </h3>
                       </Link>
@@ -824,7 +824,7 @@ function ListingChatPageContent() {
                       <Button
                         onClick={handleConfirm}
                         disabled={confirming}
-                        className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold w-full sm:w-auto whitespace-nowrap"
+                        className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
                         {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
@@ -917,7 +917,7 @@ function ListingChatPageContent() {
                               className={cn(
                                 'w-full text-left p-3 rounded-md transition-colors',
                                 selectedParticipant === participant.user_id
-                                  ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
+                                  ? 'bg-gold/20 border-2 border-gold'
                                   : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-transparent'
                               )}
                             >
@@ -933,7 +933,7 @@ function ListingChatPageContent() {
                                   )}
                                 </div>
                                 {participant.unread_count > 0 && (
-                                  <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                                  <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">
                                     {participant.unread_count}
                                   </span>
                                 )}
@@ -973,7 +973,7 @@ function ListingChatPageContent() {
                             className={cn(
                               'w-full text-left p-3 rounded-md transition-colors',
                               selectedParticipant === participant.user_id
-                                ? 'bg-[#FFC000]/20 border-2 border-[#FFC000]'
+                                ? 'bg-gold/20 border-2 border-gold'
                                 : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-transparent'
                             )}
                           >
@@ -989,7 +989,7 @@ function ListingChatPageContent() {
                                 )}
                               </div>
                               {participant.unread_count > 0 && (
-                                <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                                <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">
                                   {participant.unread_count}
                                 </span>
                               )}
@@ -1048,7 +1048,7 @@ function ListingChatPageContent() {
                               key={message.id}
                               className="flex justify-center my-4"
                             >
-                              <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
+                              <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
                                 <p className="italic">{message.message}</p>
                                 <p className="text-xs mt-1 opacity-60">
                                   {new Date(message.created_at).toLocaleTimeString('es-ES', {
@@ -1075,7 +1075,7 @@ function ListingChatPageContent() {
                               className={cn(
                                 'max-w-[70%] rounded-lg p-3 border-2 border-black',
                                 isOwnMessage
-                                  ? 'bg-[#FFC000] text-black'
+                                  ? 'bg-gold text-black'
                                   : 'bg-gray-800 text-white'
                               )}
                             >
@@ -1084,7 +1084,7 @@ function ListingChatPageContent() {
                                   {message.sender_id ? (
                                     <Link
                                       href={`/users/${message.sender_id}`}
-                                      className="hover:text-[#FFC000] hover:underline transition-colors"
+                                      className="hover:text-gold hover:underline transition-colors"
                                     >
                                       {message.sender_nickname}
                                     </Link>
@@ -1114,13 +1114,13 @@ function ListingChatPageContent() {
                             // Show rating link if user hasn't rated yet
                             <button
                               onClick={() => setShowRatingModal(true)}
-                              className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-6 py-3 text-sm border border-[#FFC000] hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                              className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-6 py-3 text-sm border border-gold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                             >
                               ⭐ Haz clic aquí para valorar a {counterpartyToRate.nickname}
                             </button>
                           ) : (
                             // Show system message with user's rating
-                            <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
+                            <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
                               <p>
                                 Has valorado a {counterpartyToRate.nickname} con{' '}
                                 {'⭐'.repeat(myRating.rating)} ({myRating.rating}/5)
@@ -1134,7 +1134,7 @@ function ListingChatPageContent() {
                       {/* Show counterparty's rating when both have rated */}
                       {listing?.status === 'completed' && bothRated && counterpartyRating && (
                         <div className="flex justify-center my-4">
-                          <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-[#FFC000]">
+                          <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
                             <p>
                               {isOwner ? 'El comprador' : 'El vendedor'} te ha valorado con{' '}
                               {'⭐'.repeat(counterpartyRating.rating)} ({counterpartyRating.rating}/5)
@@ -1247,7 +1247,7 @@ function ListingChatPageContent() {
                                 <button
                                   type="button"
                                   onClick={() => setChatTermsDialogOpen(true)}
-                                  className="text-[#FFC000] hover:underline font-semibold"
+                                  className="text-gold hover:underline font-semibold"
                                 >
                                   términos y condiciones
                                 </button>{' '}
@@ -1265,13 +1265,13 @@ function ListingChatPageContent() {
                             placeholder="Escribe un mensaje..."
                             maxLength={500}
                             rows={2}
-                            className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-[#FFC000] focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-gold focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={sending}
                           />
                           <Button
                             onClick={handleSend}
                             disabled={!messageText.trim() || sending}
-                            className="bg-[#FFC000] text-black hover:bg-yellow-400 font-bold"
+                            className="bg-gold text-black hover:bg-yellow-400 font-bold"
                           >
                             <Send className="h-4 w-4" />
                           </Button>
@@ -1314,7 +1314,7 @@ function ListingChatPageContent() {
               <div className="pt-4">
                 <Button
                   onClick={() => setChatTermsDialogOpen(false)}
-                  className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold uppercase"
+                  className="w-full bg-gold text-black hover:bg-gold-light font-bold uppercase"
                 >
                   Cerrar
                 </Button>

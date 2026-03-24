@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
@@ -173,7 +173,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         {/* Action Button */}
         <div className="mt-2 z-20 relative">
           <Link href={`/marketplace/${listing.id}`} className="block w-full">
-            <button className="w-full bg-[#FFC000] hover:bg-[#FFD700] text-black font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
+            <button className="w-full bg-gold hover:bg-gold-light text-black font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
               Ver Detalles
             </button>
           </Link>

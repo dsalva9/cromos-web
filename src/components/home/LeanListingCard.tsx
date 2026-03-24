@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -99,7 +99,7 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
                 {/* Content */}
                 <div className="p-3 flex flex-col flex-1 gap-2">
                     <div className="flex flex-col items-center text-center w-full">
-                        <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-base group-hover:text-[#FFC000] transition-colors w-full">
+                        <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-base group-hover:text-gold transition-colors w-full">
                             {listing.title}
                         </h3>
                         {listing.collection_name && (

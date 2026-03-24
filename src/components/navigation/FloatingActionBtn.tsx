@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Plus } from 'lucide-react';
 import Link from '@/components/ui/link';
@@ -35,8 +35,8 @@ export function FloatingActionBtn() {
       <Link
         href={actionLink}
         className={cn(
-          "w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFC000] focus:ring-offset-white dark:focus:ring-offset-gray-900",
-          "bg-[#FFC000] text-black hover:bg-[#FFD700] dark:hover:bg-[#FFD700]"
+          "w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold focus:ring-offset-white dark:focus:ring-offset-gray-900",
+          "bg-gold text-black hover:bg-gold-light dark:hover:bg-gold-light"
         )}
         aria-label={ariaLabel}
       >

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { AlbumPageData } from '@/hooks/album';
@@ -137,9 +137,9 @@ export default function PageHeader({
             <Progress
               value={progress}
               className="h-2 w-full bg-gray-200 border border-black rounded-md"
-              indicatorClassName="bg-[#FFC000]"
+              indicatorClassName="bg-gold"
             />
-            <span className="flex-shrink-0 text-sm font-black text-[#FFC000] uppercase">
+            <span className="flex-shrink-0 text-sm font-black text-gold uppercase">
               Tengo {page.owned_slots} / {page.total_slots}
             </span>
           </div>
@@ -162,7 +162,7 @@ export default function PageHeader({
                 size="sm"
                 variant="default"
                 onClick={() => setShowConfirmDialog(true)}
-                className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase border-2 border-black rounded-md shadow-xl"
+                className="bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase border-2 border-black rounded-md shadow-xl"
               >
                 Marcar equipo completo
               </Button>
@@ -194,7 +194,7 @@ export default function PageHeader({
               variant="default"
               onClick={handleConfirmComplete}
               disabled={isCompleting}
-              className="bg-[#FFC000] hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase rounded-md shadow-xl"
+              className="bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase rounded-md shadow-xl"
             >
               {isCompleting ? 'Completando...' : 'Confirmar'}
             </Button>
@@ -225,7 +225,7 @@ export default function PageHeader({
                 variant="default"
                 onClick={handleActionSheetComplete}
                 disabled={isCompleting}
-                className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase h-12 text-base border-2 border-black rounded-md shadow-xl"
+                className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase h-12 text-base border-2 border-black rounded-md shadow-xl"
               >
                 {isCompleting
                   ? 'Completando...'

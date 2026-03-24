@@ -1,4 +1,4 @@
-import { TradeProposalListItem } from '@/types';
+﻿import { TradeProposalListItem } from '@/types';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { UserLink } from '@/components/ui/user-link';
@@ -37,7 +37,7 @@ const getStatusBadgeVariant = (status: string) => {
     case 'cancelled':
       return 'bg-[#E84D4D] text-white border-2 border-black font-bold uppercase';
     case 'pending':
-      return 'bg-[#FFC000] text-gray-900 border-2 border-black font-bold uppercase';
+      return 'bg-gold text-gray-900 border-2 border-black font-bold uppercase';
     default:
       return 'bg-gray-500 text-white border-2 border-black font-bold uppercase';
   }
@@ -78,7 +78,7 @@ export function ProposalCard({
         onClick={onClick}
         className={`bg-white dark:bg-gray-800 hover:bg-gray-50 transition-all duration-200 cursor-pointer border-2 shadow-xl ${
           isHighlighted
-            ? 'border-[#FFC000] animate-pulse-border'
+            ? 'border-gold animate-pulse-border'
             : 'border-black'
         }`}
         style={

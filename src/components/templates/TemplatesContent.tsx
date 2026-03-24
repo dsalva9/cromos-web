@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import { useTemplates } from '@/hooks/templates/useTemplates';
@@ -68,13 +68,13 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                 {user && (
                     <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                         <Link href="/templates/my-templates" className="w-full sm:w-auto">
-                            <Button variant="outline" className="border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black font-medium w-full">
+                            <Button variant="outline" className="border-gold text-gold hover:bg-gold hover:text-black font-medium w-full">
                                 <FolderOpen className="mr-2 h-4 w-4" />
                                 Mis Colecciones Creadas
                             </Button>
                         </Link>
                         <Link href="/templates/create" className="hidden md:block w-full sm:w-auto">
-                            <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-medium w-full">
+                            <Button className="bg-gold text-black hover:bg-gold-light font-medium w-full">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Crear Colección
                             </Button>
@@ -131,7 +131,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             {/* Loading More Spinner */}
             {loading && fetchedTemplates.length > 0 && (
                 <div className="flex justify-center py-8">
-                    <Loader2 className="h-8 w-8 text-[#FFC000] animate-spin" />
+                    <Loader2 className="h-8 w-8 text-gold animate-spin" />
                 </div>
             )}
 

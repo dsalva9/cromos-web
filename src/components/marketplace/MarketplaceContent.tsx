@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -148,7 +148,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     </Button>
                                 </Link>
                                 <Link href="/marketplace/create" className="hidden md:flex md:flex-none">
-                                    <Button className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
+                                    <Button className="w-full bg-gold text-black hover:bg-gold-light font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                                         <Plus className="mr-1 md:mr-2 h-4 w-4" />
                                         Publicar
                                     </Button>
@@ -176,7 +176,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
                                     placeholder="Buscar por nombre, colección..."
-                                    className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]/20"
+                                    className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
                                 />
                             </div>
 
@@ -185,7 +185,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 <Button
                                     onClick={() => setShowFilters(!showFilters)}
                                     variant="outline"
-                                    className={`flex-1 ${showFilters ? 'bg-[#FFC000]/10 text-black dark:text-white border-[#FFC000]/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
+                                    className={`flex-1 ${showFilters ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                                 >
                                     <Filter className="mr-2 h-4 w-4" />
                                     Filtros
@@ -193,7 +193,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 <Button
                                     onClick={handleSortChange}
                                     variant="outline"
-                                    className={`flex-1 ${sortByDistance ? 'bg-[#FFC000]/10 text-black dark:text-white border-[#FFC000]/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
+                                    className={`flex-1 ${sortByDistance ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                                     disabled={!hasPostcode}
                                 >
                                     {sortByDistance ? <MapPin className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />}
@@ -319,7 +319,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 {/* Loading Spinner for Load More */}
                 {loading && listings.length > 0 && (
                     <div className="flex justify-center py-12">
-                        <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+                        <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
                     </div>
                 )}
 

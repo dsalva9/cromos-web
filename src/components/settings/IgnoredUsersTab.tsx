@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/ui/link';
@@ -75,7 +75,7 @@ export function IgnoredUsersTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-12 w-12 animate-spin text-[#FFC000]" />
+        <Loader2 className="h-12 w-12 animate-spin text-gold" />
       </div>
     );
   }
@@ -86,7 +86,7 @@ export function IgnoredUsersTab() {
         <p className="text-red-400 text-lg mb-4">{error}</p>
         <Button
           onClick={() => void fetchIgnoredUsers()}
-          className="bg-[#FFC000] hover:bg-[#FFD633] text-gray-900"
+          className="bg-gold hover:bg-[#FFD633] text-gray-900"
         >
           Reintentar
         </Button>
@@ -141,7 +141,7 @@ export function IgnoredUsersTab() {
                         className="rounded-full border-2 border-black dark:border-gray-700 object-cover hover:opacity-80 transition-opacity"
                       />
                     ) : (
-                      <div className="w-15 h-15 rounded-full bg-[#FFC000] border-2 border-black dark:border-gray-700 flex items-center justify-center hover:opacity-80 transition-opacity">
+                      <div className="w-15 h-15 rounded-full bg-gold border-2 border-black dark:border-gray-700 flex items-center justify-center hover:opacity-80 transition-opacity">
                         <User className="h-8 w-8 text-black" />
                       </div>
                     )}
@@ -153,7 +153,7 @@ export function IgnoredUsersTab() {
                       href={`/users/${ignoredUser.ignored_user_id}`}
                       className="block"
                     >
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white hover:text-[#FFC000] transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">
                         {ignoredUser.nickname}
                       </h3>
                     </Link>
@@ -177,7 +177,7 @@ export function IgnoredUsersTab() {
                     disabled={
                       unignoring === ignoredUser.ignored_user_id
                     }
-                    className="border-2 border-black dark:border-gray-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 hover:bg-[#FFC000] hover:text-gray-900 dark:hover:text-gray-900"
+                    className="border-2 border-black dark:border-gray-700 text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-900 hover:bg-gold hover:text-gray-900 dark:hover:text-gray-900"
                   >
                     {unignoring === ignoredUser.ignored_user_id ? (
                       <>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { X, Mail } from 'lucide-react';
@@ -93,7 +93,7 @@ export default function AddForwardingAddressDialog({
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubmitting}
                   placeholder="admin@example.com"
-                  className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-[#FFC000] disabled:opacity-50"
+                  className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-gold disabled:opacity-50"
                   autoFocus
                 />
               </div>
@@ -113,7 +113,7 @@ export default function AddForwardingAddressDialog({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-[#FFC000] text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Adding...' : 'Add Address'}
             </button>

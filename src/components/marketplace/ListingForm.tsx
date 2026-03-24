@@ -166,12 +166,12 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                 type="button"
                 onClick={() => handleListingTypeChange(!isForExchange, isForSale)}
                 className={`p-4 rounded-lg border-2 transition-all flex items-center gap-3 ${isForExchange
-                  ? 'border-[#FFC000] bg-[#FFC000]/10'
+                  ? 'border-gold bg-gold/10'
                   : 'border-gray-200 bg-white'
                   }`}
               >
                 <span className="text-xl">🔄</span>
-                <span className={`text-sm font-semibold ${isForExchange ? 'text-[#FFC000]' : 'text-gray-700'}`}>
+                <span className={`text-sm font-semibold ${isForExchange ? 'text-gold' : 'text-gray-700'}`}>
                   Intercambio
                 </span>
               </button>
@@ -244,7 +244,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
           <Button
             type="submit"
             disabled={loading || isSubmitting}
-            className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold text-lg py-6 border-2 border-black"
+            className="w-full bg-gold text-black hover:bg-gold-light font-bold text-lg py-6 border-2 border-black"
           >
             {loading || isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
           </Button>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from '@/components/ui/link';
@@ -209,7 +209,7 @@ export default function UserDashboard() {
                                     <h1 className="text-2xl font-black text-gray-900 dark:text-white truncate">{profile.nickname}</h1>
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                         {[1, 2, 3, 4, 5].map(star => (
-                                            <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile.rating_avg) ? 'fill-[#FFC000] text-[#FFC000]' : 'text-gray-200 dark:text-gray-600'}`} />
+                                            <Star key={star} className={`h-4 w-4 ${star <= Math.round(profile.rating_avg) ? 'fill-gold text-gold' : 'text-gray-200 dark:text-gray-600'}`} />
                                         ))}
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@ export default function UserDashboard() {
                                 )}
                             </div>
                         </div>
-                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-[#FFC000] hover:text-[#FFD700] transition-colors flex-shrink-0">
+                        <Link href={`/users/${user?.id}`} className="text-sm font-bold text-gold hover:text-gold-light transition-colors flex-shrink-0">
                             Editar Perfil
                         </Link>
                     </div>
@@ -227,26 +227,26 @@ export default function UserDashboard() {
                 {/* 2. Quick Actions Bar */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <Link href="/marketplace" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
-                            <Store className="h-6 w-6 text-[#FFC000] mb-2" />
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
+                            <Store className="h-6 w-6 text-gold mb-2" />
                             <p className="text-sm font-bold text-gray-900 dark:text-white">Explorar Marketplace</p>
                         </div>
                     </Link>
                     <Link href="/marketplace/create" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
-                            <PlusCircle className="h-6 w-6 text-[#FFC000] mb-2" />
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
+                            <PlusCircle className="h-6 w-6 text-gold mb-2" />
                             <p className="text-sm font-bold text-gray-900 dark:text-white">Publicar Anuncio</p>
                         </div>
                     </Link>
                     <Link href="/templates" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
-                            <LayoutGrid className="h-6 w-6 text-[#FFC000] mb-2" />
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
+                            <LayoutGrid className="h-6 w-6 text-gold mb-2" />
                             <p className="text-sm font-bold text-gray-900 dark:text-white">Descubrir Colecciones</p>
                         </div>
                     </Link>
                     <Link href="/chats" className="group">
-                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-[#FFC000] transition-all hover:shadow-md">
-                            <MessageCircle className="h-6 w-6 text-[#FFC000] mb-2" />
+                        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-gold transition-all hover:shadow-md">
+                            <MessageCircle className="h-6 w-6 text-gold mb-2" />
                             <p className="text-sm font-bold text-gray-900 dark:text-white">Mis Chats</p>
                         </div>
                     </Link>
@@ -268,11 +268,11 @@ export default function UserDashboard() {
 
                 {/* 4. Complete Your Collection CTA Banner */}
                 {ctaAlbum && ctaCount > 0 ? (
-                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6 transition-all duration-500">
+                    <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6 transition-all duration-500">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1 flex items-center gap-2">
-                                    <ShoppingBag className="w-4 h-4 text-[#FFC000]" />
+                                    <ShoppingBag className="w-4 h-4 text-gold" />
                                     Disponible en Marketplace
                                 </p>
                                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">
@@ -283,7 +283,7 @@ export default function UserDashboard() {
                                 </p>
                             </div>
                             <Link href={`/marketplace?collection=${ctaAlbum.copy_id}`}>
-                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
                                     Ver en Marketplace <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -297,7 +297,7 @@ export default function UserDashboard() {
                                         className={cn(
                                             "w-2 h-2 rounded-full transition-all duration-300",
                                             i === ctaIndex
-                                                ? "bg-[#FFC000] w-4"
+                                                ? "bg-gold w-4"
                                                 : "bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
                                         )}
                                         aria-label={`Ver álbum ${i + 1}`}
@@ -307,7 +307,7 @@ export default function UserDashboard() {
                         )}
                     </div>
                 ) : mostIncompleteAlbum && mostIncompleteAlbum.completion_percentage < 100 ? (
-                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
+                    <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Completa tu colección</p>
@@ -316,14 +316,14 @@ export default function UserDashboard() {
                                 </h3>
                             </div>
                             <Link href="/marketplace">
-                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
                                     Buscar en el Marketplace <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                         </div>
                     </div>
                 ) : copies.length === 0 ? (
-                    <div className="bg-gradient-to-r from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 border-2 border-[#FFC000] rounded-2xl p-6">
+                    <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Empieza a coleccionar</p>
@@ -332,7 +332,7 @@ export default function UserDashboard() {
                                 </h3>
                             </div>
                             <Link href="/templates">
-                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-black whitespace-nowrap">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap">
                                     Explorar Colecciones <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -362,7 +362,7 @@ export default function UserDashboard() {
                             <LayoutGrid className="h-10 w-10 text-gray-400 mb-3" />
                             <p className="text-gray-500 mb-4">No tienes colecciones activas</p>
                             <Link href="/templates">
-                                <Button className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold">
+                                <Button className="bg-gold text-black hover:bg-gold-light font-bold">
                                     Explorar Colecciones
                                 </Button>
                             </Link>
@@ -375,11 +375,11 @@ export default function UserDashboard() {
 
                                 return (
                                     <Link key={copy.copy_id} href={`/mis-plantillas/${copy.copy_id}`} className="block">
-                                        <div className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-[#FFC000] transition-all hover:shadow-md p-4">
+                                        <div className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-gold transition-all hover:shadow-md p-4">
                                             <div className="flex items-start gap-4">
                                                 <div className="flex-1">
                                                     <div className="flex justify-between items-start mb-2">
-                                                        <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-[#FFC000] transition-colors line-clamp-1">{copy.title}</h3>
+                                                        <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-gold transition-colors line-clamp-1">{copy.title}</h3>
                                                         {isComplete && <Trophy className="w-5 h-5 text-green-500" />}
                                                     </div>
 
@@ -391,10 +391,10 @@ export default function UserDashboard() {
                                                     <div className="space-y-2">
                                                         <div className="flex justify-between text-xs font-bold uppercase">
                                                             <span>Progreso</span>
-                                                            <span className={isComplete ? "text-green-600" : "text-[#FFC000]"}>{percentage}%</span>
+                                                            <span className={isComplete ? "text-green-600" : "text-gold"}>{percentage}%</span>
                                                         </div>
                                                         <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                            <div className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-[#FFC000]'}`} style={{ width: `${percentage}%` }} />
+                                                            <div className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-gold'}`} style={{ width: `${percentage}%` }} />
                                                         </div>
                                                         <p className="text-xs text-right text-gray-400">{copy.completed_slots} / {copy.total_slots} cromos</p>
                                                     </div>
@@ -411,7 +411,7 @@ export default function UserDashboard() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="mt-4 flex items-center justify-end text-xs font-black uppercase text-gray-400 group-hover:text-[#FFC000] transition-colors">
+                                            <div className="mt-4 flex items-center justify-end text-xs font-black uppercase text-gray-400 group-hover:text-gold transition-colors">
                                                 <span>Gestionar Colección</span>
                                                 <ArrowRight className="w-3 h-3 ml-1" />
                                             </div>
@@ -434,15 +434,15 @@ export default function UserDashboard() {
                 <div className="grid grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                     {activeListings.length === 0 ? (
                         <Link href="/marketplace/create" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
-                                <PlusCircle className="h-6 w-6 mb-2 text-[#FFC000]" />
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
+                                <PlusCircle className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Publica tu primer anuncio</p>
                             </div>
                         </Link>
                     ) : (
                         <Link href="/marketplace/my-listings" className="group block h-full transform transition hover:scale-[1.02]">
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
-                                <Package className="h-6 w-6 mb-2 text-[#FFC000]" />
+                                <Package className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{activeListings.length}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
                             </div>
@@ -451,15 +451,15 @@ export default function UserDashboard() {
 
                     {profile.favorites_count === 0 ? (
                         <Link href="/marketplace" className="group block h-full transform transition hover:scale-[1.02]">
-                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
-                                <Heart className="h-6 w-6 mb-2 text-[#FFC000]" />
+                            <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
+                                <Heart className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-sm font-black text-gray-900 dark:text-white">Guarda tus favoritos</p>
                             </div>
                         </Link>
                     ) : (
                         <Link href="/favorites" className="group block h-full transform transition hover:scale-[1.02]">
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gray-200 dark:group-hover:border-gray-600 transition-colors">
-                                <Heart className="h-6 w-6 mb-2 text-[#FFC000]" />
+                                <Heart className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-2xl font-black text-gray-900 dark:text-white line-height-none">{profile.favorites_count}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
                             </div>
@@ -467,8 +467,8 @@ export default function UserDashboard() {
                     )}
 
                     <Link href={`/users/${user?.id}#valoraciones`} className="group block h-full transform transition hover:scale-[1.02]">
-                        <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-[#FFC000]/10 to-[#FFD700]/10 dark:from-[#FFC000]/5 dark:to-[#FFD700]/5 rounded-xl p-4 border-2 border-dashed border-[#FFC000]/50 group-hover:border-[#FFC000] transition-colors">
-                            <Star className="h-6 w-6 mb-2 text-[#FFC000]" />
+                        <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-colors">
+                            <Star className="h-6 w-6 mb-2 text-gold" />
                             <p className="text-sm font-black text-gray-900 dark:text-white">
                                 {profile.rating_count} {profile.rating_count === 1 ? 'Valoración' : 'Valoraciones'}
                             </p>

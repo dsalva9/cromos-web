@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+﻿import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Política de Privacidad - Cambiocromos.com',
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
     return (
         <div className="prose dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-black uppercase mb-6 text-[#FFC000]">Política de Privacidad</h1>
+            <h1 className="text-3xl font-black uppercase mb-6 text-gold">Política de Privacidad</h1>
             <p className="text-sm text-gray-500 mb-8">Última actualización: {new Date().toLocaleDateString('es-ES')}</p>
 
             <p>

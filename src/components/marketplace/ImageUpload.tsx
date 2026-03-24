@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -158,7 +158,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                         type="button"
                         aria-label={uploading ? 'Subiendo imagen' : 'Elegir imagen'}
                         disabled={uploading}
-                        className="bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                        className="bg-gold text-black hover:bg-gold-light font-bold"
                       >
                         {uploading ? (
                           <>
@@ -179,7 +179,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                         onClick={() => setCameraOpen(true)}
                         disabled={uploading}
                         variant="outline"
-                        className="border-2 border-[#FFC000] text-[#FFC000] hover:bg-[#FFC000] hover:text-black"
+                        className="border-2 border-gold text-gold hover:bg-gold hover:text-black"
                       >
                         <Camera className="h-4 w-4 mr-2" />
                         Cámara

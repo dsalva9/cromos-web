@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/ui/link';
@@ -52,7 +52,7 @@ function ChatsPageContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
       </div>
     );
   }
@@ -84,7 +84,7 @@ function ChatsPageContent() {
               </p>
               <Link
                 href="/marketplace"
-                className="inline-block bg-[#FFC000] text-black px-6 py-2 rounded-md font-bold hover:bg-yellow-400 transition-colors"
+                className="inline-block bg-gold text-black px-6 py-2 rounded-md font-bold hover:bg-yellow-400 transition-colors"
               >
                 Explorar Marketplace
               </Link>
@@ -97,7 +97,7 @@ function ChatsPageContent() {
                 key={`${conv.listing_id}-${conv.counterparty_id}`}
                 href={`/marketplace/${conv.listing_id}/chat${conv.is_seller ? `?participant=${conv.counterparty_id}` : ''}`}
               >
-                <ModernCard className="hover:border-[#FFC000] transition-colors cursor-pointer">
+                <ModernCard className="hover:border-gold transition-colors cursor-pointer">
                   <ModernCardContent className="p-4">
                     <div className="flex gap-4">
                       {/* Listing Image */}
@@ -151,7 +151,7 @@ function ChatsPageContent() {
                               {conv.last_message}
                             </p>
                             {conv.unread_count > 0 && (
-                              <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                              <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                                 {conv.unread_count}
                               </span>
                             )}

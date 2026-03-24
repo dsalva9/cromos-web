@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Notifications Center Page
  * Sprint 15: Notifications System
  */
@@ -147,7 +147,7 @@ function NotificationsCenterContent() {
               <Bell className="h-4 w-4" />
               Nuevas
               {unreadCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 bg-[#FFC000] text-black text-xs rounded-full font-bold">
+                <span className="ml-1 px-2 py-0.5 bg-gold text-black text-xs rounded-full font-bold">
                   {unreadCount}
                 </span>
               )}

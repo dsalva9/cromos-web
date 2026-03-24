@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect } from 'react';
 import {
@@ -204,7 +204,7 @@ export function NotificationsList({
             {unreadNotifications.map(notification => (
               <ModernCard
                 key={notification.id}
-                className="bg-white dark:bg-gray-800 border-2 border-[#FFC000] shadow-xl hover:shadow-2xl transition-all cursor-pointer"
+                className="bg-white dark:bg-gray-800 border-2 border-gold shadow-xl hover:shadow-2xl transition-all cursor-pointer"
                 onClick={() => handleNotificationClick(notification)}
               >
                 <ModernCardContent className="p-4">

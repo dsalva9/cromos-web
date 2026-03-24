@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -72,7 +72,7 @@ export function ReserveListingDialog({
         <div className="space-y-4">
           {loading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin h-8 w-8 border-4 border-[#FFC000] border-r-transparent rounded-full" />
+              <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
             </div>
           ) : participants.length === 0 ? (
             <div className="text-center py-8 text-gray-600">
@@ -92,7 +92,7 @@ export function ReserveListingDialog({
                     onClick={() => setSelectedBuyerId(participant.user_id)}
                     className={`w-full text-left p-3 rounded-md border-2 transition-all ${
                       selectedBuyerId === participant.user_id
-                        ? 'border-[#FFC000] bg-[#FFC000]/10'
+                        ? 'border-gold bg-gold/10'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
@@ -104,7 +104,7 @@ export function ReserveListingDialog({
                         disabled={true} // Keep as text since this is inside a button
                       />
                       {participant.unread_count > 0 && (
-                        <span className="bg-[#FFC000] text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full">
                           {participant.unread_count} mensajes
                         </span>
                       )}
@@ -132,7 +132,7 @@ export function ReserveListingDialog({
           <Button
             onClick={handleReserve}
             disabled={!selectedBuyerId || processing || loading}
-            className="bg-[#FFC000] text-black hover:bg-yellow-400"
+            className="bg-gold text-black hover:bg-yellow-400"
           >
             {processing ? 'Reservando...' : 'Reservar'}
           </Button>

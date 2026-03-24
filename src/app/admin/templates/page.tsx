@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useAdminTemplates } from '@/hooks/admin/useAdminTemplates';
@@ -127,7 +127,7 @@ function TemplatesContent() {
         {/* Templates Table */}
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-[#FFC000]" />
+            <Loader2 className="h-8 w-8 animate-spin text-gold" />
           </div>
         ) : (
           <div className="space-y-4">
@@ -156,7 +156,7 @@ function TemplatesContent() {
                         </p>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-[#FFC000] text-[#FFC000]" />
+                            <Star className="h-4 w-4 fill-gold text-gold" />
                             <span>{template.rating_avg.toFixed(1)} ({template.rating_count})</span>
                           </div>
                           <p>Copias: {template.copies_count}</p>

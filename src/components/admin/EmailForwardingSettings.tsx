@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { Mail, Plus, Trash2, Power, PowerOff } from 'lucide-react';
@@ -69,7 +69,7 @@ export default function EmailForwardingSettings() {
         </div>
         <button
           onClick={() => setIsAddDialogOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#FFC000] text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors"
         >
           <Plus size={20} />
           Add Address
@@ -86,7 +86,7 @@ export default function EmailForwardingSettings() {
       {/* Addresses Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#FFC000]"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
           <p className="text-zinc-400 mt-4">Loading forwarding addresses...</p>
         </div>
       ) : addresses.length === 0 ? (
@@ -98,7 +98,7 @@ export default function EmailForwardingSettings() {
           </p>
           <button
             onClick={() => setIsAddDialogOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFC000] text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gold text-black font-semibold rounded-lg hover:bg-[#FFD54F] transition-colors"
           >
             <Plus size={20} />
             Add Your First Address

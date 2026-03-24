@@ -2,18 +2,10 @@
 
 /* Light theme (default) */
 :root {
-  /* Brand Colors*/
-  --brand: #2563eb;
-  --brand-50: #eff6ff;
-  --brand-100: #dbeafe;
-  --brand-200: #bfdbfe;
-  --brand-300: #93c5fd;
-  --brand-400: #60a5fa;
-  --brand-500: #3b82f6;
-  --brand-600: #2563eb;
-  --brand-700: #1d4ed8;
-  --brand-800: #1e40af;
-  --brand-900: #1e3a8a;
+  /* Gold Brand Colors */
+  --gold: #FFC000;
+  --gold-light: #FFD633;
+  --gold-dark: #E5AC00;
 
   /* Surface Colors */
   --surface: #ffffff;
@@ -90,19 +82,11 @@
 }
 
 /* Dark theme override */
-[data-theme='dark'] {
-  /* Brand Colors (adjusted for dark mode) */
-  --brand: #3b82f6;
-  --brand-50: #1e3a8a;
-  --brand-100: #1e40af;
-  --brand-200: #1d4ed8;
-  --brand-300: #2563eb;
-  --brand-400: #3b82f6;
-  --brand-500: #60a5fa;
-  --brand-600: #93c5fd;
-  --brand-700: #bfdbfe;
-  --brand-800: #dbeafe;
-  --brand-900: #eff6ff;
+.dark {
+  /* Gold Brand Colors (dark mode) */
+  --gold: #FFC000;
+  --gold-light: #FFD633;
+  --gold-dark: #CC9900;
 
   /* Surface Colors */
   --surface: #0f172a;
@@ -179,17 +163,11 @@
 }
 
 /* Utility classes for quick theming */
-.bg-brand {
-  background-color: var(--brand);
-}
 .bg-surface {
   background-color: var(--surface);
 }
 .bg-surface-50 {
   background-color: var(--surface-50);
-}
-.text-brand {
-  color: var(--brand);
 }
 .text-surface-contrast {
   color: var(--surface-contrast);
@@ -217,18 +195,7 @@
 }
 
 /* Button styling with theme variables */
-.btn-brand {
-  background-color: var(--brand);
-  color: var(--surface);
-  border: 1px solid var(--brand);
-}
 
-@media (hover: hover) {
-  .btn-brand:hover {
-    background-color: var(--brand-700);
-    border-color: var(--brand-700);
-  }
-}
 
 .btn-surface {
   background-color: var(--surface);

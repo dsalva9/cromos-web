@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
@@ -111,7 +111,7 @@ export function AvatarPicker({
           className={cn(
             'px-4 py-2 font-bold transition-colors relative',
             activeTab === 'gallery'
-              ? 'text-[#FFC000] border-b-2 border-[#FFC000]'
+              ? 'text-gold border-b-2 border-gold'
               : 'text-gray-600 hover:text-gray-900'
           )}
         >
@@ -123,7 +123,7 @@ export function AvatarPicker({
           className={cn(
             'px-4 py-2 font-bold transition-colors relative',
             activeTab === 'upload'
-              ? 'text-[#FFC000] border-b-2 border-[#FFC000]'
+              ? 'text-gold border-b-2 border-gold'
               : 'text-gray-600 hover:text-gray-900'
           )}
         >
@@ -144,9 +144,9 @@ export function AvatarPicker({
                   disabled={uploading || processing}
                   className={cn(
                     'relative aspect-square rounded-lg border-2 overflow-hidden transition-all',
-                    'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#FFC000] focus:ring-offset-2 focus:ring-offset-gray-50',
+                    'hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-gray-50',
                     selectedPresetId === preset.id
-                      ? 'border-[#FFC000] shadow-lg shadow-[#FFC000]/50'
+                      ? 'border-gold shadow-lg shadow-gold/50'
                       : 'border-gray-200 hover:border-gray-400'
                   )}
                   aria-label={preset.label}
@@ -196,7 +196,7 @@ export function AvatarPicker({
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-2 border-black text-gray-900 bg-gray-50 hover:bg-[#FFC000] hover:text-gray-900"
+                    className="border-2 border-black text-gray-900 bg-gray-50 hover:bg-gold hover:text-gray-900"
                     disabled={processing || uploading}
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -219,8 +219,8 @@ export function AvatarPicker({
             )}
 
             {processing && (
-              <div className="flex items-center justify-center gap-2 text-[#FFC000]">
-                <div className="animate-spin h-5 w-5 border-2 border-[#FFC000] border-r-transparent rounded-full" />
+              <div className="flex items-center justify-center gap-2 text-gold">
+                <div className="animate-spin h-5 w-5 border-2 border-gold border-r-transparent rounded-full" />
                 <span className="text-sm font-bold">
                   Procesando imagen...
                 </span>
@@ -249,8 +249,8 @@ export function AvatarPicker({
         )}
 
         {uploading && (
-          <div className="flex items-center gap-2 text-[#FFC000] text-sm">
-            <div className="animate-spin h-4 w-4 border-2 border-[#FFC000] border-r-transparent rounded-full" />
+          <div className="flex items-center gap-2 text-gold text-sm">
+            <div className="animate-spin h-4 w-4 border-2 border-gold border-r-transparent rounded-full" />
             <span>Subiendo...</span>
           </div>
         )}

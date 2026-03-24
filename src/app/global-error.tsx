@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
@@ -48,7 +48,7 @@ export default function GlobalError({
 
               <Button
                 onClick={reset}
-                className="w-full bg-[#FFC000] text-black hover:bg-[#FFD700] font-bold"
+                className="w-full bg-gold text-black hover:bg-gold-light font-bold"
               >
                 Recargar Página
               </Button>

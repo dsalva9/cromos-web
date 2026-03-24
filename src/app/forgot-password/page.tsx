@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { siteConfig } from '@/config/site';
 import { useState } from 'react';
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#FFC000] focus:ring-[#FFC000]"
+                className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
             </div>
 
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full bg-[#FFC000] hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
+              className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
               {loading ? 'Enviando...' : 'Enviar enlace'}
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-8 text-center">
             <Link
               href="/login"
-              className="text-[#FFC000] hover:text-yellow-400 font-bold hover:underline"
+              className="text-gold hover:text-yellow-400 font-bold hover:underline"
             >
               ← Volver a Iniciar Sesión
             </Link>
