@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from '@/components/ui/link';
@@ -48,8 +48,7 @@ export default function MarketplaceShowcase() {
               </h2>
               <p className="mt-2 text-gray-700 dark:text-gray-400 max-w-2xl">
                 Publica tus duplicados y encuentra nuevos cromos sin salir de la
-                plataforma. Los listados se actualizan en tiempo real gracias a
-                nuestro backend optimizado.
+                plataforma.
               </p>
             </div>
 
