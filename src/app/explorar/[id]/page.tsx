@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const listing = await getListingById(id);
   // Normalize URL: strip www for consistent canonical URLs
-  const baseUrl = siteConfig.url.replace('://www.', '://');
+  const baseUrl = siteConfig.url;
 
   if (!listing) {
     return {
@@ -143,7 +143,7 @@ export default async function PublicListingDetailPage({ params }: PageProps) {
     return <ListingDetailContent listing={null} error="Anuncio no encontrado" />;
   }
 
-  const baseUrl = siteConfig.url.replace('://www.', '://');
+  const baseUrl = siteConfig.url;
 
   // Build Product JSON-LD for rich results
   const productJsonLd: Record<string, unknown> = {
