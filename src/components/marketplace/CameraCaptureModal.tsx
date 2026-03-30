@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -65,7 +65,17 @@ export function CameraCaptureModal({
           videoRef.current.srcObject = mediaStream;
         }
       } catch (error) {
-        logger.error('Camera error:', error);
+        // Permission denied / dismissed is expected user behavior — don't send to Sentry
+        const isPermissionError =
+          error instanceof DOMException &&
+          (error.name === 'NotAllowedError' || error.name === 'NotFoundError');
+
+        if (isPermissionError) {
+          logger.info('Camera permission denied or no camera found');
+        } else {
+          logger.error('Camera error:', error);
+        }
+
         if (isMounted) {
           setPermissionDenied(true);
           toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
