@@ -38,6 +38,15 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     priority: 'high',
   },
 
+  // Digest notifications (periodic summaries)
+  {
+    kind: 'chat_unread',
+    label: 'Resumen semanal de mensajes sin leer',
+    description: 'Recordatorio semanal si tienes mensajes sin leer',
+    category: 'marketplace',
+    priority: 'low',
+  },
+
   // Community notifications
   {
     kind: 'user_rated',
@@ -107,7 +116,6 @@ const HIDDEN_ALWAYS_ENABLED: NotificationKind[] = ['admin_action'];
  * Legacy notification types (kept for backward compatibility, not shown in UI)
  */
 const LEGACY_TYPES: NotificationKind[] = [
-  'chat_unread',
   'proposal_accepted',
   'proposal_rejected',
   'finalization_requested',
