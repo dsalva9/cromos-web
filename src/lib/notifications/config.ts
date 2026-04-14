@@ -44,7 +44,7 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     label: 'Resumen semanal de mensajes sin leer',
     description: 'Recordatorio semanal si tienes mensajes sin leer',
     category: 'marketplace',
-    priority: 'low',
+    priority: 'high',
   },
 
   // Community notifications
