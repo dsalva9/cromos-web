@@ -23,7 +23,8 @@ export function useListing(listingId: string) {
             nickname,
             avatar_url,
             is_suspended,
-            deleted_at
+            deleted_at,
+            postcode
           )
         `
         )
@@ -33,11 +34,30 @@ export function useListing(listingId: string) {
       if (fetchError) throw fetchError;
 
       if (data) {
+        // Resolve author location from postal_codes
+        let authorLocation: string | null = null;
+        if (data.author.postcode) {
+          const { data: locData } = await supabase
+            .from('postal_codes')
+            .select('municipio, provincia')
+            .eq('postcode', data.author.postcode)
+            .eq('country', 'ES')
+            .maybeSingle();
+
+          const loc = locData as { municipio?: string | null; provincia?: string | null } | null;
+          if (loc?.municipio && loc?.provincia) {
+            authorLocation = `${loc.municipio}, ${loc.provincia}`;
+          } else if (loc?.municipio) {
+            authorLocation = loc.municipio;
+          }
+        }
+
         setListing({
           id: data.id,
           user_id: data.user_id,
           author_nickname: data.author.nickname ?? '',
           author_avatar_url: data.author.avatar_url ?? null,
+          author_location: authorLocation,
           author_is_suspended: data.author.is_suspended,  // Include suspension status
           author_deleted_at: data.author.deleted_at,  // Include author deletion timestamp
           deleted_at: data.deleted_at,  // Include listing deletion timestamp

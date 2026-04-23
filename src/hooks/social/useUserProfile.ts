@@ -45,12 +45,24 @@ export function useUserProfile(userId: string) {
       if (listingsResult.error) throw listingsResult.error;
 
       const profileData = profileResult.data;
-      const rawLabel = (profileData as Record<string, unknown>)?.location_label;
-      const locationLabel =
-        typeof rawLabel === 'string' &&
-          rawLabel.trim().length > 0
-          ? rawLabel.trim()
-          : null;
+
+      // Resolve location from postal_codes
+      let locationLabel: string | null = null;
+      if (profileData.postcode) {
+        const { data: locData } = await supabase
+          .from('postal_codes')
+          .select('municipio, provincia')
+          .eq('postcode', profileData.postcode)
+          .eq('country', 'ES')
+          .maybeSingle();
+
+        const loc = locData as { municipio?: string | null; provincia?: string | null } | null;
+        if (loc?.municipio && loc?.provincia) {
+          locationLabel = `${loc.municipio}, ${loc.provincia}`;
+        } else if (loc?.municipio) {
+          locationLabel = loc.municipio;
+        }
+      }
 
       const normalizedProfile: UserProfile = {
         id: profileData.id,

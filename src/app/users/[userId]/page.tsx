@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -273,13 +273,7 @@ export default function UserProfilePage() {
 
   const emailDisplay = isOwnProfile ? (currentUser?.email ?? null) : null;
 
-  const locationDisplay = profile.location_label
-    ? profile.postcode
-      ? `${profile.location_label} (${profile.postcode})`
-      : profile.location_label
-    : profile.postcode
-      ? `CP ${profile.postcode}`
-      : null;
+  const locationDisplay = profile.location_label ?? null;
 
   const listingTabs = availableStatuses.map(status => ({
     value: status,

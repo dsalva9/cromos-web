@@ -26,6 +26,7 @@ export interface Listing {
   author_nickname: string;
   author_avatar_url: string | null;
   author_postcode?: string | null;
+  author_location?: string | null; // "Municipio, Provincia"
   author_is_suspended?: boolean | null;  // For admin suspension indicators
   author_deleted_at?: string | null;  // For admin deletion indicators
   deleted_at?: string | null;  // Listing soft deletion timestamp

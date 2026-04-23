@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2 } from 'lucide-react';
+import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin } from 'lucide-react';
 import {
   useUser,
   useSupabaseClient,
@@ -507,6 +507,12 @@ export default function ListingDetailPage() {
                         <p className="font-bold text-gray-900 dark:text-white">
                           {listing.author_nickname}
                         </p>
+                        {listing.author_location && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                            <MapPin className="h-3 w-3 flex-shrink-0" />
+                            {listing.author_location}
+                          </p>
+                        )}
                         <p className="text-sm text-gray-600 dark:text-gray-400">Ver perfil</p>
                       </div>
                     </div>
