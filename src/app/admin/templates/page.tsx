@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useAdminTemplates } from '@/hooks/admin/useAdminTemplates';
@@ -22,7 +22,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -42,9 +42,10 @@ function TemplatesContent() {
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { templates, loading, deleteTemplate, refresh } =
+  const { templates, loading, deleteTemplate, toggleFeatured, refresh } =
     useAdminTemplates(statusFilter, searchQuery);
   const { restoreTemplate, loading: restoreLoading } = useRestoreTemplate();
+  const [featureLoading, setFeatureLoading] = useState<number | null>(null);
 
   const handleAction = async () => {
     if (!actionDialog.templateId || !actionDialog.action) return;
@@ -73,6 +74,22 @@ function TemplatesContent() {
       refresh();
     } catch (error) {
       toast.error('Error al restaurar la plantilla');
+    }
+  };
+
+  const handleToggleFeatured = async (templateId: number, currentlyFeatured: boolean) => {
+    setFeatureLoading(templateId);
+    try {
+      await toggleFeatured(templateId, !currentlyFeatured);
+      toast.success(
+        !currentlyFeatured
+          ? 'Plantilla destacada correctamente'
+          : 'Plantilla quitada de destacados'
+      );
+    } catch (error) {
+      toast.error('Error al cambiar estado destacado');
+    } finally {
+      setFeatureLoading(null);
     }
   };
 
@@ -118,6 +135,7 @@ function TemplatesContent() {
             <SelectContent className="bg-[#111827] border-gray-700">
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="active">Activa</SelectItem>
+              <SelectItem value="featured">Destacada</SelectItem>
               <SelectItem value="suspended">Suspendida</SelectItem>
               <SelectItem value="deleted">Eliminada</SelectItem>
             </SelectContent>
@@ -143,6 +161,12 @@ function TemplatesContent() {
                         <Badge className={getStatusBadge(template.status)}>
                           {template.status}
                         </Badge>
+                        {template.is_featured && (
+                          <Badge className="bg-gradient-to-r from-amber-500/20 to-gold/20 text-gold border border-gold/30">
+                            <Sparkles className="h-3 w-3 mr-1" />
+                            Destacada
+                          </Badge>
+                        )}
                         {!template.is_public && (
                           <Badge className="bg-gray-500/20 text-gray-500">
                             Privada
@@ -176,6 +200,24 @@ function TemplatesContent() {
                           Ver plantilla
                         </Button>
                       </Link>
+
+                      {/* Featured Toggle */}
+                      {!template.deleted_at && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleFeatured(template.id, template.is_featured)}
+                          disabled={featureLoading === template.id}
+                          className={`w-full ${
+                            template.is_featured
+                              ? 'border-gold text-gold hover:bg-gold/10'
+                              : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gold'
+                          }`}
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          {template.is_featured ? 'Quitar Destacado' : 'Destacar'}
+                        </Button>
+                      )}
 
                       {template.deleted_at ? (
                         <Button

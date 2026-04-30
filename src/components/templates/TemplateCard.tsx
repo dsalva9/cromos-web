@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -7,7 +7,7 @@ import { Alert } from '@/components/ui/alert';
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { User, Star, Copy, FileText, Layout, Eye, EyeOff, Edit } from 'lucide-react';
+import { User, Star, Copy, FileText, Layout, Eye, EyeOff, Edit, Sparkles } from 'lucide-react';
 import { useCopyTemplate } from '@/hooks/templates/useCopyTemplate';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useRouter } from '@/hooks/use-router';
@@ -29,6 +29,7 @@ export interface TemplateCardData {
   total_slots?: number;
   created_at: string;
   is_public?: boolean;
+  is_featured?: boolean;
   deleted_at?: string | null;
   scheduled_for?: string | null;
 }
@@ -72,8 +73,14 @@ export function TemplateCard({
     }
   };
 
+  const isFeatured = template.is_featured === true;
+
   return (
-    <ModernCard className="hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 h-full border border-gray-200/60 dark:border-slate-700/50 shadow-sm dark:shadow-md">
+    <ModernCard className={`hover:scale-[1.02] hover:shadow-lg dark:hover:shadow-xl transition-all duration-300 h-full shadow-sm dark:shadow-md ${
+      isFeatured
+        ? 'border-2 border-gold/60 ring-1 ring-gold/20 shadow-gold/10'
+        : 'border border-gray-200/60 dark:border-slate-700/50'
+    }`}>
       <ModernCardContent className="p-0 flex flex-col h-full">
         {/* Image */}
         <Link
@@ -93,6 +100,16 @@ export function TemplateCard({
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <Layout className="w-16 h-16 text-amber-200/60 dark:text-slate-500/50" />
+              </div>
+            )}
+
+            {/* Featured Badge */}
+            {isFeatured && (
+              <div className="absolute top-2 left-2 z-10">
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500 to-gold text-black shadow-md">
+                  <Sparkles className="h-3 w-3" />
+                  Destacada
+                </div>
               </div>
             )}
 

@@ -16,6 +16,7 @@ interface Template {
   pages_count: number;
   total_slots?: number;
   created_at: string;
+  is_featured?: boolean;
 }
 
 interface UseTemplatesParams {

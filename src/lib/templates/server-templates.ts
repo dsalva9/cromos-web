@@ -16,6 +16,7 @@ export interface Template {
     total_slots?: number;
     created_at: string;
     deleted_at?: string | null;
+    is_featured?: boolean;
 }
 
 interface GetTemplatesParams {

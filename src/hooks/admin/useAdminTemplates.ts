@@ -16,6 +16,7 @@ export interface AdminTemplate {
   rating_count: number;
   copies_count: number;
   is_public: boolean;
+  is_featured: boolean;
 }
 
 export function useAdminTemplates(
@@ -33,8 +34,11 @@ export function useAdminTemplates(
   const fetchTemplates = useCallback(async () => {
     setLoading(true);
     try {
+      // 'featured' is not a DB status — handle it as a client-side filter
+      const rpcStatus = statusFilter === 'featured' ? undefined : (statusFilter || undefined);
+
       const { data, error: fetchError } = await supabase.rpc('admin_list_templates', {
-        p_status: statusFilter || undefined,
+        p_status: rpcStatus,
         p_query: query || undefined,
         p_page: page,
         p_page_size: pageSize
@@ -42,8 +46,12 @@ export function useAdminTemplates(
 
       if (fetchError) throw fetchError;
 
-      setTemplates(data || []);
-      setTotalCount(data?.length || 0);
+      const filtered = statusFilter === 'featured'
+        ? (data || []).filter((t: AdminTemplate) => t.is_featured)
+        : (data || []);
+
+      setTemplates(filtered);
+      setTotalCount(filtered.length);
     } catch (err) {
       logger.error('Error fetching admin templates:', err);
       setError(err instanceof Error ? err : new Error('Error al cargar plantillas'));
@@ -77,12 +85,34 @@ export function useAdminTemplates(
     [supabase, fetchTemplates]
   );
 
+  const toggleFeatured = useCallback(
+    async (templateId: number, featured: boolean) => {
+      try {
+        const { error: toggleError } = await supabase.rpc(
+          'admin_toggle_featured_template',
+          {
+            p_template_id: templateId,
+            p_featured: featured
+          }
+        );
+
+        if (toggleError) throw toggleError;
+
+        await fetchTemplates();
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al destacar plantilla');
+      }
+    },
+    [supabase, fetchTemplates]
+  );
+
   return {
     templates,
     loading,
     error,
     totalCount,
     refresh: fetchTemplates,
-    deleteTemplate
+    deleteTemplate,
+    toggleFeatured
   };
 }
