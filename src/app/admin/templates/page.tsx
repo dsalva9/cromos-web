@@ -22,7 +22,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw, Sparkles } from 'lucide-react';
+import { Loader2, Search, ExternalLink, Trash2, Star, RotateCcw, Sparkles, ArrowUp, ArrowDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -42,10 +42,11 @@ function TemplatesContent() {
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const { templates, loading, deleteTemplate, toggleFeatured, refresh } =
+  const { templates, loading, deleteTemplate, toggleFeatured, updateFeaturedPriority, refresh } =
     useAdminTemplates(statusFilter, searchQuery);
   const { restoreTemplate, loading: restoreLoading } = useRestoreTemplate();
   const [featureLoading, setFeatureLoading] = useState<number | null>(null);
+  const [priorityLoading, setPriorityLoading] = useState<number | null>(null);
 
   const handleAction = async () => {
     if (!actionDialog.templateId || !actionDialog.action) return;
@@ -90,6 +91,33 @@ function TemplatesContent() {
       toast.error('Error al cambiar estado destacado');
     } finally {
       setFeatureLoading(null);
+    }
+  };
+
+  // Get featured templates sorted by priority for swap calculations
+  const featuredTemplates = templates
+    .filter(t => t.is_featured)
+    .sort((a, b) => (a.featured_priority ?? 999) - (b.featured_priority ?? 999));
+
+  const handleMovePriority = async (templateId: number, direction: 'up' | 'down') => {
+    const idx = featuredTemplates.findIndex(t => t.id === templateId);
+    if (idx === -1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= featuredTemplates.length) return;
+
+    const current = featuredTemplates[idx];
+    const swap = featuredTemplates[swapIdx];
+
+    setPriorityLoading(templateId);
+    try {
+      // Swap priorities
+      await updateFeaturedPriority(current.id, swap.featured_priority);
+      await updateFeaturedPriority(swap.id, current.featured_priority);
+      toast.success('Orden actualizado');
+    } catch (error) {
+      toast.error('Error al cambiar el orden');
+    } finally {
+      setPriorityLoading(null);
     }
   };
 
@@ -149,7 +177,11 @@ function TemplatesContent() {
           </div>
         ) : (
           <div className="space-y-4">
-            {templates.map((template) => (
+            {/* When filtering featured, sort by priority for visual clarity */}
+            {(statusFilter === 'featured'
+              ? [...templates].sort((a, b) => (a.featured_priority ?? 999) - (b.featured_priority ?? 999))
+              : templates
+            ).map((template) => (
               <ModernCard key={template.id}>
                 <ModernCardContent className="p-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -162,10 +194,28 @@ function TemplatesContent() {
                           {template.status}
                         </Badge>
                         {template.is_featured && (
-                          <Badge className="bg-gradient-to-r from-amber-500/20 to-gold/20 text-gold border border-gold/30">
-                            <Sparkles className="h-3 w-3 mr-1" />
-                            Destacada
-                          </Badge>
+                          <div className="flex items-center gap-1">
+                            <Badge className="bg-gradient-to-r from-amber-500/20 to-gold/20 text-gold border border-gold/30">
+                              <Sparkles className="h-3 w-3 mr-1" />
+                              #{template.featured_priority} Destacada
+                            </Badge>
+                            <button
+                              onClick={() => handleMovePriority(template.id, 'up')}
+                              disabled={priorityLoading === template.id || featuredTemplates[0]?.id === template.id}
+                              className="p-0.5 rounded hover:bg-gold/20 text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              title="Subir prioridad"
+                            >
+                              <ArrowUp className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleMovePriority(template.id, 'down')}
+                              disabled={priorityLoading === template.id || featuredTemplates[featuredTemplates.length - 1]?.id === template.id}
+                              className="p-0.5 rounded hover:bg-gold/20 text-gold disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              title="Bajar prioridad"
+                            >
+                              <ArrowDown className="h-4 w-4" />
+                            </button>
+                          </div>
                         )}
                         {!template.is_public && (
                           <Badge className="bg-gray-500/20 text-gray-500">

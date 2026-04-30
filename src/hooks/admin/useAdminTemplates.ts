@@ -17,6 +17,7 @@ export interface AdminTemplate {
   copies_count: number;
   is_public: boolean;
   is_featured: boolean;
+  featured_priority: number;
 }
 
 export function useAdminTemplates(
@@ -106,6 +107,27 @@ export function useAdminTemplates(
     [supabase, fetchTemplates]
   );
 
+  const updateFeaturedPriority = useCallback(
+    async (templateId: number, priority: number) => {
+      try {
+        const { error: updateError } = await supabase.rpc(
+          'admin_update_featured_priority',
+          {
+            p_template_id: templateId,
+            p_priority: priority
+          }
+        );
+
+        if (updateError) throw updateError;
+
+        await fetchTemplates();
+      } catch (err) {
+        throw err instanceof Error ? err : new Error('Error al actualizar prioridad');
+      }
+    },
+    [supabase, fetchTemplates]
+  );
+
   return {
     templates,
     loading,
@@ -113,6 +135,7 @@ export function useAdminTemplates(
     totalCount,
     refresh: fetchTemplates,
     deleteTemplate,
-    toggleFeatured
+    toggleFeatured,
+    updateFeaturedPriority
   };
 }
