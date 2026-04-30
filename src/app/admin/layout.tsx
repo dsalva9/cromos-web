@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from '@/components/ui/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Settings } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Settings } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -37,6 +37,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/marketplace')) return 'marketplace';
     if (pathname.includes('/admin/templates')) return 'templates';
     if (pathname.includes('/admin/testing-tools')) return 'testing-tools';
+    if (pathname.includes('/admin/feature-flags')) return 'feature-flags';
     if (pathname.includes('/admin/settings')) return 'settings';
     return 'dashboard';
   };
@@ -60,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navigation Tabs */}
             <Tabs value={getActiveTab()} className="w-full">
-              <TabsList className="flex w-full max-w-6xl overflow-x-auto md:grid md:grid-cols-8 bg-[#1F2937] scrollbar-hide">
+              <TabsList className="flex w-full max-w-6xl overflow-x-auto md:grid md:grid-cols-9 bg-[#1F2937] scrollbar-hide">
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
@@ -128,6 +129,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <FlaskConical className="h-4 w-4 mr-2" />
                     Testing Tools
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/feature-flags">
+                  <TabsTrigger
+                    value="feature-flags"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
+                  >
+                    <Flag className="h-4 w-4 mr-2" />
+                    Flags
                   </TabsTrigger>
                 </Link>
 
