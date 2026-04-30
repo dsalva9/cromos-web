@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Mail, Send, Calendar, Clock, Loader2 } from 'lucide-react';
@@ -70,7 +70,7 @@ export default function NewUserSummarySettings() {
             }
 
             toast.success(
-                `Resumen enviado a ${result.sent_count} destinatarios (${result.new_users_count} usuarios nuevos)`
+                `Resumen enviado a ${result.sent_count} destinatarios (${result.new_users_count} usuarios nuevos, ${result.reports_count ?? 0} reportes, ${result.total_messages ?? 0} mensajes)`
             );
         } catch (err) {
             logger.error('Error sending manual summary:', err);
@@ -101,9 +101,9 @@ export default function NewUserSummarySettings() {
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
-                    <h2 className="text-xl font-bold text-white mb-2">New Users Summary Email</h2>
+                    <h2 className="text-xl font-bold text-white mb-2">Activity Summary Email</h2>
                     <p className="text-zinc-400 text-sm max-w-2xl">
-                        Configure automated summary emails for new user registrations.
+                        Configure automated summary emails covering new user registrations, pending reports, and messaging activity.
                         Daily summaries are sent at 3:00 AM UTC, weekly summaries on Mondays at 3:00 AM UTC.
                         Each forwarding address can choose their preferred frequency.
                     </p>

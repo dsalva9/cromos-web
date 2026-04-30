@@ -1,8 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 /**
  * Supabase Edge Function: send-user-summary-email
- * Sends summary emails about new user registrations
- * Can be triggered by pg_cron (daily/weekly) or manually from admin console
+ * Sends admin summary emails covering:
+ *   - New user registrations
+ *   - New reports (pending moderation)
+ *   - Messaging activity stats
+ *
+ * Can be triggered by pg_cron (daily/weekly) or manually from admin console.
  *
  * Authentication:
  * - Cron triggers: No Authorization header needed (verify_jwt is disabled,
@@ -36,6 +40,16 @@ function stripHtml(html: string): string {
         .trim();
 }
 
+/** Escapes HTML special characters */
+function escapeHtml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // CORS headers for browser requests (manual trigger)
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -58,9 +72,65 @@ interface NewUser {
     chat_messages_count: number;
 }
 
+interface ReportSummary {
+    report_id: number;
+    target_type: string;
+    reason: string;
+    description: string | null;
+    reporter_nickname: string;
+    target_label: string;
+    status: string;
+    created_at: string;
+}
+
+interface MessagingActivity {
+    total_messages: number;
+    unique_senders: number;
+    unique_receivers: number;
+    unique_conversations: number;
+    messages_per_day: number;
+    busiest_hour: number | null;
+    top_senders: { nickname: string; message_count: number }[];
+}
+
 interface Recipient {
     id: number;
     email: string;
+}
+
+/** Map report reason to a human-readable Spanish label */
+function getReasonLabel(reason: string): string {
+    const labels: Record<string, string> = {
+        spam: 'Spam',
+        inappropriate_content: 'Contenido inapropiado',
+        harassment: 'Acoso',
+        copyright_violation: 'Violación de copyright',
+        misleading_information: 'Info engañosa',
+        fake_listing: 'Anuncio falso',
+        offensive_language: 'Lenguaje ofensivo',
+        other: 'Otro',
+    };
+    return labels[reason] || reason;
+}
+
+/** Map target type to Spanish */
+function getTargetTypeLabel(type: string): string {
+    const labels: Record<string, string> = {
+        listing: 'Anuncio',
+        template: 'Colección',
+        user: 'Usuario',
+        rating: 'Valoración',
+    };
+    return labels[type] || type;
+}
+
+/** Map report status to a styled indicator */
+function getStatusIndicator(status: string): string {
+    if (status === 'pending') return '🔴 Pendiente';
+    if (status === 'reviewing') return '🟡 Revisando';
+    if (status === 'resolved') return '✅ Resuelto';
+    if (status === 'dismissed') return '⚪ Descartado';
+    return status;
 }
 
 Deno.serve(async (req) => {
@@ -136,18 +206,29 @@ Deno.serve(async (req) => {
 
         console.log('[send-user-summary-email] Processing:', { frequency, days });
 
-        // Get new users summary
-        const { data: newUsers, error: usersError } = await supabase.rpc(
-            'admin_get_new_users_summary',
-            { p_days: days }
-        );
+        // ─── Fetch all data in parallel ───
+        const [usersResult, reportsResult, messagingResult] = await Promise.all([
+            supabase.rpc('admin_get_new_users_summary', { p_days: days }),
+            supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
+            supabase.rpc('admin_get_messaging_activity_summary', { p_days: days }),
+        ]);
 
-        if (usersError) {
-            console.error('[send-user-summary-email] Error fetching users:', usersError);
+        if (usersResult.error) {
+            console.error('[send-user-summary-email] Error fetching users:', usersResult.error);
             return new Response(
-                JSON.stringify({ error: 'Failed to fetch user summary', details: usersError }),
+                JSON.stringify({ error: 'Failed to fetch user summary', details: usersResult.error }),
                 { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
             );
+        }
+
+        if (reportsResult.error) {
+            console.error('[send-user-summary-email] Error fetching reports:', reportsResult.error);
+            // Non-fatal: continue without reports section
+        }
+
+        if (messagingResult.error) {
+            console.error('[send-user-summary-email] Error fetching messaging:', messagingResult.error);
+            // Non-fatal: continue without messaging section
         }
 
         // Get recipients based on frequency
@@ -185,10 +266,13 @@ Deno.serve(async (req) => {
             );
         }
 
-        // Build email content
+        // ─── Build email content ───
         const periodLabel = days === 1 ? 'las últimas 24 horas' : `los últimos ${days} días`;
-        const usersList = newUsers as NewUser[];
+        const usersList = (usersResult.data as NewUser[]) || [];
+        const reportsList = (reportsResult.data as ReportSummary[]) || [];
+        const messagingData = ((messagingResult.data as MessagingActivity[]) || [])[0] || null;
 
+        // ── Section 1: New Users ──
         let usersHtml: string;
         if (usersList.length === 0) {
             usersHtml = `
@@ -215,8 +299,8 @@ Deno.serve(async (req) => {
           <tbody>
             ${usersList.map((user, i) => `
               <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${user.nickname}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${user.email}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${escapeHtml(user.nickname)}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${escapeHtml(user.email)}</td>
                 <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.listings_count}</td>
                 <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.albums_count}</td>
                 <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.chat_messages_count}</td>
@@ -228,8 +312,107 @@ Deno.serve(async (req) => {
       `;
         }
 
+        // ── Section 2: Reports ──
+        const pendingReports = reportsList.filter(r => r.status === 'pending');
+        let reportsHtml: string;
+        if (reportsList.length === 0) {
+            reportsHtml = `
+        <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
+          No hay nuevos reportes en ${periodLabel}.
+        </p>
+      `;
+        } else {
+            reportsHtml = `
+        <p style="color: #4b5563; margin-bottom: 16px;">
+          <strong>${reportsList.length}</strong> ${reportsList.length === 1 ? 'nuevo reporte' : 'nuevos reportes'} en ${periodLabel}${pendingReports.length > 0 ? ` (<strong style="color: #dc2626;">${pendingReports.length} pendientes</strong>)` : ''}:
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <thead>
+            <tr style="background: #f3f4f6;">
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Tipo</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Objetivo</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Motivo</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Reportado por</th>
+              <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Estado</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${reportsList.map((report, i) => `
+              <tr style="background: ${report.status === 'pending' ? '#fef2f2' : i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${getTargetTypeLabel(report.target_type)}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(report.target_label || '')}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${getReasonLabel(report.reason)}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(report.reporter_nickname || 'Desconocido')}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 12px;">${getStatusIndicator(report.status)}</td>
+                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${new Date(report.created_at).toLocaleDateString('es-ES')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+        }
+
+        // ── Section 3: Messaging Activity ──
+        let messagingHtml: string;
+        if (!messagingData || messagingData.total_messages === 0) {
+            messagingHtml = `
+        <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
+          No hubo actividad de mensajes en ${periodLabel}.
+        </p>
+      `;
+        } else {
+            const topSenders = messagingData.top_senders || [];
+            const busiestHourStr = messagingData.busiest_hour !== null
+                ? `${String(messagingData.busiest_hour).padStart(2, '0')}:00 UTC`
+                : 'N/A';
+
+            messagingHtml = `
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+          <div style="flex: 1; min-width: 100px; background: #f0f9ff; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #1d4ed8;">${messagingData.total_messages}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Mensajes</div>
+          </div>
+          <div style="flex: 1; min-width: 100px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${messagingData.unique_senders}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Remitentes</div>
+          </div>
+          <div style="flex: 1; min-width: 100px; background: #fffbeb; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #d97706;">${messagingData.unique_conversations}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Conversaciones</div>
+          </div>
+          <div style="flex: 1; min-width: 100px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${messagingData.messages_per_day}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Media/día</div>
+          </div>
+        </div>
+        <p style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">
+          Hora más activa: <strong>${busiestHourStr}</strong> · Receptores únicos: <strong>${messagingData.unique_receivers}</strong>
+        </p>
+        ${topSenders.length > 0 ? `
+        <p style="color: #4b5563; font-size: 13px; font-weight: 600; margin-bottom: 8px;">Top remitentes:</p>
+        <table style="width: 100%; max-width: 400px; border-collapse: collapse; margin-bottom: 16px;">
+          <thead>
+            <tr style="background: #f3f4f6;">
+              <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Nickname</th>
+              <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Mensajes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${topSenders.map((s: { nickname: string; message_count: number }, i: number) => `
+              <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${escapeHtml(s.nickname)}</td>
+                <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-weight: 500;">${s.message_count}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        ` : ''}
+      `;
+        }
+
         const frequencyLabel = frequency === 'daily' ? 'Diario' : frequency === 'weekly' ? 'Semanal' : 'Manual';
-        const subject = `[CambioCromos] Resumen de nuevos usuarios - ${frequencyLabel}`;
+        const subject = `[CambioCromos] Resumen de actividad - ${frequencyLabel}`;
 
         const htmlContent = `
       <!DOCTYPE html>
@@ -241,13 +424,32 @@ Deno.serve(async (req) => {
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 700px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #FFC000 0%, #FF8C00 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="margin: 0; font-size: 24px; font-weight: bold;">CambioCromos</h1>
-            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Resumen de Nuevos Usuarios</p>
+            <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Resumen de Actividad</p>
           </div>
           <div style="background: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; border-top: none;">
+            <!-- Users Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
-              📊 Resumen de ${periodLabel}
+              👥 Nuevos Usuarios (${periodLabel})
             </h2>
             ${usersHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Reports Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              📋 Reportes${pendingReports.length > 0 ? ` <span style="background: #dc2626; color: white; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-left: 8px;">${pendingReports.length} pendientes</span>` : ''}
+            </h2>
+            ${reportsHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Messaging Activity Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              💬 Actividad de Mensajes (${periodLabel})
+            </h2>
+            ${messagingHtml}
           </div>
           <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
             <p style="margin: 0;">Este es un email automático del sistema de CambioCromos</p>
@@ -297,13 +499,23 @@ Deno.serve(async (req) => {
             }
         }
 
-        console.log('[send-user-summary-email] Complete:', { sentCount, errorCount: errors.length });
+        console.log('[send-user-summary-email] Complete:', {
+            sentCount,
+            newUsers: usersList.length,
+            reports: reportsList.length,
+            pendingReports: pendingReports.length,
+            totalMessages: messagingData?.total_messages ?? 0,
+            errorCount: errors.length,
+        });
 
         return new Response(
             JSON.stringify({
                 success: true,
                 sent_count: sentCount,
                 new_users_count: usersList.length,
+                reports_count: reportsList.length,
+                pending_reports_count: pendingReports.length,
+                total_messages: messagingData?.total_messages ?? 0,
                 errors: errors.length > 0 ? errors : undefined
             }),
             { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

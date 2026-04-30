@@ -24,7 +24,7 @@ export default function AdminSettingsPage() {
 
       {/* New User Summary Section */}
       <div>
-        <h2 className="text-xl font-bold text-white mb-4">New Users Summary Email</h2>
+        <h2 className="text-xl font-bold text-white mb-4">Activity Summary Email</h2>
         <ModernCard>
           <NewUserSummarySettings />
         </ModernCard>
