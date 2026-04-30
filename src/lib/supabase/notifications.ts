@@ -96,7 +96,7 @@ export async function fetchNotifications(): Promise<AppNotification[]> {
 
   if (error) {
     if (isTransientNetworkError(error)) {
-      logger.warn('Transient network error fetching notifications:', error);
+      logger.warnLocal('Transient network error fetching notifications:', error);
     } else {
       logger.error('Error fetching notifications:', error);
     }
@@ -122,7 +122,7 @@ export async function fetchUnreadCount(): Promise<number> {
 
   if (error) {
     if (isTransientNetworkError(error)) {
-      logger.warn('Transient network error fetching unread count:', error);
+      logger.warnLocal('Transient network error fetching unread count:', error);
     } else {
       logger.error('Error fetching unread count:', error);
     }
@@ -142,7 +142,7 @@ export async function markAllRead(): Promise<void> {
 
   if (error) {
     if (isTransientNetworkError(error)) {
-      logger.warn('Transient network error marking all as read:', error);
+      logger.warnLocal('Transient network error marking all as read:', error);
     } else {
       logger.error('Error marking all as read:', error);
     }
@@ -162,7 +162,7 @@ export async function markRead(notificationId: number): Promise<void> {
 
   if (error) {
     if (isTransientNetworkError(error)) {
-      logger.warn('Transient network error marking notification as read:', error);
+      logger.warnLocal('Transient network error marking notification as read:', error);
     } else {
       logger.error('Error marking notification as read:', error);
     }
@@ -186,7 +186,7 @@ export async function markListingChatNotificationsRead(
 
   if (error) {
     if (isTransientNetworkError(error)) {
-      logger.warn('Transient network error marking listing chat notifications as read:', error);
+      logger.warnLocal('Transient network error marking listing chat notifications as read:', error);
     } else {
       logger.error('Error marking listing chat notifications as read:', error);
     }

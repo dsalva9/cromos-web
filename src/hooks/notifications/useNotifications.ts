@@ -144,7 +144,7 @@ export function useNotifications(): UseNotificationsReturn {
       const errorMessage =
         err instanceof Error ? err.message : 'Error al marcar como leídas';
       // Underlying function already logs specifics; warn here to avoid Sentry noise
-      logger.warn('Error marking all as read:', errorMessage);
+      logger.warnLocal('Error marking all as read:', errorMessage);
       // Only rollback on non-network errors; network errors keep the optimistic update
       if (!isTransientNetworkError(err)) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
@@ -175,7 +175,7 @@ export function useNotifications(): UseNotificationsReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar como leída';
         // Underlying function already logs specifics; warn here to avoid Sentry noise
-        logger.warn('Error marking notification as read:', errorMessage);
+        logger.warnLocal('Error marking notification as read:', errorMessage);
         // Only rollback on non-network errors; network errors keep the optimistic update
         if (!isTransientNetworkError(err)) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
@@ -212,7 +212,7 @@ export function useNotifications(): UseNotificationsReturn {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar chat como leído';
         // Underlying function already logs specifics; warn here to avoid Sentry noise
-        logger.warn('Error marking listing chat as read:', errorMessage);
+        logger.warnLocal('Error marking listing chat as read:', errorMessage);
         // Only rollback on non-network errors; network errors keep the optimistic update
         if (!isTransientNetworkError(err)) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });

@@ -132,12 +132,12 @@ export async function updateOneSignalPlayerId(playerId: string): Promise<void> {
   if (error) {
     if (isTransientNetworkError(error)) {
       // Transient network error — throw so retry logic kicks in
-      logger.warn('Network error updating OneSignal player ID (will retry on next login):', error);
+      logger.warnLocal('Network error updating OneSignal player ID (will retry on next login):', error);
       throw new Error('Error al actualizar el ID de notificaciones push');
     }
 
     // Permanent DB errors (e.g. missing profile, auth issues) — warn only, don't throw
     // The OneSignalProvider already handles failures gracefully; retrying won't help
-    logger.warn('Non-critical error updating OneSignal player ID (will retry on next login):', error);
+    logger.warnLocal('Non-critical error updating OneSignal player ID (will retry on next login):', error);
   }
 }

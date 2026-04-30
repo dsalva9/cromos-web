@@ -129,8 +129,9 @@ export default function ListingDetailPage() {
       setAdminDeleteReason('');
       refetch(); // Refresh to show deleted state
     } catch (error) {
-      logger.error('Admin delete error:', error);
-      toast.error('Error al eliminar el listado');
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error(`Admin delete error: ${errMsg}`, error);
+      toast.error(errMsg || 'Error al eliminar el listado');
     } finally {
       setAdminDeleteLoading(false);
     }

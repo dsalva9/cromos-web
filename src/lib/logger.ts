@@ -37,6 +37,7 @@ export const logger = {
   /**
    * Warning-level logging (always logs)
    * Use for recoverable issues and deprecation warnings
+   * These ARE sent to Sentry — use warnLocal() for expected conditions
    */
   warn: (...args: unknown[]) => {
     if (isDev) {
@@ -46,6 +47,19 @@ export const logger = {
     // Send warnings to Sentry in production
     if (isSentryEnabled) {
       Sentry.captureMessage(String(args[0]), 'warning');
+    }
+  },
+
+  /**
+   * Local-only warning (development console only, never Sentry)
+   * Use for expected-but-notable conditions:
+   * - User denied permissions
+   * - Transient network errors with retry logic
+   * - Non-critical failures that self-heal
+   */
+  warnLocal: (...args: unknown[]) => {
+    if (isDev) {
+      console.warn('[WARN-LOCAL]', ...args);
     }
   },
 

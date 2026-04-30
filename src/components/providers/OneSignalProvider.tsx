@@ -40,7 +40,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
             await new Promise((resolve) => setTimeout(resolve, delay));
           } else {
             // All retries exhausted — warn, don't error (non-critical)
-            logger.warn('[OneSignal] ⚠️ Failed to save player ID after all retries (will retry on next login):', error);
+            logger.warnLocal('[OneSignal] ⚠️ Failed to save player ID after all retries (will retry on next login):', error);
           }
         }
       }
@@ -139,7 +139,7 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
             .then((accepted: boolean) => {
               logger.info('[OneSignal] Permission granted:', accepted);
               if (!accepted) {
-                logger.warn('[OneSignal] User denied notification permission');
+                logger.warnLocal('[OneSignal] User denied notification permission');
               }
             })
             .catch((err: unknown) => {

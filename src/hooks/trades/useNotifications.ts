@@ -93,9 +93,9 @@ export const useNotifications = (): UseNotificationsReturn => {
       setUnreadCount(data || 0);
     } catch (err) {
       if (isTransientNetworkError(err)) {
-        logger.warn('Transient network error fetching unread count:', err);
+        logger.warnLocal('Transient network error fetching unread count:', err);
       } else {
-        logger.error('Error fetching unread count:', err);
+        logger.warnLocal('Error fetching unread count:', err);
       }
       // Don't set error state for background count fetches
     }
@@ -152,9 +152,9 @@ export const useNotifications = (): UseNotificationsReturn => {
       await fetchUnreadCount();
     } catch (err) {
       if (isTransientNetworkError(err)) {
-        logger.warn('Transient network error marking notification as read:', err);
+        logger.warnLocal('Transient network error marking notification as read:', err);
       } else {
-        logger.error('Error marking notification as read:', err);
+        logger.warnLocal('Error marking notification as read:', err);
       }
       // Only refresh on non-network errors; network errors keep optimistic state
       if (!isTransientNetworkError(err)) {

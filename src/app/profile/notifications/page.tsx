@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Notifications Center Page
  * Sprint 15: Notifications System
  */
@@ -53,7 +53,7 @@ function NotificationsCenterContent() {
     try {
       await markAllAsRead();
     } catch (err) {
-      logger.warn('Error marking all as read:', err);
+      logger.warnLocal('Error marking all as read:', err);
     }
   };
 
@@ -61,7 +61,7 @@ function NotificationsCenterContent() {
     try {
       await markAsRead(id);
     } catch (err) {
-      logger.warn('Error marking notification as read:', err);
+      logger.warnLocal('Error marking notification as read:', err);
     }
   };
 
