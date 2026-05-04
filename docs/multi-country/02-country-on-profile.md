@@ -1,8 +1,9 @@
 # Phase 2: Country on Profile
 
+> **Status:** ✅ **DONE & TESTED** — Shipped May 2026. All checklist items verified on production.
 > **Parent doc:** [00-overview.md](./00-overview.md) — read this first for full project context, stack, and architecture.
 > **Depends on:** [01-feature-flags.md](./01-feature-flags.md) — the `useFeatureFlag('multi_country')` hook must exist.
-> **Deployment:** Ships in **Commit 1** together with Phase 1. Safe to push — country picker gated behind `multi_country` flag (defaults `false`), DB migration only adds a column with `DEFAULT 'ES'`.
+> **Deployment:** Shipped in **Commit 1** together with Phase 1.
 
 ## Objective
 

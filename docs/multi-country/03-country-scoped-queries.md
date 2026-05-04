@@ -1,8 +1,9 @@
 # Phase 3: Country-Scoped Queries
 
+> **Status:** ✅ **DONE & TESTED** — Shipped 4 May 2026. All checklist items verified on production.
 > **Parent doc:** [00-overview.md](./00-overview.md) — read this first for full project context, stack, and architecture.
 > **Depends on:** [02-country-on-profile.md](./02-country-on-profile.md) — `profiles.country_code` must exist and be populated.
-> **Deployment:** Ships as **Commit 2** (separate from Phases 1+2). This modifies ~8 live RPCs — highest risk change. Test thoroughly with flag ON and OFF before pushing. See [Deployment Checkpoints](./00-overview.md#deployment-checkpoints).
+> **Deployment:** Shipped as **Commit 2**. Legacy function overloads cleaned up. SSR paths gate on feature flag via `check_feature_flag` RPC.
 
 ## Objective
 

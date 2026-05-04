@@ -1,7 +1,8 @@
 # Phase 1: Feature Flag System
 
+> **Status:** ✅ **DONE & TESTED** — Shipped April 2026. All checklist items verified on production.
 > **Parent doc:** [00-overview.md](./00-overview.md) — read this first for full project context, stack, and architecture.
-> **Deployment:** Ships in **Commit 1** together with Phase 2. Safe to push — all flags default to `false`, zero user impact.
+> **Deployment:** Shipped in **Commit 1** together with Phase 2.
 
 ## Objective
 

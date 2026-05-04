@@ -12,13 +12,13 @@ Launch CambioCromos in **6 countries** (ES 🇪🇸, US 🇺🇸, BR 🇧🇷, A
 
 | Phase | File | Scope | Status |
 |---|---|---|---|
-| 1 | [01-feature-flags.md](./01-feature-flags.md) | Feature flag system (`feature_flags` + `user_feature_overrides` tables, admin UI, frontend hook) | Ready |
-| 2 | [02-country-on-profile.md](./02-country-on-profile.md) | `country_code` on profiles, country picker in onboarding, postcode validation per country, seed data | Ready |
-| 3 | [03-country-scoped-queries.md](./03-country-scoped-queries.md) | `country_code` on listings & templates, filter all discovery RPCs | Ready |
+| 1 | [01-feature-flags.md](./01-feature-flags.md) | Feature flag system (`feature_flags` + `user_feature_overrides` tables, admin UI, frontend hook) | ✅ Done & Tested (Apr 2026) |
+| 2 | [02-country-on-profile.md](./02-country-on-profile.md) | `country_code` on profiles, country picker in onboarding, postcode validation per country, seed data | ✅ Done & Tested (May 2026) |
+| 3 | [03-country-scoped-queries.md](./03-country-scoped-queries.md) | `country_code` on listings & templates, filter all discovery RPCs | ✅ Done & Tested (4 May 2026) |
 | 4 | [04-i18n-infrastructure.md](./04-i18n-infrastructure.md) | `next-intl`, locale routing (`/es/`, `/en/`, `/pt/`), language selector | Deferred |
 | 5 | [05-translations-and-routes.md](./05-translations-and-routes.md) | Extract ~5,500 strings, translate to EN & PT-BR, route path migration | Deferred |
 
-**Execution order:** Phases 1 → 2 → 3 are sequential and approved for immediate work. Phases 4 → 5 are deferred until Phases 1–3 are complete and tested.
+**Execution order:** Phases 1 → 2 → 3 are complete. Phases 4 → 5 are deferred until needed.
 
 Each phase file contains all the context an agent needs to implement that phase in a new conversation.
 
@@ -28,11 +28,11 @@ Each phase file contains all the context an agent needs to implement that phase 
 
 Ship in **2 commits** for Phases 1–3. Each commit goes through: implement → test locally → test on Vercel preview → push to `main`.
 
-### Commit 1: Phases 1 + 2 (Feature Flags + Country on Profile)
+### ✅ Commit 1: Phases 1 + 2 (Feature Flags + Country on Profile) — DONE
 
-**Why it's safe to ship together:** Everything is gated behind the `multi_country` flag, which defaults to `false`. No existing user sees any change. The DB migrations only ADD columns with safe defaults and create new tables.
+**Shipped:** April 2026. Verified on production.
 
-**What goes to production:**
+**What went to production:**
 - 2 new tables (`feature_flags`, `user_feature_overrides`)
 - 1 new column (`profiles.country_code DEFAULT 'ES'`)
 - New RPCs (`check_feature_flag`, `get_all_feature_flags`)
@@ -40,38 +40,22 @@ Ship in **2 commits** for Phases 1–3. Each commit goes through: implement → 
 - Modified files: `isProfileComplete.ts`, `ProfileCompletionProvider.tsx`, `useUserProfile.ts`, onboarding flow
 - Postal code seed data for US, AR, CO, MX
 
-**Verify before pushing:**
-1. `npm run build` passes with no errors
-2. All existing pages load (marketplace, templates, profile, admin)
-3. Login/signup flow works
-4. Profile completion works for Spain users (flag OFF)
-5. Enable `multi_country` flag for your admin account → country picker appears
-6. Select a non-Spain country → postcode validation adapts
-7. Disable flag → everything reverts to normal
-8. No new Sentry errors on Vercel preview deploy
+### ✅ Commit 2: Phase 3 (Country-Scoped Queries) — DONE
 
-### Commit 2: Phase 3 (Country-Scoped Queries)
+**Shipped:** 4 May 2026. Verified on production.
 
-**Why this is separate:** This commit modifies ~8 live RPC functions. Although the changes use `DEFAULT NULL` (backward compatible), modifying production RPCs is the highest-risk change in the entire plan and deserves its own isolated commit.
-
-**What goes to production:**
+**What went to production:**
 - 2 new columns (`trade_listings.country_code`, `collection_templates.country_code`)
 - 2 new indexes
 - ~8 modified RPCs (all discovery functions get `p_country_code DEFAULT NULL`)
 - Modified marketplace/template hooks (pass `country_code` when flag is ON)
+- SSR paths (`server-listings.ts`, `server-templates.ts`) check feature flag server-side
+- Old function overloads dropped (cleaned up duplicate signatures)
 
-**Verify before pushing:**
-1. `npm run build` passes
-2. **Flag OFF (critical):** Marketplace loads all listings as before. Templates page loads. Search works. Distance sort works. Pagination works.
-3. **Flag ON (your admin account):**
-   - Spain user sees only ES content
-   - Create a test listing as US user → it gets `country_code = 'US'`
-   - Spain user does NOT see the US listing
-   - Direct URL to a listing works regardless of country
-4. Admin panel: listings and templates pages load correctly
-5. My Listings / My Templates show user's own data regardless of country
-6. Existing chats still work
-7. No new Sentry errors on Vercel preview deploy
+**Key findings during testing:**
+- SSR paths (server-listings, server-templates) must check feature flag via RPC since they can't use hooks
+- PostgreSQL creates new overloads instead of replacing when parameter lists differ — old overloads must be explicitly dropped
+- `get_marketplace_availability` and `find_mutual_traders` resolve country server-side via `auth.uid()` — no frontend param needed
 
 ### Future Commits: Phases 4 + 5
 
@@ -134,10 +118,12 @@ src/
 3. **Profile completion** — `isProfileComplete(nickname, postcode, avatarUrl)` in `src/lib/profile/isProfileComplete.ts` is the single source of truth
 4. **All UI text is hardcoded Spanish** — no translation system exists
 
-### Database state (production)
-- 236 users, 185 listings, 11 templates, 11,150 postal codes (Spain only)
-- No `country_code` column on any table except `postal_codes`
-- No feature flag system
+### Database state (production — updated 4 May 2026)
+- 236+ users, 185+ listings, 13+ templates, 130K+ postal codes (ES, US, AR, CO, MX)
+- `country_code` column on `profiles`, `trade_listings`, and `collection_templates`
+- `feature_flags` + `user_feature_overrides` tables for gating
+- `check_feature_flag` RPC for both client and server-side flag checks
+- All discovery RPCs accept `p_country_code DEFAULT NULL` for country-scoped filtering
 - `listing_type` enum stored as Spanish: `'intercambio'`, `'venta'`, `'ambos'`
 - FTS index uses `to_tsvector('spanish', ...)` config
 
