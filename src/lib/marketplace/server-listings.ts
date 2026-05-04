@@ -74,6 +74,15 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             }
         }
 
+        // Check feature flag server-side before applying country filter
+        let multiCountryEnabled = false;
+        if (userId) {
+            const { data: flagResult } = await supabase.rpc('check_feature_flag', {
+                p_flag_id: 'multi_country',
+            });
+            multiCountryEnabled = flagResult === true;
+        }
+
         // Fetch listings
         const rpcParams = {
             p_limit: limit,
@@ -82,7 +91,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             p_viewer_postcode: userPostcode, // Use server-fetched postcode
             p_sort_by_distance: sortByDistance && !!userPostcode,
             p_collection_ids: collectionIds.length > 0 ? collectionIds : null,
-            ...(userCountryCode ? { p_country_code: userCountryCode } : {}),
+            ...(multiCountryEnabled && userCountryCode ? { p_country_code: userCountryCode } : {}),
         };
 
         const { data, error } = await supabase.rpc(
