@@ -13,6 +13,7 @@ interface UserProfile {
   is_suspended: boolean;
   deleted_at: string | null;
   postcode: string | null;
+  country_code: string;
   location_label: string | null;
 }
 
@@ -80,6 +81,7 @@ export function useUserProfile(userId: string) {
         is_suspended: Boolean(profileData.is_suspended),
         deleted_at: profileData.deleted_at ?? null,
         postcode: profileData.postcode ?? null,
+        country_code: profileData.country_code ?? 'ES',
         location_label: locationLabel,
       };
 

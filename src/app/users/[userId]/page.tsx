@@ -45,6 +45,8 @@ import {
 } from '@/components/profile/AvatarPicker';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { SUPPORTED_COUNTRIES } from '@/constants/countries';
+import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 
 const STATUS_LABELS = {
   active: 'Activos',
@@ -61,9 +63,6 @@ const emptyStateCopy: Record<ListingFilter, string> = {
   sold: 'No hay anuncios completados',
   removed: 'No hay anuncios eliminados',
 };
-
-const postcodeRegex = /^\d{4,5}$/;
-
 interface Rating {
   id: number;
   rater_id: string;
@@ -105,6 +104,7 @@ export default function UserProfilePage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
+  const [formCountry, setFormCountry] = useState('ES');
   const [formAvatarPath, setFormAvatarPath] = useState<string | null>(null);
   const [avatarBlob, setAvatarBlob] = useState<{
     blob: Blob;
@@ -129,9 +129,15 @@ export default function UserProfilePage() {
         : ''
     );
     setFormPostcode(profile.postcode ?? '');
+    setFormCountry(profile.country_code ?? 'ES');
     setFormAvatarPath(profile.avatar_url ?? null);
     setAvatarBlob(null);
   }, [profile, editDialogOpen]);
+
+  const postcodeRule = useMemo(
+    () => getPostcodeRule(formCountry),
+    [formCountry]
+  );
 
   // Check if current user is admin
   useEffect(() => {
@@ -204,6 +210,11 @@ export default function UserProfilePage() {
   const previewAvatarUrl = useMemo(
     () => resolveAvatarUrl(formAvatarPath, supabase),
     [formAvatarPath, supabase]
+  );
+
+  const userCountryInfo = useMemo(
+    () => SUPPORTED_COUNTRIES.find(c => c.code === profile?.country_code),
+    [profile?.country_code]
   );
 
   const statusCounts = useMemo(() => {
@@ -319,12 +330,12 @@ export default function UserProfilePage() {
     }
 
     if (!trimmedPostcode) {
-      toast.error('El código postal es obligatorio');
+      toast.error(`El ${postcodeRule.label.toLowerCase()} es obligatorio`);
       return;
     }
 
-    if (!postcodeRegex.test(trimmedPostcode)) {
-      toast.error('Introduce un código postal válido');
+    if (!validatePostcode(trimmedPostcode, formCountry)) {
+      toast.error(`Introduce un ${postcodeRule.label.toLowerCase()} válido (ej: ${postcodeRule.placeholder})`);
       return;
     }
 
@@ -373,6 +384,7 @@ export default function UserProfilePage() {
         .update({
           nickname: trimmedNickname,
           postcode: trimmedPostcode,
+          country_code: formCountry,
           avatar_url: finalAvatarPath,
         })
         .eq('id', currentUser.id);
@@ -522,6 +534,7 @@ export default function UserProfilePage() {
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-2">
                         <MapPin className="h-4 w-4 text-gray-400" />
                         <span>
+                          {userCountryInfo && <span className="mr-1">{userCountryInfo.flag}</span>}
                           {locationDisplay ??
                             (isOwnProfile
                               ? 'Añade tu código postal para mostrar tu ubicación aproximada'
@@ -651,17 +664,33 @@ export default function UserProfilePage() {
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="postcode">Código postal</Label>
+                                <Label htmlFor="country">País</Label>
+                                <Select value={formCountry} onValueChange={(val) => { setFormCountry(val); setFormPostcode(''); }}>
+                                  <SelectTrigger id="country">
+                                    <SelectValue placeholder="Selecciona tu país" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {SUPPORTED_COUNTRIES.map(country => (
+                                      <SelectItem key={country.code} value={country.code}>
+                                        {country.flag} {country.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              <div className="space-y-2">
+                                <Label htmlFor="postcode">{postcodeRule.label}</Label>
                                 <Input
                                   id="postcode"
                                   value={formPostcode}
                                   onChange={event =>
                                     setFormPostcode(event.target.value)
                                   }
-                                  maxLength={5}
-                                  placeholder="28001"
+                                  maxLength={postcodeRule.maxLength}
+                                  placeholder={postcodeRule.placeholder}
                                   required
-                                  inputMode="numeric"
+                                  inputMode={formCountry === 'AR' || formCountry === 'BR' ? 'text' : 'numeric'}
                                 />
                                 <p className="text-xs text-gray-400 dark:text-gray-500">
                                   Mostramos tu ubicación aproximada en base al
