@@ -49,6 +49,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
     );
 
     let userPostcode: string | null = null;
+    let userCountryCode: string | null = null;
     let userId: string | null = null;
 
     try {
@@ -58,15 +59,18 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
         if (session?.user) {
             userId = session.user.id;
 
-            // Fetch user postcode for distance sorting
+            // Fetch user postcode and country_code for distance sorting and country scoping
             const { data: profile } = await supabase
                 .from('profiles')
-                .select('postcode')
+                .select('postcode, country_code')
                 .eq('id', userId)
                 .single();
 
             if (profile?.postcode) {
                 userPostcode = profile.postcode;
+            }
+            if (profile?.country_code) {
+                userCountryCode = profile.country_code;
             }
         }
 
@@ -78,6 +82,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             p_viewer_postcode: userPostcode, // Use server-fetched postcode
             p_sort_by_distance: sortByDistance && !!userPostcode,
             p_collection_ids: collectionIds.length > 0 ? collectionIds : null,
+            ...(userCountryCode ? { p_country_code: userCountryCode } : {}),
         };
 
         const { data, error } = await supabase.rpc(

@@ -1,6 +1,8 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { QUERY_KEYS } from '@/lib/queryKeys';
 
 interface Template {
@@ -17,6 +19,7 @@ interface Template {
   total_slots?: number;
   created_at: string;
   is_featured?: boolean;
+  country_code?: string;
 }
 
 interface UseTemplatesParams {
@@ -41,6 +44,9 @@ export function useTemplates({
   initialData,
 }: UseTemplatesParams = {}) {
   const supabase = useSupabaseClient();
+  const { profile } = useProfileCompletion();
+  const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
+  const countryCode = multiCountryEnabled ? (profile?.country_code ?? 'ES') : undefined;
 
   // Debounce search input by 250ms
   const [deferredSearch, setDeferredSearch] = useState(search);
@@ -67,7 +73,7 @@ export function useTemplates({
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: QUERY_KEYS.templates(deferredSearch, sortBy),
+    queryKey: QUERY_KEYS.templates(deferredSearch, sortBy, countryCode),
     queryFn: async ({ pageParam = 0 }) => {
       const { data, error: rpcError } = await supabase.rpc(
         'list_public_templates',
@@ -76,6 +82,7 @@ export function useTemplates({
           p_offset: pageParam,
           p_search: deferredSearch || undefined,
           p_sort_by: sortBy,
+          ...(countryCode ? { p_country_code: countryCode } : {}),
         }
       );
 

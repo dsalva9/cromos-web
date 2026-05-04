@@ -24,7 +24,8 @@ export function useAdminTemplates(
   statusFilter?: string | null,
   query?: string | null,
   page = 1,
-  pageSize = 20
+  pageSize = 20,
+  countryFilter?: string | null
 ) {
   const supabase = createClient();
   const [templates, setTemplates] = useState<AdminTemplate[]>([]);
@@ -42,7 +43,8 @@ export function useAdminTemplates(
         p_status: rpcStatus,
         p_query: query || undefined,
         p_page: page,
-        p_page_size: pageSize
+        p_page_size: pageSize,
+        p_country_code: countryFilter || undefined
       });
 
       if (fetchError) throw fetchError;
@@ -59,7 +61,7 @@ export function useAdminTemplates(
     } finally {
       setLoading(false);
     }
-  }, [supabase, statusFilter, query, page, pageSize]);
+  }, [supabase, statusFilter, query, page, pageSize, countryFilter]);
 
   useEffect(() => {
     fetchTemplates();

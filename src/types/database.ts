@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -146,6 +146,7 @@ export type Database = {
         Row: {
           author_id: string
           copies_count: number | null
+          country_code: string
           created_at: string | null
           deleted_at: string | null
           deleted_by: string | null
@@ -169,6 +170,7 @@ export type Database = {
         Insert: {
           author_id: string
           copies_count?: number | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -192,6 +194,7 @@ export type Database = {
         Update: {
           author_id?: string
           copies_count?: number | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -1260,6 +1263,7 @@ export type Database = {
         Row: {
           collection_name: string | null
           copy_id: number | null
+          country_code: string
           created_at: string | null
           deleted_at: string | null
           deleted_by: string | null
@@ -1288,6 +1292,7 @@ export type Database = {
         Insert: {
           collection_name?: string | null
           copy_id?: number | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -1316,6 +1321,7 @@ export type Database = {
         Update: {
           collection_name?: string | null
           copy_id?: number | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deleted_by?: string | null
@@ -2269,6 +2275,7 @@ export type Database = {
       }
       admin_list_marketplace_listings: {
         Args: {
+          p_country_code?: string
           p_page?: number
           p_page_size?: number
           p_query?: string
@@ -2289,6 +2296,7 @@ export type Database = {
       }
       admin_list_templates: {
         Args: {
+          p_country_code?: string
           p_page?: number
           p_page_size?: number
           p_query?: string
@@ -3181,6 +3189,7 @@ export type Database = {
       }
       list_public_templates: {
         Args: {
+          p_country_code?: string
           p_limit?: number
           p_offset?: number
           p_search?: string
@@ -3190,6 +3199,7 @@ export type Database = {
           author_id: string
           author_nickname: string
           copies_count: number
+          country_code: string
           created_at: string
           deleted_at: string
           description: string
@@ -3202,54 +3212,13 @@ export type Database = {
           title: string
         }[]
       }
-      list_trade_listings:
-        | {
-            Args: { p_limit?: number; p_offset?: number; p_search?: string }
-            Returns: {
-              author_nickname: string
-              collection_name: string
-              copy_id: number
-              created_at: string
-              description: string
-              id: number
-              image_url: string
-              slot_id: number
-              status: string
-              sticker_number: string
-              title: string
-              updated_at: string
-              user_id: string
-              views_count: number
-            }[]
-          }
-        | {
-            Args: {
-              p_limit?: number
-              p_offset?: number
-              p_search?: string
-              p_sort_by_distance?: boolean
-              p_viewer_postcode?: string
-            }
-            Returns: {
-              author_nickname: string
-              collection_name: string
-              copy_id: number
-              created_at: string
-              description: string
-              distance_km: number
-              id: number
-              image_url: string
-              slot_id: number
-              status: string
-              sticker_number: string
-              title: string
-              updated_at: string
-              user_id: string
-              views_count: number
-            }[]
-          }
       list_trade_listings_filtered: {
-        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Args: {
+          p_country_code?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+        }
         Returns: {
           author_avatar_url: string
           author_nickname: string
@@ -3271,6 +3240,7 @@ export type Database = {
       }
       list_trade_listings_filtered_with_distance: {
         Args: {
+          p_country_code?: string
           p_limit?: number
           p_offset?: number
           p_search?: string
@@ -3301,6 +3271,7 @@ export type Database = {
       list_trade_listings_with_collection_filter: {
         Args: {
           p_collection_ids?: number[]
+          p_country_code?: string
           p_limit?: number
           p_offset?: number
           p_search?: string
@@ -3740,4 +3711,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

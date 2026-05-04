@@ -15,15 +15,16 @@ export const QUERY_KEYS = {
         sortByDistance: boolean,
         viewerPostcode: string | null,
         collectionIdsKey: string,
-        limit: number = 20
+        limit: number = 20,
+        countryCode?: string,
     ) =>
-        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit }] as const,
+        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode }] as const,
 
     listingsAll: () => ['listings'] as const,
 
     /* ─── templates ─── */
-    templates: (search: string, sortBy: string) =>
-        ['templates', { search, sortBy }] as const,
+    templates: (search: string, sortBy: string, countryCode?: string) =>
+        ['templates', { search, sortBy, countryCode }] as const,
     templatesAll: () => ['templates'] as const,
 
     /* ─── user collections ─── */

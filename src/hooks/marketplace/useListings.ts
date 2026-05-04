@@ -1,6 +1,8 @@
 import { useMemo, useCallback, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { Listing } from '@/types/v1.6.0';
 import { QUERY_KEYS } from '@/lib/queryKeys';
 
@@ -112,6 +114,9 @@ export function useListings({
   initialData,
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
+  const { profile } = useProfileCompletion();
+  const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
+  const countryCode = multiCountryEnabled ? (profile?.country_code ?? 'ES') : undefined;
 
   // Stable key for collectionIds to avoid unnecessary refetches when the
   // array reference changes but the contents are the same.
@@ -141,7 +146,7 @@ export function useListings({
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit),
+    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode),
     queryFn: async ({ pageParam = 0 }) => {
       const currentIds = collectionIdsRef.current;
       const hasCollectionFilter = currentIds && currentIds.length > 0;
@@ -152,6 +157,7 @@ export function useListings({
         p_viewer_postcode: viewerPostcode,
         p_sort_by_distance: sortByDistance,
         p_collection_ids: hasCollectionFilter ? currentIds : null,
+        ...(countryCode ? { p_country_code: countryCode } : {}),
       };
 
       const { data, error } = await supabase.rpc(

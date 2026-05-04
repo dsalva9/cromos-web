@@ -21,7 +21,8 @@ export function useAdminListings(
   statusFilter?: string | null,
   query?: string | null,
   page = 1,
-  pageSize = 20
+  pageSize = 20,
+  countryFilter?: string | null
 ) {
   const supabase = createClient();
   const [listings, setListings] = useState<AdminListing[]>([]);
@@ -38,7 +39,8 @@ export function useAdminListings(
           p_status: statusFilter || undefined,
           p_query: query || undefined,
           p_page: page,
-          p_page_size: pageSize
+          p_page_size: pageSize,
+          p_country_code: countryFilter || undefined
         }
       );
 
@@ -53,7 +55,7 @@ export function useAdminListings(
     } finally {
       setLoading(false);
     }
-  }, [supabase, statusFilter, query, page, pageSize]);
+  }, [supabase, statusFilter, query, page, pageSize, countryFilter]);
 
   useEffect(() => {
     fetchListings();
