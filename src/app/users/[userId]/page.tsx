@@ -47,6 +47,7 @@ import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 const STATUS_LABELS = {
   active: 'Activos',
@@ -99,6 +100,7 @@ export default function UserProfilePage() {
 
   const { profile, listings, loading, error, refetch, adjustFavoritesCount } =
     useUserProfile(userId);
+  const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
 
   const [listingFilter, setListingFilter] = useState<ListingFilter>('active');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -663,21 +665,23 @@ export default function UserProfilePage() {
                                 />
                               </div>
 
-                              <div className="space-y-2">
-                                <Label htmlFor="country">País</Label>
-                                <Select value={formCountry} onValueChange={(val) => { setFormCountry(val); setFormPostcode(''); }}>
-                                  <SelectTrigger id="country">
-                                    <SelectValue placeholder="Selecciona tu país" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {SUPPORTED_COUNTRIES.map(country => (
-                                      <SelectItem key={country.code} value={country.code}>
-                                        {country.flag} {country.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
+                              {multiCountryEnabled && (
+                                <div className="space-y-2">
+                                  <Label htmlFor="country">País</Label>
+                                  <Select value={formCountry} onValueChange={(val) => { setFormCountry(val); setFormPostcode(''); }}>
+                                    <SelectTrigger id="country">
+                                      <SelectValue placeholder="Selecciona tu país" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {SUPPORTED_COUNTRIES.map(country => (
+                                        <SelectItem key={country.code} value={country.code}>
+                                          {country.flag} {country.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
 
                               <div className="space-y-2">
                                 <Label htmlFor="postcode">{postcodeRule.label}</Label>
