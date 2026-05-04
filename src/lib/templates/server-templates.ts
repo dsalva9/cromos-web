@@ -68,6 +68,28 @@ export async function getPublicTemplates(params: GetTemplatesParams = {}) {
     );
 
     try {
+        // Check if user is logged in and get their country for sort priority
+        let userCountryCode: string | null = null;
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('country_code')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profile?.country_code) {
+                // Check feature flag before applying country sort
+                const { data: flagResult } = await supabase.rpc('check_feature_flag', {
+                    p_flag_id: 'multi_country',
+                });
+                if (flagResult === true) {
+                    userCountryCode = profile.country_code;
+                }
+            }
+        }
+
         const { data, error } = await supabase.rpc(
             'list_public_templates',
             {
@@ -75,6 +97,7 @@ export async function getPublicTemplates(params: GetTemplatesParams = {}) {
                 p_offset: offset,
                 p_search: search || null,
                 p_sort_by: sortBy,
+                ...(userCountryCode ? { p_country_code: userCountryCode } : {}),
             }
         );
 
