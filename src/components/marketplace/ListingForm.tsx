@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -32,9 +32,10 @@ interface ListingFormProps {
   initialData: EditListingFormInitialData;
   onSubmit: (data: CreateListingForm) => Promise<void>;
   loading?: boolean;
+  currencySymbol?: string;
 }
 
-export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps) {
+export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '€' }: ListingFormProps) {
   const {
     register,
     handleSubmit,
@@ -195,7 +196,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
             {/* Price input - visible when sale is selected */}
             {isForSale && (
               <div className="space-y-2">
-                <Label htmlFor="price">Precio (€) <span className="text-red-500">*</span></Label>
+                <Label htmlFor="price">Precio ({currencySymbol}) <span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
                     id="price"
@@ -208,7 +209,7 @@ export function ListingForm({ initialData, onSubmit, loading }: ListingFormProps
                     className={`bg-white border-2 text-gray-900 pl-8 ${errors.price ? 'border-red-500' : 'border-black'
                       }`}
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{currencySymbol}</span>
                 </div>
                 {errors.price && (
                   <p className="text-sm text-red-500">{errors.price.message as string}</p>

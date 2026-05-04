@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { AvatarPicker, AvatarSelection } from '@/components/profile/AvatarPicker';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { Input } from '@/components/ui/input';
@@ -12,18 +13,19 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { useRouter } from '@/hooks/use-router';
-
-// Spanish postcodes: 01000–52999 (5 digits, provinces 01–52)
-const SPANISH_POSTCODE_REGEX = /^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$/;
+import { SUPPORTED_COUNTRIES } from '@/constants/countries';
+import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 
 function CompleteProfileContent() {
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const router = useRouter();
   const { profile, updateProfile, refresh, markComplete } = useProfileCompletion();
+  const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
 
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
+  const [formCountryCode, setFormCountryCode] = useState('ES');
   const [formAvatarPath, setFormAvatarPath] = useState<string | null>(null);
   const [avatarBlob, setAvatarBlob] = useState<{ blob: Blob; fileName: string } | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -35,6 +37,12 @@ function CompleteProfileContent() {
     [formAvatarPath, supabase]
   );
 
+  // Get postcode rules for the currently selected country
+  const postcodeRule = useMemo(
+    () => getPostcodeRule(formCountryCode),
+    [formCountryCode]
+  );
+
   // Seed form fields from ProfileCompletionProvider context (no extra query needed)
   useEffect(() => {
     if (!user || !profile) return;
@@ -43,6 +51,7 @@ function CompleteProfileContent() {
     // Clear default/placeholder postcode so new users must enter their own
     const isDefaultPostcode = !profile.postcode || profile.postcode === '28001';
     setFormPostcode(isDefaultPostcode ? '' : (profile.postcode ?? ''));
+    setFormCountryCode(profile.country_code ?? 'ES');
     setFormAvatarPath(profile.avatar_url ?? null);
     setLoadingProfile(false);
   }, [user, profile]);
@@ -83,12 +92,12 @@ function CompleteProfileContent() {
     }
 
     if (!trimmedPostcode) {
-      setErrorMessage('El campo Código postal es obligatorio.');
+      setErrorMessage(`El campo ${postcodeRule.label} es obligatorio.`);
       return;
     }
 
-    if (!SPANISH_POSTCODE_REGEX.test(trimmedPostcode)) {
-      setErrorMessage('Introduce un código postal español válido (5 dígitos).');
+    if (!validatePostcode(trimmedPostcode, formCountryCode)) {
+      setErrorMessage(`Introduce un ${postcodeRule.label} válido (ej: ${postcodeRule.placeholder}).`);
       return;
     }
 
@@ -145,6 +154,7 @@ function CompleteProfileContent() {
             nickname: trimmedNickname,
             postcode: trimmedPostcode,
             avatar_url: finalAvatarPath,
+            country_code: formCountryCode,
           },
           { onConflict: 'id' }
         );
@@ -162,6 +172,7 @@ function CompleteProfileContent() {
         nickname: trimmedNickname,
         postcode: trimmedPostcode,
         avatar_url: finalAvatarPath,
+        country_code: formCountryCode,
       });
 
       // Lock isComplete=true BEFORE navigating — prevents the guard from
@@ -181,7 +192,7 @@ function CompleteProfileContent() {
       if (error && typeof error === 'object' && 'code' in error) {
         const dbError = error as { code: string; message?: string };
         if (dbError.code === 'P0001' && dbError.message?.toLowerCase().includes('postcode')) {
-          setErrorMessage('El código postal introducido no es válido. Por favor, comprueba que es un código postal español real.');
+          setErrorMessage('El código postal introducido no es válido. Por favor, comprueba que es un código postal real.');
         } else if (dbError.code === '23505') {
           setErrorMessage('Ese usuario ya está en uso. Prueba con otro.');
         } else {
@@ -236,14 +247,39 @@ function CompleteProfileContent() {
                 />
               </div>
 
+              {/* Country Picker — only shown when multi_country flag is enabled */}
+              {multiCountryEnabled && (
+                <div className="space-y-2">
+                  <Label htmlFor="country">País</Label>
+                  <select
+                    id="country"
+                    value={formCountryCode}
+                    onChange={e => {
+                      setFormCountryCode(e.target.value);
+                      // Clear postcode when country changes since format is different
+                      setFormPostcode('');
+                      setErrorMessage(null);
+                    }}
+                    disabled={saving}
+                    className="w-full rounded-md border-2 border-black bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold"
+                  >
+                    {SUPPORTED_COUNTRIES.map(c => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="postcode">Código postal</Label>
+                <Label htmlFor="postcode">{postcodeRule.label}</Label>
                 <Input
                   id="postcode"
                   value={formPostcode}
                   onChange={event => setFormPostcode(event.target.value)}
-                  maxLength={5}
-                  placeholder="28001"
+                  maxLength={postcodeRule.maxLength}
+                  placeholder={postcodeRule.placeholder}
                   inputMode="numeric"
                   required
                   disabled={saving}
@@ -298,5 +334,3 @@ export default function CompleteProfilePage() {
     </AuthGuard>
   );
 }
-
-

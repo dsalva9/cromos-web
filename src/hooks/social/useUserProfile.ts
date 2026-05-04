@@ -46,14 +46,15 @@ export function useUserProfile(userId: string) {
 
       const profileData = profileResult.data;
 
-      // Resolve location from postal_codes
+      // Resolve location from postal_codes using user's actual country
       let locationLabel: string | null = null;
       if (profileData.postcode) {
+        const userCountry = profileData.country_code ?? 'ES';
         const { data: locData } = await supabase
           .from('postal_codes')
           .select('municipio, provincia')
           .eq('postcode', profileData.postcode)
-          .eq('country', 'ES')
+          .eq('country', userCountry)
           .maybeSingle();
 
         const loc = locData as { municipio?: string | null; provincia?: string | null } | null;

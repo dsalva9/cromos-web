@@ -34,6 +34,7 @@ type UserProfile = {
   is_admin: boolean;
   suspended_at: string | null;
   deleted_at: string | null;
+  country_code: string;
 };
 
 interface ProfileCompletionContextValue {
@@ -57,7 +58,8 @@ function computeIsComplete(profile: UserProfile | null) {
   return isProfileComplete(
     profile.nickname,
     profile.postcode,
-    profile.avatar_url
+    profile.avatar_url,
+    profile.country_code
   );
 }
 
@@ -137,7 +139,7 @@ export function ProfileCompletionProvider({
       // Single query for ALL profile data - eliminates redundant queries
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at')
+        .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at, country_code')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -151,8 +153,9 @@ export function ProfileCompletionProvider({
           is_admin: data.is_admin ?? false,
           suspended_at: data.suspended_at ?? null,
           deleted_at: data.deleted_at ?? null,
+          country_code: data.country_code ?? 'ES',
         }
-        : { nickname: null, postcode: null, avatar_url: null, is_admin: false, suspended_at: null, deleted_at: null };
+        : { nickname: null, postcode: null, avatar_url: null, is_admin: false, suspended_at: null, deleted_at: null, country_code: 'ES' };
 
       setProfile(profileData);
 
@@ -219,6 +222,7 @@ export function ProfileCompletionProvider({
           is_admin: changes.is_admin ?? prev?.is_admin ?? false,
           suspended_at: changes.suspended_at ?? prev?.suspended_at ?? null,
           deleted_at: changes.deleted_at ?? prev?.deleted_at ?? null,
+          country_code: changes.country_code ?? prev?.country_code ?? 'ES',
         };
         // Auto-lock if the optimistic update makes profile complete
         if (computeIsComplete(next)) {

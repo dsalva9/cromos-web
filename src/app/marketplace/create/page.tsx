@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -11,11 +11,15 @@ import { CreateListingForm, PackItem } from '@/types/v1.6.0';
 import { logger } from '@/lib/logger';
 import { ArrowLeft } from 'lucide-react';
 import { useMemo } from 'react';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { getCurrencySymbol } from '@/constants/countries';
 
 function CreateListingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { createListing, loading } = useCreateListing();
+  const { profile } = useProfileCompletion();
+  const currencySymbol = getCurrencySymbol(profile?.country_code);
 
   // Get initial data from query parameters
   const initialData = useMemo(() => {
@@ -94,6 +98,7 @@ function CreateListingContent() {
           loading={loading}
           initialData={initialData}
           disablePackOption={initialData?.is_group}
+          currencySymbol={currencySymbol}
         />
       </div>
     </div>

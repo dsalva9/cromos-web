@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,11 @@ import { Listing } from '@/types/v1.6.0';
 interface ListingDetailContentProps {
   listing: Listing | null;
   error?: string | null;
+  /** Currency symbol to show for sale prices. Defaults to '€'. */
+  currencySymbol?: string;
 }
 
-export function ListingDetailContent({ listing, error }: ListingDetailContentProps) {
+export function ListingDetailContent({ listing, error, currencySymbol = '€' }: ListingDetailContentProps) {
   const [imageModalOpen, setImageModalOpen] = useState(false);
 
   const formatDate = (dateString: string) => {
@@ -270,7 +272,7 @@ export function ListingDetailContent({ listing, error }: ListingDetailContentPro
                         <span className="text-gray-700 dark:text-gray-300">
                           En venta por{' '}
                           <span className="font-bold text-green-600 dark:text-green-400 text-base">
-                            {listing.price != null ? `${Number(listing.price).toFixed(2)} €` : '—'}
+                            {listing.price != null ? `${Number(listing.price).toFixed(2)} ${currencySymbol}` : '—'}
                           </span>
                         </span>
                       </div>

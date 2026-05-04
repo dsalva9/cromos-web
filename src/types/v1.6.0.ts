@@ -29,6 +29,7 @@ export interface Listing {
   author_location?: string | null; // "Municipio, Provincia"
   author_is_suspended?: boolean | null;  // For admin suspension indicators
   author_deleted_at?: string | null;  // For admin deletion indicators
+  author_country_code?: string | null; // For currency display
   deleted_at?: string | null;  // Listing soft deletion timestamp
   title: string;
   description: string | null;

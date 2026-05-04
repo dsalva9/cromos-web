@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useListing } from '@/hooks/marketplace/useListing';
@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { CreateListingForm } from '@/types/v1.6.0';
 import { logger } from '@/lib/logger';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { getCurrencySymbol } from '@/constants/countries';
 
 function EditListingContent() {
   const params = useParams();
@@ -20,6 +22,8 @@ function EditListingContent() {
   const listingId = params.id as string;
   const { listing, loading, error } = useListing(listingId);
   const { updateListing, loading: saving } = useUpdateListing();
+  const { profile } = useProfileCompletion();
+  const currencySymbol = getCurrencySymbol(profile?.country_code);
 
   const handleSubmit = async (data: CreateListingForm) => {
     try {
@@ -130,6 +134,7 @@ function EditListingContent() {
             listing_type: listing.listing_type || 'intercambio',
             price: listing.price ?? undefined,
           }}
+          currencySymbol={currencySymbol}
         />
       </div>
     </div>

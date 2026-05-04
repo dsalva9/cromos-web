@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -12,6 +12,8 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { getCurrencySymbol } from '@/constants/countries';
 
 function PublishDuplicateContent() {
   const params = useParams();
@@ -47,6 +49,8 @@ function PublishDuplicateContent() {
   const [templateInfo, setTemplateInfo] = useState<TemplateInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const { publishDuplicate, loading: publishing } = usePublishDuplicate();
+  const { profile } = useProfileCompletion();
+  const currencySymbol = getCurrencySymbol(profile?.country_code);
 
   const fetchSlotData = useCallback(async () => {
     try {
@@ -232,6 +236,7 @@ function PublishDuplicateContent() {
           onSubmit={handlePublish}
           loading={publishing}
           disablePackOption={true}
+          currencySymbol={currencySymbol}
         />
       </div>
     </div>

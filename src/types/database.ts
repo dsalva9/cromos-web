@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -745,6 +745,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country_code: string
           created_at: string | null
           deleted_at: string | null
           deletion_reason: string | null
@@ -770,6 +771,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deletion_reason?: string | null
@@ -795,6 +797,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          country_code?: string
           created_at?: string | null
           deleted_at?: string | null
           deletion_reason?: string | null
@@ -3737,3 +3740,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

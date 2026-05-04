@@ -37,6 +37,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
+import { getCurrencySymbol } from '@/constants/countries';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -464,7 +465,7 @@ export default function ListingDetailPage() {
                         <span className="text-gray-700 dark:text-gray-300">
                           En venta por{' '}
                           <span className="font-bold text-green-600 dark:text-green-400 text-base">
-                            {listing.price != null ? `${Number(listing.price).toFixed(2)} €` : '—'}
+                            {listing.price != null ? `${Number(listing.price).toFixed(2)} ${getCurrencySymbol(listing.author_country_code)}` : '—'}
                           </span>
                         </span>
                       </div>
