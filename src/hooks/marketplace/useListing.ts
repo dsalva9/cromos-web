@@ -51,6 +51,8 @@ export function useListing(listingId: string) {
             authorLocation = `${loc.municipio}, ${loc.provincia}`;
           } else if (loc?.municipio) {
             authorLocation = loc.municipio;
+          } else if (loc?.provincia) {
+            authorLocation = loc.provincia;
           } else {
             authorLocation = `CP ${data.author.postcode}`;
           }

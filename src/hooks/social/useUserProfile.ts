@@ -62,6 +62,8 @@ export function useUserProfile(userId: string) {
           locationLabel = `${loc.municipio}, ${loc.provincia}`;
         } else if (loc?.municipio) {
           locationLabel = loc.municipio;
+        } else if (loc?.provincia) {
+          locationLabel = loc.provincia;
         } else {
           locationLabel = `CP ${profileData.postcode}`;
         }

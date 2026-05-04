@@ -280,7 +280,7 @@ function CompleteProfileContent() {
                   onChange={event => setFormPostcode(event.target.value)}
                   maxLength={postcodeRule.maxLength}
                   placeholder={postcodeRule.placeholder}
-                  inputMode="numeric"
+                  inputMode={formCountryCode === 'AR' || formCountryCode === 'BR' ? 'text' : 'numeric'}
                   required
                   disabled={saving}
                 />

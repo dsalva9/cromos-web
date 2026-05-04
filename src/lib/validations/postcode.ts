@@ -13,7 +13,7 @@ export const COUNTRY_POSTCODE_RULES: Record<string, {
   ES: { regex: /^(?:0[1-9]|[1-4]\d|5[0-2])\d{3}$/, label: 'Código Postal', placeholder: '28001', maxLength: 5 },
   US: { regex: /^\d{5}$/, label: 'ZIP Code', placeholder: '10001', maxLength: 5 },
   BR: { regex: /^\d{5}-?\d{3}$/, label: 'CEP', placeholder: '01310-100', maxLength: 9 },
-  AR: { regex: /^\d{4}$/, label: 'Código Postal', placeholder: '1425', maxLength: 4 },
+  AR: { regex: /^([A-Za-z]\d{4}[A-Za-z]{3}|\d{4})$/, label: 'Código Postal', placeholder: '1425', maxLength: 8 },
   CO: { regex: /^\d{6}$/, label: 'Código Postal', placeholder: '110111', maxLength: 6 },
   MX: { regex: /^\d{5}$/, label: 'Código Postal', placeholder: '06600', maxLength: 5 },
 };
