@@ -13,10 +13,10 @@ interface InstallAppModalProps {
 }
 
 /**
- * Post-onboarding modal that invites new users to install the app.
- * - Android: links to Google Play Store (same design as landing page)
- * - iOS: shows PWA "Add to Home Screen" instructions
- * Only shown on mobile web browsers (not PWA or native).
+ * Post-onboarding modal inviting new users to install the app.
+ * Uses the SAME button design as the landing page "Disponible en:" section.
+ * - Android: Google Play button (black, Play icon)
+ * - iOS: Apple PWA button (black, Apple icon) + share instructions
  */
 export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
     const [isIOS, setIsIOS] = useState(false);
@@ -24,7 +24,6 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
 
     useEffect(() => {
         if (!open) return;
-
         const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const android = /Android/i.test(navigator.userAgent);
         setIsIOS(ios);
@@ -33,7 +32,6 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
 
     if (!open) return null;
 
-    // Don't show on non-web platforms (auto-close and redirect)
     if (typeof window !== 'undefined' && !isWeb()) {
         onClose();
         return null;
@@ -94,42 +92,47 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
                     ))}
                 </div>
 
-                {/* Actions */}
-                <div className="px-6 pb-6 pt-2 space-y-3">
-                    {isAndroid ? (
-                        /* ── Android: Google Play Store link ── */
+                {/* Label + Store button — same as landing page */}
+                <div className="px-6 pb-6 pt-2 flex flex-col items-center gap-3">
+                    <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                        Disponible en:
+                    </p>
+
+                    {isAndroid && (
                         <a
                             href={PLAY_STORE_URL}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full flex items-center justify-center gap-3 bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-xl border-2 border-black shadow-md hover:shadow-lg transition-all"
+                            className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors"
                         >
-                            {/* Google Play icon — matches landing page */}
+                            {/* Google Play icon — exact same as landing page */}
                             <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 0 1 0 1.38l-2.302 2.302L15.396 13l2.302-2.492zM5.864 3.458L16.8 9.791l-2.302 2.302-8.635-8.635z" fill="#34A853"/>
                                 <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92z" fill="#4285F4"/>
                                 <path d="M5.864 3.458L16.8 9.791l-2.302 2.302-8.635-8.635z" fill="#EA4335"/>
                                 <path d="M16.8 14.209l-2.302 2.302-8.635 8.635L16.8 14.209z" fill="#FBBC05"/>
                                 <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
                             </svg>
-                            <span className="text-sm font-semibold">Descargar en Google Play</span>
+                            <span className="text-sm font-semibold">Google Play</span>
                         </a>
-                    ) : isIOS ? (
-                        /* ── iOS: PWA install instructions ── */
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center">
-                            <p className="text-sm text-blue-800 dark:text-blue-300">
-                                Pulsa <Share className="w-4 h-4 inline -mt-0.5 text-blue-500" />{' '}
-                                en Safari y selecciona{' '}
-                                <span className="font-bold">&quot;Añadir a pantalla de inicio&quot;</span>
+                    )}
+
+                    {isIOS && (
+                        <>
+                            <button
+                                onClick={() => {/* iOS has no programmatic install */}}
+                                className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors cursor-pointer"
+                            >
+                                {/* Apple icon — exact same as landing page PWAInstallButton */}
+                                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.09997 21.99C7.78997 22.03 6.79997 20.68 5.95997 19.47C4.24997 17 2.93997 12.45 4.69997 9.39C5.56997 7.87 7.12997 6.91 8.81997 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                                </svg>
+                                <span className="text-sm font-semibold">Instalar App</span>
+                            </button>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                                Pulsa <Share className="w-3 h-3 inline -mt-0.5 text-blue-500" /> en Safari y selecciona <span className="font-semibold">&quot;Añadir a pantalla de inicio&quot;</span>
                             </p>
-                        </div>
-                    ) : (
-                        /* ── Desktop/other: generic PWA instruction ── */
-                        <div className="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                Abre el menú <span className="font-bold">⋮</span> de Chrome y selecciona{' '}
-                                <span className="font-bold">&quot;Instalar aplicación&quot;</span>
-                            </p>
-                        </div>
+                        </>
                     )}
 
                     <button
