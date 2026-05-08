@@ -15,6 +15,8 @@ import { logger } from '@/lib/logger';
 import { useRouter } from '@/hooks/use-router';
 import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
+import { InstallAppModal } from '@/components/pwa/InstallAppModal';
+import { isWeb } from '@/lib/platform';
 
 function CompleteProfileContent() {
   const { user } = useUser();
@@ -31,6 +33,7 @@ function CompleteProfileContent() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showInstallModal, setShowInstallModal] = useState(false);
 
   const previewAvatarUrl = useMemo(
     () => resolveAvatarUrl(formAvatarPath, supabase),
@@ -184,7 +187,13 @@ function CompleteProfileContent() {
       refresh().catch(() => { /* swallow — data is already optimistic */ });
 
       toast.success('Perfil completado. ¡Bienvenido!');
-      router.push('/');
+
+      // On mobile web, show install modal before redirecting
+      if (isWeb() && typeof window !== 'undefined' && window.innerWidth < 768) {
+        setShowInstallModal(true);
+      } else {
+        router.push('/marketplace');
+      }
     } catch (error) {
       logger.error('Error completing profile', error);
 
@@ -323,6 +332,15 @@ function CompleteProfileContent() {
           )}
         </div>
       </div>
+
+      {/* Post-onboarding install modal */}
+      <InstallAppModal
+        open={showInstallModal}
+        onClose={() => {
+          setShowInstallModal(false);
+          router.push('/marketplace');
+        }}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -15,6 +15,7 @@ import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton'
 import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
 import { AnimatedList } from '@/components/ui/AnimatedList';
+import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
 
 interface MarketplaceContentProps {
     initialListings: Listing[];
@@ -102,6 +103,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 </span>
                             </h1>
 
+                            {/* Mobile web install prompt */}
+                            <InstallAppBanner />
                             {/* Stats Badges */}
                             <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">

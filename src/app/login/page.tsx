@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { siteConfig } from '@/config/site';
 
@@ -26,7 +26,7 @@ export default function LoginPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // Hard redirect — avoids App Router startTransition that gets stuck
-        window.location.href = '/';
+        window.location.href = '/marketplace';
       }
     };
 
@@ -51,7 +51,7 @@ export default function LoginPage() {
         const userId = data?.user?.id;
 
         if (!userId) {
-          window.location.href = '/';
+          window.location.href = '/marketplace';
           return;
         }
 
@@ -99,7 +99,7 @@ export default function LoginPage() {
         );
 
         // Hard redirect — avoids App Router startTransition that gets stuck
-        window.location.href = profileIsComplete ? '/' : '/profile/completar';
+        window.location.href = profileIsComplete ? '/marketplace' : '/profile/completar';
       }
     } catch {
       setError('An unexpected error occurred');

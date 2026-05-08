@@ -70,6 +70,7 @@ interface NewUser {
     listings_count: number;
     albums_count: number;
     chat_messages_count: number;
+    country_code: string;
 }
 
 interface ReportSummary {
@@ -96,6 +97,27 @@ interface MessagingActivity {
 interface Recipient {
     id: number;
     email: string;
+}
+
+interface MessagingByCountry {
+    country_code: string;
+    total_messages: number;
+    unique_senders: number;
+    unique_conversations: number;
+}
+
+// Country reference data (mirrors src/constants/countries.ts)
+const SUPPORTED_COUNTRIES = [
+    { code: 'ES', name: 'España', flag: '🇪🇸' },
+    { code: 'US', name: 'United States', flag: '🇺🇸' },
+    { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
+    { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+    { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+    { code: 'MX', name: 'México', flag: '🇲🇽' },
+];
+
+function getCountryInfo(code: string) {
+    return SUPPORTED_COUNTRIES.find(c => c.code === code) || { code, name: code, flag: '🌍' };
 }
 
 /** Map report reason to a human-readable Spanish label */
@@ -207,10 +229,11 @@ Deno.serve(async (req) => {
         console.log('[send-user-summary-email] Processing:', { frequency, days });
 
         // ─── Fetch all data in parallel ───
-        const [usersResult, reportsResult, messagingResult] = await Promise.all([
+        const [usersResult, reportsResult, messagingResult, messagingByCountryResult] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
             supabase.rpc('admin_get_messaging_activity_summary', { p_days: days }),
+            supabase.rpc('admin_get_messaging_activity_by_country', { p_days: days }),
         ]);
 
         if (usersResult.error) {
@@ -229,6 +252,11 @@ Deno.serve(async (req) => {
         if (messagingResult.error) {
             console.error('[send-user-summary-email] Error fetching messaging:', messagingResult.error);
             // Non-fatal: continue without messaging section
+        }
+
+        if (messagingByCountryResult.error) {
+            console.error('[send-user-summary-email] Error fetching messaging by country:', messagingByCountryResult.error);
+            // Non-fatal: continue without country breakdown
         }
 
         // Get recipients based on frequency
@@ -271,45 +299,81 @@ Deno.serve(async (req) => {
         const usersList = (usersResult.data as NewUser[]) || [];
         const reportsList = (reportsResult.data as ReportSummary[]) || [];
         const messagingData = ((messagingResult.data as MessagingActivity[]) || [])[0] || null;
+        const messagingByCountry = (messagingByCountryResult.data as MessagingByCountry[]) || [];
 
-        // ── Section 1: New Users ──
         let usersHtml: string;
         if (usersList.length === 0) {
-            usersHtml = `
-        <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
-          No se han registrado nuevos usuarios en ${periodLabel}.
-        </p>
-      `;
+            // Show all countries with 0
+            usersHtml = SUPPORTED_COUNTRIES.map(country => `
+              <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0;">
+                  ${country.flag} ${country.name} — <span style="color: #6b7280;">0 nuevos</span>
+                </h3>
+              </div>
+            `).join('');
         } else {
+            // Group users by country
+            const usersByCountry = new Map<string, NewUser[]>();
+            for (const user of usersList) {
+                const code = user.country_code || 'ES';
+                if (!usersByCountry.has(code)) usersByCountry.set(code, []);
+                usersByCountry.get(code)!.push(user);
+            }
+
+            // Build HTML for all supported countries (even those with 0 users)
             usersHtml = `
-        <p style="color: #4b5563; margin-bottom: 16px;">
-          Se han registrado <strong>${usersList.length}</strong> nuevos usuarios en ${periodLabel}:
-        </p>
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-          <thead>
-            <tr style="background: #f3f4f6;">
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Nickname</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Email</th>
-              <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios</th>
-              <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Álbumes</th>
-              <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Mensajes</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Registro</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${usersList.map((user, i) => `
-              <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${escapeHtml(user.nickname)}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${escapeHtml(user.email)}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.listings_count}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.albums_count}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: center;">${user.chat_messages_count}</td>
-                <td style="padding: 10px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${new Date(user.created_at).toLocaleDateString('es-ES')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
+              <p style="color: #4b5563; margin-bottom: 16px;">
+                Se han registrado <strong>${usersList.length}</strong> nuevos usuarios en ${periodLabel}:
+              </p>
+            `;
+
+            for (const country of SUPPORTED_COUNTRIES) {
+                const countryUsers = usersByCountry.get(country.code) || [];
+                
+                usersHtml += `
+                  <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0; padding: 8px 12px; background: #f3f4f6; border-radius: 6px;">
+                      ${country.flag} ${country.name} — <strong>${countryUsers.length}</strong> ${countryUsers.length === 1 ? 'nuevo' : 'nuevos'}
+                    </h3>
+                `;
+
+                if (countryUsers.length === 0) {
+                    usersHtml += `
+                    <p style="color: #9ca3af; font-style: italic; padding: 8px 12px; font-size: 13px;">
+                      Sin actividad
+                    </p>
+                  </div>
+                    `;
+                } else {
+                    usersHtml += `
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                      <thead>
+                        <tr style="background: #f9fafb;">
+                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Nickname</th>
+                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Email</th>
+                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios</th>
+                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Álbumes</th>
+                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Mensajes</th>
+                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Registro</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${countryUsers.map((user, i) => `
+                          <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500; font-size: 13px;">${escapeHtml(user.nickname)}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${escapeHtml(user.email)}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.listings_count}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.albums_count}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.chat_messages_count}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${new Date(user.created_at).toLocaleDateString('es-ES')}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                    `;
+                }
+            }
         }
 
         // ── Section 2: Reports ──
@@ -411,6 +475,39 @@ Deno.serve(async (req) => {
       `;
         }
 
+        // ── Section 3b: Country Messaging Breakdown ──
+        let messagingCountryHtml = '';
+        if (messagingByCountry.length > 0 || messagingData) {
+            const countryMap = new Map(messagingByCountry.map(c => [c.country_code, c]));
+
+            messagingCountryHtml = `
+              <h3 style="font-size: 14px; color: #374151; margin: 20px 0 12px 0; font-weight: 600;">Desglose por país:</h3>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+                <thead>
+                  <tr style="background: #f3f4f6;">
+                    <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">País</th>
+                    <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Mensajes</th>
+                    <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Remitentes</th>
+                    <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Conversaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${SUPPORTED_COUNTRIES.map((country, i) => {
+                      const data = countryMap.get(country.code);
+                      return `
+                        <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                          <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px;">${country.flag} ${country.name}</td>
+                          <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; ${!data ? 'color: #9ca3af;' : 'font-weight: 500;'}">${data ? data.total_messages : '0'}</td>
+                          <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; ${!data ? 'color: #9ca3af;' : ''}">${data ? data.unique_senders : '0'}</td>
+                          <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; ${!data ? 'color: #9ca3af;' : ''}">${data ? data.unique_conversations : '0'}</td>
+                        </tr>
+                      `;
+                  }).join('')}
+                </tbody>
+              </table>
+            `;
+        }
+
         const frequencyLabel = frequency === 'daily' ? 'Diario' : frequency === 'weekly' ? 'Semanal' : 'Manual';
         const subject = `[CambioCromos] Resumen de actividad - ${frequencyLabel}`;
 
@@ -450,6 +547,7 @@ Deno.serve(async (req) => {
               💬 Actividad de Mensajes (${periodLabel})
             </h2>
             ${messagingHtml}
+            ${messagingCountryHtml}
           </div>
           <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
             <p style="margin: 0;">Este es un email automático del sistema de CambioCromos</p>

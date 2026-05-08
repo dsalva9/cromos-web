@@ -153,7 +153,7 @@ export default function AuthCallback() {
             logger.error('All profile query attempts failed:', profileError);
             // Redirect to home — let ProfileCompletionGuard handle it
             // instead of blindly redirecting to profile completion
-            if (mountedRef.current) router.push('/');
+            if (mountedRef.current) router.push('/marketplace');
             return;
           }
 
@@ -182,7 +182,7 @@ export default function AuthCallback() {
           );
 
           logger.info('Redirecting based on profile completion:', { complete });
-          if (mountedRef.current) router.push(complete ? '/' : PROFILE_COMPLETION_ROUTE);
+          if (mountedRef.current) router.push(complete ? '/marketplace' : PROFILE_COMPLETION_ROUTE);
         } catch (err) {
           logger.error('Unexpected error in auth callback:', err);
           if (mountedRef.current) setError('Error inesperado al procesar autenticación');
