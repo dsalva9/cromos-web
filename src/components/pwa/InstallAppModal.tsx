@@ -1,15 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { Download, X, Share, Smartphone, Zap, Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Share, Zap, Bell, Smartphone } from 'lucide-react';
 import { isWeb } from '@/lib/platform';
 import Image from 'next/image';
 
-// Type for the BeforeInstallPromptEvent (not yet in standard TS lib)
-interface BeforeInstallPromptEvent extends Event {
-    prompt(): Promise<void>;
-    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cambiocromos.app';
 
 interface InstallAppModalProps {
     open: boolean;
@@ -17,66 +13,28 @@ interface InstallAppModalProps {
 }
 
 /**
- * Post-onboarding modal that invites new users to install the app/PWA.
+ * Post-onboarding modal that invites new users to install the app.
+ * - Android: links to Google Play Store (same design as landing page)
+ * - iOS: shows PWA "Add to Home Screen" instructions
  * Only shown on mobile web browsers (not PWA or native).
  */
 export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
-    const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isIOS, setIsIOS] = useState(false);
-    const [installing, setInstalling] = useState(false);
-    const promptRef = useRef<BeforeInstallPromptEvent | null>(null);
+    const [isAndroid, setIsAndroid] = useState(false);
 
     useEffect(() => {
         if (!open) return;
 
-        // Detect iOS
         const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const android = /Android/i.test(navigator.userAgent);
         setIsIOS(ios);
-
-        if (ios) return;
-
-        const handleBeforeInstallPrompt = (e: Event) => {
-            e.preventDefault();
-            const promptEvent = e as BeforeInstallPromptEvent;
-            promptRef.current = promptEvent;
-            setInstallPrompt(promptEvent);
-        };
-
-        const handleAppInstalled = () => {
-            setInstalling(false);
-            onClose();
-        };
-
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        window.addEventListener('appinstalled', handleAppInstalled);
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-            window.removeEventListener('appinstalled', handleAppInstalled);
-        };
-    }, [open, onClose]);
-
-    const handleInstall = useCallback(async () => {
-        const prompt = promptRef.current;
-        if (prompt) {
-            setInstalling(true);
-            await prompt.prompt();
-            const { outcome } = await prompt.userChoice;
-            if (outcome === 'accepted') {
-                // appinstalled event will fire and close the modal
-                return;
-            }
-            setInstalling(false);
-            setInstallPrompt(null);
-            promptRef.current = null;
-        }
-    }, []);
+        setIsAndroid(android);
+    }, [open]);
 
     if (!open) return null;
 
-    // Don't show on non-web platforms
+    // Don't show on non-web platforms (auto-close and redirect)
     if (typeof window !== 'undefined' && !isWeb()) {
-        // Auto-close and redirect
         onClose();
         return null;
     }
@@ -138,7 +96,25 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
 
                 {/* Actions */}
                 <div className="px-6 pb-6 pt-2 space-y-3">
-                    {isIOS ? (
+                    {isAndroid ? (
+                        /* ── Android: Google Play Store link ── */
+                        <a
+                            href={PLAY_STORE_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full flex items-center justify-center gap-3 bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-xl border-2 border-black shadow-md hover:shadow-lg transition-all"
+                        >
+                            {/* Google Play icon — matches landing page */}
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92z" fill="#4285F4"/>
+                                <path d="M5.864 3.458L16.8 9.791l-2.302 2.302-8.635-8.635z" fill="#EA4335"/>
+                                <path d="M16.8 14.209l-2.302 2.302-8.635 8.635L16.8 14.209z" fill="#FBBC05"/>
+                                <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
+                            </svg>
+                            <span className="text-sm font-semibold">Descargar en Google Play</span>
+                        </a>
+                    ) : isIOS ? (
+                        /* ── iOS: PWA install instructions ── */
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-center">
                             <p className="text-sm text-blue-800 dark:text-blue-300">
                                 Pulsa <Share className="w-4 h-4 inline -mt-0.5 text-blue-500" />{' '}
@@ -146,16 +122,8 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
                                 <span className="font-bold">&quot;Añadir a pantalla de inicio&quot;</span>
                             </p>
                         </div>
-                    ) : installPrompt ? (
-                        <button
-                            onClick={handleInstall}
-                            disabled={installing}
-                            className="w-full bg-gold hover:bg-yellow-400 text-black font-black uppercase py-3 rounded-xl border-2 border-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                        >
-                            <Download className="w-5 h-5" />
-                            {installing ? 'Instalando...' : 'Instalar App'}
-                        </button>
                     ) : (
+                        /* ── Desktop/other: generic PWA instruction ── */
                         <div className="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 text-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Abre el menú <span className="font-bold">⋮</span> de Chrome y selecciona{' '}
