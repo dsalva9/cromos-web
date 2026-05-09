@@ -66,8 +66,8 @@ export function InstallAppBanner() {
             </button>
 
             {/* Label — same as landing page */}
-            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                Disponible en:
+            <p className="text-xs font-bold text-gray-700 dark:text-gray-300 tracking-wide">
+                📲 ¡Para una mejor experiencia, instala la app CambioCromos!
             </p>
 
             {/* Store buttons — same design as landing page */}
