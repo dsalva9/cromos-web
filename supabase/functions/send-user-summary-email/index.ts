@@ -106,6 +106,12 @@ interface MessagingByCountry {
     unique_conversations: number;
 }
 
+interface ListingsByCountry {
+    country_code: string;
+    total_listings: number;
+    users: { nickname: string; listings_count: number; title: string; listing_type: string; collection_name: string }[];
+}
+
 // Country reference data (mirrors src/constants/countries.ts)
 const SUPPORTED_COUNTRIES = [
     { code: 'ES', name: 'España', flag: '🇪🇸' },
@@ -229,11 +235,12 @@ Deno.serve(async (req) => {
         console.log('[send-user-summary-email] Processing:', { frequency, days });
 
         // ─── Fetch all data in parallel ───
-        const [usersResult, reportsResult, messagingResult, messagingByCountryResult] = await Promise.all([
+        const [usersResult, reportsResult, messagingResult, messagingByCountryResult, listingsByCountryResult] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
             supabase.rpc('admin_get_messaging_activity_summary', { p_days: days }),
             supabase.rpc('admin_get_messaging_activity_by_country', { p_days: days }),
+            supabase.rpc('admin_get_new_listings_by_country', { p_days: days }),
         ]);
 
         if (usersResult.error) {
@@ -257,6 +264,11 @@ Deno.serve(async (req) => {
         if (messagingByCountryResult.error) {
             console.error('[send-user-summary-email] Error fetching messaging by country:', messagingByCountryResult.error);
             // Non-fatal: continue without country breakdown
+        }
+
+        if (listingsByCountryResult.error) {
+            console.error('[send-user-summary-email] Error fetching listings by country:', listingsByCountryResult.error);
+            // Non-fatal: continue without listings section
         }
 
         // Get recipients based on frequency
@@ -300,6 +312,7 @@ Deno.serve(async (req) => {
         const reportsList = (reportsResult.data as ReportSummary[]) || [];
         const messagingData = ((messagingResult.data as MessagingActivity[]) || [])[0] || null;
         const messagingByCountry = (messagingByCountryResult.data as MessagingByCountry[]) || [];
+        const listingsByCountry = (listingsByCountryResult.data as ListingsByCountry[]) || [];
 
         let usersHtml: string;
         if (usersList.length === 0) {
@@ -507,6 +520,81 @@ Deno.serve(async (req) => {
               </table>
             `;
         }
+        // ── Section 4: New Listings by Country ──
+        let listingsHtml: string;
+        const totalListings = listingsByCountry.reduce((sum, c) => sum + c.total_listings, 0);
+        if (totalListings === 0) {
+            listingsHtml = SUPPORTED_COUNTRIES.map(country => `
+              <div style="margin-bottom: 12px;">
+                <h3 style="font-size: 15px; color: #374151; margin: 0 0 4px 0;">
+                  ${country.flag} ${country.name} — <span style="color: #9ca3af;">0 anuncios</span>
+                </h3>
+              </div>
+            `).join('');
+        } else {
+            const listingsMap = new Map(listingsByCountry.map(c => [c.country_code, c]));
+
+            listingsHtml = `
+              <p style="color: #4b5563; margin-bottom: 16px;">
+                Se han publicado <strong>${totalListings}</strong> ${totalListings === 1 ? 'nuevo anuncio' : 'nuevos anuncios'} en ${periodLabel}:
+              </p>
+            `;
+
+            for (const country of SUPPORTED_COUNTRIES) {
+                const data = listingsMap.get(country.code);
+                const count = data ? data.total_listings : 0;
+
+                listingsHtml += `
+                  <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0; padding: 8px 12px; background: #f3f4f6; border-radius: 6px;">
+                      ${country.flag} ${country.name} — <strong>${count}</strong> ${count === 1 ? 'anuncio' : 'anuncios'}
+                    </h3>
+                `;
+
+                if (!data || count === 0) {
+                    listingsHtml += `
+                    <p style="color: #9ca3af; font-style: italic; padding: 8px 12px; font-size: 13px;">
+                      Sin actividad
+                    </p>
+                  </div>
+                    `;
+                } else {
+                    // Aggregate by user: count listings per nickname
+                    const userAgg = new Map<string, { count: number; titles: string[] }>();
+                    for (const item of data.users) {
+                        const existing = userAgg.get(item.nickname);
+                        if (existing) {
+                            existing.count++;
+                            if (existing.titles.length < 3) existing.titles.push(item.title || item.collection_name || '');
+                        } else {
+                            userAgg.set(item.nickname, { count: 1, titles: [item.title || item.collection_name || ''] });
+                        }
+                    }
+
+                    listingsHtml += `
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
+                      <thead>
+                        <tr style="background: #f9fafb;">
+                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Usuario</th>
+                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios</th>
+                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Ejemplos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${Array.from(userAgg.entries()).map(([nickname, info], i) => `
+                          <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500; font-size: 13px;">${escapeHtml(nickname)}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${info.count}</td>
+                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.titles.filter(Boolean).map(t => escapeHtml(t)).join(', ')}</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </div>
+                    `;
+                }
+            }
+        }
 
         const frequencyLabel = frequency === 'daily' ? 'Diario' : frequency === 'weekly' ? 'Semanal' : 'Manual';
         const subject = `[CambioCromos] Resumen de actividad - ${frequencyLabel}`;
@@ -529,6 +617,15 @@ Deno.serve(async (req) => {
               👥 Nuevos Usuarios (${periodLabel})
             </h2>
             ${usersHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- New Listings Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              📦 Nuevos Anuncios (${periodLabel})
+            </h2>
+            ${listingsHtml}
 
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
