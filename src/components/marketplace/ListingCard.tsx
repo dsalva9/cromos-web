@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { MapPin, Ban, Trash2 } from 'lucide-react';
+import { MapPin, Ban, Trash2, Flame } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
+import '@/styles/highlight-animation.css';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
@@ -16,11 +17,29 @@ interface ListingCardProps {
   listing: Listing;
 }
 
+/** Check if a listing was created within the last 24 hours */
+function isNewListing(createdAt: string): boolean {
+  const created = new Date(createdAt).getTime();
+  const now = Date.now();
+  return now - created < 24 * 60 * 60 * 1000;
+}
+
+/** Human-readable relative time in Spanish (hours/minutes granularity) */
+function formatRelativeTime(dateString: string): string {
+  const diff = Date.now() - new Date(dateString).getTime();
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return 'ahora mismo';
+  if (minutes < 60) return `hace ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  return `hace ${hours}h`;
+}
+
 export function ListingCard({ listing }: ListingCardProps) {
   const { user } = useUser();
   const supabase = useSupabaseClient(); // For avatar resolution if needed
   const { isAdmin } = useProfileCompletion();
 
+  const isNew = isNewListing(listing.created_at);
   const avatarUrl = resolveAvatarUrl(listing.author_avatar_url, supabase);
   const fallback = getAvatarFallback(listing.author_nickname);
 
@@ -68,7 +87,12 @@ export function ListingCard({ listing }: ListingCardProps) {
     <motion.div
       whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className="group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm dark:shadow-md transition-colors duration-300"
+      className={cn(
+        "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border shadow-sm dark:shadow-md transition-colors duration-300",
+        isNew
+          ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
+          : "border-gray-200/60 dark:border-gray-700/50"
+      )}
     >
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
@@ -95,8 +119,14 @@ export function ListingCard({ listing }: ListingCardProps) {
           <ListingFavoriteButton listingId={listing.id} variant="icon" />
         </div>
 
-        {/* Status Badge */}
+        {/* Status / New Badge */}
         <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+          {isNew && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100/90 text-orange-700 border border-orange-300/60 backdrop-blur-sm shadow-sm dark:bg-orange-900/60 dark:text-orange-200 dark:border-orange-600/40">
+              <Flame className="h-3 w-3" />
+              Nuevo
+            </span>
+          )}
           {getStatusLabel(listing.status) && (
             <span
               className={cn(
@@ -165,6 +195,15 @@ export function ListingCard({ listing }: ListingCardProps) {
                   <MapPin className="h-3 w-3 mr-0.5" />
                   {listing.distance_km}km
                 </span>
+              )}
+              {isNew && (
+                <>
+                  {listing.distance_km != null && <span>·</span>}
+                  <span className="flex items-center gap-0.5 text-orange-600 dark:text-orange-400 font-semibold">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                    {formatRelativeTime(listing.created_at)}
+                  </span>
+                </>
               )}
             </div>
           </div>
