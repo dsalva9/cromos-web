@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { ListingCard } from '@/components/marketplace/ListingCard';
@@ -28,6 +28,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [sortByDistance, setSortByDistance] = useState(false);
     const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
     const [showFilters, setShowFilters] = useState(false);
+    const [searchBarExpanded, setSearchBarExpanded] = useState(false);
+    const controlsBarRef = useRef<HTMLDivElement>(null);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
     const searchParams = useSearchParams();
 
@@ -46,6 +48,34 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             setSearchQuery(searchParam);
         }
     }, [searchParams]);
+
+    // Close mobile search bar expansion when tapping outside the controls bar
+    useEffect(() => {
+        if (!searchBarExpanded) return;
+        const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+            if (controlsBarRef.current && !controlsBarRef.current.contains(e.target as Node)) {
+                setSearchBarExpanded(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [searchBarExpanded]);
+
+    const handleSearchFocus = useCallback(() => {
+        setSearchBarExpanded(true);
+    }, []);
+
+    const handleSearchBlur = useCallback(() => {
+        // Delay to allow button clicks to register before collapsing
+        setTimeout(() => {
+            if (controlsBarRef.current?.contains(document.activeElement)) return;
+            setSearchBarExpanded(false);
+        }, 150);
+    }, []);
 
     // We use initialUserPostcode from server rendering to avoid a client-side fetch
     const hasPostcode = Boolean(initialUserPostcode);
@@ -171,7 +201,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                         style={{ width: 'calc(100% + 2rem)' }}
                         aria-hidden="true"
                     />
-                    <div className="relative bg-white dark:bg-gray-800 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
+                    <div ref={controlsBarRef} className="relative bg-white dark:bg-gray-800 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
                         <div className="flex flex-col md:flex-row gap-3">
                             {/* Search */}
                             <div className="flex-1">
@@ -180,11 +210,19 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     onChange={handleSearchChange}
                                     placeholder="Buscar por nombre, colección..."
                                     className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
+                                    onFocus={handleSearchFocus}
+                                    onBlur={handleSearchBlur}
                                 />
                             </div>
 
-                            {/* Mobile Filter Toggle */}
-                            <div className="md:hidden flex gap-2">
+                            {/* Mobile Filter Toggle — hidden by default, shown when search bar is tapped */}
+                            <div
+                                className={`md:hidden flex gap-2 transition-all duration-200 ease-in-out overflow-hidden ${
+                                    searchBarExpanded
+                                        ? 'max-h-20 opacity-100'
+                                        : 'max-h-0 opacity-0'
+                                }`}
+                            >
                                 <Button
                                     onClick={() => setShowFilters(!showFilters)}
                                     variant="outline"

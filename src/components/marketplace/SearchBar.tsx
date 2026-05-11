@@ -11,9 +11,11 @@ interface SearchBarProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
-export function SearchBar({ value, onChange, placeholder, className }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder, className, onFocus, onBlur }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value);
   const debouncedValue = useDebounce(localValue, 500);
   const isExternalSync = useRef(false);
@@ -46,6 +48,8 @@ export function SearchBar({ value, onChange, placeholder, className }: SearchBar
           isExternalSync.current = false;
           setLocalValue(e.target.value);
         }}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder || 'Search...'}
         className={cn(
           "pl-10 bg-white border-2 border-black text-gray-900 placeholder:text-gray-600",
