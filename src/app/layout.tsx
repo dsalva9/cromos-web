@@ -91,6 +91,8 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 import { NotificationPromptBanner } from '@/components/notifications/NotificationPromptBanner';
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 /**
  * Compose all top-level providers into a single wrapper to reduce nesting depth.
@@ -156,6 +158,8 @@ export default function RootLayout({
         <GoogleAnalytics />
         <Providers>
           <PWASplashScreen>
+            <Analytics />
+            <SpeedInsights />
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-gold focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white"

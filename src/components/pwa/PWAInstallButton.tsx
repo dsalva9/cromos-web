@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Check } from 'lucide-react';
+import { track } from '@vercel/analytics/react';
 
 // Type for the BeforeInstallPromptEvent (not yet in standard TS lib)
 interface BeforeInstallPromptEvent extends Event {
@@ -39,6 +40,7 @@ export default function PWAInstallButton() {
             setIsInstalled(true);
             setInstallPrompt(null);
             promptRef.current = null;
+            track('pwa_installed', { method: 'automatic' });
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -58,6 +60,7 @@ export default function PWAInstallButton() {
             const { outcome } = await prompt.userChoice;
             if (outcome === 'accepted') {
                 setIsInstalled(true);
+                track('pwa_installed', { method: 'native_prompt' });
             }
             setInstallPrompt(null);
             promptRef.current = null;
