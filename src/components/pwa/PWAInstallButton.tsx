@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Check } from 'lucide-react';
 import { track } from '@vercel/analytics/react';
+import { createClient } from '@/lib/supabase/client';
 
 // Type for the BeforeInstallPromptEvent (not yet in standard TS lib)
 interface BeforeInstallPromptEvent extends Event {
@@ -21,6 +22,7 @@ export default function PWAInstallButton() {
     const [isInstalled, setIsInstalled] = useState(false);
     const [showTip, setShowTip] = useState(false);
     const promptRef = useRef<BeforeInstallPromptEvent | null>(null);
+    const supabase = createClient();
 
     useEffect(() => {
         // Check if already installed (standalone mode)
@@ -41,6 +43,7 @@ export default function PWAInstallButton() {
             setInstallPrompt(null);
             promptRef.current = null;
             track('pwa_installed', { method: 'automatic' });
+            supabase.from('analytics_events' as any).insert({ event_name: 'pwa_installed', metadata: { method: 'automatic' } });
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -61,6 +64,7 @@ export default function PWAInstallButton() {
             if (outcome === 'accepted') {
                 setIsInstalled(true);
                 track('pwa_installed', { method: 'native_prompt' });
+                supabase.from('analytics_events' as any).insert({ event_name: 'pwa_installed', metadata: { method: 'native_prompt' } });
             }
             setInstallPrompt(null);
             promptRef.current = null;
