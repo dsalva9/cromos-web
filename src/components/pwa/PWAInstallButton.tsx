@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Share, MoreVertical, PlusSquare } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { track } from '@vercel/analytics/react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -20,7 +27,7 @@ interface BeforeInstallPromptEvent extends Event {
 export default function PWAInstallButton() {
     const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isInstalled, setIsInstalled] = useState(false);
-    const [showTip, setShowTip] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const promptRef = useRef<BeforeInstallPromptEvent | null>(null);
     const supabase = createClient();
 
@@ -69,9 +76,10 @@ export default function PWAInstallButton() {
             setInstallPrompt(null);
             promptRef.current = null;
         } else {
-            // No native prompt — show manual instructions tooltip
-            setShowTip(true);
-            setTimeout(() => setShowTip(false), 4000);
+            // No native prompt — show manual instructions modal
+            setIsModalOpen(true);
+            track('pwa_manual_prompt_viewed');
+            supabase.from('analytics_events' as any).insert({ event_name: 'pwa_manual_prompt_viewed', metadata: { isIOS: typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) } });
         }
     }, []);
 
@@ -89,7 +97,7 @@ export default function PWAInstallButton() {
     const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     return (
-        <div className="relative">
+        <>
             <button
                 onClick={handleInstallClick}
                 className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors cursor-pointer"
@@ -100,15 +108,53 @@ export default function PWAInstallButton() {
                 </svg>
                 <span className="text-sm font-semibold">Instalar App</span>
             </button>
-            {showTip && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs rounded-lg px-4 py-2.5 w-56 text-center shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                    {isIOS
-                        ? 'Pulsa el botón Compartir ⬆ y selecciona "Añadir a pantalla de inicio"'
-                        : 'Abre el menú ⋮ de Chrome y selecciona "Instalar aplicación"'
-                    }
-                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45" />
-                </div>
-            )}
-        </div>
+
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Instalar CambioCromos</DialogTitle>
+                        <DialogDescription>
+                            Instala nuestra app en tu dispositivo para un acceso rápido y una mejor experiencia.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="flex flex-col gap-4 py-4">
+                        {isIOS ? (
+                            <div className="space-y-4">
+                                <p className="text-sm font-medium">Para instalar la app en tu iPhone o iPad:</p>
+                                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                    <div className="bg-white dark:bg-gray-700 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-600 shrink-0">
+                                        <Share className="w-5 h-5 text-blue-500" />
+                                    </div>
+                                    <p>1. Pulsa el botón <strong>Compartir</strong> en la barra inferior de Safari.</p>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                    <div className="bg-white dark:bg-gray-700 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-600 shrink-0">
+                                        <PlusSquare className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                    </div>
+                                    <p>2. Selecciona <strong>"Añadir a pantalla de inicio"</strong>.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <p className="text-sm font-medium">Para instalar la app en tu dispositivo Android:</p>
+                                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                    <div className="bg-white dark:bg-gray-700 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-600 shrink-0">
+                                        <MoreVertical className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                                    </div>
+                                    <p>1. Toca el menú de opciones (tres puntos) en la esquina superior derecha de Chrome.</p>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                    <div className="bg-white dark:bg-gray-700 p-2 rounded-md shadow-sm border border-gray-200 dark:border-gray-600 shrink-0">
+                                        <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                                    </div>
+                                    <p>2. Selecciona <strong>"Instalar aplicación"</strong> o "Añadir a pantalla de inicio".</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
