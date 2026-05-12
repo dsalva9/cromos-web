@@ -17,11 +17,11 @@ interface ListingCardProps {
   listing: Listing;
 }
 
-/** Check if a listing was created within the last 24 hours */
+/** Check if a listing was created within the last 12 hours */
 function isNewListing(createdAt: string): boolean {
   const created = new Date(createdAt).getTime();
   const now = Date.now();
-  return now - created < 24 * 60 * 60 * 1000;
+  return now - created < 12 * 60 * 60 * 1000;
 }
 
 /** Human-readable relative time in Spanish (hours/minutes granularity) */
