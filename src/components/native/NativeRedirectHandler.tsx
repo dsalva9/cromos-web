@@ -55,6 +55,9 @@ export default function NativeRedirectHandler({ isAuthenticated, children }: Nat
 
         if (!isAuthenticated) {
             router.replace('/login');
+        } else {
+            // Authenticated app-shell users go straight to marketplace
+            router.replace('/marketplace');
         }
 
         // Hide Capacitor splash screen (only relevant for native, not PWA)

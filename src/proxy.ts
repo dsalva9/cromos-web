@@ -5,6 +5,7 @@ import { updateSession } from '@/lib/supabase/middleware';
 // Routes that require authentication (page routes)
 const PROTECTED_PAGE_PREFIXES = [
     '/admin',
+    '/dashboard',
     '/profile',
     '/chats',
     '/favorites',
@@ -99,6 +100,15 @@ export async function proxy(request: NextRequest) {
             loginUrl.searchParams.set('redirectTo', pathname);
             return NextResponse.redirect(loginUrl);
         }
+    }
+
+    // Redirect authenticated users from root `/` to `/marketplace`
+    // so returning to the app always lands on the marketplace.
+    // The dashboard is only reachable via the deliberate navbar link.
+    if (pathname === '/' && user) {
+        const marketplaceUrl = request.nextUrl.clone();
+        marketplaceUrl.pathname = '/marketplace';
+        return NextResponse.redirect(marketplaceUrl);
     }
 
     return response;
