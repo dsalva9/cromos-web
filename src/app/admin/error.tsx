@@ -22,7 +22,7 @@ export default function Error({
             <p className="text-muted-foreground mb-6 text-center max-w-md">
                 Por favor contacta con{' '}
                 <a
-                    href={getSupportMailtoUrl(error)}
+                    href={getSupportMailtoUrl(_error)}
                     className="text-gold hover:text-yellow-400 underline"
                 >
                     soporte@cambiocromos.com
