@@ -161,7 +161,9 @@ export function getDefaultPreferences(): GranularNotificationPreferences {
     // Apply default overrides if any
     if (config.defaultOverrides) {
       Object.entries(config.defaultOverrides).forEach(([channel, enabled]) => {
-        preferences[channel as NotificationChannel][config.kind] = enabled;
+        if (enabled !== undefined) {
+          preferences[channel as keyof GranularNotificationPreferences][config.kind] = enabled;
+        }
       });
     }
   });
