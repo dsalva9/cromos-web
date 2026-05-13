@@ -76,14 +76,19 @@ export function NotificationPreferencesMatrix({
   const handleToggleAllChannel = (channel: NotificationChannel, enabled: boolean) => {
     const updated = { ...localPreferences };
     visibleTypes.forEach((config) => {
-      updated[channel][config.kind] = enabled;
+      const isDisabled = config.disabledChannels?.includes(channel);
+      if (!isDisabled) {
+        updated[channel][config.kind] = enabled;
+      }
     });
     setLocalPreferences(updated);
     setHasChanges(true);
   };
 
   const isChannelAllEnabled = (channel: NotificationChannel): boolean => {
-    return visibleTypes.every((config) => localPreferences[channel][config.kind]);
+    return visibleTypes
+      .filter((config) => !config.disabledChannels?.includes(channel))
+      .every((config) => localPreferences[channel][config.kind]);
   };
 
   // Get visible notification types (exclude hidden, legacy, and not-yet-implemented)
@@ -215,31 +220,38 @@ export function NotificationPreferencesMatrix({
                       </td>
 
                       {/* Channel toggles */}
-                      {CHANNELS.map(({ id: channel }) => (
-                        <td key={channel} className="px-6 py-4 text-center">
-                          <button
-                            type="button"
-                            onClick={() => handleToggle(config.kind, channel)}
-                            disabled={saving}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                              localPreferences[channel][config.kind]
-                                ? 'bg-blue-600'
-                                : 'bg-gray-200'
-                            } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                            aria-label={`${
-                              localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
-                            } ${config.label} para ${channel}`}
-                          >
-                            <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                localPreferences[channel][config.kind]
-                                  ? 'translate-x-6'
-                                  : 'translate-x-1'
-                              }`}
-                            />
-                          </button>
-                        </td>
-                      ))}
+                      {CHANNELS.map(({ id: channel }) => {
+                        const isDisabled = config.disabledChannels?.includes(channel);
+                        return (
+                          <td key={channel} className="px-6 py-4 text-center">
+                            {!isDisabled ? (
+                              <button
+                                type="button"
+                                onClick={() => handleToggle(config.kind, channel)}
+                                disabled={saving}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                                  localPreferences[channel][config.kind]
+                                    ? 'bg-blue-600'
+                                    : 'bg-gray-200'
+                                } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                aria-label={`${
+                                  localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
+                                } ${config.label} para ${channel}`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    localPreferences[channel][config.kind]
+                                      ? 'translate-x-6'
+                                      : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">No disponible</span>
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                 </React.Fragment>
@@ -280,37 +292,42 @@ export function NotificationPreferencesMatrix({
 
                   {/* Channel toggles */}
                   <div className="space-y-2 pt-2 border-t border-gray-200">
-                    {CHANNELS.map(({ id: channel, label, icon: Icon }) => (
-                      <div key={channel} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-700">
-                            {label}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleToggle(config.kind, channel)}
-                          disabled={saving}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                            localPreferences[channel][config.kind]
-                              ? 'bg-blue-600'
-                              : 'bg-gray-200'
-                          } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                          aria-label={`${
-                            localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
-                          } ${config.label} para ${channel}`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    {CHANNELS.map(({ id: channel, label, icon: Icon }) => {
+                      const isDisabled = config.disabledChannels?.includes(channel);
+                      if (isDisabled) return null;
+
+                      return (
+                        <div key={channel} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm text-gray-700">
+                              {label}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleToggle(config.kind, channel)}
+                            disabled={saving}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                               localPreferences[channel][config.kind]
-                                ? 'translate-x-6'
-                                : 'translate-x-1'
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    ))}
+                                ? 'bg-blue-600'
+                                : 'bg-gray-200'
+                            } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            aria-label={`${
+                              localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
+                            } ${config.label} para ${channel}`}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                localPreferences[channel][config.kind]
+                                  ? 'translate-x-6'
+                                  : 'translate-x-1'
+                              }`}
+                            />
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

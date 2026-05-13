@@ -45,6 +45,7 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     description: 'Recordatorio semanal si tienes mensajes sin leer',
     category: 'marketplace',
     priority: 'high',
+    disabledChannels: ['in_app', 'push'],
   },
 
   // Community notifications
@@ -61,6 +62,7 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     description: 'Cuando obtienes un nuevo logro',
     category: 'community',
     priority: 'high',
+    defaultOverrides: { email: false },
   },
   {
     kind: 'template_rated',
@@ -147,6 +149,20 @@ export function getDefaultPreferences(): GranularNotificationPreferences {
       preferences.in_app[config.kind] = true;
       preferences.push[config.kind] = false;
       preferences.email[config.kind] = false;
+    }
+
+    // Override with disabled channels if any
+    if (config.disabledChannels) {
+      config.disabledChannels.forEach((channel) => {
+        preferences[channel][config.kind] = false;
+      });
+    }
+
+    // Apply default overrides if any
+    if (config.defaultOverrides) {
+      Object.entries(config.defaultOverrides).forEach(([channel, enabled]) => {
+        preferences[channel as NotificationChannel][config.kind] = enabled;
+      });
     }
   });
 

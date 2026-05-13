@@ -52,6 +52,8 @@ export interface NotificationTypeConfig {
   description: string;
   category: NotificationCategory;
   priority: 'high' | 'low';
+  disabledChannels?: NotificationChannel[];
+  defaultOverrides?: Partial<Record<NotificationChannel, boolean>>;
 }
 
 /**
