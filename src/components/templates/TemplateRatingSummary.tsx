@@ -1,8 +1,9 @@
-﻿'use client';
+'use client';
 
 import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { RatingSummary } from '@/hooks/templates/useTemplateRatings';
+import { useTranslations } from 'next-intl';
 
 interface TemplateRatingSummaryProps {
   summary: RatingSummary;
@@ -17,6 +18,7 @@ export function TemplateRatingSummary({
   isAuthor,
   hasUserRated
 }: TemplateRatingSummaryProps) {
+  const t = useTranslations('templates.ratingSummary');
   const distribution = summary.rating_distribution;
   const total = summary.rating_count;
 
@@ -55,7 +57,7 @@ export function TemplateRatingSummary({
               ))}
             </div>
             <div className="text-sm text-slate-400">
-              {total} {total === 1 ? 'valoración' : 'valoraciones'}
+              {t('ratingCount', { count: total })}
             </div>
           </div>
         </div>
@@ -83,7 +85,7 @@ export function TemplateRatingSummary({
         <div className="md:ml-4">
           {isAuthor ? (
             <div className="text-sm text-slate-400 bg-slate-800 px-4 py-3 rounded-lg border border-slate-700">
-              No puedes valorar tus propias plantillas
+              {t('authorWarning')}
             </div>
           ) : (
             <Button
@@ -91,7 +93,7 @@ export function TemplateRatingSummary({
               className="bg-gold text-black hover:bg-gold-light font-medium px-6"
             >
               <Star className="mr-2 h-4 w-4" />
-              {hasUserRated ? 'Actualizar valoración' : 'Valorar plantilla'}
+              {hasUserRated ? t('updateRating') : t('rateTemplate')}
             </Button>
           )}
         </div>

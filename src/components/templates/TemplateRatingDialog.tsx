@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Star, Loader2, Trash2 } from 'lucide-react';
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface TemplateRatingDialogProps {
   open: boolean;
@@ -35,6 +36,7 @@ export function TemplateRatingDialog({
   onSubmit,
   onDelete
 }: TemplateRatingDialogProps) {
+  const t = useTranslations('templates.ratingDialog');
   const [rating, setRating] = useState<number>(currentRating || 0);
   const [comment, setComment] = useState<string>(currentComment || '');
   const [hoveredStar, setHoveredStar] = useState<number>(0);
@@ -54,12 +56,12 @@ export function TemplateRatingDialog({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast.error('Por favor selecciona una valoración');
+      toast.error(t('selectRatingError'));
       return;
     }
 
     if (comment.length > 280) {
-      toast.error('El comentario no puede exceder 280 caracteres');
+      toast.error(t('commentLengthError'));
       return;
     }
 
@@ -68,13 +70,13 @@ export function TemplateRatingDialog({
       await onSubmit(rating, comment || undefined);
       toast.success(
         isEditing
-          ? 'Valoración actualizada con éxito'
-          : 'Valoración creada con éxito'
+          ? t('updateSuccess')
+          : t('createSuccess')
       );
       onOpenChange(false);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Error al guardar valoración'
+        error instanceof Error ? error.message : t('saveError')
       );
     } finally {
       setLoading(false);
@@ -87,11 +89,11 @@ export function TemplateRatingDialog({
     setLoading(true);
     try {
       await onDelete();
-      toast.success('Valoración eliminada con éxito');
+      toast.success(t('deleteSuccess'));
       onOpenChange(false);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Error al eliminar valoración'
+        error instanceof Error ? error.message : t('deleteError')
       );
     } finally {
       setLoading(false);
@@ -104,9 +106,9 @@ export function TemplateRatingDialog({
         {showDeleteConfirm ? (
           <>
             <DialogHeader>
-              <DialogTitle>Confirmar eliminación</DialogTitle>
+              <DialogTitle>{t('confirmDeleteTitle')}</DialogTitle>
               <DialogDescription className="text-gray-500 dark:text-gray-400">
-                ¿Estás seguro de que quieres eliminar tu valoración? Esta acción no se puede deshacer.
+                {t('confirmDeleteDesc')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2">
@@ -116,7 +118,7 @@ export function TemplateRatingDialog({
                 disabled={loading}
                 className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                Cancelar
+                {t('cancel')}
               </Button>
               <Button
                 onClick={handleDelete}
@@ -126,12 +128,12 @@ export function TemplateRatingDialog({
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Eliminando...
+                    {t('deleting')}
                   </>
                 ) : (
                   <>
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Eliminar
+                    {t('deleteBtn')}
                   </>
                 )}
               </Button>
@@ -141,7 +143,7 @@ export function TemplateRatingDialog({
           <>
             <DialogHeader>
               <DialogTitle>
-                {isEditing ? 'Actualizar valoración' : 'Valorar plantilla'}
+                {isEditing ? t('updateTitle') : t('rateTitle')}
               </DialogTitle>
               <DialogDescription className="text-gray-500 dark:text-gray-400">
                 {templateTitle}
@@ -152,7 +154,7 @@ export function TemplateRatingDialog({
               {/* Star Rating Selector */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Tu valoración <span className="text-red-500">*</span>
+                  {t('yourRating')} <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-2 justify-center py-4">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -175,11 +177,11 @@ export function TemplateRatingDialog({
                 </div>
                 {rating > 0 && (
                   <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-                    {rating === 1 && 'Muy mala'}
-                    {rating === 2 && 'Mala'}
-                    {rating === 3 && 'Aceptable'}
-                    {rating === 4 && 'Buena'}
-                    {rating === 5 && 'Excelente'}
+                    {rating === 1 && t('rating1')}
+                    {rating === 2 && t('rating2')}
+                    {rating === 3 && t('rating3')}
+                    {rating === 4 && t('rating4')}
+                    {rating === 5 && t('rating5')}
                   </p>
                 )}
               </div>
@@ -187,18 +189,18 @@ export function TemplateRatingDialog({
               {/* Comment */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Comentario (opcional)
+                  {t('commentLabel')}
                 </label>
                 <Textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Comparte tu opinión sobre esta plantilla..."
+                  placeholder={t('commentPlaceholder')}
                   maxLength={280}
                   rows={4}
                   className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
                 />
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-right">
-                  {comment.length}/280 caracteres
+                  {t('charsLeft', { current: comment.length })}
                 </p>
               </div>
             </div>
@@ -212,7 +214,7 @@ export function TemplateRatingDialog({
                   className="mr-auto border-red-600 text-red-500 hover:bg-red-600/10"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Eliminar
+                  {t('deleteBtn')}
                 </Button>
               )}
               <Button
@@ -221,7 +223,7 @@ export function TemplateRatingDialog({
                 disabled={loading}
                 className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                Cancelar
+                {t('cancel')}
               </Button>
               <Button
                 onClick={handleSubmit}
@@ -231,10 +233,10 @@ export function TemplateRatingDialog({
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Guardando...
+                    {t('saving')}
                   </>
                 ) : (
-                  <>{isEditing ? 'Actualizar' : 'Enviar valoración'}</>
+                  <>{isEditing ? t('updateBtn') : t('sendBtn')}</>
                 )}
               </Button>
             </DialogFooter>

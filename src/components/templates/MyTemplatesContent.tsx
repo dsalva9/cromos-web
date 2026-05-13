@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { TemplateCopy } from '@/lib/templates/server-my-templates';
 import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
+import { useTranslations } from 'next-intl';
 
 interface MyTemplatesContentProps {
     copies: TemplateCopy[];
@@ -22,6 +23,7 @@ interface MyTemplatesContentProps {
 
 export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
     const { counts: availabilityCounts } = useMarketplaceAvailabilityCounts();
+    const t = useTranslations('templates');
 
     // Build a lookup: copy_id → missing_in_marketplace count
     const availabilityMap = useMemo(() => {
@@ -39,10 +41,10 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
                     <div>
                         <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3 text-black dark:text-white">
-                            Mis Álbumes
+                            {t('myTemplates.title')}
                         </h1>
                         <p className="text-gray-500 dark:text-gray-400 text-lg max-w-2xl font-medium">
-                            Gestiona tu progreso, completa tus álbumes y organiza tus cromos.
+                            {t('myTemplates.subtitle')}
                         </p>
                     </div>
 
@@ -53,7 +55,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                 className="w-full bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 h-12 px-6 shadow-sm"
                             >
                                 <LayoutGrid className="mr-2 h-4 w-4" />
-                                Explorar Colecciones
+                                {t('myTemplates.explore')}
                             </Button>
                         </Link>
 
@@ -66,13 +68,13 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                         <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-full mb-6">
                             <LayoutGrid className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No tienes colecciones activas</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('myTemplates.emptyTitle')}</h3>
                         <p className="text-gray-500 dark:text-gray-400 text-lg mb-8 text-center max-w-md">
-                            Empieza explorando las plantillas disponibles o crea tu propia colección desde cero.
+                            {t('myTemplates.emptyDesc')}
                         </p>
                         <Link href="/templates">
                             <Button className="bg-gold text-black hover:bg-gold-light font-bold h-12 px-8 text-lg shadow-md">
-                                Explorar Colecciones
+                                {t('myTemplates.explore')}
                             </Button>
                         </Link>
                     </div>
@@ -120,7 +122,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                 <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2 font-medium">
                                                     <User className="w-3.5 h-3.5" />
                                                     <span className="truncate">
-                                                        por{' '}
+                                                        {t('card.by')}{' '}
                                                         <span className="text-gray-700 dark:text-gray-300">
                                                             {copy.original_author_nickname}
                                                         </span>
@@ -131,7 +133,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                             {/* Progress Section */}
                                             <div className="space-y-3 mb-6">
                                                 <div className="flex justify-between text-sm font-bold">
-                                                    <span className="text-gray-500 dark:text-gray-400">Progreso</span>
+                                                    <span className="text-gray-500 dark:text-gray-400">{t('myTemplates.progress')}</span>
                                                     <span className={isComplete ? "text-green-600 dark:text-green-400" : "text-black dark:text-white"}>{percentage}%</span>
                                                 </div>
                                                 <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
@@ -142,7 +144,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                     </div>
                                                 </div>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400 text-right font-mono">
-                                                    {copy.completed_slots} / {copy.total_slots} cromos
+                                                    {t('myTemplates.stickersCount', { completed: copy.completed_slots, total: copy.total_slots })}
                                                 </p>
                                             </div>
 
@@ -153,7 +155,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                         <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg">
                                                             <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                                                         </div>
-                                                        <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Tengo</span>
+                                                        <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">{t('myTemplates.stats.have')}</span>
                                                     </div>
                                                     <span className="font-bold text-gray-900 dark:text-white text-lg">{copy.completed_slots}</span>
                                                 </div>
@@ -163,7 +165,7 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                         <div className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-lg">
                                                             <X className="w-4 h-4 text-red-500 dark:text-red-400" />
                                                         </div>
-                                                        <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">Faltan</span>
+                                                        <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">{t('myTemplates.stats.need')}</span>
                                                     </div>
                                                     <span className="font-bold text-gray-900 dark:text-white text-lg">{copy.total_slots - copy.completed_slots}</span>
                                                 </div>
@@ -180,13 +182,13 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                     >
                                                         <ShoppingBag className="w-4 h-4 text-gold" />
                                                         <span className="text-sm font-bold text-gray-900 dark:text-white">
-                                                            {marketplaceCount} {marketplaceCount === 1 ? 'falta' : 'faltan'} en Marketplace
+                                                            {t('myTemplates.marketplace.missing', { count: marketplaceCount })}
                                                         </span>
                                                         <ArrowRight className="w-3.5 h-3.5 ml-auto text-gold transform group-hover/cta:translate-x-1 transition-transform" />
                                                     </Link>
                                                 )}
                                                 <div className="flex items-center justify-between text-sm font-black uppercase tracking-wide text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">
-                                                    <span>Gestionar Colección</span>
+                                                    <span>{t('myTemplates.manage')}</span>
                                                     <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                             </div>

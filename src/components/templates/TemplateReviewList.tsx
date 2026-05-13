@@ -1,15 +1,14 @@
-﻿'use client';
+'use client';
 
 import { User, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { TemplateRating } from '@/hooks/templates/useTemplateRatings';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import Image from 'next/image';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
+import { useTranslations, useFormatter } from 'next-intl';
 
 interface TemplateReviewListProps {
   ratings: TemplateRating[];
@@ -25,6 +24,8 @@ export function TemplateReviewList({
   loading,
 }: TemplateReviewListProps) {
   const supabase = useSupabaseClient();
+  const t = useTranslations('templates.reviewList');
+  const format = useFormatter();
 
   if (ratings.length === 0) {
     return (
@@ -32,7 +33,7 @@ export function TemplateReviewList({
         <ModernCardContent className="p-8 text-center">
           <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
           <p className="text-slate-400">
-            Esta plantilla aún no tiene valoraciones
+            {t('noRatings')}
           </p>
         </ModernCardContent>
       </ModernCard>
@@ -84,8 +85,8 @@ export function TemplateReviewList({
                           ))}
                         </div>
                         <span className="text-sm text-slate-400">
-                          {format(new Date(rating.created_at), 'PPP', {
-                            locale: es,
+                          {format.dateTime(new Date(rating.created_at), {
+                            dateStyle: 'long',
                           })}
                         </span>
                       </div>
@@ -112,7 +113,7 @@ export function TemplateReviewList({
             variant="outline"
             className="border-slate-600 text-white hover:bg-slate-700"
           >
-            {loading ? 'Cargando...' : 'Cargar más valoraciones'}
+            {loading ? t('loading') : t('loadMore')}
           </Button>
         </div>
       )}

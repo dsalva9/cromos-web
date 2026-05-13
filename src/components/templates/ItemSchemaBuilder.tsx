@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Plus, Trash2, GripVertical, AlertTriangle } from 'lucide-react';
 import { ItemFieldDefinition } from '@/types/v1.6.0';
+import { useTranslations } from 'next-intl';
 
 interface ItemSchemaBuilderProps {
   schema: ItemFieldDefinition[];
@@ -27,6 +28,7 @@ interface ItemSchemaBuilderProps {
 }
 
 export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBuilderProps) {
+  const t = useTranslations('templates.itemSchemaBuilder');
   const [editingField, setEditingField] = useState<ItemFieldDefinition | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [deleteWarningOpen, setDeleteWarningOpen] = useState(false);
@@ -116,9 +118,9 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Campos del Cromo</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('title')}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Define qué información tendrá cada cromo de tu colección
+            {t('description')}
           </p>
         </div>
         <Button
@@ -127,7 +129,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
           className="bg-gold text-black hover:bg-gold-light"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Añadir Campo
+          {t('addFieldBtn')}
         </Button>
       </div>
 
@@ -148,21 +150,21 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                 <GripVertical className="h-5 w-5 text-gray-400 cursor-grab active:cursor-grabbing hover:text-yellow-400 transition-colors" />
                 <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Nombre</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('name')}</p>
                     <p className="text-gray-900 dark:text-white font-medium">{field.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Tipo</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('type')}</p>
                     <p className="text-gray-900 dark:text-white capitalize">
-                      {field.type === 'text' ? 'Texto' :
-                        field.type === 'number' ? 'Número' :
-                          field.type === 'checkbox' ? 'Casilla' :
-                            field.type === 'select' ? 'Selección' : field.type}
+                      {field.type === 'text' ? t('typeText') :
+                        field.type === 'number' ? t('typeNumber') :
+                          field.type === 'checkbox' ? t('typeCheckbox') :
+                            field.type === 'select' ? t('typeSelect') : field.type}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Requerido</p>
-                    <p className="text-gray-900 dark:text-white">{field.required ? 'Sí' : 'No'}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('required')}</p>
+                    <p className="text-gray-900 dark:text-white">{field.required ? t('yes') : t('no')}</p>
                   </div>
                 </div>
                 <Button
@@ -183,25 +185,25 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
       {editingField && (
         <Card className="bg-gray-50 dark:bg-gray-900 border-yellow-400 border-2">
           <CardContent className="p-4 space-y-4">
-            <h4 className="text-gray-900 dark:text-white font-semibold">Nuevo Campo</h4>
+            <h4 className="text-gray-900 dark:text-white font-semibold">{t('newField')}</h4>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="field-name" className="text-gray-900 dark:text-white">
-                  Nombre del Campo *
+                  {t('fieldName')}
                 </Label>
                 <Input
                   id="field-name"
                   value={editingField.name}
                   onChange={(e) => updateEditingField({ name: e.target.value })}
-                  placeholder="ej: Número, Rareza, Equipo..."
+                  placeholder={t('fieldNamePlaceholder')}
                   className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
                 <Label htmlFor="field-type" className="text-gray-900 dark:text-white">
-                  Tipo de Campo
+                  {t('fieldType')}
                 </Label>
                 <select
                   id="field-type"
@@ -209,10 +211,10 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                   onChange={(e) => updateEditingField({ type: e.target.value as ItemFieldDefinition['type'] })}
                   className="w-full h-10 px-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="text">Texto</option>
-                  <option value="number">Número</option>
-                  <option value="checkbox">Casilla</option>
-                  <option value="select">Selección</option>
+                  <option value="text">{t('typeText')}</option>
+                  <option value="number">{t('typeNumber')}</option>
+                  <option value="checkbox">{t('typeCheckbox')}</option>
+                  <option value="select">{t('typeSelect')}</option>
                 </select>
               </div>
             </div>
@@ -220,7 +222,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
             {editingField.type === 'select' && (
               <div>
                 <Label htmlFor="field-options" className="text-gray-900 dark:text-white">
-                  Opciones (separadas por coma)
+                  {t('options')}
                 </Label>
                 <Input
                   id="field-options"
@@ -228,7 +230,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                   onChange={(e) => updateEditingField({
                     options: e.target.value.split(',').map(o => o.trim()).filter(Boolean)
                   })}
-                  placeholder="ej: Común, Raro, Épico, Legendario"
+                  placeholder={t('optionsPlaceholder')}
                   className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -243,7 +245,7 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                 className="w-4 h-4 rounded border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
               <Label htmlFor="field-required" className="text-gray-900 dark:text-white cursor-pointer">
-                Campo obligatorio
+                {t('isRequired')}
               </Label>
             </div>
 
@@ -253,14 +255,14 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
                 onClick={() => setEditingField(null)}
                 className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
               >
-                Cancelar
+                {t('cancel')}
               </Button>
               <Button
                 onClick={saveField}
                 disabled={!editingField.name.trim()}
                 className="bg-gold text-black hover:bg-gold-light"
               >
-                Guardar Campo
+                {t('saveField')}
               </Button>
             </div>
           </CardContent>
@@ -271,10 +273,10 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
         <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
           <CardContent className="p-8 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              No hay campos definidos. Añade campos para personalizar tu plantilla.
+              {t('emptyTitle')}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              Ejemplo: Número de Cromo, Nombre del Jugador, Equipo, Rareza, etc.
+              {t('emptyDesc')}
             </p>
           </CardContent>
         </Card>
@@ -286,17 +288,22 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl text-gray-900 dark:text-white">
               <AlertTriangle className="h-6 w-6 text-yellow-500" />
-              ¿Eliminar campo con datos?
+              {t('deleteWarningTitle')}
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-400 pt-2">
-              El campo <span className="font-bold text-gray-900 dark:text-white">&quot;{fieldToDelete?.name}&quot;</span> tiene datos en &apos;Páginas y Cromos&apos;.
-              Si eliminas este campo, <span className="font-bold text-red-400">se perderán todos los datos</span> relacionados.
+              {t.rich('deleteWarningDesc', {
+                name: fieldToDelete?.name || '',
+                strong: (chunks) => <span className="font-bold text-gray-900 dark:text-white">{chunks}</span>,
+                danger: (chunks) => <span className="font-bold text-red-400">{chunks}</span>
+              })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-red-900/20 border border-red-900/50 rounded-lg p-4 my-4">
             <p className="text-red-200 text-sm">
-              <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer. Los datos de este campo se eliminarán permanentemente de todos los cromos.
+              {t.rich('deleteWarningNotice', {
+                strong: (chunks) => <strong>{chunks}</strong>
+              })}
             </p>
           </div>
 
@@ -309,13 +316,13 @@ export function ItemSchemaBuilder({ schema, onChange, pages = [] }: ItemSchemaBu
               }}
               className="border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              Cancelar
+              {t('cancel')}
             </Button>
             <Button
               onClick={confirmRemoveField}
               className="bg-red-600 hover:bg-red-700 text-white font-bold"
             >
-              Eliminar de todas formas
+              {t('deleteConfirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

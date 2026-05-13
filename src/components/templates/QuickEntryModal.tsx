@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Check, Hash } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import type { SlotProgress } from '@/types/v1.6.0';
 
@@ -25,6 +26,7 @@ export function QuickEntryModal({
   slots,
   onUpdateProgress,
 }: QuickEntryModalProps) {
+  const t = useTranslations('templates.quickEntryModal');
   const [checklistInput, setChecklistInput] = useState('');
   const [recentUpdates, setRecentUpdates] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +52,7 @@ export function QuickEntryModal({
 
       if (!slot) {
         // Number not found
-        setRecentUpdates(prev => [`❌ No. ${globalNum} no encontrado`, ...prev.slice(0, 4)]);
+        setRecentUpdates(prev => [t('notFound', { number: globalNum }), ...prev.slice(0, 4)]);
         setChecklistInput('');
         return;
       }
@@ -61,11 +63,15 @@ export function QuickEntryModal({
 
         await onUpdateProgress(slot.slot_id, newStatus, newCount);
 
-        const displayMsg = `✓ No. ${globalNum} - ${slot.label || `Slot ${slot.slot_number}${slot.slot_variant || ''}`} (${slot.page_title})`;
+        const displayMsg = t('success', { 
+          number: globalNum, 
+          label: slot.label || `Slot ${slot.slot_number}${slot.slot_variant || ''}`, 
+          page: slot.page_title 
+        });
         setRecentUpdates(prev => [displayMsg, ...prev.slice(0, 4)]);
         setChecklistInput('');
       } catch (error) {
-        setRecentUpdates(prev => [`❌ Error: ${error}`, ...prev.slice(0, 4)]);
+        setRecentUpdates(prev => [t('error', { error: String(error) }), ...prev.slice(0, 4)]);
       }
     },
     [checklistInput, slots, onUpdateProgress]
@@ -73,11 +79,11 @@ export function QuickEntryModal({
 
   const getSlotStatusBadge = (slot: SlotProgress) => {
     if (slot.status === 'owned') {
-      return <Badge className="bg-green-100 text-green-700 border-green-200 border hover:bg-green-200">Tengo</Badge>;
+      return <Badge className="bg-green-100 text-green-700 border-green-200 border hover:bg-green-200">{t('owned')}</Badge>;
     } else if (slot.status === 'duplicate') {
-      return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 border hover:bg-yellow-200">Repe ({slot.count})</Badge>;
+      return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 border hover:bg-yellow-200">{t('duplicate', { count: slot.count })}</Badge>;
     }
-    return <Badge variant="outline" className="text-gray-500 border-gray-300">Falta</Badge>;
+    return <Badge variant="outline" className="text-gray-500 border-gray-300">{t('missing')}</Badge>;
   };
 
   return (
@@ -89,7 +95,7 @@ export function QuickEntryModal({
               <Hash className="w-5 h-5 text-yellow-700" />
             </div>
             <div>
-              <span className="block font-bold">Entrada Rápida</span>
+              <span className="block font-bold">{t('title')}</span>
               <span className="text-sm font-normal text-gray-500">{copyTitle}</span>
             </div>
           </DialogTitle>
@@ -97,7 +103,7 @@ export function QuickEntryModal({
 
         <div className="flex-1 flex flex-col overflow-hidden space-y-6 py-4">
           <div className="space-y-3">
-            <Label htmlFor="checklist-number" className="text-gray-700 font-bold">Número de Checklist</Label>
+            <Label htmlFor="checklist-number" className="text-gray-700 font-bold">{t('checklistNumber')}</Label>
             <form onSubmit={handleChecklistEntry} className="flex gap-3">
               <div className="relative flex-1">
                 <Input
@@ -108,7 +114,7 @@ export function QuickEntryModal({
                   pattern="[0-9]*"
                   value={checklistInput}
                   onChange={(e) => setChecklistInput(e.target.value)}
-                  placeholder="Ej: 45, 123, 773..."
+                  placeholder={t('placeholder')}
                   className="bg-gray-50 border-gray-200 text-gray-900 h-12 text-lg pl-4 focus:ring-gold focus:border-gold placeholder:text-gray-400"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-mono border border-gray-200 rounded px-1.5 py-0.5 bg-white">
@@ -117,18 +123,18 @@ export function QuickEntryModal({
               </div>
               <Button type="submit" className="bg-gold text-black hover:bg-gold-light h-12 px-6 font-bold shadow-sm">
                 <Check className="w-5 h-5 mr-2" />
-                Marcar
+                {t('markBtn')}
               </Button>
             </form>
             <p className="text-xs text-green-600 flex items-center gap-2 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              Modo de entrada rápida activo
+              {t('activeMode')}
             </p>
           </div>
 
           {recentUpdates.length > 0 && (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-              <Label className="text-gray-400 text-xs uppercase tracking-wider font-bold">Últimas actualizaciones</Label>
+              <Label className="text-gray-400 text-xs uppercase tracking-wider font-bold">{t('recentUpdates')}</Label>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2 border border-gray-200 shadow-inner">
                 {recentUpdates.map((update, idx) => (
                   <div key={idx} className="text-sm text-gray-700 flex items-center gap-2 font-mono">
@@ -142,7 +148,7 @@ export function QuickEntryModal({
           <div className="flex-1 overflow-y-auto bg-gray-50 rounded-xl border border-gray-200 p-4 shadow-inner">
             <h3 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
               <Hash className="w-4 h-4 text-gray-400" />
-              Referencia de Números
+              {t('reference')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
               {slots
@@ -160,7 +166,7 @@ export function QuickEntryModal({
                 ))}
               {slots.filter(s => s.global_number !== null).length > 20 && (
                 <div className="col-span-1 sm:col-span-2 text-gray-400 text-center py-4 text-xs uppercase tracking-wider">
-                  ...y {slots.filter(s => s.global_number !== null).length - 20} más
+                  {t('andMore', { count: slots.filter(s => s.global_number !== null).length - 20 })}
                 </div>
               )}
             </div>
@@ -173,7 +179,7 @@ export function QuickEntryModal({
             variant="ghost"
             className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
           >
-            Cerrar Esc
+            {t('close')}
           </Button>
         </div>
       </DialogContent>

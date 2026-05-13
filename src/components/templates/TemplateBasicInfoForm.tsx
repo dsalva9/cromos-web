@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import type { TemplateBasicInfoData } from '@/lib/validations/template.schemas';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
 import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 
 interface TemplateBasicInfoFormProps {
   data: {
@@ -36,6 +37,7 @@ export function TemplateBasicInfoForm({
   onChange,
   errors,
 }: TemplateBasicInfoFormProps) {
+  const t = useTranslations('templates.wizard.basicForm');
   const [imagePreview, setImagePreview] = useState<string | null>(
     data.image_url || null
   );
@@ -67,7 +69,7 @@ export function TemplateBasicInfoForm({
       };
       reader.readAsDataURL(result.blob);
     } catch (error) {
-      toast.error('Error al procesar la imagen');
+      toast.error(t('imageError'));
     }
   };
 
@@ -91,14 +93,14 @@ export function TemplateBasicInfoForm({
       <div className="space-y-6">
         {/* Title */}
         <div className="space-y-2">
-          <Label htmlFor="title">Título de la Colección *</Label>
+          <Label htmlFor="title">{t('titleLabel')}</Label>
           <Input
             id="title"
             aria-invalid={!!errors?.title}
             aria-describedby={errors?.title ? 'template-title-error' : undefined}
             value={data.title}
             onChange={e => onChange({ title: e.target.value })}
-            placeholder="Ej: Álbum Cromos Euro 2024"
+            placeholder={t('titlePlaceholder')}
             className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white ${errors?.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
               }`}
             required
@@ -112,7 +114,7 @@ export function TemplateBasicInfoForm({
 
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="description">Descripción</Label>
+          <Label htmlFor="description">{t('descLabel')}</Label>
           <Textarea
             id="description"
             aria-invalid={!!errors?.description}
@@ -121,7 +123,7 @@ export function TemplateBasicInfoForm({
             }
             value={data.description}
             onChange={e => onChange({ description: e.target.value })}
-            placeholder="Describe tu colección..."
+            placeholder={t('descPlaceholder')}
             rows={4}
             className={`bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white resize-none ${errors?.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-700'
               }`}
@@ -136,7 +138,7 @@ export function TemplateBasicInfoForm({
         {/* Image */}
         <div className="space-y-2">
           <Label>
-            Imagen de la Colección <span className="text-red-500">*</span>
+            {t('imageLabel')} <span className="text-red-500">*</span>
           </Label>
           {imagePreview ? (
             <div className="relative min-h-[250px] max-h-[500px] w-full bg-gray-50 dark:bg-gray-900 rounded-md overflow-hidden flex items-center justify-center">
@@ -154,7 +156,7 @@ export function TemplateBasicInfoForm({
                 onClick={handleRemoveImage}
                 className="absolute top-2 right-2 bg-red-500 border-red-500 text-white hover:bg-red-600"
               >
-                Eliminar
+                {t('imageRemove')}
               </Button>
             </div>
           ) : (
@@ -164,9 +166,9 @@ export function TemplateBasicInfoForm({
                   <ImageIcon className="h-8 w-8 text-gray-600 dark:text-gray-400" />
                 </div>
                 <div className="text-center">
-                  <p className="text-gray-900 dark:text-white font-bold mb-2">Añadir Imagen</p>
+                  <p className="text-gray-900 dark:text-white font-bold mb-2">{t('imageAdd')}</p>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                    Sube una foto de tu colección
+                    {t('imageHelp')}
                   </p>
                   <div className="flex gap-2 justify-center">
                     <div className="relative">
@@ -181,7 +183,7 @@ export function TemplateBasicInfoForm({
                         className="bg-gold text-black hover:bg-gold-light font-bold"
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Elegir
+                        {t('imageChoose')}
                       </Button>
                     </div>
                     {supportsCamera && (
@@ -192,12 +194,12 @@ export function TemplateBasicInfoForm({
                         className="border-2 border-gold text-gold hover:bg-gold hover:text-black"
                       >
                         <Camera className="h-4 w-4 mr-2" />
-                        Cámara
+                        {t('imageCamera')}
                       </Button>
                     )}
                   </div>
                   <p className="text-gray-500 dark:text-gray-400 text-xs mt-2">
-                    JPG, PNG o WebP (máx. 5MB)
+                    {t('imageFormat')}
                   </p>
                 </div>
               </div>
@@ -211,9 +213,9 @@ export function TemplateBasicInfoForm({
         {/* Public/Private */}
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="is-public" className="text-gray-900 dark:text-white">Hacer privada</Label>
+            <Label htmlFor="is-public" className="text-gray-900 dark:text-white">{t('privateLabel')}</Label>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Si activas esta opción, otros usuarios no podrán ver ni copiar esta colección
+              {t('privateHelp')}
             </p>
           </div>
           <Switch

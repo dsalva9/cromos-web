@@ -14,6 +14,7 @@ import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 import { createRipple } from '@/lib/animations';
 import { DeletionCountdown } from '@/components/deletion';
+import { useTranslations } from 'next-intl';
 
 export interface TemplateCardData {
   id: string | number;
@@ -49,6 +50,7 @@ export function TemplateCard({
   const router = useRouter();
   const { copyTemplate, loading } = useCopyTemplate();
   const [copied, setCopied] = useState(false);
+  const t = useTranslations('templates');
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -62,13 +64,13 @@ export function TemplateCard({
     try {
       const copyId = await copyTemplate(String(template.id));
       setCopied(true);
-      toast.success('¡Colección copiada con Éxito!');
+      toast.success(t('card.success'));
       setTimeout(() => {
         router.push(`/mis-plantillas/${copyId}`);
       }, 1000);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Error al copiar colección'
+        error instanceof Error ? error.message : t('card.error')
       );
     }
   };
@@ -103,27 +105,24 @@ export function TemplateCard({
               </div>
             )}
 
-            {/* Featured Badge */}
             {isFeatured && (
               <div className="absolute top-2 left-2 z-10">
                 <div className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-amber-500 to-gold text-black shadow-md">
                   <Sparkles className="h-3 w-3" />
-                  Destacada
+                  {t('card.featured')}
                 </div>
               </div>
             )}
 
             {/* Badges (Visibility and Deletion) */}
             <div className="absolute top-2 right-2 flex flex-col gap-2">
-              {/* Deletion Badge (always show if deleted) */}
               {template.deleted_at && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-red-500/80 backdrop-blur-sm text-white shadow-sm">
                   <FileText className="h-3 w-3" />
-                  Eliminada
+                  {t('card.deleted')}
                 </div>
               )}
 
-              {/* Visibility Badge */}
               {showVisibility && template.is_public !== undefined && (
                 <div
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-sm shadow-sm ${template.is_public
@@ -134,12 +133,12 @@ export function TemplateCard({
                   {template.is_public ? (
                     <>
                       <Eye className="h-3 w-3" />
-                      Pública
+                      {t('card.public')}
                     </>
                   ) : (
                     <>
                       <EyeOff className="h-3 w-3" />
-                      Privada
+                      {t('card.private')}
                     </>
                   )}
                 </div>
@@ -195,8 +194,8 @@ export function TemplateCard({
               <div className="flex items-center gap-1">
                 <FileText className="h-4 w-4" />
                 <span>
-                  {template.pages_count} páginas - {template.total_slots ?? 0}{' '}
-                  cromos
+                  {template.pages_count} {t('card.pages')} - {template.total_slots ?? 0}{' '}
+                  {t('card.stickers')}
                 </span>
               </div>
             </div>
@@ -207,7 +206,7 @@ export function TemplateCard({
                   <User className="h-3 w-3 text-slate-400" />
                 </div>
                 <span className="line-clamp-1">
-                  por{' '}
+                  {t('card.by')}{' '}
                   <UserLink
                     userId={template.author_id}
                     nickname={template.author_nickname}
@@ -229,7 +228,7 @@ export function TemplateCard({
                 size="sm"
               >
                 <Edit className="mr-2 h-4 w-4" />
-                Editar Colección
+                {t('card.edit')}
               </Button>
             </Link>
           ) : (
@@ -242,14 +241,14 @@ export function TemplateCard({
               {copied ? (
                 <>
                   <Copy className="mr-2 h-4 w-4" />
-                  ¡Copiada!
+                  {t('card.copied')}
                 </>
               ) : loading ? (
-                'Copiando...'
+                t('card.copying')
               ) : (
                 <>
                   <Copy className="mr-2 h-4 w-4" />
-                  Copiar Colección
+                  {t('card.copy')}
                 </>
               )}
             </Button>

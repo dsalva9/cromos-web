@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 
 import { Check, X, Copy as CopyIcon, Trophy, User, ShoppingBag } from 'lucide-react';
@@ -7,6 +7,7 @@ import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ImageModal } from '@/components/ui/ImageModal';
+import { useTranslations } from 'next-intl';
 
 interface TemplateCopy {
   copy_id: number;
@@ -37,6 +38,7 @@ export function TemplateSummaryHeader({
   progress,
   marketplaceCount = 0,
 }: TemplateSummaryHeaderProps) {
+  const t = useTranslations('templates.summaryHeader');
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const stats = useMemo(() => {
     // Count owned (tengo) - slots with status='owned' OR status='duplicate'
@@ -132,7 +134,7 @@ export function TemplateSummaryHeader({
                 <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <User className="w-4 h-4 flex-shrink-0" />
                   <span className="text-sm truncate">
-                    por{' '}
+                    {t('by')}{' '}
                     <Link
                       href={`/users/${copy.original_author_id}`}
                       className="hover:text-gold transition-colors underline decoration-dotted underline-offset-2 z-10 relative"
@@ -147,7 +149,7 @@ export function TemplateSummaryHeader({
             {/* Progress Bar */}
             <div className="space-y-3 w-full max-w-xl">
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-gray-500 dark:text-gray-400">Progreso General</span>
+                <span className="text-gray-500 dark:text-gray-400">{t('generalProgress')}</span>
                 <span className={isComplete ? "text-green-600 dark:text-green-400" : "text-black dark:text-white"}>
                   {stats.completionPercentage}%
                 </span>
@@ -161,7 +163,7 @@ export function TemplateSummaryHeader({
                 </div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                {stats.ownedForCompletion} de {stats.totalSlots} cromos conseguidos
+                {t('cardsCollected', { owned: stats.ownedForCompletion, total: stats.totalSlots })}
               </p>
             </div>
           </div>
@@ -174,7 +176,7 @@ export function TemplateSummaryHeader({
                 <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.owned}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Tengo</span>
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.owned')}</span>
             </div>
 
             {/* Duplicates */}
@@ -183,7 +185,7 @@ export function TemplateSummaryHeader({
                 <CopyIcon className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-700 dark:text-yellow-500" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.duplicates}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Repes</span>
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.duplicates')}</span>
             </div>
 
             {/* Missing */}
@@ -192,7 +194,7 @@ export function TemplateSummaryHeader({
                 <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-400" />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.missing}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Faltan</span>
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.missing')}</span>
             </div>
 
             {/* Marketplace Availability */}
@@ -203,7 +205,7 @@ export function TemplateSummaryHeader({
                     <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-gold" />
                   </div>
                   <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{marketplaceCount}</span>
-                  <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gold tracking-wider">En Venta</span>
+                  <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gold tracking-wider">{t('stats.onSale')}</span>
                 </div>
               </Link>
             )}

@@ -17,29 +17,43 @@ import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon 
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
+
 // Simplified schema - only title, description, and images (mandatory)
-const simplifiedListingSchema = z.object({
-  title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
-  description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres'),
-  image_url: z.string().min(1, 'La imagen es obligatoria'),
+const baseSimplifiedListingSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  image_url: z.string(),
   collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),
   listing_type: z.enum(['intercambio', 'venta', 'ambos']),
-  price: z.number().positive('El precio debe ser mayor que 0').max(99999).optional(),
+  price: z.number().optional(),
+  terms_accepted: z.boolean(),
+});
+
+type SimplifiedListingFormData = z.infer<typeof baseSimplifiedListingSchema>;
+
+const getSimplifiedListingSchema = (t: (key: string) => string) => z.object({
+  title: z.string().min(3, t('titleMin')),
+  description: z.string().min(10, t('descriptionMin')),
+  image_url: z.string().min(1, t('imageRequired')),
+  collection_name: z.string().optional().or(z.literal('')),
+  is_group: z.boolean(),
+  listing_type: z.enum(['intercambio', 'venta', 'ambos']),
+  price: z.number().positive(t('pricePositive')).max(99999).optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
-    message: 'Debes aceptar los términos de uso',
+    message: t('termsRequired'),
   }),
 }).superRefine((data, ctx) => {
   if ((data.listing_type === 'venta' || data.listing_type === 'ambos') && (!data.price || data.price <= 0)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'El precio es obligatorio cuando el anuncio incluye venta',
+      message: t('priceRequired'),
       path: ['price'],
     });
   }
 });
-
-type SimplifiedListingFormData = z.infer<typeof simplifiedListingSchema>;
 
 interface SimplifiedListingFormProps {
   initialData?: Partial<CreateListingForm>;
@@ -86,6 +100,9 @@ export function SimplifiedListingForm({
   const [slotPickerExpanded, setSlotPickerExpanded] = useState(false);
   const [expandedPageId, setExpandedPageId] = useState<number | null>(null);
 
+  const t = useTranslations('validations');
+  const schema = useMemo(() => getSimplifiedListingSchema(t as any), [t]);
+
   const {
     register,
     handleSubmit,
@@ -93,7 +110,7 @@ export function SimplifiedListingForm({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<SimplifiedListingFormData>({
-    resolver: zodResolver(simplifiedListingSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',

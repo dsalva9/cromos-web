@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Plus, Trash2, GripVertical } from 'lucide-react';
 import { ItemFieldDefinition } from '@/types/v1.6.0';
 import { DynamicFieldsEditor } from './DynamicFieldsEditor';
+import { useTranslations } from 'next-intl';
 
 interface TemplateSlotData {
   data: Record<string, string | number | boolean>;
@@ -29,6 +30,7 @@ interface TemplatePagesFormProps {
 }
 
 export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesFormProps) {
+  const t = useTranslations('templates.wizard.pagesForm');
   const [newPageTitle, setNewPageTitle] = useState('');
   const [newPageType, setNewPageType] = useState<'team' | 'special'>('team');
 
@@ -94,22 +96,22 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
         {/* Add New Page */}
         <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Añadir Nueva Página</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-white">{t('addNewPage')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-900 dark:text-white">Título de la Página *</Label>
+              <Label className="text-gray-900 dark:text-white">{t('pageTitle')}</Label>
               <Input
                 id="new-page-title"
                 value={newPageTitle}
                 onChange={e => setNewPageTitle(e.target.value)}
-                placeholder="Ej: Primera Equipación"
+                placeholder={t('pageTitlePlaceholder')}
                 className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
               />
             </div>
             <div className="space-y-2">
-              <Label>Tipo de Página</Label>
+              <Label>{t('pageType')}</Label>
               <RadioGroup
                 value={newPageType}
                 onValueChange={value =>
@@ -119,13 +121,13 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="team" id="team" />
                   <Label htmlFor="team" className="text-gray-900 dark:text-white">
-                    Normal
+                    {t('typeTeam')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="special" id="special" />
                   <Label htmlFor="special" className="text-gray-900 dark:text-white">
-                    Especial
+                    {t('typeSpecial')}
                   </Label>
                 </div>
               </RadioGroup>
@@ -137,7 +139,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             className="bg-gold text-black hover:bg-gold-light"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Añadir Página
+            {t('addPageBtn')}
           </Button>
         </CardContent>
       </Card>
@@ -151,8 +153,8 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
               <div>
                 <CardTitle className="text-gray-900 dark:text-white">{page.title}</CardTitle>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {page.slots.length} cromos · (
-                  {page.type === 'team' ? 'Normal' : 'Especial'})
+                  {t('stickersCount', { count: page.slots.length })} · (
+                  {page.type === 'team' ? t('typeTeam') : t('typeSpecial')})
                 </p>
               </div>
             </div>
@@ -170,7 +172,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor={`page-title-${pageIndex}`} className="text-gray-900 dark:text-white">
-                  Título de la Página *
+                  {t('pageTitle')}
                 </Label>
                 <Input
                   id={`page-title-${pageIndex}`}
@@ -182,7 +184,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                 />
               </div>
               <div className="space-y-2">
-                <Label>Tipo de Página</Label>
+                <Label>{t('pageType')}</Label>
                 <RadioGroup
                   value={page.type}
                   onValueChange={value =>
@@ -195,13 +197,13 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="team" id={`team-${pageIndex}`} />
                     <Label htmlFor={`team-${pageIndex}`} className="text-gray-900 dark:text-white">
-                      Normal
+                      {t('typeTeam')}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="special" id={`special-${pageIndex}`} />
                     <Label htmlFor={`special-${pageIndex}`} className="text-gray-900 dark:text-white">
-                      Especial
+                      {t('typeSpecial')}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -211,7 +213,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             {/* Slots */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Cromos de la Página</Label>
+                <Label>{t('pageStickers')}</Label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -219,7 +221,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Añadir Cromo
+                  {t('addStickerBtn')}
                 </Button>
               </div>
 
@@ -233,7 +235,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                       <div className="flex items-center gap-2">
                         <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-yellow-400 hover:cursor-grab active:cursor-grabbing transition-colors duration-200" />
                         <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                          Cromo #{slotIndex + 1}
+                          {t('stickerNumber', { number: slotIndex + 1 })}
                         </span>
                       </div>
                       <Button
@@ -256,7 +258,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                       />
                     ) : (
                       <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                        Define campos personalizados en el paso anterior para agregar datos a los cromos.
+                        {t('noFieldsDefined')}
                       </p>
                     )}
                   </div>
@@ -271,7 +273,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
       {data.pages.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-600 dark:text-gray-400">
-            No hay páginas añadidas. Añade tu primera página para comenzar.
+            {t('noPages')}
           </p>
         </div>
       )}

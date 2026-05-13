@@ -219,5 +219,341 @@
       "buyer": "Comprador:",
       "seller": "Vendedor:"
     }
+  },
+  "templates": {
+    "metadata": {
+      "title": "Colecciones Comunitarias | Cambio Cromos",
+      "description": "Descubre y copia colecciones creadas por la comunidad."
+    },
+    "index": {
+      "title": "Colecciones Comunitarias",
+      "subtitle": "Descubre y copia colecciones creadas por la comunidad",
+      "buttons": {
+        "myCollections": "Mis Colecciones Creadas",
+        "create": "Crear Colección",
+        "loadMore": "Cargar más"
+      },
+      "tip": {
+        "title": "¿Qué son las colecciones?",
+        "description": "Las colecciones son plantillas creadas por la comunidad. Copia una para crear tu propio álbum y llevar el control de los cromos que tienes, los que te faltan y los repetidos."
+      },
+      "errors": {
+        "loadFailed": "Error al cargar colecciones: {error}"
+      },
+      "empty": {
+        "searchTitle": "No se encontraron colecciones",
+        "searchDescription": "No hay colecciones que coincidan con tu búsqueda. Intenta con otros términos o crea una nueva colección.",
+        "quietDescription": "Todavía no hay colecciones comunitarias. ¡Sé el primero en crear una!",
+        "action": "Crear la primera colección"
+      }
+    },
+    "card": {
+      "featured": "Destacada",
+      "deleted": "Eliminada",
+      "public": "Pública",
+      "private": "Privada",
+      "pages": "páginas",
+      "stickers": "cromos",
+      "by": "por",
+      "edit": "Editar Colección",
+      "editBasicInfo": "Editar Información Básica",
+      "editPages": "Editar Páginas y Cromos",
+      "editCustomFields": "Editar Campos Personalizados",
+      "editDesign": "Editar Opciones de Diseño",
+      "progressGrid": {
+        "pageFallback": "Página {pageNum}",
+        "stickersOf": "Cromos de {pageTitle}",
+        "completePageBtn": "Completar Página",
+        "completePageTitle": "Completar toda la página",
+        "completePageDesc": "¿Quieres marcar todos los cromos faltantes de esta página como conseguidos?",
+        "thisAction": "Esta acción:",
+        "markAsOwned": "Marcará como <ownedTag>\"Tengo\"</ownedTag> todos los cromos que te faltan.",
+        "wontModify": "No modificará los cromos que ya tienes o tienes repetidos.",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar Completado",
+        "completing": "Completando..."
+      },
+      "ratingDialog": {
+        "selectRatingError": "Por favor selecciona una valoración",
+        "commentLengthError": "El comentario no puede exceder 280 caracteres",
+        "updateSuccess": "Valoración actualizada con éxito",
+        "createSuccess": "Valoración creada con éxito",
+        "saveError": "Error al guardar valoración",
+        "deleteSuccess": "Valoración eliminada con éxito",
+        "deleteError": "Error al eliminar valoración",
+        "confirmDeleteTitle": "Confirmar eliminación",
+        "confirmDeleteDesc": "¿Estás seguro de que quieres eliminar tu valoración? Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "deleting": "Eliminando...",
+        "deleteBtn": "Eliminar",
+        "updateTitle": "Actualizar valoración",
+        "rateTitle": "Valorar plantilla",
+        "yourRating": "Tu valoración",
+        "rating1": "Muy mala",
+        "rating2": "Mala",
+        "rating3": "Aceptable",
+        "rating4": "Buena",
+        "rating5": "Excelente",
+        "commentLabel": "Comentario (opcional)",
+        "commentPlaceholder": "Comparte tu opinión sobre esta plantilla...",
+        "charsLeft": "{current}/280 caracteres",
+        "saving": "Guardando...",
+        "updateBtn": "Actualizar",
+        "sendBtn": "Enviar valoración"
+      },
+      "ratingSummary": {
+        "ratingCount": "{count, plural, =0 {0 valoraciones} =1 {1 valoración} other {# valoraciones}}",
+        "authorWarning": "No puedes valorar tus propias plantillas",
+        "updateRating": "Actualizar valoración",
+        "rateTemplate": "Valorar plantilla"
+      },
+      "reviewForm": {
+        "basicInfo": "Información Básica",
+        "title": "Título",
+        "noTitle": "Sin título",
+        "description": "Descripción",
+        "noDescription": "Sin descripción",
+        "image": "Imagen",
+        "visibility": "Visibilidad",
+        "publicStatus": "Pública - Otros usuarios pueden verla",
+        "privateStatus": "Privada - Solo tú puedes verla",
+        "summary": "Resumen de Páginas y Cromos",
+        "pagesLabel": "Páginas",
+        "totalStickers": "Cromos Totales",
+        "normal": "Normal",
+        "special": "Especial",
+        "stickersCount": "{count, plural, =0 {0 cromos} =1 {1 cromo} other {# cromos}}",
+        "customFieldsCount": "{count, plural, =0 {0 cromos configurados con campos personalizados} =1 {1 cromo configurado con campos personalizados} other {# cromos configurados con campos personalizados}}",
+        "termsOfUse": "Términos de Uso",
+        "termsCheckbox": "Al crear esta plantilla pública <strong>asumo la responsabilidad</strong> de su contenido y confirmo que es apto para la comunidad.",
+        "viewConditions": "Ver condiciones",
+        "finalConfirmation": "Confirmación Final",
+        "aboutToCreate": "Estás a punto de crear una plantilla con:",
+        "pagesCount": "{count, plural, =0 {0 páginas} =1 {1 página} other {# páginas}}",
+        "stickersTotal": "{count, plural, =0 {0 cromos en total} =1 {1 cromo en total} other {# cromos en total}}",
+        "visibilityPublic": "Visibilidad: Pública",
+        "visibilityPrivate": "Visibilidad: Privada",
+        "availabilityDesc": "Una vez creada, la plantilla estará disponible para que tú y otros usuarios (si es pública) puedan usarla como base para sus colecciones.",
+        "termsDialogTitle": "Términos de Uso - Plantillas Públicas",
+        "termsDialogText": "Si decides compartir una plantilla o listado público, recuerda que esta información quedará visible para otros usuarios. Solo subas contenido original o sobre el que tengas derechos de uso. Al publicarlo, autorizas a Cambiocromos.com a mostrarlo dentro de la plataforma con fines informativos o de comunidad, sin adquirir derechos de propiedad sobre él. Podrás eliminar tu plantilla cuando quieras. Al continuar, aceptas las Condiciones de uso y garantizas que el contenido que compartes cumple la ley y los derechos de terceros.",
+        "close": "Cerrar"
+      },
+      "reviewList": {
+        "noRatings": "Esta plantilla aún no tiene valoraciones",
+        "loading": "Cargando...",
+        "loadMore": "Cargar más valoraciones"
+      },
+      "copied": "¡Copiada!",
+      "copying": "Copiando...",
+      "copy": "Copiar Colección",
+      "success": "¡Colección copiada con Éxito!",
+      "error": "Error al copiar colección"
+    },
+    "myTemplates": {
+      "title": "Mis Álbumes",
+      "subtitle": "Gestiona tu progreso, completa tus álbumes y organiza tus cromos.",
+      "explore": "Explorar Colecciones",
+      "emptyTitle": "No tienes colecciones activas",
+      "emptyDesc": "Empieza explorando las plantillas disponibles o crea tu propia colección desde cero.",
+      "progress": "Progreso",
+      "stickersCount": "{completed} / {total} cromos",
+      "stats": {
+        "have": "Tengo",
+        "need": "Faltan"
+      },
+      "marketplace": {
+        "missing": "{count, plural, =1 {# falta en Marketplace} other {# faltan en Marketplace}}"
+      },
+      "manage": "Gestionar Colección"
+    },
+    "myCreated": {
+      "back": "Volver a Colecciones",
+      "title": "Mis Colecciones Creadas",
+      "subtitle": "Plantillas que has creado, públicas y privadas",
+      "create": "Crear Colección",
+      "emptyTitle": "No has creado ninguna colección",
+      "emptyDesc": "Crea tu primera plantilla para compartirla con la comunidad o usarla de forma privada.",
+      "action": "Crear mi primera colección"
+    },
+    "wizard": {
+      "title": "Crear Colección",
+      "steps": {
+        "basic": { "title": "Información Básica", "desc": "Título y descripción" },
+        "schema": { "title": "Información de Cromo", "desc": "Define los campos" },
+        "pages": { "title": "Páginas y Cromos", "desc": "Añade páginas y cromos" },
+        "review": { "title": "Revisión", "desc": "Revisa y publica" }
+      },
+      "stepProgress": "Paso {current} de {total}",
+      "errors": {
+        "basicTitle": "Por favor corrige los siguientes errores:",
+        "pagesTitle": "Revisa las páginas:",
+        "pagesRule1": "• Cada página necesita título válido y al menos un cromo con etiqueta.",
+        "pagesRule2": "• Un máximo de 50 cromos por página.",
+        "termsRequired": "Debes aceptar la responsabilidad sobre el contenido para publicar una plantilla pública."
+      },
+      "basicForm": {
+        "titleLabel": "Título de la Colección *",
+        "titlePlaceholder": "Ej: Álbum Cromos Euro 2024",
+        "descLabel": "Descripción",
+        "descPlaceholder": "Describe tu colección...",
+        "imageLabel": "Imagen de la Colección",
+        "imageRemove": "Eliminar",
+        "imageAdd": "Añadir Imagen",
+        "imageHelp": "Sube una foto de tu colección",
+        "imageChoose": "Elegir",
+        "imageCamera": "Cámara",
+        "imageFormat": "JPG, PNG o WebP (máx. 5MB)",
+        "privateLabel": "Hacer privada",
+        "privateHelp": "Si activas esta opción, otros usuarios no podrán ver ni copiar esta colección",
+        "imageError": "Error al procesar la imagen"
+      },
+      "pagesForm": {
+        "addNewPage": "Añadir Nueva Página",
+        "pageTitle": "Título de la Página *",
+        "pageTitlePlaceholder": "Ej: Primera Equipación",
+        "pageType": "Tipo de Página",
+        "typeTeam": "Normal",
+        "typeSpecial": "Especial",
+        "addPageBtn": "Añadir Página",
+        "stickersCount": "{count} cromos",
+        "pageStickers": "Cromos de la Página",
+        "addStickerBtn": "Añadir Cromo",
+        "stickerNumber": "Cromo #{number}",
+        "noFieldsDefined": "Define campos personalizados en el paso anterior para agregar datos a los cromos.",
+        "noPages": "No hay páginas añadidas. Añade tu primera página para comenzar."
+      },
+      "buttons": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "creating": "Creando...",
+        "submit": "Crear Colección"
+      }
+    },
+    "itemSchemaBuilder": {
+      "title": "Campos del Cromo",
+      "description": "Define qué información tendrá cada cromo de tu colección",
+      "addFieldBtn": "Añadir Campo",
+      "name": "Nombre",
+      "type": "Tipo",
+      "required": "Requerido",
+      "typeText": "Texto",
+      "typeNumber": "Número",
+      "typeCheckbox": "Casilla",
+      "typeSelect": "Selección",
+      "yes": "Sí",
+      "no": "No",
+      "newField": "Nuevo Campo",
+      "fieldName": "Nombre del Campo *",
+      "fieldNamePlaceholder": "ej: Número, Rareza, Equipo...",
+      "fieldType": "Tipo de Campo",
+      "options": "Opciones (separadas por coma)",
+      "optionsPlaceholder": "ej: Común, Raro, Épico, Legendario",
+      "isRequired": "Campo obligatorio",
+      "cancel": "Cancelar",
+      "saveField": "Guardar Campo",
+      "emptyTitle": "No hay campos definidos. Añade campos para personalizar tu plantilla.",
+      "emptyDesc": "Ejemplo: Número de Cromo, Nombre del Jugador, Equipo, Rareza, etc.",
+      "deleteWarningTitle": "¿Eliminar campo con datos?",
+      "deleteWarningDesc": "El campo \"{name}\" tiene datos en 'Páginas y Cromos'. Si eliminas este campo, se perderán todos los datos relacionados.",
+      "deleteWarningNotice": "⚠️ Advertencia: Esta acción no se puede deshacer. Los datos de este campo se eliminarán permanentemente de todos los cromos.",
+      "deleteConfirm": "Eliminar de todas formas"
+    },
+    "dynamicFieldsEditor": {
+      "yes": "Sí",
+      "no": "No",
+      "enter": "Ingresa {name}",
+      "select": "Selecciona {name}"
+    },
+    "publishSparesModal": {
+      "title": "Publicar Pack de Repes",
+      "description": "Vas a publicar todos tus cromos repetidos de {collection} en un solo anuncio.",
+      "howItWorks": "¡Cómo funciona?",
+      "howItWorksDesc": "Se creará un anuncio tipo \"Pack\" con todos tus cromos repetidos. La descripción se genera automáticamente con los detalles de cada cromo. Puedes editarla si lo deseas.",
+      "sparesCount": "{count, plural, =1 {cromo repetido} other {cromos repetidos}}",
+      "totalUnits": "Total de unidades: {total}",
+      "packDescription": "Descripción del Pack",
+      "packDescriptionPlaceholder": "Descripción generada automáticamente...",
+      "packDescriptionHelp": "Puedes editar la descripción antes de publicar. Se incluyen todos los detalles de cada cromo.",
+      "cancel": "Cancelar",
+      "publishing": "Publicando...",
+      "publishBtn": "Publicar Pack ({count})"
+    },
+    "quickEntryModal": {
+      "title": "Entrada Rápida",
+      "checklistNumber": "Número de Checklist",
+      "placeholder": "Ej: 45, 123, 773...",
+      "markBtn": "Marcar",
+      "activeMode": "Modo de entrada rápida activo",
+      "recentUpdates": "Últimas actualizaciones",
+      "notFound": "❌ No. {number} no encontrado",
+      "error": "❌ Error: {error}",
+      "success": "✓ No. {number} - {label} ({page})",
+      "owned": "Tengo",
+      "duplicate": "Repe ({count})",
+      "missing": "Falta",
+      "reference": "Referencia de Números",
+      "andMore": "...y {count} más",
+      "close": "Cerrar Esc"
+    },
+    "slotTile": {
+      "owned": "Tengo",
+      "duplicate": "Repe",
+      "missing": "Falta",
+      "special": "SPECIAL",
+      "sticker": "Cromo {number}",
+      "inMarketplace": "EN MARKETPLACE",
+      "viewListing": "VER ANUNCIO",
+      "createListing": "CREAR ANUNCIO",
+      "createListingTitle": "Necesitas al menos 2 cromos para crear un anuncio",
+      "updated": "¡Actualizado!",
+      "updateError": "Error al actualizar",
+      "countError": "Error al actualizar cantidad"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar plantillas por título o descripción...",
+      "sortBy": "Ordenar por:",
+      "sortOptions": {
+        "recent": "Más Recientes",
+        "rating": "Mejor Valoradas",
+        "popular": "Más Populares"
+      }
+    },
+    "summaryHeader": {
+      "by": "por",
+      "generalProgress": "Progreso General",
+      "cardsCollected": "{owned} de {total} cromos conseguidos",
+      "stats": {
+        "owned": "Tengo",
+        "duplicates": "Repes",
+        "missing": "Faltan",
+        "onSale": "En Venta"
+      }
+    }
+  },
+  "validations": {
+    "pageTitleRequired": "El título de la página es obligatorio",
+    "pageTitleMax": "El título no puede superar los 100 caracteres",
+    "pageTypeInvalid": "El tipo de página debe ser 'team' o 'special'",
+    "slotsMin": "La página debe tener al menos 1 cromo",
+    "slotsMax": "La página no puede tener más de 50 cromos",
+    "titleMin": "El título debe tener al menos 3 caracteres",
+    "titleMax": "El título no puede superar los 100 caracteres",
+    "descriptionMax": "La descripción no puede superar los 1000 caracteres",
+    "imageRequired": "La imagen es obligatoria",
+    "imageInvalid": "URL de imagen no válida",
+    "pagesMin": "Debe haber al menos 1 página",
+    "pagesMax": "No puede haber más de 20 páginas",
+    "slotInvalid": "ID de cromo no válido",
+    "invalidStatus": "Estado no válido",
+    "countInt": "La cantidad debe ser un número entero",
+    "countMin": "La cantidad no puede ser negativa",
+    "countMax": "La cantidad no puede superar 999",
+    "stickerMax": "El número de cromo no puede superar los 50 caracteres",
+    "collectionMax": "El nombre de la colección no puede superar los 100 caracteres",
+    "slotVariantMax": "La variante no puede superar los 10 caracteres",
+    "pricePositive": "El precio debe ser mayor a 0",
+    "priceMax": "El precio no puede superar 99999",
+    "termsRequired": "Debes aceptar los términos y condiciones",
+    "priceRequired": "El precio es obligatorio para las ventas"
   }
 }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import {
@@ -15,6 +15,7 @@ import { PackagePlus, Info } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 
 interface PublishSparesBulkModalProps {
   open: boolean;
@@ -31,6 +32,7 @@ export function PublishSparesBulkModal({
   spares,
   onPublish,
 }: PublishSparesBulkModalProps) {
+  const t = useTranslations('templates.publishSparesModal');
   const [isPublishing, setIsPublishing] = useState(false);
   const [customDescription, setCustomDescription] = useState('');
 
@@ -100,12 +102,13 @@ export function PublishSparesBulkModal({
             <div className="bg-gold/10 p-2 rounded-lg">
               <PackagePlus className="w-6 h-6 text-gold" />
             </div>
-            Publicar Pack de Repes
+            {t('title')}
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-400 pt-2">
-            Vas a publicar todos tus cromos repetidos de{' '}
-            <span className="text-gray-900 dark:text-white font-semibold">{collectionTitle}</span> en un
-            solo anuncio.
+            {t.rich('description', {
+              collection: collectionTitle,
+              strong: (chunks) => <span className="text-gray-900 dark:text-white font-semibold">{chunks}</span>
+            })}
           </DialogDescription>
         </DialogHeader>
 
@@ -114,11 +117,9 @@ export function PublishSparesBulkModal({
           <div className="bg-blue-900/20 border border-blue-900/50 rounded-lg p-4 flex gap-3">
             <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-blue-200">
-              <p className="font-semibold mb-1">¡Cómo funciona?</p>
+              <p className="font-semibold mb-1">{t('howItWorks')}</p>
               <p>
-                Se creará un anuncio tipo &quot;Pack&quot; con todos tus cromos repetidos. La
-                descripción se genera automáticamente con los detalles de cada cromo.
-                Puedes editarla si lo deseas.
+                {t('howItWorksDesc')}
               </p>
             </div>
           </div>
@@ -129,30 +130,28 @@ export function PublishSparesBulkModal({
               <span className="text-gold font-bold text-lg">
                 {spares.length}
               </span>{' '}
-              {spares.length === 1 ? 'cromo repetido' : 'cromos repetidos'}
+              {t('sparesCount', { count: spares.length })}
             </p>
             <p className="text-gray-600 dark:text-gray-400 text-xs mt-1">
-              Total de unidades:{' '}
-              {spares.reduce((sum, spare) => sum + spare.count, 0)}
+              {t('totalUnits', { total: spares.reduce((sum, spare) => sum + spare.count, 0) })}
             </p>
           </div>
 
           {/* Description Preview/Edit */}
           <div className="space-y-2">
             <Label htmlFor="description" className="text-gray-900 dark:text-white">
-              Descripción del Pack
+              {t('packDescription')}
             </Label>
             <Textarea
               id="description"
               value={customDescription || autoDescription}
               onChange={(e) => setCustomDescription(e.target.value)}
-              placeholder="Descripción generada automáticamente..."
+              placeholder={t('packDescriptionPlaceholder')}
               rows={12}
               className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono text-sm resize-none"
             />
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              Puedes editar la descripción antes de publicar. Se incluyen todos los
-              detalles de cada cromo.
+              {t('packDescriptionHelp')}
             </p>
           </div>
         </div>
@@ -164,14 +163,14 @@ export function PublishSparesBulkModal({
             disabled={isPublishing}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            Cancelar
+            {t('cancel')}
           </Button>
           <Button
             onClick={handlePublish}
             disabled={isPublishing || spares.length === 0}
             className="bg-gold text-black hover:bg-gold-light font-bold"
           >
-            {isPublishing ? 'Publicando...' : `Publicar Pack (${spares.length})`}
+            {isPublishing ? t('publishing') : t('publishBtn', { count: spares.length })}
           </Button>
         </DialogFooter>
       </DialogContent>

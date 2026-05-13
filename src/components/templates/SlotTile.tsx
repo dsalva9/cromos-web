@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 
@@ -6,6 +6,7 @@ import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag } from 'lucid
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from '@/components/ui/link';
+import { useTranslations } from 'next-intl';
 
 interface SlotProgress {
   slot_id: number;
@@ -42,6 +43,7 @@ interface SlotTileProps {
 }
 
 export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [], inMarketplace = false }: SlotTileProps) {
+  const t = useTranslations('templates.slotTile');
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
 
@@ -70,11 +72,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
   const getStatusLabel = () => {
     switch (slot.status) {
       case 'missing':
-        return 'Falta';
+        return t('missing');
       case 'owned':
-        return 'Tengo';
+        return t('owned');
       case 'duplicate':
-        return 'Repe';
+        return t('duplicate');
       default:
         return slot.status;
     }
@@ -106,9 +108,9 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
       setUpdating(true);
       await onUpdate(slot.slot_id, newStatus, newCount);
       setLocalCount(newCount);
-      toast.success('¡Actualizado!');
+      toast.success(t('updated'));
     } catch {
-      toast.error('Error al actualizar');
+      toast.error(t('updateError'));
     } finally {
       setUpdating(false);
     }
@@ -149,7 +151,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
       await onUpdate(slot.slot_id, newStatus, newCount);
       setLocalCount(newCount);
     } catch {
-      toast.error('Error al actualizar cantidad');
+      toast.error(t('countError'));
     } finally {
       setUpdating(false);
     }
@@ -181,11 +183,11 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           <div className="flex items-center justify-center gap-1 mb-1">
             <span className="text-xs font-mono text-gray-500 dark:text-gray-400">#{slot.slot_number}{slot.slot_variant || ''}</span>
             {slot.is_special && (
-              <span className="text-[10px] bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 px-1 rounded border border-purple-200 dark:border-purple-700 font-bold">SPECIAL</span>
+              <span className="text-[10px] bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 px-1 rounded border border-purple-200 dark:border-purple-700 font-bold">{t('special')}</span>
             )}
           </div>
           <p className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 min-h-[2rem] leading-tight">
-            {slot.label || `Cromo ${slot.slot_number || ''}`}
+            {slot.label || t('sticker', { number: slot.slot_number || '' })}
           </p>
 
           {/* Custom fields data */}
@@ -211,7 +213,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
             <Link href={`/marketplace?search=${encodeURIComponent(slot.label || `#${slot.slot_number}`)}`} className="block">
               <div className="w-full bg-gold/10 border border-gold/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-gold hover:bg-gold/20 transition-colors cursor-pointer font-bold">
                 <ShoppingBag className="w-3 h-3" />
-                <span>EN MARKETPLACE</span>
+                <span>{t('inMarketplace')}</span>
               </div>
             </Link>
           )}
@@ -266,7 +268,7 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                 <Link href={`/marketplace/${listing.id}`} className="block">
                   <div className="w-full bg-green-50 border border-green-200 rounded-lg py-1 px-2 flex items-center justify-center gap-1.5 text-[10px] text-green-700 hover:bg-green-100 transition-colors cursor-pointer font-bold">
                     <Upload className="w-3 h-3" />
-                    <span>VER ANUNCIO</span>
+                    <span>{t('viewListing')}</span>
                   </div>
                 </Link>
               ) : listingsLoading ? (
@@ -289,17 +291,17 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
                     }}
                   >
                     <Upload className="w-3 h-3" />
-                    <span>CREAR ANUNCIO</span>
+                    <span>{t('createListing')}</span>
                   </button>
                 </Link>
               ) : (
                 <button
                   disabled
-                  title="Necesitas al menos 2 cromos para crear un anuncio"
+                  title={t('createListingTitle')}
                   className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500 rounded-lg py-1 px-2 text-[10px] font-medium flex items-center justify-center gap-1.5 cursor-not-allowed"
                 >
                   <Upload className="w-3 h-3" />
-                  <span>CREAR ANUNCIO</span>
+                  <span>{t('createListing')}</span>
                 </button>
               )}
             </div>

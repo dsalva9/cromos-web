@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import { useTemplates } from '@/hooks/templates/useTemplates';
@@ -13,6 +13,7 @@ import { useSearchParams } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Template } from '@/lib/templates/server-templates';
 import { TemplateCardSkeleton } from '@/components/skeletons/TemplateCardSkeleton';
+import { useTranslations } from 'next-intl';
 
 interface TemplatesContentProps {
     initialTemplates: Template[];
@@ -26,6 +27,7 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
     const initialSearch = searchParams.get('search') || '';
     const [searchQuery, setSearchQuery] = useState(initialSearch);
     const [sortBy, setSortBy] = useState<SortOption>('recent');
+    const t = useTranslations('templates');
 
     // Pass server data as initialData - hook will skip initial fetch if filters are at defaults
     const {
@@ -58,10 +60,10 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 dark:text-white mb-2">
-                        Colecciones Comunitarias
+                        {t('index.title')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                        Descubre y copia colecciones creadas por la comunidad
+                        {t('index.subtitle')}
                     </p>
                 </div>
 
@@ -70,13 +72,13 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
                         <Link href="/templates/my-templates" className="w-full sm:w-auto">
                             <Button variant="outline" className="border-gold text-gold hover:bg-gold hover:text-black font-medium w-full">
                                 <FolderOpen className="mr-2 h-4 w-4" />
-                                Mis Colecciones Creadas
+                                {t('index.buttons.myCollections')}
                             </Button>
                         </Link>
                         <Link href="/templates/create" className="hidden md:block w-full sm:w-auto">
                             <Button className="bg-gold text-black hover:bg-gold-light font-medium w-full">
                                 <Plus className="mr-2 h-4 w-4" />
-                                Crear Colección
+                                {t('index.buttons.create')}
                             </Button>
                         </Link>
                     </div>
@@ -93,14 +95,14 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             <ContextualTip
                 tipId="tip-templates"
                 icon={Lightbulb}
-                title="¿Qué son las colecciones?"
-                description="Las colecciones son plantillas creadas por la comunidad. Copia una para crear tu propio álbum y llevar el control de los cromos que tienes, los que te faltan y los repetidos."
+                title={t('index.tip.title')}
+                description={t('index.tip.description')}
                 className="mt-6"
             />
 
             {error && (
                 <div className="text-red-500 text-center py-8">
-                    Error al cargar colecciones: {error}
+                    {t('index.errors.loadFailed', { error })}
                 </div>
             )}
 
@@ -139,22 +141,21 @@ export function TemplatesContent({ initialTemplates }: TemplatesContentProps) {
             {hasMore && !loading && (
                 <div className="flex justify-center mt-8">
                     <Button onClick={loadMore} variant="outline">
-                        Cargar más
+                        {t('index.buttons.loadMore')}
                     </Button>
                 </div>
             )}
 
-            {/* Empty State */}
             {!loading && fetchedTemplates.length === 0 && (
                 <EmptyState
                     icon={FolderOpen}
-                    title="No se encontraron colecciones"
+                    title={t('index.empty.searchTitle')}
                     description={
                         searchQuery
-                            ? 'No hay colecciones que coincidan con tu búsqueda. Intenta con otros términos o crea una nueva colección.'
-                            : 'Todavía no hay colecciones comunitarias. ¡Sé el primero en crear una!'
+                            ? t('index.empty.searchDescription')
+                            : t('index.empty.quietDescription')
                     }
-                    actionLabel={user ? 'Crear la primera colección' : undefined}
+                    actionLabel={user ? t('index.empty.action') : undefined}
                     actionHref={user ? '/templates/create' : undefined}
                 />
             )}

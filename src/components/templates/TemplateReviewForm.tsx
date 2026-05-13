@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Eye, EyeOff, FileText } from 'lucide-react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface TemplateSlotData {
   data: Record<string, string | number | boolean>;
@@ -53,6 +54,7 @@ export function TemplateReviewForm({
   data,
   onChange,
 }: TemplateReviewFormProps) {
+  const t = useTranslations('templates.reviewForm');
   const [isEditing, setIsEditing] = useState({
     title: false,
     description: false,
@@ -75,7 +77,7 @@ export function TemplateReviewForm({
       <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white flex items-center justify-between">
-            Información Básica
+            {t('basicInfo')}
             <Button
               variant="ghost"
               size="sm"
@@ -89,7 +91,7 @@ export function TemplateReviewForm({
         <CardContent className="space-y-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label className="text-gray-900 dark:text-white">Título</Label>
+            <Label className="text-gray-900 dark:text-white">{t('title')}</Label>
             {isEditing.title ? (
               <Input
                 value={data.title}
@@ -97,13 +99,13 @@ export function TemplateReviewForm({
                 className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
               />
             ) : (
-              <p className="text-gray-900 dark:text-white">{data.title || 'Sin título'}</p>
+              <p className="text-gray-900 dark:text-white">{data.title || t('noTitle')}</p>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label className="text-gray-900 dark:text-white">Descripción</Label>
+            <Label className="text-gray-900 dark:text-white">{t('description')}</Label>
             {isEditing.description ? (
               <Textarea
                 value={data.description}
@@ -113,7 +115,7 @@ export function TemplateReviewForm({
               />
             ) : (
               <p className="text-gray-900 dark:text-white">
-                {data.description || 'Sin descripción'}
+                {data.description || t('noDescription')}
               </p>
             )}
           </div>
@@ -121,7 +123,7 @@ export function TemplateReviewForm({
           {/* Image */}
           {data.image_url && (
             <div className="space-y-2">
-              <Label className="text-gray-900 dark:text-white">Imagen</Label>
+              <Label className="text-gray-900 dark:text-white">{t('image')}</Label>
               <div className="relative min-h-[250px] max-h-[500px] w-full bg-gray-50 dark:bg-gray-900 rounded-md overflow-hidden flex items-center justify-center">
                 <Image
                   src={data.image_url}
@@ -137,11 +139,11 @@ export function TemplateReviewForm({
           {/* Public/Private */}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label className="text-gray-900 dark:text-white">Visibilidad</Label>
+              <Label className="text-gray-900 dark:text-white">{t('visibility')}</Label>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {data.is_public
-                  ? 'Pública - Otros usuarios pueden verla'
-                  : 'Privada - Solo tú puedes verla'}
+                  ? t('publicStatus')
+                  : t('privateStatus')}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -165,7 +167,7 @@ export function TemplateReviewForm({
       <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
           <CardTitle className="text-gray-900 dark:text-white">
-            Resumen de Páginas y Cromos
+            {t('summary')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -175,13 +177,13 @@ export function TemplateReviewForm({
               <div className="text-2xl font-bold text-gold">
                 {data.pages.length}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Páginas</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{t('pagesLabel')}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-gold">
                 {totalSlots}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Cromos Totales</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{t('totalStickers')}</div>
             </div>
           </div>
 
@@ -195,15 +197,15 @@ export function TemplateReviewForm({
                     <Badge
                       variant={page.type === 'team' ? 'default' : 'secondary'}
                     >
-                      {page.type === 'team' ? 'Normal' : 'Especial'}
+                      {page.type === 'team' ? t('normal') : t('special')}
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <FileText className="h-4 w-4" />
-                    <span>{page.slots.length} cromos</span>
+                    <span>{t('stickersCount', { count: page.slots.length })}</span>
                   </div>
                   <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    {page.slots.length} cromo(s) configurado(s) con campos personalizados
+                    {t('customFieldsCount', { count: page.slots.length })}
                   </div>
                 </CardContent>
               </Card>
@@ -216,7 +218,7 @@ export function TemplateReviewForm({
       {data.is_public && (
         <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Términos de Uso</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-white">{t('termsOfUse')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-start space-x-3">
@@ -233,13 +235,15 @@ export function TemplateReviewForm({
                   htmlFor="template-terms"
                   className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                 >
-                  Al crear esta plantilla pública <strong>asumo la responsabilidad</strong> de su contenido y confirmo que es apto para la comunidad.{' '}
+                  {t.rich('termsCheckbox', {
+                    strong: (chunks) => <strong>{chunks}</strong>
+                  })}{' '}
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
                     className="text-gold hover:text-gold-light underline"
                   >
-                    Ver condiciones
+                    {t('viewConditions')}
                   </button>
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
@@ -252,22 +256,20 @@ export function TemplateReviewForm({
       {/* Final Confirmation */}
       <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle className="text-gray-900 dark:text-white">Confirmación Final</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-white">{t('finalConfirmation')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <p className="text-gray-900 dark:text-white">
-              Estás a punto de crear una plantilla con:
+              {t('aboutToCreate')}
             </p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
-              <li>{data.pages.length} página(s)</li>
-              <li>{totalSlots} cromo(s) en total</li>
-              <li>Visibilidad: {data.is_public ? 'Pública' : 'Privada'}</li>
+              <li>{t('pagesCount', { count: data.pages.length })}</li>
+              <li>{t('stickersTotal', { count: totalSlots })}</li>
+              <li>{data.is_public ? t('visibilityPublic') : t('visibilityPrivate')}</li>
             </ul>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
-              Una vez creada, la plantilla estará disponible para que tú y otros
-              usuarios (si es pública) puedan usarla como base para sus
-              colecciones.
+              {t('availabilityDesc')}
             </p>
           </div>
         </CardContent>
@@ -278,19 +280,19 @@ export function TemplateReviewForm({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-              Términos de Uso - Plantillas Públicas
+              {t('termsDialogTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-gray-600 dark:text-gray-400">
             <p>
-              Si decides compartir una plantilla o listado público, recuerda que esta información quedará visible para otros usuarios. Solo subas contenido original o sobre el que tengas derechos de uso. Al publicarlo, autorizas a Cambiocromos.com a mostrarlo dentro de la plataforma con fines informativos o de comunidad, sin adquirir derechos de propiedad sobre él. Podrás eliminar tu plantilla cuando quieras. Al continuar, aceptas las Condiciones de uso y garantizas que el contenido que compartes cumple la ley y los derechos de terceros.
+              {t('termsDialogText')}
             </p>
             <div className="pt-4">
               <Button
                 onClick={() => setTermsDialogOpen(false)}
                 className="w-full bg-gold text-black hover:bg-gold-light"
               >
-                Cerrar
+                {t('close')}
               </Button>
             </div>
           </div>

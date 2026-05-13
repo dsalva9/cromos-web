@@ -10,9 +10,11 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  editListingSchema,
+  getEditListingSchema,
   type EditListingFormData,
 } from '@/lib/validations/marketplace.schemas';
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 
 interface EditListingFormInitialData {
   title: string;
@@ -36,6 +38,9 @@ interface ListingFormProps {
 }
 
 export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '€' }: ListingFormProps) {
+  const t = useTranslations('validations');
+  const schema = useMemo(() => getEditListingSchema(t as any), [t]);
+
   const {
     register,
     handleSubmit,
@@ -43,7 +48,7 @@ export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<EditListingFormData>({
-    resolver: zodResolver(editListingSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       title: initialData.title || '',
       description: initialData.description || '',

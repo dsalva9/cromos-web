@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TemplateBasicInfoForm } from './TemplateBasicInfoForm';
@@ -7,11 +7,12 @@ import { TemplatePagesForm } from './TemplatePagesForm';
 import { TemplateReviewForm } from './TemplateReviewForm';
 import { ChevronLeft, ChevronRight, Check, CheckCircle } from 'lucide-react';
 import {
-  templateBasicInfoSchema,
-  templatePageSchema,
+  getTemplateBasicInfoSchema,
+  getTemplatePageSchema,
   type TemplateBasicInfoData,
 } from '@/lib/validations/template.schemas';
 import { ItemFieldDefinition } from '@/types/v1.6.0';
+import { useTranslations } from 'next-intl';
 
 interface TemplateData {
   title: string;
@@ -40,8 +41,12 @@ export function TemplateCreationWizard({
   onSubmit,
   isSubmitting,
   initialData,
-  title = 'Crear Colección',
+  title,
 }: TemplateCreationWizardProps) {
+  const t = useTranslations('templates.wizard');
+  const tValidations = useTranslations('validations');
+  
+  const defaultTitle = title || t('title');
   const [currentStep, setCurrentStep] = useState(0);
   const [attempted, setAttempted] = useState<{ basic: boolean; schema: boolean; pages: boolean }>({
     basic: false,
@@ -61,10 +66,10 @@ export function TemplateCreationWizard({
   );
 
   const steps = [
-    { title: 'Información Básica', description: 'Título y descripción' },
-    { title: 'Información de Cromo', description: 'Define los campos' },
-    { title: 'Páginas y Cromos', description: 'Añade páginas y cromos' },
-    { title: 'Revisión', description: 'Revisa y publica' },
+    { title: t('steps.basic.title'), description: t('steps.basic.desc') },
+    { title: t('steps.schema.title'), description: t('steps.schema.desc') },
+    { title: t('steps.pages.title'), description: t('steps.pages.desc') },
+    { title: t('steps.review.title'), description: t('steps.review.desc') },
   ];
 
   const updateTemplateData = (stepData: Partial<TemplateData>) => {
@@ -92,8 +97,11 @@ export function TemplateCreationWizard({
     await onSubmit(templateData);
   };
 
+  const basicInfoSchema = useMemo(() => getTemplateBasicInfoSchema(tValidations as any), [tValidations]);
+  const pageSchema = useMemo(() => getTemplatePageSchema(tValidations as any), [tValidations]);
+
   const basicInfoErrors = useMemo(() => {
-    const result = templateBasicInfoSchema.safeParse({
+    const result = basicInfoSchema.safeParse({
       title: templateData.title,
       description: templateData.description,
       image_url: templateData.image_url,
@@ -106,13 +114,13 @@ export function TemplateCreationWizard({
       if (path) errors[path] = issue.message;
     }
     return errors;
-  }, [templateData.title, templateData.description, templateData.image_url, templateData.is_public]);
+  }, [templateData.title, templateData.description, templateData.image_url, templateData.is_public, basicInfoSchema]);
 
   const pagesStepValid = useMemo(() => {
     if (!templateData.pages || templateData.pages.length === 0) return false;
 
     // Check basic page structure
-    if (!templateData.pages.every(page => templatePageSchema.safeParse(page).success)) {
+    if (!templateData.pages.every(page => pageSchema.safeParse(page).success)) {
       return false;
     }
 
@@ -233,9 +241,9 @@ export function TemplateCreationWizard({
       <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>{title} - {steps[currentStep].title}</span>
+            <span>{defaultTitle} - {steps[currentStep].title}</span>
             <span className="text-sm font-normal text-gray-600 dark:text-gray-400">
-              Paso {currentStep + 1} de {steps.length}
+              {t('stepProgress', { current: currentStep + 1, total: steps.length })}
             </span>
           </CardTitle>
         </CardHeader>
@@ -243,7 +251,7 @@ export function TemplateCreationWizard({
           {/* Validation summary */}
           {currentStep === 0 && attempted.basic && Object.keys(basicInfoErrors).length > 0 && (
             <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
-              <p className="font-semibold mb-1">Por favor corrige los siguientes errores:</p>
+              <p className="font-semibold mb-1">{t('errors.basicTitle')}</p>
               <ul className="list-disc pl-5">
                 {Object.entries(basicInfoErrors).map(([field, msg]) => (
                   <li key={field}>{msg}</li>
@@ -253,14 +261,14 @@ export function TemplateCreationWizard({
           )}
           {currentStep === 2 && attempted.pages && !pagesStepValid && (
             <div className="mb-4 rounded border border-red-500 bg-red-900/30 p-3 text-sm text-red-200" role="alert">
-              <p className="font-semibold">Revisa las páginas:</p>
-              <p>• Cada página necesita título válido y al menos un cromo con etiqueta.</p>
-              <p>• Un máximo de 50 cromos por página.</p>
+              <p className="font-semibold">{t('errors.pagesTitle')}</p>
+              <p>{t('errors.pagesRule1')}</p>
+              <p>{t('errors.pagesRule2')}</p>
             </div>
           )}
           {currentStep === 3 && templateData.is_public && !templateData.terms_accepted && (
             <div className="mb-4 rounded border border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-800 dark:text-red-200" role="alert">
-              <p className="font-semibold">Debes aceptar la responsabilidad sobre el contenido para publicar una plantilla pública.</p>
+              <p className="font-semibold">{t('errors.termsRequired')}</p>
             </div>
           )}
           {currentStep === 0 && (
@@ -300,7 +308,7 @@ export function TemplateCreationWizard({
               className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
-              Anterior
+              {t('buttons.previous')}
             </Button>
 
             {currentStep < steps.length - 1 ? (
@@ -309,7 +317,7 @@ export function TemplateCreationWizard({
                 disabled={!canGoNext()}
                 className="bg-gold text-black hover:bg-gold-light"
               >
-                Siguiente
+                {t('buttons.next')}
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
@@ -318,7 +326,7 @@ export function TemplateCreationWizard({
                 disabled={isSubmitting || !canGoNext()}
                 className="bg-gold text-black hover:bg-gold-light"
               >
-                {isSubmitting ? 'Creando...' : 'Crear Colección'}
+                {isSubmitting ? t('buttons.creating') : t('buttons.submit')}
                 <Check className="ml-2 h-4 w-4" />
               </Button>
             )}

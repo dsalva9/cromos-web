@@ -219,5 +219,341 @@
       "buyer": "Buyer:",
       "seller": "Seller:"
     }
+  },
+  "templates": {
+    "metadata": {
+      "title": "Community Collections | Cambio Cromos",
+      "description": "Discover and copy collections created by the community."
+    },
+    "index": {
+      "title": "Community Collections",
+      "subtitle": "Discover and copy collections created by the community",
+      "buttons": {
+        "myCollections": "My Created Collections",
+        "create": "Create Collection",
+        "loadMore": "Load More"
+      },
+      "tip": {
+        "title": "What are collections?",
+        "description": "Collections are templates created by the community. Copy one to create your own album and keep track of the stickers you have, need, and your duplicates."
+      },
+      "errors": {
+        "loadFailed": "Error loading collections: {error}"
+      },
+      "empty": {
+        "searchTitle": "No collections found",
+        "searchDescription": "There are no collections matching your search. Try other terms or create a new collection.",
+        "quietDescription": "There are no community collections yet. Be the first to create one!",
+        "action": "Create the first collection"
+      }
+    },
+    "card": {
+      "featured": "Featured",
+      "deleted": "Deleted",
+      "public": "Public",
+      "private": "Private",
+      "pages": "pages",
+      "stickers": "stickers",
+      "by": "by",
+      "edit": "Edit Collection",
+      "editBasicInfo": "Edit Basic Info",
+      "editPages": "Edit Pages and Stickers",
+      "editCustomFields": "Edit Custom Fields",
+      "editDesign": "Edit Design Options",
+      "progressGrid": {
+        "pageFallback": "Page {pageNum}",
+        "stickersOf": "Stickers from {pageTitle}",
+        "completePageBtn": "Complete Page",
+        "completePageTitle": "Complete entire page",
+        "completePageDesc": "Do you want to mark all missing stickers on this page as owned?",
+        "thisAction": "This action:",
+        "markAsOwned": "Will mark all your missing stickers as <ownedTag>\"Owned\"</ownedTag>.",
+        "wontModify": "Will not modify stickers you already own or have duplicates of.",
+        "cancel": "Cancel",
+        "confirm": "Confirm Completion",
+        "completing": "Completing..."
+      },
+      "ratingDialog": {
+        "selectRatingError": "Please select a rating",
+        "commentLengthError": "Comment cannot exceed 280 characters",
+        "updateSuccess": "Rating updated successfully",
+        "createSuccess": "Rating created successfully",
+        "saveError": "Error saving rating",
+        "deleteSuccess": "Rating deleted successfully",
+        "deleteError": "Error deleting rating",
+        "confirmDeleteTitle": "Confirm deletion",
+        "confirmDeleteDesc": "Are you sure you want to delete your rating? This action cannot be undone.",
+        "cancel": "Cancel",
+        "deleting": "Deleting...",
+        "deleteBtn": "Delete",
+        "updateTitle": "Update rating",
+        "rateTitle": "Rate template",
+        "yourRating": "Your rating",
+        "rating1": "Very bad",
+        "rating2": "Bad",
+        "rating3": "Acceptable",
+        "rating4": "Good",
+        "rating5": "Excellent",
+        "commentLabel": "Comment (optional)",
+        "commentPlaceholder": "Share your opinion about this template...",
+        "charsLeft": "{current}/280 characters",
+        "saving": "Saving...",
+        "updateBtn": "Update",
+        "sendBtn": "Submit rating"
+      },
+      "ratingSummary": {
+        "ratingCount": "{count, plural, =0 {0 ratings} =1 {1 rating} other {# ratings}}",
+        "authorWarning": "You cannot rate your own templates",
+        "updateRating": "Update rating",
+        "rateTemplate": "Rate template"
+      },
+      "reviewForm": {
+        "basicInfo": "Basic Information",
+        "title": "Title",
+        "noTitle": "No title",
+        "description": "Description",
+        "noDescription": "No description",
+        "image": "Image",
+        "visibility": "Visibility",
+        "publicStatus": "Public - Other users can see it",
+        "privateStatus": "Private - Only you can see it",
+        "summary": "Pages and Stickers Summary",
+        "pagesLabel": "Pages",
+        "totalStickers": "Total Stickers",
+        "normal": "Normal",
+        "special": "Special",
+        "stickersCount": "{count, plural, =0 {0 stickers} =1 {1 sticker} other {# stickers}}",
+        "customFieldsCount": "{count, plural, =0 {0 stickers configured with custom fields} =1 {1 sticker configured with custom fields} other {# stickers configured with custom fields}}",
+        "termsOfUse": "Terms of Use",
+        "termsCheckbox": "By creating this public template I <strong>assume responsibility</strong> for its content and confirm it is suitable for the community.",
+        "viewConditions": "View conditions",
+        "finalConfirmation": "Final Confirmation",
+        "aboutToCreate": "You are about to create a template with:",
+        "pagesCount": "{count, plural, =0 {0 pages} =1 {1 page} other {# pages}}",
+        "stickersTotal": "{count, plural, =0 {0 stickers in total} =1 {1 sticker in total} other {# stickers in total}}",
+        "visibilityPublic": "Visibility: Public",
+        "visibilityPrivate": "Visibility: Private",
+        "availabilityDesc": "Once created, the template will be available for you and other users (if public) to use as a base for their collections.",
+        "termsDialogTitle": "Terms of Use - Public Templates",
+        "termsDialogText": "If you decide to share a public template or list, remember that this information will be visible to other users. Only upload original content or content you have rights to use. By publishing it, you authorize Cambiocromos.com to display it within the platform for informational or community purposes, without acquiring ownership rights over it. You can delete your template whenever you want. By continuing, you accept the Terms of Use and guarantee that the content you share complies with the law and third-party rights.",
+        "close": "Close"
+      },
+      "reviewList": {
+        "noRatings": "This template has no ratings yet",
+        "loading": "Loading...",
+        "loadMore": "Load more ratings"
+      },
+      "copied": "Copied!",
+      "copying": "Copying...",
+      "copy": "Copy Collection",
+      "success": "Collection copied successfully!",
+      "error": "Error copying collection"
+    },
+    "myTemplates": {
+      "title": "My Albums",
+      "subtitle": "Manage your progress, complete your albums and organize your stickers.",
+      "explore": "Explore Collections",
+      "emptyTitle": "You have no active collections",
+      "emptyDesc": "Start by exploring the available templates or create your own collection from scratch.",
+      "progress": "Progress",
+      "stickersCount": "{completed} / {total} stickers",
+      "stats": {
+        "have": "Have",
+        "need": "Need"
+      },
+      "marketplace": {
+        "missing": "{count, plural, =1 {# missing in Marketplace} other {# missing in Marketplace}}"
+      },
+      "manage": "Manage Collection"
+    },
+    "myCreated": {
+      "back": "Back to Collections",
+      "title": "My Created Collections",
+      "subtitle": "Collections you have created, public and private",
+      "create": "Create Collection",
+      "emptyTitle": "You haven't created any collections",
+      "emptyDesc": "Create your first collection to share with the community or use privately.",
+      "action": "Create my first collection"
+    },
+    "wizard": {
+      "title": "Create Collection",
+      "steps": {
+        "basic": { "title": "Basic Info", "desc": "Title and description" },
+        "schema": { "title": "Sticker Info", "desc": "Define fields" },
+        "pages": { "title": "Pages & Stickers", "desc": "Add pages and stickers" },
+        "review": { "title": "Review", "desc": "Review and publish" }
+      },
+      "stepProgress": "Step {current} of {total}",
+      "errors": {
+        "basicTitle": "Please correct the following errors:",
+        "pagesTitle": "Check your pages:",
+        "pagesRule1": "• Each page needs a valid title and at least one labeled sticker.",
+        "pagesRule2": "• A maximum of 50 stickers per page.",
+        "termsRequired": "You must accept responsibility for the content to publish a public template."
+      },
+      "basicForm": {
+        "titleLabel": "Collection Title *",
+        "titlePlaceholder": "Ex: Euro 2024 Sticker Album",
+        "descLabel": "Description",
+        "descPlaceholder": "Describe your collection...",
+        "imageLabel": "Collection Image",
+        "imageRemove": "Remove",
+        "imageAdd": "Add Image",
+        "imageHelp": "Upload a photo of your collection",
+        "imageChoose": "Choose",
+        "imageCamera": "Camera",
+        "imageFormat": "JPG, PNG or WebP (max 5MB)",
+        "privateLabel": "Make private",
+        "privateHelp": "If you activate this option, other users won't be able to see or copy this collection",
+        "imageError": "Error processing image"
+      },
+      "pagesForm": {
+        "addNewPage": "Add New Page",
+        "pageTitle": "Page Title *",
+        "pageTitlePlaceholder": "Ex: First Kit",
+        "pageType": "Page Type",
+        "typeTeam": "Normal",
+        "typeSpecial": "Special",
+        "addPageBtn": "Add Page",
+        "stickersCount": "{count} stickers",
+        "pageStickers": "Page Stickers",
+        "addStickerBtn": "Add Sticker",
+        "stickerNumber": "Sticker #{number}",
+        "noFieldsDefined": "Define custom fields in the previous step to add data to the stickers.",
+        "noPages": "No pages added yet. Add your first page to begin."
+      },
+      "buttons": {
+        "previous": "Previous",
+        "next": "Next",
+        "creating": "Creating...",
+        "submit": "Create Collection"
+      }
+    },
+    "itemSchemaBuilder": {
+      "title": "Sticker Fields",
+      "description": "Define what information each sticker in your collection will have",
+      "addFieldBtn": "Add Field",
+      "name": "Name",
+      "type": "Type",
+      "required": "Required",
+      "typeText": "Text",
+      "typeNumber": "Number",
+      "typeCheckbox": "Checkbox",
+      "typeSelect": "Select",
+      "yes": "Yes",
+      "no": "No",
+      "newField": "New Field",
+      "fieldName": "Field Name *",
+      "fieldNamePlaceholder": "e.g. Number, Rarity, Team...",
+      "fieldType": "Field Type",
+      "options": "Options (comma separated)",
+      "optionsPlaceholder": "e.g. Common, Rare, Epic, Legendary",
+      "isRequired": "Required field",
+      "cancel": "Cancel",
+      "saveField": "Save Field",
+      "emptyTitle": "No fields defined. Add fields to customize your template.",
+      "emptyDesc": "Example: Sticker Number, Player Name, Team, Rarity, etc.",
+      "deleteWarningTitle": "Delete field with data?",
+      "deleteWarningDesc": "The field \"{name}\" has data in 'Pages and Stickers'. If you delete this field, all related data will be lost.",
+      "deleteWarningNotice": "⚠️ Warning: This action cannot be undone. Data for this field will be permanently deleted from all stickers.",
+      "deleteConfirm": "Delete anyway"
+    },
+    "dynamicFieldsEditor": {
+      "yes": "Yes",
+      "no": "No",
+      "enter": "Enter {name}",
+      "select": "Select {name}"
+    },
+    "publishSparesModal": {
+      "title": "Publish Spares Pack",
+      "description": "You are going to publish all your spare stickers from {collection} in a single listing.",
+      "howItWorks": "How it works?",
+      "howItWorksDesc": "A \"Pack\" listing will be created with all your spare stickers. The description is automatically generated with details of each sticker. You can edit it if you want.",
+      "sparesCount": "{count, plural, =1 {spare sticker} other {spare stickers}}",
+      "totalUnits": "Total units: {total}",
+      "packDescription": "Pack Description",
+      "packDescriptionPlaceholder": "Automatically generated description...",
+      "packDescriptionHelp": "You can edit the description before publishing. It includes all details for each sticker.",
+      "cancel": "Cancel",
+      "publishing": "Publishing...",
+      "publishBtn": "Publish Pack ({count})"
+    },
+    "quickEntryModal": {
+      "title": "Quick Entry",
+      "checklistNumber": "Checklist Number",
+      "placeholder": "Ex: 45, 123, 773...",
+      "markBtn": "Mark",
+      "activeMode": "Quick entry mode active",
+      "recentUpdates": "Recent updates",
+      "notFound": "❌ No. {number} not found",
+      "error": "❌ Error: {error}",
+      "success": "✓ No. {number} - {label} ({page})",
+      "owned": "Owned",
+      "duplicate": "Spare ({count})",
+      "missing": "Missing",
+      "reference": "Number Reference",
+      "andMore": "...and {count} more",
+      "close": "Close Esc"
+    },
+    "slotTile": {
+      "owned": "Owned",
+      "duplicate": "Spare",
+      "missing": "Missing",
+      "special": "SPECIAL",
+      "sticker": "Sticker {number}",
+      "inMarketplace": "IN MARKETPLACE",
+      "viewListing": "VIEW LISTING",
+      "createListing": "CREATE LISTING",
+      "createListingTitle": "You need at least 2 stickers to create a listing",
+      "updated": "Updated!",
+      "updateError": "Error updating",
+      "countError": "Error updating count"
+    },
+    "filters": {
+      "searchPlaceholder": "Search templates by title or description...",
+      "sortBy": "Sort by:",
+      "sortOptions": {
+        "recent": "Most Recent",
+        "rating": "Highest Rated",
+        "popular": "Most Popular"
+      }
+    },
+    "summaryHeader": {
+      "by": "by",
+      "generalProgress": "General Progress",
+      "cardsCollected": "{owned} of {total} stickers collected",
+      "stats": {
+        "owned": "Owned",
+        "duplicates": "Spares",
+        "missing": "Missing",
+        "onSale": "On Sale"
+      }
+    }
+  },
+  "validations": {
+    "pageTitleRequired": "Page title is required",
+    "pageTitleMax": "Title cannot exceed 100 characters",
+    "pageTypeInvalid": "Page type must be 'team' or 'special'",
+    "slotsMin": "Page must have at least 1 sticker",
+    "slotsMax": "Page cannot have more than 50 stickers",
+    "titleMin": "Title must be at least 3 characters",
+    "titleMax": "Title cannot exceed 100 characters",
+    "descriptionMax": "Description cannot exceed 1000 characters",
+    "imageRequired": "Image is required",
+    "imageInvalid": "Invalid image URL",
+    "pagesMin": "There must be at least 1 page",
+    "pagesMax": "Cannot exceed 20 pages",
+    "slotInvalid": "Invalid sticker ID",
+    "invalidStatus": "Invalid status",
+    "countInt": "Count must be an integer",
+    "countMin": "Count cannot be negative",
+    "countMax": "Count cannot exceed 999",
+    "stickerMax": "Sticker number cannot exceed 50 characters",
+    "collectionMax": "Collection name cannot exceed 100 characters",
+    "slotVariantMax": "Variant cannot exceed 10 characters",
+    "pricePositive": "Price must be greater than 0",
+    "priceMax": "Price cannot exceed 99999",
+    "termsRequired": "You must accept the terms and conditions",
+    "priceRequired": "Price is required for sales"
   }
 }

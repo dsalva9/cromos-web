@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { SlotTile } from '@/components/templates/SlotTile';
@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useSlotListings } from '@/hooks/templates/useSlotListings';
 import { CheckCircle2, LayoutGrid } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 
 interface SlotProgress {
   slot_id: number;
@@ -49,6 +50,7 @@ export function TemplateProgressGrid({
   customFields = [],
   marketplaceSlotIds,
 }: TemplateProgressGridProps) {
+  const t = useTranslations('templates.progressGrid');
   const [selectedPage, setSelectedPage] = useState<number>(1);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [isCompletingPage, setIsCompletingPage] = useState(false);
@@ -81,7 +83,7 @@ export function TemplateProgressGrid({
     const titles: Record<number, string> = {};
     Object.entries(groups).forEach(([pageNum, slots]) => {
       if (slots.length > 0) {
-        titles[parseInt(pageNum)] = slots[0].page_title || `Página ${pageNum}`;
+        titles[parseInt(pageNum)] = slots[0].page_title || t('pageFallback', { pageNum });
       }
     });
 
@@ -97,7 +99,7 @@ export function TemplateProgressGrid({
     });
 
     return { pageGroups: groups, pageTitles: titles };
-  }, [progress]);
+  }, [progress, t]);
 
   const pageNumbers = Object.keys(pageGroups)
     .map(Number)
@@ -179,7 +181,7 @@ export function TemplateProgressGrid({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
           <LayoutGrid className="w-5 h-5" />
-          <span className="font-medium">Cromos de {pageTitles[selectedPage] || `Página ${selectedPage}`}</span>
+          <span className="font-medium">{t('stickersOf', { pageTitle: pageTitles[selectedPage] || t('pageFallback', { pageNum: selectedPage }) })}</span>
         </div>
 
         <Button
@@ -193,7 +195,7 @@ export function TemplateProgressGrid({
           "
         >
           <CheckCircle2 className="mr-2 h-4 w-4" />
-          Completar Página
+          {t('completePageBtn')}
         </Button>
       </div>
 
@@ -219,18 +221,18 @@ export function TemplateProgressGrid({
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <CheckCircle2 className="text-gold" />
-              Completar toda la página
+              {t('completePageTitle')}
             </DialogTitle>
             <DialogDescription className="text-gray-500 dark:text-gray-400 pt-2">
-              ¡Quieres marcar todos los cromos faltantes de esta página como conseguidos?
+              {t('completePageDesc')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-100 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-            <p>Esta acción:</p>
+            <p>{t('thisAction')}</p>
             <ul className="list-disc list-inside mt-2 space-y-1 text-gray-600 dark:text-gray-400">
-              <li>Marcará como <strong>&quot;Tengo&quot;</strong> todos los cromos que te faltan.</li>
-              <li>No modificará los cromos que ya tienes o tienes repetidos.</li>
+              <li>{t.rich('markAsOwned', { ownedTag: (chunks) => <strong>{chunks}</strong> })}</li>
+              <li>{t('wontModify')}</li>
             </ul>
           </div>
 
@@ -241,14 +243,14 @@ export function TemplateProgressGrid({
               disabled={isCompletingPage}
               className="border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
             >
-              Cancelar
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleCompleteAllPage}
               disabled={isCompletingPage}
               className="bg-gold text-black hover:bg-gold-light font-bold"
             >
-              {isCompletingPage ? 'Completando...' : 'Confirmar Completado'}
+              {isCompletingPage ? t('completing') : t('confirm')}
             </Button>
           </DialogFooter>
         </DialogContent>

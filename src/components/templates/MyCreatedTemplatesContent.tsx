@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from '@/components/ui/link';
 import { TemplateCard } from '@/components/templates/TemplateCard';
@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Plus, FolderOpen, ArrowLeft } from 'lucide-react';
 import { CreatedTemplate } from '@/lib/templates/server-my-created-templates';
+import { useTranslations } from 'next-intl';
 
 interface MyCreatedTemplatesContentProps {
     templates: CreatedTemplate[];
@@ -13,6 +14,7 @@ interface MyCreatedTemplatesContentProps {
 }
 
 export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesContentProps) {
+    const t = useTranslations('templates');
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             <div className="container mx-auto px-4 py-8">
@@ -22,23 +24,23 @@ export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesConte
                     className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
                 >
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Volver a Colecciones
+                    {t('myCreated.back')}
                 </Link>
 
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl lg:text-4xl font-bold uppercase text-gray-900 dark:text-white mb-2">
-                            Mis Colecciones Creadas
+                            {t('myCreated.title')}
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400">
-                            Colecciones que has creado, públicas y privadas
+                            {t('myCreated.subtitle')}
                         </p>
                     </div>
 
                     <Link href="/templates/create">
                         <Button className="bg-gold text-black hover:bg-gold-light font-medium">
                             <Plus className="mr-2 h-4 w-4" />
-                            Crear Colección
+                            {t('myCreated.create')}
                         </Button>
                     </Link>
                 </div>
@@ -63,9 +65,9 @@ export function MyCreatedTemplatesContent({ templates }: MyCreatedTemplatesConte
                 ) : (
                     <EmptyState
                         icon={FolderOpen}
-                        title="No has creado ninguna colección"
-                        description="Crea tu primera colección para compartirla con la comunidad o usarla de forma privada."
-                        actionLabel="Crear mi primera colección"
+                        title={t('myCreated.emptyTitle')}
+                        description={t('myCreated.emptyDesc')}
+                        actionLabel={t('myCreated.action')}
                         actionHref="/templates/create"
                     />
                 )}
