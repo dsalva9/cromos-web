@@ -13,6 +13,7 @@ import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useLocale } from 'next-intl';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,19 +21,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const supabase = useSupabaseClient();
+  const locale = useLocale();
 
   // Redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Hard redirect — avoids App Router startTransition that gets stuck
-        window.location.href = '/marketplace';
+        window.location.href = `/${locale}/marketplace`;
       }
     };
-
     checkAuth();
-  }, [supabase]);
+  }, [supabase, locale]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +52,7 @@ export default function LoginPage() {
         const userId = data?.user?.id;
 
         if (!userId) {
-          window.location.href = '/marketplace';
+          window.location.href = `/${locale}/marketplace`;
           return;
         }
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
         );
 
         // Hard redirect — avoids App Router startTransition that gets stuck
-        window.location.href = profileIsComplete ? '/marketplace' : '/profile/completar';
+        window.location.href = profileIsComplete ? `/${locale}/marketplace` : `/${locale}/profile/completar`;
       }
     } catch {
       setError('An unexpected error occurred');

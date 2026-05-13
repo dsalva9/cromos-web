@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, MouseEvent } from 'react';
 import Link from '@/components/ui/link';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { toast } from '@/lib/toast';
+import { useLocale } from 'next-intl';
 
 interface UserAvatarDropdownProps {
   isAdmin?: boolean;
@@ -26,6 +27,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   const { profile, isComplete, loading } = useProfileCompletion();
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const locale = useLocale();
   const [internalOpen, setInternalOpen] = useState(false);
 
   // Use controlled state if provided, otherwise use internal state
@@ -44,7 +46,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
       await supabase.auth.signOut();
       toast.success('Sesión cerrada correctamente', { id: toastId });
       // Use window.location.href for a full reload to ensure safe clear of all state
-      window.location.href = '/login';
+      window.location.href = `/${locale}/login`;
     } catch (error) {
       logger.error('Sign out error:', error);
       toast.error('Error al cerrar sesión', { id: toastId });

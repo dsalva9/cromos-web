@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
 import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -10,11 +11,21 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
+/** Strip the locale prefix from a pathname for active-state matching. */
+function stripLocale(path: string): string {
+  return path.replace(/^\/(es|en|pt)/, '') || '/';
+}
+
 export function MobileBottomNav() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = stripLocale(rawPathname);
+  const locale = useLocale();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = useSupabaseClient();
   const router = useRouter();
+
+  /** Prefix a path with the current locale */
+  const lp = (path: string) => `/${locale}${path}`;
 
   /* Existing hook calls... */
   const { user, wasAuthed } = useUser(); // Ensure useUser is imported from SupabaseProvider
@@ -36,7 +47,7 @@ export function MobileBottomNav() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/login';
+    window.location.href = lp('/login');
     setIsMenuOpen(false);
   };
 
@@ -47,7 +58,7 @@ export function MobileBottomNav() {
     hapticImpact();
     // Hard navigation workaround — Next.js 16 client-side transitions
     // silently hang for authenticated users, so bypass via window.location.href
-    window.location.href = href;
+    window.location.href = lp(href);
   };
 
   const handleMenuClick = () => {
@@ -139,7 +150,7 @@ export function MobileBottomNav() {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
-                window.location.href = '/marketplace/my-listings';
+                window.location.href = lp('/marketplace/my-listings');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
@@ -153,7 +164,7 @@ export function MobileBottomNav() {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
-                window.location.href = '/templates';
+                window.location.href = lp('/templates');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
@@ -167,7 +178,7 @@ export function MobileBottomNav() {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
-                window.location.href = '/ajustes';
+                window.location.href = lp('/ajustes');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
@@ -182,7 +193,7 @@ export function MobileBottomNav() {
                   e.preventDefault();
                   hapticImpact();
                   setIsMenuOpen(false);
-                  window.location.href = '/admin/dashboard';
+                  window.location.href = lp('/admin/dashboard');
                 }}
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
@@ -209,7 +220,7 @@ export function MobileBottomNav() {
             <div className="flex flex-wrap items-center justify-center gap-3 px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
               <a
                 href="/legal/terms"
-                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/terms'; }}
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/terms'); }}
                 className="hover:text-gold transition-colors"
               >
                 Términos
@@ -217,7 +228,7 @@ export function MobileBottomNav() {
               <span>·</span>
               <a
                 href="/legal/privacy"
-                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/privacy'; }}
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/privacy'); }}
                 className="hover:text-gold transition-colors"
               >
                 Privacidad
@@ -225,7 +236,7 @@ export function MobileBottomNav() {
               <span>·</span>
               <a
                 href="/legal/cookies"
-                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = '/legal/cookies'; }}
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/cookies'); }}
                 className="hover:text-gold transition-colors"
               >
                 Cookies

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from '@/hooks/use-router';
@@ -23,9 +23,9 @@ export default function AdminGuard({
   // Redirect unauthenticated users — must be before any early returns
   useEffect(() => {
     if (!loading && !user) {
-      window.location.href = '/login';
+      router.push('/login');
     }
-  }, [loading, user]);
+  }, [loading, user, router]);
 
   // Show loading while checking auth or admin status
   if (loading) {

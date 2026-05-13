@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -757,6 +781,7 @@ export type Database = {
           is_suspended: boolean | null
           last_login_date: string | null
           level: number | null
+          locale: string
           login_streak_days: number | null
           longest_login_streak: number | null
           nickname: string | null
@@ -783,6 +808,7 @@ export type Database = {
           is_suspended?: boolean | null
           last_login_date?: string | null
           level?: number | null
+          locale?: string
           login_streak_days?: number | null
           longest_login_streak?: number | null
           nickname?: string | null
@@ -809,6 +835,7 @@ export type Database = {
           is_suspended?: boolean | null
           last_login_date?: string | null
           level?: number | null
+          locale?: string
           login_streak_days?: number | null
           longest_login_streak?: number | null
           nickname?: string | null
@@ -2148,6 +2175,15 @@ export type Database = {
           to_addresses: string[]
         }[]
       }
+      admin_get_messaging_activity_by_country: {
+        Args: { p_days?: number }
+        Returns: {
+          country_code: string
+          total_messages: number
+          unique_conversations: number
+          unique_senders: number
+        }[]
+      }
       admin_get_messaging_activity_summary: {
         Args: { p_days?: number }
         Returns: {
@@ -2160,11 +2196,20 @@ export type Database = {
           unique_senders: number
         }[]
       }
+      admin_get_new_listings_by_country: {
+        Args: { p_days?: number }
+        Returns: {
+          country_code: string
+          total_listings: number
+          users: Json
+        }[]
+      }
       admin_get_new_users_summary: {
         Args: { p_days?: number }
         Returns: {
           albums_count: number
           chat_messages_count: number
+          country_code: string
           created_at: string
           email: string
           listings_count: number

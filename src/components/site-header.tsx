@@ -13,6 +13,8 @@ import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useRouter } from '@/hooks/use-router';
+import { useLocale } from 'next-intl';
+import { LanguageSelector } from '@/components/i18n/LanguageSelector';
 import { toast } from '@/lib/toast';
 import { GlobalRatingModal } from '@/components/marketplace/GlobalRatingModal';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
@@ -92,6 +94,7 @@ export default function SiteHeader() {
   // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
   const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
+  const locale = useLocale();
   const { handleOpenRatingModal, ratingModalElement } = GlobalRatingModal();
 
   // Defer client-only values to avoid SSR hydration mismatch (React #418)
@@ -152,7 +155,7 @@ export default function SiteHeader() {
             'Necesitas completar tu perfil para empezar a cambiar cromos!'
           );
           // Hard redirect — router.push gets stuck due to Next.js 16 transition bug
-          window.location.href = '/profile/completar';
+          window.location.href = `/${locale}/profile/completar`;
           return;
         }
 
@@ -227,9 +230,11 @@ export default function SiteHeader() {
                 <UserAvatarDropdown isAdmin={isAdmin} />
               </div>
             )}
+            <LanguageSelector />
           </nav>
 
           <div className="flex items-center gap-2 md:hidden auth-dependent">
+            <LanguageSelector />
             {!hasMounted || loading ? (
               /* Invisible spacer to prevent layout shift while auth loads */
               <div className="w-10 h-10" />

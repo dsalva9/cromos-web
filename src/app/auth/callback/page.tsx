@@ -1,12 +1,26 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from '@/hooks/use-router';
+import { useRouter } from 'next/navigation';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
+const DEFAULT_LOCALE = 'es';
+
+/** Read stored locale preference, with fallback to 'es'. */
+function getStoredLocale(): string {
+  if (typeof window === 'undefined') return DEFAULT_LOCALE;
+  return localStorage.getItem('locale') || DEFAULT_LOCALE;
+}
+
+/** Prefix a path with a locale segment. */
+function lp(path: string, locale: string): string {
+  const localeRegex = /^\/(es|en|pt)(\/|$)/;
+  if (localeRegex.test(path)) return path;
+  return `/${locale}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
 export default function AuthCallback() {
   const supabase = useSupabaseClient();
@@ -115,13 +129,13 @@ export default function AuthCallback() {
               if (mountedRef.current) {
                 setError('No se pudo completar el inicio de sesión. Por favor, inténtalo de nuevo.');
                 // Auto-redirect to login after a short delay so the user sees the message
-                setTimeout(() => { if (mountedRef.current) router.push('/login'); }, 3000);
+                setTimeout(() => { if (mountedRef.current) router.push(lp('/login', getStoredLocale())); }, 3000);
               }
             } else {
               logger.warn('No authenticated user found after processing callback');
               if (mountedRef.current) {
                 setError('El enlace ha expirado o ya fue utilizado. Por favor, inicia sesión de nuevo.');
-                setTimeout(() => { if (mountedRef.current) router.push('/login'); }, 3000);
+                setTimeout(() => { if (mountedRef.current) router.push(lp('/login', getStoredLocale())); }, 3000);
               }
             }
             return;
@@ -133,7 +147,7 @@ export default function AuthCallback() {
           for (let attempt = 0; attempt < 3; attempt++) {
             const result = await supabase
               .from('profiles')
-              .select('suspended_at, deleted_at, nickname, postcode, avatar_url')
+              .select('suspended_at, deleted_at, nickname, postcode, avatar_url, locale')
               .eq('id', sessionUser.id)
               .single();
 
@@ -153,7 +167,7 @@ export default function AuthCallback() {
             logger.error('All profile query attempts failed:', profileError);
             // Redirect to home — let ProfileCompletionGuard handle it
             // instead of blindly redirecting to profile completion
-            if (mountedRef.current) router.push('/marketplace');
+            if (mountedRef.current) router.push(lp('/marketplace', profile?.locale || getStoredLocale()));
             return;
           }
 
@@ -167,10 +181,10 @@ export default function AuthCallback() {
             return;
           }
 
-          // If there's a next parameter, redirect there (for password reset, etc.)
-          if (next) {
+            if (next) {
             logger.info('Redirecting to next:', next);
-            if (mountedRef.current) router.push(next);
+            const userLocale = profile?.locale || getStoredLocale();
+            if (mountedRef.current) router.push(lp(next, userLocale));
             return;
           }
 
@@ -182,7 +196,8 @@ export default function AuthCallback() {
           );
 
           logger.info('Redirecting based on profile completion:', { complete });
-          if (mountedRef.current) router.push(complete ? '/marketplace' : PROFILE_COMPLETION_ROUTE);
+          const userLocale = profile?.locale || getStoredLocale();
+          if (mountedRef.current) router.push(lp(complete ? '/marketplace' : PROFILE_COMPLETION_ROUTE, userLocale));
         } catch (err) {
           logger.error('Unexpected error in auth callback:', err);
           if (mountedRef.current) setError('Error inesperado al procesar autenticación');

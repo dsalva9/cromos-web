@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { useLocale } from 'next-intl';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -13,13 +14,16 @@ export default function AuthGuard({
   redirectTo = '/login',
 }: AuthGuardProps) {
   const { user, loading } = useUser();
+  const locale = useLocale();
 
   useEffect(() => {
     if (!loading && !user) {
-      // TODO: Remove window.location.href workaround when Next.js fixes transition state bug
-      window.location.href = redirectTo;
+      // Prefix with locale for correct routing
+      const localeRegex = /^\/(es|en|pt)(\/|$)/;
+      const url = localeRegex.test(redirectTo) ? redirectTo : `/${locale}${redirectTo}`;
+      window.location.href = url;
     }
-  }, [user, loading, redirectTo]);
+  }, [user, loading, redirectTo, locale]);
 
   // Show nothing while checking auth
   if (loading) {

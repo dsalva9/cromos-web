@@ -2,6 +2,10 @@ import { spawnSync } from 'node:child_process';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 import withSerwistInit from '@serwist/next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+// next-intl plugin — must wrap outermost
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 // Revision for service worker precache versioning
 const revision = spawnSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf-8' }).stdout?.trim() ?? crypto.randomUUID();
@@ -52,36 +56,37 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
-  // Redirects for legacy PHP URLs
+  // Redirects: legacy PHP URLs → /es/ root, legacy non-prefixed URLs → /es/ prefixed
   async redirects() {
     return [
+      // --- Legacy PHP redirects ---
       {
         source: '/proximamente',
-        destination: '/',
+        destination: '/es',
         permanent: true,
       },
       {
         source: '/parking.php',
-        destination: '/',
+        destination: '/es',
         permanent: true,
       },
       {
         source: '/search/tsc.php',
-        destination: '/',
+        destination: '/es',
         permanent: true,
       },
       {
         source: '/search/cc.php',
-        destination: '/',
+        destination: '/es',
         permanent: true,
       },
     ];
   },
 };
 
-export default withSerwist(withSentryConfig(nextConfig, {
+export default withNextIntl(withSerwist(withSentryConfig(nextConfig, {
   // Suppresses source map upload logs during build
   silent: true,
   // Prevent Sentry from wrapping console methods (we handle this via logger.ts)
   disableLogger: true,
-}));
+})));

@@ -1,10 +1,28 @@
 import { MetadataRoute } from 'next';
 import { siteConfig } from '@/config/site';
+import { routing } from '@/i18n/routing';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 // Regenerate sitemap at most once per hour
 export const revalidate = 3600;
+
+const locales = routing.locales;
+const defaultLocale = routing.defaultLocale;
+
+/**
+ * Build alternates map for a given path across all locales.
+ * This provides hreflang signals to search engines.
+ */
+function buildAlternates(path: string) {
+    const languages: Record<string, string> = {};
+    for (const loc of locales) {
+        languages[loc] = `${siteConfig.url}/${loc}${path}`;
+    }
+    // x-default points to the default locale
+    languages['x-default'] = `${siteConfig.url}/${defaultLocale}${path}`;
+    return { languages };
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticRoutes = [
@@ -15,12 +33,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { path: '/legal/terms', changeFrequency: 'monthly' as const, priority: 0.3 },
     ];
 
-    const staticEntries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
-        url: `${siteConfig.url}${route.path}`,
-        lastModified: new Date(),
-        changeFrequency: route.changeFrequency,
-        priority: route.priority,
-    }));
+    // Generate one entry per locale per static route
+    const staticEntries: MetadataRoute.Sitemap = staticRoutes.flatMap((route) =>
+        locales.map((loc) => ({
+            url: `${siteConfig.url}/${loc}${route.path}`,
+            lastModified: new Date(),
+            changeFrequency: route.changeFrequency,
+            priority: route.priority,
+            alternates: buildAlternates(route.path),
+        }))
+    );
 
     // Fetch active listing IDs for dynamic /explorar/[id] pages
     let listingEntries: MetadataRoute.Sitemap = [];
@@ -52,12 +74,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             .order('created_at', { ascending: false });
 
         if (data) {
-            listingEntries = data.map((listing) => ({
-                url: `${siteConfig.url}/explorar/${listing.id}`,
-                lastModified: new Date(listing.created_at),
-                changeFrequency: 'weekly' as const,
-                priority: 0.6,
-            }));
+            listingEntries = data.flatMap((listing) =>
+                locales.map((loc) => ({
+                    url: `${siteConfig.url}/${loc}/explorar/${listing.id}`,
+                    lastModified: new Date(listing.created_at),
+                    changeFrequency: 'weekly' as const,
+                    priority: 0.6,
+                    alternates: buildAlternates(`/explorar/${listing.id}`),
+                }))
+            );
         }
     } catch {
         // If DB query fails, just return static routes — sitemap should never error

@@ -55,7 +55,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         // Handle password recovery: redirect to reset page immediately
         if (event === 'PASSWORD_RECOVERY') {
           sessionStorage.setItem('password_recovery_required', 'true');
-          window.location.href = '/profile/reset-password';
+          // Extract locale from current URL path (e.g. /es/...) or fallback
+          const pathLocale = window.location.pathname.match(/^\/(es|en|pt)(\/|$)/)?.[1] || 'es';
+          window.location.href = `/${pathLocale}/profile/reset-password`;
           return;
         }
 
