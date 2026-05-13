@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
     title: 'Política de Privacidad',
@@ -29,7 +30,7 @@ export default function PrivacyPage() {
 
             <h2>1. Responsable del Tratamiento</h2>
             <p>
-                El responsable del tratamiento de los datos es el equipo de administración de Cambiocromos.com. Para cualquier cuestión relativa a la privacidad, puedes contactar con nuestro Delegado de Protección de Datos en: <a href="mailto:privacidad@cambiocromos.com">privacidad@cambiocromos.com</a>.
+                El responsable del tratamiento de los datos es el equipo de administración de Cambiocromos.com. Para cualquier cuestión relativa a la privacidad, puedes contactar con nuestro Delegado de Protección de Datos en: <a href={getSupportMailtoUrl(undefined, "Privacidad - CambioCromos").replace("soporte@", "privacidad@")}>privacidad@cambiocromos.com</a>.
             </p>
 
             <h2>2. Qué datos recopilamos</h2>
@@ -86,7 +87,7 @@ export default function PrivacyPage() {
                 <li><strong>Portabilidad:</strong> Solicitar una copia de tus datos en un formato estructurado.</li>
             </ul>
             <p>
-                Puedes ejercer estos derechos escribiendo a <a href="mailto:privacidad@cambiocromos.com">privacidad@cambiocromos.com</a>.
+                Puedes ejercer estos derechos escribiendo a <a href={getSupportMailtoUrl(undefined, "Privacidad - CambioCromos").replace("soporte@", "privacidad@")}>privacidad@cambiocromos.com</a>.
             </p>
         </div>
     );

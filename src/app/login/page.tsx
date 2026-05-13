@@ -12,6 +12,7 @@ import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -218,7 +219,7 @@ export default function LoginPage() {
                     <>
                       Tu cuenta está suspendida, por favor contacta con{' '}
                       <a
-                        href="mailto:admin@cambiocromos.com"
+                        href={getSupportMailtoUrl(undefined, "Soporte Admin - CambioCromos")}
                         className="underline hover:text-gray-200"
                       >
                         admin@cambiocromos.com
@@ -231,7 +232,7 @@ export default function LoginPage() {
                       <br />
                       Por favor contacta con{' '}
                       <a
-                        href="mailto:soporte@cambiocromos.com"
+                        href={getSupportMailtoUrl()}
                         className="underline hover:text-gray-200"
                       >
                         soporte@cambiocromos.com

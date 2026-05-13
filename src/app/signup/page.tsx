@@ -18,6 +18,7 @@ import {
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -266,7 +267,7 @@ export default function SignupPage() {
                 <p className="text-sm text-white font-bold mt-2">
                   Por favor contacta con{' '}
                   <a
-                    href="mailto:soporte@cambiocromos.com"
+                    href={getSupportMailtoUrl()}
                     className="underline hover:text-gray-200"
                   >
                     soporte@cambiocromos.com

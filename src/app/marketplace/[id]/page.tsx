@@ -38,6 +38,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { getCurrencySymbol } from '@/constants/countries';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -163,7 +164,7 @@ export default function ListingDetailPage() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Por favor contacta con{' '}
             <a
-              href="mailto:soporte@cambiocromos.com"
+              href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com
@@ -199,7 +200,7 @@ export default function ListingDetailPage() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Por favor contacta con{' '}
             <a
-              href="mailto:soporte@cambiocromos.com"
+              href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com

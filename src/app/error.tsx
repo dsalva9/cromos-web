@@ -5,6 +5,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function Error({
   error,
@@ -52,7 +53,7 @@ export default function Error({
             <p className="text-gray-600 mt-4">
               Por favor contacta con{' '}
               <a
-                href="mailto:soporte@cambiocromos.com"
+                href={getSupportMailtoUrl(error)}
                 className="text-gold hover:text-yellow-400 underline"
               >
                 soporte@cambiocromos.com

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export const metadata: Metadata = {
     title: 'Términos de Servicio',
@@ -82,7 +83,7 @@ export default function TermsPage() {
 
             <h2>7. Contacto</h2>
             <p>
-                Para reportar infracciones o consultas legales, contáctenos en: <a href="mailto:legal@cambiocromos.com">legal@cambiocromos.com</a>
+                Para reportar infracciones o consultas legales, contáctenos en: <a href={getSupportMailtoUrl(undefined, "Legal - CambioCromos").replace("soporte@", "legal@")}>legal@cambiocromos.com</a>
             </p>
         </div>
     );

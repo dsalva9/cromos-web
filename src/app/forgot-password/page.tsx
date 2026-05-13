@@ -8,6 +8,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -102,7 +103,7 @@ export default function ForgotPasswordPage() {
                       <span key={index}>
                         {part}
                         <a
-                          href="mailto:soporte@cambiocromos.com"
+                          href={getSupportMailtoUrl()}
                           className="underline hover:text-gray-200"
                         >
                           soporte@cambiocromos.com

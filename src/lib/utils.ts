@@ -79,3 +79,27 @@ export function sleep(ms: number): Promise<void> {
 export function generateId(): string {
   return crypto.randomUUID();
 }
+
+/**
+ * Generate a pre-filled mailto URL for support, optionally including error details.
+ */
+export function getSupportMailtoUrl(error?: Error & { digest?: string }, customSubject?: string): string {
+  const isBrowser = typeof window !== 'undefined';
+  const url = isBrowser ? window.location.href : 'N/A';
+
+  if (error) {
+    const subject = encodeURIComponent(customSubject || "Reporte de Error - CambioCromos");
+    const body = encodeURIComponent(
+      `Hola equipo de soporte,\n\nEncontré un error en la aplicación.\n\n` +
+      `--- Detalles técnicos (por favor no borrar) ---\n` +
+      `Mensaje: ${error.message || 'N/A'}\n` +
+      `Digest: ${error.digest || 'N/A'}\n` +
+      `URL: ${url}`
+    );
+    return `mailto:soporte@cambiocromos.com?subject=${subject}&body=${body}`;
+  }
+
+  const subject = encodeURIComponent(customSubject || "Soporte CambioCromos");
+  const body = encodeURIComponent("Hola equipo de soporte,\n\n");
+  return `mailto:soporte@cambiocromos.com?subject=${subject}&body=${body}`;
+}

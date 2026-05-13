@@ -17,6 +17,7 @@ import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 import { InstallAppModal } from '@/components/pwa/InstallAppModal';
 import { isWeb } from '@/lib/platform';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 function CompleteProfileContent() {
   const { user } = useUser();
@@ -307,7 +308,7 @@ function CompleteProfileContent() {
                       <br />
                       Por favor contacta con{' '}
                       <a
-                        href="mailto:soporte@cambiocromos.com"
+                        href={getSupportMailtoUrl()}
                         className="underline hover:text-gray-200"
                       >
                         soporte@cambiocromos.com

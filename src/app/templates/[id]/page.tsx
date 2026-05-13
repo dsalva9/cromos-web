@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { ImageModal } from '@/components/ui/ImageModal';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 export default function TemplateDetailsPage() {
   const params = useParams();
@@ -174,7 +175,7 @@ export default function TemplateDetailsPage() {
             <p className="text-slate-400">
               Por favor contacta con{' '}
               <a
-                href="mailto:soporte@cambiocromos.com"
+                href={getSupportMailtoUrl()}
                 className="text-gold hover:text-yellow-400 underline"
               >
                 soporte@cambiocromos.com

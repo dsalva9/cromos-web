@@ -14,6 +14,7 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { logger } from '@/lib/logger';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { getCurrencySymbol } from '@/constants/countries';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 function EditListingContent() {
   const params = useParams();
@@ -62,7 +63,7 @@ function EditListingContent() {
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Por favor contacta con{' '}
             <a
-              href="mailto:soporte@cambiocromos.com"
+              href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-400 underline"
             >
               soporte@cambiocromos.com

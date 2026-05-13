@@ -48,6 +48,7 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { getSupportMailtoUrl } from '@/lib/utils';
 
 const STATUS_LABELS = {
   active: 'Activos',
@@ -273,7 +274,7 @@ export default function UserProfilePage() {
           <p className="text-gray-500 dark:text-gray-400 mt-4">
             Por favor contacta con{' '}
             <a
-              href="mailto:soporte@cambiocromos.com"
+              href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-600 underline font-bold"
             >
               soporte@cambiocromos.com
