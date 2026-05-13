@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/ui/link';
@@ -10,6 +10,7 @@ import { MessageCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 
 interface Conversation {
   listing_id: number;
@@ -26,6 +27,7 @@ interface Conversation {
 }
 
 function ChatsPageContent() {
+  const t = useTranslations('chats');
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -61,17 +63,17 @@ function ChatsPageContent() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Mis Chats</h1>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">{t('title')}</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Todas tus conversaciones sobre anuncios del marketplace
+            {t('subtitle')}
           </p>
         </div>
 
         <ContextualTip
           tipId="tip-chats"
           icon={Lightbulb}
-          title="Tus conversaciones"
-          description="Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
+          title={t('tip.title')}
+          description={t('tip.description')}
           className="mb-6"
         />
 
@@ -80,13 +82,13 @@ function ChatsPageContent() {
             <ModernCardContent className="p-8 text-center">
               <MessageCircle className="h-16 w-16 text-gray-400 dark:text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-                No tienes conversaciones activas
+                {t('empty.title')}
               </p>
               <Link
                 href="/marketplace"
                 className="inline-block bg-gold text-black px-6 py-2 rounded-md font-bold hover:bg-yellow-400 transition-colors"
               >
-                Explorar Marketplace
+                {t('empty.action')}
               </Link>
             </ModernCardContent>
           </ModernCard>
@@ -128,19 +130,19 @@ function ChatsPageContent() {
                               conv.listing_status === 'sold' && 'bg-gray-200 text-gray-700'
                             )}
                           >
-                            {conv.listing_status === 'active' && 'Activo'}
-                            {conv.listing_status === 'reserved' && 'Reservado'}
-                            {conv.listing_status === 'completed' && 'Completado'}
-                            {conv.listing_status === 'sold' && 'Completado'}
+                            {conv.listing_status === 'active' && t('status.active')}
+                            {conv.listing_status === 'reserved' && t('status.reserved')}
+                            {conv.listing_status === 'completed' && t('status.completed')}
+                            {conv.listing_status === 'sold' && t('status.completed')}
                           </span>
                         </div>
 
                         {/* Counterparty */}
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                           {conv.is_seller ? (
-                            <>Comprador: {conv.counterparty_nickname}</>
+                            <>{t('roles.buyer')} {conv.counterparty_nickname}</>
                           ) : (
-                            <>Vendedor: {conv.counterparty_nickname}</>
+                            <>{t('roles.seller')} {conv.counterparty_nickname}</>
                           )}
                         </p>
 

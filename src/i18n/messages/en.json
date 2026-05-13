@@ -1,5 +1,223 @@
 {
   "common": {
     "loading": "Loading..."
+  },
+  "layout": {
+    "skipToContent": "Skip to main content"
+  },
+  "error": {
+    "title": "Something went wrong!",
+    "message": "We encountered an error loading this page.",
+    "contactSupport": "Please contact",
+    "details": "Error details (development only)",
+    "retry": "Try Again",
+    "home": "Go to Home"
+  },
+  "auth": {
+    "login": {
+      "title": "Log In",
+      "subtitle": "Access your sticker collection",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submitButton": "Log In",
+      "loading": "Logging in...",
+      "googleButton": "Continue with Google",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create account",
+      "backToHome": "← Back to home",
+      "or": "OR"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Join the collector community",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPasswordLabel": "Confirm Password",
+      "termsLabel": "I accept the terms of service",
+      "termsHelperPre": "I have read and accept the",
+      "termsLink": "Terms of Service",
+      "termsAnd": "and the",
+      "privacyLink": "Privacy Policy",
+      "submitButton": "Create Account",
+      "loading": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "backToHome": "← Back to home",
+      "successTitle": "Check your email!",
+      "successSubtitle": "Account created",
+      "successSent": "We have sent a confirmation link to",
+      "successInstruction": "Click the link in the email to activate your account and start collecting stickers.",
+      "successLogin": "Go to login",
+      "termsError": "You must accept the terms of service to create your account",
+      "passwordMatchError": "Passwords do not match"
+    },
+    "forgotPassword": {
+      "title": "Recover Password",
+      "subtitle": "Enter your email and we will send you the instructions",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "submitButton": "Send link",
+      "loading": "Sending...",
+      "backToLogin": "← Back to Login",
+      "successMessage": "If the email exists, you will receive a link to recover your password."
+    },
+    "errors": {
+      "suspended": "Your account is suspended, please contact",
+      "contactSupport": "Please contact",
+      "unexpected": "An unexpected error occurred",
+      "googleUnexpected": "An unexpected error occurred during Google Sign In"
+    }
+  },
+  "profile": {
+    "index": {
+      "title": "Profile",
+      "editAvatar": "Edit Avatar",
+      "loading": "Loading profile...",
+      "welcome": "Hello, {nickname}",
+      "collections": {
+        "title": "My Collections",
+        "description": "You have {count} active collections",
+        "descriptionPlural": "You have {count} active collections"
+      },
+      "actions": {
+        "title": "Quick Actions",
+        "myListings": "My Listings",
+        "myListingsDesc": "Manage your stickers and packs",
+        "createListing": "Create Listing",
+        "createListingDesc": "Publish a new listing to trade"
+      },
+      "stats": {
+        "title": "Your Stats",
+        "transactions": "Completed Trades",
+        "transactionsDesc": "Successful trades",
+        "rating": "Community Rating",
+        "ratingDesc": "Based on {count} reviews"
+      },
+      "nickname": {
+        "editLabel": "Change Nickname",
+        "save": "Save",
+        "cancel": "Cancel",
+        "success": "Nickname updated successfully",
+        "error": "Error updating nickname"
+      }
+    },
+    "completar": {
+      "title": "Complete Your Profile",
+      "subtitle": "Tell us a bit about yourself to start trading",
+      "avatarLabel": "Profile Picture",
+      "avatarChange": "Change avatar",
+      "nicknameLabel": "Nickname",
+      "nicknamePlaceholder": "How do you want to be known?",
+      "nicknameDesc": "This will be public",
+      "countryLabel": "Country",
+      "postcodeLabel": "Postal Code",
+      "postcodePlaceholder": "E.g. 28001",
+      "postcodeDesc": "Used to find nearby collectors",
+      "loading": "Loading...",
+      "submitButton": "Complete Profile",
+      "submitButtonLoading": "Saving...",
+      "successMessage": "Profile updated successfully!",
+      "errors": {
+        "invalidPostcode": "Please enter a valid postal code",
+        "nicknameTaken": "This nickname is already in use",
+        "validationFailed": "Please complete all required fields",
+        "unexpected": "An unexpected error occurred",
+        "avatarUpload": "Error uploading the image",
+        "saveFailed": "Error saving profile. Please try again later."
+      }
+    }
+  },
+  "marketplace": {
+    "metadata": {
+      "title": "Marketplace | Cambio Cromos",
+      "description": "Buy, sell and trade stickers with the community. Find your missing stickers and complete your collections."
+    },
+    "index": {
+      "title": "Marketplace",
+      "stats": {
+        "active": "{count} active",
+        "community": "Active community",
+        "communityShort": "Active",
+        "updated": "Updated today",
+        "updatedShort": "Today"
+      },
+      "buttons": {
+        "myListings": "My Listings",
+        "publish": "Publish",
+        "filters": "Filters",
+        "near": "Near",
+        "recent": "Recent",
+        "distance": "Distance",
+        "loadMore": "Load More Listings"
+      },
+      "search": {
+        "placeholder": "Search by name, collection..."
+      },
+      "typeFilter": {
+        "all": "All",
+        "cromo": "Sticker",
+        "pack": "Pack"
+      },
+      "tip": {
+        "title": "Find what you're looking for",
+        "description": "Search stickers by name or filter by collection. When you find something interesting, open a chat with the seller to arrange a trade."
+      },
+      "errors": {
+        "loadFailed": "Error loading listings",
+        "distanceDisabled": "Add your postal code in your profile"
+      },
+      "empty": {
+        "searchTitle": "No listings found",
+        "searchDescription": "Try searching with other terms or filters",
+        "quietTitle": "The market is quiet",
+        "quietDescriptionAuth": "Be the first to publish a listing and start trading",
+        "quietDescriptionNoAuth": "Log in to see the best offers from the community",
+        "publishFirst": "Publish First Listing",
+        "login": "Log In"
+      }
+    },
+    "card": {
+      "new": "New",
+      "status": {
+        "pack": "PACK",
+        "sold": "SOLD",
+        "removed": "REMOVED"
+      },
+      "time": {
+        "now": "just now",
+        "minutes": "{count} min ago",
+        "hours": "{count}h ago",
+        "today": "today",
+        "yesterday": "yesterday",
+        "days": "{count}d ago"
+      },
+      "viewDetails": "View Details"
+    }
+  },
+  "chats": {
+    "title": "My Chats",
+    "subtitle": "All your marketplace listing conversations",
+    "tip": {
+      "title": "Your conversations",
+      "description": "Here you will see all chats about Marketplace listings. You can also favorite users to find them easily later."
+    },
+    "empty": {
+      "title": "You have no active conversations",
+      "action": "Explore Marketplace"
+    },
+    "status": {
+      "active": "Active",
+      "reserved": "Reserved",
+      "completed": "Completed"
+    },
+    "roles": {
+      "buyer": "Buyer:",
+      "seller": "Seller:"
+    }
   }
 }

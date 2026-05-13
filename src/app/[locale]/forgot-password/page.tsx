@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { siteConfig } from '@/config/site';
 import { useState } from 'react';
@@ -9,12 +9,15 @@ import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const supabase = useSupabaseClient();
+  const t = useTranslations('auth.forgotPassword');
+  const tErrors = useTranslations('auth.errors');
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,16 +30,16 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        setMessage({ type: 'error', text: `${error.message}\n\nPor favor contacta con soporte@cambiocromos.com` });
+        setMessage({ type: 'error', text: `${error.message}\n\n${tErrors('contactSupport')} soporte@cambiocromos.com` });
       } else {
         setMessage({
           type: 'success',
-          text: 'Si el email existe, recibirás un enlace para recuperar tu contraseña.',
+          text: t('successMessage'),
         });
       }
     } catch (error) {
       logger.error('Password reset error:', error);
-      setMessage({ type: 'error', text: 'Ocurrió un error inesperado. Inténtalo de nuevo.\n\nPor favor contacta con soporte@cambiocromos.com' });
+      setMessage({ type: 'error', text: `${tErrors('unexpected')}\n\n${tErrors('contactSupport')} soporte@cambiocromos.com` });
     } finally {
       setLoading(false);
     }
@@ -65,10 +68,10 @@ export default function ForgotPasswordPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-white mb-2">
-              Recuperar Contraseña
+              {t('title')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 font-medium">
-              Ingresa tu email y te enviaremos las instrucciones
+              {t('subtitle')}
             </p>
           </div>
 
@@ -78,13 +81,13 @@ export default function ForgotPasswordPage() {
                 htmlFor="email"
                 className="text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Email
+                {t('emailLabel')}
               </label>
 
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -122,7 +125,7 @@ export default function ForgotPasswordPage() {
               className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
-              {loading ? 'Enviando...' : 'Enviar enlace'}
+              {loading ? t('loading') : t('submitButton')}
             </Button>
           </form>
 
@@ -131,7 +134,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-gold hover:text-yellow-400 font-bold hover:underline"
             >
-              ← Volver a Iniciar Sesión
+              {t('backToLogin')}
             </Link>
           </div>
         </div>

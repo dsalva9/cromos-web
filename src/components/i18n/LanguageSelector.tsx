@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Globe } from 'lucide-react';
@@ -15,6 +15,7 @@ const LOCALE_LABELS: Record<Locale, { flag: string; label: string }> = {
 
 export function LanguageSelector() {
   const locale = useLocale() as Locale;
+  const t = useTranslations('language');
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -65,7 +66,7 @@ export function LanguageSelector() {
           'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-1',
           open && 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
         )}
-        aria-label="Change language"
+        aria-label={t('change')}
         aria-expanded={open}
       >
         <Globe className="h-4 w-4" />

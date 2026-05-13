@@ -80,6 +80,19 @@ const nextConfig: NextConfig = {
         destination: '/es',
         permanent: true,
       },
+      // --- Legacy non-prefixed paths redirects ---
+      { source: '/marketplace', destination: '/es/marketplace', permanent: true },
+      { source: '/mis-plantillas', destination: '/es/mis-plantillas', permanent: true },
+      { source: '/mi-coleccion', destination: '/es/mi-coleccion', permanent: true },
+      { source: '/templates', destination: '/es/templates', permanent: true },
+      { source: '/login', destination: '/es/login', permanent: true },
+      { source: '/signup', destination: '/es/signup', permanent: true },
+      { source: '/favorites', destination: '/es/favorites', permanent: true },
+      { source: '/chats', destination: '/es/chats', permanent: true },
+      { source: '/profile', destination: '/es/profile', permanent: true },
+      { source: '/admin', destination: '/es/admin', permanent: true },
+      { source: '/dashboard', destination: '/es/dashboard', permanent: true },
+      { source: '/marketplace/:path*', destination: '/es/marketplace/:path*', permanent: true },
     ];
   },
 };

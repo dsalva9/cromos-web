@@ -13,10 +13,10 @@ import { UserAvatarDropdown } from '@/components/profile/UserAvatarDropdown';
 import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useRouter } from '@/hooks/use-router';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { LanguageSelector } from '@/components/i18n/LanguageSelector';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
-import { toast } from '@/lib/toast';
+import { toast } from 'sonner';
 import { GlobalRatingModal } from '@/components/marketplace/GlobalRatingModal';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { Capacitor } from '@capacitor/core';
@@ -96,6 +96,7 @@ export default function SiteHeader() {
   const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations('header');
   const { enabled: i18nEnabled } = useFeatureFlag('i18n');
   const { handleOpenRatingModal, ratingModalElement } = GlobalRatingModal();
 
@@ -107,15 +108,15 @@ export default function SiteHeader() {
   const closeMenu = () => setIsMenuOpen(false);
 
   const baseLinks: NavigationLink[] = [
-    { href: '/marketplace', label: 'Marketplace', requiresCompletion: true },
-    { href: '/mis-plantillas', label: 'Mis Álbumes', requiresCompletion: true },
-    { href: '/chats', label: 'Chats', requiresCompletion: true },
-    { href: '/favorites', label: 'Favoritos', requiresCompletion: true },
+    { href: '/marketplace', label: t('marketplace'), requiresCompletion: true },
+    { href: '/mis-plantillas', label: t('myAlbums'), requiresCompletion: true },
+    { href: '/chats', label: t('chats'), requiresCompletion: true },
+    { href: '/favorites', label: t('favorites'), requiresCompletion: true },
   ];
 
   const unauthenticatedLinks: NavigationLink[] = [
-    { href: '/login', label: 'Iniciar Sesión' },
-    { href: '/signup', label: 'Registrarse' },
+    { href: '/login', label: t('login') },
+    { href: '/signup', label: t('signup') },
   ];
 
   // While loading + wasAuthed, render authenticated links (CSS hides them via auth-dependent)
@@ -153,9 +154,7 @@ export default function SiteHeader() {
         ) {
           event.preventDefault();
           closeMenu();
-          toast.info(
-            'Necesitas completar tu perfil para empezar a cambiar cromos!'
-          );
+          toast.info(t('completeProfile'));
           // Hard redirect — router.push gets stuck due to Next.js 16 transition bug
           window.location.href = `/${locale}/profile/completar`;
           return;
@@ -252,7 +251,7 @@ export default function SiteHeader() {
                     href="/login"
                     className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-gold hover:text-black transition-colors"
                   >
-                    Entrar
+                    {t('enter')}
                   </Link>
                 )
               )

@@ -12,6 +12,7 @@ import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteB
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 interface ListingCardProps {
   listing: Listing;
@@ -35,6 +36,7 @@ function formatRelativeTime(dateString: string): string {
 }
 
 export function ListingCard({ listing }: ListingCardProps) {
+  const t = useTranslations('marketplace.card');
   const { user } = useUser();
   const supabase = useSupabaseClient(); // For avatar resolution if needed
   const { isAdmin } = useProfileCompletion();
@@ -60,11 +62,11 @@ export function ListingCard({ listing }: ListingCardProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return listing.is_group ? 'PACK' : null; // Only show PACK for groups
+        return listing.is_group ? t('status.pack') : null; // Only show PACK for groups
       case 'sold':
-        return 'VENDIDO';
+        return t('status.sold');
       case 'removed':
-        return 'ELIMINADO';
+        return t('status.removed');
       default:
         return status;
     }
@@ -76,11 +78,19 @@ export function ListingCard({ listing }: ListingCardProps) {
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'hoy';
-    if (diffDays === 1) return 'ayer';
-    if (diffDays < 7)
-      return `hace ${diffDays} ${diffDays === 1 ? 'd' : 'd'}`;
-    return `hace ${diffDays}d`;
+    if (diffDays === 0) return t('time.today');
+    if (diffDays === 1) return t('time.yesterday');
+    return t('time.days', { count: diffDays });
+  };
+
+  /** Human-readable relative time */
+  const formatRelativeTimeLocale = (dateString: string): string => {
+    const diff = Date.now() - new Date(dateString).getTime();
+    const minutes = Math.floor(diff / 60_000);
+    if (minutes < 1) return t('time.now');
+    if (minutes < 60) return t('time.minutes', { count: minutes });
+    const hours = Math.floor(minutes / 60);
+    return t('time.hours', { count: hours });
   };
 
   return (
@@ -124,7 +134,7 @@ export function ListingCard({ listing }: ListingCardProps) {
           {isNew && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100/90 text-orange-700 border border-orange-300/60 backdrop-blur-sm shadow-sm dark:bg-orange-900/60 dark:text-orange-200 dark:border-orange-600/40">
               <Flame className="h-3 w-3" />
-              Nuevo
+              {t('new')}
             </span>
           )}
           {getStatusLabel(listing.status) && (
@@ -201,7 +211,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                   {listing.distance_km != null && <span>·</span>}
                   <span className="flex items-center gap-0.5 text-orange-600 dark:text-orange-400 font-semibold">
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
-                    {formatRelativeTime(listing.created_at)}
+                    {formatRelativeTimeLocale(listing.created_at)}
                   </span>
                 </>
               )}
@@ -213,7 +223,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         <div className="mt-2 z-20 relative">
           <Link href={`/marketplace/${listing.id}`} className="block w-full">
             <button className="w-full bg-gold hover:bg-gold-light text-black font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
-              Ver Detalles
+              {t('viewDetails')}
             </button>
           </Link>
         </div>

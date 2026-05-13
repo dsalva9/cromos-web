@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
 import { AnimatedList } from '@/components/ui/AnimatedList';
 import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
+import { useTranslations } from 'next-intl';
 
 interface MarketplaceContentProps {
     initialListings: Listing[];
@@ -23,6 +24,7 @@ interface MarketplaceContentProps {
 }
 
 export function MarketplaceContent({ initialListings, initialUserPostcode }: MarketplaceContentProps) {
+    const t = useTranslations('marketplace.index');
     const { user } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
     const [sortByDistance, setSortByDistance] = useState(false);
@@ -129,7 +131,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                         <div className="flex-1 w-full">
                             <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
                                 <span className="text-black dark:text-white">
-                                    Marketplace
+                                    {t('title')}
                                 </span>
                             </h1>
 
@@ -139,19 +141,19 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                             <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                     <span className="text-base md:text-lg">🔥</span>
-                                    <span className="font-bold text-black dark:text-white">{listings.length}</span>
-                                    <span className="hidden md:inline">activos</span>
+                                    <span className="font-bold text-black dark:text-white">{t('stats.active', { count: listings.length }).split(' ')[0]}</span>
+                                    <span className="hidden md:inline">{t('stats.active', { count: listings.length }).split(' ').slice(1).join(' ')}</span>
                                 </div>
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                     <span className="text-base md:text-lg">👥</span>
-                                    <span className="hidden md:inline">Comunidad activa</span>
-                                    <span className="md:hidden">Activa</span>
+                                    <span className="hidden md:inline">{t('stats.community')}</span>
+                                    <span className="md:hidden">{t('stats.communityShort')}</span>
                                 </div>
                                 {!loading && listings.length > 0 && (
                                     <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                         <span className="text-base md:text-lg">⚡</span>
-                                        <span className="hidden md:inline">Actualizado hoy</span>
-                                        <span className="md:hidden">Hoy</span>
+                                        <span className="hidden md:inline">{t('stats.updated')}</span>
+                                        <span className="md:hidden">{t('stats.updatedShort')}</span>
                                     </div>
                                 )}
                                 {/* Mobile: Mis Anuncios aligned to right */}
@@ -177,13 +179,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                         className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 md:h-12 px-3 md:px-6 text-sm"
                                     >
                                         <List className="h-4 w-4 md:mr-2" />
-                                        <span className="hidden md:inline">Mis Anuncios</span>
+                                        <span className="hidden md:inline">{t('buttons.myListings')}</span>
                                     </Button>
                                 </Link>
                                 <Link href="/marketplace/create" className="hidden md:flex md:flex-none">
                                     <Button className="w-full bg-gold text-black hover:bg-gold-light font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
                                         <Plus className="mr-1 md:mr-2 h-4 w-4" />
-                                        Publicar
+                                        {t('buttons.publish')}
                                     </Button>
                                 </Link>
                             </div>
@@ -208,7 +210,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 <SearchBar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    placeholder="Buscar por nombre, colección..."
+                                    placeholder={t('search.placeholder')}
                                     className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
                                     onFocus={handleSearchFocus}
                                     onBlur={handleSearchBlur}
@@ -229,7 +231,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     className={`flex-1 ${showFilters ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                                 >
                                     <Filter className="mr-2 h-4 w-4" />
-                                    Filtros
+                                    {t('buttons.filters')}
                                 </Button>
                                 <Button
                                     onClick={handleSortChange}
@@ -238,7 +240,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     disabled={!hasPostcode}
                                 >
                                     {sortByDistance ? <MapPin className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />}
-                                    {sortByDistance ? 'Cerca' : 'Reciente'}
+                                    {sortByDistance ? t('buttons.near') : t('buttons.recent')}
                                 </Button>
                             </div>
 
@@ -253,7 +255,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                                             }`}
                                     >
-                                        Todos
+                                        {t('typeFilter.all')}
                                     </button>
                                     <button
                                         onClick={() => handleTypeFilterChange('cromo')}
@@ -262,7 +264,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                                             }`}
                                     >
-                                        Cromo
+                                        {t('typeFilter.cromo')}
                                     </button>
                                     <button
                                         onClick={() => handleTypeFilterChange('pack')}
@@ -271,7 +273,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                                             }`}
                                     >
-                                        Pack
+                                        {t('typeFilter.pack')}
                                     </button>
                                 </div>
 
@@ -294,7 +296,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                                             }`}
                                     >
-                                        Reciente
+                                        {t('buttons.recent')}
                                     </button>
                                     <button
                                         onClick={handleSortChange}
@@ -303,9 +305,9 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             ? 'bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10'
                                             : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
                                             }`}
-                                        title={!hasPostcode ? 'Añade tu código postal en el perfil' : undefined}
+                                        title={!hasPostcode ? t('errors.distanceDisabled') : undefined}
                                     >
-                                        Distancia
+                                        {t('buttons.distance')}
                                     </button>
                                 </div>
                             </div>
@@ -317,15 +319,15 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 <ContextualTip
                     tipId="tip-marketplace"
                     icon={Lightbulb}
-                    title="Encuentra lo que buscas"
-                    description="Busca cromos por nombre o filtra por colección. Cuando encuentres algo que te interese, abre un chat con el vendedor para acordar un intercambio."
+                    title={t('tip.title')}
+                    description={t('tip.description')}
                     className="mb-6"
                 />
 
                 {/* Listings Grid */}
                 {error && (
                     <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 text-center">
-                        <p className="font-bold text-lg mb-1">Error al cargar anuncios</p>
+                        <p className="font-bold text-lg mb-1">{t('errors.loadFailed')}</p>
                         <p className="text-sm opacity-80">{error}</p>
                     </div>
                 )}
@@ -352,7 +354,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                             variant="outline"
                             className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
                         >
-                            Cargar Más Anuncios
+                            {t('buttons.loadMore')}
                         </Button>
                     </div>
                 )}
@@ -370,16 +372,16 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                         <EmptyState
                             icon={Package}
                             title={
-                                searchQuery ? 'No se encontraron anuncios' : 'El mercado está tranquilo'
+                                searchQuery ? t('empty.searchTitle') : t('empty.quietTitle')
                             }
                             description={
                                 searchQuery
-                                    ? 'Intenta buscar con otros términos o filtros'
+                                    ? t('empty.searchDescription')
                                     : user
-                                        ? 'Sé el primero en publicar un anuncio y comienza a intercambiar'
-                                        : 'Inicia sesión para ver las mejores ofertas de la comunidad'
+                                        ? t('empty.quietDescriptionAuth')
+                                        : t('empty.quietDescriptionNoAuth')
                             }
-                            actionLabel={user ? 'Publicar Primer Anuncio' : 'Iniciar Sesión'}
+                            actionLabel={user ? t('empty.publishFirst') : t('empty.login')}
                             actionHref={user ? '/marketplace/create' : '/login'}
                         />
                     </div>

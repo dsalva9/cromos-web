@@ -1,5 +1,223 @@
 {
   "common": {
     "loading": "Cargando..."
+  },
+  "layout": {
+    "skipToContent": "Saltar al contenido principal"
+  },
+  "error": {
+    "title": "¡Algo salió mal!",
+    "message": "Encontramos un error al cargar esta página.",
+    "contactSupport": "Por favor contacta con",
+    "details": "Detalles del error (solo en desarrollo)",
+    "retry": "Intentar de Nuevo",
+    "home": "Ir al Inicio"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "subtitle": "Accede a tu colección de cromos",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "submitButton": "Iniciar Sesión",
+      "loading": "Iniciando sesión...",
+      "googleButton": "Continuar con Google",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "noAccount": "¿No tienes cuenta?",
+      "createAccount": "Crear cuenta",
+      "backToHome": "← Volver al inicio",
+      "or": "O"
+    },
+    "signup": {
+      "title": "Crear Cuenta",
+      "subtitle": "Únete a la comunidad de coleccionistas",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "••••••••",
+      "confirmPasswordLabel": "Confirmar Contraseña",
+      "termsLabel": "Acepto los terminos del servicio",
+      "termsHelperPre": "He leído y acepto los",
+      "termsLink": "Términos de servicio",
+      "termsAnd": "y la",
+      "privacyLink": "Política de privacidad",
+      "submitButton": "Crear Cuenta",
+      "loading": "Creando cuenta...",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Iniciar sesión",
+      "backToHome": "← Volver al inicio",
+      "successTitle": "¡Revisa tu email!",
+      "successSubtitle": "Cuenta creada",
+      "successSent": "Te hemos enviado un enlace de confirmación a",
+      "successInstruction": "Haz clic en el enlace del email para activar tu cuenta y empezar a coleccionar cromos.",
+      "successLogin": "Ir a iniciar sesión",
+      "termsError": "Debes aceptar los terminos del servicio para crear tu cuenta",
+      "passwordMatchError": "Las contrasenas no coinciden"
+    },
+    "forgotPassword": {
+      "title": "Recuperar Contraseña",
+      "subtitle": "Ingresa tu email y te enviaremos las instrucciones",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu@email.com",
+      "submitButton": "Enviar enlace",
+      "loading": "Enviando...",
+      "backToLogin": "← Volver a Iniciar Sesión",
+      "successMessage": "Si el email existe, recibirás un enlace para recuperar tu contraseña."
+    },
+    "errors": {
+      "suspended": "Tu cuenta está suspendida, por favor contacta con",
+      "contactSupport": "Por favor contacta con",
+      "unexpected": "Ocurrió un error inesperado",
+      "googleUnexpected": "Ocurrió un error inesperado durante el inicio de sesión con Google"
+    }
+  },
+  "profile": {
+    "index": {
+      "title": "Perfil",
+      "editAvatar": "Editar Avatar",
+      "loading": "Cargando perfil...",
+      "welcome": "Hola, {nickname}",
+      "collections": {
+        "title": "Mis Colecciones",
+        "description": "Tienes {count} colección activa",
+        "descriptionPlural": "Tienes {count} colecciones activas"
+      },
+      "actions": {
+        "title": "Acciones Rápidas",
+        "myListings": "Mis Anuncios",
+        "myListingsDesc": "Gestiona tus cromos y packs publicados",
+        "createListing": "Publicar Anuncio",
+        "createListingDesc": "Sube un nuevo anuncio al mercado"
+      },
+      "stats": {
+        "title": "Tus Estadísticas",
+        "transactions": "Intercambios Completados",
+        "transactionsDesc": "Tratos exitosos",
+        "rating": "Valoración de la Comunidad",
+        "ratingDesc": "Basado en {count} reseñas"
+      },
+      "nickname": {
+        "editLabel": "Cambiar Nickname",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "success": "Nickname actualizado correctamente",
+        "error": "Error al actualizar el nickname"
+      }
+    },
+    "completar": {
+      "title": "Completa tu Perfil",
+      "subtitle": "Cuéntanos un poco sobre ti para empezar a intercambiar",
+      "avatarLabel": "Foto de Perfil",
+      "avatarChange": "Cambiar avatar",
+      "nicknameLabel": "Nickname",
+      "nicknamePlaceholder": "¿Cómo quieres que te conozcan?",
+      "nicknameDesc": "Este será tu nombre público",
+      "countryLabel": "País",
+      "postcodeLabel": "Código Postal",
+      "postcodePlaceholder": "Ej. 28001",
+      "postcodeDesc": "Se usará para encontrar coleccionistas cercanos",
+      "loading": "Cargando...",
+      "submitButton": "Completar Perfil",
+      "submitButtonLoading": "Guardando...",
+      "successMessage": "¡Perfil actualizado con éxito!",
+      "errors": {
+        "invalidPostcode": "Por favor, introduce un código postal válido",
+        "nicknameTaken": "Este nickname ya está en uso",
+        "validationFailed": "Por favor, completa todos los campos requeridos",
+        "unexpected": "Ocurrió un error inesperado",
+        "avatarUpload": "Error al subir la imagen",
+        "saveFailed": "Error al guardar el perfil. Inténtalo de nuevo más tarde."
+      }
+    }
+  },
+  "marketplace": {
+    "metadata": {
+      "title": "Marketplace | Cambio Cromos",
+      "description": "Compra, vende e intercambia cromos con la comunidad. Encuentra los cromos que te faltan y completa tus colecciones."
+    },
+    "index": {
+      "title": "Marketplace",
+      "stats": {
+        "active": "{count} activos",
+        "community": "Comunidad activa",
+        "communityShort": "Activa",
+        "updated": "Actualizado hoy",
+        "updatedShort": "Hoy"
+      },
+      "buttons": {
+        "myListings": "Mis Anuncios",
+        "publish": "Publicar",
+        "filters": "Filtros",
+        "near": "Cerca",
+        "recent": "Reciente",
+        "distance": "Distancia",
+        "loadMore": "Cargar Más Anuncios"
+      },
+      "search": {
+        "placeholder": "Buscar por nombre, colección..."
+      },
+      "typeFilter": {
+        "all": "Todos",
+        "cromo": "Cromo",
+        "pack": "Pack"
+      },
+      "tip": {
+        "title": "Encuentra lo que buscas",
+        "description": "Busca cromos por nombre o filtra por colección. Cuando encuentres algo que te interese, abre un chat con el vendedor para acordar un intercambio."
+      },
+      "errors": {
+        "loadFailed": "Error al cargar anuncios",
+        "distanceDisabled": "Añade tu código postal en el perfil"
+      },
+      "empty": {
+        "searchTitle": "No se encontraron anuncios",
+        "searchDescription": "Intenta buscar con otros términos o filtros",
+        "quietTitle": "El mercado está tranquilo",
+        "quietDescriptionAuth": "Sé el primero en publicar un anuncio y comienza a intercambiar",
+        "quietDescriptionNoAuth": "Inicia sesión para ver las mejores ofertas de la comunidad",
+        "publishFirst": "Publicar Primer Anuncio",
+        "login": "Iniciar Sesión"
+      }
+    },
+    "card": {
+      "new": "Nuevo",
+      "status": {
+        "pack": "PACK",
+        "sold": "VENDIDO",
+        "removed": "ELIMINADO"
+      },
+      "time": {
+        "now": "ahora mismo",
+        "minutes": "hace {count} min",
+        "hours": "hace {count}h",
+        "today": "hoy",
+        "yesterday": "ayer",
+        "days": "hace {count}d"
+      },
+      "viewDetails": "Ver Detalles"
+    }
+  },
+  "chats": {
+    "title": "Mis Chats",
+    "subtitle": "Todas tus conversaciones sobre anuncios del marketplace",
+    "tip": {
+      "title": "Tus conversaciones",
+      "description": "Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
+    },
+    "empty": {
+      "title": "No tienes conversaciones activas",
+      "action": "Explorar Marketplace"
+    },
+    "status": {
+      "active": "Activo",
+      "reserved": "Reservado",
+      "completed": "Completado"
+    },
+    "roles": {
+      "buyer": "Comprador:",
+      "seller": "Vendedor:"
+    }
   }
 }

@@ -18,6 +18,7 @@ import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 import { InstallAppModal } from '@/components/pwa/InstallAppModal';
 import { isWeb } from '@/lib/platform';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 function CompleteProfileContent() {
   const { user } = useUser();
@@ -25,6 +26,8 @@ function CompleteProfileContent() {
   const router = useRouter();
   const { profile, updateProfile, refresh, markComplete } = useProfileCompletion();
   const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
+  const t = useTranslations('profile.completar');
+  const tErrors = useTranslations('auth.errors');
 
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
@@ -81,32 +84,32 @@ function CompleteProfileContent() {
     const trimmedPostcode = formPostcode.trim();
 
     if (!trimmedNickname) {
-      setErrorMessage('El campo Usuario es obligatorio.');
+      setErrorMessage(t('errors.missingUsername'));
       return;
     }
 
-    if (trimmedNickname.toLowerCase() === 'sin nombre') {
-      setErrorMessage('Elige un usuario distinto a "Sin nombre".');
+    if (trimmedNickname.toLowerCase() === 'sin nombre' || trimmedNickname.toLowerCase() === 'no name' || trimmedNickname.toLowerCase() === 'sem nome') {
+      setErrorMessage(t('errors.invalidUsername1'));
       return;
     }
 
     if (trimmedNickname.toLowerCase().startsWith('pending_')) {
-      setErrorMessage('Elige un nombre de usuario personalizado.');
+      setErrorMessage(t('errors.invalidUsername2'));
       return;
     }
 
     if (!trimmedPostcode) {
-      setErrorMessage(`El campo ${postcodeRule.label} es obligatorio.`);
+      setErrorMessage(t('errors.missingPostcode', { label: postcodeRule.label }));
       return;
     }
 
     if (!validatePostcode(trimmedPostcode, formCountryCode)) {
-      setErrorMessage(`Introduce un ${postcodeRule.label} válido (ej: ${postcodeRule.placeholder}).`);
+      setErrorMessage(t('errors.invalidPostcode', { label: postcodeRule.label, placeholder: postcodeRule.placeholder }));
       return;
     }
 
     if (!formAvatarPath && !avatarBlob) {
-      setErrorMessage('Selecciona un avatar para tu perfil.');
+      setErrorMessage(t('errors.missingAvatar'));
       return;
     }
 
@@ -127,7 +130,7 @@ function CompleteProfileContent() {
       }
 
       if (existingNickname) {
-        setErrorMessage('Ese usuario ya está en uso. Prueba con otro.');
+        setErrorMessage(t('errors.usernameTaken'));
         setSaving(false);
         return;
       }
@@ -165,7 +168,7 @@ function CompleteProfileContent() {
 
       if (updateError) {
         if ('code' in updateError && updateError.code === '23505') {
-          setErrorMessage('Ese usuario ya está en uso. Prueba con otro.');
+          setErrorMessage(t('errors.usernameTaken'));
           setSaving(false);
           return;
         }
@@ -187,7 +190,7 @@ function CompleteProfileContent() {
       // are sufficient; the DB re-fetch can settle after navigation.
       refresh().catch(() => { /* swallow — data is already optimistic */ });
 
-      toast.success('Perfil completado. ¡Bienvenido!');
+      toast.success(t('successMessage'));
 
       // On mobile web, show install modal before redirecting
       if (isWeb() && typeof window !== 'undefined' && window.innerWidth < 768) {
@@ -202,9 +205,9 @@ function CompleteProfileContent() {
       if (error && typeof error === 'object' && 'code' in error) {
         const dbError = error as { code: string; message?: string };
         if (dbError.code === 'P0001' && dbError.message?.toLowerCase().includes('postcode')) {
-          setErrorMessage('El código postal introducido no es válido. Por favor, comprueba que es un código postal real.');
+          setErrorMessage(t('errors.invalidPostcodeFormat'));
         } else if (dbError.code === '23505') {
-          setErrorMessage('Ese usuario ya está en uso. Prueba con otro.');
+          setErrorMessage(t('errors.usernameTaken'));
         } else {
           setErrorMessage('profile_save_error');
         }
@@ -222,21 +225,21 @@ function CompleteProfileContent() {
         <div className="max-w-3xl mx-auto bg-white border-2 border-black rounded-xl shadow-xl p-8">
           <header className="mb-8">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900">
-              Completa tu perfil
+              {t('title')}
             </h1>
             <p className="text-gray-600 mt-2">
-              Necesitamos algunos datos básicos antes de que puedas usar todas las secciones de la app.
+              {t('subtitle')}
             </p>
           </header>
 
           {loadingProfile ? (
             <div className="h-64 flex items-center justify-center">
-              <span className="text-gray-600">Cargando perfil...</span>
+              <span className="text-gray-600">{t('loading')}</span>
             </div>
           ) : (
             <div className="space-y-6">
               <div className="space-y-3">
-                <Label>Avatar</Label>
+                <Label>{t('avatarLabel')}</Label>
                 <AvatarPicker
                   currentAvatarUrl={previewAvatarUrl}
                   onSelect={handleAvatarSelection}
@@ -245,13 +248,13 @@ function CompleteProfileContent() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="nickname">Usuario</Label>
+                <Label htmlFor="nickname">{t('usernameLabel')}</Label>
                 <Input
                   id="nickname"
                   value={formNickname}
                   onChange={event => setFormNickname(event.target.value)}
                   maxLength={50}
-                  placeholder="Tu nombre de usuario"
+                  placeholder={t('usernamePlaceholder')}
                   required
                   disabled={saving}
                 />
@@ -260,7 +263,7 @@ function CompleteProfileContent() {
               {/* Country Picker — only shown when multi_country flag is enabled */}
               {multiCountryEnabled && (
                 <div className="space-y-2">
-                  <Label htmlFor="country">País</Label>
+                  <Label htmlFor="country">{t('countryLabel')}</Label>
                   <select
                     id="country"
                     value={formCountryCode}
@@ -295,7 +298,7 @@ function CompleteProfileContent() {
                   disabled={saving}
                 />
                 <p className="text-xs text-gray-600">
-                  Usamos tu código postal para mostrar tu ubicación aproximada en intercambios.
+                  {t('postcodeNote')}
                 </p>
               </div>
 
@@ -303,10 +306,10 @@ function CompleteProfileContent() {
                 <div className="bg-red-600/80 border-2 border-black rounded-md px-4 py-3 text-sm font-bold text-white">
                   {errorMessage === 'profile_save_error' ? (
                     <>
-                      No pudimos guardar tu perfil. Intenta nuevamente.
+                      {t('errors.saveError')}
                       <br />
                       <br />
-                      Por favor contacta con{' '}
+                      {tErrors('contactSupport')}{' '}
                       <a
                         href={getSupportMailtoUrl()}
                         className="underline hover:text-gray-200"
@@ -326,7 +329,7 @@ function CompleteProfileContent() {
                   onClick={handleSave}
                   disabled={saving}
                 >
-                  {saving ? 'Guardando...' : 'Guardar y continuar'}
+                  {saving ? t('saving') : t('saveButton')}
                 </Button>
               </div>
             </div>

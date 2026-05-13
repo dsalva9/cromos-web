@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export default function Error({
   error,
@@ -14,6 +15,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations('error');
+
   useEffect(() => {
     // ChunkLoadError happens after deployments when stale tabs reference old chunks.
     // Auto-reload once to pick up the new assets.
@@ -45,13 +48,13 @@ export default function Error({
 
           <div>
             <h2 className="text-2xl font-black text-gray-900 mb-2">
-              ¡Algo salió mal!
+              {t('title')}
             </h2>
             <p className="text-gray-600">
-              Encontramos un error al cargar esta página.
+              {t('message')}
             </p>
             <p className="text-gray-600 mt-4">
-              Por favor contacta con{' '}
+              {t('contactSupport')}{' '}
               <a
                 href={getSupportMailtoUrl(error)}
                 className="text-gold hover:text-yellow-400 underline"
@@ -64,7 +67,7 @@ export default function Error({
           {process.env.NODE_ENV === 'development' && error && (
             <details className="text-left">
               <summary className="text-sm text-gray-600 cursor-pointer">
-                Detalles del error (solo en desarrollo)
+                {t('details')}
               </summary>
               <pre className="mt-2 text-xs text-red-400 overflow-auto p-2 bg-black rounded">
                 {error.message}
@@ -77,14 +80,14 @@ export default function Error({
               onClick={reset}
               className="flex-1 bg-gold text-black hover:bg-gold-light font-bold"
             >
-              Intentar de Nuevo
+              {t('retry')}
             </Button>
             <Button
               onClick={() => window.location.href = '/'}
               variant="outline"
               className="flex-1 border-2 border-black"
             >
-              Ir al Inicio
+              {t('home')}
             </Button>
           </div>
         </ModernCardContent>

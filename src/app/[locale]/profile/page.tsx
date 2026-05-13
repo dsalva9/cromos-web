@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from '@/hooks/use-router';
@@ -20,11 +20,13 @@ import {
   XCircle,
   EyeOff,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
   const supabase = useSupabaseClient();
   const router = useRouter();
+  const t = useTranslations('profile.index');
 
   // Profile data
   const {
@@ -104,7 +106,7 @@ function ProfileContent() {
       // Optimistic update
       setOptimisticNickname(newNickname);
       setEditingNickname(false);
-      toast.success('Nombre actualizado');
+      toast.success(t('successMessage'));
 
       // Server call
       const { error } = await supabase.from('profiles').upsert(
@@ -122,7 +124,7 @@ function ProfileContent() {
       // Rollback optimistic update
       setOptimisticNickname(previousNickname);
       setEditingNickname(true);
-      toast.error('Error al actualizar nombre');
+      toast.error(t('errorMessage'));
     } finally {
       setActionLoading(prev => ({ ...prev, [actionKey]: false }));
     }
@@ -147,7 +149,7 @@ function ProfileContent() {
   if (userLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-gray-900 dark:text-white text-xl">Cargando perfil...</div>
+        <div className="text-gray-900 dark:text-white text-xl">{t('loading')}</div>
       </div>
     );
   }
@@ -161,13 +163,13 @@ function ProfileContent() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center space-y-4 text-gray-900 dark:text-white">
-          <h1 className="text-2xl font-bold uppercase">Error</h1>
+          <h1 className="text-2xl font-bold uppercase">{t('errorTitle')}</h1>
           <p>{error}</p>
           <Button
             onClick={() => window.location.reload()}
             className="bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-bold uppercase"
           >
-            Reintentar
+            {t('retryButton')}
           </Button>
         </div>
       </div>
@@ -180,9 +182,9 @@ function ProfileContent() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-black uppercase text-gray-900 dark:text-white drop-shadow-lg mb-2">
-            Mi Perfil
+            {t('title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">Gestiona tu información y colecciones</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('subtitle')}</p>
 
           {/* Quick Actions */}
           <div className="flex justify-center gap-4 mt-6">
@@ -193,7 +195,7 @@ function ProfileContent() {
               className="border-2 border-black dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-800 hover:bg-gold hover:text-gray-900"
             >
               <EyeOff className="w-4 h-4 mr-2" />
-              Usuarios Ignorados
+              {t('ignoredUsers')}
             </Button>
           </div>
         </div>
@@ -222,7 +224,7 @@ function ProfileContent() {
                         <Input
                           value={tempNickname}
                           onChange={e => setTempNickname(e.target.value)}
-                          placeholder="Tu nombre de usuario"
+                          placeholder={t('usernamePlaceholder')}
                           className="bg-gray-50 border-2 border-black text-gray-900 focus:border-gold focus:ring-gold flex-1"
                           onKeyDown={handleKeyDown}
                           ref={inputRef}
@@ -238,11 +240,11 @@ function ProfileContent() {
                           type="button"
                         >
                           {actionLoading['nick-user'] ? (
-                            'Guardando...'
+                            t('saving')
                           ) : (
                             <>
                               <CheckCircle className="w-4 h-4 mr-1" />
-                              Guardar
+                              {t('saveButton')}
                             </>
                           )}
                         </Button>
@@ -255,7 +257,7 @@ function ProfileContent() {
                           type="button"
                         >
                           <XCircle className="w-4 h-4 mr-1" />
-                          Cancelar
+                          {t('cancelButton')}
                         </Button>
                       </div>
                     </div>
@@ -263,7 +265,7 @@ function ProfileContent() {
                     <div>
                       <div className="flex items-center space-x-3 mb-2">
                         <h2 className="text-3xl font-bold">
-                          {displayNickname || 'Sin nombre'}
+                          {displayNickname || t('noName')}
                         </h2>
                         <Button
                           size="sm"
@@ -279,7 +281,7 @@ function ProfileContent() {
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4" />
                           <span>
-                            Desde{' '}
+                            {t('since')}{' '}
                             {new Date(
                               profile?.created_at || ''
                             ).toLocaleDateString()}
@@ -288,8 +290,9 @@ function ProfileContent() {
                         <div className="flex items-center space-x-2">
                           <Users className="w-4 h-4" />
                           <span>
-                            {ownedCollections?.length || 0} colección
-                            {(ownedCollections?.length || 0) !== 1 ? 'es' : ''}
+                            {(ownedCollections?.length || 0) === 1
+                              ? t('collectionsCount', { count: 1 })
+                              : t('collectionsCountPlural', { count: ownedCollections?.length || 0 })}
                           </span>
                         </div>
                       </div>

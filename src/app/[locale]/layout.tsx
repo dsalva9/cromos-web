@@ -1,5 +1,5 @@
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import SiteHeader from '@/components/site-header';
@@ -57,6 +57,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // Enable static rendering
   setRequestLocale(locale);
+  const t = await getTranslations('layout');
 
   return (
     <NextIntlClientProvider locale={locale}>
@@ -68,7 +69,7 @@ export default async function LocaleLayout({ children, params }: Props) {
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-gold focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white"
           >
-            Saltar al contenido principal
+            {t('skipToContent')}
           </a>
           <header role="banner">
             <SiteHeader />

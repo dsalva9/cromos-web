@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 
 import { siteConfig } from '@/config/site';
@@ -19,6 +19,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -28,8 +29,9 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const termsErrorMessage =
-    'Debes aceptar los terminos del servicio para crear tu cuenta';
+  const t = useTranslations('auth.signup');
+  const tErrors = useTranslations('auth.errors');
+  const termsErrorMessage = t('termsError');
   const supabase = useSupabaseClient();
 
   const handleTermsToggle = (value: boolean | 'indeterminate') => {
@@ -49,7 +51,7 @@ export default function SignupPage() {
     }
 
     if (password !== confirmPassword) {
-      setError('Las contrasenas no coinciden');
+      setError(t('passwordMatchError'));
       return;
     }
 
@@ -87,7 +89,7 @@ export default function SignupPage() {
             📧
           </div>
           <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
-            ¡Revisa tu email!
+            {t('successTitle')}
           </h1>
         </div>
 
@@ -99,23 +101,22 @@ export default function SignupPage() {
                 <span className="text-2xl">✅</span>
               </div>
               <h2 className="text-xl font-black uppercase text-gray-900 dark:text-white mb-2">
-                Cuenta creada
+                {t('successSubtitle')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 font-medium">
-                Te hemos enviado un enlace de confirmación a{' '}
+                {t('successSent')}{' '}
                 <strong>{email}</strong>
               </p>
             </div>
 
             <div className="space-y-4">
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                Haz clic en el enlace del email para activar tu cuenta y empezar
-                a coleccionar cromos.
+                {t('successInstruction')}
               </p>
 
               <Link href="/login">
                 <Button className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200">
-                  Ir a iniciar sesión
+                  {t('successLogin')}
                 </Button>
               </Link>
             </div>
@@ -128,7 +129,7 @@ export default function SignupPage() {
             href="/"
             className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold hover:underline"
           >
-            ← Volver al inicio
+            {t('backToHome')}
           </Link>
         </div>
       </div>
@@ -158,10 +159,10 @@ export default function SignupPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black uppercase text-gray-900 dark:text-white mb-2">
-              Crear Cuenta
+              {t('title')}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 font-medium">
-              Únete a la comunidad de coleccionistas
+              {t('subtitle')}
             </p>
           </div>
 
@@ -171,12 +172,12 @@ export default function SignupPage() {
                 htmlFor="email"
                 className="text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Email
+                {t('emailLabel')}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -189,12 +190,12 @@ export default function SignupPage() {
                 htmlFor="password"
                 className="text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Contraseña
+                {t('passwordLabel')}
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -207,12 +208,12 @@ export default function SignupPage() {
                 htmlFor="confirmPassword"
                 className="text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Confirmar Contraseña
+                {t('confirmPasswordLabel')}
               </label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required
@@ -234,24 +235,24 @@ export default function SignupPage() {
                     htmlFor="terms"
                     className="font-medium text-gray-900 dark:text-white cursor-pointer select-none"
                   >
-                    Acepto los terminos del servicio
+                    {t('termsLabel')}
                   </label>
                   <p id="terms-helper" className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                    He leído y acepto los{' '}
+                    {t('termsHelperPre')}{' '}
                     <Link
                       href="/legal/terms"
                       target="_blank"
                       className="font-semibold text-gold hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
-                      Términos de servicio
+                      {t('termsLink')}
                     </Link>{' '}
-                    y la{' '}
+                    {t('termsAnd')}{' '}
                     <Link
                       href="/legal/privacy"
                       target="_blank"
                       className="font-semibold text-gold hover:text-yellow-400 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm"
                     >
-                      Política de privacidad
+                      {t('privacyLink')}
                     </Link>
                     .
                   </p>
@@ -262,10 +263,10 @@ export default function SignupPage() {
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
                 <p className="text-sm text-white font-bold">
-                  {error === 'unexpected' ? 'Ocurrió un error inesperado.' : error}
+                  {error === 'unexpected' ? tErrors('unexpected') : error}
                 </p>
                 <p className="text-sm text-white font-bold mt-2">
-                  Por favor contacta con{' '}
+                  {tErrors('contactSupport')}{' '}
                   <a
                     href={getSupportMailtoUrl()}
                     className="underline hover:text-gray-200"
@@ -281,19 +282,19 @@ export default function SignupPage() {
               className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
-              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+              {loading ? t('loading') : t('submitButton')}
             </Button>
           </form>
 
           <div className="mt-8 text-center">
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                ¿Ya tienes cuenta?{' '}
+                {t('hasAccount')}{' '}
                 <Link
                   href="/login"
                   className="text-gold hover:text-yellow-400 font-bold hover:underline"
                 >
-                  Iniciar sesión
+                  {t('loginLink')}
                 </Link>
               </p>
             </div>
@@ -307,7 +308,7 @@ export default function SignupPage() {
           href="/"
           className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold hover:underline"
         >
-          ← Volver al inicio
+          {t('backToHome')}
         </Link>
       </div>
     </div>

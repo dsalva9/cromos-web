@@ -13,7 +13,7 @@ import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { getSupportMailtoUrl } from '@/lib/utils';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -22,6 +22,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const supabase = useSupabaseClient();
   const locale = useLocale();
+  const t = useTranslations('auth.login');
+  const tErrors = useTranslations('auth.errors');
 
   // Redirect if already logged in
   useEffect(() => {
@@ -103,7 +105,7 @@ export default function LoginPage() {
         window.location.href = profileIsComplete ? `/${locale}/marketplace` : `/${locale}/profile/completar`;
       }
     } catch {
-      setError('An unexpected error occurred');
+      setError('unexpected');
     } finally {
       setLoading(false);
     }
@@ -139,7 +141,7 @@ export default function LoginPage() {
       }
       // On success: don't reset loading — browser will redirect away
     } catch {
-      setError('An unexpected error occurred during Google Sign In');
+      setError('googleUnexpected');
       setLoading(false);
     }
   };
@@ -168,9 +170,9 @@ export default function LoginPage() {
         <div className="p-4 sm:p-8">
           <div className="text-center mb-4 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-black uppercase text-gray-900 dark:text-white mb-1 sm:mb-2">
-              Iniciar Sesión
+              {t('title')}
             </h2>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap">Accede a tu colección de cromos</p>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium whitespace-nowrap">{t('subtitle')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-3 sm:space-y-6">
@@ -179,13 +181,13 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="text-xs sm:text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Email
+                {t('emailLabel')}
               </label>
 
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@email.com"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -198,13 +200,13 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="text-xs sm:text-sm font-bold uppercase text-gray-900 dark:text-white"
               >
-                Contraseña
+                {t('passwordLabel')}
               </label>
 
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
@@ -217,7 +219,7 @@ export default function LoginPage() {
                 <p className="text-sm text-white font-bold">
                   {error === 'suspended' ? (
                     <>
-                      Tu cuenta está suspendida, por favor contacta con{' '}
+                      {tErrors('suspended')}{' '}
                       <a
                         href={getSupportMailtoUrl(undefined, "Soporte Admin - CambioCromos")}
                         className="underline hover:text-gray-200"
@@ -227,10 +229,10 @@ export default function LoginPage() {
                     </>
                   ) : (
                     <>
-                      {error}
+                      {error === 'unexpected' ? tErrors('unexpected') : error === 'googleUnexpected' ? tErrors('googleUnexpected') : error}
                       <br />
                       <br />
-                      Por favor contacta con{' '}
+                      {tErrors('contactSupport')}{' '}
                       <a
                         href={getSupportMailtoUrl()}
                         className="underline hover:text-gray-200"
@@ -248,7 +250,7 @@ export default function LoginPage() {
               className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase h-10 sm:py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
               disabled={loading}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? t('loading') : t('submitButton')}
             </Button>
           </form>
 
@@ -257,7 +259,7 @@ export default function LoginPage() {
               <span className="w-full border-t-2 border-gray-200 dark:border-gray-700"></span>
             </div>
             <div className="relative flex justify-center text-sm uppercase">
-              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold text-xs">O</span>
+              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold text-xs">{t('or')}</span>
             </div>
           </div>
 
@@ -269,7 +271,7 @@ export default function LoginPage() {
             disabled={loading}
           >
             <GoogleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span>Continuar con Google</span>
+            <span>{t('googleButton')}</span>
           </Button>
 
           <div className="mt-4 sm:mt-8 text-center space-y-2 sm:space-y-4">
@@ -277,17 +279,17 @@ export default function LoginPage() {
               href="/forgot-password"
               className="text-xs sm:text-sm text-gold hover:text-yellow-400 font-bold hover:underline"
             >
-              ¿Olvidaste tu contraseña?
+              {t('forgotPassword')}
             </Link>
 
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-2 sm:pt-4">
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">
-                ¿No tienes cuenta?{' '}
+                {t('noAccount')}{' '}
                 <Link
                   href="/signup"
                   className="text-gold hover:text-yellow-400 font-bold hover:underline"
                 >
-                  Crear cuenta
+                  {t('createAccount')}
                 </Link>
               </p>
             </div>
@@ -301,7 +303,7 @@ export default function LoginPage() {
           href="/"
           className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold hover:underline"
         >
-          ← Volver al inicio
+          {t('backToHome')}
         </Link>
       </div>
     </div >
