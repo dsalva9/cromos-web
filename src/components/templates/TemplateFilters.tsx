@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { useTranslations } from 'next-intl';
 
 type SortOption = 'recent' | 'rating' | 'popular';
 
@@ -25,26 +26,28 @@ export function TemplateFilters({
   sortBy,
   onSortChange,
 }: TemplateFiltersProps) {
+  const t = useTranslations('templates.filters');
+
   return (
     <div className="space-y-4">
       {/* Search */}
       <SearchBar
         value={searchQuery}
         onChange={onSearchChange}
-        placeholder="Buscar plantillas por título o descripción..."
+        placeholder={t('searchPlaceholder')}
       />
 
       {/* Sort */}
       <div className="flex items-center gap-4">
-        <Label className="text-gray-900 dark:text-white">Ordenar por:</Label>
+        <Label className="text-gray-900 dark:text-white">{t('sortLabel')}</Label>
         <Select value={sortBy} onValueChange={onSortChange}>
           <SelectTrigger className="w-48 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="recent">Más Recientes</SelectItem>
-            <SelectItem value="rating">Mejor Valoradas</SelectItem>
-            <SelectItem value="popular">Más Populares</SelectItem>
+            <SelectItem value="recent">{t('sortRecent')}</SelectItem>
+            <SelectItem value="rating">{t('sortRating')}</SelectItem>
+            <SelectItem value="popular">{t('sortPopular')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

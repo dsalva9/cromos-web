@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ItemFieldDefinition } from '@/types/v1.6.0';
+import { useTranslations } from 'next-intl';
 
 interface DynamicFieldsEditorProps {
   schema: ItemFieldDefinition[];
@@ -15,6 +16,8 @@ export function DynamicFieldsEditor({
   onChange,
   idPrefix,
 }: DynamicFieldsEditorProps) {
+  const t = useTranslations('templates.dynamicFields');
+
   const updateField = (fieldName: string, value: string | number | boolean) => {
     onChange({
       ...data,
@@ -55,7 +58,7 @@ export function DynamicFieldsEditor({
                   type="text"
                   value={typeof value === 'string' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value)}
-                  placeholder={`Ingresa ${field.name.toLowerCase()}`}
+                  placeholder={t('enterField', { field: field.name.toLowerCase() })}
                   className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 />
@@ -68,7 +71,7 @@ export function DynamicFieldsEditor({
                   inputMode="numeric"
                   value={typeof value === 'number' ? value : ''}
                   onChange={(e) => updateField(field.name, e.target.value ? parseFloat(e.target.value) : '')}
-                  placeholder={`Ingresa ${field.name.toLowerCase()}`}
+                  placeholder={t('enterField', { field: field.name.toLowerCase() })}
                   className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 />
@@ -84,7 +87,7 @@ export function DynamicFieldsEditor({
                     className="w-4 h-4 rounded border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
                   />
                   <Label htmlFor={fieldId} className="text-gray-600 dark:text-gray-400 text-sm cursor-pointer">
-                    {value ? 'Sí' : 'No'}
+                    {value ? t('yes') : t('no')}
                   </Label>
                 </div>
               )}
@@ -97,7 +100,7 @@ export function DynamicFieldsEditor({
                   className="w-full h-10 px-3 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
                   required={field.required}
                 >
-                  <option value="">Selecciona {field.name.toLowerCase()}</option>
+                  <option value="">{t('selectField', { field: field.name.toLowerCase() })}</option>
                   {field.options.map((option, optIndex) => (
                     <option key={optIndex} value={option}>
                       {option}

@@ -87,14 +87,14 @@ export function TemplateCard({
         {/* Image */}
         <Link
           href={`/templates/${template.id}`}
-          aria-label={`Ver colección: ${template.title}`}
+          aria-label={t('card.viewCollection', { title: template.title })}
           className="block"
         >
           <div className="relative aspect-video bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-700 dark:to-slate-800 cursor-pointer">
             {template.image_url ? (
               <Image
                 src={template.image_url}
-                alt={`Portada de la colección ${template.title}`}
+                alt={t('card.coverAlt', { title: template.title })}
                 fill
                 className="object-contain"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

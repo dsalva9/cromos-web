@@ -8,6 +8,7 @@ import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { legacyFrom, legacyRpc } from '@/types/legacy-tables';
 import { convertToFullWebP, convertToThumbWebP } from '@/lib/imageUtils';
+import { useTranslations } from 'next-intl';
 
 type Collection = { id: number; name: string };
 
@@ -70,6 +71,7 @@ function splitCSVLine(line: string): string[] {
 
 export default function BulkUploadTab() {
   const supabase = useSupabaseClient();
+  const t = useTranslations('admin.bulkUpload');
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<number | null>(null);
   const [csvText, setCsvText] = useState('');
@@ -79,8 +81,6 @@ export default function BulkUploadTab() {
   const [overwrite, setOverwrite] = useState(true);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
-
-
 
   const fetchCollections = useCallback(async () => {
     const { data, error } = await legacyFrom(supabase, 'collections').select('id,name').order('id');
@@ -122,11 +122,11 @@ export default function BulkUploadTab() {
 
   async function runApply() {
     if (!selectedCollection) {
-      toast('Selecciona una colección', 'error');
+      toast(t('errorSelectCollection'), 'error');
       return;
     }
     if (prepared.length === 0) {
-      toast('No hay datos para procesar', 'error');
+      toast(t('errorNoData'), 'error');
       return;
     }
     setRunning(true);
@@ -143,7 +143,7 @@ export default function BulkUploadTab() {
         const pr = prepared[myIdx];
         const code = pr.row.sticker_code?.trim();
         if (!code) {
-          newResults.push({ code: '(vacío)', ok: false, error: 'sticker_code requerido' });
+          newResults.push({ code: '(empty)', ok: false, error: 'sticker_code required' });
           continue;
         }
         try {
@@ -201,7 +201,7 @@ export default function BulkUploadTab() {
           newResults.push({ code, ok: true });
         } catch (e: unknown) {
           logger.error('Bulk row error', e);
-          const msg = e instanceof Error ? e.message : 'Error desconocido';
+          const msg = e instanceof Error ? e.message : t('errorUnknown');
           newResults.push({ code: pr.row.sticker_code, ok: false, error: msg });
         }
       }
@@ -210,7 +210,7 @@ export default function BulkUploadTab() {
     await Promise.all(workers);
     setResults(newResults);
     setRunning(false);
-    toast('Carga masiva completada', 'success');
+    toast(t('successComplete'), 'success');
   }
 
   function findByBase(index: Map<string, File>, base: string): File | null {
@@ -228,17 +228,13 @@ export default function BulkUploadTab() {
   const failedRows = results.filter(r => !r.ok).map(r => r.code);
 
   function downloadTemplate() {
-    const template = `sticker_code,player_name,team_name,rarity,rating,page_code,page_number
-EX001,Lionel Messi,Argentina,legendario,95,,
-EX002,Cristiano Ronaldo,Portugal,épico,94,,
-EX003,Kylian Mbappé,Francia,raro,89,,
-EX004,Erling Haaland,Noruega,común,87,,`;
+    const template = `sticker_code,player_name,team_name,rarity,rating,page_code,page_number\r\nEX001,Lionel Messi,Argentina,legendario,95,,\r\nEX002,Cristiano Ronaldo,Portugal,épico,94,,\r\nEX003,Kylian Mbappé,Francia,raro,89,,\r\nEX004,Erling Haaland,Noruega,común,87,,`;
     const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'plantilla_carga_masiva.csv';
     link.click();
-    toast('Plantilla descargada', 'success');
+    toast(t('templateDownloaded'), 'success');
   }
 
   function retryFailed() {
@@ -248,42 +244,42 @@ EX004,Erling Haaland,Noruega,común,87,,`;
     setPrepared(failedPrepared);
     setCsvRows(failedPrepared.map(p => p.row));
     setResults([]);
-    toast(`Reintentar ${failedRows.length} filas fallidas`, 'info');
+    toast(t('retryRows', { count: failedRows.length }), 'info');
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-3 justify-between">
-        <h2 className="text-2xl font-black text-white">Carga Masiva</h2>
+        <h2 className="text-2xl font-black text-white">{t('title')}</h2>
         <Button size="sm" variant="secondary" onClick={downloadTemplate}>
-          Descargar Plantilla CSV
+          {t('downloadTemplate')}
         </Button>
       </div>
 
       <div className="bg-[#2D3748] border-4 border-black rounded-md p-4 text-white space-y-4">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="text-white">Colección</label>
+          <label className="text-white">{t('collection')}</label>
           <select className="bg-[#1F2737] text-white border-2 border-black rounded-md px-2 py-2" value={selectedCollection ?? ''} onChange={e => setSelectedCollection(Number(e.target.value) || null)}>
             {collections.map(c => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
-          <label className="flex items-center gap-2"><input type="checkbox" checked={overwrite} onChange={e => setOverwrite(e.target.checked)} /> Sobrescribir existentes</label>
+          <label className="flex items-center gap-2"><input type="checkbox" checked={overwrite} onChange={e => setOverwrite(e.target.checked)} /> {t('overwrite')}</label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="font-semibold mb-2">CSV (metadatos)</p>
+            <p className="font-semibold mb-2">{t('csvLabel')}</p>
             <Input type="file" accept=".csv" onChange={e => e.target.files && handleCsvFile(e.target.files[0])} />
             <div className="mt-2">
-              <Button size="sm" onClick={previewCsv}>Previsualizar</Button>
+              <Button size="sm" onClick={previewCsv}>{t('preview')}</Button>
             </div>
-            <p className="text-xs mt-2 opacity-80">Cabeceras: sticker_code, player_name, team_name (opcional), rarity, rating (opcional), page_code | page_number (opcional)</p>
+            <p className="text-xs mt-2 opacity-80">{t('csvHeaders')}</p>
           </div>
           <div>
-            <p className="font-semibold mb-2">Imágenes (opcional)</p>
+            <p className="font-semibold mb-2">{t('imagesLabel')}</p>
             <input type="file" multiple onChange={e => setImageFiles(e.target.files ? Array.from(e.target.files) : [])} />
-            <p className="text-xs mt-2 opacity-80">Convención: {'{sticker_code}'}_full.* y {'{sticker_code}'}_thumb.* — Se convierten a WebP (300px / 100px)</p>
+            <p className="text-xs mt-2 opacity-80">{t('imageConvention', { code: '{sticker_code}' })}</p>
           </div>
         </div>
       </div>
@@ -294,10 +290,10 @@ EX004,Erling Haaland,Noruega,común,87,,`;
           <table className="min-w-full text-sm bg-[#2D3748] text-white border-4 border-black rounded-md">
             <thead>
               <tr className="bg-gray-700">
-                <th className="px-3 py-2 text-left border-b border-black">Código</th>
-                <th className="px-3 py-2 text-left border-b border-black">Jugador</th>
-                <th className="px-3 py-2 text-left border-b border-black">Rareza</th>
-                <th className="px-3 py-2 text-left border-b border-black">Rating</th>
+                <th className="px-3 py-2 text-left border-b border-black">{t('colCode')}</th>
+                <th className="px-3 py-2 text-left border-b border-black">{t('colPlayer')}</th>
+                <th className="px-3 py-2 text-left border-b border-black">{t('colRarity')}</th>
+                <th className="px-3 py-2 text-left border-b border-black">{t('colRating')}</th>
               </tr>
             </thead>
             <tbody>
@@ -315,18 +311,18 @@ EX004,Erling Haaland,Noruega,común,87,,`;
       )}
 
       <div className="flex items-center gap-2">
-        <Button disabled={running || prepared.length === 0} onClick={runApply}>{running ? 'Procesando…' : 'Aplicar'}</Button>
+        <Button disabled={running || prepared.length === 0} onClick={runApply}>{running ? t('processing') : t('apply')}</Button>
         {errCount > 0 && (
           <Button size="sm" variant="destructive" disabled={running} onClick={retryFailed}>
-            Reintentar fallidos ({errCount})
+            {t('retryFailed', { count: errCount })}
           </Button>
         )}
-        {results.length > 0 && <span className="text-white text-sm">OK: {okCount} — Errores: {errCount}</span>}
+        {results.length > 0 && <span className="text-white text-sm">OK: {okCount} — {t('errors')}: {errCount}</span>}
       </div>
 
       {results.length > 0 && (
         <div className="bg-[#2D3748] border-4 border-black rounded-md p-3 text-white">
-          <p className="font-semibold mb-2">Resumen</p>
+          <p className="font-semibold mb-2">{t('summary')}</p>
           <ul className="text-sm space-y-1 max-h-64 overflow-auto">
             {results.map((r, i) => (
               <li key={i} className={r.ok ? 'text-green-300' : 'text-red-300'}>
