@@ -21,7 +21,7 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     label: 'Mensajes de chat',
     description: 'Nuevos mensajes sobre tus listados',
     category: 'marketplace',
-    priority: 'low',
+    priority: 'high',
   },
   {
     kind: 'listing_reserved',
