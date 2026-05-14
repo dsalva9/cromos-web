@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
@@ -9,7 +9,7 @@ import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHea
 import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb, Plus } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useMarketplaceAvailabilitySlots } from '@/hooks/marketplace/useMarketplaceAvailability';
@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import { useHaptic } from '@/hooks/useHaptic';
 
 function TemplateProgressContent() {
   const params = useParams();
@@ -34,6 +35,7 @@ function TemplateProgressContent() {
 
   const { copy, progress, customFields, loading, error, updateSlotStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
+  const { hapticImpact } = useHaptic();
 
   const { slotIds: marketplaceSlotIds, totalAvailable: marketplaceCount } =
     useMarketplaceAvailabilitySlots(copyId ? Number(copyId) : undefined);
@@ -263,6 +265,22 @@ function TemplateProgressContent() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Floating Action Button for Quick Entry (Mobile Only) */}
+        {hasGlobalNumbers && (
+          <div className="md:hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom)+1rem)] right-4 z-40">
+            <Button
+              onClick={() => {
+                hapticImpact();
+                setQuickEntryOpen(true);
+              }}
+              className="w-14 h-14 rounded-full shadow-2xl flex items-center justify-center bg-gold text-black hover:bg-gold-light transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gold border-2 border-black"
+              aria-label="Entrada Rápida"
+            >
+              <Plus className="h-8 w-8" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

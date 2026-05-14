@@ -1,12 +1,18 @@
-﻿'use client';
+'use client';
 
 import { Plus } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
+/** Strip the locale prefix from a pathname for matching. */
+function stripLocale(path: string): string {
+  return path.replace(/^\/(es|en|pt)/, '') || '/';
+}
+
 export function FloatingActionBtn() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = stripLocale(rawPathname);
 
   // Determine action based on current path
   let actionLink = null;
@@ -15,15 +21,20 @@ export function FloatingActionBtn() {
   if ((pathname === '/marketplace' || pathname?.startsWith('/marketplace/')) &&
     !pathname?.includes('/chat') &&
     !pathname?.endsWith('/create')) {
-    // Only show on main marketplace page or subpages where it makes sense?
-    // User asked: "when we are in Marketplace"
-    // Let's show it on /marketplace and /marketplace/my-listings, but maybe not on detail pages if they cover it?
-    // For now, let's stick to /marketplace root to be safe, or just check startsWith
     actionLink = '/marketplace/create';
     ariaLabel = 'Publicar Anuncio';
-  } else if (pathname === '/templates' || pathname?.startsWith('/templates/')) {
+  } else if (pathname === '/mis-plantillas/create' || pathname?.startsWith('/templates/create')) {
     actionLink = '/templates/create';
     ariaLabel = 'Crear Plantilla';
+  } else if (pathname === '/templates' || pathname === '/mis-plantillas' || pathname?.startsWith('/templates/')) {
+    // On /templates or /mis-plantillas, we point to explore templates
+    actionLink = '/templates';
+    ariaLabel = 'Explorar Colecciones';
+  } else if (pathname?.startsWith('/mis-plantillas/') || pathname?.startsWith('/mi-coleccion/')) {
+    // If inside an album, we could point to adding stickers, 
+    // but for now let's show the create template as a secondary? 
+    // Or maybe "Quick Entry" should be handled here if we can.
+    // For now, let's just restore visibility to Marketplace and Templates.
   }
 
   // If no action defined for this page, don't render
