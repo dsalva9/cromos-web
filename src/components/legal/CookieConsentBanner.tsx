@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import { Cookie, X } from 'lucide-react';
@@ -8,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export function CookieConsentBanner() {
     const [isVisible, setIsVisible] = useState(false);
+    const t = useTranslations('legal.cookiesBanner');
 
     useEffect(() => {
         // Show banner if no consent choice has been made
@@ -49,7 +51,7 @@ export function CookieConsentBanner() {
                             </div>
                             <div className="flex-1">
                                 <h3 className="font-black uppercase text-gray-900 dark:text-white mb-2 flex justify-between items-center">
-                                    Control de Cookies
+                                    {t('title')}
                                     <button
                                         onClick={() => setIsVisible(false)}
                                         className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -58,24 +60,27 @@ export function CookieConsentBanner() {
                                     </button>
                                 </h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4">
-                                    Utilizamos cookies para analizar el tráfico y mejorar tu experiencia. Al aceptar, nos ayudas a optimizar la plataforma. Consulta nuestra{' '}
-                                    <Link href="/legal/cookies" className="text-gold hover:underline font-bold">
-                                        Política de Cookies
-                                    </Link> para más detalles.
+                                    {t.rich('description', {
+                                        policy: (chunks) => (
+                                            <Link href="/legal/cookies" className="text-gold hover:underline font-bold">
+                                                {chunks}
+                                            </Link>
+                                        )
+                                    })}
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-2">
                                     <Button
                                         onClick={handleAccept}
                                         className="bg-gold hover:bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all flex-1"
                                     >
-                                        Aceptar todas
+                                        {t('acceptAll')}
                                     </Button>
                                     <Button
                                         variant="outline"
                                         onClick={handleDecline}
                                         className="bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-bold border-2 border-black dark:border-gray-700 transition-all flex-1"
                                     >
-                                        Solo esenciales
+                                        {t('essentialOnly')}
                                     </Button>
                                 </div>
                                 <div className="mt-3 text-center">
@@ -83,7 +88,7 @@ export function CookieConsentBanner() {
                                         href="/legal/cookies"
                                         className="text-xs text-gray-500 hover:text-gold transition-colors underline underline-offset-2"
                                     >
-                                        Personalizar preferencias
+                                        {t('customize')}
                                     </Link>
                                 </div>
                             </div>

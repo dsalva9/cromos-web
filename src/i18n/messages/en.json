@@ -1138,12 +1138,12 @@
     }
   },
   "settings": {
-    "pageTitle": "Ajustes",
-    "pageDescription": "Configura tus preferencias y gestiona tu cuenta",
+    "pageTitle": "Settings",
+    "pageDescription": "Configure your preferences and manage your account",
     "tabs": {
-      "notifications": "Notificaciones",
-      "blocked": "Bloqueados",
-      "system": "Sistema",
+      "notifications": "Notifications",
+      "blocked": "Blocked",
+      "system": "System",
       "legal": "Legal"
     },
     "system": {
@@ -1491,6 +1491,36 @@
       "silver": "STARTER",
       "gold": "STAR",
       "special": "LEGEND"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "new_one": "new",
+    "new_other": "new",
+    "loading": "Loading...",
+    "empty": "You have no new notifications",
+    "viewAll": "View all notifications",
+    "andMore": "and {count} more..."
+  },
+  "pwa": {
+    "installPrompt": "?? For a better experience, install the CambioCromos app!",
+    "installApp": "Install App",
+    "googlePlay": "Google Play",
+    "iosInstructions": "Tap the Share button <icon/> and select \"Add to Home Screen\"",
+    "notifyPrompt": "Turn on notifications so you don't miss messages or trade offers.",
+    "activate": "Turn on",
+    "close": "Close",
+    "onesignalMessage": "Subscribe to our notifications to get messages and trade offers. You can disable anytime.",
+    "onesignalAccept": "Subscribe",
+    "onesignalCancel": "Later"
+  },
+  "legal": {
+    "cookiesBanner": {
+      "title": "Cookie Control",
+      "description": "We use cookies to analyze traffic and improve your experience. By accepting, you help us optimize the platform. Check our <policy>Cookie Policy</policy> for more details.",
+      "acceptAll": "Accept all",
+      "essentialOnly": "Essential only",
+      "customize": "Customize preferences"
     }
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Capacitor } from '@capacitor/core';
 import { requestPushPermission } from '@/components/providers/OneSignalProvider';
 
@@ -15,6 +16,7 @@ const PROMPT_DELAY_MS = 45_000; // 45 seconds
  */
 export function NotificationPromptBanner() {
   const [visible, setVisible] = useState(false);
+  const t = useTranslations('pwa');
 
   // Should we even consider showing the banner?
   const shouldShow = useCallback(() => {
@@ -63,7 +65,7 @@ export function NotificationPromptBanner() {
       </span>
 
       <p className="notification-prompt-banner__text">
-        Activa las notificaciones para no perderte mensajes ni ofertas de intercambio.
+        {t('notifyPrompt')}
       </p>
 
       <div className="notification-prompt-banner__actions">
@@ -72,14 +74,14 @@ export function NotificationPromptBanner() {
           onClick={activate}
           className="notification-prompt-banner__cta"
         >
-          Activar
+          {t('activate')}
         </button>
 
         <button
           type="button"
           onClick={dismiss}
           className="notification-prompt-banner__dismiss"
-          aria-label="Cerrar aviso de notificaciones"
+          aria-label={t('close')}
         >
           ✕
         </button>

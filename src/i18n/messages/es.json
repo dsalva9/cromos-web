@@ -1492,5 +1492,35 @@
       "gold": "ESTRELLA",
       "special": "LEYENDA"
     }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "new_one": "nueva",
+    "new_other": "nuevas",
+    "loading": "Cargando...",
+    "empty": "No tienes notificaciones nuevas",
+    "viewAll": "Ver todas las notificaciones",
+    "andMore": "y {count} m�s..."
+  },
+  "pwa": {
+    "installPrompt": "?? �Para una mejor experiencia, instala la app CambioCromos!",
+    "installApp": "Instalar App",
+    "googlePlay": "Google Play",
+    "iosInstructions": "Pulsa el bot�n Compartir <icon/> y selecciona \"A�adir a pantalla de inicio\"",
+    "notifyPrompt": "Activa las notificaciones para no perderte mensajes ni ofertas de intercambio.",
+    "activate": "Activar",
+    "close": "Cerrar aviso de notificaciones",
+    "onesignalMessage": "Suscr�bete a nuestras notificaciones para no perderte mensajes ni ofertas de intercambio. Puedes desactivarlo en cualquier momento.",
+    "onesignalAccept": "Suscribirme",
+    "onesignalCancel": "M�s tarde"
+  },
+  "legal": {
+    "cookiesBanner": {
+      "title": "Control de Cookies",
+      "description": "Utilizamos cookies para analizar el tráfico y mejorar tu experiencia. Al aceptar, nos ayudas a optimizar la plataforma. Consulta nuestra <policy>Política de Cookies</policy> para más detalles.",
+      "acceptAll": "Aceptar todas",
+      "essentialOnly": "Solo esenciales",
+      "customize": "Personalizar preferencias"
+    }
   }
 }

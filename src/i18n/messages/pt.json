@@ -1138,10 +1138,10 @@
     }
   },
   "settings": {
-    "pageTitle": "Ajustes",
-    "pageDescription": "Configura tus preferencias y gestiona tu cuenta",
+    "pageTitle": "Configura��es",
+    "pageDescription": "Configure suas prefer�ncias e gerencie sua conta",
     "tabs": {
-      "notifications": "Notificaciones",
+      "notifications": "Notifica��es",
       "blocked": "Bloqueados",
       "system": "Sistema",
       "legal": "Legal"
@@ -1491,6 +1491,36 @@
       "silver": "TITULAR",
       "gold": "ESTRELA",
       "special": "LENDA"
+    }
+  },
+  "notifications": {
+    "title": "Notifica��es",
+    "new_one": "nova",
+    "new_other": "novas",
+    "loading": "Carregando...",
+    "empty": "Voc� n�o tem novas notifica��es",
+    "viewAll": "Ver todas as notifica��es",
+    "andMore": "e {count} mais..."
+  },
+  "pwa": {
+    "installPrompt": "?? Para uma melhor experi�ncia, instale o app CambioCromos!",
+    "installApp": "Instalar App",
+    "googlePlay": "Google Play",
+    "iosInstructions": "Toque no bot�o Compartilhar <icon/> e selecione \"Adicionar � Tela de In�cio\"",
+    "notifyPrompt": "Ative as notifica��es para n�o perder mensagens ou ofertas de troca.",
+    "activate": "Ativar",
+    "close": "Fechar",
+    "onesignalMessage": "Inscreva-se nas nossas notifica��es para receber mensagens e ofertas de troca. Voc� pode desativar a qualquer momento.",
+    "onesignalAccept": "Inscrever-se",
+    "onesignalCancel": "Depois"
+  },
+  "legal": {
+    "cookiesBanner": {
+      "title": "Controle de Cookies",
+      "description": "Usamos cookies para analisar o tráfego e melhorar sua experiência. Ao aceitar, você nos ajuda a otimizar a plataforma. Consulte nossa <policy>Política de Cookies</policy> para mais detalhes.",
+      "acceptAll": "Aceitar todos",
+      "essentialOnly": "Apenas essenciais",
+      "customize": "Personalizar preferências"
     }
   }
 }

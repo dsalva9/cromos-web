@@ -7,6 +7,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -36,6 +37,7 @@ interface NotificationDropdownProps {
 export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: controlledOpen, onOpenChange }: NotificationDropdownProps) {
   const { unreadNotifications, unreadCount, markAsRead, loading } = useNotifications();
   const [internalOpen, setInternalOpen] = useState(false);
+  const t = useTranslations('notifications');
 
   // Use controlled state if provided, otherwise use internal state
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -60,7 +62,7 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
           variant="ghost"
           size="icon"
           className="relative"
-          aria-label="Notificaciones"
+          aria-label={t('title')}
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
@@ -76,10 +78,10 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
 
       <DropdownMenuContent align="end" className="w-96 max-w-[calc(100vw-2rem)] z-[101]">
         <DropdownMenuLabel className="flex items-center justify-between">
-          <span>Notificaciones</span>
+          <span>{t('title')}</span>
           {unreadCount > 0 && (
             <Badge variant="secondary" className="text-xs">
-              {unreadCount} {unreadCount === 1 ? 'nueva' : 'nuevas'}
+              {unreadCount} {unreadCount === 1 ? t('new_one') : t('new_other')}
             </Badge>
           )}
         </DropdownMenuLabel>
@@ -89,7 +91,7 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
         {/* Loading State */}
         {loading && (
           <div className="p-4 text-center text-sm text-comic-muted">
-            Cargando...
+            {t('loading')}
           </div>
         )}
 
@@ -98,7 +100,7 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
           <div className="p-6 text-center">
             <Bell className="h-12 w-12 mx-auto text-comic-muted mb-2 opacity-50" />
             <p className="text-sm text-comic-muted">
-              No tienes notificaciones nuevas
+              {t('empty')}
             </p>
           </div>
         )}
@@ -133,13 +135,13 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
                 className="w-full flex items-center justify-center gap-2 py-2 text-center font-medium text-comic-accent"
                 onClick={() => setIsOpen(false)}
               >
-                Ver todas las notificaciones
+                {t('viewAll')}
                 <ExternalLink className="h-4 w-4" />
               </Link>
             </DropdownMenuItem>
             {hasMore && (
               <div className="px-2 pb-2 text-xs text-center text-comic-muted">
-                y {unreadNotifications.length - maxItems} más...
+                {t('andMore', { count: unreadNotifications.length - maxItems })}
               </div>
             )}
           </>

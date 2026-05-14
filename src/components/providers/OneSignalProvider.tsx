@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Capacitor } from '@capacitor/core';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { updateOneSignalPlayerId } from '@/lib/supabase/notification-preferences';
@@ -11,6 +12,7 @@ import { logger } from '@/lib/logger';
 
 export function OneSignalProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
+  const t = useTranslations('pwa');
 
   useEffect(() => {
     if (!user) {
@@ -201,7 +203,21 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
             autoRegister: ONESIGNAL_CONFIG.autoRegister,
             serviceWorkerPath: ONESIGNAL_CONFIG.serviceWorkerPath,
             serviceWorkerUpdaterPath: ONESIGNAL_CONFIG.serviceWorkerUpdaterPath,
-            // No promptOptions — custom NotificationPromptBanner handles prompting
+            promptOptions: {
+              slidedown: {
+                prompts: [
+                  {
+                    type: "push",
+                    autoPrompt: false,
+                    text: {
+                      actionMessage: t('onesignalMessage'),
+                      acceptButton: t('onesignalAccept'),
+                      cancelButton: t('onesignalCancel')
+                    }
+                  }
+                ]
+              }
+            }
           });
 
           logger.info('[OneSignal] Web SDK initialized');
