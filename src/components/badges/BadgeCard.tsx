@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslations } from 'next-intl';
 
 interface BadgeCardProps {
   badge: UserBadge | BadgeProgress;
@@ -36,6 +37,7 @@ export function BadgeCard({
   className,
   isHighlighted = false,
 }: BadgeCardProps) {
+  const t = useTranslations('badges');
   const colors = getBadgeTierColors(badge.tier);
   const isProgress = 'is_earned' in badge;
   const isEarned = isProgress ? badge.is_earned : true;
@@ -144,9 +146,10 @@ export function BadgeCard({
           {/* Earned date for earned badges */}
           {showEarnedDate && isEarned && 'earned_at' in badge && badge.earned_at && (
             <p className="mt-2 text-xs text-gray-500">
-              Ganada el{' '}
-              {format(new Date(badge.earned_at), 'dd MMM yyyy', {
-                locale: es,
+              {t('earnedOn', {
+                date: format(new Date(badge.earned_at), 'dd MMM yyyy', {
+                  locale: es,
+                })
               })}
             </p>
           )}

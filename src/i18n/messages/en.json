@@ -1446,5 +1446,51 @@
     "termsTitle": "Terms of Use - Sticker Publication",
     "termsBody": "Remember that the images, descriptions, or names you upload must be yours or you must have the necessary rights to use them. Cambiocromos.com does not publish content for you, it only offers you the space to share it with other collectors. The user is solely responsible for the content they publish. If you upload images that infringe copyright, trademarks, or any legal rules, we may remove them and suspend your account. Cambiocromos.com does not own the stickers nor acts as an intermediary in sales or exchanges; it only connects users. By continuing, you declare that you have the right to publish the content and accept our Content Policy.",
     "termsClose": "Close"
+  },
+  "badges": {
+    "title": "Badges",
+    "viewAll": "View all badges",
+    "noBadgesOwn": "You haven't earned any badges yet",
+    "noBadgesOther": "No badges earned",
+    "viewAllShort": "View all",
+    "earned": "earned",
+    "unearned": "unearned",
+    "allBadges": "All badges",
+    "earnedCount": "Earned ({count})",
+    "emptyMessageOwn": "You haven't earned any badges yet. Start collecting!",
+    "emptyMessageOther": "This user hasn't earned any badges yet.",
+    "earnedOn": "Earned on {date}",
+    "categories": {
+      "collector": {
+        "name": "Collector",
+        "description": "Copy collections to your library"
+      },
+      "creator": {
+        "name": "Creator",
+        "description": "Create collections for the community"
+      },
+      "reviewer": {
+        "name": "Reviewer",
+        "description": "Rate and review collections"
+      },
+      "completionist": {
+        "name": "Completionist",
+        "description": "Complete collections to 100%"
+      },
+      "trader": {
+        "name": "Trader",
+        "description": "Trade stickers successfully"
+      },
+      "top_rated": {
+        "name": "Top Rated",
+        "description": "Maintain an excellent reputation"
+      }
+    },
+    "tiers": {
+      "bronze": "ACADEMY",
+      "silver": "STARTER",
+      "gold": "STAR",
+      "special": "LEGEND"
+    }
   }
 }

@@ -1446,5 +1446,51 @@
     "termsTitle": "Termos de Uso - Publicação de Figurinhas",
     "termsBody": "Lembre-se que as imagens, descrições ou nomes que você enviar devem ser seus ou você deve ter os direitos necessários para usá-los. Cambiocromos.com não publica conteúdo para você, apenas oferece o espaço para compartilhá-lo com outros colecionadores. O usuário é o único responsável pelo conteúdo que publica. Se você enviar imagens que infrinjam direitos autorais, marcas registradas ou quaisquer regras legais, podemos removê-las e suspender sua conta. Cambiocromos.com não possui as figurinhas nem atua como intermediário em vendas ou trocas; apenas conecta usuários. Ao continuar, você declara que tem o direito de publicar o conteúdo e aceita nossa Política de Conteúdo.",
     "termsClose": "Fechar"
+  },
+  "badges": {
+    "title": "Conquistas",
+    "viewAll": "Ver todas as conquistas",
+    "noBadgesOwn": "Ainda não ganhou nenhuma conquista",
+    "noBadgesOther": "Sem conquistas ganhas",
+    "viewAllShort": "Ver todas",
+    "earned": "ganhas",
+    "unearned": "por ganhar",
+    "allBadges": "Todas as conquistas",
+    "earnedCount": "Ganhas ({count})",
+    "emptyMessageOwn": "Ainda não ganhou nenhuma conquista. Comece a colecionar!",
+    "emptyMessageOther": "Este utilizador ainda não ganhou conquistas.",
+    "earnedOn": "Ganha em {date}",
+    "categories": {
+      "collector": {
+        "name": "Colecionador",
+        "description": "Copie coleções para a sua biblioteca"
+      },
+      "creator": {
+        "name": "Criador",
+        "description": "Crie coleções para a comunidade"
+      },
+      "reviewer": {
+        "name": "Avaliador",
+        "description": "Avalie e comente coleções"
+      },
+      "completionist": {
+        "name": "Completista",
+        "description": "Complete coleções a 100%"
+      },
+      "trader": {
+        "name": "Negociador",
+        "description": "Troque cromos com sucesso"
+      },
+      "top_rated": {
+        "name": "Bem Avaliado",
+        "description": "Mantenha uma excelente reputação"
+      }
+    },
+    "tiers": {
+      "bronze": "CANTERA",
+      "silver": "TITULAR",
+      "gold": "ESTRELA",
+      "special": "LENDA"
+    }
   }
 }

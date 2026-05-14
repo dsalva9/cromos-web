@@ -18,6 +18,7 @@ import {
 import { Award, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BadgeCategory } from '@/types/badges';
+import { useTranslations } from 'next-intl';
 
 interface BadgesModalProps {
   userId: string;
@@ -32,6 +33,7 @@ export function BadgesModal({
   open,
   onOpenChange,
 }: BadgesModalProps) {
+  const t = useTranslations('badges');
   const { progress, isLoading: progressLoading } = useBadgeProgress(userId);
 
   if (progressLoading) {
@@ -41,7 +43,7 @@ export function BadgesModal({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Award className="w-6 h-6" />
-              Logros
+              {t('title')}
             </DialogTitle>
           </DialogHeader>
           <div className="animate-pulse space-y-4 py-4">
@@ -93,7 +95,7 @@ export function BadgesModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Award className="w-6 h-6" />
-            Logros
+            {t('title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -102,21 +104,21 @@ export function BadgesModal({
           <div className="flex items-center gap-1">
             <Award className="w-4 h-4 text-green-600" />
             <span className="font-semibold">{earnedBadges.length}</span>
-            <span className="text-gray-500">ganados</span>
+            <span className="text-gray-500">{t('earned')}</span>
           </div>
           <div className="flex items-center gap-1">
             <TrendingUp className="w-4 h-4 text-blue-600" />
             <span className="font-semibold">{unearnedBadges.length}</span>
-            <span className="text-gray-500">por ganar</span>
+            <span className="text-gray-500">{t('unearned')}</span>
           </div>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="all">Todos los logros</TabsTrigger>
+            <TabsTrigger value="all">{t('allBadges')}</TabsTrigger>
             <TabsTrigger value="earned">
-              Ganados ({earnedBadges.length})
+              {t('earnedCount', { count: earnedBadges.length })}
             </TabsTrigger>
           </TabsList>
 
@@ -134,10 +136,10 @@ export function BadgesModal({
                 <div key={category}>
                   <div className="mb-4">
                     <h3 className={cn('text-lg font-semibold', catInfo.color)}>
-                      {catInfo.name_es}
+                      {t(`categories.${category}.name`)}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {catInfo.description_es}
+                      {t(`categories.${category}.description`)}
                     </p>
                   </div>
                   <BadgeGrid
@@ -158,8 +160,8 @@ export function BadgesModal({
                 <Award className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">
                   {isOwnProfile
-                    ? 'Aún no has ganado ningún logro. ¡Comienza a coleccionar!'
-                    : 'Este usuario aún no ha ganado logros.'}
+                    ? t('emptyMessageOwn')
+                    : t('emptyMessageOther')}
                 </p>
               </div>
             ) : (
