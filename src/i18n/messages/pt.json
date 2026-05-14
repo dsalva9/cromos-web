@@ -305,6 +305,233 @@
       "viewListing": "Ver anúncio",
       "createListing": "Publicar repetida",
       "createListingTitle": "Você precisa de pelo menos 2 cópias para publicar"
+    },
+    "index": {
+      "title": "Coleções",
+      "subtitle": "Explore coleções da comunidade e encontre seu próximo álbum",
+      "buttons": {
+        "myCollections": "Minhas Coleções",
+        "create": "Criar Coleção",
+        "loadMore": "Carregar mais"
+      },
+      "tip": {
+        "title": "Descubra coleções",
+        "description": "Navegue por coleções criadas pela comunidade. Você pode copiar qualquer coleção pública para começar a acompanhar seu progresso."
+      },
+      "errors": {
+        "loadFailed": "Erro ao carregar coleções: {error}"
+      },
+      "empty": {
+        "searchTitle": "Nenhuma coleção encontrada",
+        "searchDescription": "Tente buscar com outros termos",
+        "quietDescription": "Ainda não há coleções publicadas",
+        "action": "Criar primeira coleção"
+      }
+    },
+    "myCreated": {
+      "back": "Voltar às coleções",
+      "title": "Minhas Coleções Criadas",
+      "subtitle": "Gerencie as coleções que você criou",
+      "create": "Criar Coleção",
+      "emptyTitle": "Você ainda não criou coleções",
+      "emptyDesc": "Crie sua primeira coleção para que outros colecionadores possam usá-la",
+      "action": "Criar Coleção"
+    },
+    "wizard": {
+      "title": "Criar Coleção",
+      "stepProgress": "Passo {current} de {total}",
+      "steps": {
+        "basic": {
+          "title": "Info Básica",
+          "desc": "Nome, descrição e imagem"
+        },
+        "schema": {
+          "title": "Campos",
+          "desc": "Defina a estrutura de cada figurinha"
+        },
+        "pages": {
+          "title": "Páginas",
+          "desc": "Adicione páginas e figurinhas"
+        },
+        "review": {
+          "title": "Revisão",
+          "desc": "Confirme e publique"
+        }
+      },
+      "buttons": {
+        "previous": "Anterior",
+        "next": "Próximo",
+        "creating": "Criando...",
+        "submit": "Criar Coleção"
+      },
+      "errors": {
+        "basicTitle": "Corrija os seguintes erros:",
+        "pagesTitle": "As páginas contêm erros",
+        "pagesRule1": "Cada página deve ter um título e pelo menos 1 figurinha",
+        "pagesRule2": "Os campos obrigatórios devem estar preenchidos em cada figurinha",
+        "termsRequired": "Você deve aceitar os termos para publicar uma coleção pública"
+      },
+      "basicForm": {
+        "titleLabel": "Título da coleção",
+        "titlePlaceholder": "Ex: Liga Espanhola 2025-26",
+        "descLabel": "Descrição",
+        "descPlaceholder": "Descreva do que se trata sua coleção...",
+        "imageLabel": "Imagem de capa",
+        "imageError": "Erro ao processar a imagem",
+        "imageRemove": "Remover",
+        "imageAdd": "Adicione uma imagem de capa",
+        "imageHelp": "Uma boa capa ajuda outros colecionadores a encontrar sua coleção",
+        "imageChoose": "Enviar imagem",
+        "imageCamera": "Câmera",
+        "imageFormat": "JPG, PNG ou WebP. Máx 2MB.",
+        "privateLabel": "Coleção privada",
+        "privateHelp": "Apenas você poderá ver e usar esta coleção"
+      },
+      "pagesForm": {
+        "addNewPage": "Adicionar nova página",
+        "pageTitle": "Título da página",
+        "pageTitlePlaceholder": "Ex: Argentina, Especiais...",
+        "pageType": "Tipo",
+        "typeTeam": "Normal",
+        "typeSpecial": "Especial",
+        "addPageBtn": "Adicionar página",
+        "stickersCount": "{count} figurinhas",
+        "pageStickers": "Figurinhas",
+        "addStickerBtn": "Adicionar figurinha",
+        "stickerNumber": "Figurinha #{number}",
+        "noFieldsDefined": "Defina campos no passo anterior para personalizar cada figurinha",
+        "noPages": "Você ainda não adicionou páginas. Comece criando sua primeira página."
+      }
+    },
+    "quickEntryModal": {
+      "title": "Entrada Rápida",
+      "checklistNumber": "Número da figurinha",
+      "placeholder": "Ex: 42",
+      "markBtn": "Marcar",
+      "activeMode": "Modo de entrada rápida ativo",
+      "recentUpdates": "Atualizações recentes",
+      "reference": "Referência de figurinhas",
+      "close": "Fechar",
+      "notFound": "#{number} — Não encontrado",
+      "success": "#{number} — {label} ({page}) ✓",
+      "error": "Erro: {error}",
+      "owned": "Tenho",
+      "duplicate": "Repe ×{count}",
+      "missing": "Falta",
+      "andMore": "... e mais {count}"
+    },
+    "reviewForm": {
+      "basicInfo": "Informações Básicas",
+      "title": "Título",
+      "noTitle": "Sem título",
+      "description": "Descrição",
+      "noDescription": "Sem descrição",
+      "image": "Imagem",
+      "visibility": "Visibilidade",
+      "publicStatus": "Visível para todos os usuários",
+      "privateStatus": "Visível apenas para você",
+      "summary": "Resumo do Conteúdo",
+      "pagesLabel": "Páginas",
+      "totalStickers": "Figurinhas totais",
+      "normal": "Normal",
+      "special": "Especial",
+      "stickersCount": "{count} figurinhas",
+      "customFieldsCount": "{count} figurinhas com campos personalizados",
+      "termsOfUse": "Termos de Uso",
+      "termsCheckbox": "Concordo que minha coleção seja visível e utilizável por outros usuários da plataforma de acordo com os <strong>termos de uso</strong>",
+      "viewConditions": "Ver condições completas",
+      "finalConfirmation": "Confirmação Final",
+      "aboutToCreate": "Você está prestes a criar sua coleção com o seguinte conteúdo:",
+      "pagesCount": "{count} páginas",
+      "stickersTotal": "{count} figurinhas no total",
+      "visibilityPublic": "Visível para toda a comunidade",
+      "visibilityPrivate": "Visível apenas para você",
+      "availabilityDesc": "Após criada, sua coleção estará disponível imediatamente.",
+      "termsDialogTitle": "Termos de Uso de Coleções Públicas",
+      "termsDialogText": "Ao publicar sua coleção como pública, você concorda que outros usuários possam copiá-la e usá-la para acompanhar seu próprio progresso.",
+      "close": "Entendido"
+    },
+    "reviewList": {
+      "noRatings": "Ainda não há avaliações. Seja o primeiro a opinar!",
+      "loading": "A carregar...",
+      "loadMore": "Ver mais avaliações"
+    },
+    "ratingSummary": {
+      "ratingCount": "{count} avaliações",
+      "authorWarning": "Você não pode avaliar sua própria coleção",
+      "updateRating": "Atualizar avaliação",
+      "rateTemplate": "Avaliar coleção"
+    },
+    "ratingDialog": {
+      "rateTitle": "Avaliar coleção",
+      "updateTitle": "Atualizar avaliação",
+      "yourRating": "Sua avaliação",
+      "rating1": "Muito ruim",
+      "rating2": "Ruim",
+      "rating3": "Normal",
+      "rating4": "Bom",
+      "rating5": "Excelente",
+      "commentLabel": "Comentário (opcional)",
+      "commentPlaceholder": "O que achou desta coleção?",
+      "charsLeft": "{current}/280",
+      "cancel": "Cancelar",
+      "sendBtn": "Enviar avaliação",
+      "updateBtn": "Atualizar",
+      "saving": "A guardar...",
+      "deleteBtn": "Eliminar",
+      "deleting": "A eliminar...",
+      "selectRatingError": "Selecione uma avaliação",
+      "commentLengthError": "O comentário não pode exceder 280 caracteres",
+      "createSuccess": "Obrigado pela sua avaliação!",
+      "updateSuccess": "Avaliação atualizada",
+      "saveError": "Erro ao guardar avaliação",
+      "deleteSuccess": "Avaliação eliminada",
+      "deleteError": "Erro ao eliminar avaliação",
+      "confirmDeleteTitle": "Eliminar avaliação",
+      "confirmDeleteDesc": "Tem certeza que deseja eliminar sua avaliação? Esta ação não pode ser desfeita."
+    },
+    "publishSparesModal": {
+      "title": "Publicar repetidas",
+      "description": "Você vai publicar suas figurinhas repetidas de <strong>{collection}</strong> como um pacote no marketplace",
+      "howItWorks": "Como funciona?",
+      "howItWorksDesc": "Um anúncio do tipo Pacote será criado com todas as suas figurinhas repetidas. Outros usuários poderão contactá-lo para trocar.",
+      "sparesCount": "figurinhas repetidas diferentes",
+      "totalUnits": "Total de unidades: {total}",
+      "packDescription": "Descrição do pacote",
+      "packDescriptionPlaceholder": "Descreva seu pacote de repetidas...",
+      "packDescriptionHelp": "Uma descrição automática foi gerada. Você pode editá-la.",
+      "cancel": "Cancelar",
+      "publishing": "A publicar...",
+      "publishBtn": "Publicar {count} figurinhas"
+    },
+    "itemSchemaBuilder": {
+      "title": "Campos personalizados",
+      "description": "Defina que informações cada figurinha da sua coleção terá",
+      "addFieldBtn": "Adicionar campo",
+      "name": "Nome",
+      "type": "Tipo",
+      "required": "Obrigatório",
+      "yes": "Sim",
+      "no": "Não",
+      "typeText": "Texto",
+      "typeNumber": "Número",
+      "typeCheckbox": "Caixa de seleção",
+      "typeSelect": "Seleção",
+      "newField": "Novo campo",
+      "fieldName": "Nome do campo",
+      "fieldNamePlaceholder": "Ex: Nome do jogador",
+      "fieldType": "Tipo de campo",
+      "options": "Opções",
+      "optionsPlaceholder": "Opção 1, Opção 2, Opção 3",
+      "isRequired": "Campo obrigatório",
+      "cancel": "Cancelar",
+      "saveField": "Guardar campo",
+      "emptyTitle": "Nenhum campo definido",
+      "emptyDesc": "Os campos são opcionais. Pode adicioná-los para enriquecer as informações de cada figurinha.",
+      "deleteWarningTitle": "Eliminar campo",
+      "deleteWarningDesc": "O campo <strong>{name}</strong> tem dados nas figurinhas existentes. <danger>Eliminar este campo apagará esses dados permanentemente.</danger>",
+      "deleteWarningNotice": "<strong>Importante:</strong> Esta ação não pode ser desfeita.",
+      "deleteConfirm": "Sim, eliminar campo"
     }
   },
   "validations": {
@@ -628,5 +855,23 @@
       "errorNoSession": "Nenhuma sessão ativa",
       "errorSend": "Erro ao enviar o email"
     }
+  },
+  "header": {
+    "marketplace": "Marketplace",
+    "myAlbums": "Meus Álbuns",
+    "chats": "Chats",
+    "favorites": "Favoritos",
+    "login": "Iniciar Sessão",
+    "signup": "Criar Conta",
+    "completeProfile": "Complete seu perfil para acessar esta seção",
+    "enter": "Entrar"
+  },
+  "footer": {
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "cookies": "Cookies"
+  },
+  "language": {
+    "change": "Mudar idioma"
   }
 }

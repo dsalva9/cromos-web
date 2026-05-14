@@ -305,6 +305,233 @@
       "viewListing": "View listing",
       "createListing": "List duplicate",
       "createListingTitle": "You need at least 2 copies to list"
+    },
+    "index": {
+      "title": "Collections",
+      "subtitle": "Explore community collections and find your next album",
+      "buttons": {
+        "myCollections": "My Collections",
+        "create": "Create Collection",
+        "loadMore": "Load more"
+      },
+      "tip": {
+        "title": "Discover collections",
+        "description": "Browse collections created by the community. You can copy any public collection to start tracking your progress."
+      },
+      "errors": {
+        "loadFailed": "Error loading collections: {error}"
+      },
+      "empty": {
+        "searchTitle": "No collections found",
+        "searchDescription": "Try searching with different terms",
+        "quietDescription": "No collections published yet",
+        "action": "Create first collection"
+      }
+    },
+    "myCreated": {
+      "back": "Back to collections",
+      "title": "My Created Collections",
+      "subtitle": "Manage the collections you have created",
+      "create": "Create Collection",
+      "emptyTitle": "You have not created any collections yet",
+      "emptyDesc": "Create your first collection for other collectors to use",
+      "action": "Create Collection"
+    },
+    "wizard": {
+      "title": "Create Collection",
+      "stepProgress": "Step {current} of {total}",
+      "steps": {
+        "basic": {
+          "title": "Basic Info",
+          "desc": "Name, description and image"
+        },
+        "schema": {
+          "title": "Fields",
+          "desc": "Define each sticker structure"
+        },
+        "pages": {
+          "title": "Pages",
+          "desc": "Add pages and stickers"
+        },
+        "review": {
+          "title": "Review",
+          "desc": "Confirm and publish"
+        }
+      },
+      "buttons": {
+        "previous": "Previous",
+        "next": "Next",
+        "creating": "Creating...",
+        "submit": "Create Collection"
+      },
+      "errors": {
+        "basicTitle": "Please fix the following errors:",
+        "pagesTitle": "Pages have errors",
+        "pagesRule1": "Each page must have a title and at least 1 sticker",
+        "pagesRule2": "Required fields must be filled in for each sticker",
+        "termsRequired": "You must accept the terms to publish a public collection"
+      },
+      "basicForm": {
+        "titleLabel": "Collection title",
+        "titlePlaceholder": "E.g. Spanish League 2025-26",
+        "descLabel": "Description",
+        "descPlaceholder": "Describe what your collection is about...",
+        "imageLabel": "Cover image",
+        "imageError": "Error processing image",
+        "imageRemove": "Remove",
+        "imageAdd": "Add a cover image",
+        "imageHelp": "A good cover helps other collectors find your collection",
+        "imageChoose": "Upload image",
+        "imageCamera": "Camera",
+        "imageFormat": "JPG, PNG or WebP. Max 2MB.",
+        "privateLabel": "Private collection",
+        "privateHelp": "Only you will be able to see and use this collection"
+      },
+      "pagesForm": {
+        "addNewPage": "Add new page",
+        "pageTitle": "Page title",
+        "pageTitlePlaceholder": "E.g. Argentina, Specials...",
+        "pageType": "Type",
+        "typeTeam": "Normal",
+        "typeSpecial": "Special",
+        "addPageBtn": "Add page",
+        "stickersCount": "{count} stickers",
+        "pageStickers": "Stickers",
+        "addStickerBtn": "Add sticker",
+        "stickerNumber": "Sticker #{number}",
+        "noFieldsDefined": "Define fields in the previous step to customize each sticker",
+        "noPages": "You have not added any pages yet. Start by creating your first page."
+      }
+    },
+    "quickEntryModal": {
+      "title": "Quick Entry",
+      "checklistNumber": "Sticker number",
+      "placeholder": "E.g. 42",
+      "markBtn": "Mark",
+      "activeMode": "Quick entry mode active",
+      "recentUpdates": "Recent updates",
+      "reference": "Sticker reference",
+      "close": "Close",
+      "notFound": "#{number} — Not found",
+      "success": "#{number} — {label} ({page}) ✓",
+      "error": "Error: {error}",
+      "owned": "Owned",
+      "duplicate": "Dupe ×{count}",
+      "missing": "Missing",
+      "andMore": "... and {count} more"
+    },
+    "reviewForm": {
+      "basicInfo": "Basic Information",
+      "title": "Title",
+      "noTitle": "No title",
+      "description": "Description",
+      "noDescription": "No description",
+      "image": "Image",
+      "visibility": "Visibility",
+      "publicStatus": "Visible to all users",
+      "privateStatus": "Only visible to you",
+      "summary": "Content Summary",
+      "pagesLabel": "Pages",
+      "totalStickers": "Total stickers",
+      "normal": "Normal",
+      "special": "Special",
+      "stickersCount": "{count} stickers",
+      "customFieldsCount": "{count} stickers with custom fields",
+      "termsOfUse": "Terms of Use",
+      "termsCheckbox": "I agree that my collection will be visible and usable by other platform users according to the <strong>terms of use</strong>",
+      "viewConditions": "View full conditions",
+      "finalConfirmation": "Final Confirmation",
+      "aboutToCreate": "You are about to create your collection with the following content:",
+      "pagesCount": "{count} pages",
+      "stickersTotal": "{count} stickers in total",
+      "visibilityPublic": "Visible to the entire community",
+      "visibilityPrivate": "Only visible to you",
+      "availabilityDesc": "Once created, your collection will be available immediately.",
+      "termsDialogTitle": "Public Collections Terms of Use",
+      "termsDialogText": "By publishing your collection as public, you agree that other users can copy and use it to track their own sticker progress.",
+      "close": "Understood"
+    },
+    "reviewList": {
+      "noRatings": "No ratings yet. Be the first to share your opinion!",
+      "loading": "Loading...",
+      "loadMore": "See more ratings"
+    },
+    "ratingSummary": {
+      "ratingCount": "{count} ratings",
+      "authorWarning": "You cannot rate your own collection",
+      "updateRating": "Update rating",
+      "rateTemplate": "Rate collection"
+    },
+    "ratingDialog": {
+      "rateTitle": "Rate collection",
+      "updateTitle": "Update rating",
+      "yourRating": "Your rating",
+      "rating1": "Very bad",
+      "rating2": "Bad",
+      "rating3": "Average",
+      "rating4": "Good",
+      "rating5": "Excellent",
+      "commentLabel": "Comment (optional)",
+      "commentPlaceholder": "What did you think of this collection?",
+      "charsLeft": "{current}/280",
+      "cancel": "Cancel",
+      "sendBtn": "Submit rating",
+      "updateBtn": "Update",
+      "saving": "Saving...",
+      "deleteBtn": "Delete",
+      "deleting": "Deleting...",
+      "selectRatingError": "Please select a rating",
+      "commentLengthError": "Comment cannot exceed 280 characters",
+      "createSuccess": "Thanks for your rating!",
+      "updateSuccess": "Rating updated",
+      "saveError": "Error saving rating",
+      "deleteSuccess": "Rating deleted",
+      "deleteError": "Error deleting rating",
+      "confirmDeleteTitle": "Delete rating",
+      "confirmDeleteDesc": "Are you sure you want to delete your rating? This action cannot be undone."
+    },
+    "publishSparesModal": {
+      "title": "Publish duplicates",
+      "description": "You are about to publish your duplicate stickers from <strong>{collection}</strong> as a pack on the marketplace",
+      "howItWorks": "How does it work?",
+      "howItWorksDesc": "A Pack listing will be created with all your duplicate stickers. Other users will be able to contact you to trade.",
+      "sparesCount": "different duplicate stickers",
+      "totalUnits": "Total units: {total}",
+      "packDescription": "Pack description",
+      "packDescriptionPlaceholder": "Describe your duplicates pack...",
+      "packDescriptionHelp": "An automatic description has been generated. You can edit it.",
+      "cancel": "Cancel",
+      "publishing": "Publishing...",
+      "publishBtn": "Publish {count} stickers"
+    },
+    "itemSchemaBuilder": {
+      "title": "Custom fields",
+      "description": "Define what information each sticker in your collection will have",
+      "addFieldBtn": "Add field",
+      "name": "Name",
+      "type": "Type",
+      "required": "Required",
+      "yes": "Yes",
+      "no": "No",
+      "typeText": "Text",
+      "typeNumber": "Number",
+      "typeCheckbox": "Checkbox",
+      "typeSelect": "Select",
+      "newField": "New field",
+      "fieldName": "Field name",
+      "fieldNamePlaceholder": "E.g. Player name",
+      "fieldType": "Field type",
+      "options": "Options",
+      "optionsPlaceholder": "Option 1, Option 2, Option 3",
+      "isRequired": "Required field",
+      "cancel": "Cancel",
+      "saveField": "Save field",
+      "emptyTitle": "No fields defined",
+      "emptyDesc": "Fields are optional. You can add them to enrich each sticker information.",
+      "deleteWarningTitle": "Delete field",
+      "deleteWarningDesc": "The field <strong>{name}</strong> has data in existing stickers. <danger>Deleting this field will permanently remove that data.</danger>",
+      "deleteWarningNotice": "<strong>Important:</strong> This action cannot be undone.",
+      "deleteConfirm": "Yes, delete field"
     }
   },
   "validations": {
@@ -628,5 +855,23 @@
       "errorNoSession": "No active session",
       "errorSend": "Error sending email"
     }
+  },
+  "header": {
+    "marketplace": "Marketplace",
+    "myAlbums": "My Albums",
+    "chats": "Chats",
+    "favorites": "Favorites",
+    "login": "Log In",
+    "signup": "Sign Up",
+    "completeProfile": "Complete your profile to access this section",
+    "enter": "Enter"
+  },
+  "footer": {
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies"
+  },
+  "language": {
+    "change": "Change language"
   }
 }

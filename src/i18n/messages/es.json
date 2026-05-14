@@ -5,6 +5,24 @@
   "layout": {
     "skipToContent": "Saltar al contenido principal"
   },
+  "header": {
+    "marketplace": "Marketplace",
+    "myAlbums": "Mis Álbumes",
+    "chats": "Chats",
+    "favorites": "Favoritos",
+    "login": "Iniciar Sesión",
+    "signup": "Crear Cuenta",
+    "completeProfile": "Completa tu perfil para acceder a esta sección",
+    "enter": "Entrar"
+  },
+  "footer": {
+    "terms": "Términos",
+    "privacy": "Privacidad",
+    "cookies": "Cookies"
+  },
+  "language": {
+    "change": "Cambiar idioma"
+  },
   "error": {
     "title": "¡Algo salió mal!",
     "message": "Encontramos un error al cargar esta página.",
@@ -305,6 +323,221 @@
       "viewListing": "Ver anuncio",
       "createListing": "Publicar repetido",
       "createListingTitle": "Necesitas al menos 2 copias para publicar"
+    },
+    "index": {
+      "title": "Colecciones",
+      "subtitle": "Explora colecciones de la comunidad y encuentra tu próximo álbum",
+      "buttons": {
+        "myCollections": "Mis Colecciones",
+        "create": "Crear Colección",
+        "loadMore": "Cargar más"
+      },
+      "tip": {
+        "title": "Descubre colecciones",
+        "description": "Busca colecciones creadas por la comunidad. Puedes copiar cualquier colección pública para empezar a llevar tu progreso."
+      },
+      "errors": {
+        "loadFailed": "Error al cargar colecciones: {error}"
+      },
+      "empty": {
+        "searchTitle": "No se encontraron colecciones",
+        "searchDescription": "Intenta buscar con otros términos",
+        "quietDescription": "Aún no hay colecciones publicadas",
+        "action": "Crear primera colección"
+      }
+    },
+    "myCreated": {
+      "back": "Volver a colecciones",
+      "title": "Mis Colecciones Creadas",
+      "subtitle": "Gestiona las colecciones que has creado",
+      "create": "Crear Colección",
+      "emptyTitle": "Aún no has creado colecciones",
+      "emptyDesc": "Crea tu primera colección para que otros coleccionistas puedan usarla",
+      "action": "Crear Colección"
+    },
+    "wizard": {
+      "title": "Crear Colección",
+      "stepProgress": "Paso {current} de {total}",
+      "steps": {
+        "basic": { "title": "Info Básica", "desc": "Nombre, descripción e imagen" },
+        "schema": { "title": "Campos", "desc": "Define la estructura de cada cromo" },
+        "pages": { "title": "Páginas", "desc": "Añade páginas y cromos" },
+        "review": { "title": "Revisión", "desc": "Confirma y publica" }
+      },
+      "buttons": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "creating": "Creando...",
+        "submit": "Crear Colección"
+      },
+      "errors": {
+        "basicTitle": "Corrige los siguientes errores:",
+        "pagesTitle": "Las páginas tienen errores",
+        "pagesRule1": "Cada página debe tener un título y al menos 1 cromo",
+        "pagesRule2": "Los campos obligatorios deben estar completos en cada cromo",
+        "termsRequired": "Debes aceptar los términos para publicar una colección pública"
+      },
+      "basicForm": {
+        "titleLabel": "Título de la colección",
+        "titlePlaceholder": "Ej: Liga Española 2025-26",
+        "descLabel": "Descripción",
+        "descPlaceholder": "Describe de qué trata tu colección...",
+        "imageLabel": "Imagen de portada",
+        "imageError": "Error al procesar la imagen",
+        "imageRemove": "Eliminar",
+        "imageAdd": "Añade una imagen de portada",
+        "imageHelp": "Una buena portada ayuda a otros coleccionistas a encontrar tu colección",
+        "imageChoose": "Subir imagen",
+        "imageCamera": "Cámara",
+        "imageFormat": "JPG, PNG o WebP. Max 2MB.",
+        "privateLabel": "Colección privada",
+        "privateHelp": "Solo tú podrás ver y usar esta colección"
+      },
+      "pagesForm": {
+        "addNewPage": "Añadir nueva página",
+        "pageTitle": "Título de la página",
+        "pageTitlePlaceholder": "Ej: Argentina, Especiales...",
+        "pageType": "Tipo",
+        "typeTeam": "Normal",
+        "typeSpecial": "Especial",
+        "addPageBtn": "Añadir página",
+        "stickersCount": "{count} cromos",
+        "pageStickers": "Cromos",
+        "addStickerBtn": "Añadir cromo",
+        "stickerNumber": "Cromo #{number}",
+        "noFieldsDefined": "Define campos en el paso anterior para personalizar cada cromo",
+        "noPages": "Aún no has añadido páginas. Empieza creando tu primera página."
+      }
+    },
+    "quickEntryModal": {
+      "title": "Entrada Rápida",
+      "checklistNumber": "Número del cromo",
+      "placeholder": "Ej: 42",
+      "markBtn": "Marcar",
+      "activeMode": "Modo entrada rápida activo",
+      "recentUpdates": "Últimas actualizaciones",
+      "reference": "Referencia de cromos",
+      "close": "Cerrar",
+      "notFound": "#{number} — No encontrado",
+      "success": "#{number} — {label} ({page}) ✓",
+      "error": "Error: {error}",
+      "owned": "Tengo",
+      "duplicate": "Repe ×{count}",
+      "missing": "Falta",
+      "andMore": "... y {count} más"
+    },
+    "reviewForm": {
+      "basicInfo": "Información Básica",
+      "title": "Título",
+      "noTitle": "Sin título",
+      "description": "Descripción",
+      "noDescription": "Sin descripción",
+      "image": "Imagen",
+      "visibility": "Visibilidad",
+      "publicStatus": "Visible para todos los usuarios",
+      "privateStatus": "Solo visible para ti",
+      "summary": "Resumen de Contenido",
+      "pagesLabel": "Páginas",
+      "totalStickers": "Cromos totales",
+      "normal": "Normal",
+      "special": "Especial",
+      "stickersCount": "{count} cromos",
+      "customFieldsCount": "{count} cromos con campos personalizados",
+      "termsOfUse": "Términos de Uso",
+      "termsCheckbox": "Acepto que mi colección sea visible y utilizable por otros usuarios de la plataforma según los <strong>términos de uso</strong>",
+      "viewConditions": "Ver condiciones completas",
+      "finalConfirmation": "Confirmación Final",
+      "aboutToCreate": "Estás a punto de crear tu colección con el siguiente contenido:",
+      "pagesCount": "{count} páginas",
+      "stickersTotal": "{count} cromos en total",
+      "visibilityPublic": "Visible para toda la comunidad",
+      "visibilityPrivate": "Solo visible para ti",
+      "availabilityDesc": "Una vez creada, tu colección estará disponible inmediatamente.",
+      "termsDialogTitle": "Condiciones de Uso de Colecciones Públicas",
+      "termsDialogText": "Al publicar tu colección como pública, aceptas que otros usuarios puedan copiarla y usarla para llevar su propio seguimiento de cromos. Los datos de la colección (estructura, páginas y cromos) podrán ser utilizados por la comunidad.",
+      "close": "Entendido"
+    },
+    "reviewList": {
+      "noRatings": "Aún no hay valoraciones. ¡Sé el primero en opinar!",
+      "loading": "Cargando...",
+      "loadMore": "Ver más valoraciones"
+    },
+    "ratingSummary": {
+      "ratingCount": "{count} valoraciones",
+      "authorWarning": "No puedes valorar tu propia colección",
+      "updateRating": "Actualizar valoración",
+      "rateTemplate": "Valorar colección"
+    },
+    "ratingDialog": {
+      "rateTitle": "Valorar colección",
+      "updateTitle": "Actualizar valoración",
+      "yourRating": "Tu valoración",
+      "rating1": "Muy mala",
+      "rating2": "Mala",
+      "rating3": "Normal",
+      "rating4": "Buena",
+      "rating5": "Excelente",
+      "commentLabel": "Comentario (opcional)",
+      "commentPlaceholder": "¿Qué te ha parecido esta colección?",
+      "charsLeft": "{current}/280",
+      "cancel": "Cancelar",
+      "sendBtn": "Enviar valoración",
+      "updateBtn": "Actualizar",
+      "saving": "Guardando...",
+      "deleteBtn": "Eliminar",
+      "deleting": "Eliminando...",
+      "selectRatingError": "Selecciona una valoración",
+      "commentLengthError": "El comentario no puede superar 280 caracteres",
+      "createSuccess": "¡Gracias por tu valoración!",
+      "updateSuccess": "Valoración actualizada",
+      "saveError": "Error al guardar la valoración",
+      "deleteSuccess": "Valoración eliminada",
+      "deleteError": "Error al eliminar la valoración",
+      "confirmDeleteTitle": "Eliminar valoración",
+      "confirmDeleteDesc": "¿Estás seguro de que quieres eliminar tu valoración? Esta acción no se puede deshacer."
+    },
+    "publishSparesModal": {
+      "title": "Publicar repetidos",
+      "description": "Vas a publicar tus cromos repetidos de <strong>{collection}</strong> como un pack en el marketplace",
+      "howItWorks": "¿Cómo funciona?",
+      "howItWorksDesc": "Se creará un anuncio de tipo 'Pack' con todos tus cromos repetidos. Otros usuarios podrán contactarte para intercambiar.",
+      "sparesCount": "cromos repetidos diferentes",
+      "totalUnits": "Total de unidades: {total}",
+      "packDescription": "Descripción del pack",
+      "packDescriptionPlaceholder": "Describe tu pack de repetidos...",
+      "packDescriptionHelp": "Se ha generado una descripción automática. Puedes editarla.",
+      "cancel": "Cancelar",
+      "publishing": "Publicando...",
+      "publishBtn": "Publicar {count} cromos"
+    },
+    "itemSchemaBuilder": {
+      "title": "Campos personalizados",
+      "description": "Define qué información tendrá cada cromo de tu colección",
+      "addFieldBtn": "Añadir campo",
+      "name": "Nombre",
+      "type": "Tipo",
+      "required": "Obligatorio",
+      "yes": "Sí",
+      "no": "No",
+      "typeText": "Texto",
+      "typeNumber": "Número",
+      "typeCheckbox": "Casilla",
+      "typeSelect": "Selección",
+      "newField": "Nuevo campo",
+      "fieldName": "Nombre del campo",
+      "fieldNamePlaceholder": "Ej: Nombre del jugador",
+      "fieldType": "Tipo de campo",
+      "options": "Opciones",
+      "optionsPlaceholder": "Opción 1, Opción 2, Opción 3",
+      "isRequired": "Campo obligatorio",
+      "cancel": "Cancelar",
+      "saveField": "Guardar campo",
+      "emptyTitle": "No hay campos definidos",
+      "emptyDesc": "Los campos son opcionales. Puedes añadirlos para enriquecer la información de cada cromo.",
+      "deleteWarningTitle": "Eliminar campo",
+      "deleteWarningDesc": "El campo <strong>{name}</strong> tiene datos en los cromos existentes. <danger>Eliminar este campo borrará esos datos permanentemente.</danger>",
+      "deleteWarningNotice": "<strong>Importante:</strong> Esta acción no se puede deshacer.",
+      "deleteConfirm": "Sí, eliminar campo"
     }
   },
   "validations": {
