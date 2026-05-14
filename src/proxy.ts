@@ -100,6 +100,8 @@ export async function proxy(request: NextRequest) {
         || pathname === '/manifest.json'
         || pathname === '/icon.png';
 
+    let intlHeaders: Headers | null = null;
+
     if (!isAuthOrApi) {
         // --- 2. Run next-intl locale negotiation ---
         // This handles: locale detection, adding prefix, redirecting to default locale.
@@ -111,11 +113,24 @@ export async function proxy(request: NextRequest) {
         if (location) {
             return intlResponse;
         }
+
+        // Stash the intl headers so we can forward them onto the auth response.
+        // This is critical: intlMiddleware sets x-next-intl-locale which tells
+        // next-intl/server which messages to load. Without forwarding it, the
+        // server always falls back to the defaultLocale (Spanish).
+        intlHeaders = intlResponse.headers;
     }
 
     // --- 3. Supabase Session Refresh & Auth Protection ---
     // Always refresh the session to keep tokens fresh and sync cookies.
     const { user, response } = await updateSession(request);
+
+    // Forward next-intl locale headers onto the final response
+    if (intlHeaders) {
+        intlHeaders.forEach((value, key) => {
+            response.headers.set(key, value);
+        });
+    }
 
     // For locale-prefixed routes, strip the prefix before checking auth
     const pathWithoutLocale = stripLocalePrefix(pathname);
