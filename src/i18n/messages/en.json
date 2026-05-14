@@ -236,7 +236,75 @@
     },
     "card": {
       "viewCollection": "View collection: {title}",
-      "coverAlt": "Cover of collection {title}"
+      "coverAlt": "Cover of collection {title}",
+      "by": "by",
+      "featured": "Featured",
+      "deleted": "Deleted",
+      "public": "Public",
+      "private": "Private",
+      "pages": "pages",
+      "stickers": "stickers",
+      "copy": "Use this template",
+      "copying": "Copying...",
+      "copied": "Copied!",
+      "success": "Template copied! Redirecting...",
+      "error": "Error copying template",
+      "edit": "Edit"
+    },
+    "myTemplates": {
+      "title": "My Albums",
+      "subtitle": "Manage your progress in each collection",
+      "explore": "Explore collections",
+      "emptyTitle": "You don't have any albums yet",
+      "emptyDesc": "Explore available collections and add the ones you want to follow",
+      "progress": "Progress",
+      "stickersCount": "{completed} / {total} stickers",
+      "manage": "View album",
+      "marketplace": {
+        "missing": "{count} missing in marketplace"
+      },
+      "stats": {
+        "have": "Have",
+        "need": "Need"
+      }
+    },
+    "summaryHeader": {
+      "by": "by",
+      "generalProgress": "General progress",
+      "cardsCollected": "{owned} of {total} stickers collected",
+      "stats": {
+        "owned": "Have",
+        "duplicates": "Dupes",
+        "missing": "Missing",
+        "onSale": "On sale"
+      }
+    },
+    "progressGrid": {
+      "pageFallback": "Page {pageNum}",
+      "stickersOf": "Stickers of {pageTitle}",
+      "completePageBtn": "Complete page",
+      "completePageTitle": "Complete page",
+      "completePageDesc": "Mark all missing stickers on this page as owned?",
+      "thisAction": "This action will:",
+      "markAsOwned": "Mark <ownedTag>missing</ownedTag> stickers as 'Have'",
+      "wontModify": "Won't modify stickers you already own or duplicates",
+      "cancel": "Cancel",
+      "completing": "Completing...",
+      "confirm": "Complete page"
+    },
+    "slotTile": {
+      "missing": "Missing",
+      "owned": "Have",
+      "duplicate": "Duplicate",
+      "special": "Special",
+      "sticker": "Sticker #{number}",
+      "inMarketplace": "Available in marketplace",
+      "updated": "Updated",
+      "updateError": "Error updating",
+      "countError": "Error updating count",
+      "viewListing": "View listing",
+      "createListing": "List duplicate",
+      "createListingTitle": "You need at least 2 copies to list"
     }
   },
   "validations": {
@@ -266,6 +334,17 @@
     "priceRequired": "Price is required for sales"
   },
   "admin": {
+    "index": {
+      "title": "Admin Panel",
+      "subtitle": "Manage collections, teams, pages, stickers, users and audit actions",
+      "tabCollections": "Collections",
+      "tabTeams": "Teams",
+      "tabPages": "Pages",
+      "tabStickers": "Stickers",
+      "tabBulk": "Bulk Upload",
+      "tabUsers": "Users",
+      "tabAudit": "Audit"
+    },
     "audit": {
       "title": "Audit log",
       "entityLabel": "Entity",

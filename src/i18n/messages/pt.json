@@ -236,7 +236,75 @@
     },
     "card": {
       "viewCollection": "Ver coleção: {title}",
-      "coverAlt": "Capa da coleção {title}"
+      "coverAlt": "Capa da coleção {title}",
+      "by": "por",
+      "featured": "Destaque",
+      "deleted": "Excluído",
+      "public": "Público",
+      "private": "Privado",
+      "pages": "páginas",
+      "stickers": "figurinhas",
+      "copy": "Usar este modelo",
+      "copying": "Copiando...",
+      "copied": "Copiado!",
+      "success": "Modelo copiado! Redirecionando...",
+      "error": "Erro ao copiar o modelo",
+      "edit": "Editar"
+    },
+    "myTemplates": {
+      "title": "Meus Álbuns",
+      "subtitle": "Gerencie seu progresso em cada coleção",
+      "explore": "Explorar coleções",
+      "emptyTitle": "Você ainda não tem álbuns",
+      "emptyDesc": "Explore as coleções disponíveis e adicione as que quiser seguir",
+      "progress": "Progresso",
+      "stickersCount": "{completed} / {total} figurinhas",
+      "manage": "Ver álbum",
+      "marketplace": {
+        "missing": "{count} faltam no marketplace"
+      },
+      "stats": {
+        "have": "Tenho",
+        "need": "Faltam"
+      }
+    },
+    "summaryHeader": {
+      "by": "por",
+      "generalProgress": "Progresso geral",
+      "cardsCollected": "{owned} de {total} figurinhas coletadas",
+      "stats": {
+        "owned": "Tenho",
+        "duplicates": "Repetidas",
+        "missing": "Faltam",
+        "onSale": "À venda"
+      }
+    },
+    "progressGrid": {
+      "pageFallback": "Página {pageNum}",
+      "stickersOf": "Figurinhas de {pageTitle}",
+      "completePageBtn": "Completar página",
+      "completePageTitle": "Completar página",
+      "completePageDesc": "Marcar todas as figurinhas faltantes nesta página como obtidas?",
+      "thisAction": "Esta ação irá:",
+      "markAsOwned": "Marcar as figurinhas <ownedTag>faltantes</ownedTag> como 'Tenho'",
+      "wontModify": "Não modificará figurinhas que já possui ou as repetidas",
+      "cancel": "Cancelar",
+      "completing": "Completando...",
+      "confirm": "Completar página"
+    },
+    "slotTile": {
+      "missing": "Falta",
+      "owned": "Tenho",
+      "duplicate": "Repetida",
+      "special": "Especial",
+      "sticker": "Figurinha #{number}",
+      "inMarketplace": "Disponível no marketplace",
+      "updated": "Atualizado",
+      "updateError": "Erro ao atualizar",
+      "countError": "Erro ao atualizar quantidade",
+      "viewListing": "Ver anúncio",
+      "createListing": "Publicar repetida",
+      "createListingTitle": "Você precisa de pelo menos 2 cópias para publicar"
     }
   },
   "validations": {
@@ -266,6 +334,17 @@
     "priceRequired": "O preço é obrigatório para as vendas"
   },
   "admin": {
+    "index": {
+      "title": "Painel de Administração",
+      "subtitle": "Gerencie coleções, times, páginas, figurinhas, usuários e audite ações",
+      "tabCollections": "Coleções",
+      "tabTeams": "Times",
+      "tabPages": "Páginas",
+      "tabStickers": "Figurinhas",
+      "tabBulk": "Upload em Massa",
+      "tabUsers": "Usuários",
+      "tabAudit": "Auditoria"
+    },
     "audit": {
       "title": "Registro de auditoria",
       "entityLabel": "Entidade",

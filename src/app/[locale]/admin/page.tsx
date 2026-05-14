@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import CollectionsTab from '@/components/admin/CollectionsTab';
 import TeamsTab from '@/components/admin/TeamsTab';
 import PagesTab from '@/components/admin/PagesTab';
@@ -11,15 +12,16 @@ import AuditTab from '@/components/admin/AuditTab';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('collections');
+  const t = useTranslations('admin.index');
 
   const tabs = [
-    { value: 'collections', label: 'Colecciones' },
-    { value: 'teams', label: 'Equipos' },
-    { value: 'pages', label: 'Páginas' },
-    { value: 'stickers', label: 'Cromos' },
-    { value: 'bulk', label: 'Carga Masiva' },
-    { value: 'users', label: 'Usuarios' },
-    { value: 'audit', label: 'Auditoría' },
+    { value: 'collections', label: t('tabCollections') },
+    { value: 'teams', label: t('tabTeams') },
+    { value: 'pages', label: t('tabPages') },
+    { value: 'stickers', label: t('tabStickers') },
+    { value: 'bulk', label: t('tabBulk') },
+    { value: 'users', label: t('tabUsers') },
+    { value: 'audit', label: t('tabAudit') },
   ];
 
   return (
@@ -27,8 +29,8 @@ export default function AdminPage() {
       {/* Header */}
       <div className="bg-[#2D3748] border-b-4 border-black">
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-4xl font-black text-white mb-2">Panel de Administración</h1>
-          <p className="text-gray-300">Gestiona colecciones, equipos, páginas, cromos, usuarios y audita acciones</p>
+          <h1 className="text-4xl font-black text-white mb-2">{t('title')}</h1>
+          <p className="text-gray-300">{t('subtitle')}</p>
         </div>
       </div>
 

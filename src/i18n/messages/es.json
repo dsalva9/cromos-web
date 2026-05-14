@@ -236,7 +236,75 @@
     },
     "card": {
       "viewCollection": "Ver colección: {title}",
-      "coverAlt": "Portada de la colección {title}"
+      "coverAlt": "Portada de la colección {title}",
+      "by": "por",
+      "featured": "Destacada",
+      "deleted": "Eliminada",
+      "public": "Pública",
+      "private": "Privada",
+      "pages": "páginas",
+      "stickers": "cromos",
+      "copy": "Usar esta plantilla",
+      "copying": "Copiando...",
+      "copied": "¡Copiada!",
+      "success": "¡Plantilla copiada! Redirigiendo...",
+      "error": "Error al copiar la plantilla",
+      "edit": "Editar"
+    },
+    "myTemplates": {
+      "title": "Mis Álbumes",
+      "subtitle": "Gestiona tu progreso en cada colección",
+      "explore": "Explorar colecciones",
+      "emptyTitle": "Aún no tienes álbumes",
+      "emptyDesc": "Explora las colecciones disponibles y añade las que quieras seguir",
+      "progress": "Progreso",
+      "stickersCount": "{completed} / {total} cromos",
+      "manage": "Ver álbum",
+      "marketplace": {
+        "missing": "{count} te faltan en el marketplace"
+      },
+      "stats": {
+        "have": "Tengo",
+        "need": "Me faltan"
+      }
+    },
+    "summaryHeader": {
+      "by": "por",
+      "generalProgress": "Progreso general",
+      "cardsCollected": "{owned} de {total} cromos obtenidos",
+      "stats": {
+        "owned": "Tengo",
+        "duplicates": "Repes",
+        "missing": "Faltan",
+        "onSale": "En venta"
+      }
+    },
+    "progressGrid": {
+      "pageFallback": "Página {pageNum}",
+      "stickersOf": "Cromos de {pageTitle}",
+      "completePageBtn": "Completar página",
+      "completePageTitle": "Completar página",
+      "completePageDesc": "¿Marcar todos los cromos que faltan en esta página como obtenidos?",
+      "thisAction": "Esta acción:",
+      "markAsOwned": "Marcará los cromos <ownedTag>que faltan</ownedTag> como 'Tengo'",
+      "wontModify": "No modificará los cromos que ya tienes o los repetidos",
+      "cancel": "Cancelar",
+      "completing": "Completando...",
+      "confirm": "Completar página"
+    },
+    "slotTile": {
+      "missing": "Falta",
+      "owned": "Tengo",
+      "duplicate": "Repetido",
+      "special": "Especial",
+      "sticker": "Cromo #{number}",
+      "inMarketplace": "Disponible en marketplace",
+      "updated": "Actualizado",
+      "updateError": "Error al actualizar",
+      "countError": "Error al actualizar cantidad",
+      "viewListing": "Ver anuncio",
+      "createListing": "Publicar repetido",
+      "createListingTitle": "Necesitas al menos 2 copias para publicar"
     }
   },
   "validations": {
@@ -266,6 +334,17 @@
     "priceRequired": "El precio es obligatorio para las ventas"
   },
   "admin": {
+    "index": {
+      "title": "Panel de Administración",
+      "subtitle": "Gestiona colecciones, equipos, páginas, cromos, usuarios y audita acciones",
+      "tabCollections": "Colecciones",
+      "tabTeams": "Equipos",
+      "tabPages": "Páginas",
+      "tabStickers": "Cromos",
+      "tabBulk": "Carga Masiva",
+      "tabUsers": "Usuarios",
+      "tabAudit": "Auditoría"
+    },
     "audit": {
       "title": "Registro de auditoría",
       "entityLabel": "Entidad",
