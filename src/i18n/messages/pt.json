@@ -1173,5 +1173,23 @@
     "slots": "Cromos",
     "stats": "Estatísticas",
     "loading": "Carregando modelos..."
+  },
+  "myListings": {
+    "title": "Meus Anúncios",
+    "description": "Gerencie seus anúncios do mercado",
+    "back": "Voltar ao Marketplace",
+    "newListing": "Novo Anúncio",
+    "active": "Ativos",
+    "reserved": "Reservados",
+    "completed": "Concluídos",
+    "deleted": "Excluídos",
+    "selectStatus": "Selecione o status",
+    "errorLoading": "Erro ao carregar anúncios:",
+    "noActiveTitle": "Você não tem anúncios ativos",
+    "noActiveDesc": "Crie seu primeiro anúncio para compartilhar seus cromos com a comunidade",
+    "createFirst": "Criar Seu Primeiro Anúncio",
+    "noReserved": "Você não tem anúncios reservados",
+    "noCompleted": "Você não tem anúncios concluídos",
+    "noDeleted": "Você não tem anúncios excluídos"
   }
 }

@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useMyListings } from '@/hooks/integration/useMyListings';
 import { MyListingCard } from '@/components/integration/MyListingCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,6 +22,7 @@ import {
 type ListingStatus = 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO';
 
 function MyListingsContent() {
+  const t = useTranslations('myListings');
   const { listings, loading, error, refetch } = useMyListings();
   const [selectedStatus, setSelectedStatus] = useState<ListingStatus>('active');
 
@@ -43,24 +45,24 @@ function MyListingsContent() {
           className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver al Marketplace
+          {t('back')}
         </Link>
 
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
-              Mis Anuncios
+              {t('title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Gestiona tus anuncios del mercado
+              {t('description')}
             </p>
           </div>
 
           <Link href="/marketplace/create">
             <Button className="bg-gold text-black hover:bg-gold-light">
               <Plus className="mr-2 h-4 w-4" />
-              Nuevo Anuncio
+              {t('newListing')}
             </Button>
           </Link>
         </div>
@@ -68,7 +70,7 @@ function MyListingsContent() {
         {/* Error State */}
         {error && (
           <div className="text-red-500 text-center py-8">
-            Error al cargar anuncios: {error}
+            {t('errorLoading')} {error}
           </div>
         )}
 
@@ -78,13 +80,13 @@ function MyListingsContent() {
           <div className="md:hidden mb-6">
             <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as ListingStatus)}>
               <SelectTrigger className="w-full h-12">
-                <SelectValue placeholder="Selecciona estado" />
+                <SelectValue placeholder="{t('selectStatus')}" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Activos ({activeListings.length})</SelectItem>
-                <SelectItem value="reserved">Reservados ({reservedListings.length})</SelectItem>
-                <SelectItem value="completed">Completados ({completedListings.length})</SelectItem>
-                <SelectItem value="ELIMINADO">Eliminados ({eliminadoListings.length})</SelectItem>
+                <SelectItem value="active">{t('active')} ({activeListings.length})</SelectItem>
+                <SelectItem value="reserved">{t('reserved')} ({reservedListings.length})</SelectItem>
+                <SelectItem value="completed">{t('completed')} ({completedListings.length})</SelectItem>
+                <SelectItem value="ELIMINADO">{t('deleted')} ({eliminadoListings.length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -93,16 +95,16 @@ function MyListingsContent() {
           <Tabs defaultValue="active" value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as ListingStatus)} className="hidden md:block space-y-6">
             <TabsList className="grid grid-cols-4">
               <TabsTrigger value="active">
-                Activos ({activeListings.length})
+                {t('active')} ({activeListings.length})
               </TabsTrigger>
               <TabsTrigger value="reserved">
-                Reservados ({reservedListings.length})
+                {t('reserved')} ({reservedListings.length})
               </TabsTrigger>
               <TabsTrigger value="completed">
-                Completados ({completedListings.length})
+                {t('completed')} ({completedListings.length})
               </TabsTrigger>
               <TabsTrigger value="ELIMINADO">
-                Eliminados ({eliminadoListings.length})
+                {t('deleted')} ({eliminadoListings.length})
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -119,9 +121,9 @@ function MyListingsContent() {
               ) : activeListings.length === 0 ? (
                 <EmptyState
                   icon={Package}
-                  title="No tienes anuncios activos"
-                  description="Crea tu primer anuncio para compartir tus cromos con la comunidad"
-                  actionLabel="Crear Tu Primer Anuncio"
+                  title=t('noActiveTitle')
+                  description=t('noActiveDesc')
+                  actionLabel=t('createFirst')
                   actionHref="/marketplace/create"
                 />
               ) : (
@@ -142,7 +144,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {reservedListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios reservados</p>
+                  <p className="text-gray-600 dark:text-gray-400">{t('noReserved')}</p>
                 </div>
               ) : (
                 reservedListings.map(listing => (
@@ -162,7 +164,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {completedListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios completados</p>
+                  <p className="text-gray-600 dark:text-gray-400">{t('noCompleted')}</p>
                 </div>
               ) : (
                 completedListings.map(listing => (
@@ -182,7 +184,7 @@ function MyListingsContent() {
             <div className="space-y-4">
               {eliminadoListings.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-600 dark:text-gray-400">No tienes anuncios eliminados</p>
+                  <p className="text-gray-600 dark:text-gray-400">{t('noDeleted')}</p>
                 </div>
               ) : (
                 eliminadoListings.map(listing => (

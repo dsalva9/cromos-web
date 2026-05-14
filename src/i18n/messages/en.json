@@ -1173,5 +1173,23 @@
     "slots": "Stickers",
     "stats": "Statistics",
     "loading": "Loading templates..."
+  },
+  "myListings": {
+    "title": "My Listings",
+    "description": "Manage your marketplace listings",
+    "back": "Back to Marketplace",
+    "newListing": "New Listing",
+    "active": "Active",
+    "reserved": "Reserved",
+    "completed": "Completed",
+    "deleted": "Deleted",
+    "selectStatus": "Select status",
+    "errorLoading": "Error loading listings:",
+    "noActiveTitle": "You have no active listings",
+    "noActiveDesc": "Create your first listing to share your stickers with the community",
+    "createFirst": "Create Your First Listing",
+    "noReserved": "You have no reserved listings",
+    "noCompleted": "You have no completed listings",
+    "noDeleted": "You have no deleted listings"
   }
 }
