@@ -80,7 +80,7 @@ function MyListingsContent() {
           <div className="md:hidden mb-6">
             <Select value={selectedStatus} onValueChange={(value) => setSelectedStatus(value as ListingStatus)}>
               <SelectTrigger className="w-full h-12">
-                <SelectValue placeholder="{t('selectStatus')}" />
+                <SelectValue placeholder={t('selectStatus')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">{t('active')} ({activeListings.length})</SelectItem>
@@ -121,9 +121,9 @@ function MyListingsContent() {
               ) : activeListings.length === 0 ? (
                 <EmptyState
                   icon={Package}
-                  title=t('noActiveTitle')
-                  description=t('noActiveDesc')
-                  actionLabel=t('createFirst')
+                  title={t('noActiveTitle')}
+                  description={t('noActiveDesc')}
+                  actionLabel={t('createFirst')}
                   actionHref="/marketplace/create"
                 />
               ) : (
