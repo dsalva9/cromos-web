@@ -1231,5 +1231,17 @@
       "noMatch": "Las contraseñas no coinciden",
       "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo."
     }
+  },
+  "userMenu": {
+    "myProfile": "Mi Perfil",
+    "myListings": "Mis Anuncios",
+    "collections": "Colecciones",
+    "settings": "Ajustes",
+    "adminPanel": "Admin Panel",
+    "logout": "Cerrar sesión",
+    "loggingOut": "Cerrando sesión...",
+    "logoutSuccess": "Sesión cerrada correctamente",
+    "logoutError": "Error al cerrar sesión",
+    "incompleteProfile": "¡Necesitas completar tu perfil para empezar a cambiar cromos!"
   }
 }

@@ -1231,5 +1231,17 @@
       "noMatch": "Passwords do not match",
       "unexpected": "An unexpected error occurred. Please try again."
     }
+  },
+  "userMenu": {
+    "myProfile": "My Profile",
+    "myListings": "My Listings",
+    "collections": "Collections",
+    "settings": "Settings",
+    "adminPanel": "Admin Panel",
+    "logout": "Log out",
+    "loggingOut": "Logging out...",
+    "logoutSuccess": "Successfully logged out",
+    "logoutError": "Error logging out",
+    "incompleteProfile": "You need to complete your profile to start trading stickers!"
   }
 }

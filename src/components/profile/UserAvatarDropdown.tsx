@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { toast } from '@/lib/toast';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface UserAvatarDropdownProps {
   isAdmin?: boolean;
@@ -28,6 +28,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   const supabase = useSupabaseClient();
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations('userMenu');
   const [internalOpen, setInternalOpen] = useState(false);
 
   // Use controlled state if provided, otherwise use internal state
@@ -41,15 +42,15 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
   };
 
   const handleSignOut = async () => {
-    const toastId = toast.loading('Cerrando sesión...');
+    const toastId = toast.loading(t('loggingOut'));
     try {
       await supabase.auth.signOut();
-      toast.success('Sesión cerrada correctamente', { id: toastId });
+      toast.success(t('logoutSuccess'), { id: toastId });
       // Use window.location.href for a full reload to ensure safe clear of all state
       window.location.href = `/${locale}/login`;
     } catch (error) {
       logger.error('Sign out error:', error);
-      toast.error('Error al cerrar sesión', { id: toastId });
+      toast.error(t('logoutError'), { id: toastId });
     }
     handleSetIsOpen(false);
   };
@@ -60,9 +61,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
         // Block navigation for incomplete profiles and redirect to completion page.
         if (requiresCompletion && !loading && !isComplete) {
           event.preventDefault();
-          toast.info(
-            'Necesitas completar tu perfil para empezar a cambiar cromos!'
-          );
+          toast.info(t('incompleteProfile'));
           handleSetIsOpen(false);
           router.push('/profile/completar');
           return;
@@ -146,7 +145,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <User className="h-4 w-4" />
-                <span>Mi Perfil</span>
+                <span>{t('myProfile')}</span>
               </Link>
 
               <Link
@@ -155,7 +154,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <Package className="h-4 w-4" />
-                <span>Mis Anuncios</span>
+                <span>{t('myListings')}</span>
               </Link>
 
               <Link
@@ -164,7 +163,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <LayoutTemplate className="h-4 w-4" />
-                <span>Colecciones</span>
+                <span>{t('collections')}</span>
               </Link>
 
               <Link
@@ -173,7 +172,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <Settings className="h-4 w-4" />
-                <span>Ajustes</span>
+                <span>{t('settings')}</span>
               </Link>
 
               {isAdmin && (
@@ -184,7 +183,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                     onClick={handleProtectedClick('/admin/dashboard')}
                     className="flex items-center gap-3 px-4 py-2 text-gold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-bold"
                   >
-                    <span>Admin Panel</span>
+                    <span>{t('adminPanel')}</span>
                   </Link>
                 </>
               )}
@@ -197,7 +196,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 className="flex items-center gap-3 px-4 py-3 text-gray-900 dark:text-white hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors w-full"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Cerrar sesión</span>
+                <span>{t('logout')}</span>
               </button>
             </div>
           </div>

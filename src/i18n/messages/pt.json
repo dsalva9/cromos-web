@@ -1231,5 +1231,17 @@
       "noMatch": "As senhas não coincidem",
       "unexpected": "Ocorreu um erro inesperado. Tente novamente."
     }
+  },
+  "userMenu": {
+    "myProfile": "Meu Perfil",
+    "myListings": "Meus Anúncios",
+    "collections": "Coleções",
+    "settings": "Configurações",
+    "adminPanel": "Admin Panel",
+    "logout": "Sair",
+    "loggingOut": "Saindo...",
+    "logoutSuccess": "Sessão encerrada com sucesso",
+    "logoutError": "Erro ao sair da sessão",
+    "incompleteProfile": "Você precisa completar seu perfil para começar a trocar figurinhas!"
   }
 }
