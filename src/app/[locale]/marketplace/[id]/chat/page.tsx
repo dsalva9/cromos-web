@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -9,13 +9,14 @@ import { useListingChat } from '@/hooks/marketplace/useListingChat';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Package, ChevronDown, Info } from 'lucide-react';
+import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
@@ -29,6 +30,7 @@ import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
 function ListingChatPageContent() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations('marketplaceChat');
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const listingId = parseInt(params.id as string, 10);
@@ -576,7 +578,7 @@ function ListingChatPageContent() {
             className="text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver a mis chats
+            {t('backToChats')}
           </Button>
         </div>
 
@@ -626,7 +628,7 @@ function ListingChatPageContent() {
                       {listing.title}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      Vendedor: {listing.author_nickname}
+                      {t('seller')} {listing.author_nickname}
                     </p>
                   </div>
                   <button
@@ -649,7 +651,7 @@ function ListingChatPageContent() {
                     className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                   >
                     <Package className="h-3.5 w-3.5 mr-1" />
-                    {reserving ? 'Marcando...' : 'Reservar'}
+                    {reserving ? t('reserving') : t('reserve')}
                   </Button>
                 )}
                 {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
@@ -661,7 +663,7 @@ function ListingChatPageContent() {
                       className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                     >
                       <Package className="h-3.5 w-3.5 mr-1" />
-                      {completing ? 'Completando...' : 'Completar'}
+                      {completing ? t('completing') : t('complete')}
                     </Button>
                     <Button
                       onClick={handleUnreserve}
@@ -670,7 +672,7 @@ function ListingChatPageContent() {
                       variant="outline"
                       className="text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 font-bold text-xs flex-1"
                     >
-                      {unreserving ? 'Liberando...' : 'Liberar'}
+                      {unreserving ? t('unreserving') : t('unreserve')}
                     </Button>
                   </>
                 )}
@@ -682,7 +684,7 @@ function ListingChatPageContent() {
                     className="bg-gold text-black hover:bg-yellow-400 font-bold text-xs flex-1"
                   >
                     <Package className="h-3.5 w-3.5 mr-1" />
-                    {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
+                    {confirming ? t('confirming') : t('confirmReceipt')}
                   </Button>
                 )}
               </div>
@@ -722,10 +724,10 @@ function ListingChatPageContent() {
                     listing.status === 'completed' && 'bg-blue-100 text-blue-700',
                     listing.status === 'sold' && 'bg-gray-200 text-gray-700'
                   )}>
-                    {listing.status === 'active' && 'Activo'}
-                    {listing.status === 'reserved' && 'Reservado'}
-                    {listing.status === 'completed' && 'Completado'}
-                    {listing.status === 'sold' && 'Completado'}
+                    {listing.status === 'active' && t('statusActive')}
+                    {listing.status === 'reserved' && t('statusReserved')}
+                    {listing.status === 'completed' && t('statusCompleted')}
+                    {listing.status === 'sold' && t('statusSold')}
                   </span>
                   <ChevronDown
                     className={cn(
@@ -775,16 +777,16 @@ function ListingChatPageContent() {
                           listing.status === 'completed' && 'bg-blue-100 text-blue-700',
                           listing.status === 'sold' && 'bg-gray-200 text-gray-700'
                         )}>
-                          {listing.status === 'active' && 'Disponible'}
-                          {listing.status === 'reserved' && 'Reservado'}
-                          {listing.status === 'completed' && 'Completado'}
-                          {listing.status === 'sold' && 'Completado'}
+                          {listing.status === 'active' && t('statusAvailable')}
+                          {listing.status === 'reserved' && t('statusReserved')}
+                          {listing.status === 'completed' && t('statusCompleted')}
+                          {listing.status === 'sold' && t('statusSold')}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    {/* Desktop action buttons - keep as is */}
+                    {/* Desktop action buttons */}
                     {isOwner && listing.status === 'active' && !transactionStatus && (
                       <Button
                         onClick={handleReserve}
@@ -793,7 +795,7 @@ function ListingChatPageContent() {
                         className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
-                        {reserving ? 'Marcando...' : 'Marcar Reservado'}
+                        {reserving ? t('reserving') : t('markReserved')}
                       </Button>
                     )}
                     {isOwner && listing.status === 'reserved' && transactionStatus === 'reserved' && (
@@ -805,7 +807,7 @@ function ListingChatPageContent() {
                           className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                         >
                           <Package className="h-4 w-4 mr-2" />
-                          {completing ? 'Completando...' : 'Marcar Completado'}
+                          {completing ? t('completing') : t('complete')}
                         </Button>
                         <Button
                           onClick={handleUnreserve}
@@ -814,7 +816,7 @@ function ListingChatPageContent() {
                           className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 w-full sm:w-auto whitespace-nowrap"
                         >
                           <Package className="h-4 w-4 mr-2" />
-                          {unreserving ? 'Liberando...' : 'Liberar Reserva'}
+                          {unreserving ? t('unreserving') : t('unreserve')}
                         </Button>
                       </>
                     )}
@@ -827,7 +829,7 @@ function ListingChatPageContent() {
                         className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:w-auto whitespace-nowrap"
                       >
                         <Package className="h-4 w-4 mr-2" />
-                        {confirming ? 'Confirmando...' : 'Confirmar Recepción'}
+                        {confirming ? t('confirming') : t('confirmReceipt')}
                       </Button>
                     )}
                   </div>
@@ -837,12 +839,12 @@ function ListingChatPageContent() {
           </ModernCard>
         )}
 
-        {/* Mobile Info Modal (replacing inline accordion if desired, but for now just fix the layout structure in grid) */}
+        {/* Mobile Info Modal */}
         {listingCardExpanded && (
           <Dialog open={listingCardExpanded} onOpenChange={setListingCardExpanded}>
             <DialogContent className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 w-[95%] rounded-lg">
               <DialogHeader>
-                <DialogTitle className="text-gray-900 dark:text-white">Información del Anuncio</DialogTitle>
+                <DialogTitle className="text-gray-900 dark:text-white">{t('listingInfo')}</DialogTitle>
               </DialogHeader>
               {listing && (
                 <div className="space-y-4">
@@ -856,7 +858,7 @@ function ListingChatPageContent() {
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 flex items-center justify-center rounded-md">
-                        <span className="text-gray-500">Sin imagen</span>
+                        <span className="text-gray-500">{t('noImage')}</span>
                       </div>
                     )}
                   </div>
@@ -871,15 +873,15 @@ function ListingChatPageContent() {
                         listing.status === 'completed' && 'bg-blue-900/30 text-blue-400',
                         listing.status === 'sold' && 'bg-gray-700 text-gray-300'
                       )}>
-                        {listing.status === 'active' && 'Disponible'}
-                        {listing.status === 'reserved' && 'Reservado'}
-                        {listing.status === 'completed' && 'Completado'}
-                        {listing.status === 'sold' && 'Completado'}
+                        {listing.status === 'active' && t('statusAvailable')}
+                        {listing.status === 'reserved' && t('statusReserved')}
+                        {listing.status === 'completed' && t('statusCompleted')}
+                        {listing.status === 'sold' && t('statusSold')}
                       </span>
                     </div>
                   </div>
                   <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-md">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{listing.description || 'Sin descripción'}</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{listing.description || t('noDescription')}</p>
                   </div>
                 </div>
               )}
@@ -898,7 +900,7 @@ function ListingChatPageContent() {
                   <ModernCard>
                     <ModernCardContent className="p-4">
                       <h3 className="font-bold text-gray-900 dark:text-white mb-3">
-                        Conversaciones ({participants.length})
+                        {t('conversations')} ({participants.length})
                       </h3>
                       <div className="space-y-2">
                         {participants.map(participant => {
@@ -928,7 +930,7 @@ function ListingChatPageContent() {
                                   </span>
                                   {isReservedForThisParticipant && (
                                     <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-1.5 py-0.5 rounded">
-                                      Reservado
+                                      {t('reserved')}
                                     </span>
                                   )}
                                 </div>
@@ -956,9 +958,12 @@ function ListingChatPageContent() {
               <div className="hidden md:block md:col-span-1 overflow-y-auto min-h-0">
                 <ModernCard>
                   <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-3">
-                      Conversaciones
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                      {t('selectConversation')}
                     </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                      {t('chooseBuyer')}
+                    </p>
                     <div className="space-y-2">
                       {participants.map(participant => {
                         const isReservedForThisParticipant =
@@ -984,7 +989,7 @@ function ListingChatPageContent() {
                                 </span>
                                 {isReservedForThisParticipant && (
                                   <span className="bg-yellow-100 text-yellow-700 text-xs font-bold px-1.5 py-0.5 rounded">
-                                    Reservado
+                                    {t('reserved')}
                                   </span>
                                 )}
                               </div>
@@ -1027,15 +1032,16 @@ function ListingChatPageContent() {
                   {isOwner && !selectedParticipant && participants.length > 0 ? (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-gray-400 dark:text-gray-500">
-                        Selecciona una conversación para ver los mensajes
+                        {t('selectConversation')}
                       </p>
                     </div>
                   ) : messages.length === 0 ? (
-                    <div className="flex items-center justify-center h-full">
-                      <p className="text-gray-400 dark:text-gray-500">
-                        {isOwner
-                          ? 'No hay mensajes en esta conversación'
-                          : 'Envía un mensaje para iniciar la conversación'}
+                    <div className="flex flex-col items-center justify-center h-full text-center p-6 space-y-4">
+                      <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                        <MessageCircle className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400 max-w-sm">
+                        {t('noMessages')}
                       </p>
                     </div>
                   ) : (
@@ -1116,15 +1122,17 @@ function ListingChatPageContent() {
                               onClick={() => setShowRatingModal(true)}
                               className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-6 py-3 text-sm border border-gold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                             >
-                              ⭐ Haz clic aquí para valorar a {counterpartyToRate.nickname}
+                              ⭐ {t('rateCounterparty', { nickname: counterpartyToRate.nickname })}
                             </button>
                           ) : (
                             // Show system message with user's rating
                             <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
                               <p>
-                                Has valorado a {counterpartyToRate.nickname} con{' '}
-                                {'⭐'.repeat(myRating.rating)} ({myRating.rating}/5)
-                                {myRating.comment && ` y has comentado: "${myRating.comment}"`}
+                                {t('alreadyRated', {
+                                  nickname: counterpartyToRate.nickname,
+                                  rating: myRating.rating,
+                                  comment: myRating.comment ? ` y has comentado: "${myRating.comment}"` : ''
+                                })}
                               </p>
                             </div>
                           )}
@@ -1136,7 +1144,7 @@ function ListingChatPageContent() {
                         <div className="flex justify-center my-4">
                           <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
                             <p>
-                              {isOwner ? 'El comprador' : 'El vendedor'} te ha valorado con{' '}
+                              {isOwner ? t('buyerRatedYou') : t('sellerRatedYou')}
                               {'⭐'.repeat(counterpartyRating.rating)} ({counterpartyRating.rating}/5)
                               {counterpartyRating.comment && ` y ha comentado: "${counterpartyRating.comment}"`}
                             </p>
@@ -1160,27 +1168,25 @@ function ListingChatPageContent() {
                     // Access denied (RLS or blocked)
                     if (listingAccessDenied && !isOwner) {
                       return (
-                        <p className="text-gray-400 dark:text-gray-500 text-center italic">
-                          No tienes acceso a este chat
-                        </p>
+                        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-center border border-red-200 dark:border-red-800">
+                          <h4 className="font-bold">{t('accessDenied')}</h4>
+                          <p className="text-sm mt-1">{t('accessDeniedDesc')}</p>
+                        </div>
                       );
                     }
 
                     // Completed listing
                     if (isCompleted) {
-                      // Only allow chat if it was the successful transaction (for history/rating) - though typically completed chats are read-only eventually
-                      // For now, let's keep it simple: if completed, chat is closed for everyone or maybe just read-only?
-                      // The original code said: "Chat cerrado - La transacción ha sido completada" if isReservedBuyer or isOwner
                       if ((isReservedBuyer || isOwner)) {
                         return (
                           <p className="text-gray-400 dark:text-gray-500 text-center italic">
-                            Chat cerrado - La transacción ha sido completada
+                            {t('chatClosedCompleted')}
                           </p>
                         );
                       }
                       return (
                         <p className="text-gray-400 dark:text-gray-500 text-center italic">
-                          Este anuncio ya no está disponible
+                          {t('listingUnavailable')}
                         </p>
                       );
                     }
@@ -1196,7 +1202,7 @@ function ListingChatPageContent() {
                       if (isOwner && !isReservedParticipant) {
                         return (
                           <p className="text-gray-400 dark:text-gray-500 text-center italic">
-                            Este anuncio está reservado para otro usuario
+                            {t('listingReservedOther')}
                           </p>
                         );
                       }
@@ -1210,7 +1216,7 @@ function ListingChatPageContent() {
                       if (!isOwner && !isReservedBuyer) {
                         return (
                           <p className="text-gray-400 dark:text-gray-500 text-center italic">
-                            Este anuncio está reservado para otro usuario
+                            {t('listingReservedOther')}
                           </p>
                         );
                       }
@@ -1221,7 +1227,7 @@ function ListingChatPageContent() {
                     if (isOwner && !selectedParticipant && participants.length > 0) {
                       return (
                         <p className="text-gray-400 dark:text-gray-500 text-center">
-                          Selecciona una conversación para responder
+                          {t('selectToRespond')}
                         </p>
                       );
                     }
@@ -1243,15 +1249,14 @@ function ListingChatPageContent() {
                                 htmlFor="tos-chat"
                                 className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer leading-relaxed"
                               >
-                                Acepto los{' '}
+                                {t('tosAccept')}
                                 <button
                                   type="button"
                                   onClick={() => setChatTermsDialogOpen(true)}
                                   className="text-gold hover:underline font-semibold"
                                 >
-                                  términos y condiciones
-                                </button>{' '}
-                                y me comprometo a realizar intercambios de manera honesta y respetuosa.
+                                  {t('termsAndConditions')}
+                                </button>
                               </label>
                             </div>
                           </div>
@@ -1261,8 +1266,7 @@ function ListingChatPageContent() {
                           <textarea
                             value={messageText}
                             onChange={e => setMessageText(e.target.value)}
-
-                            placeholder="Escribe un mensaje..."
+                            placeholder={t('writeMessage')}
                             maxLength={500}
                             rows={2}
                             className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-gold focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1279,7 +1283,7 @@ function ListingChatPageContent() {
                       </>
                     )}
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    {messageText.length}/500 caracteres
+                    {messageText.length}/500 {t('characters')}
                   </p>
                 </div>
               </ModernCardContent>

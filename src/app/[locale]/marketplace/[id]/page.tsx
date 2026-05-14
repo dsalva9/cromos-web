@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {
   useUser,
   useSupabaseClient,
@@ -43,6 +44,7 @@ import { getSupportMailtoUrl } from '@/lib/utils';
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations('marketplaceDetails');
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const listingId = params.id as string;
@@ -103,7 +105,7 @@ export default function ListingDetailPage() {
   const handleSoftDelete = async () => {
     try {
       await softDeleteListing(listingId);
-      toast.success('Anuncio movido a Eliminados');
+      toast.success(t('moveToDeleted'));
       router.push('/marketplace/my-listings?tab=ELIMINADO');
     } catch (error) {
       logger.error('Delete error:', error);
@@ -113,7 +115,7 @@ export default function ListingDetailPage() {
 
   const handleAdminDelete = async () => {
     if (!adminDeleteReason.trim()) {
-      toast.error('Por favor ingresa un motivo para eliminar');
+      toast.error(t('pleaseEnterReason'));
       return;
     }
 
@@ -126,14 +128,14 @@ export default function ListingDetailPage() {
 
       if (error) throw error;
 
-      toast.success('Listado eliminado con éxito (90 días de retención)');
+      toast.success(t('adminDeleteSuccess'));
       setShowAdminDeleteDialog(false);
       setAdminDeleteReason('');
       refetch(); // Refresh to show deleted state
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : String(error);
       logger.error(`Admin delete error: ${errMsg}`, error);
-      toast.error(errMsg || 'Error al eliminar el listado');
+      toast.error(errMsg || t('adminDeleteError'));
     } finally {
       setAdminDeleteLoading(false);
     }
@@ -155,14 +157,14 @@ export default function ListingDetailPage() {
             <Trash className="h-12 w-12 text-gray-500" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Anuncio no encontrado
+            {t('notFound')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             {error ||
-              'Este anuncio puede haber sido eliminado o ya no está disponible'}
+              t('notFoundDesc')}
           </p>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Por favor contacta con{' '}
+            {t('contactSupport')}{' '}
             <a
               href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-400 underline"
@@ -192,13 +194,13 @@ export default function ListingDetailPage() {
             <Trash className="h-12 w-12 text-gray-500" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Anuncio no encontrado
+            {t('notFound')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Este anuncio puede haber sido eliminado o ya no está disponible
+            {t('notFoundDesc')}
           </p>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Por favor contacta con{' '}
+            {t('contactSupport')}{' '}
             <a
               href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-400 underline"
@@ -208,7 +210,7 @@ export default function ListingDetailPage() {
           </p>
           <Link href="/marketplace">
             <Button className="bg-gold text-black hover:bg-gold-light font-bold">
-              Volver al Marketplace
+              {t('backToMarketplace')}
             </Button>
           </Link>
         </div>
@@ -219,15 +221,15 @@ export default function ListingDetailPage() {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'active':
-        return 'Disponible';
+        return t('statusAvailable');
       case 'reserved':
-        return 'Reservado';
+        return t('statusReserved');
       case 'completed':
-        return 'Completado';
+        return t('statusCompleted');
       case 'sold':
-        return 'Completado';
+        return t('statusCompleted');
       case 'removed':
-        return 'Eliminado';
+        return t('statusDeleted');
       default:
         return status;
     }
@@ -299,18 +301,18 @@ export default function ListingDetailPage() {
                     text-white border-2 border-black
                   `}
                   >
-                    {listing.is_group ? 'Pack de cromos' : 'Cromo individual'}
+                    {listing.is_group ? t('pack') : t('single')}
                   </Badge>
 
                   {/* Listing Type Badges */}
                   {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
                     <Badge className="bg-gold text-black border-2 border-black">
-                      🔄 Intercambio
+                      🔄 {t('exchange')}
                     </Badge>
                   )}
                   {(listing.listing_type === 'venta' || listing.listing_type === 'ambos') && (
                     <Badge className="bg-green-600 text-white border-2 border-black">
-                      💰 Venta
+                      💰 {t('sale')}
                     </Badge>
                   )}
 
@@ -318,7 +320,7 @@ export default function ListingDetailPage() {
                   {isAdmin && listing.author_is_suspended && !listing.author_deleted_at && listing.status !== 'removed' && (
                     <Badge className="bg-red-900 text-red-200 border-2 border-red-700 flex items-center gap-1">
                       <Ban className="h-3 w-3" />
-                      Autor Suspendido
+                      {t('authorSuspended')}
                     </Badge>
                   )}
 
@@ -326,7 +328,7 @@ export default function ListingDetailPage() {
                   {isAdmin && listing.author_deleted_at && listing.status !== 'removed' && (
                     <Badge className="bg-orange-900 text-orange-200 border-2 border-orange-700 flex items-center gap-1">
                       <Trash2 className="h-3 w-3" />
-                      Autor Eliminado
+                      {t('authorDeleted')}
                     </Badge>
                   )}
 
@@ -334,7 +336,7 @@ export default function ListingDetailPage() {
                   {isAdmin && listing.deleted_at && (
                     <Badge className="bg-red-600 text-white border-2 border-red-800 flex items-center gap-1">
                       <Trash2 className="h-3 w-3" />
-                      Eliminado
+                      {t('deleted')}
                     </Badge>
                   )}
                 </div>
@@ -368,7 +370,7 @@ export default function ListingDetailPage() {
               <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
                 {listing.collection_name && (
                   <div>
-                    <span className="font-bold">Colección:</span>{' '}
+                    <span className="font-bold">{t('collection')}:</span>{' '}
                     <Link
                       href={`/templates?search=${encodeURIComponent(listing.collection_name)}`}
                       className="text-gold hover:underline"
@@ -379,7 +381,7 @@ export default function ListingDetailPage() {
                 )}
                 <div className="flex items-center gap-1">
                   <Eye className="h-4 w-4" />
-                  {listing.views_count} visualizaciones
+                  {listing.views_count} {t('views')}
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
@@ -396,12 +398,12 @@ export default function ListingDetailPage() {
                   <ModernCard className="mb-6">
                     <ModernCardContent className="p-4">
                       <h3 className="font-bold text-gray-900 dark:text-white mb-3">
-                        Detalles del Cromo
+                        {t('details')}
                       </h3>
                       <div className="space-y-2 text-sm">
                         {(listing.page_number || listing.page_title) && (
                           <div className="text-gray-600 dark:text-gray-400">
-                            <span className="font-bold text-gray-900 dark:text-white">Página:</span>{' '}
+                            <span className="font-bold text-gray-900 dark:text-white">{t('page')}:</span>{' '}
                             {listing.page_number && `${listing.page_number}`}
                             {listing.page_number &&
                               listing.page_title &&
@@ -412,7 +414,7 @@ export default function ListingDetailPage() {
                         {(listing.sticker_number || listing.slot_variant) && (
                           <div className="text-gray-600 dark:text-gray-400">
                             <span className="font-bold text-gray-900 dark:text-white">
-                              Número de cromo:
+                              {t('stickerNumber')}:
                             </span>{' '}
                             #{listing.sticker_number}
                             {listing.slot_variant}
@@ -421,7 +423,7 @@ export default function ListingDetailPage() {
                         {listing.global_number && (
                           <div className="text-gray-600 dark:text-gray-400">
                             <span className="font-bold text-gray-900 dark:text-white">
-                              Número global:
+                              {t('globalNumber')}:
                             </span>{' '}
                             #{listing.global_number}
                           </div>
@@ -435,7 +437,7 @@ export default function ListingDetailPage() {
               {listing.description && (
                 <ModernCard className="mb-6">
                   <ModernCardContent className="p-4">
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-2">Descripción</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-2">{t('description')}</h3>
                     <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
                       {listing.description}
                     </p>
@@ -446,7 +448,7 @@ export default function ListingDetailPage() {
               {/* Listing Type Info Card */}
               <ModernCard className="mb-6">
                 <ModernCardContent className="p-4">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Tipo de Anuncio</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('listingType')}</h3>
                   <div className="space-y-2">
                     {(listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
                       <div className="flex items-center gap-2 text-sm">
@@ -454,7 +456,7 @@ export default function ListingDetailPage() {
                           <span className="text-base">🔄</span>
                         </span>
                         <span className="text-gray-700 dark:text-gray-300">
-                          Disponible para <span className="font-semibold text-gold">intercambio</span> con otros cromos
+                          {t('availableForExchange')}
                         </span>
                       </div>
                     )}
@@ -464,7 +466,7 @@ export default function ListingDetailPage() {
                           <span className="text-base">💰</span>
                         </span>
                         <span className="text-gray-700 dark:text-gray-300">
-                          En venta por{' '}
+                          {t('forSale')}{' '}
                           <span className="font-bold text-green-600 dark:text-green-400 text-base">
                             {listing.price != null ? `${Number(listing.price).toFixed(2)} ${getCurrencySymbol(listing.author_country_code)}` : '—'}
                           </span>
@@ -478,7 +480,7 @@ export default function ListingDetailPage() {
               {/* Seller */}
               <ModernCard className="mb-6">
                 <ModernCardContent className="p-4">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">Vendedor</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('seller')}</h3>
                   <Link href={`/users/${listing.user_id}`}>
                     <div className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                       {(() => {
@@ -516,7 +518,7 @@ export default function ListingDetailPage() {
                             {listing.author_location}
                           </p>
                         )}
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Ver perfil</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('viewProfile')}</p>
                       </div>
                     </div>
                   </Link>
@@ -532,7 +534,7 @@ export default function ListingDetailPage() {
                 >
                   <Link href={`/marketplace/${listing.id}/chat`}>
                     <MessageCircle className="mr-2 h-5 w-5" />
-                    Contactar Vendedor
+                    {t('contactSeller')}
                   </Link>
                 </Button>
               )}
@@ -553,7 +555,7 @@ export default function ListingDetailPage() {
 
               {isOwner && (
                 <div className="text-center space-y-4">
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">Este es tu anuncio</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">{t('yourListing')}</p>
                   {hasConversations ? (
                     <Button
                       size="lg"
@@ -562,7 +564,7 @@ export default function ListingDetailPage() {
                     >
                       <Link href={`/marketplace/${listing.id}/chat`}>
                         <MessageCircle className="mr-2 h-5 w-5" />
-                        Ver Conversaciones
+                        {t('viewConversations')}
                       </Link>
                     </Button>
                   ) : (
@@ -572,7 +574,7 @@ export default function ListingDetailPage() {
                       disabled
                     >
                       <MessageCircle className="mr-2 h-5 w-5" />
-                      {checkingConversations ? 'Cargando...' : 'Sin Conversaciones'}
+                      {checkingConversations ? t('loading') : t('noConversations')}
                     </Button>
                   )}
 
@@ -584,17 +586,17 @@ export default function ListingDetailPage() {
                         onClick={async () => {
                           try {
                             await restoreListing(listingId);
-                            toast.success('Anuncio restaurado correctamente');
+                            toast.success(t('restoreSuccess'));
                             window.location.reload();
                           } catch (err) {
                             logger.error('Error restoring listing:', err);
-                            toast.error('Error al restaurar el anuncio');
+                            toast.error(t('restoreError'));
                           }
                         }}
                         disabled={restoreLoading}
                       >
                         <RotateCcw className="mr-2 h-4 w-4" />
-                        Restaurar Anuncio
+                        {t('restoreListing')}
                       </Button>
                     ) : (listing.status === 'sold' || listing.status === 'completed' || listing.status === 'reserved') ? (
                       // No action buttons for completed/sold/reserved listings
@@ -604,7 +606,7 @@ export default function ListingDetailPage() {
                       <Button variant="outline" asChild>
                         <Link href={`/marketplace/${listing.id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Editar Anuncio
+                          {t('editListing')}
                         </Link>
                       </Button>
                     )}
@@ -616,7 +618,7 @@ export default function ListingDetailPage() {
                         className="text-blue-500 border-blue-500 hover:bg-blue-500 hover:text-white"
                       >
                         <Trash className="mr-2 h-4 w-4" />
-                        Eliminar Anuncio
+                        {t('deleteListing')}
                       </Button>
                     )}
                   </div>
@@ -630,9 +632,9 @@ export default function ListingDetailPage() {
                       href="/login"
                       className="text-gold hover:underline"
                     >
-                      Iniciar Sesión
+                      {t('loginToContact')}
                     </Link>{' '}
-                    para contactar al vendedor
+                    {t('toContact')}
                   </p>
                 </div>
               )}
@@ -661,7 +663,7 @@ export default function ListingDetailPage() {
       <Dialog open={showAdminDeleteDialog} onOpenChange={setShowAdminDeleteDialog}>
         <DialogContent className="bg-slate-800 text-white border-slate-700">
           <DialogHeader>
-            <DialogTitle>Eliminar Listado (Admin)</DialogTitle>
+            <DialogTitle>{t('adminDeleteTitle')}</DialogTitle>
             <DialogDescription className="text-slate-400">
               {listing.title}
             </DialogDescription>
@@ -669,17 +671,17 @@ export default function ListingDetailPage() {
 
           <div className="space-y-2 py-4">
             <label className="text-sm font-medium text-slate-300">
-              Motivo (requerido)
+              {t('adminDeleteReason')}
             </label>
             <Textarea
               value={adminDeleteReason}
               onChange={(e) => setAdminDeleteReason(e.target.value)}
-              placeholder="Explica por qué se elimina este listado..."
+              placeholder={t('adminDeletePlaceholder')}
               rows={3}
               className="bg-slate-900 border-slate-700 text-white"
             />
             <p className="text-xs text-slate-400 mt-2">
-              El listado será eliminado permanentemente después de 90 días de retención.
+              {t('adminDeleteWarning')}
             </p>
           </div>
 
@@ -693,7 +695,7 @@ export default function ListingDetailPage() {
               disabled={adminDeleteLoading}
               className="border-slate-600 text-white hover:bg-slate-700"
             >
-              Cancelar
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleAdminDelete}
@@ -703,10 +705,10 @@ export default function ListingDetailPage() {
               {adminDeleteLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Eliminando...
+                  {t('deleting')}
                 </>
               ) : (
-                <>Confirmar Eliminación</>
+                <>{t('confirmDelete')}</>
               )}
             </Button>
           </DialogFooter>

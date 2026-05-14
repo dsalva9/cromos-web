@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -20,6 +20,7 @@ export function MobileBottomNav() {
   const rawPathname = usePathname();
   const pathname = stripLocale(rawPathname);
   const locale = useLocale();
+  const t = useTranslations('navigation');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = useSupabaseClient();
   const router = useRouter();
@@ -141,7 +142,7 @@ export function MobileBottomNav() {
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DrawerContent className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-black dark:text-white pb-[env(safe-area-inset-bottom)] z-[var(--z-modal)]">
           <DrawerHeader className="border-b border-gray-100 dark:border-gray-800 mb-2">
-            <DrawerTitle className="text-center font-bold text-lg">Menú</DrawerTitle>
+            <DrawerTitle className="text-center font-bold text-lg">{t('menu')}</DrawerTitle>
           </DrawerHeader>
           <div className="p-4 space-y-2">
             <a
@@ -155,7 +156,7 @@ export function MobileBottomNav() {
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Package className="h-5 w-5 text-gold" />
-              <span className="font-medium">Mis Anuncios</span>
+              <span className="font-medium">{t('myListings')}</span>
             </a>
 
             <a
@@ -169,7 +170,7 @@ export function MobileBottomNav() {
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <FileText className="h-5 w-5 text-gold" />
-              <span className="font-medium">Colecciones</span>
+              <span className="font-medium">{t('collections')}</span>
             </a>
 
             <a
@@ -183,7 +184,7 @@ export function MobileBottomNav() {
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Settings className="h-5 w-5 text-gold" />
-              <span className="font-medium">Ajustes</span>
+              <span className="font-medium">{t('settings')}</span>
             </a>
 
             {isAdmin && (
@@ -212,7 +213,7 @@ export function MobileBottomNav() {
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 text-red-600 dark:text-red-400 w-full transition-colors"
             >
               <LogOut className="h-5 w-5" />
-              <span className="font-medium">Cerrar Sesión</span>
+              <span className="font-medium">{t('logout')}</span>
             </button>
 
             {/* Legal links — footer is hidden on mobile, these are the mobile equivalent */}
@@ -223,7 +224,7 @@ export function MobileBottomNav() {
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/terms'); }}
                 className="hover:text-gold transition-colors"
               >
-                Términos
+                {t('terms')}
               </a>
               <span>·</span>
               <a
@@ -231,7 +232,7 @@ export function MobileBottomNav() {
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/privacy'); }}
                 className="hover:text-gold transition-colors"
               >
-                Privacidad
+                {t('privacy')}
               </a>
               <span>·</span>
               <a
@@ -239,7 +240,7 @@ export function MobileBottomNav() {
                 onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/cookies'); }}
                 className="hover:text-gold transition-colors"
               >
-                Cookies
+                {t('cookies')}
               </a>
             </div>
             <p className="text-center text-[10px] text-gray-300 dark:text-gray-600 pb-1">v1.0 Beta</p>

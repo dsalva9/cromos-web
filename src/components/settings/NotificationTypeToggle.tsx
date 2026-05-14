@@ -4,6 +4,7 @@
  */
 
 import type { NotificationTypeConfig } from '@/types/notifications';
+import { useTranslations } from 'next-intl';
 
 interface NotificationTypeToggleProps {
   config: NotificationTypeConfig;
@@ -18,16 +19,18 @@ export function NotificationTypeToggle({
   onChange,
   disabled = false,
 }: NotificationTypeToggleProps) {
+  const t = useTranslations('settings.notifications.types');
+
   return (
     <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
       <div className="flex items-center gap-3 flex-1">
         {/* Label and description */}
         <div className="flex-1">
           <h4 className="text-sm font-medium text-gray-900">
-            {config.label}
+            {t(`${config.kind}.label`)}
           </h4>
           <p className="text-xs text-gray-600 mt-0.5">
-            {config.description}
+            {t(`${config.kind}.description`)}
           </p>
         </div>
 
@@ -41,7 +44,7 @@ export function NotificationTypeToggle({
               ? 'bg-blue-600'
               : 'bg-gray-200 dark:bg-gray-700'
           } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          aria-label={`${enabled ? 'Desactivar' : 'Activar'} ${config.label}`}
+          aria-label={`${enabled ? 'Desactivar' : 'Activar'} ${t(`${config.kind}.label`)}`}
         >
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

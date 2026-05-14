@@ -11,6 +11,7 @@ import type {
   GranularNotificationPreferences,
   NotificationChannel,
 } from '@/types/notifications';
+import { useTranslations } from 'next-intl';
 import { CHANNEL_INFO } from '@/lib/notifications/config';
 import { NotificationChannelTab } from './NotificationChannelTab';
 
@@ -31,6 +32,7 @@ export function NotificationPreferencesTabs({
   onSave,
   saving,
 }: NotificationPreferencesTabsProps) {
+  const t = useTranslations('settings.notifications');
   const [activeTab, setActiveTab] = useState<NotificationChannel>('in_app');
   const [localPreferences, setLocalPreferences] = useState<GranularNotificationPreferences>(preferences);
   const [hasChanges, setHasChanges] = useState(false);
@@ -82,7 +84,7 @@ export function NotificationPreferencesTabs({
                     }
                   `}
                 />
-                {channelInfo.label}
+                {t(`channels.${id}.label`)}
               </button>
             );
           })}
@@ -92,7 +94,7 @@ export function NotificationPreferencesTabs({
       {/* Channel description */}
       <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          {CHANNEL_INFO[activeTab].description}
+          {t(`channels.${activeTab}.description`)}
         </p>
       </div>
 
@@ -112,7 +114,7 @@ export function NotificationPreferencesTabs({
             disabled={saving}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cancelar
+            {t('actions.cancel')}
           </button>
           <button
             onClick={handleSave}
@@ -122,12 +124,12 @@ export function NotificationPreferencesTabs({
             {saving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                Guardando...
+                {t('actions.saving')}
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                Guardar cambios
+                {t('actions.saveChanges')}
               </>
             )}
           </button>

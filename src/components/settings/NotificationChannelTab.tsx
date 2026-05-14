@@ -11,6 +11,7 @@ import type {
   NotificationCategory,
   NotificationKind,
 } from '@/types/notifications';
+import { useTranslations } from 'next-intl';
 import {
   getCategoryNotificationTypes,
   CATEGORY_INFO,
@@ -33,6 +34,7 @@ export function NotificationChannelTab({
   onUpdate,
   disabled = false,
 }: NotificationChannelTabProps) {
+  const t = useTranslations('settings.notifications');
   const [expandedCategories, setExpandedCategories] = useState<Set<NotificationCategory>>(
     new Set(CATEGORIES)
   );
@@ -107,10 +109,10 @@ export function NotificationChannelTab({
                   )}
                   <div>
                     <h3 className="text-sm font-semibold text-gray-900">
-                      {categoryInfo.label}
+                      {t(`categories.${category}.label`)}
                     </h3>
                     <p className="text-xs text-gray-600">
-                      {categoryInfo.description}
+                      {t(`categories.${category}.description`)}
                     </p>
                   </div>
                 </button>
@@ -121,7 +123,7 @@ export function NotificationChannelTab({
                   disabled={disabled}
                   className="text-xs text-blue-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {allEnabled ? 'Desactivar todas' : 'Activar todas'}
+                  {allEnabled ? t('actions.disableAll') : t('actions.enableAll')}
                 </button>
               </div>
             </div>

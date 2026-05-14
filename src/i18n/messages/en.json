@@ -227,6 +227,103 @@
         "desc": "Reg�strate gratis para contactar con los vendedores e intercambiar tus cromos",
         "registerBtn": "Crear Cuenta Gratis"
       }
+    },
+    "detail": {
+      "notFoundTitle": "Listing not found",
+      "notFoundDesc": "This listing may have been removed or is no longer available",
+      "contactSupport": "Please contact",
+      "backToMarketplace": "Back to Marketplace",
+      "status": {
+        "active": "Available",
+        "reserved": "Reserved",
+        "completed": "Completed",
+        "sold": "Completed",
+        "removed": "Removed"
+      },
+      "typeGroup": "Sticker Pack",
+      "typeSingle": "Single Sticker",
+      "exchange": "Trade",
+      "sale": "Sale",
+      "authorSuspended": "Author Suspended",
+      "authorDeleted": "Author Deleted",
+      "deleted": "Deleted",
+      "collection": "Collection",
+      "views": "views",
+      "cardDetails": "Card Details",
+      "pageNumber": "Page / Section",
+      "stickerNumber": "Number / Code",
+      "slotVariant": "Slot Variant",
+      "globalNumber": "Global Number",
+      "listingType": "Listing Type",
+      "acceptsReturns": "Accepts returns",
+      "noReturns": "No returns",
+      "shipping": "Shipping",
+      "handDelivery": "Hand delivery",
+      "domesticShipping": "Domestic shipping",
+      "internationalShipping": "International shipping",
+      "buyerPaysShipping": "Buyer pays shipping",
+      "price": "Price",
+      "makeOffer": "Accepts offers",
+      "description": "Description",
+      "seller": "Seller",
+      "joined": "Joined",
+      "listings": "listings",
+      "rating": "Rating",
+      "noRatings": "No ratings yet",
+      "chatWithSeller": "Contact Seller",
+      "youAreOwner": "You are the seller of this listing",
+      "chatAsOwner": "Go to listing chat",
+      "chats": "chats",
+      "noChats": "No chats yet",
+      "reportListing": "Report listing"
+    },
+    "chat": {
+      "backToChats": "Back to my chats",
+      "seller": "Seller",
+      "status": {
+        "active": "Active",
+        "reserved": "Reserved",
+        "completed": "Completed",
+        "sold": "Completed"
+      },
+      "markReserved": "Mark Reserved",
+      "reserving": "Marking...",
+      "markCompleted": "Complete",
+      "completing": "Completing...",
+      "releaseReserve": "Release",
+      "releasing": "Releasing...",
+      "confirmReceipt": "Confirm Receipt",
+      "confirming": "Confirming...",
+      "reservePrompt": "Are you sure you want to reserve this listing for {name}?",
+      "unreservePrompt": "Are you sure you want to release the reservation with {name}? The listing will be available again to everyone.",
+      "completePrompt": "Do you confirm you have completed the trade with {name}? This will send a notification to the buyer to confirm.",
+      "reservedSuccess": "Listing reserved for {name}",
+      "unreservedSuccess": "Reservation released. The listing is available again.",
+      "completedSuccess": "Trade marked as completed. Waiting for {name} to confirm.",
+      "confirmedSuccess": "Transaction confirmed. You can now rate the seller!",
+      "errorReserving": "Error reserving the listing",
+      "errorUnreserving": "Error releasing the reservation",
+      "errorCompleting": "Error completing the trade",
+      "errorConfirming": "Error confirming the transaction",
+      "tosError": "You must accept the terms and conditions before sending a message",
+      "systemMessage": "System message",
+      "writeMessage": "Write a message...",
+      "send": "Send",
+      "sending": "Sending...",
+      "ratingTitle": "Rate transaction",
+      "ratingSubmitted": "Rating submitted",
+      "acceptTerms": "Accept terms",
+      "termsTitle": "Chat Terms",
+      "termsDescription": "For your safety and that of the community, remember:",
+      "termsRule1": "Always be respectful and polite.",
+      "termsRule2": "Do not share sensitive personal information.",
+      "termsRule3": "Agree clearly on shipping details or meeting point.",
+      "termsRule4": "Spam or abusive behavior will result in account suspension.",
+      "iAccept": "I accept the terms",
+      "myRating": "My rating",
+      "counterpartyRating": "Received rating",
+      "transactionCompleted": "Transaction completed",
+      "youAreSeller": "You are the seller"
     }
   },
   "chats": {
@@ -1239,62 +1336,85 @@
         "errorSave": "Error saving preferences"
       },
       "channels": {
-        "in_app": "In App",
-        "push": "Push",
-        "email": "Email"
+        "in_app": {
+          "label": "In-app",
+          "description": "Notifications inside the CambioCromos app"
+        },
+        "push": {
+          "label": "Push",
+          "description": "Notifications sent to your device even when not using the app"
+        },
+        "email": {
+          "label": "Email",
+          "description": "Notifications sent to your registered email"
+        }
       },
       "categories": {
         "marketplace": {
           "label": "Marketplace",
-          "description": "Notifications about listings and transactions"
+          "description": "Notifications about listings, reservations, and transactions"
         },
         "community": {
           "label": "Community",
-          "description": "Ratings, achievements, and collections"
+          "description": "Interactions with other users"
+        },
+        "trades": {
+          "label": "Trades",
+          "description": "Updates on your sticker trades"
         },
         "system": {
           "label": "System",
-          "description": "System messages and levels"
+          "description": "Important platform and account updates"
+        },
+        "templates": {
+          "label": "Templates",
+          "description": "Updates related to album templates"
         }
       },
       "types": {
-        "listing_chat": {
-          "label": "Chat messages",
-          "description": "New messages about your listings"
+        "marketplace_message": {
+          "label": "Messages",
+          "description": "When someone sends you a message",
+          "category": "Marketplace"
         },
         "listing_reserved": {
-          "label": "Item reserved",
-          "description": "When someone reserves your listing"
+          "label": "Listing reserved",
+          "description": "When someone reserves your listing",
+          "category": "Marketplace"
         },
         "listing_completed": {
-          "label": "Transaction completed",
-          "description": "When a transaction is completed"
+          "label": "Listing completed",
+          "description": "When a transaction is successfully completed",
+          "category": "Marketplace"
         },
-        "chat_unread": {
-          "label": "Weekly unread messages digest",
-          "description": "Weekly reminder if you have unread messages"
-        },
-        "user_rated": {
-          "label": "You have been rated",
-          "description": "When another user rates you"
-        },
-        "badge_earned": {
+        "achievement_earned": {
           "label": "Achievement earned",
-          "description": "When you get a new achievement"
+          "description": "When you unlock a new achievement",
+          "category": "Account"
         },
-        "template_rated": {
-          "label": "Collection rating",
-          "description": "When someone rates your collection"
+        "system_alert": {
+          "label": "System alerts",
+          "description": "Important platform updates and security notices",
+          "category": "System"
         },
-        "system_message": {
-          "label": "System message",
-          "description": "Important system messages"
-        },
-        "level_up": {
-          "label": "Level up",
-          "description": "When you level up"
+        "weekly_summary": {
+          "label": "Weekly summary",
+          "description": "A summary of your weekly activity and unread messages",
+          "category": "System"
         }
-      }
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "enableAll": "Enable all",
+        "disableAll": "Disable all",
+        "noTypesAvailable": "No notification types available for this channel."
+      },
+      "saveChanges": "Save changes",
+      "activate": "Enable",
+      "deactivate": "Disable",
+      "for": "for"
     },
     "theme": {
       "title": "Appearance",
@@ -1500,7 +1620,13 @@
     "loading": "Loading...",
     "empty": "You have no new notifications",
     "viewAll": "View all notifications",
-    "andMore": "and {count} more..."
+    "andMore": "and {count} more...",
+    "suspended": "Suspended",
+    "rateUser": "Rate user",
+    "goToChat": "Go to chat",
+    "confirmTransaction": "Confirm transaction",
+    "viewRating": "View rating",
+    "viewDetails": "View details"
   },
   "pwa": {
     "installPrompt": "?? For a better experience, install the CambioCromos app!",
@@ -1521,6 +1647,222 @@
       "acceptAll": "Accept all",
       "essentialOnly": "Essential only",
       "customize": "Customize preferences"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: March 2026",
+      "intro": "At Cambiocromos.com, we take your privacy very seriously. This policy describes how we collect, use, and protect your personal information, in compliance with the General Data Protection Regulation (GDPR) and LOPDGDD.",
+      "section1Title": "1. Data Controller",
+      "section1Desc": "The data controller is the Cambiocromos.com administration team. For any privacy-related issues, you can contact our Data Protection Officer at:",
+      "section2Title": "2. What data we collect",
+      "section2Li1": "<strong>Identification Data:</strong> Email, username (nickname), profile picture (avatar).",
+      "section2Li2": "<strong>Location Data:</strong> Postal code (to facilitate nearby trades), country, and province.",
+      "section2Li3": "<strong>Usage Data:</strong> Information about your collections, missing/duplicate lists, interactions, and chats.",
+      "section2Li4": "<strong>Technical Data:</strong> IP address, device type, and browser (for security and analytics purposes).",
+      "section3Title": "3. Purpose of processing",
+      "section3Intro": "We use your data to:",
+      "section3Li1": "Manage your user account and allow access to the platform.",
+      "section3Li2": "Facilitate the matching system to find other nearby collectors.",
+      "section3Li3": "Allow communication between users through the internal chat.",
+      "section3Li4": "Send important notifications about the service (you can disable them).",
+      "section3Li5": "Ensure the security of the platform and prevent fraud.",
+      "section4Title": "4. Legitimation",
+      "section4Desc": "The legal basis for processing your data is the <strong>performance of the contract</strong> (Terms of Service) you agree to when registering, as well as your <strong>explicit consent</strong> for certain features (such as approximate location).",
+      "section5Title": "5. Recipients and Third Parties",
+      "section5Intro": "We do not sell your data to third parties. We share information only with service providers strictly necessary for the operation of the app:",
+      "section5Li1": "<strong>Supabase:</strong> Database and authentication provider.",
+      "section5Li2": "<strong>Google Analytics:</strong> For anonymous web traffic analysis.",
+      "section5Li3": "<strong>OneSignal:</strong> For sending push notifications.",
+      "section6Title": "6. Data Retention",
+      "section6Intro": "We will keep your data as long as your account remains active. If you decide to delete your account:",
+      "section6Li1": "Your direct personal data (email, profile) will be deleted or anonymized immediately or after a 30-day grace period to prevent accidental deletions.",
+      "section6Li2": "Database backups are automatically deleted according to our retention cycle (maximum 90 days).",
+      "section7Title": "7. Your Rights",
+      "section7Intro": "As a user, you have the right to:",
+      "section7Li1": "<strong>Access</strong> your data and know what information we hold.",
+      "section7Li2": "<strong>Rectify</strong> incorrect or incomplete data from your profile.",
+      "section7Li3": "<strong>Erase</strong> your data (\"Right to be forgotten\") through the \"Delete Account\" option in Settings.",
+      "section7Li4": "<strong>Restrict</strong> the processing of your data in certain circumstances.",
+      "section7Li5": "<strong>Portability:</strong> Request a copy of your data in a structured format.",
+      "section7Outro": "You can exercise these rights by writing to"
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "intro": "Cambiocromos.com uses cookies and similar technologies to improve your experience, ensure site security, and analyze how our platform is used.",
+      "section1Title": "1. What are cookies?",
+      "section1Desc": "Cookies are small text files that websites save on your computer or mobile device when you visit them. They allow the site to remember your actions and preferences (such as login) over a period of time.",
+      "section2Title": "2. Types of cookies we use",
+      "section2Sub1": "Essential Cookies (Technical)",
+      "section2Sub1Intro": "They are strictly necessary for the operation of the website. They allow us to:",
+      "section2Sub1Li1": "Keep your session securely logged in (Authentication with Supabase).",
+      "section2Sub1Li2": "Remember your privacy preferences.",
+      "section2Sub1Li3": "Protect the web against automated attacks.",
+      "section2Sub2": "Analytics Cookies",
+      "section2Sub2Intro": "We use Google Analytics to collect anonymous information about how visitors use our site. This helps us improve performance and usability.",
+      "section2Sub2Li1": "These cookies do not collect information that personally identifies you.",
+      "section2Sub2Li2": "All information is aggregated and therefore anonymous.",
+      "section3Title": "3. How to control cookies",
+      "section3Desc": "You can control and/or delete cookies as you wish. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed. However, if you do this, you may have to manually adjust some preferences every time you visit a site and some services and functionalities (such as logging in) may not work."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: March 2026",
+      "section1Title": "1. Acceptance of Terms",
+      "section1Desc": "Welcome to Cambiocromos.com. By accessing, registering or using our platform, you (\"User\") agree to be legally bound by these Terms of Service (\"Terms\"). If you do not agree with any part of these terms, you must not use our services.",
+      "alertTitle": "Service exclusively for adults over 18",
+      "alertDesc": "Due to the social nature of the platform (interaction with strangers, private chats, and transactions), <strong>Cambiocromos.com is reserved exclusively for people over 18 years of age</strong>. By registering, you represent and warrant that you are at least 18 years of age. Accounts found to belong to minors will be suspended immediately and without notice.",
+      "section2Title": "2. User Accounts",
+      "section2Desc": "To use certain features, you must register and create an account. You are responsible for maintaining the confidentiality of your password and all activities that occur under your account. We reserve the right to suspend or delete accounts that violate these terms, provide false information, or remain inactive for extended periods.",
+      "section3Title": "3. User Generated Content (UGC)",
+      "section3Intro": "Our platform allows users to publish images (stickers), create collections, and send messages. Regarding this content:",
+      "section3Li1": "<strong>Ownership:</strong> You retain intellectual property rights to the content you create and upload. However, by publishing it, you grant Cambiocromos.com a worldwide, non-exclusive, and free license to use, display, and distribute such content in connection with the service.",
+      "section3Li2": "<strong>User Responsibility:</strong> You are <strong>solely responsible</strong> for all content you publish. You declare that you have all necessary rights or authorizations to publish such content and that it does not infringe third-party rights.",
+      "section3Li3": "<strong>Moderation:</strong> Cambiocromos.com has no obligation to preview content, but has the <strong>absolute right and at its sole discretion to review, reject or delete any content</strong> it deems inappropriate, illegal or violating these Terms, without notice.",
+      "section31Title": "3.1. Prohibited Content",
+      "section31Intro": "It is strictly forbidden to publish:",
+      "section31Li1": "Illegal, defamatory, obscene, pornographic, indecent, or threatening content.",
+      "section31Li2": "Hate speech, harassment, or discrimination against other users.",
+      "section31Li3": "Material that infringes copyrights, trademarks, or third-party intellectual property.",
+      "section31Li4": "Spam, unauthorized advertising, or links to malicious sites.",
+      "section4Title": "4. Social Interactions and Security",
+      "section4Intro": "Cambiocromos.com facilitates contact between users. You acknowledge that:",
+      "section4Li1": "You are interacting with people who may be strangers to you.",
+      "section4Li2": "You are responsible for exercising caution in all interactions, especially when sharing information or arranging shipments.",
+      "section4Li3": "<strong>Zero Tolerance:</strong> We do not tolerate harassment, insults, or abusive behavior. We have tools to <strong>Report</strong> and <strong>Block</strong> users. Any verified report of abuse will result in immediate suspension of the offending account.",
+      "section5Title": "5. Disclaimer",
+      "section5Desc": "Cambiocromos.com acts solely as a technological intermediary. We are not a party to any exchange or sale transaction between users. We do not guarantee the veracity of the listings, the quality of the stickers, or the fulfillment of agreements between users. You release Cambiocromos.com from any claim, demand, or damage related to disputes with other users.",
+      "section6Title": "6. Modifications",
+      "section6Desc": "We reserve the right to modify these terms at any time. Modifications will take effect immediately upon publication. Continued use of the service implies acceptance of the new terms.",
+      "section7Title": "7. Contact",
+      "section7Desc": "To report violations or legal inquiries, contact us at:"
     }
+  },
+  "navigation": {
+    "menu": "Menu",
+    "myListings": "My Listings",
+    "collections": "Collections",
+    "settings": "Settings",
+    "logout": "Sign Out",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies"
+  },
+  "notificationsDropdown": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "settings": "Settings",
+    "viewAll": "View all",
+    "empty": "No notifications",
+    "noUnread": "No unread notifications",
+    "unread": "Unread",
+    "error": "Error loading notifications"
+  },
+  "marketplaceDetails": {
+    "notFound": "Listing not found",
+    "notFoundDesc": "This listing may have been deleted or is no longer available",
+    "contactSupport": "Please contact",
+    "backToMarketplace": "Back to Marketplace",
+    "statusAvailable": "Available",
+    "statusReserved": "Reserved",
+    "statusCompleted": "Completed",
+    "statusDeleted": "Deleted",
+    "pack": "Sticker Pack",
+    "single": "Single Sticker",
+    "exchange": "Exchange",
+    "sale": "Sale",
+    "authorSuspended": "Author Suspended",
+    "authorDeleted": "Author Deleted",
+    "deleted": "Deleted",
+    "collection": "Collection",
+    "views": "views",
+    "details": "Sticker Details",
+    "page": "Page",
+    "stickerNumber": "Sticker Number",
+    "globalNumber": "Global Number",
+    "description": "Description",
+    "listingType": "Listing Type",
+    "availableForExchange": "Available for exchange with other stickers",
+    "forSale": "For sale at",
+    "seller": "Seller",
+    "viewProfile": "View Profile",
+    "contactSeller": "Contact Seller",
+    "yourListing": "This is your listing",
+    "viewConversations": "View Conversations",
+    "loading": "Loading...",
+    "noConversations": "No Conversations",
+    "restoreListing": "Restore Listing",
+    "editListing": "Edit Listing",
+    "deleteListing": "Delete Listing",
+    "loginToContact": "Login",
+    "toContact": "to contact the seller",
+    "moveToDeleted": "Listing moved to Deleted",
+    "adminDeleteTitle": "Delete Listing (Admin)",
+    "adminDeleteReason": "Reason (required)",
+    "adminDeletePlaceholder": "Explain why this listing is being deleted...",
+    "adminDeleteWarning": "The listing will be permanently deleted after 90 days retention.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "confirmDelete": "Confirm Deletion",
+    "adminDeleteSuccess": "Listing successfully deleted (90 days retention)",
+    "adminDeleteError": "Error deleting the listing",
+    "pleaseEnterReason": "Please enter a reason for deletion",
+    "restoreSuccess": "Listing restored successfully",
+    "restoreError": "Error restoring the listing"
+  },
+  "marketplaceChat": {
+    "backToChats": "Back to my chats",
+    "loading": "Loading...",
+    "seller": "Seller:",
+    "reserving": "Marking...",
+    "reserve": "Reserve",
+    "completing": "Completing...",
+    "complete": "Complete",
+    "unreserving": "Releasing...",
+    "unreserve": "Release",
+    "confirming": "Confirming...",
+    "confirmReceipt": "Confirm Receipt",
+    "statusActive": "Active",
+    "statusAvailable": "Available",
+    "statusReserved": "Reserved",
+    "statusCompleted": "Completed",
+    "statusSold": "Completed",
+    "markReserved": "Mark as Reserved",
+    "you": "You",
+    "send": "Send",
+    "writeMessage": "Write a message...",
+    "acceptTos": "I accept the",
+    "termsAndConditions": "terms and conditions",
+    "ofChat": "of the chat",
+    "noMessages": "No messages in this conversation yet. Send a message to start!",
+    "accessDenied": "Access Denied",
+    "accessDeniedDesc": "This listing is no longer available or the author's account has been restricted.",
+    "selectConversation": "Select a conversation",
+    "chooseBuyer": "Choose a potential buyer from the list",
+    "conversations": "Conversations",
+    "listingInfo": "Listing Information",
+    "noImage": "No image",
+    "noDescription": "No description",
+    "reserved": "Reserved",
+    "rateCounterparty": "⭐ Click here to rate {nickname}",
+    "alreadyRated": "You rated {nickname} with {rating}/5{comment}",
+    "buyerRatedYou": "The buyer rated you",
+    "sellerRatedYou": "The seller rated you",
+    "chatClosedCompleted": "Chat closed - Transaction has been completed",
+    "listingUnavailable": "This listing is no longer available",
+    "listingReservedOther": "This listing is reserved for another user",
+    "selectToRespond": "Select a conversation to respond",
+    "tosAccept": "I accept the ",
+    "characters": "characters"
+  },
+  "marketplaceCreate": {
+    "title": "Create Listing",
+    "subtitle": "Sell or exchange your stickers",
+    "back": "Back",
+    "album": "Select Album",
+    "stickers": "Select Stickers",
+    "price": "Price",
+    "description": "Description",
+    "submit": "Publish Listing",
+    "uploadImage": "Upload Image"
   }
 }

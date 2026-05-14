@@ -1,61 +1,60 @@
 import { Metadata } from 'next';
 import { siteConfig } from '@/config/site';
+import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export const metadata: Metadata = {
-    title: 'Política de Cookies',
-    description: 'Información sobre el uso de cookies y tecnologías similares en Cambiocromos.com',
-    alternates: {
-        canonical: `${siteConfig.url}/legal/cookies`,
-    },
-    openGraph: {
-        title: 'Política de Cookies | Cambiocromos',
-        description: 'Información sobre el uso de cookies y tecnologías similares en Cambiocromos.com',
-        url: `${siteConfig.url}/legal/cookies`,
-        siteName: siteConfig.name,
-        locale: 'es_ES',
-        type: 'website',
-    },
-};
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+    const t = await getTranslations({ locale, namespace: 'legal.cookies' });
+    const url = `${siteConfig.url}/legal/cookies`;
+    
+    return {
+        title: t('title'),
+        description: t('intro').substring(0, 150) + '...',
+        alternates: {
+            canonical: url,
+        },
+        openGraph: {
+            title: `${t('title')} | ${siteConfig.name}`,
+            description: t('intro').substring(0, 150) + '...',
+            url: url,
+            siteName: siteConfig.name,
+            locale: locale === 'en' ? 'en_US' : locale === 'pt' ? 'pt_BR' : 'es_ES',
+            type: 'website',
+        },
+    };
+}
 
 export default function CookiesPage() {
+    const t = useTranslations('legal.cookies');
+    
     return (
         <div className="prose dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-black uppercase mb-6 text-gold">Política de Cookies</h1>
+            <h1 className="text-3xl font-black uppercase mb-6 text-gold">{t('title')}</h1>
 
-            <p>
-                Cambiocromos.com utiliza cookies y tecnologías similares para mejorar tu experiencia, garantizar la seguridad del sitio y analizar cómo se utiliza nuestra plataforma.
-            </p>
+            <p>{t('intro')}</p>
 
-            <h2>1. ¿Qué son las cookies?</h2>
-            <p>
-                Las cookies son pequeños archivos de texto que los sitios web guardan en tu ordenador o dispositivo móvil cuando los visitas. Permiten que el sitio recuerde tus acciones y preferencias (como el inicio de sesión) durante un período de tiempo.
-            </p>
+            <h2>{t('section1Title')}</h2>
+            <p>{t('section1Desc')}</p>
 
-            <h2>2. Tipos de cookies que utilizamos</h2>
+            <h2>{t('section2Title')}</h2>
 
-            <h3>Cookies Esenciales (Técnicas)</h3>
-            <p>
-                Son estrictamente necesarias para el funcionamiento del sitio web. Nos permiten:
-            </p>
+            <h3>{t('section2Sub1')}</h3>
+            <p>{t('section2Sub1Intro')}</p>
             <ul>
-                <li>Mantener tu sesión iniciada de forma segura (Autenticación con Supabase).</li>
-                <li>Recordar tus preferencias de privacidad.</li>
-                <li>Proteger la web contra ataques automatizados.</li>
+                <li>{t('section2Sub1Li1')}</li>
+                <li>{t('section2Sub1Li2')}</li>
+                <li>{t('section2Sub1Li3')}</li>
             </ul>
 
-            <h3>Cookies de Análisis</h3>
-            <p>
-                Utilizamos Google Analytics para recopilar información anónima sobre cómo los visitantes usan nuestro sitio. Esto nos ayuda a mejorar el rendimiento y la usabilidad.
-            </p>
+            <h3>{t('section2Sub2')}</h3>
+            <p>{t('section2Sub2Intro')}</p>
             <ul>
-                <li>Estas cookies no recopilan información que te identifique personalmente.</li>
-                <li>Toda la información es agregada y, por lo tanto, anónima.</li>
+                <li>{t('section2Sub2Li1')}</li>
+                <li>{t('section2Sub2Li2')}</li>
             </ul>
 
-            <h2>3. Cómo controlar las cookies</h2>
-            <p>
-                Puedes controlar y/o eliminar las cookies como desees. Puedes eliminar todas las cookies que ya están en tu ordenador y puedes configurar la mayoría de los navegadores para que eviten que se coloquen. Sin embargo, si haces esto, es posible que tengas que ajustar manualmente algunas preferencias cada vez que visites un sitio y que algunos servicios y funcionalidades (como el inicio de sesión) no funcionen.
-            </p>
+            <h2>{t('section3Title')}</h2>
+            <p>{t('section3Desc')}</p>
         </div>
     );
 }

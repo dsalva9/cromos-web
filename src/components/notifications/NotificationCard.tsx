@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NotificationCard Component
  * Sprint 15: Notifications System
  * Displays individual notifications with actions
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useTranslations } from 'next-intl';
 import type { FormattedNotification } from '@/types/notifications';
 import { getRelativeTimeString } from '@/lib/notifications/formatter';
 import {
@@ -51,6 +52,7 @@ export function NotificationCard({
   compact = false,
   onNavigate,
 }: NotificationCardProps) {
+  const t = useTranslations('notifications');
   const isUnread = !notification.readAt;
   const IconComponent = iconMap[notification.icon as keyof typeof iconMap] || Bell;
 
@@ -134,12 +136,12 @@ export function NotificationCard({
               {/* Status badges */}
               {notification.listingStatus === 'suspended' && (
                 <Badge variant="destructive" className="text-xs">
-                  Suspendido
+                  {t('suspended')}
                 </Badge>
               )}
               {notification.templateStatus === 'suspended' && (
                 <Badge variant="destructive" className="text-xs">
-                  Suspendido
+                  {t('suspended')}
                 </Badge>
               )}
             </div>
@@ -155,7 +157,7 @@ export function NotificationCard({
                   onClick={handleRateUser}
                 >
                   <Star className="h-3 w-3 mr-1" />
-                  Valorar usuario
+                  {t('rateUser')}
                 </Button>
               )}
 
@@ -169,12 +171,12 @@ export function NotificationCard({
                 >
                   <Link href={notification.href} onClick={onNavigate}>
                     {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
-                      ? 'Ir al chat'
+                      ? t('goToChat')
                       : notification.kind === 'listing_completed' && notification.payload?.needs_confirmation
-                      ? 'Confirmar transacción'
+                      ? t('confirmTransaction')
                       : notification.kind.includes('rating')
-                      ? 'Ver valoración'
-                      : 'Ver detalles'}
+                      ? t('viewRating')
+                      : t('viewDetails')}
                   </Link>
                 </Button>
               )}
