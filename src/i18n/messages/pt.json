@@ -1211,5 +1211,25 @@
       "trades": "Trocas",
       "system": "Sistema"
     }
+  },
+  "resetPassword": {
+    "title": "Nova Senha",
+    "description": "Digite sua nova senha",
+    "verifying": "Verificando sessão...",
+    "wait": "Por favor aguarde um momento",
+    "successTitle": "✅ Senha atualizada",
+    "successDesc": "Redirecionando para a página inicial...",
+    "newPasswordLabel": "Nova Senha",
+    "confirmPasswordLabel": "Confirmar Senha",
+    "submitButton": "Mudar Senha",
+    "submitting": "Atualizando...",
+    "backToLogin": "← Voltar ao Login",
+    "errors": {
+      "noSession": "Não foi possível verificar a sessão. Solicite um novo link de recuperação.",
+      "processError": "Erro ao processar recuperação. Tente novamente.",
+      "minChars": "A senha deve ter pelo menos 6 caracteres",
+      "noMatch": "As senhas não coincidem",
+      "unexpected": "Ocorreu um erro inesperado. Tente novamente."
+    }
   }
 }

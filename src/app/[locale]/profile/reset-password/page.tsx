@@ -2,6 +2,7 @@
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -10,6 +11,7 @@ import { useRouter } from '@/hooks/use-router';
 import { logger } from '@/lib/logger';
 
 export default function ResetPasswordPage() {
+  const t = useTranslations('resetPassword');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function ResetPasswordPage() {
 
           if (error) {
             logger.error('[ResetPassword] Error setting session:', error);
-            setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
+            setError(t('errors.noSession'));
             setCheckingSession(false);
             return;
           }
@@ -61,13 +63,13 @@ export default function ResetPasswordPage() {
           sessionStorage.setItem('password_recovery_required', 'true');
           logger.debug('[ResetPassword] Existing session found');
         } else {
-          setError('No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.');
+          setError(t('errors.noSession'));
         }
 
         setCheckingSession(false);
       } catch (err) {
         logger.error('[ResetPassword] Exception:', err);
-        setError('Error al procesar la recuperación. Por favor, intenta nuevamente.');
+        setError(t('errors.processError'));
         setCheckingSession(false);
       }
     };
@@ -82,13 +84,13 @@ export default function ResetPasswordPage() {
 
     // Client-side validation
     if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError(t('errors.minChars'));
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError(t('errors.noMatch'));
       setLoading(false);
       return;
     }
@@ -111,7 +113,7 @@ export default function ResetPasswordPage() {
       }
     } catch (error) {
       logger.error('Reset password error:', error);
-      setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+      setError(t('errors.unexpected'));
     } finally {
       setLoading(false);
     }
@@ -134,29 +136,29 @@ export default function ResetPasswordPage() {
         <div className="p-8">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-black uppercase text-gray-900 mb-2">
-              Nueva Contraseña
+              {t('title')}
             </h2>
             <p className="text-gray-700 font-medium">
-              Ingresa tu nueva contraseña
+              {t('description')}
             </p>
           </div>
 
           {checkingSession ? (
             <div className="bg-gray-100 border-2 border-black rounded-md p-6 text-center">
               <p className="text-gray-900 font-bold text-lg mb-2">
-                Verificando sesión...
+                {t('verifying')}
               </p>
               <p className="text-gray-700 text-sm">
-                Por favor espera un momento
+                {t('wait')}
               </p>
             </div>
           ) : success ? (
             <div className="bg-green-600 border-2 border-black rounded-md p-6 text-center">
               <p className="text-white font-bold text-lg mb-2">
-                ✅ Contraseña actualizada
+                {t('successTitle')}
               </p>
               <p className="text-white text-sm">
-                Redirigiendo a la página principal...
+                {t('successDesc')}
               </p>
             </div>
           ) : (
@@ -165,9 +167,7 @@ export default function ResetPasswordPage() {
                 <label
                   htmlFor="password"
                   className="text-sm font-bold uppercase text-gray-900"
-                >
-                  Nueva Contraseña
-                </label>
+                >{t('newPasswordLabel')}</label>
 
                 <Input
                   id="password"
@@ -186,7 +186,7 @@ export default function ResetPasswordPage() {
                   htmlFor="confirmPassword"
                   className="text-sm font-bold uppercase text-gray-900"
                 >
-                  Confirmar Contraseña
+                  {t('confirmPasswordLabel')}
                 </label>
 
                 <Input
@@ -212,7 +212,7 @@ export default function ResetPasswordPage() {
                 className="w-full bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase py-3 rounded-md shadow-xl border-2 border-black transition-all duration-200"
                 disabled={loading}
               >
-                {loading ? 'Actualizando...' : 'Cambiar Contraseña'}
+                {loading ? t('submitting') : t('submitButton')}
               </Button>
             </form>
           )}
@@ -223,7 +223,7 @@ export default function ResetPasswordPage() {
                 href="/login"
                 className="text-gold hover:text-yellow-400 font-bold hover:underline"
               >
-                ← Volver a Iniciar Sesión
+                {t('backToLogin')}
               </Link>
             </div>
           )}

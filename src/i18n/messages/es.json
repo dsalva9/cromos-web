@@ -1211,5 +1211,25 @@
       "trades": "Intercambios",
       "system": "Sistema"
     }
+  },
+  "resetPassword": {
+    "title": "Nueva Contraseña",
+    "description": "Ingresa tu nueva contraseña",
+    "verifying": "Verificando sesión...",
+    "wait": "Por favor espera un momento",
+    "successTitle": "✅ Contraseña actualizada",
+    "successDesc": "Redirigiendo a la página principal...",
+    "newPasswordLabel": "Nueva Contraseña",
+    "confirmPasswordLabel": "Confirmar Contraseña",
+    "submitButton": "Cambiar Contraseña",
+    "submitting": "Actualizando...",
+    "backToLogin": "← Volver a Iniciar Sesión",
+    "errors": {
+      "noSession": "No se pudo verificar la sesión. Por favor, solicita un nuevo enlace de recuperación.",
+      "processError": "Error al procesar la recuperación. Por favor, intenta nuevamente.",
+      "minChars": "La contraseña debe tener al menos 6 caracteres",
+      "noMatch": "Las contraseñas no coinciden",
+      "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo."
+    }
   }
 }
