@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/hooks/use-router';
 import { useListing } from '@/hooks/marketplace/useListing';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import Link from 'next/link';
+import { IntlLink as Link } from '@/i18n/navigation';
 import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
