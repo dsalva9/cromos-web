@@ -1191,5 +1191,25 @@
     "noReserved": "No tienes anuncios reservados",
     "noCompleted": "No tienes anuncios completados",
     "noDeleted": "No tienes anuncios eliminados"
+  },
+  "notificationsCenter": {
+    "title": "Notificaciones",
+    "description": "Mantente al día con todas tus actividades",
+    "markAllAsRead": "Marcar todas como leídas",
+    "new": "Nuevas",
+    "history": "Historial",
+    "loadingUnread": "Cargando notificaciones...",
+    "loadingHistory": "Cargando historial...",
+    "emptyUnreadTitle": "No hay notificaciones nuevas",
+    "emptyUnreadDesc": "Estás al día con todas tus actividades",
+    "emptyHistoryTitle": "No hay notificaciones leídas",
+    "emptyHistoryDesc": "El historial aparecerá aquí cuando marques notificaciones como leídas",
+    "categories": {
+      "marketplace": "Marketplace",
+      "templates": "Colecciones",
+      "community": "Comunidad",
+      "trades": "Intercambios",
+      "system": "Sistema"
+    }
   }
 }

@@ -6,6 +6,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,6 +18,7 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 function NotificationsCenterContent() {
+  const t = useTranslations('notificationsCenter');
   const {
     unreadNotifications,
     readNotifications,
@@ -98,11 +100,11 @@ function NotificationsCenterContent() {
   };
 
   const categoryLabels = {
-    marketplace: 'Marketplace',
-    templates: 'Colecciones',
-    community: 'Comunidad',
-    trades: 'Intercambios',
-    system: 'Sistema',
+    marketplace: t('categories.marketplace'),
+    templates: t('categories.templates'),
+    community: t('categories.community'),
+    trades: t('categories.trades'),
+    system: t('categories.system'),
   };
 
   return (
@@ -113,11 +115,9 @@ function NotificationsCenterContent() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-2">
-                Notificaciones
-              </h1>
+                {t('title')}</h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Mantente al día con todas tus actividades
-              </p>
+                {t('description')}</p>
             </div>
 
             {unreadCount > 0 && (
@@ -127,7 +127,7 @@ function NotificationsCenterContent() {
                 className="gap-2 w-full sm:w-auto shrink-0"
               >
                 <CheckCheck className="h-4 w-4" />
-                Marcar todas como leídas
+                {t('markAllAsRead')}
               </Button>
             )}
           </div>
@@ -145,7 +145,7 @@ function NotificationsCenterContent() {
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="unread" className="gap-2">
               <Bell className="h-4 w-4" />
-              Nuevas
+              {t('new')}
               {unreadCount > 0 && (
                 <span className="ml-1 px-2 py-0.5 bg-gold text-black text-xs rounded-full font-bold">
                   {unreadCount}
@@ -154,15 +154,14 @@ function NotificationsCenterContent() {
             </TabsTrigger>
             <TabsTrigger value="history" className="gap-2">
               <Inbox className="h-4 w-4" />
-              Historial
-            </TabsTrigger>
+              {t('history')}</TabsTrigger>
           </TabsList>
 
           {/* Unread Tab */}
           <TabsContent value="unread" className="space-y-6">
             {loading && (
               <div className="text-center py-12 text-gray-600 dark:text-gray-400">
-                Cargando notificaciones...
+                {t('loadingUnread')}
               </div>
             )}
 
@@ -170,10 +169,10 @@ function NotificationsCenterContent() {
               <div className="text-center py-12">
                 <Bell className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                  No hay notificaciones nuevas
+                  {t('emptyUnreadTitle')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Estás al día con todas tus actividades
+                  {t('emptyUnreadDesc')}
                 </p>
               </div>
             )}
@@ -209,7 +208,7 @@ function NotificationsCenterContent() {
           <TabsContent value="history" className="space-y-6">
             {loading && (
               <div className="text-center py-12 text-gray-600 dark:text-gray-400">
-                Cargando historial...
+                {t('loadingHistory')}
               </div>
             )}
 
@@ -217,10 +216,10 @@ function NotificationsCenterContent() {
               <div className="text-center py-12">
                 <Inbox className="h-16 w-16 mx-auto text-gray-400 dark:text-gray-600 mb-4 opacity-50" />
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                  No hay notificaciones leídas
+                  {t('emptyHistoryTitle')}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  El historial aparecerá aquí cuando marques notificaciones como leídas
+                  {t('emptyHistoryDesc')}
                 </p>
               </div>
             )}

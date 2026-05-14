@@ -1191,5 +1191,25 @@
     "noReserved": "You have no reserved listings",
     "noCompleted": "You have no completed listings",
     "noDeleted": "You have no deleted listings"
+  },
+  "notificationsCenter": {
+    "title": "Notifications",
+    "description": "Stay up to date with all your activities",
+    "markAllAsRead": "Mark all as read",
+    "new": "New",
+    "history": "History",
+    "loadingUnread": "Loading notifications...",
+    "loadingHistory": "Loading history...",
+    "emptyUnreadTitle": "No new notifications",
+    "emptyUnreadDesc": "You are up to date with all your activities",
+    "emptyHistoryTitle": "No read notifications",
+    "emptyHistoryDesc": "History will appear here when you mark notifications as read",
+    "categories": {
+      "marketplace": "Marketplace",
+      "templates": "Collections",
+      "community": "Community",
+      "trades": "Trades",
+      "system": "System"
+    }
   }
 }
