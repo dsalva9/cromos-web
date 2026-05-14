@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { LeanListingCard } from '@/components/home/LeanListingCard';
@@ -17,6 +18,7 @@ interface PublicMarketplaceContentProps {
 }
 
 export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceContentProps) {
+    const t = useTranslations('marketplace.public');
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [searchBarExpanded, setSearchBarExpanded] = useState(false);
@@ -94,7 +96,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                         <div className="flex-1 w-full">
                             <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
                                 <span className="text-black dark:text-white">
-                                    Explorar Cromos
+                                    {t('title')}
                                 </span>
                             </h1>
 
@@ -102,19 +104,18 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                             <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                     <span className="text-base md:text-lg">🔥</span>
-                                    <span className="font-bold text-black dark:text-white">{listings.length}</span>
-                                    <span className="hidden md:inline">activos</span>
+                                    <span className="font-bold text-black dark:text-white">{t('stats.active', { count: listings.length })}</span>
                                 </div>
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                     <span className="text-base md:text-lg">👥</span>
-                                    <span className="hidden md:inline">Comunidad activa</span>
-                                    <span className="md:hidden">Activa</span>
+                                    <span className="hidden md:inline">{t('stats.community')}</span>
+                                    <span className="md:hidden">{t('stats.communityShort')}</span>
                                 </div>
                                 {!loading && listings.length > 0 && (
                                     <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                         <span className="text-base md:text-lg">⚡</span>
-                                        <span className="hidden md:inline">Actualizado hoy</span>
-                                        <span className="md:hidden">Hoy</span>
+                                        <span className="hidden md:inline">{t('stats.updated')}</span>
+                                        <span className="md:hidden">{t('stats.updatedShort')}</span>
                                     </div>
                                 )}
                             </div>
@@ -124,7 +125,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                         <div className="flex gap-2 md:gap-3 w-full md:w-auto shrink-0">
                             <Link href="/signup" className="w-full md:w-auto">
                                 <Button className="w-full bg-gold text-black hover:bg-gold-light font-bold h-10 md:h-12 px-4 md:px-6 shadow-md hover:shadow-lg transition-all text-sm">
-                                    Registrarse para Intercambiar
+                                    {t('registerCtaBtn')}
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
@@ -148,7 +149,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                 <SearchBar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    placeholder="Buscar por nombre, colección..."
+                                    placeholder="{t('searchPlaceholder')}"
                                     className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
                                     onFocus={handleSearchFocus}
                                     onBlur={handleSearchBlur}
@@ -169,7 +170,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                     className={`flex-1 ${showFilters ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
                                 >
                                     <Filter className="mr-2 h-4 w-4" />
-                                    Filtros
+                                    {t('filterBtn')}
                                 </Button>
                             </div>
 
@@ -212,7 +213,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                 {/* Listings Grid */}
                 {error && (
                     <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 text-center">
-                        <p className="font-bold text-lg mb-1">Error al cargar anuncios</p>
+                        <p className="font-bold text-lg mb-1">{t('errorTitle')}</p>
                         <p className="text-sm opacity-80">{error}</p>
                     </div>
                 )}
@@ -239,7 +240,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                             variant="outline"
                             className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
                         >
-                            Cargar Más Anuncios
+                            {t('loadMoreBtn')}
                         </Button>
                     </div>
                 )}
@@ -257,14 +258,14 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                         <EmptyState
                             icon={Package}
                             title={
-                                searchQuery ? 'No se encontraron anuncios' : 'El mercado está tranquilo'
+                                searchQuery ? t('emptyState.searchTitle') : t('emptyState.quietTitle')
                             }
                             description={
                                 searchQuery
-                                    ? 'Intenta buscar con otros términos o filtros'
-                                    : 'Regístrate para publicar tus duplicados y comienza a intercambiar'
+                                    ? t('emptyState.searchDesc')
+                                    : t('emptyState.quietDesc')
                             }
-                            actionLabel="Registrarse"
+                            actionLabel={t('emptyState.registerBtn')}
                             actionHref="/signup"
                         />
                     </div>
@@ -276,10 +277,10 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
                         <div className="relative z-10">
                             <h2 className="text-2xl md:text-3xl font-black uppercase text-black mb-3">
-                                ¿Te interesa algún cromo?
+                                {t('ctaBanner.title')}
                             </h2>
                             <p className="text-black/80 font-medium mb-6 max-w-lg mx-auto">
-                                Regístrate gratis para contactar con los vendedores e intercambiar tus cromos
+                                {t('ctaBanner.desc')}
                             </p>
                             <Button
                                 asChild
@@ -287,7 +288,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                 className="bg-black hover:bg-gray-800 text-white font-black text-lg h-14 px-10 border-2 border-transparent shadow-2xl transition-all hover:scale-105 rounded-full"
                             >
                                 <Link href="/signup">
-                                    Crear Cuenta Gratis <ArrowRight className="ml-2 w-5 h-5" />
+                                    {t('ctaBanner.registerBtn')} <ArrowRight className="ml-2 w-5 h-5" />
                                 </Link>
                             </Button>
                         </div>

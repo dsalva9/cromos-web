@@ -13,11 +13,13 @@ import { useListingFavorite } from '@/hooks/marketplace/useListingFavorite';
 import { toast } from 'sonner';
 import AuthGuard from '@/components/AuthGuard';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useTranslations } from 'next-intl';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 type TabType = 'users' | 'listings';
 
 function FavoritesContent() {
+  const t = useTranslations('favorites');
   const [activeTab, setActiveTab] = useState<TabType>('listings');
   const { favorites: userFavorites, loading: usersLoading, refetch: refetchUsers } = useMyFavorites();
   const { favorites: listingFavorites, loading: listingsLoading, refetch: refetchListings } = useMyFavoriteListings();
@@ -28,20 +30,20 @@ function FavoritesContent() {
   const handleRemoveUser = async (userId: string) => {
     try {
       await toggleFavorite(userId);
-      toast.success('Usuario eliminado de favoritos');
+      toast.success(t('toast.userRemoved'));
       refetchUsers();
     } catch {
-      toast.error('No se pudo eliminar el favorito');
+      toast.error(t('toast.removeError'));
     }
   };
 
   const handleRemoveListing = async (listingId: number) => {
     try {
       await toggleListingFavorite(listingId);
-      toast.success('Anuncio eliminado de favoritos');
+      toast.success(t('toast.listingRemoved'));
       refetchListings();
     } catch {
-      toast.error('No se pudo eliminar el favorito');
+      toast.error(t('toast.removeError'));
     }
   };
 
@@ -69,7 +71,7 @@ function FavoritesContent() {
             Mis favoritos
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Usuarios y anuncios que has marcado como favoritos
+            {t('header.desc')}
           </p>
         </div>
 
@@ -88,7 +90,7 @@ function FavoritesContent() {
             >
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                <span>Usuarios</span>
+                <span>{t('tabs.users')}</span>
                 {userFavorites.length > 0 && (
                   <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs">
                     {userFavorites.length}
@@ -112,7 +114,7 @@ function FavoritesContent() {
             >
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5" />
-                <span>Anuncios</span>
+                <span>{t('tabs.listings')}</span>
                 {listingFavorites.length > 0 && (
                   <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs">
                     {listingFavorites.length}
@@ -131,14 +133,14 @@ function FavoritesContent() {
           <div className="text-center py-16">
             <Heart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              Todavía no tienes favoritos
+              {t('emptyState.allTitle')}
             </p>
             <p className="text-gray-500 text-sm mb-6">
-              Visita perfiles de usuarios y anuncios del marketplace para agregarlos a tus favoritos
+              {t('emptyState.allDesc')}
             </p>
             <Link href="/marketplace">
               <Button className="bg-gold text-black hover:bg-gold-light">
-                Explorar el marketplace
+                {t('emptyState.exploreBtn')}
               </Button>
             </Link>
           </div>
@@ -153,12 +155,12 @@ function FavoritesContent() {
               <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-gray-300" />
             )}
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
-              No tienes {activeTab === 'users' ? 'usuarios' : 'anuncios'} favoritos
+              {activeTab === 'users' ? t('emptyState.usersTitle') : t('emptyState.listingsTitle')}
             </p>
             <p className="text-gray-500 text-sm mb-6">
               {activeTab === 'users'
-                ? 'Visita perfiles de usuarios y agrégalos a tus favoritos'
-                : 'Explora el marketplace y marca anuncios como favoritos'
+                ? t('emptyState.usersDesc')
+                : t('emptyState.listingsDesc')
               }
             </p>
           </div>
@@ -216,7 +218,7 @@ function FavoritesContent() {
                         <div className="flex gap-2 w-full">
                           <Link href={`/users/${favorite.favorite_user_id}`} className="flex-1">
                             <Button variant="outline" className="w-full">
-                              Ver perfil
+                              {t('users.viewProfile')}
                             </Button>
                           </Link>
                           <Button
@@ -230,7 +232,7 @@ function FavoritesContent() {
 
                         {/* Added Date */}
                         <p className="text-xs text-gray-500">
-                          Agregado el {new Date(favorite.created_at).toLocaleDateString()}
+                          {t('users.addedDate', { date: new Date(favorite.created_at).toLocaleDateString() })}
                         </p>
                       </div>
                     </ModernCardContent>
@@ -272,7 +274,7 @@ function FavoritesContent() {
                               ? 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700'
                               : 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
                               }`}>
-                              {favorite.status === 'active' && favorite.is_group ? 'Pack' : 'Vendido'}
+                              {favorite.status === 'active' && favorite.is_group ? t('listings.pack') : t('listings.sold')}
                             </span>
                           </div>
                         )}
@@ -312,7 +314,7 @@ function FavoritesContent() {
                         className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950 text-xs"
                       >
                         <Heart className="h-3 w-3 fill-current mr-1" />
-                        Quitar
+                        {t('listings.remove')}
                       </Button>
                     </div>
                   </ModernCardContent>

@@ -215,6 +215,36 @@
         "days": "hace {count}d"
       },
       "viewDetails": "Ver Detalles"
+    },
+    "public": {
+      "title": "Explorar Cromos",
+      "stats": {
+        "active": "{count} activos",
+        "community": "Comunidad activa",
+        "communityShort": "Activa",
+        "updated": "Actualizado hoy",
+        "updatedShort": "Hoy"
+      },
+      "registerCtaBtn": "Registrarse para Intercambiar",
+      "searchPlaceholder": "Buscar por nombre, colecci�n...",
+      "filterBtn": "Filtros",
+      "filterTypeAll": "Todos",
+      "filterTypeCromo": "Cromo",
+      "filterTypePack": "Pack",
+      "errorTitle": "Error al cargar anuncios",
+      "loadMoreBtn": "Cargar M�s Anuncios",
+      "emptyState": {
+        "searchTitle": "No se encontraron anuncios",
+        "searchDesc": "Intenta buscar con otros t�rminos o filtros",
+        "quietTitle": "El mercado est� tranquilo",
+        "quietDesc": "Reg�strate para publicar tus duplicados y comienza a intercambiar",
+        "registerBtn": "Registrarse"
+      },
+      "ctaBanner": {
+        "title": "�Te interesa alg�n cromo?",
+        "desc": "Reg�strate gratis para contactar con los vendedores e intercambiar tus cromos",
+        "registerBtn": "Crear Cuenta Gratis"
+      }
     }
   },
   "chats": {
@@ -359,10 +389,22 @@
       "title": "Crear Colección",
       "stepProgress": "Paso {current} de {total}",
       "steps": {
-        "basic": { "title": "Info Básica", "desc": "Nombre, descripción e imagen" },
-        "schema": { "title": "Campos", "desc": "Define la estructura de cada cromo" },
-        "pages": { "title": "Páginas", "desc": "Añade páginas y cromos" },
-        "review": { "title": "Revisión", "desc": "Confirma y publica" }
+        "basic": {
+          "title": "Info Básica",
+          "desc": "Nombre, descripción e imagen"
+        },
+        "schema": {
+          "title": "Campos",
+          "desc": "Define la estructura de cada cromo"
+        },
+        "pages": {
+          "title": "Páginas",
+          "desc": "Añade páginas y cromos"
+        },
+        "review": {
+          "title": "Revisión",
+          "desc": "Confirma y publica"
+        }
       },
       "buttons": {
         "previous": "Anterior",
@@ -860,6 +902,249 @@
       "errorEmpty": "Por favor, completa el asunto y el mensaje",
       "errorNoSession": "No hay sesión activa",
       "errorSend": "Error al enviar el correo"
+    }
+  },
+  "landing": {
+    "hero": {
+      "badge": "La Plataforma #1 de intercambio de Cromos",
+      "titleLine1": "Tu colecci�n",
+      "titleLine2": "a otro nivel",
+      "descriptionPart1": "Gestiona tus �lbumes, encuentra esos cromos dif�ciles y completa tu colecci�n con la comunidad m�s activa en tu plataforma ",
+      "descriptionHighlight": "totalmente gratuita",
+      "startTrading": "Empezar a Intercambiar",
+      "exploreMarket": "Explorar Mercado",
+      "alreadyHaveAccount": "�Ya tienes cuenta?",
+      "login": "Inicia Sesi�n",
+      "availableOn": "Disponible en:"
+    },
+    "features": {
+      "feature1": {
+        "title": "Gestiona Albumes",
+        "desc": "Olv�date del papel. Marca los cromos que te faltan y repes directamente en la app."
+      },
+      "feature2": {
+        "title": "Busca Repes",
+        "desc": "Encuentra al instante qui�n tiene los cromos que te faltan."
+      },
+      "feature3": {
+        "title": "Gana Logros",
+        "desc": "Completa intercambios y destaca como un \"Top Trader\"."
+      }
+    },
+    "seo": {
+      "title": "Tu destino para el intercambio de cromos",
+      "desc": "Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colecci�n. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de f�tbol del Mundial y cualquier otra colecci�n deportiva. Gestiona tus �lbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda Espa�a � todo en una sola plataforma gratuita."
+    },
+    "cta": {
+      "title": "�Listo para completar tu �lbum?",
+      "desc": "�nete a miles de coleccionistas que ya est�n intercambiando sus cromos hoy mismo.",
+      "button": "Crear Cuenta Gratis"
+    },
+    "mockup": {
+      "special": "ESPECIAL",
+      "cardCollection": "Liga 2024 � Cromo Especial",
+      "trades": "intercambios",
+      "location": "Madrid, Espa�a",
+      "tradesLabel": "Trades",
+      "ratingLabel": "Rating",
+      "sendMessage": "Enviar Mensaje",
+      "userListings": "Sus anuncios (24)",
+      "online": "En l�nea",
+      "message1": "�Hola! Vi que tienes el cromo de Messi. �Lo intercambias?",
+      "message2": "�Claro! �Qu� tienes para ofrecer?",
+      "message3": "Tengo Mbapp� y Haaland duplicados ??",
+      "inputPlaceholder": "Escribe un mensaje...",
+      "searchPlaceholder": "Buscar cromos..."
+    },
+    "showcase": {
+      "badge": "Marketplace en vivo",
+      "title": "�ltimos anuncios publicados",
+      "desc": "Publica tus duplicados y encuentra nuevos cromos sin salir de la plataforma.",
+      "goToMarket": "Ir al marketplace",
+      "error": "Ha ocurrido un error al cargar los anuncios: {error}",
+      "emptyTitle": "A�n no hay anuncios activos",
+      "emptyDesc": "S� la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
+      "publishBtn": "Publicar un anuncio"
+    }
+  },
+  "explorar": {
+    "meta": {
+      "title": "Explorar Cromos",
+      "description": "Explora cromos disponibles para intercambio y venta. Encuentra los cromos que necesitas en la comunidad de coleccionistas m�s activa de Espa�a.",
+      "jsonLdName": "Explorar Cromos � Cambiocromos"
+    }
+  },
+  "explorar.detail": {
+    "meta": {
+      "notFoundTitle": "Anuncio no encontrado",
+      "notFoundDesc": "Este anuncio puede haber sido eliminado o ya no est� disponible.",
+      "stickerFromCollection": "Cromo de la colecci�n",
+      "numberPrefix": "n�mero #",
+      "forSale": "en venta",
+      "forTradeAndSale": "disponible para intercambio y venta",
+      "forTrade": "disponible para intercambio",
+      "forPrice": "por {price} �",
+      "communitySuffix": "en Cambio Cromos, la comunidad de coleccionistas de cromos.",
+      "jsonLdDescFallbackSticker": "Cromo",
+      "jsonLdDescFallbackFrom": "de"
+    }
+  },
+  "favorites": {
+    "toast": {
+      "userRemoved": "Usuario eliminado de favoritos",
+      "listingRemoved": "Anuncio eliminado de favoritos",
+      "removeError": "No se pudo eliminar el favorito"
+    },
+    "header": {
+      "title": "Mis favoritos",
+      "desc": "Usuarios y anuncios que has marcado como favoritos"
+    },
+    "tabs": {
+      "users": "Usuarios",
+      "listings": "Anuncios"
+    },
+    "emptyState": {
+      "allTitle": "Todavía no tienes favoritos",
+      "allDesc": "Visita perfiles de usuarios y anuncios del marketplace para agregarlos a tus favoritos",
+      "exploreBtn": "Explorar el marketplace",
+      "usersTitle": "No tienes usuarios favoritos",
+      "usersDesc": "Visita perfiles de usuarios y agrégalos a tus favoritos",
+      "listingsTitle": "No tienes anuncios favoritos",
+      "listingsDesc": "Explora el marketplace y marca anuncios como favoritos"
+    },
+    "users": {
+      "viewProfile": "Ver perfil",
+      "addedDate": "Agregado el {date}"
+    },
+    "listings": {
+      "pack": "Pack",
+      "sold": "Vendido",
+      "remove": "Quitar"
+    }
+  },
+  "dashboard": {
+    "adminBadge": "Administrador",
+    "editProfileBtn": "Editar Perfil",
+    "quickLinks": {
+      "marketplace": "Explorar Marketplace",
+      "createListing": "Publicar Anuncio",
+      "templates": "Descubrir Colecciones",
+      "chats": "Mis Chats"
+    },
+    "tips": {
+      "title": "Cómo empezar",
+      "marketplace": "Visita el Marketplace para encontrar esos cromos que te faltan.",
+      "collections": "Explora las Colecciones para copiar un Álbum y empezar a seguir tus cromos.",
+      "publish": "Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas."
+    },
+    "ctaBanner": {
+      "available": "Disponible en Marketplace",
+      "stickersAvailableOne": "{count} cromo de {album} disponibles",
+      "stickersAvailableOther": "{count} cromos de {album} disponibles",
+      "missingTotal": "Te faltan {missing} cromos en total",
+      "viewBtn": "Ver en Marketplace",
+      "completeTitle": "Completa tu colección",
+      "missingFromAlbum": "Te faltan {missing} cromos de {album}",
+      "searchBtn": "Buscar en el Marketplace",
+      "startTitle": "Empieza a coleccionar",
+      "startDesc": "Comienza tu primera colección",
+      "exploreBtn": "Explorar Colecciones"
+    },
+    "albums": {
+      "title": "Mis Álbumes",
+      "viewAllBtn": "Ver Todas",
+      "emptyState": "No tienes colecciones activas",
+      "byAuthor": "por {author}",
+      "progress": "Progreso",
+      "stickersCount": "{completed} / {total} cromos",
+      "have": "TENGO {count}",
+      "missing": "FALTAN {count}",
+      "manageBtn": "Gestionar Colección"
+    },
+    "stats": {
+      "firstListing": "Publica tu primer anuncio",
+      "activeListings": "Anuncios activos",
+      "saveFavorites": "Guarda tus favoritos",
+      "favorites": "Favoritos",
+      "ratingsOne": "{count} Valoración",
+      "ratingsOther": "{count} Valoraciones"
+    }
+  },
+  "userProfile": {
+    "status": {
+      "active": "Activos",
+      "reserved": "Reservados",
+      "sold": "Completados",
+      "removed": "Eliminados"
+    },
+    "emptyListings": {
+      "active": "No hay anuncios activos",
+      "reserved": "No hay anuncios reservados",
+      "sold": "No hay anuncios completados",
+      "removed": "No hay anuncios eliminados"
+    },
+    "toast": {
+      "nicknameRequired": "El usuario es obligatorio",
+      "nicknameInvalid": "Elige un usuario distinto a \"Sin nombre\"",
+      "postcodeRequired": "El {field} es obligatorio",
+      "postcodeInvalid": "Introduce un {field} válido (ej: {placeholder})",
+      "nicknameTaken": "Ese usuario ya está en uso. Prueba con otro.",
+      "profileUpdated": "Perfil actualizado",
+      "postcodeApiError": "El código postal introducido no es válido. Por favor, comprueba que es un código postal real.",
+      "updateError": "No se pudo actualizar el perfil"
+    },
+    "notFoundTitle": "Usuario no encontrado",
+    "notFoundContact": "Por favor contacta con ",
+    "addPostcodePrompt": "Añade tu código postal para mostrar tu ubicación aproximada",
+    "locationUnavailable": "Ubicación no disponible",
+    "ratingsCountOne": "valoración",
+    "ratingsCountOther": "valoraciones",
+    "badges": {
+      "admin": "Administrador",
+      "suspended": "Usuario Suspendido",
+      "deleted": "Usuario Eliminado"
+    },
+    "editModal": {
+      "btn": "Editar perfil",
+      "title": "Editar perfil",
+      "desc": "Actualiza tu avatar, usuario y ubicación aproximada.",
+      "avatarLabel": "Avatar",
+      "nicknameLabel": "Usuario",
+      "nicknamePlaceholder": "Tu usuario",
+      "countryLabel": "País",
+      "countryPlaceholder": "Selecciona tu país",
+      "postcodeHint": "Mostramos tu ubicación aproximada en base al código postal.",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "save": "Guardar cambios"
+    },
+    "stats": {
+      "activeListings": "Anuncios activos",
+      "favorites": "Favoritos",
+      "ratings": "Valoraciones"
+    },
+    "ratings": {
+      "title": "Valoraciones",
+      "basedOnOne": "Basado en {count} valoración",
+      "basedOnOther": "Basado en {count} valoraciones",
+      "stars5": "5 estrellas",
+      "stars4": "4 estrellas",
+      "stars3": "3 estrellas",
+      "stars2": "2 estrellas",
+      "stars1": "1 estrella",
+      "typeListing": "Anuncio",
+      "typeTrade": "Intercambio",
+      "empty": "Este usuario aún no ha recibido valoraciones"
+    }
+  },
+  "settings": {
+    "pageTitle": "Ajustes",
+    "pageDescription": "Configura tus preferencias y gestiona tu cuenta",
+    "tabs": {
+      "notifications": "Notificaciones",
+      "blocked": "Bloqueados",
+      "system": "Sistema",
+      "legal": "Legal"
     }
   }
 }

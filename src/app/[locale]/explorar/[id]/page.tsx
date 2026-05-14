@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
@@ -81,19 +82,20 @@ async function getListingById(id: string): Promise<Listing | null> {
 }
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: 'explorar.detail' });
   const listing = await getListingById(id);
   // Normalize URL: strip www for consistent canonical URLs
   const baseUrl = siteConfig.url;
 
   if (!listing) {
     return {
-      title: 'Anuncio no encontrado',
-      description: 'Este anuncio puede haber sido eliminado o ya no está disponible.',
+      title: t('meta.notFoundTitle'),
+      description: t('meta.notFoundDesc'),
       alternates: {
         canonical: `${baseUrl}/explorar/${id}`,
       },
@@ -107,15 +109,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   // Build a structured description for SEO
   const descParts: string[] = [];
-  if (listing.collection_name) descParts.push(`Cromo de la colección ${listing.collection_name}`);
-  if (listing.sticker_number) descParts.push(`número #${listing.sticker_number}${listing.slot_variant || ''}`);
-  const listingTypeLabel = listing.listing_type === 'venta' ? 'en venta' :
-    listing.listing_type === 'ambos' ? 'disponible para intercambio y venta' : 'disponible para intercambio';
+  if (listing.collection_name) descParts.push(`${t('meta.stickerFromCollection')} ${listing.collection_name}`);
+  if (listing.sticker_number) descParts.push(`${t('meta.numberPrefix')}${listing.sticker_number}${listing.slot_variant || ''}`);
+  const listingTypeLabel = listing.listing_type === 'venta' ? t('meta.forSale') :
+    listing.listing_type === 'ambos' ? t('meta.forTradeAndSale') : t('meta.forTrade');
   descParts.push(listingTypeLabel);
   if (listing.price != null && (listing.listing_type === 'venta' || listing.listing_type === 'ambos')) {
-    descParts.push(`por ${Number(listing.price).toFixed(2)} €`);
+    descParts.push(`${t('meta.forPrice', { price: Number(listing.price).toFixed(2) })}`);
   }
-  descParts.push('en Cambio Cromos, la comunidad de coleccionistas de cromos.');
+  descParts.push(t('meta.communitySuffix'));
   const description = descParts.join(' — ');
 
   return {
@@ -136,11 +138,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function PublicListingDetailPage({ params }: PageProps) {
-  const { id } = await params;
+  const { locale, id } = await params;
+  const t = await getTranslations({ locale, namespace: 'explorar.detail' });
   const listing = await getListingById(id);
 
   if (!listing) {
-    return <ListingDetailContent listing={null} error="Anuncio no encontrado" />;
+    return <ListingDetailContent listing={null} error="${t('meta.notFoundTitle')}" />;
   }
 
   const baseUrl = siteConfig.url;
@@ -151,7 +154,7 @@ export default async function PublicListingDetailPage({ params }: PageProps) {
     '@type': 'Product',
     name: listing.title,
     url: `${baseUrl}/explorar/${id}`,
-    description: listing.description || `Cromo ${listing.title}${listing.collection_name ? ` de ${listing.collection_name}` : ''}`,
+    description: listing.description || `${t('meta.jsonLdDescFallbackSticker')} ${listing.title}${listing.collection_name ? ` ${t('meta.jsonLdDescFallbackFrom')} ${listing.collection_name}` : ''}`,
     ...(listing.image_url ? { image: listing.image_url } : {}),
     ...(listing.collection_name ? { category: listing.collection_name } : {}),
     ...(listing.sticker_number ? { sku: `${listing.sticker_number}${listing.slot_variant || ''}` } : {}),

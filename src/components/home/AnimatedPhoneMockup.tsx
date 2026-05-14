@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Bell, Search, Store, Library, MessageCircle, Heart, Menu, ArrowLeft, Star, MapPin, Send, User } from 'lucide-react';
 
 // Screen types for the flow
@@ -64,6 +65,7 @@ function MarketplaceScreen({ onTapCard, scrollY }: { onTapCard: () => void; scro
 
 // Detail Screen Component
 function DetailScreen({ onTapProfile }: { onTapProfile: () => void }) {
+    const t = useTranslations('landing.mockup');
     return (
         <motion.div
             className="flex-1 overflow-hidden bg-white"
@@ -81,7 +83,7 @@ function DetailScreen({ onTapProfile }: { onTapProfile: () => void }) {
                     <path d="M50 80 L70 95" stroke="black" strokeWidth="4" strokeLinecap="round" />
                 </svg>
                 <div className="absolute top-2 left-2 bg-gold text-black text-[8px] font-black px-2 py-0.5 rounded">
-                    ESPECIAL
+                    {t('special')}
                 </div>
             </div>
 
@@ -106,7 +108,7 @@ function DetailScreen({ onTapProfile }: { onTapProfile: () => void }) {
                         <div className="flex items-center gap-1 text-[8px] text-gray-500">
                             <Star className="w-2 h-2 fill-yellow-400 text-yellow-400" />
                             <span>4.9</span>
-                            <span>• 127 intercambios</span>
+                            <span>• 127 {t('trades')}</span>
                         </div>
                     </div>
                     <ArrowLeft className="w-3 h-3 text-gray-400 rotate-180" />
@@ -118,6 +120,7 @@ function DetailScreen({ onTapProfile }: { onTapProfile: () => void }) {
 
 // Profile Screen Component
 function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
+    const t = useTranslations('landing.mockup');
     return (
         <motion.div
             className="flex-1 overflow-hidden bg-gray-50"
@@ -139,14 +142,14 @@ function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
                 <div className="flex justify-center gap-4 mt-2">
                     <div className="text-center">
                         <div className="font-bold text-xs">127</div>
-                        <div className="text-[8px] text-gray-500">Trades</div>
+                        <div className="text-[8px] text-gray-500">{t('tradesLabel')}</div>
                     </div>
                     <div className="text-center">
                         <div className="font-bold text-xs flex items-center gap-0.5">
                             <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
                             4.9
                         </div>
-                        <div className="text-[8px] text-gray-500">Rating</div>
+                        <div className="text-[8px] text-gray-500">{t('ratingLabel')}</div>
                     </div>
                 </div>
             </div>
@@ -161,13 +164,13 @@ function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
                     transition={{ duration: 0.8, repeat: Infinity }}
                 >
                     <MessageCircle className="w-3 h-3" />
-                    Enviar Mensaje
+                    {t('sendMessage')}
                 </motion.button>
             </div>
 
             {/* Some listings */}
             <div className="px-3">
-                <div className="text-[10px] font-bold mb-2">Sus anuncios (24)</div>
+                <div className="text-[10px] font-bold mb-2">{t('userListings')}</div>
                 <div className="grid grid-cols-3 gap-1">
                     {[1, 2, 3].map(i => (
                         <div key={i} className="aspect-square bg-white rounded border" />
@@ -180,6 +183,7 @@ function ProfileScreen({ onTapChat }: { onTapChat: () => void }) {
 
 // Chat Screen Component
 function ChatScreen() {
+    const t = useTranslations('landing.mockup');
     const [showMessages, setShowMessages] = useState(false);
 
     useEffect(() => {
@@ -243,7 +247,7 @@ function ChatScreen() {
             {/* Input */}
             <div className="p-2 bg-white border-t flex items-center gap-2">
                 <div className="flex-1 bg-gray-100 rounded-full px-3 py-1.5 text-[11px] text-gray-400">
-                    Escribe un mensaje...
+                    {t('inputPlaceholder')}
                 </div>
                 <div className="w-7 h-7 bg-gold rounded-full flex items-center justify-center">
                     <Send className="w-3 h-3 text-black" />
@@ -254,6 +258,7 @@ function ChatScreen() {
 }
 
 export default function AnimatedPhoneMockup({ className, flat }: { className?: string; flat?: boolean }) {
+    const t = useTranslations('landing.mockup');
     const [currentScreen, setCurrentScreen] = useState<Screen>('marketplace');
     const [scrollY, setScrollY] = useState(0);
     const [showTapIndicator, setShowTapIndicator] = useState(false);
@@ -350,7 +355,7 @@ export default function AnimatedPhoneMockup({ className, flat }: { className?: s
                         <div className="px-3 mb-2">
                             <div className="bg-white border rounded-lg p-2 flex items-center gap-2 text-gray-400 text-[10px] shadow-sm">
                                 <Search className="w-3 h-3" />
-                                <span>Buscar cromos...</span>
+                                <span>{t('searchPlaceholder')}</span>
                             </div>
                         </div>
                     )}

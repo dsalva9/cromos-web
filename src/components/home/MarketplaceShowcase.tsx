@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import { LeanListingCard } from '@/components/home/LeanListingCard';
@@ -11,6 +12,7 @@ import { logger } from '@/lib/logger';
 import { AnimatedList } from '@/components/ui/AnimatedList';
 
 export default function MarketplaceShowcase() {
+  const t = useTranslations('landing.showcase');
   const { listings, loading, error } = useListings({ limit: 6 });
   const [displayListings, setDisplayListings] = useState<typeof listings>([]);
   const [isReady, setIsReady] = useState(false);
@@ -41,7 +43,7 @@ export default function MarketplaceShowcase() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-gold">
-                Marketplace en vivo
+                {t('badge')}
               </p>
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white uppercase">
                 Últimos anuncios publicados
@@ -57,14 +59,14 @@ export default function MarketplaceShowcase() {
               size="lg"
               className="bg-gold hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black shadow-xl"
             >
-              <Link href="/explorar">Ir al marketplace</Link>
+              <Link href="/explorar">{t('goToMarket')}</Link>
             </Button>
           </div>
 
           {error && (
             <div className="flex items-center gap-3 rounded-lg border-2 border-red-300 bg-red-50 px-4 py-3 text-red-800">
               <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <span>Ha ocurrido un error al cargar los anuncios: {error}</span>
+              <span>{t('error', { error })}</span>
             </div>
           )}
 
@@ -101,7 +103,7 @@ export default function MarketplaceShowcase() {
                 variant="outline"
                 className="mt-6 border-2 border-black bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 font-bold"
               >
-                <Link href="/marketplace/create">Publicar un anuncio</Link>
+                <Link href="/marketplace/create">{t('publishBtn')}</Link>
               </Button>
             </div>
           )}

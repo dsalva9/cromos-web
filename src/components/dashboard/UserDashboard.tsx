@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
+import { useTranslations } from 'next-intl';
 
 // Reuse logic from server-my-templates but for client
 interface TemplateCopy {
@@ -35,6 +36,7 @@ interface TemplateCopy {
 
 export default function UserDashboard() {
     const { user } = useUser();
+    const t = useTranslations('dashboard');
     const supabase = useSupabaseClient();
     const router = useRouter();
 
@@ -220,12 +222,12 @@ export default function UserDashboard() {
                                         </div>
                                     </div>
                                     {profile.is_admin && (
-                                        <Badge className="bg-red-50 text-red-600 border-red-100 mt-2">Administrador</Badge>
+                                        <Badge className="bg-red-50 text-red-600 border-red-100 mt-2">{t('adminBadge')}</Badge>
                                     )}
                                 </div>
                             </div>
                             <Link href={`/users/${user?.id}`} className="text-sm font-bold text-gold hover:text-gold-light transition-colors flex-shrink-0">
-                                Editar Perfil
+                                {t('editProfileBtn')}
                             </Link>
                         </div>
                     </div>
@@ -234,10 +236,10 @@ export default function UserDashboard() {
                 {/* 2. Quick Actions Bar — with subtle hover glow */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
-                        { href: '/marketplace', icon: Store, label: 'Explorar Marketplace' },
-                        { href: '/marketplace/create', icon: PlusCircle, label: 'Publicar Anuncio' },
-                        { href: '/templates', icon: LayoutGrid, label: 'Descubrir Colecciones' },
-                        { href: '/chats', icon: MessageCircle, label: 'Mis Chats' },
+                        { href: '/marketplace', icon: Store, label: t('quickLinks.marketplace') },
+                        { href: '/marketplace/create', icon: PlusCircle, label: t('quickLinks.createListing') },
+                        { href: '/templates', icon: LayoutGrid, label: t('quickLinks.templates') },
+                        { href: '/chats', icon: MessageCircle, label: t('quickLinks.chats') },
                     ].map(({ href, icon: Icon, label }) => (
                         <Link key={href} href={href} className="group">
                             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-all duration-200 hover:border-gold hover:shadow-[0_0_0_1px_var(--gold),0_4px_12px_rgba(0,0,0,0.08)]">
@@ -252,12 +254,12 @@ export default function UserDashboard() {
                 <ContextualTip
                     tipId="tip-dashboard"
                     icon={Lightbulb}
-                    title="Cómo empezar"
+                    title={t('tips.title')}
                     description={
                         <ul className="list-disc pl-4 space-y-1">
-                            <li>Visita el Marketplace para encontrar esos cromos que te faltan.</li>
-                            <li>Explora las Colecciones para copiar un Álbum y empezar a seguir tus cromos.</li>
-                            <li>Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas.</li>
+                            <li>{t('tips.marketplace')}</li>
+                            <li>{t('tips.collections')}</li>
+                            <li>{t('tips.publish')}</li>
                         </ul>
                     }
                 />
@@ -271,18 +273,18 @@ export default function UserDashboard() {
                             <div>
                                 <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1 flex items-center gap-2">
                                     <ShoppingBag className="w-4 h-4 text-gold" />
-                                    Disponible en Marketplace
+                                    {t('ctaBanner.available')}
                                 </p>
                                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-                                    {ctaCount} {ctaCount === 1 ? 'cromo' : 'cromos'} de {ctaAlbum.title} disponibles
+                                    {ctaCount === 1 ? t('ctaBanner.stickersAvailableOne', { count: ctaCount, album: ctaAlbum.title }) : t('ctaBanner.stickersAvailableOther', { count: ctaCount, album: ctaAlbum.title })}
                                 </h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                    Te faltan {ctaAlbum.total_slots - ctaAlbum.completed_slots} cromos en total
+                                    {t('ctaBanner.missingTotal', { missing: ctaAlbum.total_slots - ctaAlbum.completed_slots })}
                                 </p>
                             </div>
                             <Link href={`/marketplace?collection=${ctaAlbum.copy_id}`}>
                                 <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
-                                    Ver en Marketplace <ArrowRight className="ml-2 h-4 w-4" />
+                                    {t('ctaBanner.viewBtn')} <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                         </div>
@@ -308,14 +310,14 @@ export default function UserDashboard() {
                     <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Completa tu colección</p>
+                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">{t('ctaBanner.completeTitle')}</p>
                                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-                                    Te faltan {mostIncompleteAlbum.total_slots - mostIncompleteAlbum.completed_slots} cromos de {mostIncompleteAlbum.title}
+                                    {t('ctaBanner.missingFromAlbum', { missing: mostIncompleteAlbum.total_slots - mostIncompleteAlbum.completed_slots, album: mostIncompleteAlbum.title })}
                                 </h3>
                             </div>
                             <Link href="/marketplace">
                                 <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
-                                    Buscar en el Marketplace <ArrowRight className="ml-2 h-4 w-4" />
+                                    {t('ctaBanner.searchBtn')} <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                         </div>
@@ -324,14 +326,14 @@ export default function UserDashboard() {
                     <div className="bg-gradient-to-r from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 border-2 border-gold rounded-2xl p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">Empieza a coleccionar</p>
+                                <p className="text-sm font-bold text-gray-600 dark:text-gray-400 uppercase mb-1">{t('ctaBanner.startTitle')}</p>
                                 <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-                                    Comienza tu primera colección
+                                    {t('ctaBanner.startDesc')}
                                 </h3>
                             </div>
                             <Link href="/templates">
                                 <Button className="bg-gold text-black hover:bg-gold-light font-black whitespace-nowrap shadow-sm hover:shadow-md transition-all">
-                                    Explorar Colecciones <ArrowRight className="ml-2 h-4 w-4" />
+                                    {t('ctaBanner.exploreBtn')} <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </Link>
                         </div>
@@ -341,11 +343,11 @@ export default function UserDashboard() {
                 {/* 5. Albums (Mis Álbumes) */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">Mis Álbumes</h2>
+                        <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase">{t('albums.title')}</h2>
                         <Link href="/templates">
                             <Button variant="outline" size="sm" className="hidden md:flex">
                                 <LayoutGrid className="mr-2 h-4 w-4" />
-                                Ver Todas
+                                {t('albums.viewAllBtn')}
                             </Button>
                         </Link>
                     </div>
@@ -358,10 +360,10 @@ export default function UserDashboard() {
                     ) : copies.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 border-dashed">
                             <LayoutGrid className="h-10 w-10 text-gray-400 mb-3" />
-                            <p className="text-gray-500 mb-4">No tienes colecciones activas</p>
+                            <p className="text-gray-500 mb-4">{t('albums.emptyState')}</p>
                             <Link href="/templates">
                                 <Button className="bg-gold text-black hover:bg-gold-light font-bold">
-                                    Explorar Colecciones
+                                    {t('ctaBanner.exploreBtn')}
                                 </Button>
                             </Link>
                         </div>
@@ -389,12 +391,12 @@ export default function UserDashboard() {
 
                                                     <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
                                                         <User className="w-3 h-3" />
-                                                        <span>por {copy.original_author_nickname}</span>
+                                                        <span>{t('albums.byAuthor', { author: copy.original_author_nickname })}</span>
                                                     </div>
 
                                                     <div className="space-y-2">
                                                         <div className="flex justify-between text-xs font-bold uppercase">
-                                                            <span>Progreso</span>
+                                                            <span>{t('albums.progress')}</span>
                                                             <span className={isComplete ? "text-green-600" : "text-gold"}>{percentage}%</span>
                                                         </div>
                                                         <div className="h-2.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -403,23 +405,23 @@ export default function UserDashboard() {
                                                                 style={{ width: `${percentage}%` }}
                                                             />
                                                         </div>
-                                                        <p className="text-xs text-right text-gray-400">{copy.completed_slots} / {copy.total_slots} cromos</p>
+                                                        <p className="text-xs text-right text-gray-400">{t('albums.stickersCount', { completed: copy.completed_slots, total: copy.total_slots })}</p>
                                                     </div>
 
                                                     <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                                                         <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/10 px-2.5 py-1 rounded-md text-xs font-bold text-green-700 dark:text-green-400">
                                                             <Check className="w-3 h-3" />
-                                                            <span>TENGO {copy.completed_slots}</span>
+                                                            <span>{t('albums.have', { count: copy.completed_slots })}</span>
                                                         </div>
                                                         <div className="flex items-center gap-1.5 bg-red-50 dark:bg-red-900/10 px-2.5 py-1 rounded-md text-xs font-bold text-red-700 dark:text-red-400">
                                                             <X className="w-3 h-3" />
-                                                            <span>FALTAN {missing}</span>
+                                                            <span>{t('albums.missing', { count: missing })}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="mt-4 flex items-center justify-end text-xs font-black uppercase text-gray-400 group-hover:text-gold transition-colors">
-                                                <span>Gestionar Colección</span>
+                                                <span>{t('albums.manageBtn')}</span>
                                                 <ArrowRight className="w-3 h-3 ml-1 transition-transform duration-200 group-hover:translate-x-0.5" />
                                             </div>
                                         </div>
@@ -443,7 +445,7 @@ export default function UserDashboard() {
                         <Link href="/marketplace/create" className="group block h-full">
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <PlusCircle className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
-                                <p className="text-sm font-black text-gray-900 dark:text-white">Publica tu primer anuncio</p>
+                                <p className="text-sm font-black text-gray-900 dark:text-white">{t('stats.firstListing')}</p>
                             </div>
                         </Link>
                     ) : (
@@ -451,7 +453,7 @@ export default function UserDashboard() {
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gold/50 transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <Package className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{activeListings.length}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Anuncios activos</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('stats.activeListings')}</p>
                             </div>
                         </Link>
                     )}
@@ -460,7 +462,7 @@ export default function UserDashboard() {
                         <Link href="/marketplace" className="group block h-full">
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <Heart className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
-                                <p className="text-sm font-black text-gray-900 dark:text-white">Guarda tus favoritos</p>
+                                <p className="text-sm font-black text-gray-900 dark:text-white">{t('stats.saveFavorites')}</p>
                             </div>
                         </Link>
                     ) : (
@@ -468,7 +470,7 @@ export default function UserDashboard() {
                             <div className="flex flex-col items-center justify-center h-full text-center bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 group-hover:border-gold/50 transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                                 <Heart className="h-6 w-6 mb-2 text-gold" />
                                 <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">{profile.favorites_count}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Favoritos</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{t('stats.favorites')}</p>
                             </div>
                         </Link>
                     )}
@@ -477,7 +479,7 @@ export default function UserDashboard() {
                         <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-gold/10 to-gold-light/10 dark:from-gold/5 dark:to-gold-light/5 rounded-xl p-4 border-2 border-dashed border-gold/50 group-hover:border-gold transition-all duration-200 group-hover:shadow-sm group-active:scale-[0.98]">
                             <Star className="h-6 w-6 mb-2 text-gold transition-transform duration-200 group-hover:scale-110" />
                             <p className="text-sm font-black text-gray-900 dark:text-white">
-                                {profile.rating_count} {profile.rating_count === 1 ? 'Valoración' : 'Valoraciones'}
+                                {profile.rating_count === 1 ? t('stats.ratingsOne', { count: profile.rating_count }) : t('stats.ratingsOther', { count: profile.rating_count })}
                             </p>
                         </div>
                     </Link>

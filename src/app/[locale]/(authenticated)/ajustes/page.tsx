@@ -19,9 +19,10 @@ import {
   FileText,
   Cookie,
 } from 'lucide-react';
-import Link from '@/components/ui/link'; // Added Link import
+import { useTranslations } from 'next-intl';
 
 export default function AjustesPage() {
+  const t = useTranslations('settings');
   const router = useRouter();
   const { user, loading } = useUser();
 
@@ -55,10 +56,10 @@ export default function AjustesPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-display font-bold text-gray-900 dark:text-white mb-2">
-              Ajustes
+              {t('pageTitle')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Configura tus preferencias y gestiona tu cuenta
+              {t('pageDescription')}
             </p>
           </div>
 
@@ -66,16 +67,16 @@ export default function AjustesPage() {
           <Tabs defaultValue="notificaciones" className="w-full">
             <TabsList className="w-full mb-6">
               <TabsTrigger value="notificaciones" className="flex-1">
-                Notificaciones
+                {t('tabs.notifications')}
               </TabsTrigger>
               <TabsTrigger value="ignorados" className="flex-1">
-                Bloqueados
+                {t('tabs.blocked')}
               </TabsTrigger>
               <TabsTrigger value="sistema" className="flex-1">
-                Sistema
+                {t('tabs.system')}
               </TabsTrigger>
               <TabsTrigger value="legal" className="flex-1">
-                Legal
+                {t('tabs.legal')}
               </TabsTrigger>
             </TabsList>
 

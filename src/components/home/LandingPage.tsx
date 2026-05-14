@@ -2,6 +2,7 @@
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MarketplaceShowcase from './MarketplaceShowcase';
@@ -10,6 +11,7 @@ import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 import { ArrowRight, Check, Search, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
+    const t = useTranslations('landing');
 
 
     return (
@@ -26,7 +28,7 @@ export default function LandingPage() {
                         {/* Hero Content (Centered) */}
                         <div className="flex-1 max-w-2xl text-center space-y-6 lg:space-y-8 flex flex-col items-center">
                             <Badge className="bg-gold text-black border-2 border-black px-4 py-1 text-sm font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] uppercase tracking-wide w-fit">
-                                La Plataforma #1 de intercambio de Cromos
+                                {t('hero.badge')}
                             </Badge>
 
                             <div className="relative w-64 h-64 lg:w-80 lg:h-80 mb-0 -mt-6 lg:-mt-8 animate-in fade-in slide-in-from-bottom-10 duration-1000">
@@ -43,7 +45,7 @@ export default function LandingPage() {
                             <h1 className="-mt-6 lg:-mt-8 text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
                                 Tu colección <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-yellow-500 drop-shadow-sm">
-                                    a otro nivel
+                                    {t('hero.titleLine2')}
                                 </span>
                             </h1>
 
@@ -58,7 +60,7 @@ export default function LandingPage() {
                                     className="bg-gold hover:bg-yellow-400 text-black font-black text-lg h-14 px-8 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 active:translate-y-0 active:shadow-none rounded-xl"
                                 >
                                     <Link href="/signup">
-                                        Empezar a Intercambiar
+                                        {t('hero.startTrading')}
                                     </Link>
                                 </Button>
                                 <Button
@@ -67,7 +69,7 @@ export default function LandingPage() {
                                     variant="outline"
                                     className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm text-black dark:text-white font-bold text-lg h-14 px-8 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 active:translate-y-0 active:shadow-none rounded-xl cursor-pointer"
                                 >
-                                    <Link href="/explorar">Explorar Mercado</Link>
+                                    <Link href="/explorar">{t('hero.exploreMarket')}</Link>
                                 </Button>
                             </div>
 
@@ -81,7 +83,7 @@ export default function LandingPage() {
                             {/* Download Section — mobile only */}
                             <div className="flex flex-col items-center gap-3 pt-4 md:hidden">
                                 <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                                    Disponible en:
+                                    {t('hero.availableOn')}
                                 </p>
                                 <div className="flex flex-row items-center gap-4">
                                     <a
@@ -126,7 +128,7 @@ export default function LandingPage() {
                                 <Check className="w-6 h-6 lg:w-8 lg:h-8 text-black" strokeWidth={3} />
                             </div>
                             <div className="md:mt-4">
-                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Gestiona Albumes</h3>
+                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">{t('features.feature1.title')}</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
                                     Olvídate del papel. Marca los cromos que te faltan y repes directamente en la app.
                                 </p>
@@ -139,7 +141,7 @@ export default function LandingPage() {
                                 <Search className="w-6 h-6 lg:w-7 lg:h-7 text-white dark:text-black" strokeWidth={3} />
                             </div>
                             <div className="md:mt-4">
-                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Busca Repes</h3>
+                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">{t('features.feature2.title')}</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
                                     Encuentra al instante quién tiene los cromos que te faltan.
                                 </p>
@@ -152,9 +154,9 @@ export default function LandingPage() {
                                 <Trophy className="w-6 h-6 lg:w-7 lg:h-7 text-white" strokeWidth={3} />
                             </div>
                             <div className="md:mt-4">
-                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">Gana Logros</h3>
+                                <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">{t('features.feature3.title')}</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
-                                    Completa intercambios y destaca como un "Top Trader".
+                                    {t('features.feature3.desc')}
                                 </p>
                             </div>
                         </div>
@@ -175,7 +177,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center space-y-4">
                         <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-gray-900 dark:text-white">
-                            Tu destino para el intercambio de cromos
+                            {t('seo.title')}
                         </h2>
                         <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
                             Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colección. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de fútbol del Mundial y cualquier otra colección deportiva. Gestiona tus álbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda España — todo en una sola plataforma gratuita.
@@ -202,7 +204,7 @@ export default function LandingPage() {
                         className="bg-black hover:bg-gray-800 text-white font-black text-xl h-16 px-12 border-2 border-transparent shadow-2xl transition-all hover:scale-105 rounded-full"
                     >
                         <Link href="/signup">
-                            Crear Cuenta Gratis <ArrowRight className="ml-2 w-6 h-6" />
+                            {t('cta.button')} <ArrowRight className="ml-2 w-6 h-6" />
                         </Link>
                     </Button>
                 </div>

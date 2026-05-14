@@ -48,8 +48,10 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { useTranslations } from 'next-intl';
 import { getSupportMailtoUrl } from '@/lib/utils';
 
+// @ts-ignore
 const STATUS_LABELS = {
   active: 'Activos',
   reserved: 'Reservados',
@@ -92,6 +94,7 @@ interface RatingSummary {
 }
 
 export default function UserProfilePage() {
+  const t = useTranslations('userProfile');
   const params = useParams();
   const { user: currentUser } = useUser();
   const supabase = useSupabaseClient();
@@ -270,9 +273,9 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-900 dark:text-white text-xl mb-4">Usuario no encontrado</p>
+          <p className="text-gray-900 dark:text-white text-xl mb-4">{t('notFoundTitle')}</p>
           <p className="text-gray-500 dark:text-gray-400 mt-4">
-            Por favor contacta con{' '}
+            {t('notFoundContact')}{' '}
             <a
               href={getSupportMailtoUrl()}
               className="text-gold hover:text-yellow-600 underline font-bold"
@@ -291,14 +294,13 @@ export default function UserProfilePage() {
 
   const listingTabs = availableStatuses.map(status => ({
     value: status,
-    label: STATUS_LABELS[status],
+    label: t(`status.${status}`),
     badge: (
       <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-black/10 border border-black/30">
         {statusCounts[status]}
       </span>
     ),
   }));
-
   const handleAvatarSelection = async (selection: AvatarSelection) => {
     if (selection.type === 'preset') {
       // Preset avatar - just store the public path
@@ -323,22 +325,22 @@ export default function UserProfilePage() {
     const trimmedPostcode = formPostcode.trim();
 
     if (!trimmedNickname) {
-      toast.error('El usuario es obligatorio');
+      toast.error(t('toast.nicknameRequired'));
       return;
     }
 
     if (trimmedNickname.toLowerCase() === 'sin nombre') {
-      toast.error('Elige un usuario distinto a "Sin nombre"');
+      toast.error(t('toast.nicknameInvalid'));
       return;
     }
 
     if (!trimmedPostcode) {
-      toast.error(`El ${postcodeRule.label.toLowerCase()} es obligatorio`);
+      toast.error(t('toast.postcodeRequired', { field: postcodeRule.label.toLowerCase() }));
       return;
     }
 
     if (!validatePostcode(trimmedPostcode, formCountry)) {
-      toast.error(`Introduce un ${postcodeRule.label.toLowerCase()} válido (ej: ${postcodeRule.placeholder})`);
+      toast.error(t('toast.postcodeInvalid', { field: postcodeRule.label.toLowerCase(), placeholder: postcodeRule.placeholder }));
       return;
     }
 
@@ -357,7 +359,7 @@ export default function UserProfilePage() {
       }
 
       if (existingNickname) {
-        toast.error('Ese usuario ya está en uso. Prueba con otro.');
+        toast.error(t('toast.nicknameTaken'));
         return;
       }
 
@@ -400,7 +402,7 @@ export default function UserProfilePage() {
         throw updateError;
       }
 
-      toast.success('Perfil actualizado');
+      toast.success(t('toast.profileUpdated'));
       setEditDialogOpen(false);
       if (isOwnProfile) {
         updateCompletionProfile({
@@ -426,12 +428,12 @@ export default function UserProfilePage() {
           errorMessage.includes('codigo postal') ||
           errorMessage.includes('postcode')
         ) {
-          toast.error('El código postal introducido no es válido. Por favor, comprueba que es un código postal español real.');
+          toast.error(t('toast.postcodeApiError'));
           return;
         }
       }
 
-      toast.error('No se pudo actualizar el perfil');
+      toast.error(t('toast.updateError'));
     } finally {
       setSavingProfile(false);
       setUploadingAvatar(false);
@@ -540,8 +542,8 @@ export default function UserProfilePage() {
                           {userCountryInfo && <span className="mr-1">{userCountryInfo.flag}</span>}
                           {locationDisplay ??
                             (isOwnProfile
-                              ? 'Añade tu código postal para mostrar tu ubicación aproximada'
-                              : 'Ubicación no disponible')}
+                              ? t('addPostcodePrompt')
+                              : t('locationUnavailable'))}
                         </span>
                       </div>
 
@@ -566,8 +568,8 @@ export default function UserProfilePage() {
                           <span className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">
                             ({profile.rating_count}{' '}
                             {profile.rating_count === 1
-                              ? 'valoración'
-                              : 'valoraciones'}
+                              ? t('ratingsCountOne')
+                              : t('ratingsCountOther')}
                             )
                           </span>
                         </a>
@@ -577,19 +579,19 @@ export default function UserProfilePage() {
                       <div className="flex gap-2 mt-3">
                         {profile.is_admin && isCurrentUserAdmin && (
                           <Badge className="bg-red-50 text-red-600 border-red-100">
-                            Administrador
+                            {t('badges.admin')}
                           </Badge>
                         )}
                         {profile.is_suspended && !profile.deleted_at && isCurrentUserAdmin && (
                           <Badge className="bg-red-50 text-red-600 border-red-100 flex items-center gap-1">
                             <Ban className="h-3 w-3" />
-                            Usuario Suspendido
+                            {t('badges.suspended')}
                           </Badge>
                         )}
                         {profile.deleted_at && isCurrentUserAdmin && (
                           <Badge className="bg-orange-50 text-orange-600 border-orange-100 flex items-center gap-1">
                             <Trash2 className="h-3 w-3" />
-                            Usuario Eliminado
+                            {t('badges.deleted')}
                           </Badge>
                         )}
                       </div>
@@ -627,24 +629,23 @@ export default function UserProfilePage() {
                               className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                             >
                               <Pencil className="w-4 h-4 mr-2" />
-                              Editar perfil
+                              {t('editModal.btn')}
                             </Button>
                           </DialogTrigger>
 
                           <DialogContent className="max-w-2xl p-0 max-h-[calc(100dvh-6rem)]">
                             <div className="p-6 pb-4 flex-shrink-0">
                               <DialogHeader>
-                                <DialogTitle>Editar perfil</DialogTitle>
+                                <DialogTitle>{t('editModal.title')}</DialogTitle>
                                 <DialogDescription>
-                                  Actualiza tu avatar, usuario y ubicación
-                                  aproximada.
+                                  {t('editModal.desc')}
                                 </DialogDescription>
                               </DialogHeader>
                             </div>
 
                             <div className="px-6 pb-6 space-y-6 overflow-y-auto flex-1 min-h-0">
                               <div className="space-y-3">
-                                <Label>Avatar</Label>
+                                <Label>{t('editModal.avatarLabel')}</Label>
                                 <AvatarPicker
                                   currentAvatarUrl={previewAvatarUrl}
                                   onSelect={handleAvatarSelection}
@@ -653,7 +654,7 @@ export default function UserProfilePage() {
                               </div>
 
                               <div className="space-y-2">
-                                <Label htmlFor="nickname">Usuario</Label>
+                                <Label htmlFor="nickname">{t('editModal.nicknameLabel')}</Label>
                                 <Input
                                   id="nickname"
                                   value={formNickname}
@@ -661,17 +662,17 @@ export default function UserProfilePage() {
                                     setFormNickname(event.target.value)
                                   }
                                   maxLength={50}
-                                  placeholder="Tu usuario"
+                                  placeholder={t('editModal.nicknamePlaceholder')}
                                   required
                                 />
                               </div>
 
                               {multiCountryEnabled && (
                                 <div className="space-y-2">
-                                  <Label htmlFor="country">País</Label>
+                                  <Label htmlFor="country">{t('editModal.countryLabel')}</Label>
                                   <Select value={formCountry} onValueChange={(val) => { setFormCountry(val); setFormPostcode(''); }}>
                                     <SelectTrigger id="country">
-                                      <SelectValue placeholder="Selecciona tu país" />
+                                      <SelectValue placeholder={t('editModal.countryPlaceholder')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                       {SUPPORTED_COUNTRIES.map(country => (
@@ -698,8 +699,7 @@ export default function UserProfilePage() {
                                   inputMode={formCountry === 'AR' || formCountry === 'BR' ? 'text' : 'numeric'}
                                 />
                                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                                  Mostramos tu ubicación aproximada en base al
-                                  código postal.
+                                  {t('editModal.postcodeHint')}
                                 </p>
                               </div>
                             </div>
@@ -713,7 +713,7 @@ export default function UserProfilePage() {
                                   type="button"
                                   disabled={savingProfile}
                                 >
-                                  Cancelar
+                                  {t('editModal.cancel')}
                                 </Button>
                                 <Button
                                   className="bg-gold text-black hover:bg-gold-light font-bold"
@@ -722,8 +722,8 @@ export default function UserProfilePage() {
                                   disabled={savingProfile || uploadingAvatar}
                                 >
                                   {savingProfile
-                                    ? 'Guardando...'
-                                    : 'Guardar cambios'}
+                                    ? t('editModal.saving')
+                                    : t('editModal.save')}
                                 </Button>
                               </DialogFooter>
                             </div>
@@ -738,14 +738,14 @@ export default function UserProfilePage() {
                     {renderStatCard(
                       <Package className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       statusCounts.active,
-                      'Anuncios activos',
+                      t('stats.activeListings'),
                       isOwnProfile ? '/marketplace/my-listings' : undefined
                     )}
 
                     {renderStatCard(
                       <Heart className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       profile.favorites_count,
-                      'Favoritos',
+                      t('stats.favorites'),
                       isOwnProfile ? '/favorites' : undefined
                     )}
 
@@ -764,7 +764,7 @@ export default function UserProfilePage() {
                         <p className="text-2xl font-black text-gray-900 dark:text-white">
                           {profile.rating_count}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Valoraciones</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('ratings.title')}</p>
                       </div>
                     </a>
                   </div>
@@ -802,10 +802,7 @@ export default function UserProfilePage() {
                       <Star className="h-8 w-8 fill-gold text-gold" />
                     </div>
                     <p className="text-gray-500 dark:text-gray-400">
-                      Basado en {ratingSummary.rating_count}{' '}
-                      {ratingSummary.rating_count === 1
-                        ? 'valoración'
-                        : 'valoraciones'}
+                      {ratingSummary.rating_count === 1 ? t('ratings.basedOnOne', { count: ratingSummary.rating_count }) : t('ratings.basedOnOther', { count: ratingSummary.rating_count })}
                     </p>
                   </div>
 
@@ -813,7 +810,7 @@ export default function UserProfilePage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
-                        5 estrellas
+                        {t('ratings.stars5')}
                       </span>
                       {renderRatingBar(
                         ratingSummary.rating_distribution['5_star'],
@@ -822,7 +819,7 @@ export default function UserProfilePage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
-                        4 estrellas
+                        {t('ratings.stars4')}
                       </span>
                       {renderRatingBar(
                         ratingSummary.rating_distribution['4_star'],
@@ -831,7 +828,7 @@ export default function UserProfilePage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
-                        3 estrellas
+                        {t('ratings.stars3')}
                       </span>
                       {renderRatingBar(
                         ratingSummary.rating_distribution['3_star'],
@@ -840,7 +837,7 @@ export default function UserProfilePage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
-                        2 estrellas
+                        {t('ratings.stars2')}
                       </span>
                       {renderRatingBar(
                         ratingSummary.rating_distribution['2_star'],
@@ -849,7 +846,7 @@ export default function UserProfilePage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-gray-700 dark:text-gray-300 min-w-[4rem]">
-                        1 estrella
+                        {t('ratings.stars1')}
                       </span>
                       {renderRatingBar(
                         ratingSummary.rating_distribution['1_star'],
@@ -909,8 +906,8 @@ export default function UserProfilePage() {
                                   className="text-xs border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800"
                                 >
                                   {rating.context_type === 'listing'
-                                    ? 'Anuncio'
-                                    : 'Intercambio'}
+                                    ? t('ratings.typeListing')
+                                    : t('ratings.typeTrade')}
                                 </Badge>
                               </div>
                             </div>
@@ -942,7 +939,7 @@ export default function UserProfilePage() {
           ) : (
             <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-white/50 dark:bg-gray-800/50">
               <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Este usuario aún no ha recibido valoraciones
+                {t('ratings.empty')}
               </p>
             </div>
           )}
