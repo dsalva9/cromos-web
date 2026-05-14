@@ -36,6 +36,7 @@ export interface Listing {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
+  thumbnail_url?: string | null;  // 400px WebP thumbnail, generated on upload
   status: string;  // DB returns string; narrow at use site
   views_count: number;
   created_at: string;
@@ -147,6 +148,8 @@ export interface CreateListingForm {
   sticker_number: string;
   collection_name: string;
   image_url?: string;
+  /** 400px WebP thumbnail URL, generated on upload alongside image_url */
+  thumbnail_url?: string;
   copy_id?: number;
   slot_id?: number;
   // Panini-style fields

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,9 +16,7 @@ import { z } from 'zod';
 import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
-
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
 
 // Simplified schema - only title, description, and images (mandatory)
 const baseSimplifiedListingSchema = z.object({
@@ -74,6 +72,8 @@ export function SimplifiedListingForm({
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false);
   const [templates, setTemplates] = useState<Array<{ copy_id: number; template_id: number; title: string }>>([]);
+  // Holds the thumbnail URL produced by ImageUpload alongside the full image
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   // Slot picker state
   interface TemplateSlot {
@@ -213,6 +213,7 @@ export function SimplifiedListingForm({
         : '',
       collection_name: data.collection_name || '',
       image_url: data.image_url,
+      thumbnail_url: thumbnailUrl || undefined,
       is_group: data.is_group,
       group_count: data.is_group ? 1 : undefined,
       listing_type: data.listing_type || 'intercambio',
@@ -281,7 +282,10 @@ export function SimplifiedListingForm({
             </Label>
             <ImageUpload
               value={imageUrl}
-              onChange={url => setValue('image_url', url || '', { shouldValidate: true })}
+              onChange={(url, thumbUrl) => {
+                setValue('image_url', url || '', { shouldValidate: true });
+                setThumbnailUrl(thumbUrl ?? null);
+              }}
             />
             {errors.image_url && (
               <p className="text-sm text-red-500">{errors.image_url.message}</p>

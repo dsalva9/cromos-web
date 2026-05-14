@@ -21,6 +21,7 @@ interface RpcListingResponse {
   sticker_number: string | null;
   collection_name: string | null;
   image_url: string | null;
+  thumbnail_url?: string | null; // 400px WebP thumbnail
   status: string;  // DB returns string
   views_count: number;
   created_at: string;
@@ -57,6 +58,7 @@ function transformRow(item: RpcListingResponse): Listing {
     sticker_number: item.sticker_number,
     collection_name: item.collection_name,
     image_url: item.image_url,
+    thumbnail_url: item.thumbnail_url,
     status: item.status,
     views_count: item.views_count,
     created_at: item.created_at,

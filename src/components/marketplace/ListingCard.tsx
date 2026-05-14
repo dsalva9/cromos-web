@@ -108,13 +108,13 @@ export function ListingCard({ listing }: ListingCardProps) {
 
       {/* Image Container */}
       <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center">
-        {listing.image_url ? (
+        {(listing.thumbnail_url || listing.image_url) ? (
           <Image
-            src={listing.image_url}
+            src={listing.thumbnail_url ?? listing.image_url!}
             alt={listing.title}
             fill
             className="object-contain transition-transform duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-orange-100/80 dark:from-gray-800 dark:to-gray-900">

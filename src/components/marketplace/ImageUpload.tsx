@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,17 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
-import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, generateThumbnail } from '@/lib/images/processImageBeforeUpload';
 
 interface ImageUploadProps {
   value?: string | null;
-  onChange: (url: string | null) => void;
+  /**
+   * Called after upload completes.
+   * @param imageUrl     - Public URL of the full-size image (marketplace/{id}.webp)
+   * @param thumbnailUrl - Public URL of the 400px thumbnail (marketplace/{id}-thumb.webp),
+   *                       or null if the thumbnail upload failed (non-fatal)
+   */
+  onChange: (imageUrl: string | null, thumbnailUrl?: string | null) => void;
 }
 
 export function ImageUpload({ value, onChange }: ImageUploadProps) {
@@ -32,14 +38,12 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type and size
     if (!file.type.startsWith('image/')) {
       toast.error('Por favor selecciona un archivo de imagen');
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      // 5MB limit
       toast.error('La imagen debe ser menor a 5MB');
       return;
     }
@@ -52,39 +56,57 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       setUploading(true);
 
       // Always compress and convert to WebP before upload
-      const fileToProcess = file instanceof File
-        ? file
-        : new File([file], 'upload.jpg', { type: file.type || 'image/jpeg' });
+      const fileToProcess =
+        file instanceof File
+          ? file
+          : new File([file], 'upload.jpg', { type: file.type || 'image/jpeg' });
+
       const result = await processImageBeforeUpload(fileToProcess, {
         maxSizeMB: 2,
         maxWidthOrHeight: 1600,
         convertToWebP: true,
         quality: 0.85,
       });
-      const fileToUpload = result.blob;
+      const fullBlob = result.blob;
 
-      // Generate unique filename
-      const finalFileName =
-        fileName ||
-        `${Date.now()}-${Math.random().toString(36).substring(2)}.webp`;
-      const filePath = `marketplace/${finalFileName}`;
+      // Generate base filename (shared between full and thumb)
+      const baseName =
+        fileName?.replace(/\.webp$/, '') ||
+        `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+      const fullPath = `marketplace/${baseName}.webp`;
+      const thumbPath = `marketplace/${baseName}-thumb.webp`;
 
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
+      // Generate the thumbnail (non-blocking — failure is non-fatal)
+      const thumbnailBlob = await generateThumbnail(fullBlob).catch((err) => {
+        logger.warn('Thumbnail generation failed (non-fatal):', err);
+        return null;
+      });
+
+      // Upload full image and thumbnail in parallel
+      const [fullUpload, thumbUpload] = await Promise.all([
+        supabase.storage
+          .from('sticker-images')
+          .upload(fullPath, fullBlob, { contentType: 'image/webp', upsert: true }),
+        thumbnailBlob
+          ? supabase.storage
+              .from('sticker-images')
+              .upload(thumbPath, thumbnailBlob, { contentType: 'image/webp', upsert: true })
+          : Promise.resolve({ error: new Error('Thumbnail skipped') }),
+      ]);
+
+      if (fullUpload.error) throw fullUpload.error;
+
+      // Resolve public URLs
+      const { data: { publicUrl: imageUrl } } = supabase.storage
         .from('sticker-images')
-        .upload(filePath, fileToUpload, {
-          contentType: 'image/webp',
-          upsert: true,
-        });
+        .getPublicUrl(fullPath);
 
-      if (uploadError) throw uploadError;
+      const thumbnailUrl =
+        thumbUpload.error || !thumbnailBlob
+          ? null
+          : supabase.storage.from('sticker-images').getPublicUrl(thumbPath).data.publicUrl;
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('sticker-images').getPublicUrl(filePath);
-
-      onChange(publicUrl);
+      onChange(imageUrl, thumbnailUrl);
       toast.success('Imagen subida con éxito');
     } catch (error) {
       logger.error('Upload error:', error);
@@ -101,7 +123,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
   };
 
   const handleRemove = () => {
-    onChange(null);
+    onChange(null, null);
   };
 
   return (

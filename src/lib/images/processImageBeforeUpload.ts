@@ -171,3 +171,74 @@ export async function fileToProcessedBlob(
   const result = await processImageBeforeUpload(file, options);
   return result.blob;
 }
+
+/**
+ * Generate a WebP thumbnail from any Blob/File.
+ * Always resizes to at most `maxWidth` pixels wide, preserving aspect ratio.
+ * Skips the size-limit guard — thumbnails are expected to be small.
+ *
+ * @param source  - Source image (File or Blob)
+ * @param maxWidth - Maximum thumbnail width in pixels (default: 400)
+ * @param quality  - WebP quality 0-1 (default: 0.75)
+ */
+export async function generateThumbnail(
+  source: File | Blob,
+  maxWidth = 400,
+  quality = 0.75
+): Promise<Blob> {
+  const file =
+    source instanceof File
+      ? source
+      : new File([source], 'thumb.webp', { type: source.type || 'image/webp' });
+
+  const objectUrl = URL.createObjectURL(file);
+
+  return new Promise<Blob>((resolve, reject) => {
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
+    const img = new window.Image();
+
+    img.onload = () => {
+      try {
+        const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+        const targetWidth = Math.round(img.width * scale);
+        const targetHeight = Math.round(img.height * scale);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          cleanup();
+          reject(new Error('No se pudo crear el contexto del canvas'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+        cleanup();
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('No se pudo generar el thumbnail'));
+              return;
+            }
+            resolve(blob);
+          },
+          'image/webp',
+          quality
+        );
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
+    };
+
+    img.onerror = () => {
+      cleanup();
+      reject(new Error('No se pudo cargar la imagen para el thumbnail'));
+    };
+
+    img.src = objectUrl;
+  });
+}

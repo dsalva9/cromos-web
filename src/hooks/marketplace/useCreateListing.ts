@@ -28,6 +28,7 @@ export function useCreateListing() {
           p_sticker_number: data.sticker_number || '',
           p_collection_name: data.collection_name || '',
           p_image_url: data.image_url || '',
+          p_thumbnail_url: data.thumbnail_url || null,
           p_copy_id: data.copy_id ?? null,
           p_slot_id: data.slot_id ?? null,
           p_page_number: data.page_number ?? null,

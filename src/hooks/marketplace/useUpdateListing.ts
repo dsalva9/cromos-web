@@ -13,6 +13,7 @@ export function useUpdateListing() {
       sticker_number?: string;
       collection_name?: string;
       image_url?: string;
+      thumbnail_url?: string;
       listing_type?: 'intercambio' | 'venta' | 'ambos';
       price?: number;
     }
@@ -27,6 +28,7 @@ export function useUpdateListing() {
         p_sticker_number: data.sticker_number || undefined,
         p_collection_name: data.collection_name || undefined,
         p_image_url: data.image_url || undefined,
+        p_thumbnail_url: data.thumbnail_url || undefined,
         p_listing_type: data.listing_type || undefined,
         p_price: data.price || undefined,
       });

@@ -14,7 +14,7 @@ import {
   type EditListingFormData,
 } from '@/lib/validations/marketplace.schemas';
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 
 interface EditListingFormInitialData {
   title: string;
@@ -61,6 +61,8 @@ export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '
 
   const imageUrl = watch('image_url');
   const listingType = watch('listing_type');
+  // Holds the thumbnail URL produced by ImageUpload alongside the full image
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   // Derive checkbox states from listing_type
   const isForExchange = listingType === 'intercambio' || listingType === 'ambos';
@@ -87,6 +89,7 @@ export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '
       sticker_number: initialData.sticker_number || '',
       collection_name: initialData.collection_name || '',
       image_url: data.image_url || undefined,
+      thumbnail_url: thumbnailUrl || undefined,
       listing_type: data.listing_type || 'intercambio',
       price: data.price || undefined,
     };
@@ -102,7 +105,10 @@ export function ListingForm({ initialData, onSubmit, loading, currencySymbol = '
             <Label>Imagen del Cromo</Label>
             <ImageUpload
               value={imageUrl}
-              onChange={url => setValue('image_url', url || '')}
+              onChange={(url, thumbUrl) => {
+                setValue('image_url', url || '');
+                setThumbnailUrl(thumbUrl ?? null);
+              }}
             />
             <p className="text-sm text-gray-600">
               Sube una foto de tu cromo para mayor visibilidad
