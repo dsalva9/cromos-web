@@ -1,4 +1,5 @@
-﻿import { getMyTemplateCopies } from '@/lib/templates/server-my-templates';
+﻿import { useTranslations } from 'next-intl';
+import { getMyTemplateCopies } from '@/lib/templates/server-my-templates';
 import { MyTemplatesContent } from '@/components/templates/MyTemplatesContent';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';

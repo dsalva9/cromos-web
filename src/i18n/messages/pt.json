@@ -1146,5 +1146,32 @@
       "system": "Sistema",
       "legal": "Legal"
     }
+  },
+  "myCollection": {
+    "title": "Minha Coleção",
+    "description": "Gerencie sua coleção pessoal de álbuns e cromos",
+    "albums": "Álbuns",
+    "stickers": "Cromos",
+    "progress": "Progresso",
+    "emptyState": "Você ainda não tem coleções",
+    "emptyDescription": "Explore modelos para começar sua coleção",
+    "exploreTemplates": "Explorar Modelos",
+    "viewCollection": "Ver Coleção",
+    "loading": "Carregando..."
+  },
+  "myTemplates": {
+    "title": "Meus Modelos",
+    "description": "Gerencie os modelos que você criou",
+    "createNew": "Criar Novo",
+    "published": "Publicado",
+    "draft": "Rascunho",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "emptyState": "Você não criou nenhum modelo",
+    "emptyDescription": "Crie seu primeiro modelo para começar",
+    "publishSlot": "Publicar Cromo",
+    "slots": "Cromos",
+    "stats": "Estatísticas",
+    "loading": "Carregando modelos..."
   }
 }

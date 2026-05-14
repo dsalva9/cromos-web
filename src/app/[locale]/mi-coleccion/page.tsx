@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useRouter } from '@/hooks/use-router';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';

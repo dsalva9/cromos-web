@@ -1146,5 +1146,32 @@
       "system": "Sistema",
       "legal": "Legal"
     }
+  },
+  "myCollection": {
+    "title": "My Collection",
+    "description": "Manage your personal collection of albums and stickers",
+    "albums": "Albums",
+    "stickers": "Stickers",
+    "progress": "Progress",
+    "emptyState": "You don't have any collections yet",
+    "emptyDescription": "Explore templates to start your collection",
+    "exploreTemplates": "Explore Templates",
+    "viewCollection": "View Collection",
+    "loading": "Loading..."
+  },
+  "myTemplates": {
+    "title": "My Templates",
+    "description": "Manage the templates you've created",
+    "createNew": "Create New",
+    "published": "Published",
+    "draft": "Draft",
+    "edit": "Edit",
+    "delete": "Delete",
+    "emptyState": "You haven't created any templates",
+    "emptyDescription": "Create your first template to get started",
+    "publishSlot": "Publish Sticker",
+    "slots": "Stickers",
+    "stats": "Statistics",
+    "loading": "Loading templates..."
   }
 }

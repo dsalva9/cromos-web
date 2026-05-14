@@ -1146,5 +1146,32 @@
       "system": "Sistema",
       "legal": "Legal"
     }
+  },
+  "myCollection": {
+    "title": "Mi Colección",
+    "description": "Gestiona tu colección personal de álbumes y cromos",
+    "albums": "Álbumes",
+    "stickers": "Cromos",
+    "progress": "Progreso",
+    "emptyState": "Aún no tienes colecciones",
+    "emptyDescription": "Explora plantillas para empezar tu colección",
+    "exploreTemplates": "Explorar Plantillas",
+    "viewCollection": "Ver Colección",
+    "loading": "Cargando..."
+  },
+  "myTemplates": {
+    "title": "Mis Plantillas",
+    "description": "Gestiona las plantillas que has creado",
+    "createNew": "Crear Nueva",
+    "published": "Publicado",
+    "draft": "Borrador",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "emptyState": "No has creado ninguna plantilla",
+    "emptyDescription": "Crea tu primera plantilla para empezar",
+    "publishSlot": "Publicar Cromo",
+    "slots": "Cromos",
+    "stats": "Estadísticas",
+    "loading": "Cargando plantillas..."
   }
 }
