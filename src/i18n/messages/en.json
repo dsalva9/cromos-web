@@ -1318,17 +1318,11 @@
       "matrix": {
         "restore": "Restore defaults",
         "cancel": "Cancel",
-        "save": "Save changes",
         "saving": "Saving...",
-        "type": "Notification Type",
+        "type": "Notification type",
         "uncheckAll": "Uncheck all",
         "checkAll": "Check all",
-        "notAvailable": "Not available",
-        "aria": {
-          "disable": "Disable",
-          "enable": "Enable",
-          "for": "for"
-        }
+        "notAvailable": "Not available"
       },
       "messages": {
         "errorLoad": "Error loading preferences",
@@ -1336,18 +1330,9 @@
         "errorSave": "Error saving preferences"
       },
       "channels": {
-        "in_app": {
-          "label": "In-app",
-          "description": "Notifications inside the CambioCromos app"
-        },
-        "push": {
-          "label": "Push",
-          "description": "Notifications sent to your device even when not using the app"
-        },
-        "email": {
-          "label": "Email",
-          "description": "Notifications sent to your registered email"
-        }
+        "in_app": "In-App",
+        "push": "Push",
+        "email": "Email"
       },
       "categories": {
         "marketplace": {
@@ -1379,13 +1364,11 @@
         },
         "listing_reserved": {
           "label": "Listing reserved",
-          "description": "When someone reserves your listing",
-          "category": "Marketplace"
+          "description": "When someone reserves your listing"
         },
         "listing_completed": {
-          "label": "Listing completed",
-          "description": "When a transaction is successfully completed",
-          "category": "Marketplace"
+          "label": "Transaction completed",
+          "description": "When a transaction is completed"
         },
         "achievement_earned": {
           "label": "Achievement earned",
@@ -1401,6 +1384,30 @@
           "label": "Weekly summary",
           "description": "A summary of your weekly activity and unread messages",
           "category": "System"
+        },
+        "listing_chat": {
+          "label": "Chat messages",
+          "description": "New messages about your listings"
+        },
+        "chat_unread": {
+          "label": "Weekly message summary",
+          "description": "Weekly reminder if you have unread messages"
+        },
+        "user_rated": {
+          "label": "You were rated",
+          "description": "When another user rates you"
+        },
+        "badge_earned": {
+          "label": "Achievement earned",
+          "description": "When you earn a new achievement"
+        },
+        "template_rated": {
+          "label": "Collection rated",
+          "description": "When someone rates your collection"
+        },
+        "system_message": {
+          "label": "System message",
+          "description": "Important system messages"
         }
       },
       "actions": {

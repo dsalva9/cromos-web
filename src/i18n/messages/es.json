@@ -1254,13 +1254,11 @@
         },
         "listing_reserved": {
           "label": "Anuncio reservado",
-          "description": "Cuando alguien reserva tu anuncio",
-          "category": "Marketplace"
+          "description": "Cuando alguien reserva tu anuncio"
         },
         "listing_completed": {
           "label": "Anuncio completado",
-          "description": "Cuando una transacción se completa con éxito",
-          "category": "Marketplace"
+          "description": "Cuando una transacción se completa"
         },
         "achievement_earned": {
           "label": "Logro ganado",
@@ -1276,6 +1274,30 @@
           "label": "Resumen semanal",
           "description": "Un resumen de tu actividad semanal y mensajes no leídos",
           "category": "Sistema"
+        },
+        "listing_chat": {
+          "label": "Mensajes de chat",
+          "description": "Nuevos mensajes sobre tus listados"
+        },
+        "chat_unread": {
+          "label": "Resumen semanal de mensajes",
+          "description": "Recordatorio semanal si tienes mensajes sin leer"
+        },
+        "user_rated": {
+          "label": "Te han valorado",
+          "description": "Cuando otro usuario te valora"
+        },
+        "badge_earned": {
+          "label": "Logro ganado",
+          "description": "Cuando obtienes un nuevo logro"
+        },
+        "template_rated": {
+          "label": "Valoración de colección",
+          "description": "Cuando alguien valora tu colección"
+        },
+        "system_message": {
+          "label": "Mensaje del sistema",
+          "description": "Mensajes importantes del sistema"
         }
       },
       "items": {
@@ -1313,18 +1335,9 @@
         "noTypesAvailable": "No hay tipos de notificación disponibles para este canal."
       },
       "channels": {
-        "in_app": {
-          "label": "En la aplicación",
-          "description": "Notificaciones dentro de la aplicación CambioCromos"
-        },
-        "push": {
-          "label": "Push",
-          "description": "Notificaciones enviadas a tu dispositivo incluso cuando no usas la app"
-        },
-        "email": {
-          "label": "Email",
-          "description": "Notificaciones enviadas a tu correo electrónico registrado"
-        }
+        "in_app": "En la App",
+        "push": "Push",
+        "email": "Email"
       },
       "categories": {
         "marketplace": {
@@ -1351,7 +1364,16 @@
       "saveChanges": "Guardar cambios",
       "activate": "Activar",
       "deactivate": "Desactivar",
-      "for": "para"
+      "for": "para",
+      "matrix": {
+        "restore": "Restaurar valores por defecto",
+        "cancel": "Cancelar",
+        "saving": "Guardando...",
+        "type": "Tipo de notificación",
+        "uncheckAll": "Desmarcar todo",
+        "checkAll": "Marcar todo",
+        "notAvailable": "No disponible"
+      }
     },
     "system": {
       "reactivateTips": {
