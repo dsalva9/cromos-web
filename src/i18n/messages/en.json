@@ -1023,51 +1023,51 @@
     }
   },
   "dashboard": {
-    "adminBadge": "Administrador",
-    "editProfileBtn": "Editar Perfil",
+    "adminBadge": "Administrator",
+    "editProfileBtn": "Edit Profile",
     "quickLinks": {
-      "marketplace": "Explorar Marketplace",
-      "createListing": "Publicar Anuncio",
-      "templates": "Descubrir Colecciones",
-      "chats": "Mis Chats"
+      "marketplace": "Explore Marketplace",
+      "createListing": "Create Listing",
+      "templates": "Discover Collections",
+      "chats": "My Chats"
     },
     "tips": {
-      "title": "Cómo empezar",
-      "marketplace": "Visita el Marketplace para encontrar esos cromos que te faltan.",
-      "collections": "Explora las Colecciones para copiar un Álbum y empezar a seguir tus cromos.",
-      "publish": "Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas."
+      "title": "How to get started",
+      "marketplace": "Visit the Marketplace to find those missing stickers.",
+      "collections": "Explore Collections to copy an Album and start tracking your stickers.",
+      "publish": "When you have duplicates, publish them on the Marketplace to trade with other collectors."
     },
     "ctaBanner": {
-      "available": "Disponible en Marketplace",
-      "stickersAvailableOne": "{count} cromo de {album} disponibles",
-      "stickersAvailableOther": "{count} cromos de {album} disponibles",
-      "missingTotal": "Te faltan {missing} cromos en total",
-      "viewBtn": "Ver en Marketplace",
-      "completeTitle": "Completa tu colección",
-      "missingFromAlbum": "Te faltan {missing} cromos de {album}",
-      "searchBtn": "Buscar en el Marketplace",
-      "startTitle": "Empieza a coleccionar",
-      "startDesc": "Comienza tu primera colección",
-      "exploreBtn": "Explorar Colecciones"
+      "available": "Available in Marketplace",
+      "stickersAvailableOne": "{count} sticker from {album} available",
+      "stickersAvailableOther": "{count} stickers from {album} available",
+      "missingTotal": "You are missing {missing} stickers in total",
+      "viewBtn": "View in Marketplace",
+      "completeTitle": "Complete your collection",
+      "missingFromAlbum": "You are missing {missing} stickers from {album}",
+      "searchBtn": "Search in Marketplace",
+      "startTitle": "Start collecting",
+      "startDesc": "Start your first collection",
+      "exploreBtn": "Explore Collections"
     },
     "albums": {
-      "title": "Mis Álbumes",
-      "viewAllBtn": "Ver Todas",
-      "emptyState": "No tienes colecciones activas",
-      "byAuthor": "por {author}",
-      "progress": "Progreso",
-      "stickersCount": "{completed} / {total} cromos",
-      "have": "TENGO {count}",
-      "missing": "FALTAN {count}",
-      "manageBtn": "Gestionar Colección"
+      "title": "My Albums",
+      "viewAllBtn": "View All",
+      "emptyState": "You have no active collections",
+      "byAuthor": "by {author}",
+      "progress": "Progress",
+      "stickersCount": "{completed} / {total} stickers",
+      "have": "HAVE {count}",
+      "missing": "MISSING {count}",
+      "manageBtn": "Manage Collection"
     },
     "stats": {
-      "firstListing": "Publica tu primer anuncio",
-      "activeListings": "Anuncios activos",
-      "saveFavorites": "Guarda tus favoritos",
-      "favorites": "Favoritos",
-      "ratingsOne": "{count} Valoración",
-      "ratingsOther": "{count} Valoraciones"
+      "firstListing": "Publish your first listing",
+      "activeListings": "Active listings",
+      "saveFavorites": "Save your favorites",
+      "favorites": "Favorites",
+      "ratingsOne": "{count} Rating",
+      "ratingsOther": "{count} Ratings"
     }
   },
   "userProfile": {

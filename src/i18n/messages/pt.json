@@ -1027,47 +1027,47 @@
     "editProfileBtn": "Editar Perfil",
     "quickLinks": {
       "marketplace": "Explorar Marketplace",
-      "createListing": "Publicar Anuncio",
-      "templates": "Descubrir Colecciones",
-      "chats": "Mis Chats"
+      "createListing": "Criar Anúncio",
+      "templates": "Descobrir Coleções",
+      "chats": "Meus Chats"
     },
     "tips": {
-      "title": "Cómo empezar",
-      "marketplace": "Visita el Marketplace para encontrar esos cromos que te faltan.",
-      "collections": "Explora las Colecciones para copiar un Álbum y empezar a seguir tus cromos.",
-      "publish": "Cuando tengas repetidos, publícalos en el Marketplace para intercambiar con otros coleccionistas."
+      "title": "Como começar",
+      "marketplace": "Visite o Marketplace para encontrar as figurinhas que faltam.",
+      "collections": "Explore as Coleções para copiar um Álbum e começar a acompanhar suas figurinhas.",
+      "publish": "Quando tiver repetidas, publique-as no Marketplace para trocar com outros colecionadores."
     },
     "ctaBanner": {
-      "available": "Disponible en Marketplace",
-      "stickersAvailableOne": "{count} cromo de {album} disponibles",
-      "stickersAvailableOther": "{count} cromos de {album} disponibles",
-      "missingTotal": "Te faltan {missing} cromos en total",
-      "viewBtn": "Ver en Marketplace",
-      "completeTitle": "Completa tu colección",
-      "missingFromAlbum": "Te faltan {missing} cromos de {album}",
-      "searchBtn": "Buscar en el Marketplace",
-      "startTitle": "Empieza a coleccionar",
-      "startDesc": "Comienza tu primera colección",
-      "exploreBtn": "Explorar Colecciones"
+      "available": "Disponível no Marketplace",
+      "stickersAvailableOne": "{count} figurinha de {album} disponível",
+      "stickersAvailableOther": "{count} figurinhas de {album} disponíveis",
+      "missingTotal": "Faltam {missing} figurinhas no total",
+      "viewBtn": "Ver no Marketplace",
+      "completeTitle": "Complete sua coleção",
+      "missingFromAlbum": "Faltam {missing} figurinhas de {album}",
+      "searchBtn": "Buscar no Marketplace",
+      "startTitle": "Comece a colecionar",
+      "startDesc": "Comece sua primeira coleção",
+      "exploreBtn": "Explorar Coleções"
     },
     "albums": {
-      "title": "Mis Álbumes",
-      "viewAllBtn": "Ver Todas",
-      "emptyState": "No tienes colecciones activas",
+      "title": "Meus Álbuns",
+      "viewAllBtn": "Ver Todos",
+      "emptyState": "Você não tem coleções ativas",
       "byAuthor": "por {author}",
-      "progress": "Progreso",
-      "stickersCount": "{completed} / {total} cromos",
-      "have": "TENGO {count}",
-      "missing": "FALTAN {count}",
-      "manageBtn": "Gestionar Colección"
+      "progress": "Progresso",
+      "stickersCount": "{completed} / {total} figurinhas",
+      "have": "TENHO {count}",
+      "missing": "FALTAM {count}",
+      "manageBtn": "Gerenciar Coleção"
     },
     "stats": {
-      "firstListing": "Publica tu primer anuncio",
-      "activeListings": "Anuncios activos",
-      "saveFavorites": "Guarda tus favoritos",
+      "firstListing": "Publique seu primeiro anúncio",
+      "activeListings": "Anúncios ativos",
+      "saveFavorites": "Guarde seus favoritos",
       "favorites": "Favoritos",
-      "ratingsOne": "{count} Valoración",
-      "ratingsOther": "{count} Valoraciones"
+      "ratingsOne": "{count} Avaliação",
+      "ratingsOther": "{count} Avaliações"
     }
   },
   "userProfile": {
