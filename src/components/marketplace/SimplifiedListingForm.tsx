@@ -18,10 +18,10 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 
-// Simplified schema - only title, description, and images (mandatory)
+// Simplified listing schema with is_group support (extends base marketplace schema)
 const baseSimplifiedListingSchema = z.object({
   title: z.string(),
-  description: z.string(),
+  description: z.string().optional().or(z.literal('')),
   image_url: z.string(),
   collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),
@@ -33,13 +33,13 @@ const baseSimplifiedListingSchema = z.object({
 type SimplifiedListingFormData = z.infer<typeof baseSimplifiedListingSchema>;
 
 const getSimplifiedListingSchema = (t: (key: string) => string) => z.object({
-  title: z.string().min(3, t('titleMin')),
-  description: z.string().min(10, t('descriptionMin')),
+  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')),
+  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')),
   image_url: z.string().min(1, t('imageRequired')),
   collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),
   listing_type: z.enum(['intercambio', 'venta', 'ambos']),
-  price: z.number().positive(t('pricePositive')).max(99999).optional(),
+  price: z.number().positive(t('pricePositive')).max(99999, t('priceMax')).optional(),
   terms_accepted: z.boolean().refine(val => val === true, {
     message: t('termsRequired'),
   }),
@@ -207,7 +207,7 @@ export function SimplifiedListingForm({
   const submitHandler = async (data: SimplifiedListingFormData) => {
     const payload: CreateListingForm = {
       title: data.title,
-      description: data.description,
+      description: data.description ?? '',
       sticker_number: selectedSlot
         ? `${selectedSlot.slot_number}${selectedSlot.slot_variant || ''}`
         : '',
