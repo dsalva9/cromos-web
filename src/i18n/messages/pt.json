@@ -1138,170 +1138,93 @@
     }
   },
   "settings": {
-    "pageTitle": "Configura��es",
-    "pageDescription": "Configure suas prefer�ncias e gerencie sua conta",
+    "pageTitle": "Configurações",
+    "pageDescription": "Gerencie suas preferências de conta e configurações do sistema.",
     "tabs": {
-      "notifications": "Notifica��es",
+      "notifications": "Notificações",
       "blocked": "Bloqueados",
       "system": "Sistema",
       "legal": "Legal"
     },
+    "notifications": {
+      "title": "Preferências de Notificação",
+      "description": "Escolha como você deseja ser notificado sobre a atividade na plataforma.",
+      "types": {
+        "push": "Push",
+        "email": "E-mail",
+        "in_app": "App"
+      },
+      "items": {
+        "chat_message": {
+          "title": "Mensagens de Chat",
+          "description": "Alerta-o quando recebe uma nova mensagem no chat."
+        },
+        "referral_used": {
+          "title": "Código de Indicação",
+          "description": "Alerta-o quando o seu código é usado."
+        },
+        "marketplace_match": {
+          "title": "Correspondência no Marketplace",
+          "description": "Alerta-o sobre novos itens correspondentes às suas buscas."
+        },
+        "price_drop": {
+          "title": "Queda de Preço",
+          "description": "Alerta-o quando o preço de um cromo cai."
+        },
+        "weekly_digest": {
+          "title": "Resumo Semanal",
+          "description": "Receba um resumo de sua atividade semanal."
+        },
+        "achievement_earned": {
+          "title": "Conquistas",
+          "description": "Alerta-o quando você ganha uma nova conquista."
+        }
+      }
+    },
     "system": {
       "reactivateTips": {
-        "title": "Dicas de Ajuda",
-        "description": "Mostra dicas contextuais em diferentes seções do aplicativo para ajudar você a usar todos os recursos.",
-        "button": "Reativar dicas",
+        "title": "Reativar Dicas",
+        "description": "Reativar todas as dicas ocultas e mensagens de integração.",
+        "button": "Reativar Dicas",
         "success": "Dicas reativadas com sucesso",
         "error": "Erro ao reativar dicas"
       },
       "signOutAll": {
-        "title": "Sair de todos os dispositivos",
-        "description": "Saia de todos os dispositivos onde você fez login, incluindo este. Você terá que fazer login novamente.",
-        "button": "Sair de todos os dispositivos",
-        "buttonMobile": "Sair de todos",
+        "title": "Sair de Todos os Dispositivos",
+        "description": "Sair de todas as sessões ativas, exceto a atual.",
+        "buttonMobile": "Sair de Todos",
         "loading": "Saindo...",
-        "success": "Saiu de todos os dispositivos",
+        "success": "Saiu de todos os dispositivos com sucesso",
         "error": "Erro ao sair de todos os dispositivos"
       },
       "deleteAccount": {
-        "title": "Excluir minha conta",
-        "description": "Esta ação agendará sua conta para exclusão permanente em 90 dias. Durante este período, você pode cancelar a exclusão. Você perderá:",
+        "title": "Excluir Conta",
+        "description": "Ação irreversível. Isso excluirá permanentemente sua conta e todos os dados associados.",
+        "warning": "Atenção: A exclusão da conta será final e não poderá ser desfeita.",
         "list": {
-          "data": "Todos os seus dados de usuário",
-          "history": "Histórico de trocas",
-          "listings": "Todos os seus anúncios no marketplace",
-          "collections": "Suas coleções e modelos",
-          "messages": "Mensagens e conversas",
-          "reviews": "Avaliações e comentários"
-        },
-        "warning": "Esta ação é irreversível",
-        "button": "Excluir minha conta"
+          "data": "Todos os dados do seu perfil",
+          "history": "Histórico de transações",
+          "listings": "Anúncios no marketplace",
+          "collections": "Coleções",
+          "messages": "Mensagens",
+          "reviews": "Avaliações"
+        }
       }
     },
     "legal": {
+      "version": "Versão",
       "terms": {
-        "title": "Termos de Serviço",
-        "description": "Regras da comunidade e termos de uso"
+        "title": "Termos de Uso",
+        "description": "Leia nossos termos de uso."
       },
       "privacy": {
         "title": "Política de Privacidade",
-        "description": "Como gerenciamos e protegemos seus dados"
+        "description": "Leia nossa política de privacidade."
       },
       "cookies": {
         "title": "Política de Cookies",
-        "description": "Uso de cookies e tecnologias semelhantes"
-      },
-      "version": "Versão"
-    },
-    "ignored": {
-      "empty": {
-        "title": "Você não tem usuários bloqueados",
-        "description": "Quando você bloquear usuários, eles aparecerão aqui para que você possa gerenciá-los."
-      },
-      "retry": "Tentar novamente",
-      "unblock": {
-        "button": "Desbloquear",
-        "loading": "Removendo...",
-        "success": "{nickname} foi removido da sua lista de bloqueados",
-        "error": "Erro ao desbloquear usuário"
-      },
-      "time": {
-        "blocked": "Bloqueado",
-        "today": "hoje",
-        "yesterday": "ontem",
-        "daysAgo": "há {count} dias",
-        "dayAgo": "há {count} dia",
-        "weeksAgo": "há {count} semanas",
-        "weekAgo": "há {count} semana",
-        "monthsAgo": "há {count} meses",
-        "monthAgo": "há {count} mês"
+        "description": "Leia nossa política de cookies."
       }
-    },
-    "notifications": {
-      "matrix": {
-        "restore": "Restaurar padrões",
-        "cancel": "Cancelar",
-        "save": "Salvar alterações",
-        "saving": "Salvando...",
-        "type": "Tipo de Notificação",
-        "uncheckAll": "Desmarcar todas",
-        "checkAll": "Marcar todas",
-        "notAvailable": "Não disponível",
-        "aria": {
-          "disable": "Desativar",
-          "enable": "Ativar",
-          "for": "para"
-        }
-      },
-      "messages": {
-        "errorLoad": "Erro ao carregar preferências",
-        "success": "Preferências atualizadas com sucesso",
-        "errorSave": "Erro ao salvar preferências"
-      },
-      "channels": {
-        "in_app": "No App",
-        "push": "Push",
-        "email": "Email"
-      },
-      "categories": {
-        "marketplace": {
-          "label": "Marketplace",
-          "description": "Notificações sobre anúncios e transações"
-        },
-        "community": {
-          "label": "Comunidade",
-          "description": "Avaliações, conquistas e coleções"
-        },
-        "system": {
-          "label": "Sistema",
-          "description": "Mensagens do sistema e níveis"
-        }
-      },
-      "types": {
-        "listing_chat": {
-          "label": "Mensagens de chat",
-          "description": "Novas mensagens sobre seus anúncios"
-        },
-        "listing_reserved": {
-          "label": "Item reservado",
-          "description": "Quando alguém reserva seu anúncio"
-        },
-        "listing_completed": {
-          "label": "Transação concluída",
-          "description": "Quando uma transação é concluída"
-        },
-        "chat_unread": {
-          "label": "Resumo semanal de mensagens não lidas",
-          "description": "Lembrete semanal se você tiver mensagens não lidas"
-        },
-        "user_rated": {
-          "label": "Você foi avaliado",
-          "description": "Quando outro usuário avalia você"
-        },
-        "badge_earned": {
-          "label": "Conquista obtida",
-          "description": "Quando você ganha uma nova conquista"
-        },
-        "template_rated": {
-          "label": "Avaliação da coleção",
-          "description": "Quando alguém avalia sua coleção"
-        },
-        "system_message": {
-          "label": "Mensagem do sistema",
-          "description": "Mensagens importantes do sistema"
-        },
-        "level_up": {
-          "label": "Subida de nível",
-          "description": "Quando você sobe de nível"
-        }
-      }
-    },
-    "theme": {
-      "title": "Aparência",
-      "description": "Personalize a aparência do aplicativo",
-      "light": "Claro",
-      "dark": "Escuro",
-      "system": "Sistema"
     }
   },
   "myCollection": {
@@ -1494,25 +1417,22 @@
     }
   },
   "notifications": {
-    "title": "Notifica��es",
-    "new_one": "nova",
-    "new_other": "novas",
-    "loading": "Carregando...",
-    "empty": "Voc� n�o tem novas notifica��es",
-    "viewAll": "Ver todas as notifica��es",
-    "andMore": "e {count} mais..."
+    "title": "Notificações",
+    "empty": "Você não tem novas notificações",
+    "viewAll": "Ver todas as notificações",
+    "loading": "Carregando..."
   },
   "pwa": {
-    "installPrompt": "?? Para uma melhor experi�ncia, instale o app CambioCromos!",
-    "installApp": "Instalar App",
+    "installPrompt": "📲 Para uma melhor experiência, instale o app CambioCromos!",
     "googlePlay": "Google Play",
-    "iosInstructions": "Toque no bot�o Compartilhar <icon/> e selecione \"Adicionar � Tela de In�cio\"",
-    "notifyPrompt": "Ative as notifica��es para n�o perder mensagens ou ofertas de troca.",
+    "installApp": "Instalar App",
+    "iosInstructions": "Toque no botão Compartilhar <icon/> e selecione \"Adicionar à Tela de Início\"",
+    "notifyPrompt": "Ative as notificações para não perder mensagens nem ofertas de troca.",
     "activate": "Ativar",
-    "close": "Fechar",
-    "onesignalMessage": "Inscreva-se nas nossas notifica��es para receber mensagens e ofertas de troca. Voc� pode desativar a qualquer momento.",
-    "onesignalAccept": "Inscrever-se",
-    "onesignalCancel": "Depois"
+    "close": "Fechar aviso de notificações",
+    "onesignalMessage": "Inscreva-se nas nossas notificações para as últimas notícias e atualizações!",
+    "onesignalAccept": "Permitir",
+    "onesignalCancel": "Agora não"
   },
   "legal": {
     "cookiesBanner": {

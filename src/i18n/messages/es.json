@@ -1139,169 +1139,92 @@
   },
   "settings": {
     "pageTitle": "Ajustes",
-    "pageDescription": "Configura tus preferencias y gestiona tu cuenta",
+    "pageDescription": "Gestiona las preferencias de tu cuenta y la configuración del sistema.",
     "tabs": {
       "notifications": "Notificaciones",
       "blocked": "Bloqueados",
       "system": "Sistema",
       "legal": "Legal"
     },
+    "notifications": {
+      "title": "Preferencias de Notificación",
+      "description": "Elige cómo quieres que te notifiquemos sobre la actividad en la plataforma.",
+      "types": {
+        "push": "Push",
+        "email": "Email",
+        "in_app": "App"
+      },
+      "items": {
+        "chat_message": {
+          "title": "Mensajes de Chat",
+          "description": "Te avisa cuando recibes un nuevo mensaje en el chat."
+        },
+        "referral_used": {
+          "title": "Código de Referido",
+          "description": "Te avisa cuando se utiliza tu código de referido."
+        },
+        "marketplace_match": {
+          "title": "Coincidencia en Marketplace",
+          "description": "Te avisa de nuevos artículos que coinciden con tus búsquedas."
+        },
+        "price_drop": {
+          "title": "Bajada de Precio",
+          "description": "Te avisa cuando baja el precio de un cromo."
+        },
+        "weekly_digest": {
+          "title": "Resumen Semanal",
+          "description": "Recibe un resumen de tu actividad semanal."
+        },
+        "achievement_earned": {
+          "title": "Logros",
+          "description": "Te avisa cuando desbloqueas un nuevo logro."
+        }
+      }
+    },
     "system": {
       "reactivateTips": {
-        "title": "Consejos de ayuda",
-        "description": "Muestra consejos contextuales en las distintas secciones de la app para ayudarte a usar todas las funciones.",
-        "button": "Reactivar consejos",
+        "title": "Reactivar Consejos",
+        "description": "Vuelve a activar todos los consejos ocultos y mensajes de ayuda.",
+        "button": "Reactivar Consejos",
         "success": "Consejos reactivados correctamente",
-        "error": "Error al reactivar los consejos"
+        "error": "Error al reactivar consejos"
       },
       "signOutAll": {
-        "title": "Cerrar sesión en todos los dispositivos",
-        "description": "Cierra tu sesión en todos los dispositivos donde hayas iniciado sesión, incluyendo este. Tendrás que volver a iniciar sesión.",
-        "button": "Cerrar sesión en todos los dispositivos",
-        "buttonMobile": "Cerrar sesión en todos",
-        "loading": "Cerrando sesión...",
-        "success": "Se ha cerrado sesión en todos los dispositivos",
+        "title": "Cerrar Sesión en Todos los Dispositivos",
+        "description": "Cierra todas las sesiones activas excepto la actual.",
+        "buttonMobile": "Cerrar en Todos",
+        "loading": "Cerrando...",
+        "success": "Sesión cerrada en todos los dispositivos",
         "error": "Error al cerrar sesión en todos los dispositivos"
       },
       "deleteAccount": {
-        "title": "Eliminar mi cuenta",
-        "description": "Esta acción programará tu cuenta para eliminación permanente en 90 días. Durante este período puedes cancelar la eliminación. Perderás:",
+        "title": "Eliminar Cuenta",
+        "description": "Acción irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados.",
+        "warning": "Atención: La eliminación de la cuenta es definitiva y no se puede deshacer.",
         "list": {
-          "data": "Todos tus datos de usuario",
-          "history": "Historial de intercambios",
-          "listings": "Todos tus anuncios del marketplace",
-          "collections": "Tus colecciones y plantillas",
-          "messages": "Mensajes y conversaciones",
-          "reviews": "Valoraciones y comentarios"
-        },
-        "warning": "Esta acción es irreversible",
-        "button": "Eliminar mi cuenta"
+          "data": "Todos los datos de tu perfil",
+          "history": "Historial de transacciones",
+          "listings": "Anuncios del marketplace",
+          "collections": "Colecciones",
+          "messages": "Mensajes",
+          "reviews": "Valoraciones"
+        }
       }
     },
     "legal": {
+      "version": "Versión",
       "terms": {
-        "title": "Términos de Servicio",
-        "description": "Normas de la comunidad y condiciones de uso"
+        "title": "Términos de Uso",
+        "description": "Lee nuestros términos de uso."
       },
       "privacy": {
         "title": "Política de Privacidad",
-        "description": "Cómo gestionamos y protegemos tus datos"
+        "description": "Lee nuestra política de privacidad."
       },
       "cookies": {
         "title": "Política de Cookies",
-        "description": "Uso de cookies y tecnologías similares"
-      },
-      "version": "Versión"
-    },
-    "ignored": {
-      "empty": {
-        "title": "No tienes usuarios bloqueados",
-        "description": "Cuando bloquees a usuarios, aparecerán aquí para que puedas gestionarlos."
-      },
-      "retry": "Reintentar",
-      "unblock": {
-        "button": "Desbloquear",
-        "loading": "Eliminando...",
-        "success": "{nickname} ha sido eliminado de tu lista de bloqueados",
-        "error": "Error al desbloquear usuario"
-      },
-      "time": {
-        "blocked": "Bloqueado",
-        "today": "hoy",
-        "yesterday": "ayer",
-        "daysAgo": "hace {count} días",
-        "dayAgo": "hace {count} día",
-        "weeksAgo": "hace {count} semanas",
-        "weekAgo": "hace {count} semana",
-        "monthsAgo": "hace {count} meses",
-        "monthAgo": "hace {count} mes"
+        "description": "Lee nuestra política de cookies."
       }
-    },
-    "notifications": {
-      "matrix": {
-        "restore": "Restaurar valores por defecto",
-        "cancel": "Cancelar",
-        "save": "Guardar cambios",
-        "saving": "Guardando...",
-        "type": "Tipo de Notificación",
-        "uncheckAll": "Desmarcar todas",
-        "checkAll": "Marcar todas",
-        "notAvailable": "No disponible",
-        "aria": {
-          "disable": "Desactivar",
-          "enable": "Activar",
-          "for": "para"
-        }
-      },
-      "messages": {
-        "errorLoad": "Error al cargar las preferencias",
-        "success": "Preferencias actualizadas correctamente",
-        "errorSave": "Error al guardar las preferencias"
-      },
-      "channels": {
-        "in_app": "En la App",
-        "push": "Push",
-        "email": "Email"
-      },
-      "categories": {
-        "marketplace": {
-          "label": "Marketplace",
-          "description": "Notificaciones sobre listados y transacciones"
-        },
-        "community": {
-          "label": "Comunidad",
-          "description": "Valoraciones, logros y colecciones"
-        },
-        "system": {
-          "label": "Sistema",
-          "description": "Mensajes del sistema y niveles"
-        }
-      },
-      "types": {
-        "listing_chat": {
-          "label": "Mensajes de chat",
-          "description": "Nuevos mensajes sobre tus listados"
-        },
-        "listing_reserved": {
-          "label": "Artículo reservado",
-          "description": "Cuando alguien reserva tu listado"
-        },
-        "listing_completed": {
-          "label": "Transacción completada",
-          "description": "Cuando una transacción se completa"
-        },
-        "chat_unread": {
-          "label": "Resumen semanal de mensagens sin leer",
-          "description": "Recordatorio semanal si tienes mensajes sin leer"
-        },
-        "user_rated": {
-          "label": "Te han valorado",
-          "description": "Cuando otro usuario te valora"
-        },
-        "badge_earned": {
-          "label": "Logro ganado",
-          "description": "Cuando obtienes un nuevo logro"
-        },
-        "template_rated": {
-          "label": "Valoración de colección",
-          "description": "Cuando alguien valora tu colección"
-        },
-        "system_message": {
-          "label": "Mensaje del sistema",
-          "description": "Mensajes importantes del sistema"
-        },
-        "level_up": {
-          "label": "Subida de nivel",
-          "description": "Cuando subes de nivel"
-        }
-      }
-    },
-    "theme": {
-      "title": "Apariencia",
-      "description": "Personaliza cómo se ve la aplicación",
-      "light": "Claro",
-      "dark": "Escuro",
-      "system": "Sistema"
     }
   },
   "myCollection": {
@@ -1495,24 +1418,21 @@
   },
   "notifications": {
     "title": "Notificaciones",
-    "new_one": "nueva",
-    "new_other": "nuevas",
-    "loading": "Cargando...",
     "empty": "No tienes notificaciones nuevas",
     "viewAll": "Ver todas las notificaciones",
-    "andMore": "y {count} m�s..."
+    "loading": "Cargando..."
   },
   "pwa": {
-    "installPrompt": "?? �Para una mejor experiencia, instala la app CambioCromos!",
-    "installApp": "Instalar App",
+    "installPrompt": "📲 ¡Para una mejor experiencia, instala la app CambioCromos!",
     "googlePlay": "Google Play",
-    "iosInstructions": "Pulsa el bot�n Compartir <icon/> y selecciona \"A�adir a pantalla de inicio\"",
+    "installApp": "Instalar App",
+    "iosInstructions": "Pulsa el botón Compartir <icon/> y selecciona \"Añadir a pantalla de inicio\"",
     "notifyPrompt": "Activa las notificaciones para no perderte mensajes ni ofertas de intercambio.",
     "activate": "Activar",
     "close": "Cerrar aviso de notificaciones",
-    "onesignalMessage": "Suscr�bete a nuestras notificaciones para no perderte mensajes ni ofertas de intercambio. Puedes desactivarlo en cualquier momento.",
-    "onesignalAccept": "Suscribirme",
-    "onesignalCancel": "M�s tarde"
+    "onesignalMessage": "¡Suscríbete a nuestras notificaciones para recibir las últimas noticias y actualizaciones!",
+    "onesignalAccept": "Permitir",
+    "onesignalCancel": "Ahora no"
   },
   "legal": {
     "cookiesBanner": {
