@@ -3,15 +3,17 @@
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Sun, Moon, Monitor } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export function ThemeSettingsSection() {
+  const t = useTranslations('settings');
   const { theme, setTheme, resolvedTheme } = useTheme();
 
   const options = [
-    { value: 'light' as const, label: 'Claro', icon: Sun },
-    { value: 'dark' as const, label: 'Oscuro', icon: Moon },
-    { value: 'system' as const, label: 'Sistema', icon: Monitor },
+    { value: 'light' as const, label: t('theme.light'), icon: Sun },
+    { value: 'dark' as const, label: t('theme.dark'), icon: Moon },
+    { value: 'system' as const, label: t('theme.system'), icon: Monitor },
   ];
 
   return (

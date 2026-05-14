@@ -3,8 +3,10 @@
 import Link from '@/components/ui/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Shield, FileText, Cookie, ChevronRight, ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export function LegalSettingsTab() {
+    const t = useTranslations('settings');
     return (
         <div className="space-y-4 md:space-y-6">
             <ModernCard className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -20,10 +22,8 @@ export function LegalSettingsTab() {
                                     <FileText className="w-5 h-5 text-gold" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 dark:text-white">Términos de Servicio</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                        Normas de la comunidad y condiciones de uso
-                                    </p>
+                                    <h3 className="font-bold text-gray-900 dark:text-white">{t('legal.terms.title')}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('legal.terms.description')}</p>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gold transition-colors" />
@@ -39,10 +39,8 @@ export function LegalSettingsTab() {
                                     <Shield className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 dark:text-white">Política de Privacidad</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                        Cómo gestionamos y protegemos tus datos
-                                    </p>
+                                    <h3 className="font-bold text-gray-900 dark:text-white">{t('legal.privacy.title')}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('legal.privacy.description')}</p>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
@@ -58,10 +56,8 @@ export function LegalSettingsTab() {
                                     <Cookie className="w-5 h-5 text-purple-500" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 dark:text-white">Política de Cookies</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                        Uso de cookies y tecnologías similares
-                                    </p>
+                                    <h3 className="font-bold text-gray-900 dark:text-white">{t('legal.cookies.title')}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('legal.cookies.description')}</p>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
@@ -72,7 +68,7 @@ export function LegalSettingsTab() {
 
             <div className="text-center">
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Versión 1.6.0 | © {new Date().getFullYear()} Cambiocromos.com
+                    {t('legal.version')}  1.6.0 | © {new Date().getFullYear()} Cambiocromos.com
                 </p>
             </div>
         </div>

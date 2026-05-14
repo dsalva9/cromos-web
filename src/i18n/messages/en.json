@@ -1145,6 +1145,163 @@
       "blocked": "Bloqueados",
       "system": "Sistema",
       "legal": "Legal"
+    },
+    "system": {
+      "reactivateTips": {
+        "title": "Help Tips",
+        "description": "Show contextual tips in different sections of the app to help you use all features.",
+        "button": "Reactivate tips",
+        "success": "Tips reactivated successfully",
+        "error": "Error reactivating tips"
+      },
+      "signOutAll": {
+        "title": "Sign out of all devices",
+        "description": "Sign out of all devices where you have logged in, including this one. You will have to log in again.",
+        "button": "Sign out of all devices",
+        "buttonMobile": "Sign out of all",
+        "loading": "Signing out...",
+        "success": "Signed out of all devices",
+        "error": "Error signing out of all devices"
+      },
+      "deleteAccount": {
+        "title": "Delete my account",
+        "description": "This action will schedule your account for permanent deletion in 90 days. During this period you can cancel the deletion. You will lose:",
+        "list": {
+          "data": "All your user data",
+          "history": "Trade history",
+          "listings": "All your marketplace listings",
+          "collections": "Your collections and templates",
+          "messages": "Messages and conversations",
+          "reviews": "Ratings and reviews"
+        },
+        "warning": "This action is irreversible",
+        "button": "Delete my account"
+      }
+    },
+    "legal": {
+      "terms": {
+        "title": "Terms of Service",
+        "description": "Community rules and terms of use"
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "description": "How we manage and protect your data"
+      },
+      "cookies": {
+        "title": "Cookie Policy",
+        "description": "Use of cookies and similar technologies"
+      },
+      "version": "Version"
+    },
+    "ignored": {
+      "empty": {
+        "title": "You have no blocked users",
+        "description": "When you block users, they will appear here so you can manage them."
+      },
+      "retry": "Retry",
+      "unblock": {
+        "button": "Unblock",
+        "loading": "Removing...",
+        "success": "{nickname} has been removed from your blocked list",
+        "error": "Error unblocking user"
+      },
+      "time": {
+        "blocked": "Blocked",
+        "today": "today",
+        "yesterday": "yesterday",
+        "daysAgo": "{count} days ago",
+        "dayAgo": "{count} day ago",
+        "weeksAgo": "{count} weeks ago",
+        "weekAgo": "{count} week ago",
+        "monthsAgo": "{count} months ago",
+        "monthAgo": "{count} month ago"
+      }
+    },
+    "notifications": {
+      "matrix": {
+        "restore": "Restore defaults",
+        "cancel": "Cancel",
+        "save": "Save changes",
+        "saving": "Saving...",
+        "type": "Notification Type",
+        "uncheckAll": "Uncheck all",
+        "checkAll": "Check all",
+        "notAvailable": "Not available",
+        "aria": {
+          "disable": "Disable",
+          "enable": "Enable",
+          "for": "for"
+        }
+      },
+      "messages": {
+        "errorLoad": "Error loading preferences",
+        "success": "Preferences updated successfully",
+        "errorSave": "Error saving preferences"
+      },
+      "channels": {
+        "in_app": "In App",
+        "push": "Push",
+        "email": "Email"
+      },
+      "categories": {
+        "marketplace": {
+          "label": "Marketplace",
+          "description": "Notifications about listings and transactions"
+        },
+        "community": {
+          "label": "Community",
+          "description": "Ratings, achievements, and collections"
+        },
+        "system": {
+          "label": "System",
+          "description": "System messages and levels"
+        }
+      },
+      "types": {
+        "listing_chat": {
+          "label": "Chat messages",
+          "description": "New messages about your listings"
+        },
+        "listing_reserved": {
+          "label": "Item reserved",
+          "description": "When someone reserves your listing"
+        },
+        "listing_completed": {
+          "label": "Transaction completed",
+          "description": "When a transaction is completed"
+        },
+        "chat_unread": {
+          "label": "Weekly unread messages digest",
+          "description": "Weekly reminder if you have unread messages"
+        },
+        "user_rated": {
+          "label": "You have been rated",
+          "description": "When another user rates you"
+        },
+        "badge_earned": {
+          "label": "Achievement earned",
+          "description": "When you get a new achievement"
+        },
+        "template_rated": {
+          "label": "Collection rating",
+          "description": "When someone rates your collection"
+        },
+        "system_message": {
+          "label": "System message",
+          "description": "Important system messages"
+        },
+        "level_up": {
+          "label": "Level up",
+          "description": "When you level up"
+        }
+      }
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Customize how the app looks",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     }
   },
   "myCollection": {

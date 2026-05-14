@@ -11,9 +11,11 @@ import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 export function IgnoredUsersTab() {
+  const t = useTranslations('settings');
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const {
@@ -40,14 +42,14 @@ export function IgnoredUsersTab() {
 
       if (error) throw error;
 
-      toast.success(`${nickname} ha sido eliminado de tu lista de bloqueados`);
+      toast.success(t('ignored.unblock.success', { nickname }));
       removeFromIgnoredList(userId);
     } catch (error) {
       logger.error('Error unignoring user:', error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al desbloquear usuario'
+          : t('ignored.unblock.error')
       );
     } finally {
       setUnignoring(null);
@@ -87,9 +89,7 @@ export function IgnoredUsersTab() {
         <Button
           onClick={() => void fetchIgnoredUsers()}
           className="bg-gold hover:bg-[#FFD633] text-gray-900"
-        >
-          Reintentar
-        </Button>
+        >{t('ignored.retry')}</Button>
       </div>
     );
   }
@@ -99,13 +99,8 @@ export function IgnoredUsersTab() {
       <ModernCard className="bg-white dark:bg-gray-800/10 backdrop-blur-sm border border-gray-200 dark:border-gray-700/20">
         <ModernCardContent className="p-16 text-center">
           <Eye className="w-20 h-20 text-gray-400 dark:text-white/50 mx-auto mb-6" />
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-            No tienes usuarios bloqueados
-          </h2>
-          <p className="text-gray-600 dark:text-white/80 text-lg">
-            Cuando bloquees a usuarios, aparecerán aquí para que puedas
-            gestionarlos.
-          </p>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">{t('ignored.empty.title')}</h2>
+          <p className="text-gray-600 dark:text-white/80 text-lg">{t('ignored.empty.description')}</p>
         </ModernCardContent>
       </ModernCard>
     );
@@ -158,7 +153,7 @@ export function IgnoredUsersTab() {
                       </h3>
                     </Link>
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      Bloqueado {formatDate(ignoredUser.created_at)}
+                      {t('ignored.time.blocked')} {formatDate(ignoredUser.created_at)}
                     </p>
                   </div>
                 </div>
@@ -181,11 +176,9 @@ export function IgnoredUsersTab() {
                   >
                     {unignoring === ignoredUser.ignored_user_id ? (
                       <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Eliminando...
-                      </>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />{t('ignored.unblock.loading')}</>
                     ) : (
-                      'Desbloquear'
+                      t('ignored.unblock.button')
                     )}
                   </Button>
                 </div>

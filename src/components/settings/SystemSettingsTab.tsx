@@ -9,9 +9,11 @@ import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 import { DeleteAccountDialog } from '@/components/deletion';
 import { ThemeSettingsSection } from './ThemeSettingsSection';
+import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 export function SystemSettingsTab() {
+  const t = useTranslations('settings');
   const supabase = useSupabaseClient();
   const router = useRouter();
   const { user } = useUser();
@@ -22,11 +24,11 @@ export function SystemSettingsTab() {
     try {
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem('dismissed-tips');
-        toast.success('Consejos reactivados correctamente');
+        toast.success(t('system.reactivateTips.success'));
       }
     } catch (error) {
       logger.error('Error reactivating tips:', error);
-      toast.error('Error al reactivar los consejos');
+      toast.error(t('system.reactivateTips.error'));
     }
   };
 
@@ -39,14 +41,14 @@ export function SystemSettingsTab() {
 
       if (error) throw error;
 
-      toast.success('Se ha cerrado sesión en todos los dispositivos');
+      toast.success(t('system.signOutAll.success'));
       router.push('/login');
     } catch (error) {
       logger.error('Error signing out from all devices:', error);
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Error al cerrar sesión en todos los dispositivos'
+          : t('system.signOutAll.error')
       );
     } finally {
       setSigningOut(false);
@@ -68,18 +70,16 @@ export function SystemSettingsTab() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Consejos de ayuda
+                {t('system.reactivateTips.title')}
               </h3>
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-                Muestra consejos contextuales en las distintas secciones de la app para ayudarte a usar todas las funciones.
+                {t('system.reactivateTips.description')}
               </p>
               <Button
                 onClick={handleReactivateTips}
                 className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto text-sm md:text-base"
               >
-                <Lightbulb className="h-4 w-4 mr-2" />
-                Reactivar consejos
-              </Button>
+                <Lightbulb className="h-4 w-4 mr-2" />{t('system.reactivateTips.button')}</Button>
             </div>
           </div>
         </ModernCardContent>
@@ -94,11 +94,10 @@ export function SystemSettingsTab() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Cerrar sesión en todos los dispositivos
+                {t('system.signOutAll.title')}
               </h3>
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-                Cierra tu sesión en todos los dispositivos donde hayas iniciado
-                sesión, incluyendo este. Tendrás que volver a iniciar sesión.
+                {t('system.signOutAll.description')}
               </p>
               <Button
                 onClick={handleSignOutAllDevices}
@@ -107,14 +106,12 @@ export function SystemSettingsTab() {
               >
                 {signingOut ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Cerrando sesión...
-                  </>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />{t('system.signOutAll.loading')}</>
                 ) : (
                   <>
                     <LogOut className="h-4 w-4 mr-2" />
-                    <span className="sm:hidden">Cerrar sesión en todos</span>
-                    <span className="hidden sm:inline">Cerrar sesión en todos los dispositivos</span>
+                    <span className="sm:hidden">{t('system.signOutAll.buttonMobile')}</span>
+                    <span className="hidden sm:inline">{t('system.signOutAll.title')}</span>
                   </>
                 )}
               </Button>
@@ -132,25 +129,22 @@ export function SystemSettingsTab() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Eliminar mi cuenta
+                {t('system.deleteAccount.title')}
               </h3>
               <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-                Esta acción programará tu cuenta para eliminación permanente en 90 días.
-                Durante este período puedes cancelar la eliminación. Perderás:
+                {t('system.deleteAccount.description')}
               </p>
               <ul className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4 list-disc list-inside space-y-1">
-                <li>Todos tus datos de usuario</li>
-                <li>Historial de intercambios</li>
-                <li>Todos tus anuncios del marketplace</li>
-                <li>Tus colecciones y plantillas</li>
-                <li>Mensajes y conversaciones</li>
-                <li>Valoraciones y comentarios</li>
+                <li>{t('system.deleteAccount.list.data')}</li>
+                <li>{t('system.deleteAccount.list.history')}</li>
+                <li>{t('system.deleteAccount.list.listings')}</li>
+                <li>{t('system.deleteAccount.list.collections')}</li>
+                <li>{t('system.deleteAccount.list.messages')}</li>
+                <li>{t('system.deleteAccount.list.reviews')}</li>
               </ul>
               <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-500 dark:border-red-400 rounded-lg p-3 md:p-4 mb-4">
                 <p className="text-sm md:text-base text-red-600 dark:text-red-400 font-bold flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 flex-shrink-0" />
-                  Esta acción es irreversible
-                </p>
+                  <AlertTriangle className="h-5 w-5 flex-shrink-0" />{t('system.deleteAccount.warning')}</p>
               </div>
               <Button
                 onClick={() => setShowDeleteDialog(true)}
@@ -158,7 +152,7 @@ export function SystemSettingsTab() {
                 className="bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border-2 border-red-500 dark:border-red-400 hover:text-red-700 dark:hover:text-red-300 w-full sm:w-auto text-sm md:text-base"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar mi cuenta
+                {t('system.deleteAccount.title')}
               </Button>
             </div>
           </div>

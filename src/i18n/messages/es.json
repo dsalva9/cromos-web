@@ -1145,6 +1145,163 @@
       "blocked": "Bloqueados",
       "system": "Sistema",
       "legal": "Legal"
+    },
+    "system": {
+      "reactivateTips": {
+        "title": "Consejos de ayuda",
+        "description": "Muestra consejos contextuales en las distintas secciones de la app para ayudarte a usar todas las funciones.",
+        "button": "Reactivar consejos",
+        "success": "Consejos reactivados correctamente",
+        "error": "Error al reactivar los consejos"
+      },
+      "signOutAll": {
+        "title": "Cerrar sesión en todos los dispositivos",
+        "description": "Cierra tu sesión en todos los dispositivos donde hayas iniciado sesión, incluyendo este. Tendrás que volver a iniciar sesión.",
+        "button": "Cerrar sesión en todos los dispositivos",
+        "buttonMobile": "Cerrar sesión en todos",
+        "loading": "Cerrando sesión...",
+        "success": "Se ha cerrado sesión en todos los dispositivos",
+        "error": "Error al cerrar sesión en todos los dispositivos"
+      },
+      "deleteAccount": {
+        "title": "Eliminar mi cuenta",
+        "description": "Esta acción programará tu cuenta para eliminación permanente en 90 días. Durante este período puedes cancelar la eliminación. Perderás:",
+        "list": {
+          "data": "Todos tus datos de usuario",
+          "history": "Historial de intercambios",
+          "listings": "Todos tus anuncios del marketplace",
+          "collections": "Tus colecciones y plantillas",
+          "messages": "Mensajes y conversaciones",
+          "reviews": "Valoraciones y comentarios"
+        },
+        "warning": "Esta acción es irreversible",
+        "button": "Eliminar mi cuenta"
+      }
+    },
+    "legal": {
+      "terms": {
+        "title": "Términos de Servicio",
+        "description": "Normas de la comunidad y condiciones de uso"
+      },
+      "privacy": {
+        "title": "Política de Privacidad",
+        "description": "Cómo gestionamos y protegemos tus datos"
+      },
+      "cookies": {
+        "title": "Política de Cookies",
+        "description": "Uso de cookies y tecnologías similares"
+      },
+      "version": "Versión"
+    },
+    "ignored": {
+      "empty": {
+        "title": "No tienes usuarios bloqueados",
+        "description": "Cuando bloquees a usuarios, aparecerán aquí para que puedas gestionarlos."
+      },
+      "retry": "Reintentar",
+      "unblock": {
+        "button": "Desbloquear",
+        "loading": "Eliminando...",
+        "success": "{nickname} ha sido eliminado de tu lista de bloqueados",
+        "error": "Error al desbloquear usuario"
+      },
+      "time": {
+        "blocked": "Bloqueado",
+        "today": "hoy",
+        "yesterday": "ayer",
+        "daysAgo": "hace {count} días",
+        "dayAgo": "hace {count} día",
+        "weeksAgo": "hace {count} semanas",
+        "weekAgo": "hace {count} semana",
+        "monthsAgo": "hace {count} meses",
+        "monthAgo": "hace {count} mes"
+      }
+    },
+    "notifications": {
+      "matrix": {
+        "restore": "Restaurar valores por defecto",
+        "cancel": "Cancelar",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "type": "Tipo de Notificación",
+        "uncheckAll": "Desmarcar todas",
+        "checkAll": "Marcar todas",
+        "notAvailable": "No disponible",
+        "aria": {
+          "disable": "Desactivar",
+          "enable": "Activar",
+          "for": "para"
+        }
+      },
+      "messages": {
+        "errorLoad": "Error al cargar las preferencias",
+        "success": "Preferencias actualizadas correctamente",
+        "errorSave": "Error al guardar las preferencias"
+      },
+      "channels": {
+        "in_app": "En la App",
+        "push": "Push",
+        "email": "Email"
+      },
+      "categories": {
+        "marketplace": {
+          "label": "Marketplace",
+          "description": "Notificaciones sobre listados y transacciones"
+        },
+        "community": {
+          "label": "Comunidad",
+          "description": "Valoraciones, logros y colecciones"
+        },
+        "system": {
+          "label": "Sistema",
+          "description": "Mensajes del sistema y niveles"
+        }
+      },
+      "types": {
+        "listing_chat": {
+          "label": "Mensajes de chat",
+          "description": "Nuevos mensajes sobre tus listados"
+        },
+        "listing_reserved": {
+          "label": "Artículo reservado",
+          "description": "Cuando alguien reserva tu listado"
+        },
+        "listing_completed": {
+          "label": "Transacción completada",
+          "description": "Cuando una transacción se completa"
+        },
+        "chat_unread": {
+          "label": "Resumen semanal de mensagens sin leer",
+          "description": "Recordatorio semanal si tienes mensajes sin leer"
+        },
+        "user_rated": {
+          "label": "Te han valorado",
+          "description": "Cuando otro usuario te valora"
+        },
+        "badge_earned": {
+          "label": "Logro ganado",
+          "description": "Cuando obtienes un nuevo logro"
+        },
+        "template_rated": {
+          "label": "Valoración de colección",
+          "description": "Cuando alguien valora tu colección"
+        },
+        "system_message": {
+          "label": "Mensaje del sistema",
+          "description": "Mensajes importantes del sistema"
+        },
+        "level_up": {
+          "label": "Subida de nivel",
+          "description": "Cuando subes de nivel"
+        }
+      }
+    },
+    "theme": {
+      "title": "Apariencia",
+      "description": "Personaliza cómo se ve la aplicación",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
     }
   },
   "myCollection": {

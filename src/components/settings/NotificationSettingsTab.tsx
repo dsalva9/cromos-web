@@ -8,8 +8,10 @@ import {
 import type { GranularNotificationPreferences } from '@/types/notifications';
 import { NotificationPreferencesMatrix } from '@/components/settings/NotificationPreferencesMatrix';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 
 export function NotificationSettingsTab() {
+  const t = useTranslations('settings');
   const [preferences, setPreferences] = useState<GranularNotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,7 +30,7 @@ export function NotificationSettingsTab() {
       logger.error('[NotificationSettingsTab] Error loading preferences:', error);
       setMessage({
         type: 'error',
-        text: 'Error al cargar las preferencias',
+        text: t('notifications.messages.errorLoad'),
       });
     } finally {
       setLoading(false);
@@ -42,7 +44,7 @@ export function NotificationSettingsTab() {
       setPreferences(newPreferences);
       setMessage({
         type: 'success',
-        text: 'Preferencias actualizadas correctamente',
+        text: t('notifications.messages.success'),
       });
 
       // Clear message after 3 seconds
@@ -51,7 +53,7 @@ export function NotificationSettingsTab() {
       logger.error('[NotificationSettingsTab] Error saving preferences:', error);
       setMessage({
         type: 'error',
-        text: 'Error al guardar las preferencias',
+        text: t('notifications.messages.errorSave'),
       });
       throw error;
     } finally {

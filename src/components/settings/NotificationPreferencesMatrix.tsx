@@ -22,6 +22,7 @@ import {
   isHiddenNotificationType,
 } from '@/lib/notifications/config';
 import { toggleNotificationPreference } from '@/lib/supabase/notification-preferences';
+import { useTranslations } from 'next-intl';
 
 interface NotificationPreferencesMatrixProps {
   preferences: GranularNotificationPreferences;
@@ -29,10 +30,10 @@ interface NotificationPreferencesMatrixProps {
   saving: boolean;
 }
 
-const CHANNELS: { id: NotificationChannel; label: string; icon: typeof Bell; color: string }[] = [
-  { id: 'in_app', label: 'En la App', icon: Bell, color: 'blue' },
-  { id: 'push', label: 'Push', icon: Smartphone, color: 'purple' },
-  { id: 'email', label: 'Email', icon: Mail, color: 'orange' },
+const getChannels = (t: any): { id: NotificationChannel; label: string; icon: typeof Bell; color: string }[] => [
+  { id: 'in_app', label: t('notifications.channels.in_app'), icon: Bell, color: 'blue' },
+  { id: 'push', label: t('notifications.channels.push'), icon: Smartphone, color: 'purple' },
+  { id: 'email', label: t('notifications.channels.email'), icon: Mail, color: 'orange' },
 ];
 
 const ACTIVE_CATEGORIES: NotificationCategory[] = ['marketplace', 'community'];
@@ -42,6 +43,7 @@ export function NotificationPreferencesMatrix({
   onSave,
   saving,
 }: NotificationPreferencesMatrixProps) {
+  const t = useTranslations('settings');
   const [localPreferences, setLocalPreferences] = useState<GranularNotificationPreferences>(preferences);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -105,9 +107,7 @@ export function NotificationPreferencesMatrix({
           disabled={saving}
           className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
         >
-          <RotateCcw className="w-4 h-4" />
-          Restaurar valores por defecto
-        </button>
+          <RotateCcw className="w-4 h-4" />{t('notifications.matrix.restore')}</button>
 
         {hasChanges && (
           <div className="flex items-center gap-3">
@@ -115,9 +115,7 @@ export function NotificationPreferencesMatrix({
               onClick={handleCancel}
               disabled={saving}
               className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-center"
-            >
-              Cancelar
-            </button>
+            >{t('notifications.matrix.cancel')}</button>
             <button
               onClick={handleSave}
               disabled={saving}
@@ -125,9 +123,7 @@ export function NotificationPreferencesMatrix({
             >
               {saving ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Guardando...
-                </>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />{t('notifications.matrix.saving')}</>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
@@ -144,10 +140,8 @@ export function NotificationPreferencesMatrix({
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">
-                Tipo de Notificación
-              </th>
-              {CHANNELS.map(({ id, label, icon: Icon, color }) => {
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">{t('notifications.matrix.type')}</th>
+              {getChannels(t).map(({ id, label, icon: Icon, color }) => {
                 const allEnabled = isChannelAllEnabled(id);
                 return (
                   <th
@@ -166,14 +160,10 @@ export function NotificationPreferencesMatrix({
                       >
                         {allEnabled ? (
                           <>
-                            <CheckSquare className="w-3 h-3" />
-                            Desmarcar todas
-                          </>
+                            <CheckSquare className="w-3 h-3" />{t('notifications.matrix.uncheckAll')}</>
                         ) : (
                           <>
-                            <Square className="w-3 h-3" />
-                            Marcar todas
-                          </>
+                            <Square className="w-3 h-3" />{t('notifications.matrix.checkAll')}</>
                         )}
                       </button>
                     </div>
@@ -195,7 +185,7 @@ export function NotificationPreferencesMatrix({
                       colSpan={4}
                       className="px-6 py-3 text-sm font-semibold text-gray-900"
                     >
-                      {CATEGORY_INFO[category].label}
+                      {t(`notifications.categories.${category}.label`)}
                     </td>
                   </tr>
 
@@ -210,17 +200,17 @@ export function NotificationPreferencesMatrix({
                         <div className="flex items-center gap-2">
                           <div>
                             <span className="text-sm font-medium text-gray-900">
-                              {config.label}
+                              {t(`notifications.types.${config.kind}.label`)}
                             </span>
                             <p className="text-xs text-gray-500 mt-0.5">
-                              {config.description}
+                              {t(`notifications.types.${config.kind}.description`)}
                             </p>
                           </div>
                         </div>
                       </td>
 
                       {/* Channel toggles */}
-                      {CHANNELS.map(({ id: channel }) => {
+                      {getChannels(t).map(({ id: channel }) => {
                         const isDisabled = config.disabledChannels?.includes(channel);
                         return (
                           <td key={channel} className="px-6 py-4 text-center">
@@ -236,7 +226,7 @@ export function NotificationPreferencesMatrix({
                                 } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                                 aria-label={`${
                                   localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
-                                } ${config.label} para ${channel}`}
+                                } ${t(`notifications.types.${config.kind}.label`)} para ${channel}`}
                               >
                                 <span
                                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -247,7 +237,7 @@ export function NotificationPreferencesMatrix({
                                 />
                               </button>
                             ) : (
-                              <span className="text-xs text-gray-400 italic">No disponible</span>
+                              <span className="text-xs text-gray-400 italic">{t('notifications.matrix.notAvailable')}</span>
                             )}
                           </td>
                         );
@@ -271,7 +261,7 @@ export function NotificationPreferencesMatrix({
             <div key={category} className="space-y-3">
               {/* Category header */}
               <h3 className="text-sm font-semibold text-gray-900 px-2">
-                {CATEGORY_INFO[category].label}
+                {t(`notifications.categories.${category}.label`)}
               </h3>
 
               {/* Notification cards */}
@@ -283,16 +273,16 @@ export function NotificationPreferencesMatrix({
                   {/* Notification title */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-900">
-                      {config.label}
+                      {t(`notifications.types.${config.kind}.label`)}
                     </h4>
                     <p className="text-xs text-gray-500 mt-1">
-                      {config.description}
+                      {t(`notifications.types.${config.kind}.description`)}
                     </p>
                   </div>
 
                   {/* Channel toggles */}
                   <div className="space-y-2 pt-2 border-t border-gray-200">
-                    {CHANNELS.map(({ id: channel, label, icon: Icon }) => {
+                    {getChannels(t).map(({ id: channel, label, icon: Icon }) => {
                       const isDisabled = config.disabledChannels?.includes(channel);
                       if (isDisabled) return null;
 
@@ -315,7 +305,7 @@ export function NotificationPreferencesMatrix({
                             } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             aria-label={`${
                               localPreferences[channel][config.kind] ? 'Desactivar' : 'Activar'
-                            } ${config.label} para ${channel}`}
+                            } ${t(`notifications.types.${config.kind}.label`)} para ${channel}`}
                           >
                             <span
                               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
