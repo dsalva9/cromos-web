@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
 import { ArrowLeft } from 'lucide-react';
 import { useMemo } from 'react';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useTranslations } from 'next-intl';
 import { getCurrencySymbol } from '@/constants/countries';
 
 function CreateListingContent() {
@@ -20,6 +21,7 @@ function CreateListingContent() {
   const { createListing, loading } = useCreateListing();
   const { profile } = useProfileCompletion();
   const currencySymbol = getCurrencySymbol(profile?.country_code);
+  const t = useTranslations('createListing');
 
   // Get initial data from query parameters
   const initialData = useMemo(() => {
@@ -63,12 +65,12 @@ function CreateListingContent() {
         template_id: templateId ? parseInt(templateId) : undefined,
         pack_items: packItems,
       });
-      toast.success('¡Anuncio publicado con éxito!');
+      toast.success(t('successToast'));
       router.push(`/marketplace/${listingId}`);
     } catch (error) {
       logger.error('Create listing error:', error);
       toast.error(
-        error instanceof Error ? error.message : 'Error al crear el anuncio'
+        error instanceof Error ? error.message : t('errorToast')
       );
     }
   };
@@ -81,15 +83,15 @@ function CreateListingContent() {
           className="inline-flex items-center text-gold hover:text-gold-light mb-6 transition-colors"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {backUrl.includes('/mis-plantillas/') ? 'Volver al Álbum' : 'Volver al Marketplace'}
+          {backUrl.includes('/mis-plantillas/') ? t('backAlbum') : t('backMarketplace')}
         </Link>
 
         <div className="mb-8">
           <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
-            Publicar Anuncio
+            {t('title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {initialData ? 'Revisa y completa los detalles de tu pack' : 'Comparte tu cromo con la comunidad'}
+            {initialData ? t('subtitleGroup') : t('subtitleIndividual')}
           </p>
         </div>
 

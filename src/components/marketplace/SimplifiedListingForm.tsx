@@ -101,6 +101,7 @@ export function SimplifiedListingForm({
   const [expandedPageId, setExpandedPageId] = useState<number | null>(null);
 
   const t = useTranslations('validations');
+  const tCreate = useTranslations('createListing');
   const schema = useMemo(() => getSimplifiedListingSchema(t as any), [t]);
 
   const {
@@ -236,7 +237,7 @@ export function SimplifiedListingForm({
           {/* Listing Type Toggle */}
           {!disablePackOption && (
             <div className="space-y-3">
-              <Label>Tipo de Anuncio</Label>
+              <Label>{tCreate('adTypeLabel')}</Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -248,7 +249,7 @@ export function SimplifiedListingForm({
                 >
                   <FileText className={`h-6 w-6 mx-auto mb-2 ${!isGroup ? 'text-gold' : 'text-gray-600'}`} />
                   <p className={`text-sm font-semibold ${!isGroup ? 'text-gold' : 'text-gray-700'}`}>
-                    Cromo Individual
+                    {tCreate('typeIndividual')}
                   </p>
                 </button>
                 <button
@@ -261,13 +262,13 @@ export function SimplifiedListingForm({
                 >
                   <PackagePlus className={`h-6 w-6 mx-auto mb-2 ${isGroup ? 'text-gold' : 'text-gray-600'}`} />
                   <p className={`text-sm font-semibold ${isGroup ? 'text-gold' : 'text-gray-700'}`}>
-                    Pack de Cromos
+                    {tCreate('typePack')}
                   </p>
                 </button>
               </div>
               {isGroup && (
                 <p className="text-xs text-yellow-800 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 p-3 rounded-lg">
-                  ℹ️ Estás creando un anuncio para múltiples cromos. Describe todos los cromos en la descripción.
+                  {tCreate('packWarning')}
                 </p>
               )}
             </div>
@@ -276,7 +277,7 @@ export function SimplifiedListingForm({
           {/* Image Upload - MANDATORY */}
           <div className="space-y-2">
             <Label>
-              Imagen <span className="text-red-500">*</span>
+              {tCreate('imageLabel')} <span className="text-red-500">*</span>
             </Label>
             <ImageUpload
               value={imageUrl}
@@ -286,19 +287,19 @@ export function SimplifiedListingForm({
               <p className="text-sm text-red-500">{errors.image_url.message}</p>
             )}
             <p className="text-sm text-gray-600">
-              La imagen es obligatoria para publicar un anuncio
+              {tCreate('imageRequired')}
             </p>
           </div>
 
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">
-              Título <span className="text-red-500">*</span>
+              {tCreate('titleLabel')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
               {...register('title')}
-              placeholder={isGroup ? "ej. Pack de 10 cromos de la Liga" : "ej. Messi Inter Miami 2024"}
+              placeholder={isGroup ? tCreate('titlePlaceholderGroup') : tCreate('titlePlaceholderIndividual')}
               className={`bg-white border-2 text-gray-900 ${errors.title ? 'border-red-500' : 'border-black'
                 }`}
             />
@@ -309,25 +310,25 @@ export function SimplifiedListingForm({
 
           {/* Collection */}
           <div className="space-y-2">
-            <Label htmlFor="collection_name">Colección</Label>
+            <Label htmlFor="collection_name">{tCreate("collectionLabel")}</Label>
             <div className="flex gap-2">
               <Input
                 id="collection_name"
                 {...register('collection_name')}
-                placeholder="ej. Panini LaLiga 2024"
+                placeholder={tCreate('collectionPlaceholder')}
                 className="bg-white border-2 border-black text-gray-900 flex-1"
               />
               <Button
                 type="button"
                 onClick={() => setTemplatesDialogOpen(true)}
                 className="bg-white hover:bg-gray-100 text-gray-900 border-2 border-black shrink-0"
-                title="Seleccionar de mis plantillas"
+                title={tCreate('myTemplatesTooltip')}
               >
                 <Library className="h-4 w-4" />
               </Button>
             </div>
             <p className="text-sm text-gray-600">
-              Opcional: nombre de la colección o álbum
+              {tCreate('collectionOptional')}
             </p>
           </div>
 
@@ -337,14 +338,14 @@ export function SimplifiedListingForm({
               <div className="flex items-center justify-between">
                 <Label className="flex items-center gap-1.5">
                   <LinkIcon className="h-3.5 w-3.5" />
-                  Vincular a cromo del álbum
+                  {tCreate('linkAlbumLabel')}
                 </Label>
                 <button
                   type="button"
                   onClick={handleClearSlotLink}
                   className="text-xs text-gray-500 hover:text-red-500 transition-colors"
                 >
-                  Desvincular
+                  {tCreate('unlink')}
                 </button>
               </div>
 
@@ -373,15 +374,15 @@ export function SimplifiedListingForm({
                     onClick={() => setSlotPickerExpanded(!slotPickerExpanded)}
                     className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors text-sm text-gray-700"
                   >
-                    <span>Seleccionar cromo de <strong>{selectedCopy.title}</strong></span>
+                    <span>{tCreate('selectFrom')} <strong>{selectedCopy.title}</strong></span>
                     {slotPickerExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                   </button>
                   {slotPickerExpanded && (
                     <div className="max-h-64 overflow-y-auto border-t border-gray-200">
                       {loadingPages ? (
-                        <div className="p-4 text-center text-gray-500 text-sm">Cargando páginas...</div>
+                        <div className="p-4 text-center text-gray-500 text-sm">{tCreate('loadingPages')}</div>
                       ) : templatePages.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500 text-sm">No se encontraron páginas</div>
+                        <div className="p-4 text-center text-gray-500 text-sm">{tCreate('noPages')}</div>
                       ) : (
                         templatePages.map(page => (
                           <div key={page.id}>
@@ -422,14 +423,14 @@ export function SimplifiedListingForm({
                 </div>
               )}
               <p className="text-xs text-gray-500">
-                Opcional: vincular a un cromo específico mejora la visibilidad en los álbumes de otros usuarios
+                {tCreate('linkOptional')}
               </p>
             </div>
           )}
 
           {/* Listing Type - Exchange / Sale */}
           <div className="space-y-3">
-            <Label>Tipo de Anuncio <span className="text-red-500">*</span></Label>
+            <Label>{tCreate('adTypeLabel')} <span className="text-red-500">*</span></Label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -441,7 +442,7 @@ export function SimplifiedListingForm({
               >
                 <span className="text-xl">🔄</span>
                 <span className={`text-sm font-semibold ${isForExchange ? 'text-gold' : 'text-gray-700'}`}>
-                  Intercambio
+                  {tCreate('exchange')}
                 </span>
               </button>
               <button
@@ -454,14 +455,14 @@ export function SimplifiedListingForm({
               >
                 <span className="text-xl">💰</span>
                 <span className={`text-sm font-semibold ${isForSale ? 'text-green-600' : 'text-gray-700'}`}>
-                  Venta
+                  {tCreate('sale')}
                 </span>
               </button>
             </div>
 
             {isForSale && (
               <div className="space-y-2">
-                <Label htmlFor="price">Precio ({currencySymbol}) <span className="text-red-500">*</span></Label>
+                <Label htmlFor="price">{tCreate('priceLabel')} ({currencySymbol}) <span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
                     id="price"
@@ -486,16 +487,12 @@ export function SimplifiedListingForm({
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">
-              Descripción <span className="text-red-500">*</span>
+              {tCreate('descLabel')} <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="description"
               {...register('description')}
-              placeholder={
-                isGroup
-                  ? "Describe todos los cromos incluidos en el pack, su estado, etc."
-                  : "Describe el cromo, su estado, características especiales, etc."
-              }
+              placeholder={isGroup ? tCreate('descPlaceholderGroup') : tCreate('descPlaceholderIndividual')}
               rows={6}
               className={`bg-white border-2 text-gray-900 resize-none ${errors.description ? 'border-red-500' : 'border-black'
                 }`}
@@ -504,9 +501,7 @@ export function SimplifiedListingForm({
               <p className="text-sm text-red-500">{errors.description.message}</p>
             )}
             <p className="text-sm text-gray-600">
-              {isGroup
-                ? "Lista todos los cromos incluidos con sus detalles"
-                : "Incluye número, colección, rareza, y cualquier detalle relevante"}
+              {isGroup ? tCreate('descHelperGroup') : tCreate('descHelperIndividual')}
             </p>
           </div>
 
@@ -528,13 +523,13 @@ export function SimplifiedListingForm({
                   htmlFor="terms"
                   className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                 >
-                  He leído y estoy de acuerdo con los{' '}
+                  {tCreate('termsPrefix')}{' '}
                   <button
                     type="button"
                     onClick={() => setTermsDialogOpen(true)}
                     className="text-gold hover:text-gold-light underline"
                   >
-                    términos de uso
+                    {tCreate('termsLink')}
                   </button>
                   <span className="text-red-500 ml-1">*</span>
                 </Label>
@@ -554,7 +549,7 @@ export function SimplifiedListingForm({
               disabled={loading || isSubmitting}
               className="bg-gold text-black hover:bg-gold-light"
             >
-              {loading || isSubmitting ? 'Publicando...' : 'Publicar'}
+              {loading || isSubmitting ? tCreate('publishWait') : tCreate('publish')}
             </Button>
           </div>
         </ModernCardContent>
@@ -565,13 +560,13 @@ export function SimplifiedListingForm({
         <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Mis Plantillas
+              {tCreate('templatesTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto">
             {templates.length === 0 ? (
               <p className="text-gray-600 text-center py-8">
-                No tienes plantillas guardadas
+                {tCreate('noTemplates')}
               </p>
             ) : (
               <div className="space-y-2">
@@ -593,7 +588,7 @@ export function SimplifiedListingForm({
               onClick={() => setTemplatesDialogOpen(false)}
               className="w-full bg-gray-200 text-gray-900 hover:bg-gray-300"
             >
-              Cancelar
+              {tCreate('cancel')}
             </Button>
           </div>
         </DialogContent>
@@ -604,19 +599,19 @@ export function SimplifiedListingForm({
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
-              Términos de Uso - Publicación de Cromos
+              {tCreate('termsTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-gray-700">
             <p>
-              Recuerda que las imágenes, descripciones o nombres que subas deben ser tuyos o contar con los derechos necesarios para usarlos. Cambiocromos.com no publica contenido por ti, solo te ofrece el espacio para compartirlo con otros coleccionistas. El usuario es el único responsable del contenido que publique. Si subes imágenes que infrinjan derechos de autor, marcas registradas o cualquier norma legal, podremos retirarlas y suspender tu cuenta. Cambiocromos.com no es propietaria de los cromos ni intermedia en las ventas o intercambios; solo pone en contacto a los usuarios. Al continuar, declaras que tienes derecho a publicar el contenido y aceptas nuestra Política de contenidos.
+              {tCreate('termsBody')}
             </p>
             <div className="pt-4">
               <Button
                 onClick={() => setTermsDialogOpen(false)}
                 className="w-full bg-gold text-black hover:bg-gold-light"
               >
-                Cerrar
+                {tCreate('termsClose')}
               </Button>
             </div>
           </div>
