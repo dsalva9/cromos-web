@@ -43,14 +43,14 @@ export default function LandingPage() {
 
 
                             <h1 className="-mt-6 lg:-mt-8 text-5xl lg:text-7xl font-black uppercase tracking-tight text-gray-900 dark:text-white leading-[0.9]">
-                                Tu colección <br />
+                                {t('hero.titleLine1')} <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold to-yellow-500 drop-shadow-sm">
                                     {t('hero.titleLine2')}
                                 </span>
                             </h1>
 
                             <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
-                                Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa en tu plataforma <span className="text-black dark:text-white font-black bg-gold/20 dark:bg-gold/10 px-1 rounded transform -rotate-1 inline-block border-b-2 border-gold">totalmente gratuita</span>
+                                {t('hero.descriptionPart1')}<span className="text-black dark:text-white font-black bg-gold/20 dark:bg-gold/10 px-1 rounded transform -rotate-1 inline-block border-b-2 border-gold">{t('hero.descriptionHighlight')}</span>
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 pt-2 w-full sm:w-auto">
@@ -77,7 +77,7 @@ export default function LandingPage() {
                                 href="/login"
                                 className="text-gray-600 dark:text-gray-400 font-bold hover:text-gold transition-colors flex items-center justify-center gap-2 text-sm pt-2"
                             >
-                                ¿Ya tienes cuenta? <span className="text-black dark:text-white border-b-2 border-gold">Inicia Sesión</span>
+                                {t('hero.alreadyHaveAccount')} <span className="text-black dark:text-white border-b-2 border-gold">{t('hero.login')}</span>
                             </Link>
 
                             {/* Download Section — mobile only */}
@@ -130,7 +130,7 @@ export default function LandingPage() {
                             <div className="md:mt-4">
                                 <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">{t('features.feature1.title')}</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
-                                    Olvídate del papel. Marca los cromos que te faltan y repes directamente en la app.
+                                    {t('features.feature1.desc')}
                                 </p>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ export default function LandingPage() {
                             <div className="md:mt-4">
                                 <h3 className="text-lg lg:text-xl font-black uppercase mb-1 lg:mb-2 text-gray-900 dark:text-white">{t('features.feature2.title')}</h3>
                                 <p className="text-sm lg:text-base text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2 md:line-clamp-none">
-                                    Encuentra al instante quién tiene los cromos que te faltan.
+                                    {t('features.feature2.desc')}
                                 </p>
                             </div>
                         </div>
@@ -180,7 +180,7 @@ export default function LandingPage() {
                             {t('seo.title')}
                         </h2>
                         <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
-                            Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colección. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de fútbol del Mundial y cualquier otra colección deportiva. Gestiona tus álbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda España — todo en una sola plataforma gratuita.
+                            {t('seo.desc')}
                         </p>
                     </div>
                 </div>
@@ -193,10 +193,10 @@ export default function LandingPage() {
 
                 <div className="container mx-auto px-4 text-center relative z-10">
                     <h2 className="text-4xl md:text-6xl font-black uppercase mb-8 text-black tracking-tight">
-                        ¿Listo para completar tu álbum?
+                        {t('cta.title')}
                     </h2>
                     <p className="text-xl md:text-2xl text-black/80 font-bold max-w-2xl mx-auto mb-10">
-                        Únete a miles de coleccionistas que ya están intercambiando sus cromos hoy mismo.
+                        {t('cta.desc')}
                     </p>
                     <Button
                         asChild

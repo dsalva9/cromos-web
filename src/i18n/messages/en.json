@@ -906,65 +906,65 @@
   },
   "landing": {
     "hero": {
-      "badge": "La Plataforma #1 de intercambio de Cromos",
-      "titleLine1": "Tu colecci�n",
-      "titleLine2": "a otro nivel",
-      "descriptionPart1": "Gestiona tus �lbumes, encuentra esos cromos dif�ciles y completa tu colecci�n con la comunidad m�s activa en tu plataforma ",
-      "descriptionHighlight": "totalmente gratuita",
-      "startTrading": "Empezar a Intercambiar",
-      "exploreMarket": "Explorar Mercado",
-      "alreadyHaveAccount": "�Ya tienes cuenta?",
-      "login": "Inicia Sesi�n",
-      "availableOn": "Disponible en:"
+      "badge": "The #1 Sticker Trading Platform",
+      "titleLine1": "Your collection",
+      "titleLine2": "to another level",
+      "descriptionPart1": "Manage your albums, find those missing stickers and complete your collection with the most active community on a platform that is ",
+      "descriptionHighlight": "completely free",
+      "startTrading": "Start Trading",
+      "exploreMarket": "Explore Market",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Log In",
+      "availableOn": "Available on:"
     },
     "features": {
       "feature1": {
-        "title": "Gestiona Albumes",
-        "desc": "Olv�date del papel. Marca los cromos que te faltan y repes directamente en la app."
+        "title": "Manage Albums",
+        "desc": "Forget about paper. Mark the stickers you are missing and your duplicates directly in the app."
       },
       "feature2": {
-        "title": "Busca Repes",
-        "desc": "Encuentra al instante qui�n tiene los cromos que te faltan."
+        "title": "Find Duplicates",
+        "desc": "Instantly find who has the stickers you are missing."
       },
       "feature3": {
-        "title": "Gana Logros",
-        "desc": "Completa intercambios y destaca como un \"Top Trader\"."
+        "title": "Earn Achievements",
+        "desc": "Complete trades and stand out as a \"Top Trader\"."
       }
     },
     "seo": {
-      "title": "Tu destino para el intercambio de cromos",
-      "desc": "Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colecci�n. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de f�tbol del Mundial y cualquier otra colecci�n deportiva. Gestiona tus �lbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda Espa�a � todo en una sola plataforma gratuita."
+      "title": "Your destination for sticker trading",
+      "desc": "With the 2026 World Cup just around the corner, it's time to complete your collection. Whether it's Panini, Adrenalyn XL or Topps sticker collections, LaLiga or the 2026 World Cup... CambioCromos is the perfect place to trade World Cup football stickers and any other sports collection. Manage your albums, find the stickers you are missing and connect with collectors from all over Spain — all in a single free platform."
     },
     "cta": {
-      "title": "�Listo para completar tu �lbum?",
-      "desc": "�nete a miles de coleccionistas que ya est�n intercambiando sus cromos hoy mismo.",
-      "button": "Crear Cuenta Gratis"
+      "title": "Ready to complete your album?",
+      "desc": "Join thousands of collectors who are already trading their stickers today.",
+      "button": "Create Free Account"
     },
     "mockup": {
-      "special": "ESPECIAL",
-      "cardCollection": "Liga 2024 � Cromo Especial",
-      "trades": "intercambios",
-      "location": "Madrid, Espa�a",
+      "special": "SPECIAL",
+      "cardCollection": "Liga 2024 • Special Sticker",
+      "trades": "trades",
+      "location": "Madrid, Spain",
       "tradesLabel": "Trades",
       "ratingLabel": "Rating",
-      "sendMessage": "Enviar Mensaje",
-      "userListings": "Sus anuncios (24)",
-      "online": "En l�nea",
-      "message1": "�Hola! Vi que tienes el cromo de Messi. �Lo intercambias?",
-      "message2": "�Claro! �Qu� tienes para ofrecer?",
-      "message3": "Tengo Mbapp� y Haaland duplicados ??",
-      "inputPlaceholder": "Escribe un mensaje...",
-      "searchPlaceholder": "Buscar cromos..."
+      "sendMessage": "Send Message",
+      "userListings": "Their listings (24)",
+      "online": "Online",
+      "message1": "Hi! I saw you have the Messi sticker. Will you trade it?",
+      "message2": "Sure! What do you have to offer?",
+      "message3": "I have Mbappe and Haaland duplicates 🤝",
+      "inputPlaceholder": "Type a message...",
+      "searchPlaceholder": "Search stickers..."
     },
     "showcase": {
-      "badge": "Marketplace en vivo",
-      "title": "�ltimos anuncios publicados",
-      "desc": "Publica tus duplicados y encuentra nuevos cromos sin salir de la plataforma.",
-      "goToMarket": "Ir al marketplace",
-      "error": "Ha ocurrido un error al cargar los anuncios: {error}",
-      "emptyTitle": "A�n no hay anuncios activos",
-      "emptyDesc": "S� la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
-      "publishBtn": "Publicar un anuncio"
+      "badge": "Live Marketplace",
+      "title": "Latest published listings",
+      "desc": "Publish your duplicates and find new stickers without leaving the platform.",
+      "goToMarket": "Go to marketplace",
+      "error": "An error occurred while loading listings: {error}",
+      "emptyTitle": "No active listings yet",
+      "emptyDesc": "Be the first to publish your duplicates and activate the trading community.",
+      "publishBtn": "Publish a listing"
     }
   },
   "explorar": {

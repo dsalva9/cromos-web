@@ -46,11 +46,10 @@ export default function MarketplaceShowcase() {
                 {t('badge')}
               </p>
               <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white uppercase">
-                Últimos anuncios publicados
+                {t('title')}
               </h2>
               <p className="mt-2 text-gray-700 dark:text-gray-400 max-w-2xl">
-                Publica tus duplicados y encuentra nuevos cromos sin salir de la
-                plataforma.
+                {t('desc')}
               </p>
             </div>
 
@@ -90,11 +89,10 @@ export default function MarketplaceShowcase() {
           {!showSkeletons && !hasListings && !error && (
             <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gray-100 dark:bg-gray-800 px-6 py-12 text-center">
               <h3 className="text-2xl font-bold uppercase text-gray-900 dark:text-white">
-                Aún no hay anuncios activos
+                {t('emptyTitle')}
               </h3>
               <p className="mt-3 text-gray-600 dark:text-gray-400">
-                Sé la primera persona en publicar tus duplicados y activa la
-                comunidad de intercambio.
+                {t('emptyDesc')}
               </p>
 
               <Button

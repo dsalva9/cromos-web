@@ -906,65 +906,65 @@
   },
   "landing": {
     "hero": {
-      "badge": "La Plataforma #1 de intercambio de Cromos",
-      "titleLine1": "Tu colecci�n",
-      "titleLine2": "a otro nivel",
-      "descriptionPart1": "Gestiona tus �lbumes, encuentra esos cromos dif�ciles y completa tu colecci�n con la comunidad m�s activa en tu plataforma ",
+      "badge": "A Plataforma #1 de troca de Figurinhas",
+      "titleLine1": "Sua coleção",
+      "titleLine2": "em outro nível",
+      "descriptionPart1": "Gerencie seus álbuns, encontre aquelas figurinhas difíceis e complete sua coleção com a comunidade mais ativa em uma plataforma ",
       "descriptionHighlight": "totalmente gratuita",
-      "startTrading": "Empezar a Intercambiar",
+      "startTrading": "Começar a Trocar",
       "exploreMarket": "Explorar Mercado",
-      "alreadyHaveAccount": "�Ya tienes cuenta?",
-      "login": "Inicia Sesi�n",
-      "availableOn": "Disponible en:"
+      "alreadyHaveAccount": "Já tem conta?",
+      "login": "Entrar",
+      "availableOn": "Disponível em:"
     },
     "features": {
       "feature1": {
-        "title": "Gestiona Albumes",
-        "desc": "Olv�date del papel. Marca los cromos que te faltan y repes directamente en la app."
+        "title": "Gerenciar Álbuns",
+        "desc": "Esqueça o papel. Marque as figurinhas que faltam e as repetidas diretamente no app."
       },
       "feature2": {
-        "title": "Busca Repes",
-        "desc": "Encuentra al instante qui�n tiene los cromos que te faltan."
+        "title": "Buscar Repetidas",
+        "desc": "Encontre instantaneamente quem tem as figurinhas que você precisa."
       },
       "feature3": {
-        "title": "Gana Logros",
-        "desc": "Completa intercambios y destaca como un \"Top Trader\"."
+        "title": "Ganhar Conquistas",
+        "desc": "Complete trocas e destaque-se como um \"Top Trader\"."
       }
     },
     "seo": {
-      "title": "Tu destino para el intercambio de cromos",
-      "desc": "Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colecci�n. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de f�tbol del Mundial y cualquier otra colecci�n deportiva. Gestiona tus �lbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda Espa�a � todo en una sola plataforma gratuita."
+      "title": "Seu destino para troca de figurinhas",
+      "desc": "Com a Copa do Mundo de 2026 chegando, é hora de completar sua coleção. Sejam coleções de figurinhas Panini, Adrenalyn XL ou Topps, da LaLiga ou da Copa do Mundo de 2026... CambioCromos é o lugar perfeito para trocar figurinhas de futebol da Copa do Mundo e qualquer outra coleção esportiva. Gerencie seus álbuns, encontre as figurinhas que faltam e conecte-se com colecionadores de toda a Espanha — tudo em uma única plataforma gratuita."
     },
     "cta": {
-      "title": "�Listo para completar tu �lbum?",
-      "desc": "�nete a miles de coleccionistas que ya est�n intercambiando sus cromos hoy mismo.",
-      "button": "Crear Cuenta Gratis"
+      "title": "Pronto para completar seu álbum?",
+      "desc": "Junte-se a milhares de colecionadores que já estão trocando suas figurinhas hoje mesmo.",
+      "button": "Criar Conta Grátis"
     },
     "mockup": {
       "special": "ESPECIAL",
-      "cardCollection": "Liga 2024 � Cromo Especial",
-      "trades": "intercambios",
-      "location": "Madrid, Espa�a",
-      "tradesLabel": "Trades",
-      "ratingLabel": "Rating",
-      "sendMessage": "Enviar Mensaje",
-      "userListings": "Sus anuncios (24)",
-      "online": "En l�nea",
-      "message1": "�Hola! Vi que tienes el cromo de Messi. �Lo intercambias?",
-      "message2": "�Claro! �Qu� tienes para ofrecer?",
-      "message3": "Tengo Mbapp� y Haaland duplicados ??",
-      "inputPlaceholder": "Escribe un mensaje...",
-      "searchPlaceholder": "Buscar cromos..."
+      "cardCollection": "Liga 2024 • Figurinha Especial",
+      "trades": "trocas",
+      "location": "Madri, Espanha",
+      "tradesLabel": "Trocas",
+      "ratingLabel": "Avaliação",
+      "sendMessage": "Enviar Mensagem",
+      "userListings": "Seus anúncios (24)",
+      "online": "Online",
+      "message1": "Oi! Vi que você tem a figurinha do Messi. Você troca?",
+      "message2": "Claro! O que você tem para oferecer?",
+      "message3": "Tenho Mbappé e Haaland repetidos 🤝",
+      "inputPlaceholder": "Digite uma mensagem...",
+      "searchPlaceholder": "Buscar figurinhas..."
     },
     "showcase": {
-      "badge": "Marketplace en vivo",
-      "title": "�ltimos anuncios publicados",
-      "desc": "Publica tus duplicados y encuentra nuevos cromos sin salir de la plataforma.",
-      "goToMarket": "Ir al marketplace",
-      "error": "Ha ocurrido un error al cargar los anuncios: {error}",
-      "emptyTitle": "A�n no hay anuncios activos",
-      "emptyDesc": "S� la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
-      "publishBtn": "Publicar un anuncio"
+      "badge": "Marketplace ao vivo",
+      "title": "Últimos anúncios publicados",
+      "desc": "Publique suas repetidas e encontre novas figurinhas sem sair da plataforma.",
+      "goToMarket": "Ir para o marketplace",
+      "error": "Ocorreu um erro ao carregar os anúncios: {error}",
+      "emptyTitle": "Nenhum anúncio ativo ainda",
+      "emptyDesc": "Seja o primeiro a publicar suas repetidas e ative a comunidade de troca.",
+      "publishBtn": "Publicar um anúncio"
     }
   },
   "explorar": {
