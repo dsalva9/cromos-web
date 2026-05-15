@@ -3,12 +3,9 @@
 import { useEffect } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor, type PluginListenerHandle } from '@capacitor/core';
-import { useRouter } from '@/hooks/use-router';
 import { logger } from '@/lib/logger';
 
 export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) {
       return;
@@ -38,8 +35,11 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
 
       logger.debug('Navigating to:', path);
 
-      // Navigate to the path
-      router.push(path);
+      // Use window.location.href instead of router.push to avoid the custom
+      // use-router hook prepending the current locale prefix to the path.
+      // Deep links like /auth/callback live OUTSIDE the /[locale]/ segment,
+      // so adding /es/ would result in /es/auth/callback → 404.
+      window.location.href = path;
     }).then(handle => {
       listenerHandle = handle;
     });
@@ -50,8 +50,7 @@ export function DeepLinkHandler({ children }: { children: React.ReactNode }) {
         listenerHandle.remove();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once - router dependency causes infinite loops
+  }, []);
 
   return <>{children}</>;
 }
