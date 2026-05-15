@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useUserSearch } from '@/hooks/admin/useUserSearch';
@@ -216,7 +216,7 @@ function UserSearchContent() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
                       <div>
                         <p className="text-gray-400">Rating</p>
                         <p className="text-white font-bold">
@@ -244,9 +244,13 @@ function UserSearchContent() {
                         <p className="text-white font-bold">{user.reports_received_count}</p>
                       </div>
                       <div>
+                        <p className="text-gray-400">Country</p>
+                        <p className="text-white font-bold">{user.country_code}</p>
+                      </div>
+                      <div>
                         <p className="text-gray-400">Joined</p>
                         <p className="text-white font-bold">
-                          {new Date(user.created_at).toLocaleDateString()}
+                          {new Date(user.created_at).toLocaleString()}
                         </p>
                       </div>
                     </div>

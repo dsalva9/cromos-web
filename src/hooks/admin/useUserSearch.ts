@@ -18,6 +18,7 @@ interface AdminUser {
   messages_sent: number;
   messages_received: number;
   albums_count: number;
+  country_code: string;
 }
 
 export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended' | 'pending_deletion') {
