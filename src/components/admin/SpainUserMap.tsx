@@ -4,9 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
-/* ─── Province center coordinates (lat, lng) ───────────────────────── */
-// Spanish postal codes: first 2 digits = province code
-// Coordinates are approximate province capitals / centers
+/* ─── Province coords (first 2 digits of postcode) ─────────────────── */
 const PROVINCE_COORDS: Record<string, { lat: number; lng: number; name: string }> = {
   '01': { lat: 42.85, lng: -2.67, name: 'Álava' },
   '02': { lat: 38.99, lng: -1.86, name: 'Albacete' },
@@ -62,105 +60,145 @@ const PROVINCE_COORDS: Record<string, { lat: number; lng: number; name: string }
   '52': { lat: 35.29, lng: -2.94, name: 'Melilla' },
 };
 
-/* ─── Geo projection (simple Mercator-like for Spain) ──────────────── */
-// Bounding box: lat [35.0, 44.0], lng [-9.5, 4.5]
-// We map to a viewBox of ~600x500
-const MAP_BOUNDS = {
-  latMin: 35.0,
-  latMax: 44.0,
-  lngMin: -9.5,
-  lngMax: 4.5,
+/* ─── Province → Comunidad Autónoma mapping ────────────────────────── */
+const PROVINCE_TO_CCAA: Record<string, string> = {
+  '01': 'PV', '20': 'PV', '48': 'PV',
+  '02': 'CM', '13': 'CM', '16': 'CM', '19': 'CM', '45': 'CM',
+  '03': 'VC', '12': 'VC', '46': 'VC',
+  '04': 'AN', '11': 'AN', '14': 'AN', '18': 'AN', '21': 'AN', '23': 'AN', '29': 'AN', '41': 'AN',
+  '05': 'CL', '09': 'CL', '24': 'CL', '34': 'CL', '37': 'CL', '40': 'CL', '42': 'CL', '47': 'CL', '49': 'CL',
+  '06': 'EX', '10': 'EX',
+  '07': 'IB',
+  '08': 'CT', '17': 'CT', '25': 'CT', '43': 'CT',
+  '15': 'GA', '27': 'GA', '32': 'GA', '36': 'GA',
+  '22': 'AR', '44': 'AR', '50': 'AR',
+  '26': 'RI', '28': 'MD', '30': 'MU', '31': 'NA', '33': 'AS',
+  '35': 'CN', '38': 'CN', '39': 'CB', '51': 'CE', '52': 'ML',
 };
 
-// Canary Islands inset box (bottom-left)
-const CANARY_OFFSET = { x: 80, y: 400 };
-const CANARY_CODES = ['35', '38'];
+const CCAA_NAMES: Record<string, string> = {
+  AN: 'Andalucía', AR: 'Aragón', AS: 'Asturias', IB: 'Illes Balears',
+  CN: 'Canarias', CB: 'Cantabria', CL: 'Castilla y León', CM: 'Castilla-La Mancha',
+  CT: 'Cataluña', VC: 'Com. Valenciana', EX: 'Extremadura', GA: 'Galicia',
+  MD: 'Madrid', MU: 'Murcia', NA: 'Navarra', PV: 'País Vasco',
+  RI: 'La Rioja', CE: 'Ceuta', ML: 'Melilla',
+};
 
-function projectToSVG(lat: number, lng: number, code: string): { x: number; y: number } {
-  const { latMin, latMax, lngMin, lngMax } = MAP_BOUNDS;
-  const width = 560;
-  const height = 420;
-  const padding = 20;
+/* ─── Geo projection ───────────────────────────────────────────────── */
+const MAP = { latMin: 35.5, latMax: 44.0, lngMin: -9.8, lngMax: 4.8 };
+const W = 600, H = 430, PAD = 20;
+const CANARY_OFF = { x: 60, y: 380 };
+const CANARY_CODES = new Set(['35', '38']);
 
-  // Handle Canary Islands separately
-  if (CANARY_CODES.includes(code)) {
-    // Canary Islands relative positioning within the inset
-    const canaryLngMin = -18.5;
-    const canaryLngMax = -13.0;
-    const canaryLatMin = 27.5;
-    const canaryLatMax = 29.5;
-    const insetWidth = 120;
-    const insetHeight = 55;
-
-    const x = CANARY_OFFSET.x + ((lng - canaryLngMin) / (canaryLngMax - canaryLngMin)) * insetWidth;
-    const y = CANARY_OFFSET.y + ((canaryLatMax - lat) / (canaryLatMax - canaryLatMin)) * insetHeight;
-    return { x, y };
+function proj(lat: number, lng: number, code?: string): [number, number] {
+  if (code && CANARY_CODES.has(code)) {
+    const x = CANARY_OFF.x + ((lng - (-18.5)) / 5.5) * 130;
+    const y = CANARY_OFF.y + ((29.5 - lat) / 2.0) * 55;
+    return [x, y];
   }
-
-  const x = padding + ((lng - lngMin) / (lngMax - lngMin)) * width;
-  const y = padding + ((latMax - lat) / (latMax - latMin)) * height;
-  return { x, y };
+  const x = PAD + ((lng - MAP.lngMin) / (MAP.lngMax - MAP.lngMin)) * (W - 2 * PAD);
+  const y = PAD + ((MAP.latMax - lat) / (MAP.latMax - MAP.latMin)) * (H - 2 * PAD);
+  return [x, y];
 }
 
-/* ─── Spain outline path (simplified) ──────────────────────────────── */
-const SPAIN_OUTLINE = `M 108,42 L 130,30 155,22 180,25 210,20 240,28 270,25 300,22
-  330,26 355,28 380,30 405,25 430,30 455,38 478,50 495,65 510,85
-  518,105 525,130 530,155 535,175 540,195 535,215 525,235 518,258
-  510,278 498,298 485,315 470,328 455,338 435,348 415,355 395,358
-  375,362 355,370 335,378 315,385 295,388 275,385 255,378 240,372
-  225,365 210,358 195,355 178,358 160,362 142,368 125,372 108,375
-  92,370 78,362 65,352 55,340 48,325 42,308 38,290 35,270
-  32,250 30,230 30,210 32,190 35,170 38,150 42,130 48,112
-  55,95 65,78 78,62 92,48 108,42Z`;
+function polyPath(pts: [number, number][]): string {
+  return pts.map(([lat, lng], i) => {
+    const [x, y] = proj(lat, lng);
+    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ') + 'Z';
+}
+
+/* ─── Spain outline as lat/lng polygons ────────────────────────────── */
+// Mainland – clockwise from NW Galicia
+const MAINLAND: [number, number][] = [
+  [43.79,-7.87],[43.65,-8.17],[43.37,-8.40],[43.19,-8.81],[42.88,-9.27],
+  [42.44,-8.87],[42.12,-8.85],[41.87,-8.88],[41.87,-8.17],[41.80,-7.90],
+  [41.38,-7.43],[41.08,-8.17],[40.40,-7.60],[39.66,-7.55],[39.47,-7.53],
+  [39.02,-7.50],[38.73,-7.41],[38.18,-7.00],[37.53,-7.44],[37.17,-7.41],
+  [36.98,-7.43],[36.78,-7.00],[36.48,-6.36],[36.14,-5.68],[36.00,-5.61],
+  [36.01,-5.35],[36.13,-5.44],[36.18,-5.36],[36.07,-5.32],[36.07,-5.23],
+  [36.39,-5.14],[36.72,-4.42],[36.72,-3.83],[36.73,-3.18],[36.75,-2.64],
+  [36.84,-2.43],[37.10,-1.88],[37.56,-1.63],[37.63,-0.96],[37.82,-0.75],
+  [38.00,-0.69],[38.13,-0.52],[38.35,-0.49],[38.54,-0.13],[38.75,0.17],
+  [38.91,0.00],[39.05,-0.20],[39.47,-0.33],[39.50,0.15],[39.87,0.20],
+  [40.08,0.10],[40.43,0.32],[40.53,0.48],[40.62,0.60],[40.74,0.69],
+  [41.08,1.20],[41.18,1.42],[41.27,1.98],[41.37,2.17],[41.58,2.52],
+  [41.72,2.72],[42.01,3.05],[42.32,3.15],[42.43,3.18],
+  [42.50,3.05],[42.60,2.70],[42.68,2.00],[42.65,1.40],[42.73,0.73],
+  [42.77,0.30],[42.82,-0.30],[42.88,-0.70],[42.93,-1.30],[43.08,-1.40],
+  [43.27,-1.78],[43.32,-1.79],[43.38,-1.93],[43.40,-2.40],[43.32,-2.93],
+  [43.42,-3.45],[43.46,-3.81],[43.40,-4.05],[43.38,-4.51],[43.34,-5.00],
+  [43.55,-5.60],[43.56,-5.85],[43.54,-6.40],[43.56,-6.85],[43.65,-7.27],
+  [43.66,-7.60],
+];
+
+// Balearic Islands (simplified)
+const MALLORCA: [number, number][] = [
+  [39.96,2.39],[39.87,3.08],[39.72,3.44],[39.45,3.48],[39.27,3.18],
+  [39.26,2.70],[39.35,2.35],[39.55,2.31],[39.78,2.32],
+];
+const IBIZA: [number, number][] = [
+  [39.08,1.21],[38.98,1.55],[38.84,1.58],[38.84,1.20],[38.93,1.18],
+];
+
+// Canary Islands (simplified outlines for inset)
+const TENERIFE: [number, number][] = [
+  [28.53,-16.60],[28.10,-16.80],[28.00,-16.52],[28.05,-16.12],[28.38,-16.13],[28.53,-16.42],
+];
+const GRAN_CANARIA: [number, number][] = [
+  [28.17,-15.70],[27.97,-15.72],[27.75,-15.57],[27.74,-15.38],[27.92,-15.36],[28.15,-15.43],
+];
 
 /* ─── Main component ───────────────────────────────────────────────── */
-export default function SpainUserMap() {
+export default function SpainUserMap({ days }: { days: number | null }) {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<{ province_code: string; user_count: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [hoveredProvince, setHoveredProvince] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetch() {
+    async function load() {
       setLoading(true);
-      const { data: result, error } = await supabase.rpc('admin_get_user_distribution_by_postcode', {
-        p_country_code: 'ES',
-      });
-      if (error) {
-        logger.error('admin_get_user_distribution_by_postcode error', error);
-      } else {
-        setData((result as { province_code: string; user_count: number }[]) || []);
-      }
+      const params: Record<string, unknown> = { p_country_code: 'ES' };
+      if (days !== null) params.p_days = days;
+      const { data: result, error } = await supabase.rpc(
+        'admin_get_user_distribution_by_postcode',
+        params as { p_country_code: string; p_days?: number },
+      );
+      if (error) logger.error('distribution_by_postcode', error);
+      else setData((result as { province_code: string; user_count: number }[]) || []);
       setLoading(false);
     }
-    void fetch();
-  }, [supabase]);
+    void load();
+  }, [supabase, days]);
 
-  // Max user count for scaling
   const maxCount = useMemo(() => Math.max(...data.map(d => d.user_count), 1), [data]);
   const totalUsers = useMemo(() => data.reduce((s, d) => s + d.user_count, 0), [data]);
 
-  // Build dots with positions
   const dots = useMemo(() => {
     return data
       .filter(d => PROVINCE_COORDS[d.province_code])
       .map(d => {
-        const coords = PROVINCE_COORDS[d.province_code];
-        const pos = projectToSVG(coords.lat, coords.lng, d.province_code);
-        // Scale radius: min 4, max 22, proportional to sqrt of count
-        const minR = 4;
-        const maxR = 22;
+        const c = PROVINCE_COORDS[d.province_code];
+        const [x, y] = proj(c.lat, c.lng, d.province_code);
         const ratio = Math.sqrt(d.user_count) / Math.sqrt(maxCount);
-        const r = minR + ratio * (maxR - minR);
-        return {
-          ...d,
-          ...coords,
-          ...pos,
-          r,
-        };
+        const r = 4 + ratio * 18;
+        return { ...d, name: c.name, x, y, r };
       })
-      .sort((a, b) => b.user_count - a.user_count); // Render larger dots first (behind smaller)
+      .sort((a, b) => b.user_count - a.user_count);
   }, [data, maxCount]);
+
+  // Comunidad Autónoma aggregation
+  const ccaaRows = useMemo(() => {
+    const map = new Map<string, number>();
+    data.forEach(d => {
+      const ccaa = PROVINCE_TO_CCAA[d.province_code];
+      if (ccaa) map.set(ccaa, (map.get(ccaa) || 0) + d.user_count);
+    });
+    return Array.from(map.entries())
+      .map(([code, count]) => ({ code, name: CCAA_NAMES[code] || code, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [data]);
 
   if (loading) {
     return (
@@ -171,165 +209,156 @@ export default function SpainUserMap() {
   }
 
   if (data.length === 0) {
-    return (
-      <div className="text-center text-gray-500 py-8">
-        No postcode data available
-      </div>
-    );
+    return <div className="text-center text-gray-500 py-8">No postcode data for this period</div>;
   }
 
+  const mainlandPath = polyPath(MAINLAND);
+  const mallorcaPath = polyPath(MALLORCA);
+  const ibizaPath = polyPath(IBIZA);
+  const tenerifePath = polyPath(TENERIFE);
+  const granCanariaPath = polyPath(GRAN_CANARIA);
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">
-          {totalUsers} users with postcode data across {data.length} provinces
-        </p>
-        {/* Legend */}
-        <div className="flex items-center gap-3 text-xs text-gray-500">
-          <div className="flex items-center gap-1">
-            <svg width="8" height="8"><circle cx="4" cy="4" r="3" fill="#f59e0b" opacity="0.7" /></svg>
-            <span>1-5</span>
+    <div className="space-y-6">
+      {/* ── Map ────────────────────────────────────────────── */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm text-gray-400">
+            {totalUsers} users across {data.length} provinces
+          </p>
+          <div className="flex items-center gap-3 text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <svg width="8" height="8"><circle cx="4" cy="4" r="3" fill="#f59e0b" opacity="0.7" /></svg>1-5
+            </span>
+            <span className="flex items-center gap-1">
+              <svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#f59e0b" opacity="0.7" /></svg>10+
+            </span>
+            <span className="flex items-center gap-1">
+              <svg width="22" height="22"><circle cx="11" cy="11" r="10" fill="#f59e0b" opacity="0.7" /></svg>50+
+            </span>
           </div>
-          <div className="flex items-center gap-1">
-            <svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="#f59e0b" opacity="0.7" /></svg>
-            <span>10+</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <svg width="22" height="22"><circle cx="11" cy="11" r="10" fill="#f59e0b" opacity="0.7" /></svg>
-            <span>50+</span>
-          </div>
+        </div>
+
+        <div className="relative bg-[#1a2332] rounded-lg border border-gray-700/50 p-2 overflow-hidden">
+          <svg viewBox={`0 0 ${W} ${H + 50}`} className="w-full h-auto" style={{ maxHeight: '520px' }}>
+            {/* Spain mainland */}
+            <path d={mainlandPath} fill="#2a3a4e" stroke="#4a6078" strokeWidth="1.2" />
+            {/* Balearic Islands */}
+            <path d={mallorcaPath} fill="#2a3a4e" stroke="#4a6078" strokeWidth="1" />
+            <path d={ibizaPath} fill="#2a3a4e" stroke="#4a6078" strokeWidth="1" />
+
+            {/* Canary Islands inset */}
+            <rect x={CANARY_OFF.x - 15} y={CANARY_OFF.y - 18} width={160} height={85}
+              fill="none" stroke="#4a6078" strokeWidth="0.8" strokeDasharray="4,3" rx="4" />
+            <text x={CANARY_OFF.x - 10} y={CANARY_OFF.y - 5}
+              fill="#6B7280" fontSize="8" fontFamily="sans-serif">Canarias</text>
+            <path d={tenerifePath} fill="#2a3a4e" stroke="#4a6078" strokeWidth="1" />
+            <path d={granCanariaPath} fill="#2a3a4e" stroke="#4a6078" strokeWidth="1" />
+
+            {/* Province dots */}
+            {[...dots].reverse().map(dot => (
+              <g key={dot.province_code}
+                onMouseEnter={() => setHoveredProvince(dot.province_code)}
+                onMouseLeave={() => setHoveredProvince(null)}
+                className="cursor-pointer">
+                <circle cx={dot.x} cy={dot.y} r={dot.r + 2}
+                  fill="#f59e0b" opacity={hoveredProvince === dot.province_code ? 0.3 : 0.08}
+                  className="transition-opacity duration-200" />
+                <circle cx={dot.x} cy={dot.y} r={dot.r}
+                  fill="#f59e0b"
+                  opacity={hoveredProvince === dot.province_code ? 0.95 : 0.75}
+                  stroke={hoveredProvince === dot.province_code ? '#fbbf24' : 'none'}
+                  strokeWidth="2" className="transition-all duration-200" />
+                {dot.r >= 8 && (
+                  <text x={dot.x} y={dot.y + 1} textAnchor="middle" dominantBaseline="middle"
+                    fill="#000" fontSize={dot.r >= 14 ? '10' : '7'} fontWeight="bold"
+                    fontFamily="sans-serif" pointerEvents="none">
+                    {dot.user_count}
+                  </text>
+                )}
+              </g>
+            ))}
+
+            {/* Tooltip */}
+            {hoveredProvince && (() => {
+              const dot = dots.find(d => d.province_code === hoveredProvince);
+              if (!dot) return null;
+              const tw = 120;
+              const tx = Math.min(Math.max(dot.x - tw / 2, 5), W - tw - 5);
+              const ty = dot.y - dot.r - 35;
+              return (
+                <g>
+                  <rect x={tx} y={ty} width={tw} height={28} rx="4"
+                    fill="#111827" stroke="#374151" strokeWidth="1" />
+                  <text x={tx + tw / 2} y={ty + 11} textAnchor="middle"
+                    fill="#f59e0b" fontSize="10" fontWeight="bold" fontFamily="sans-serif">
+                    {dot.name} ({dot.province_code})
+                  </text>
+                  <text x={tx + tw / 2} y={ty + 22} textAnchor="middle"
+                    fill="#D1D5DB" fontSize="9" fontFamily="sans-serif">
+                    {dot.user_count} user{dot.user_count !== 1 ? 's' : ''}
+                  </text>
+                </g>
+              );
+            })()}
+          </svg>
         </div>
       </div>
 
-      <div className="relative bg-[#1a2332] rounded-lg border-2 border-gray-700/50 p-2 overflow-hidden">
-        <svg
-          viewBox="0 0 600 470"
-          className="w-full h-auto"
-          style={{ maxHeight: '500px' }}
-        >
-          {/* Spain outline */}
-          <path
-            d={SPAIN_OUTLINE}
-            fill="#2D3748"
-            stroke="#4A5568"
-            strokeWidth="1.5"
-            opacity="0.6"
-          />
-
-          {/* Canary Islands inset box */}
-          <rect
-            x={CANARY_OFFSET.x - 10}
-            y={CANARY_OFFSET.y - 15}
-            width={140}
-            height={75}
-            fill="none"
-            stroke="#4A5568"
-            strokeWidth="1"
-            strokeDasharray="4,3"
-            rx="4"
-          />
-          <text
-            x={CANARY_OFFSET.x - 5}
-            y={CANARY_OFFSET.y - 3}
-            fill="#6B7280"
-            fontSize="8"
-            fontFamily="sans-serif"
-          >
-            Canarias
-          </text>
-
-          {/* Province dots - render smallest on top */}
-          {[...dots].reverse().map(dot => (
-            <g
-              key={dot.province_code}
-              onMouseEnter={() => setHoveredProvince(dot.province_code)}
-              onMouseLeave={() => setHoveredProvince(null)}
-              className="cursor-pointer"
-            >
-              {/* Glow effect */}
-              <circle
-                cx={dot.x}
-                cy={dot.y}
-                r={dot.r + 2}
-                fill="#f59e0b"
-                opacity={hoveredProvince === dot.province_code ? 0.3 : 0.1}
-                className="transition-opacity duration-200"
-              />
-              {/* Main dot */}
-              <circle
-                cx={dot.x}
-                cy={dot.y}
-                r={dot.r}
-                fill="#f59e0b"
-                opacity={hoveredProvince === dot.province_code ? 0.95 : 0.7}
-                stroke={hoveredProvince === dot.province_code ? '#fbbf24' : 'none'}
-                strokeWidth="2"
-                className="transition-all duration-200"
-              />
-              {/* Count label for larger dots */}
-              {dot.r >= 8 && (
-                <text
-                  x={dot.x}
-                  y={dot.y + 1}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="#000"
-                  fontSize={dot.r >= 14 ? '10' : '8'}
-                  fontWeight="bold"
-                  fontFamily="sans-serif"
-                  pointerEvents="none"
-                >
-                  {dot.user_count}
-                </text>
-              )}
-            </g>
-          ))}
-
-          {/* Tooltip */}
-          {hoveredProvince && (() => {
-            const dot = dots.find(d => d.province_code === hoveredProvince);
-            if (!dot) return null;
-            const tooltipWidth = 120;
-            const tooltipX = Math.min(Math.max(dot.x - tooltipWidth / 2, 5), 600 - tooltipWidth - 5);
-            const tooltipY = dot.y - dot.r - 35;
-            return (
-              <g>
-                <rect
-                  x={tooltipX}
-                  y={tooltipY}
-                  width={tooltipWidth}
-                  height={28}
-                  rx="4"
-                  fill="#111827"
-                  stroke="#374151"
-                  strokeWidth="1"
-                />
-                <text
-                  x={tooltipX + tooltipWidth / 2}
-                  y={tooltipY + 11}
-                  textAnchor="middle"
-                  fill="#f59e0b"
-                  fontSize="10"
-                  fontWeight="bold"
-                  fontFamily="sans-serif"
-                >
-                  {dot.name} ({dot.province_code})
-                </text>
-                <text
-                  x={tooltipX + tooltipWidth / 2}
-                  y={tooltipY + 22}
-                  textAnchor="middle"
-                  fill="#D1D5DB"
-                  fontSize="9"
-                  fontFamily="sans-serif"
-                >
-                  {dot.user_count} user{dot.user_count !== 1 ? 's' : ''}
-                </text>
-              </g>
-            );
-          })()}
-        </svg>
-      </div>
+      {/* ── CCAA Table (separate, after the map) ───────────────── */}
+      {ccaaRows.length > 0 && (
+        <div className="bg-gray-800/40 rounded-lg border border-gray-700/50 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-700/50">
+            <h4 className="text-sm font-semibold text-white">
+              Usuarios por Comunidad Autónoma
+            </h4>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-gray-400 text-xs border-b border-gray-700/30">
+                  <th className="text-left px-4 py-2 font-medium">Comunidad</th>
+                  <th className="text-right px-4 py-2 font-medium">Usuarios</th>
+                  <th className="text-right px-4 py-2 font-medium">%</th>
+                  <th className="px-4 py-2 font-medium" style={{ width: '40%' }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {ccaaRows.map(row => {
+                  const pct = totalUsers > 0 ? (row.count / totalUsers) * 100 : 0;
+                  return (
+                    <tr key={row.code} className="border-b border-gray-700/20 hover:bg-gray-700/20 transition-colors">
+                      <td className="px-4 py-2 text-gray-200 font-medium">{row.name}</td>
+                      <td className="px-4 py-2 text-right text-amber-400 font-semibold tabular-nums">
+                        {row.count.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-2 text-right text-gray-400 tabular-nums">
+                        {pct.toFixed(1)}%
+                      </td>
+                      <td className="px-4 py-2">
+                        <div className="w-full bg-gray-700/40 rounded-full h-2">
+                          <div className="bg-amber-500/70 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${Math.min(pct, 100)}%` }} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-gray-600/50">
+                  <td className="px-4 py-2 text-white font-bold">Total</td>
+                  <td className="px-4 py-2 text-right text-amber-400 font-bold tabular-nums">
+                    {totalUsers.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-2 text-right text-gray-400 font-bold">100%</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

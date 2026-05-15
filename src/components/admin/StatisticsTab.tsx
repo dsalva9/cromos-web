@@ -273,7 +273,7 @@ export default function StatisticsTab() {
                 <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
               </div>
             }>
-              <SpainUserMap />
+              <SpainUserMap days={period === 'all' ? null : (TIME_PERIODS.find(p => p.key === period)?.days ?? null)} />
             </Suspense>
           </section>
 
