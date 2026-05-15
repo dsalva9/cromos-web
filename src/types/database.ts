@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -1311,6 +1311,7 @@ export type Database = {
           sticker_number: string | null
           suspended_at: string | null
           suspension_reason: string | null
+          thumbnail_url: string | null
           title: string
           updated_at: string | null
           user_id: string
@@ -1340,6 +1341,7 @@ export type Database = {
           sticker_number?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          thumbnail_url?: string | null
           title: string
           updated_at?: string | null
           user_id: string
@@ -1369,6 +1371,7 @@ export type Database = {
           sticker_number?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string | null
           user_id?: string
@@ -2175,6 +2178,13 @@ export type Database = {
           to_addresses: string[]
         }[]
       }
+      admin_get_listing_status_stats: {
+        Args: { p_days?: number }
+        Returns: {
+          status: string
+          total: number
+        }[]
+      }
       admin_get_messaging_activity_by_country: {
         Args: { p_days?: number }
         Returns: {
@@ -2363,25 +2373,46 @@ export type Database = {
           title: string
         }[]
       }
-      admin_list_users: {
-        Args: {
-          p_filter?: string
-          p_limit?: number
-          p_offset?: number
-          p_search?: string
-        }
-        Returns: {
-          created_at: string
-          email: string
-          is_admin: boolean
-          is_suspended: boolean
-          last_sign_in_at: string
-          nickname: string
-          sticker_count: number
-          trade_count: number
-          user_id: string
-        }[]
-      }
+      admin_list_users:
+        | {
+            Args: {
+              p_filter?: string
+              p_limit?: number
+              p_offset?: number
+              p_search?: string
+            }
+            Returns: {
+              country_code: string
+              created_at: string
+              email: string
+              is_admin: boolean
+              is_suspended: boolean
+              last_sign_in_at: string
+              nickname: string
+              sticker_count: number
+              trade_count: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_filter?: string
+              p_limit?: number
+              p_offset?: number
+              p_search?: string
+            }
+            Returns: {
+              created_at: string
+              email: string
+              is_admin: boolean
+              is_suspended: boolean
+              last_sign_in_at: string
+              nickname: string
+              sticker_count: number
+              trade_count: number
+              user_id: string
+            }[]
+          }
       admin_move_to_deletion: { Args: { p_user_id: string }; Returns: Json }
       admin_permanently_delete_listing: {
         Args: { p_listing_id: number }
@@ -2571,6 +2602,7 @@ export type Database = {
           p_slot_id: number
           p_slot_variant?: string
           p_sticker_number: string
+          p_thumbnail_url?: string
           p_title: string
         }
         Returns: number
@@ -3340,6 +3372,7 @@ export type Database = {
           slot_id: number
           status: string
           sticker_number: string
+          thumbnail_url: string
           title: string
           user_id: string
           views_count: number
@@ -3604,19 +3637,34 @@ export type Database = {
         Args: { p_is_special?: boolean; p_label?: string; p_slot_id: number }
         Returns: undefined
       }
-      update_trade_listing: {
-        Args: {
-          p_collection_name?: string
-          p_description?: string
-          p_image_url?: string
-          p_listing_id: number
-          p_listing_type?: string
-          p_price?: number
-          p_sticker_number?: string
-          p_title: string
-        }
-        Returns: undefined
-      }
+      update_trade_listing:
+        | {
+            Args: {
+              p_collection_name?: string
+              p_description?: string
+              p_image_url?: string
+              p_listing_id: number
+              p_listing_type?: string
+              p_price?: number
+              p_sticker_number?: string
+              p_title: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_collection_name?: string
+              p_description?: string
+              p_image_url?: string
+              p_listing_id: number
+              p_listing_type?: string
+              p_price?: number
+              p_sticker_number?: string
+              p_thumbnail_url?: string
+              p_title: string
+            }
+            Returns: undefined
+          }
       update_user_rating: {
         Args: { p_comment?: string; p_rating: number; p_rating_id: number }
         Returns: undefined

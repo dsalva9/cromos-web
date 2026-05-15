@@ -27,6 +27,7 @@ type User = {
   last_sign_in_at: string | null;
   sticker_count: number;
   trade_count: number;
+  country_code: string;
 };
 
 type ActionDialog = {
@@ -222,6 +223,7 @@ export default function UsersTab() {
               <th className="px-3 py-2 text-left border-b border-black">Email</th>
               <th className="px-3 py-2 text-left border-b border-black">Nickname</th>
               <th className="px-3 py-2 text-left border-b border-black">{t('colStatus')}</th>
+              <th className="px-3 py-2 text-left border-b border-black">{t('colCountry')}</th>
               <th className="px-3 py-2 text-left border-b border-black">{t('colStickers')}</th>
               <th className="px-3 py-2 text-left border-b border-black">{t('colTrades')}</th>
               <th className="px-3 py-2 text-left border-b border-black">{t('colCreated')}</th>
@@ -230,8 +232,8 @@ export default function UsersTab() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (<tr><td className="px-3 py-4" colSpan={8}>{t('loading')}</td></tr>)
-              : users.length === 0 ? (<tr><td className="px-3 py-4" colSpan={8}>{t('noResults')}</td></tr>)
+            {loading ? (<tr><td className="px-3 py-4" colSpan={9}>{t('loading')}</td></tr>)
+              : users.length === 0 ? (<tr><td className="px-3 py-4" colSpan={9}>{t('noResults')}</td></tr>)
               : (
               users.map(u => (
                 <tr
@@ -259,6 +261,9 @@ export default function UsersTab() {
                       )}
                     </div>
                   </td>
+                  <td className="px-3 py-2 border-b border-black whitespace-nowrap">
+                    {u.country_code}
+                  </td>
                   <td className="px-3 py-2 border-b border-black">
                     {u.sticker_count}
                   </td>
@@ -266,11 +271,11 @@ export default function UsersTab() {
                     {u.trade_count}
                   </td>
                   <td className="px-3 py-2 border-b border-black whitespace-nowrap">
-                    {new Date(u.created_at).toLocaleDateString()}
+                    {new Date(u.created_at).toLocaleString()}
                   </td>
                   <td className="px-3 py-2 border-b border-black whitespace-nowrap">
                     {u.last_sign_in_at
-                      ? new Date(u.last_sign_in_at).toLocaleDateString()
+                      ? new Date(u.last_sign_in_at).toLocaleString()
                       : '-'}
                   </td>
                   <td className="px-3 py-2 border-b border-black">
