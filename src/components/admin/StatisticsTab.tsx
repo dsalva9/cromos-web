@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, lazy, Suspense } from 'react';
 import { useAdminStatistics, TIME_PERIODS, type TimePeriodKey } from '@/hooks/admin/useAdminStatistics';
 import { useTranslations } from 'next-intl';
-import { Users, MessageSquare, ShoppingCart, TrendingUp, Globe, RefreshCw } from 'lucide-react';
+import { Users, MessageSquare, ShoppingCart, TrendingUp, Globe, RefreshCw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const SpainUserMap = lazy(() => import('@/components/admin/SpainUserMap'));
 
 /* ─── Country flag helper ──────────────────────────────────────────── */
 function countryFlag(code: string) {
@@ -258,6 +260,21 @@ export default function StatisticsTab() {
                 )}
               </div>
             )}
+          </section>
+
+          {/* ── 1b. Spain User Map ──────────────────────────────── */}
+          <section>
+            <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-amber-400" />
+              {t('spainMap')}
+            </h3>
+            <Suspense fallback={
+              <div className="flex justify-center py-12">
+                <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
+              </div>
+            }>
+              <SpainUserMap />
+            </Suspense>
           </section>
 
           {/* ── 2. Messaging ───────────────────────────────────── */}
