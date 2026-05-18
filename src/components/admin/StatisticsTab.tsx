@@ -237,7 +237,7 @@ export default function StatisticsTab() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.slice(0, 25).map(u => (
+                    {filteredUsers.slice(0, 200).map(u => (
                       <tr key={u.user_id} className="odd:bg-[#2D3748] even:bg-[#253044]">
                         <td className="px-3 py-1.5 border-b border-black font-medium">{u.nickname}</td>
                         <td className="px-3 py-1.5 border-b border-black text-gray-400">{u.email}</td>
@@ -253,9 +253,9 @@ export default function StatisticsTab() {
                     ))}
                   </tbody>
                 </table>
-                {filteredUsers.length > 25 && (
+                {filteredUsers.length > 200 && (
                   <p className="text-xs text-gray-500 mt-1">
-                    {t('showingFirst', { count: 25, total: filteredUsers.length })}
+                    {t('showingFirst', { count: 200, total: filteredUsers.length })}
                   </p>
                 )}
               </div>
