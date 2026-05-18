@@ -149,7 +149,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                 <SearchBar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
-                                    placeholder="{t('searchPlaceholder')}"
+                                    placeholder={t('searchPlaceholder')}
                                     className="bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:border-gold focus:ring-gold/20"
                                     onFocus={handleSearchFocus}
                                     onBlur={handleSearchBlur}
