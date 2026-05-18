@@ -40,7 +40,7 @@ es.legal.faq = {
   q7: '¿Puedo vender mis cromos?',
   a7: 'Sí. Puedes venderlos poniéndoles un valor al crear el anuncio. Aunque Cambiocromos no realiza arbitraje en las transacciones, ni actúa como soporte. Es responsabilidad del usuario tanto los acuerdos que realice como los datos que comparta. Para más información puedes revisar la <a href="/legal/privacy" class="text-gold hover:underline">Política de Privacidad</a> y los <a href="/legal/terms" class="text-gold hover:underline">Términos y Condiciones</a>.',
   q8: '¿Puedo reportar a un usuario?',
-  a8: 'Sí. Si detectas comportamientos inapropiados o cualquier problema, puedes contactar con nosotros en: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
+  a8: 'Sí. Si detectas comportamientos inapropiados o cualquier problema, puedes usar el botón de reporte disponible en el perfil o anuncio del usuario directamente desde la app, o bien contactar con nosotros en: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
   q9: '¿Quién está detrás de Cambiocromos?',
   a9: 'Somos Alberto, David y Marcos, tres amigos de Mallorca que decidimos crear una app para facilitar el intercambio de cromos entre coleccionistas.',
 };
@@ -63,7 +63,7 @@ en.legal.faq = {
   q7: 'Can I sell my stickers?',
   a7: 'Yes. You can sell them by setting a price when creating a listing. However, Cambiocromos does not mediate transactions and does not act as support. The user is responsible for any agreements made and data shared. For more information, please review our <a href="/legal/privacy" class="text-gold hover:underline">Privacy Policy</a> and <a href="/legal/terms" class="text-gold hover:underline">Terms and Conditions</a>.',
   q8: 'Can I report a user?',
-  a8: 'Yes. If you detect inappropriate behavior or any problem, you can contact us at: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
+  a8: 'Yes. If you detect inappropriate behavior or any problem, you can use the report button available on the user profile or listing directly in the app, or contact us at: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
   q9: 'Who is behind Cambiocromos?',
   a9: 'We are Alberto, David and Marcos, three friends from Mallorca who decided to create an app to make sticker trading easier for collectors.',
 };
@@ -86,7 +86,7 @@ pt.legal.faq = {
   q7: 'Posso vender os meus cromos?',
   a7: 'Sim. Pode vendê-los definindo um valor ao criar o anúncio. No entanto, o Cambiocromos não realiza arbitragem nas transações, nem atua como suporte. É responsabilidade do utilizador os acordos que realize e os dados que partilhe. Para mais informações, consulte a nossa <a href="/legal/privacy" class="text-gold hover:underline">Política de Privacidade</a> e os <a href="/legal/terms" class="text-gold hover:underline">Termos e Condições</a>.',
   q8: 'Posso denunciar um utilizador?',
-  a8: 'Sim. Se detetar comportamentos inapropriados ou qualquer problema, pode contactar-nos em: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
+  a8: 'Sim. Se detetar comportamentos inapropriados ou qualquer problema, pode usar o botão de denúncia disponível no perfil ou anúncio do utilizador diretamente na app, ou contactar-nos em: <a href="mailto:soporte@cambiocromos.com" class="text-gold hover:underline">soporte@cambiocromos.com</a>.',
   q9: 'Quem está por detrás do Cambiocromos?',
   a9: 'Somos Alberto, David e Marcos, três amigos de Maiorca que decidimos criar uma app para facilitar a troca de cromos entre colecionadores.',
 };
