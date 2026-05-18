@@ -18,7 +18,10 @@
   "footer": {
     "terms": "Términos",
     "privacy": "Privacidad",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "faq": "FAQ",
+    "contact": "Contacto",
+    "about": "Sobre Nosotros"
   },
   "language": {
     "change": "Cambiar idioma"
@@ -1761,6 +1764,60 @@
       "section6Desc": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Las modificaciones entrarán en vigor inmediatamente después de su publicación. El uso continuado del servicio implica la aceptación de los nuevos términos.",
       "section7Title": "7. Contacto",
       "section7Desc": "Para reportar infracciones o consultas legales, contáctenos en:"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "metaDescription": "Respuestas a las preguntas más frecuentes sobre Cambiocromos.",
+      "q1": "¿Qué es Cambiocromos?",
+      "a1": "Cambiocromos es una plataforma creada para ayudar a coleccionistas a intercambiar cromos de forma fácil, rápida y organizada.",
+      "q2": "¿La plataforma es gratuita?",
+      "a2": "Sí. Actualmente Cambiocromos es totalmente gratuita.",
+      "q3": "¿Cómo funciona?",
+      "a3": "En el marketplace encontrarás todos los cromos disponibles que ofrecen los usuarios de la comunidad, podrás contactar con ellos a través del chat y organizar el intercambio o la venta. Desde la sección de anuncios, tú podrás subir tus cromos repetidos para que otros usuarios contacten contigo.",
+      "q4": "¿Qué colecciones puedo encontrar?",
+      "a4": "Podrás encontrar y copiar todas las colecciones que los usuarios creen en la plataforma de forma pública. Somos una comunidad muy activa y siempre encontrarás las últimas colecciones. También podrás crear tu propia colección o modificar las que hayas copiado.",
+      "q5": "¿Necesito quedar en persona para intercambiar?",
+      "a5": "No necesariamente. Algunos usuarios prefieren quedar en persona y otros realizan intercambios por correo.",
+      "q6": "¿Cómo contacto con otros usuarios?",
+      "a6": "Cuando encuentres un usuario compatible podrás ponerte en contacto con él para organizar el intercambio.",
+      "q7": "¿Puedo vender mis cromos?",
+      "a7": "Sí. Puedes venderlos poniéndoles un valor al crear el anuncio. Aunque Cambiocromos no realiza arbitraje en las transacciones, ni actúa como soporte. Es responsabilidad del usuario tanto los acuerdos que realice como los datos que comparta. Para más información puedes revisar la <a href=\"/legal/privacy\" class=\"text-gold hover:underline\">Política de Privacidad</a> y los <a href=\"/legal/terms\" class=\"text-gold hover:underline\">Términos y Condiciones</a>.",
+      "q8": "¿Puedo reportar a un usuario?",
+      "a8": "Sí. Si detectas comportamientos inapropiados o cualquier problema, puedes contactar con nosotros en: <a href=\"mailto:soporte@cambiocromos.com\" class=\"text-gold hover:underline\">soporte@cambiocromos.com</a>.",
+      "q9": "¿Quién está detrás de Cambiocromos?",
+      "a9": "Somos Alberto, David y Marcos, tres amigos de Mallorca que decidimos crear una app para facilitar el intercambio de cromos entre coleccionistas."
+    },
+    "contact": {
+      "title": "Contacto",
+      "metaDescription": "Ponte en contacto con el equipo de Cambiocromos para dudas, problemas o sugerencias.",
+      "intro": "¿Tienes alguna duda, problema o sugerencia?",
+      "desc": "En Cambiocromos intentamos mejorar la plataforma poco a poco y escuchar a la comunidad es una parte muy importante del proyecto.",
+      "reasonsTitle": "Puedes escribirnos para:",
+      "reason1": "Resolver problemas con tu cuenta",
+      "reason2": "Dudas con el funcionamiento de la aplicación",
+      "reason3": "Reportar errores o fallos",
+      "reason4": "Informar sobre usuarios o comportamientos inapropiados",
+      "reason5": "Proponer nuevas funcionalidades",
+      "reason6": "Sugerir nuevas colecciones",
+      "reason7": "Enviarnos cualquier idea para mejorar la plataforma",
+      "outro": "Intentaremos responderte lo antes posible.",
+      "thanks": "¡Gracias por ayudarnos a seguir creciendo!"
+    },
+    "about": {
+      "title": "Sobre Nosotros",
+      "metaDescription": "Conoce la historia detrás de Cambiocromos y al equipo que lo hace posible.",
+      "greeting": "¡Hola!",
+      "intro": "Somos Alberto, David y Marcos, tres amigos de Mallorca unidos en este proyecto.",
+      "origin": "La idea de Cambiocromos nació de una situación muy simple. A Marcos (y especialmente a sus hijos) les encanta hacer álbumes y completar colecciones. Pero como le ocurre a muchísima gente, acababa pasando horas buscando en foros, grupos y redes sociales los cromos que le faltaban, intentando encontrar a alguien con quien intercambiar.",
+      "spark": "Un día comentó que debería existir una app para hacer esto mucho más fácil.",
+      "quote": "Y ahí empezó todo.",
+      "start": "David, profesional de la informática con muchos años de experiencia, y Alberto, al que le encanta crear y lanzar proyectos, lo tuvieron claro desde el primer momento: vamos a crear una app para intercambiar cromos.",
+      "team": "Así nació Cambiocromos.",
+      "born": "Lo que empezó como una idea entre amigos hoy se está convirtiendo poco a poco en una comunidad de coleccionistas que comparten la misma afición: completar álbumes, intercambiar cromos y disfrutar del hobby con otras personas.",
+      "community": "",
+      "mission": "Nuestro objetivo es hacer que intercambiar cromos sea algo sencillo, rápido y accesible para cualquier coleccionista, además de seguir construyendo una comunidad cercana y activa alrededor de esta pasión.",
+      "cta": "¿Y esto no ha hecho más que empezar, te unes?",
+      "downloadTitle": "Descarga la app"
     }
   },
   "navigation": {

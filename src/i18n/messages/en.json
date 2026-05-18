@@ -1028,7 +1028,10 @@
   "footer": {
     "terms": "Terms",
     "privacy": "Privacy",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "about": "About Us"
   },
   "language": {
     "change": "Change language"
@@ -1774,6 +1777,60 @@
       "section6Desc": "We reserve the right to modify these terms at any time. Modifications will take effect immediately upon publication. Continued use of the service implies acceptance of the new terms.",
       "section7Title": "7. Contact",
       "section7Desc": "To report violations or legal inquiries, contact us at:"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "metaDescription": "Answers to the most common questions about Cambiocromos.",
+      "q1": "What is Cambiocromos?",
+      "a1": "Cambiocromos is a platform created to help collectors trade stickers easily, quickly, and in an organized way.",
+      "q2": "Is the platform free?",
+      "a2": "Yes. Cambiocromos is currently completely free.",
+      "q3": "How does it work?",
+      "a3": "In the marketplace you will find all the stickers available from community members. You can contact them via chat to arrange a trade or sale. From the listings section, you can post your duplicate stickers so other users can reach out to you.",
+      "q4": "What collections can I find?",
+      "a4": "You can find and copy all collections that users create publicly on the platform. We are a very active community and you will always find the latest collections. You can also create your own collection or modify copied ones.",
+      "q5": "Do I need to meet in person to trade?",
+      "a5": "Not necessarily. Some users prefer to meet in person, while others trade by mail.",
+      "q6": "How do I contact other users?",
+      "a6": "When you find a compatible user, you can reach out to them to arrange the trade.",
+      "q7": "Can I sell my stickers?",
+      "a7": "Yes. You can sell them by setting a price when creating a listing. However, Cambiocromos does not mediate transactions and does not act as support. The user is responsible for any agreements made and data shared. For more information, please review our <a href=\"/legal/privacy\" class=\"text-gold hover:underline\">Privacy Policy</a> and <a href=\"/legal/terms\" class=\"text-gold hover:underline\">Terms and Conditions</a>.",
+      "q8": "Can I report a user?",
+      "a8": "Yes. If you detect inappropriate behavior or any problem, you can contact us at: <a href=\"mailto:soporte@cambiocromos.com\" class=\"text-gold hover:underline\">soporte@cambiocromos.com</a>.",
+      "q9": "Who is behind Cambiocromos?",
+      "a9": "We are Alberto, David and Marcos, three friends from Mallorca who decided to create an app to make sticker trading easier for collectors."
+    },
+    "contact": {
+      "title": "Contact",
+      "metaDescription": "Get in touch with the Cambiocromos team for questions, issues, or suggestions.",
+      "intro": "Do you have a question, problem, or suggestion?",
+      "desc": "At Cambiocromos we work to improve the platform step by step, and listening to the community is a very important part of the project.",
+      "reasonsTitle": "You can write to us to:",
+      "reason1": "Resolve issues with your account",
+      "reason2": "Ask questions about how the app works",
+      "reason3": "Report bugs or errors",
+      "reason4": "Report users or inappropriate behavior",
+      "reason5": "Suggest new features",
+      "reason6": "Suggest new collections",
+      "reason7": "Share any idea to help improve the platform",
+      "outro": "We will try to reply as soon as possible.",
+      "thanks": "Thank you for helping us keep growing!"
+    },
+    "about": {
+      "title": "About Us",
+      "metaDescription": "Learn the story behind Cambiocromos and the team that makes it possible.",
+      "greeting": "Hello!",
+      "intro": "We are Alberto, David and Marcos, three friends from Mallorca united by this project.",
+      "origin": "The idea for Cambiocromos came from a very simple situation. Marcos (and especially his kids) love making albums and completing collections. But like so many people, he would end up spending hours searching forums, groups and social networks for the stickers he was missing, trying to find someone to trade with.",
+      "spark": "One day he mentioned that there should be an app to make this much easier.",
+      "quote": "And that's where it all began.",
+      "start": "David, an IT professional with many years of experience, and Alberto, who loves creating and launching projects, knew immediately: let's build an app for trading stickers.",
+      "team": "That is how Cambiocromos was born.",
+      "born": "What started as an idea among friends is now slowly becoming a community of collectors who share the same passion: completing albums, trading stickers and enjoying the hobby with other people.",
+      "community": "",
+      "mission": "Our goal is to make sticker trading something simple, fast and accessible for any collector, while continuing to build a close-knit and active community around this passion.",
+      "cta": "This is just the beginning — want to join us?",
+      "downloadTitle": "Download the app"
     }
   },
   "navigation": {

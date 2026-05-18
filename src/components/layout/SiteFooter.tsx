@@ -21,6 +21,15 @@ export function SiteFooter() {
             <Link href="/legal/cookies" className="hover:text-gold transition-colors">
               {t('cookies')}
             </Link>
+            <Link href="/legal/faq" className="hover:text-gold transition-colors">
+              {t('faq')}
+            </Link>
+            <Link href="/legal/contact" className="hover:text-gold transition-colors">
+              {t('contact')}
+            </Link>
+            <Link href="/legal/about" className="hover:text-gold transition-colors">
+              {t('about')}
+            </Link>
           </div>
         </div>
       </div>
