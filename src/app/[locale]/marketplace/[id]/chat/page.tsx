@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useListingChat } from '@/hooks/marketplace/useListingChat';
@@ -35,10 +35,14 @@ function ListingChatPageContent() {
   const supabase = useSupabaseClient();
   const listingId = parseInt(params.id as string, 10);
 
+  const searchParams = useSearchParams();
+  // Pre-select the participant from the URL query param (set by the chats list for sellers)
+  const participantFromUrl = searchParams.get('participant');
+
   const [messageText, setMessageText] = useState('');
   const [listingOwner, setListingOwner] = useState<string | null>(null);
   const [isOwner, setIsOwner] = useState(false);
-  const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState<string | null>(participantFromUrl);
   const [listing, setListing] = useState<Listing | null>(null);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [reserving, setReserving] = useState(false);
@@ -58,7 +62,8 @@ function ListingChatPageContent() {
   const [listingAccessDenied, setListingAccessDenied] = useState(false);
   const [chatTermsDialogOpen, setChatTermsDialogOpen] = useState(false);
   const [listingCardExpanded, setListingCardExpanded] = useState(false);
-  const [showConversationList, setShowConversationList] = useState(true);
+  // If a participant was pre-selected from the URL, start with the list hidden
+  const [showConversationList, setShowConversationList] = useState(!participantFromUrl);
 
 
 
@@ -166,7 +171,7 @@ function ListingChatPageContent() {
     }
   }, [isOwner, fetchParticipants]);
 
-  // Auto-select conversation when only one exists
+  // Auto-select conversation when only one exists (skip if participant already set from URL)
   useEffect(() => {
     if (isOwner && participants.length === 1 && !selectedParticipant) {
       setSelectedParticipant(participants[0].user_id);
