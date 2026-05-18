@@ -1460,6 +1460,37 @@
         "title": "Política de Cookies",
         "description": "Leia nossa política de cookies."
       }
+    },
+    "ignored": {
+      "empty": {
+        "title": "Não tens utilizadores bloqueados",
+        "description": "Quando bloqueares utilizadores, eles aparecerão aqui para que possas geri-los."
+      },
+      "retry": "Tentar novamente",
+      "unblock": {
+        "button": "Desbloquear",
+        "loading": "A remover...",
+        "success": "{nickname} foi removido da tua lista de bloqueados",
+        "error": "Erro ao desbloquear utilizador"
+      },
+      "time": {
+        "blocked": "Bloqueado",
+        "today": "hoje",
+        "yesterday": "ontem",
+        "daysAgo": "há {count} dias",
+        "dayAgo": "há {count} dia",
+        "weeksAgo": "há {count} semanas",
+        "weekAgo": "há {count} semana",
+        "monthsAgo": "há {count} meses",
+        "monthAgo": "há {count} mês"
+      }
+    },
+    "theme": {
+      "title": "Aparência",
+      "description": "Personaliza o aspeto da aplicação",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
     }
   },
   "myCollection": {
