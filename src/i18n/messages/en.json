@@ -1798,7 +1798,8 @@
       "q8": "Can I report a user?",
       "a8": "Yes. If you detect inappropriate behavior or any problem, you can use the report button available on the user profile or listing directly in the app, or contact us at: <a href=\"mailto:soporte@cambiocromos.com\" class=\"text-gold hover:underline\">soporte@cambiocromos.com</a>.",
       "q9": "Who is behind Cambiocromos?",
-      "a9": "We are Alberto, David and Marcos, three friends from Mallorca who decided to create an app to make sticker trading easier for collectors."
+      "a9": "We are Alberto, David and Marcos, three friends from Mallorca who decided to create an app to make sticker trading easier for collectors.",
+      "downloadTitle": "Download the app"
     },
     "contact": {
       "title": "Contact",
@@ -1841,7 +1842,10 @@
     "logout": "Sign Out",
     "terms": "Terms",
     "privacy": "Privacy",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "about": "About Us"
   },
   "notificationsDropdown": {
     "title": "Notifications",

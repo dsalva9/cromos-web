@@ -242,6 +242,30 @@ export function MobileBottomNav() {
               >
                 {t('cookies')}
               </a>
+              <span>·</span>
+              <a
+                href="/legal/faq"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/faq'); }}
+                className="hover:text-gold transition-colors"
+              >
+                {t('faq')}
+              </a>
+              <span>·</span>
+              <a
+                href="/legal/contact"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/contact'); }}
+                className="hover:text-gold transition-colors"
+              >
+                {t('contact')}
+              </a>
+              <span>·</span>
+              <a
+                href="/legal/about"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/legal/about'); }}
+                className="hover:text-gold transition-colors"
+              >
+                {t('about')}
+              </a>
             </div>
             <p className="text-center text-[10px] text-gray-300 dark:text-gray-600 pb-1">v1.0 Beta</p>
           </div>

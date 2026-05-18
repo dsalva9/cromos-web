@@ -1785,7 +1785,8 @@
       "q8": "Posso denunciar um utilizador?",
       "a8": "Sim. Se detetar comportamentos inapropriados ou qualquer problema, pode usar o botão de denúncia disponível no perfil ou anúncio do utilizador diretamente na app, ou contactar-nos em: <a href=\"mailto:soporte@cambiocromos.com\" class=\"text-gold hover:underline\">soporte@cambiocromos.com</a>.",
       "q9": "Quem está por detrás do Cambiocromos?",
-      "a9": "Somos Alberto, David e Marcos, três amigos de Maiorca que decidimos criar uma app para facilitar a troca de cromos entre colecionadores."
+      "a9": "Somos Alberto, David e Marcos, três amigos de Maiorca que decidimos criar uma app para facilitar a troca de cromos entre colecionadores.",
+      "downloadTitle": "Descarregar a app"
     },
     "contact": {
       "title": "Contacto",
@@ -1828,7 +1829,10 @@
     "logout": "Terminar Sessão",
     "terms": "Termos",
     "privacy": "Privacidade",
-    "cookies": "Cookies"
+    "cookies": "Cookies",
+    "faq": "FAQ",
+    "contact": "Contato",
+    "about": "Sobre Nós"
   },
   "notificationsDropdown": {
     "title": "Notificações",
