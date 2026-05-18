@@ -1039,24 +1039,24 @@
   "landing": {
     "hero": {
       "badge": "La Plataforma #1 de intercambio de Cromos",
-      "titleLine1": "Tu colecci�n",
+      "titleLine1": "Tu colección",
       "titleLine2": "a otro nivel",
-      "descriptionPart1": "Gestiona tus �lbumes, encuentra esos cromos dif�ciles y completa tu colecci�n con la comunidad m�s activa en tu plataforma ",
+      "descriptionPart1": "Gestiona tus álbumes, encuentra esos cromos difíciles y completa tu colección con la comunidad más activa en tu plataforma ",
       "descriptionHighlight": "totalmente gratuita",
       "startTrading": "Empezar a Intercambiar",
       "exploreMarket": "Explorar Mercado",
-      "alreadyHaveAccount": "�Ya tienes cuenta?",
-      "login": "Inicia Sesi�n",
+      "alreadyHaveAccount": "¿Ya tienes cuenta?",
+      "login": "Inicia Sesión",
       "availableOn": "Disponible en:"
     },
     "features": {
       "feature1": {
         "title": "Gestiona Albumes",
-        "desc": "Olv�date del papel. Marca los cromos que te faltan y repes directamente en la app."
+        "desc": "Olvídate del papel. Marca los cromos que te faltan y repes directamente en la app."
       },
       "feature2": {
         "title": "Busca Repes",
-        "desc": "Encuentra al instante qui�n tiene los cromos que te faltan."
+        "desc": "Encuentra al instante quién tiene los cromos que te faltan."
       },
       "feature3": {
         "title": "Gana Logros",
@@ -1065,57 +1065,57 @@
     },
     "seo": {
       "title": "Tu destino para el intercambio de cromos",
-      "desc": "Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colecci�n. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de f�tbol del Mundial y cualquier otra colecci�n deportiva. Gestiona tus �lbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda Espa�a � todo en una sola plataforma gratuita."
+      "desc": "Con la Copa del Mundo 2026 a la vuelta de la esquina, es el momento de completar tu colección. Sean colecciones de cromos de Panini, Adrenalyn XL o Topps, de LaLiga o del Mundial 2026... CambioCromos es el lugar perfecto para cambiar cromos de fútbol del Mundial y cualquier otra colección deportiva. Gestiona tus álbumes, encuentra los cromos que te faltan y conecta con coleccionistas de toda España — todo en una sola plataforma gratuita."
     },
     "cta": {
-      "title": "�Listo para completar tu �lbum?",
-      "desc": "�nete a miles de coleccionistas que ya est�n intercambiando sus cromos hoy mismo.",
+      "title": "¿Listo para completar tu álbum?",
+      "desc": "Únete a miles de coleccionistas que ya están intercambiando sus cromos hoy mismo.",
       "button": "Crear Cuenta Gratis"
     },
     "mockup": {
       "special": "ESPECIAL",
-      "cardCollection": "Liga 2024 � Cromo Especial",
+      "cardCollection": "Liga 2024 — Cromo Especial",
       "trades": "intercambios",
-      "location": "Madrid, Espa�a",
+      "location": "Madrid, España",
       "tradesLabel": "Trades",
       "ratingLabel": "Rating",
       "sendMessage": "Enviar Mensaje",
       "userListings": "Sus anuncios (24)",
-      "online": "En l�nea",
-      "message1": "�Hola! Vi que tienes el cromo de Messi. �Lo intercambias?",
-      "message2": "�Claro! �Qu� tienes para ofrecer?",
-      "message3": "Tengo Mbapp� y Haaland duplicados ??",
+      "online": "En línea",
+      "message1": "¡Hola! Vi que tienes el cromo de Messi. ¿Lo intercambias?",
+      "message2": "¡Claro! ¿Qué tienes para ofrecer?",
+      "message3": "Tengo Mbappé y Haaland duplicados ??",
       "inputPlaceholder": "Escribe un mensaje...",
       "searchPlaceholder": "Buscar cromos..."
     },
     "showcase": {
       "badge": "Marketplace en vivo",
-      "title": "�ltimos anuncios publicados",
+      "title": "Últimos anuncios publicados",
       "desc": "Publica tus duplicados y encuentra nuevos cromos sin salir de la plataforma.",
       "goToMarket": "Ir al marketplace",
       "error": "Ha ocurrido un error al cargar los anuncios: {error}",
-      "emptyTitle": "A�n no hay anuncios activos",
-      "emptyDesc": "S� la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
+      "emptyTitle": "Aún no hay anuncios activos",
+      "emptyDesc": "Sé la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
       "publishBtn": "Publicar un anuncio"
     }
   },
   "explorar": {
     "meta": {
       "title": "Explorar Cromos",
-      "description": "Explora cromos disponibles para intercambio y venta. Encuentra los cromos que necesitas en la comunidad de coleccionistas m�s activa de Espa�a.",
-      "jsonLdName": "Explorar Cromos � Cambiocromos"
+      "description": "Explora cromos disponibles para intercambio y venta. Encuentra los cromos que necesitas en la comunidad de coleccionistas más activa de España.",
+      "jsonLdName": "Explorar Cromos — Cambiocromos"
     }
   },
   "explorar.detail": {
     "meta": {
       "notFoundTitle": "Anuncio no encontrado",
-      "notFoundDesc": "Este anuncio puede haber sido eliminado o ya no est� disponible.",
-      "stickerFromCollection": "Cromo de la colecci�n",
-      "numberPrefix": "n�mero #",
+      "notFoundDesc": "Este anuncio puede haber sido eliminado o ya no está disponible.",
+      "stickerFromCollection": "Cromo de la colección",
+      "numberPrefix": "número #",
       "forSale": "en venta",
       "forTradeAndSale": "disponible para intercambio y venta",
       "forTrade": "disponible para intercambio",
-      "forPrice": "por {price} �",
+      "forPrice": "por {price} €",
       "communitySuffix": "en Cambio Cromos, la comunidad de coleccionistas de cromos.",
       "jsonLdDescFallbackSticker": "Cromo",
       "jsonLdDescFallbackFrom": "de"
