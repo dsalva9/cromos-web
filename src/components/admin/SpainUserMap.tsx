@@ -153,6 +153,7 @@ const GRAN_CANARIA: [number, number][] = [
 export default function SpainUserMap({ days }: { days: number | null }) {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<{ province_code: string; user_count: number }[]>([]);
+  const [totalEsUsers, setTotalEsUsers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [hoveredProvince, setHoveredProvince] = useState<string | null>(null);
 
@@ -161,12 +162,30 @@ export default function SpainUserMap({ days }: { days: number | null }) {
       setLoading(true);
       const params: Record<string, unknown> = { p_country_code: 'ES' };
       if (days !== null) params.p_days = days;
-      const { data: result, error } = await supabase.rpc(
-        'admin_get_user_distribution_by_postcode',
-        params as { p_country_code: string; p_days?: number },
-      );
-      if (error) logger.error('distribution_by_postcode', error);
-      else setData((result as { province_code: string; user_count: number }[]) || []);
+
+      // Run both queries in parallel:
+      // 1. Postcode distribution (only users WITH a postcode)
+      // 2. Total ES users in period (with OR without postcode)
+      const [distRes, totalRes] = await Promise.all([
+        supabase.rpc(
+          'admin_get_user_distribution_by_postcode',
+          params as { p_country_code: string; p_days?: number },
+        ),
+        supabase
+          .from('profiles')
+          .select('id', { count: 'exact', head: true })
+          .eq('country_code', 'ES')
+          .is('deleted_at', null)
+          .gte('created_at', days !== null
+            ? new Date(Date.now() - days * 86400000).toISOString()
+            : '1970-01-01'),
+      ]);
+
+      if (distRes.error) logger.error('distribution_by_postcode', distRes.error);
+      else setData((distRes.data as { province_code: string; user_count: number }[]) || []);
+
+      if (!totalRes.error) setTotalEsUsers(totalRes.count ?? null);
+
       setLoading(false);
     }
     void load();
@@ -224,7 +243,13 @@ export default function SpainUserMap({ days }: { days: number | null }) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm text-gray-400">
-            {totalUsers} users across {data.length} provinces
+            {totalUsers} ES users with postcode data
+            {totalEsUsers !== null && totalEsUsers > totalUsers && (
+              <span className="text-gray-500 ml-1">
+                ({totalEsUsers - totalUsers} without postcode, not shown)
+              </span>
+            )}
+            {' · '}{data.length} provinces
           </p>
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1">
