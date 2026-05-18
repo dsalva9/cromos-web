@@ -1204,16 +1204,16 @@
   },
   "userProfile": {
     "status": {
-      "active": "Activos",
+      "active": "Ativos",
       "reserved": "Reservados",
-      "sold": "Completados",
-      "removed": "Eliminados"
+      "sold": "Concluidos",
+      "removed": "Removidos"
     },
     "emptyListings": {
-      "active": "No hay anuncios activos",
-      "reserved": "No hay anuncios reservados",
-      "sold": "No hay anuncios completados",
-      "removed": "No hay anuncios eliminados"
+      "active": "Sem anuncios ativos",
+      "reserved": "Sem anuncios reservados",
+      "sold": "Sem anuncios concluidos",
+      "removed": "Sem anuncios removidos"
     },
     "toast": {
       "nicknameRequired": "El usuario es obligatorio",
@@ -1267,6 +1267,12 @@
       "typeListing": "Anuncio",
       "typeTrade": "Intercambio",
       "empty": "Este usuario aún no ha recibido valoraciones"
+    },
+    "listings": {
+      "title": "Anuncios ativos",
+      "titleOwn": "Meus anuncios",
+      "empty": "Este usuario nao tem anuncios ativos",
+      "seeMore": "Ver mais anuncios"
     }
   },
   "settings": {

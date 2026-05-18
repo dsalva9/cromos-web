@@ -1267,6 +1267,12 @@
       "typeListing": "Anuncio",
       "typeTrade": "Intercambio",
       "empty": "Este usuario aún no ha recibido valoraciones"
+    },
+    "listings": {
+      "title": "Anuncios activos",
+      "titleOwn": "Mis anuncios",
+      "empty": "Este usuario no tiene anuncios activos",
+      "seeMore": "Ver mas anuncios"
     }
   },
   "settings": {

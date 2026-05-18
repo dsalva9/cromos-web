@@ -51,22 +51,7 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { useTranslations } from 'next-intl';
 import { getSupportMailtoUrl } from '@/lib/utils';
 
-// @ts-ignore
-const STATUS_LABELS = {
-  active: 'Activos',
-  reserved: 'Reservados',
-  sold: 'Completados',
-  removed: 'Eliminados',
-} as const;
-
-type ListingFilter = keyof typeof STATUS_LABELS;
-
-const emptyStateCopy: Record<ListingFilter, string> = {
-  active: 'No hay anuncios activos',
-  reserved: 'No hay anuncios reservados',
-  sold: 'No hay anuncios completados',
-  removed: 'No hay anuncios eliminados',
-};
+type ListingFilter = 'active' | 'reserved' | 'sold' | 'removed';
 interface Rating {
   id: number;
   rater_id: string;
@@ -107,6 +92,7 @@ export default function UserProfilePage() {
   const { enabled: multiCountryEnabled } = useFeatureFlag('multi_country');
 
   const [listingFilter, setListingFilter] = useState<ListingFilter>('active');
+  const [visibleCount, setVisibleCount] = useState(8);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [formNickname, setFormNickname] = useState('');
   const [formPostcode, setFormPostcode] = useState('');
@@ -779,10 +765,59 @@ export default function UserProfilePage() {
           </div>
         </div>
 
+      {/* Active Listings Section */}
+      {(isOwnProfile || statusCounts.active > 0) && (
+        <div className="space-y-6 mt-8">
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+            {isOwnProfile ? t('listings.titleOwn') : t('listings.title')}
+          </h2>
+
+          {/* Tab bar – own profile only */}
+          {isOwnProfile && (
+            <SegmentedTabs
+              tabs={listingTabs}
+              value={listingFilter}
+              onValueChange={(v) => {
+                setListingFilter(v as ListingFilter);
+                setVisibleCount(8);
+              }}
+            />
+          )}
+
+          {filteredListings.length === 0 ? (
+            <div className="text-center py-16 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-white/50 dark:bg-gray-800/50">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                {isOwnProfile
+                  ? t(`emptyListings.${listingFilter}`)
+                  : t('listings.empty')}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredListings.slice(0, visibleCount).map(listing => (
+                  <ListingCard key={listing.id} listing={listing} />
+                ))}
+              </div>
+              {visibleCount < filteredListings.length && (
+                <div className="flex justify-center mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setVisibleCount(v => v + 8)}
+                    className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    {t('listings.seeMore')}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
         {/* Ratings Section */}
         <div id="valoraciones" className="space-y-6 mt-12 scroll-mt-8">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white">Valoraciones</h2>
+          <h2 className="text-2xl font-black text-gray-900 dark:text-white">{t('ratings.title')}</h2>
 
           {loadingRatings ? (
             <div className="flex items-center justify-center py-12">
