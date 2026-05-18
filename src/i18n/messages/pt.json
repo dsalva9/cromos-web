@@ -1253,10 +1253,10 @@
     "stats": {
       "activeListings": "Anuncios activos",
       "favorites": "Favoritos",
-      "ratings": "Valoraciones"
+      "ratings": "Avaliacoes"
     },
     "ratings": {
-      "title": "Valoraciones",
+      "title": "Avaliacoes",
       "basedOnOne": "Basado en {count} valoración",
       "basedOnOther": "Basado en {count} valoraciones",
       "stars5": "5 estrellas",
