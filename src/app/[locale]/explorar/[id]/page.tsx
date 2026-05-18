@@ -96,6 +96,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: t('meta.notFoundTitle'),
       description: t('meta.notFoundDesc'),
+      robots: { index: false, follow: true },
       alternates: {
         canonical: `${baseUrl}/explorar/${id}`,
       },
@@ -123,6 +124,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    robots: { index: false, follow: true },
     alternates: {
       canonical: `${baseUrl}/explorar/${id}`,
     },
