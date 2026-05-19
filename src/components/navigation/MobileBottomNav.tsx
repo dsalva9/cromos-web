@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield } from 'lucide-react';
+import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
@@ -171,6 +171,20 @@ export function MobileBottomNav() {
             >
               <FileText className="h-5 w-5 text-gold" />
               <span className="font-medium">{t('collections')}</span>
+            </a>
+
+            <a
+              href="/blog"
+              onClick={(e) => {
+                e.preventDefault();
+                hapticImpact();
+                setIsMenuOpen(false);
+                window.location.href = lp('/blog');
+              }}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <BookOpen className="h-5 w-5 text-gold" />
+              <span className="font-medium">{t('blog')}</span>
             </a>
 
             <a

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -161,6 +161,20 @@ export default function LandingPage() {
                             </div>
                         </div>
 
+                    </div>
+                </div>
+            </section>
+
+            {/* Blog CTA */}
+            <section className="py-4 lg:py-6">
+                <div className="container mx-auto px-4">
+                    <div className="max-w-2xl mx-auto text-center">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
+                            📝 {t('blogCta.text')}{' '}
+                            <Link href="/blog" className="text-gold font-bold hover:underline">
+                                {t('blogCta.link')}
+                            </Link>
+                        </p>
                     </div>
                 </div>
             </section>

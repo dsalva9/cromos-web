@@ -112,11 +112,13 @@ export default function SiteHeader() {
     { href: '/mis-plantillas', label: t('myAlbums'), requiresCompletion: true },
     { href: '/chats', label: t('chats'), requiresCompletion: true },
     { href: '/favorites', label: t('favorites'), requiresCompletion: true },
+    { href: '/blog', label: t('blog') },
   ];
 
   const unauthenticatedLinks: NavigationLink[] = [
     { href: '/login', label: t('login') },
     { href: '/signup', label: t('signup') },
+    { href: '/blog', label: t('blog') },
   ];
 
   // While loading + wasAuthed, render authenticated links (CSS hides them via auth-dependent)

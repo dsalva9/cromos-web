@@ -1023,7 +1023,8 @@
     "login": "Log In",
     "signup": "Sign Up",
     "completeProfile": "Complete your profile to access this section",
-    "enter": "Enter"
+    "enter": "Enter",
+    "blog": "Blog"
   },
   "footer": {
     "terms": "Terms",
@@ -1031,7 +1032,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contact",
-    "about": "About Us"
+    "about": "About Us",
+    "blog": "Blog"
   },
   "language": {
     "change": "Change language"
@@ -1097,6 +1099,10 @@
       "emptyTitle": "No active listings yet",
       "emptyDesc": "Be the first to publish your duplicates and activate the trading community.",
       "publishBtn": "Publish a listing"
+    },
+    "blogCta": {
+      "text": "If you want to learn more about the world of sticker collecting, visit our",
+      "link": "blog"
     }
   },
   "explorar": {
@@ -1851,7 +1857,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contact",
-    "about": "About Us"
+    "about": "About Us",
+    "blog": "Blog"
   },
   "notificationsDropdown": {
     "title": "Notifications",
@@ -1970,5 +1977,22 @@
     "description": "Description",
     "submit": "Publish Listing",
     "uploadImage": "Upload Image"
+  },
+  "blog": {
+    "metadata": {
+      "title": "Blog | CambioCromos",
+      "description": "Articles, tips, and news about the world of sports sticker collecting."
+    },
+    "index": {
+      "title": "Blog",
+      "subtitle": "Articles and tips about sticker collecting",
+      "readMore": "Read more →",
+      "empty": "We will soon publish articles about the world of collecting."
+    },
+    "article": {
+      "backToBlog": "← Back to Blog",
+      "publishedOn": "Published on",
+      "by": "by"
+    }
   }
 }

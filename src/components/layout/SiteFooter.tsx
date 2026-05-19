@@ -30,6 +30,9 @@ export function SiteFooter() {
             <Link href="/legal/about" className="hover:text-gold transition-colors">
               {t('about')}
             </Link>
+            <Link href="/blog" className="hover:text-gold transition-colors">
+              {t('blog')}
+            </Link>
           </div>
         </div>
       </div>

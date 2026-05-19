@@ -1023,7 +1023,8 @@
     "login": "Iniciar Sessão",
     "signup": "Criar Conta",
     "completeProfile": "Complete seu perfil para acessar esta seção",
-    "enter": "Entrar"
+    "enter": "Entrar",
+    "blog": "Blog"
   },
   "footer": {
     "terms": "Termos",
@@ -1031,7 +1032,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contato",
-    "about": "Sobre Nós"
+    "about": "Sobre Nós",
+    "blog": "Blog"
   },
   "language": {
     "change": "Mudar idioma"
@@ -1097,6 +1099,10 @@
       "emptyTitle": "Nenhum anúncio ativo ainda",
       "emptyDesc": "Seja o primeiro a publicar suas repetidas e ative a comunidade de troca.",
       "publishBtn": "Publicar um anúncio"
+    },
+    "blogCta": {
+      "text": "Se você quer saber mais sobre o mundo de colecionar figurinhas, visite nosso",
+      "link": "blog"
     }
   },
   "explorar": {
@@ -1869,7 +1875,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contato",
-    "about": "Sobre Nós"
+    "about": "Sobre Nós",
+    "blog": "Blog"
   },
   "notificationsDropdown": {
     "title": "Notificações",
@@ -1988,5 +1995,22 @@
     "description": "Descrição",
     "submit": "Publicar Anúncio",
     "uploadImage": "Enviar Imagem"
+  },
+  "blog": {
+    "metadata": {
+      "title": "Blog | CambioCromos",
+      "description": "Artigos, dicas e novidades sobre o mundo do colecionismo de figurinhas esportivas."
+    },
+    "index": {
+      "title": "Blog",
+      "subtitle": "Artigos e dicas sobre colecionismo de figurinhas",
+      "readMore": "Leia mais →",
+      "empty": "Em breve publicaremos artigos sobre o mundo do colecionismo."
+    },
+    "article": {
+      "backToBlog": "← Voltar ao Blog",
+      "publishedOn": "Publicado em",
+      "by": "por"
+    }
   }
 }

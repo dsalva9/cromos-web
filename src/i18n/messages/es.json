@@ -13,7 +13,8 @@
     "login": "Iniciar Sesión",
     "signup": "Crear Cuenta",
     "completeProfile": "Completa tu perfil para acceder a esta sección",
-    "enter": "Entrar"
+    "enter": "Entrar",
+    "blog": "Blog"
   },
   "footer": {
     "terms": "Términos",
@@ -21,7 +22,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contacto",
-    "about": "Sobre Nosotros"
+    "about": "Sobre Nosotros",
+    "blog": "Blog"
   },
   "language": {
     "change": "Cambiar idioma"
@@ -1097,6 +1099,10 @@
       "emptyTitle": "Aún no hay anuncios activos",
       "emptyDesc": "Sé la primera persona en publicar tus duplicados y activa la comunidad de intercambio.",
       "publishBtn": "Publicar un anuncio"
+    },
+    "blogCta": {
+      "text": "Si quieres saber más sobre el mundo de coleccionar cromos, visita nuestro",
+      "link": "blog"
     }
   },
   "explorar": {
@@ -1869,7 +1875,8 @@
     "cookies": "Cookies",
     "faq": "FAQ",
     "contact": "Contacto",
-    "about": "Sobre Nosotros"
+    "about": "Sobre Nosotros",
+    "blog": "Blog"
   },
   "notificationsDropdown": {
     "title": "Notificaciones",
@@ -1988,5 +1995,22 @@
     "description": "Descripción",
     "submit": "Publicar Anuncio",
     "uploadImage": "Subir Imagen"
+  },
+  "blog": {
+    "metadata": {
+      "title": "Blog | CambioCromos",
+      "description": "Artículos, consejos y novedades sobre el mundo del coleccionismo de cromos deportivos."
+    },
+    "index": {
+      "title": "Blog",
+      "subtitle": "Artículos y consejos sobre el coleccionismo de cromos",
+      "readMore": "Leer más →",
+      "empty": "Próximamente publicaremos artículos sobre el mundo del coleccionismo."
+    },
+    "article": {
+      "backToBlog": "← Volver al Blog",
+      "publishedOn": "Publicado el",
+      "by": "por"
+    }
   }
 }

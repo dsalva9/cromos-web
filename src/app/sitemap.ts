@@ -3,6 +3,7 @@ import { siteConfig } from '@/config/site';
 import { routing } from '@/i18n/routing';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getAllArticles } from '@/lib/blog';
 
 // Regenerate sitemap at most once per hour
 export const revalidate = 3600;
@@ -88,5 +89,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // If DB query fails, just return static routes — sitemap should never error
     }
 
-    return [...staticEntries, ...listingEntries];
+    // Blog entries
+    const blogIndexEntries: MetadataRoute.Sitemap = locales.map((loc) => ({
+        url: `${siteConfig.url}/${loc}/blog`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+        alternates: buildAlternates('/blog'),
+    }));
+
+    const articles = getAllArticles();
+    const blogArticleEntries: MetadataRoute.Sitemap = articles.flatMap((article) =>
+        locales.map((loc) => ({
+            url: `${siteConfig.url}/${loc}/blog/${article.slug}`,
+            lastModified: new Date(article.publishedAt),
+            changeFrequency: 'monthly' as const,
+            priority: 0.6,
+            alternates: buildAlternates(`/blog/${article.slug}`),
+        }))
+    );
+
+    return [...staticEntries, ...blogIndexEntries, ...blogArticleEntries, ...listingEntries];
 }
