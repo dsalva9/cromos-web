@@ -1103,6 +1103,10 @@
     "blogCta": {
       "text": "Want to learn more about the world of sticker collecting? Discover tips, news, and guides on our blog.",
       "link": "Visit the Blog"
+    },
+    "social": {
+      "title": "Follow us on social media",
+      "subtitle": "Join our community on Instagram and TikTok for updates, giveaways, and much more."
     }
   },
   "explorar": {
@@ -1993,6 +1997,10 @@
       "backToBlog": "← Back to Blog",
       "publishedOn": "Published on",
       "by": "by"
+    },
+    "cta": {
+      "followUs": "Follow us on social media!",
+      "installApp": "Download the app and start trading!"
     }
   }
 }

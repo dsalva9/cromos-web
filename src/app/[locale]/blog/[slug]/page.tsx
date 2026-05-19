@@ -6,6 +6,7 @@ import { getArticleBySlug, getArticleSlugs } from '@/lib/blog';
 import { routing } from '@/i18n/routing';
 import type { Locale } from '@/i18n/routing';
 import Link from '@/components/ui/link';
+import BlogArticleCTA from '@/components/blog/BlogArticleCTA';
 
 type Props = {
     params: Promise<{ locale: string; slug: string }>;
@@ -117,6 +118,8 @@ export default async function BlogArticlePage({ params }: Props) {
                     </div>
 
                     <div dangerouslySetInnerHTML={{ __html: content.body }} />
+
+                    <BlogArticleCTA />
                 </article>
             </div>
         </>

@@ -1103,6 +1103,10 @@
     "blogCta": {
       "text": "¿Quieres saber más sobre el mundo de coleccionar cromos? Descubre consejos, novedades y guías en nuestro blog.",
       "link": "Visitar el Blog"
+    },
+    "social": {
+      "title": "Síguenos en redes sociales",
+      "subtitle": "Únete a nuestra comunidad en Instagram y TikTok para estar al día de novedades, sorteos y mucho más."
     }
   },
   "explorar": {
@@ -2011,6 +2015,10 @@
       "backToBlog": "← Volver al Blog",
       "publishedOn": "Publicado el",
       "by": "por"
+    },
+    "cta": {
+      "followUs": "¡Síguenos en redes sociales!",
+      "installApp": "¡Descarga la app y empieza a intercambiar!"
     }
   }
 }
