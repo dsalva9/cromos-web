@@ -20,7 +20,7 @@ import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle } from 'luci
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
-import Link from 'next/link';
+import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 
@@ -602,9 +602,14 @@ function ListingChatPageContent() {
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
-                      {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
-                    </p>
+                    <Link
+                      href={`/users/${selectedParticipant}`}
+                      className="inline-block hover:text-gold transition-colors"
+                    >
+                      <p className="font-bold text-sm text-gray-900 dark:text-white truncate hover:underline">
+                        {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
+                      </p>
+                    </Link>
                     {listing && (
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                         {listing.title}
@@ -633,7 +638,13 @@ function ListingChatPageContent() {
                       {listing.title}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
-                      {t('seller')} {listing.author_nickname}
+                      {t('seller')}{' '}
+                      <Link
+                        href={`/users/${listing.user_id}`}
+                        className="hover:text-gold hover:underline transition-colors font-bold"
+                      >
+                        {listing.author_nickname}
+                      </Link>
                     </p>
                   </div>
                   <button
