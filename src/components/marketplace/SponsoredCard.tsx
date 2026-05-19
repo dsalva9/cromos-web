@@ -72,8 +72,8 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
 
           {/* Pricing & Review row */}
           <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-            <span className="text-sm font-black text-gray-950 dark:text-white">
-              {product.price}
+            <span className="text-[11px] font-extrabold text-[#FF9900] dark:text-[#ffaa33] tracking-wide uppercase">
+              {t('priceLabel')}
             </span>
             <div className="flex items-center gap-0.5 text-amber-400">
               {Array.from({ length: product.rating }).map((_, i) => (
