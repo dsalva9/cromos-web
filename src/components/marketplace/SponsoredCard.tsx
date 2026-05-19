@@ -32,13 +32,13 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
 
       <div className="h-full flex flex-col bg-white dark:bg-gray-800 rounded-[15px] overflow-hidden">
         {/* Image Container */}
-        <div className="relative aspect-square bg-gradient-to-br from-amber-50/30 to-orange-50/30 dark:from-gray-850 dark:to-gray-900/60 overflow-hidden flex items-center justify-center p-4">
-          <div className="relative w-full h-full bg-white dark:bg-white/95 rounded-lg flex items-center justify-center p-3">
+        <div className="relative aspect-square bg-gradient-to-br from-amber-50/30 to-orange-50/30 dark:from-gray-850 dark:to-gray-900/60 overflow-hidden flex items-center justify-center p-2 sm:p-4">
+          <div className="relative w-full h-full bg-white dark:bg-white/95 rounded-lg flex items-center justify-center p-2 sm:p-3">
             <Image
               src={product.imageUrl}
               alt={t('title')}
               fill
-              className="object-contain transition-transform duration-500 group-hover:scale-105 p-3"
+              className="object-contain transition-transform duration-500 group-hover:scale-105 p-2 sm:p-3"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           </div>
@@ -60,27 +60,27 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-3 flex flex-col flex-1 gap-2">
+        <div className="p-2 sm:p-3 flex flex-col flex-1 gap-1 sm:gap-2">
           {/* Best Seller Badge */}
           <div className="flex items-center">
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-[#C45500]/10 text-[#C45500] dark:bg-[#FF9900]/25 dark:text-[#ffaa33] border border-[#C45500]/15 dark:border-[#FF9900]/25 shadow-sm uppercase tracking-wider">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black bg-[#C45500]/10 text-[#C45500] dark:bg-[#FF9900]/25 dark:text-[#ffaa33] border border-[#C45500]/15 dark:border-[#FF9900]/25 shadow-sm uppercase tracking-wider">
               {t('bestSeller')}
             </span>
           </div>
 
           {/* Title & Tagline */}
-          <div className="min-h-[3rem]">
-            <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-orange-500 dark:group-hover:text-amber-400 transition-colors">
+          <div>
+            <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-xs sm:text-sm group-hover:text-orange-500 dark:group-hover:text-amber-400 transition-colors">
               {t('title')}
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
+            <p className="hidden sm:block text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
               {t('tagline')}
             </p>
           </div>
 
           {/* Pricing & Review row */}
-          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-            <span className="text-[11px] font-extrabold text-[#FF9900] dark:text-[#ffaa33] tracking-wide uppercase">
+          <div className="flex items-center justify-between mt-auto pt-1.5 sm:pt-2 border-t border-gray-100 dark:border-gray-700">
+            <span className="text-[10px] sm:text-[11px] font-extrabold text-[#FF9900] dark:text-[#ffaa33] tracking-wide uppercase">
               {t('priceLabel')}
             </span>
             <div className="flex items-center gap-1">
@@ -107,10 +107,10 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
           </div>
 
           {/* Amazon Orange CTA Button */}
-          <div className="mt-2 z-20 relative">
-            <button className="w-full bg-[#FF9900] hover:bg-[#e68a00] text-white font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-1.5">
+          <div className="mt-1 sm:mt-2 z-20 relative">
+            <button className="w-full bg-[#FF9900] hover:bg-[#e68a00] text-white font-black text-[10px] sm:text-xs uppercase py-2 sm:py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-1 sm:gap-1.5">
               <span>{t('cta')}</span>
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
           </div>
         </div>
