@@ -6,8 +6,8 @@ export interface SponsoredProduct {
 }
 
 export const SPONSORED_PRODUCT: SponsoredProduct = {
-  imageUrl: "https://images-na.ssl-images-amazon.com/images/I/71N7e6lE-tL._AC_SL1500_.jpg",
-  price: "9,99 €",
+  imageUrl: "/assets/ultra-pro-sleeves.png",
+  price: "2,49 €",
   rating: 5,
   amazonUrl: "https://amzn.to/3Rgmd0g"
 };
