@@ -166,16 +166,28 @@ export default function LandingPage() {
             </section>
 
             {/* Blog CTA */}
-            <section className="py-4 lg:py-6">
+            <section className="py-8 lg:py-12">
                 <div className="container mx-auto px-4">
-                    <div className="max-w-2xl mx-auto text-center">
-                        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
-                            📝 {t('blogCta.text')}{' '}
-                            <Link href="/blog" className="text-gold font-bold hover:underline">
-                                {t('blogCta.link')}
-                            </Link>
-                        </p>
-                    </div>
+                    <Link href="/blog" className="block max-w-2xl mx-auto group">
+                        <div className="relative overflow-hidden rounded-2xl border-2 border-gold/30 dark:border-gold/20 bg-gradient-to-br from-yellow-50 via-white to-amber-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-750 p-6 md:p-8 shadow-lg hover:shadow-xl hover:border-gold transition-all duration-300">
+                            {/* Decorative accent */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold via-yellow-400 to-gold" />
+
+                            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gold/10 dark:bg-gold/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                </div>
+                                <div className="flex-1 text-center sm:text-left">
+                                    <p className="text-gray-700 dark:text-gray-200 text-base md:text-lg font-medium">
+                                        {t('blogCta.text')}
+                                    </p>
+                                    <span className="inline-flex items-center gap-1 mt-2 text-gold font-bold text-sm md:text-base group-hover:underline">
+                                        {t('blogCta.link')} →
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
             </section>
 
