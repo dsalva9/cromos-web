@@ -12,7 +12,20 @@ import { ArrowRight, Check, Search, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
     const t = useTranslations('landing');
+    const tAbout = useTranslations('legal.about');
+    const tFaq = useTranslations('legal.faq');
 
+    const questions = [
+        { q: tFaq('q1'), a: tFaq('a1') },
+        { q: tFaq('q2'), a: tFaq('a2') },
+        { q: tFaq('q3'), a: tFaq('a3') },
+        { q: tFaq('q4'), a: tFaq('a4') },
+        { q: tFaq('q5'), a: tFaq('a5') },
+        { q: tFaq('q6'), a: tFaq('a6') },
+        { q: tFaq('q7'), a: tFaq('a7') },
+        { q: tFaq('q8'), a: tFaq('a8') },
+        { q: tFaq('q9'), a: tFaq('a9') },
+    ];
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
@@ -246,6 +259,66 @@ export default function LandingPage() {
                                 TikTok
                             </a>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* About & FAQ Grid Section */}
+            <section className="py-16 lg:py-24 bg-gray-50/50 dark:bg-gray-900/50 border-y-2 border-gray-100 dark:border-gray-800">
+                <div className="container mx-auto px-4 max-w-6xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+                        
+                        {/* Left Column: About Us */}
+                        <div className="lg:col-span-5 space-y-6">
+                            <div className="space-y-4">
+                                <h2 className="text-3xl lg:text-4xl font-black uppercase text-gray-900 dark:text-white tracking-tight border-b-4 border-gold pb-2 w-fit">
+                                    {tAbout('title')}
+                                </h2>
+                                <p className="text-lg font-bold text-gray-900 dark:text-white pt-2">
+                                    {tAbout('greeting')}
+                                </p>
+                            </div>
+                            <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                                <p>{tAbout('intro')}</p>
+                                <p>{tAbout('origin')}</p>
+                                <p>{tAbout('spark')}</p>
+                                <blockquote className="border-l-4 border-gold pl-4 italic font-semibold text-gray-700 dark:text-gray-300 my-4">
+                                    &ldquo;{tAbout('quote')}&rdquo;
+                                </blockquote>
+                                <p>{tAbout('start')}</p>
+                                <p>{tAbout('team')}</p>
+                                <p>{tAbout('born')}</p>
+                                {tAbout('community') && <p>{tAbout('community')}</p>}
+                                <p>{tAbout('mission')}</p>
+                                <p className="font-bold text-gray-900 dark:text-white text-base">
+                                    {tAbout('cta')}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Right Column: FAQ */}
+                        <div className="lg:col-span-7 space-y-6">
+                            <h2 className="text-3xl lg:text-4xl font-black uppercase text-gray-900 dark:text-white tracking-tight border-b-4 border-gold pb-2 w-fit mb-6">
+                                {tFaq('title')}
+                            </h2>
+                            <div className="space-y-4">
+                                {questions.map((item, i) => (
+                                    <div 
+                                        key={i} 
+                                        className="bg-white dark:bg-gray-800 p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800 hover:border-gold/50 shadow-sm transition-all duration-300"
+                                    >
+                                        <h3 className="text-base md:text-lg font-black text-gray-900 dark:text-white mb-2">
+                                            {item.q}
+                                        </h3>
+                                        <p
+                                            className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base"
+                                            dangerouslySetInnerHTML={{ __html: item.a }}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </section>
