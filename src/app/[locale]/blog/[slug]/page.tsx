@@ -99,12 +99,12 @@ export default async function BlogArticlePage({ params }: Props) {
                     {t('article.backToBlog')}
                 </Link>
 
-                <article className="prose dark:prose-invert max-w-none">
+                <article className="blog-article">
                     <h1 className="text-2xl md:text-3xl font-black uppercase mb-4 text-gray-900 dark:text-white !leading-tight">
                         {content.title}
                     </h1>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-400 dark:text-gray-500 mb-8 not-prose">
+                    <div className="flex items-center gap-3 text-sm text-gray-400 dark:text-gray-500 mb-8">
                         <time dateTime={article.publishedAt}>
                             {t('article.publishedOn')}{' '}
                             {new Date(article.publishedAt).toLocaleDateString(
