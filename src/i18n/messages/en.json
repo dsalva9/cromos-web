@@ -198,6 +198,12 @@
       },
       "viewDetails": "View Details"
     },
+    "sponsored": {
+      "badge": "Sponsored",
+      "title": "Official Sticker Album - Complete Collection",
+      "tagline": "The official album to collect your favorite stickers",
+      "cta": "View on Amazon"
+    },
     "public": {
       "title": "Explorar Cromos",
       "stats": {

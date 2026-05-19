@@ -15,6 +15,8 @@ import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton'
 import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
 import { AnimatedList } from '@/components/ui/AnimatedList';
+import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
+import { SPONSORED_PRODUCT } from '@/lib/marketplace/sponsored-product';
 import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
 import { useTranslations } from 'next-intl';
 
@@ -340,6 +342,9 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     </div>
                 ) : (
                     <AnimatedList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {listings.length > 0 && !searchQuery.trim() && (
+                            <SponsoredCard product={SPONSORED_PRODUCT} />
+                        )}
                         {listings.map((listing: Listing) => (
                             <ListingCard key={listing.id} listing={listing} />
                         ))}

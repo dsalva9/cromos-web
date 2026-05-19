@@ -198,6 +198,12 @@
       },
       "viewDetails": "Ver Detalhes"
     },
+    "sponsored": {
+      "badge": "Patrocinado",
+      "title": "Álbum Oficial de Cromos - Coleção Completa",
+      "tagline": "O álbum oficial para colecionar seus cromos favoritos",
+      "cta": "Ver na Amazon"
+    },
     "public": {
       "title": "Explorar Cromos",
       "stats": {

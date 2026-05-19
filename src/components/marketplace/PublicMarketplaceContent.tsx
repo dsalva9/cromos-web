@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { LeanListingCard } from '@/components/home/LeanListingCard';
+import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
+import { SPONSORED_PRODUCT } from '@/lib/marketplace/sponsored-product';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { Button } from '@/components/ui/button';
 import { Filter, Package, ArrowRight } from 'lucide-react';
@@ -226,6 +228,9 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {listings.length > 0 && !searchQuery.trim() && (
+                            <SponsoredCard product={SPONSORED_PRODUCT} />
+                        )}
                         {listings.map((listing: Listing) => (
                             <LeanListingCard key={listing.id} listing={listing} href={`/explorar/${listing.id}`} />
                         ))}
