@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { ExternalLink, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { SponsoredProduct } from '@/lib/marketplace/sponsored-product';
 
@@ -13,6 +13,7 @@ interface SponsoredCardProps {
 
 export function SponsoredCard({ product }: SponsoredCardProps) {
   const t = useTranslations('marketplace.sponsored');
+  const locale = useLocale();
 
   return (
     <motion.div
@@ -60,6 +61,13 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
 
         {/* Content */}
         <div className="p-3 flex flex-col flex-1 gap-2">
+          {/* Best Seller Badge */}
+          <div className="flex items-center">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black bg-[#C45500]/10 text-[#C45500] dark:bg-[#FF9900]/25 dark:text-[#ffaa33] border border-[#C45500]/15 dark:border-[#FF9900]/25 shadow-sm uppercase tracking-wider">
+              {t('bestSeller')}
+            </span>
+          </div>
+
           {/* Title & Tagline */}
           <div className="min-h-[3rem]">
             <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-orange-500 dark:group-hover:text-amber-400 transition-colors">
@@ -75,10 +83,29 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
             <span className="text-[11px] font-extrabold text-[#FF9900] dark:text-[#ffaa33] tracking-wide uppercase">
               {t('priceLabel')}
             </span>
-            <div className="flex items-center gap-0.5 text-amber-400">
-              {Array.from({ length: product.rating }).map((_, i) => (
-                <Star key={i} className="h-3 w-3 fill-current" />
-              ))}
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300">
+                {product.rating.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              </span>
+              <div className="flex items-center gap-0.5 text-amber-400">
+                {Array.from({ length: Math.floor(product.rating) }).map((_, i) => (
+                  <Star key={`full-${i}`} className="h-3 w-3 fill-current text-amber-400 stroke-amber-400" />
+                ))}
+                {product.rating % 1 >= 0.4 && product.rating % 1 <= 0.8 && (
+                  <div className="relative h-3 w-3">
+                    <Star className="absolute inset-0 h-3 w-3 text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600" />
+                    <div className="absolute inset-0 overflow-hidden w-1/2">
+                      <Star className="h-3 w-3 fill-current text-amber-400 stroke-amber-400" />
+                    </div>
+                  </div>
+                )}
+                {Array.from({ length: 5 - Math.floor(product.rating) - (product.rating % 1 >= 0.4 && product.rating % 1 <= 0.8 ? 1 : 0) }).map((_, i) => (
+                  <Star key={`empty-${i}`} className="h-3 w-3 text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600" />
+                ))}
+              </div>
+              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-medium">
+                ({product.ratingsCount.toLocaleString(locale)})
+              </span>
             </div>
           </div>
 
