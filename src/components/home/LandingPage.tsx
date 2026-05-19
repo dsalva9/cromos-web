@@ -166,7 +166,7 @@ export default function LandingPage() {
             </section>
 
             {/* Blog CTA */}
-            <section className="py-8 lg:py-12">
+            <section className="py-8 lg:py-12 bg-gradient-to-b from-yellow-100/60 via-yellow-50/30 to-transparent dark:from-yellow-900/10 dark:via-gray-900/50 dark:to-transparent">
                 <div className="container mx-auto px-4">
                     <Link href="/blog" className="block max-w-2xl mx-auto group">
                         <div className="relative overflow-hidden rounded-2xl border-2 border-gold/30 dark:border-gold/20 bg-gradient-to-br from-yellow-50 via-white to-amber-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-750 p-6 md:p-8 shadow-lg hover:shadow-xl hover:border-gold transition-all duration-300">
