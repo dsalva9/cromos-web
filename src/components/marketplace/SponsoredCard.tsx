@@ -103,9 +103,6 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
                   <Star key={`empty-${i}`} className="h-3 w-3 text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600" />
                 ))}
               </div>
-              <span className="text-[9px] text-gray-400 dark:text-gray-500 font-medium">
-                ({product.ratingsCount.toLocaleString(locale)})
-              </span>
             </div>
           </div>
 
