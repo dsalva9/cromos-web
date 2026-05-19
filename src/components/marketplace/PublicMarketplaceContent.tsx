@@ -93,17 +93,17 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
             {/* Hero Section */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <div className="container mx-auto px-4 pt-4 pb-2 md:py-8">
+                <div className="container mx-auto px-4 pt-3 pb-1 md:pt-4 md:pb-2 md:py-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex-1 w-full">
-                            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-3">
+                            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-1 md:mb-3">
                                 <span className="text-black dark:text-white">
                                     {t('title')}
                                 </span>
                             </h1>
 
                             {/* Stats Badges */}
-                            <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                            <div className="hidden md:flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
                                 <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
                                     <span className="text-base md:text-lg">🔥</span>
                                     <span className="font-bold text-black dark:text-white">{t('stats.active', { count: listings.length })}</span>
@@ -136,7 +136,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 pt-5 pb-6 md:py-6">
+            <div className="container mx-auto px-4 pt-3 pb-6 md:py-6">
                 {/* Controls Bar */}
                 <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + var(--sat, 0px) + 0.5rem)' }}>
                     <div
