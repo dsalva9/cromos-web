@@ -30,7 +30,7 @@ export default async function ExplorePage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'explorar' });
   const { listings } = await getMarketplaceData({
-    limit: 20,
+    limit: 19,
     search: '',
   });
 

@@ -29,7 +29,7 @@ export default async function MarketplacePage({ params }: { params: Promise<{ lo
   // This handles geolocation server-side if user is logged in
   // eliminating the client-side profile fetch waterfall
   const { listings, userPostcode } = await getMarketplaceData({
-    limit: 20,
+    limit: 19,
     search: '',
   });
 

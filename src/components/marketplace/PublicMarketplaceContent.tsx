@@ -65,7 +65,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
 
     const { listings: fetchedListings, loading, error, hasMore, loadMore } = useListings({
         search: searchQuery,
-        limit: 20,
+        limit: 19,
         sortByDistance: false,
         viewerPostcode: null,
         collectionIds: [],

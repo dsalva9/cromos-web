@@ -78,7 +78,7 @@ function transformRow(item: RpcListingResponse): Listing {
  *
  * @param params - Configuration options for listings
  * @param params.search - Optional search query to filter listings by title or collection name
- * @param params.limit - Number of listings per page (default: 20)
+ * @param params.limit - Number of listings per page (default: 19)
  * @param params.sortByDistance - Sort listings by distance (requires postcode)
  * @param params.viewerPostcode - User's postcode for distance calculation
  * @param params.collectionIds - Filter by user's collection IDs (template copies)
@@ -109,7 +109,7 @@ function transformRow(item: RpcListingResponse): Listing {
  */
 export function useListings({
   search = '',
-  limit = 20,
+  limit = 19,
   sortByDistance = false,
   viewerPostcode = null,
   collectionIds = [],

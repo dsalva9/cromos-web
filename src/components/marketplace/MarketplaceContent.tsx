@@ -87,7 +87,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     // Pass server data as initialData - hook will skip initial fetch if filters are at defaults
     const { listings: fetchedListings, loading, error, hasMore, loadMore } = useListings({
         search: searchQuery,
-        limit: 20,
+        limit: 19,
         sortByDistance: sortByDistance && hasPostcode,
         viewerPostcode: initialUserPostcode,
         collectionIds: selectedCollectionIds,
