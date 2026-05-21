@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, lazy, Suspense } from 'react';
-import { useAdminStatistics, TIME_PERIODS, type TimePeriodKey } from '@/hooks/admin/useAdminStatistics';
+import { useAdminStatistics, TIME_PERIODS, getTodaySince, type TimePeriodKey } from '@/hooks/admin/useAdminStatistics';
 import { useTranslations } from 'next-intl';
 import { Users, MessageSquare, ShoppingCart, TrendingUp, Globe, RefreshCw, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -273,7 +273,10 @@ export default function StatisticsTab() {
                 <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
               </div>
             }>
-              <SpainUserMap days={period === 'all' ? null : (TIME_PERIODS.find(p => p.key === period)?.days ?? null)} />
+              <SpainUserMap
+                days={period === 'all' || period === 'today' ? null : (TIME_PERIODS.find(p => p.key === period)?.days ?? null)}
+                since={period === 'today' ? getTodaySince() : undefined}
+              />
             </Suspense>
           </section>
 

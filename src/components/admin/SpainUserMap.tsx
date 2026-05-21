@@ -150,7 +150,7 @@ const GRAN_CANARIA: [number, number][] = [
 ];
 
 /* ─── Main component ───────────────────────────────────────────────── */
-export default function SpainUserMap({ days }: { days: number | null }) {
+export default function SpainUserMap({ days, since }: { days: number | null; since?: string }) {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<{ province_code: string; user_count: number }[]>([]);
   const [totalEsUsers, setTotalEsUsers] = useState<number | null>(null);
@@ -161,7 +161,18 @@ export default function SpainUserMap({ days }: { days: number | null }) {
     async function load() {
       setLoading(true);
       const params: Record<string, unknown> = { p_country_code: 'ES' };
-      if (days !== null) params.p_days = days;
+      if (since) {
+        params.p_since = since;
+      } else if (days !== null) {
+        params.p_days = days;
+      }
+
+      // Determine cutoff for the total-count query
+      const cutoff = since
+        ? since
+        : days !== null
+          ? new Date(Date.now() - days * 86400000).toISOString()
+          : '1970-01-01';
 
       // Run both queries in parallel:
       // 1. Postcode distribution (only users WITH a postcode)
@@ -169,16 +180,14 @@ export default function SpainUserMap({ days }: { days: number | null }) {
       const [distRes, totalRes] = await Promise.all([
         supabase.rpc(
           'admin_get_user_distribution_by_postcode',
-          params as { p_country_code: string; p_days?: number },
+          params as { p_country_code: string; p_days?: number; p_since?: string },
         ),
         supabase
           .from('profiles')
           .select('id', { count: 'exact', head: true })
           .eq('country_code', 'ES')
           .is('deleted_at', null)
-          .gte('created_at', days !== null
-            ? new Date(Date.now() - days * 86400000).toISOString()
-            : '1970-01-01'),
+          .gte('created_at', cutoff),
       ]);
 
       if (distRes.error) logger.error('distribution_by_postcode', distRes.error);
@@ -189,7 +198,7 @@ export default function SpainUserMap({ days }: { days: number | null }) {
       setLoading(false);
     }
     void load();
-  }, [supabase, days]);
+  }, [supabase, days, since]);
 
   const maxCount = useMemo(() => Math.max(...data.map(d => d.user_count), 1), [data]);
   const totalUsers = useMemo(() => data.reduce((s, d) => s + d.user_count, 0), [data]);

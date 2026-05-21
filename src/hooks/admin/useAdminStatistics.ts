@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 // ── Time period mapping ───────────────────────────────────────────────
 export const TIME_PERIODS = [
+  { key: 'today', days: 0 },
   { key: '24h', days: 1 },
   { key: '3d', days: 3 },
   { key: '1w', days: 7 },
@@ -14,6 +15,22 @@ export const TIME_PERIODS = [
 ] as const;
 
 export type TimePeriodKey = (typeof TIME_PERIODS)[number]['key'];
+
+/**
+ * Returns the ISO timestamp for "today at 3 AM UTC".
+ * This matches the time the daily digest email is sent.
+ */
+export function getTodaySince(): string {
+  const now = new Date();
+  const today3am = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0),
+  );
+  // If it's currently before 3 AM UTC, go back to yesterday's 3 AM
+  if (now < today3am) {
+    today3am.setUTCDate(today3am.getUTCDate() - 1);
+  }
+  return today3am.toISOString();
+}
 
 // ── Response types ────────────────────────────────────────────────────
 export type NewUserRow = {
@@ -76,19 +93,26 @@ export function useAdminStatistics(period: TimePeriodKey) {
   const [error, setError] = useState<string | null>(null);
 
   const days = TIME_PERIODS.find(p => p.key === period)?.days ?? 7;
+  const isToday = period === 'today';
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
+      // Build the RPC params: use p_since for "today", p_days for all others
+      const params: { p_days: number; p_since?: string } = { p_days: days };
+      if (isToday) {
+        params.p_since = getTodaySince();
+      }
+
       const [usersRes, msgSummaryRes, msgCountryRes, listingStatusRes, listingCountryRes] =
         await Promise.all([
-          supabase.rpc('admin_get_new_users_summary', { p_days: days }),
-          supabase.rpc('admin_get_messaging_activity_summary', { p_days: days }),
-          supabase.rpc('admin_get_messaging_activity_by_country', { p_days: days }),
-          supabase.rpc('admin_get_listing_status_stats', { p_days: days }),
-          supabase.rpc('admin_get_new_listings_by_country', { p_days: days }),
+          supabase.rpc('admin_get_new_users_summary', params),
+          supabase.rpc('admin_get_messaging_activity_summary', params),
+          supabase.rpc('admin_get_messaging_activity_by_country', params),
+          supabase.rpc('admin_get_listing_status_stats', params),
+          supabase.rpc('admin_get_new_listings_by_country', params),
         ]);
 
       // Check for errors
@@ -112,7 +136,7 @@ export function useAdminStatistics(period: TimePeriodKey) {
     } finally {
       setLoading(false);
     }
-  }, [supabase, days]);
+  }, [supabase, days, isToday]);
 
   useEffect(() => {
     void fetchAll();

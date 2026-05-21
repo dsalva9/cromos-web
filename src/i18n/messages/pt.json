@@ -951,6 +951,7 @@
     },
     "statistics": {
       "title": "Estatísticas",
+      "period_today": "Hoje",
       "period_24h": "24h",
       "period_3d": "3 dias",
       "period_1w": "1 semana",
