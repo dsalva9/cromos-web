@@ -32,6 +32,10 @@ if (SENTRY_DSN) {
             'Failed to connect to MetaMask',
             // OneSignal SW timing race: notification shown before SW is active.
             'Registration does not have an active worker',
+            // iOS Safari unhandled promise rejection noise from extensions/analytics
+            'Non-Error promise rejection captured with value: undefined',
+            // Third-party scripts, Facebook WebView autofill, and extension TypeErrors
+            "Cannot read properties of undefined (reading 'value')",
         ],
 
         beforeSend(event, hint) {
