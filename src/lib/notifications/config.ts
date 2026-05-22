@@ -62,7 +62,7 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     description: 'Cuando obtienes un nuevo logro',
     category: 'community',
     priority: 'high',
-    defaultOverrides: { email: false },
+    disabledChannels: ['email'],
   },
   {
     kind: 'template_rated',

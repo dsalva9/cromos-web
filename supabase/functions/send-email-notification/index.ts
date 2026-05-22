@@ -96,6 +96,15 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Achievement notifications are in-app/push only — no email
+    if (notification_kind === 'badge_earned') {
+      console.log('[send-email-notification] Skipping badge_earned (email disabled for achievements)');
+      return new Response(
+        JSON.stringify({ message: 'Email disabled for badge_earned notifications' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Check if Resend API key is configured
     if (!RESEND_API_KEY) {
       console.error('[send-email-notification] Resend API key not configured');
@@ -161,6 +170,44 @@ Deno.serve(async (req) => {
         JSON.stringify({ message: `Email notifications disabled for ${notification_kind}` }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
+    }
+
+    // 6-hour cooldown for listing_chat emails to avoid spamming
+    if (notification_kind === 'listing_chat') {
+      const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+      const { data: recentSend, error: cooldownError } = await supabase
+        .from('email_send_log')
+        .select('id')
+        .eq('user_id', user_id)
+        .eq('notification_kind', 'listing_chat')
+        .gte('sent_at', sixHoursAgo)
+        .limit(1);
+
+      if (!cooldownError && recentSend && recentSend.length > 0) {
+        console.log('[send-email-notification] Skipping listing_chat (cooldown active, last sent within 6h)');
+        return new Response(
+          JSON.stringify({ message: 'Cooldown active for listing_chat' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Bounce suppression: skip if recipient email has been suppressed
+    {
+      const { data: bounceRecord } = await supabase
+        .from('email_bounces')
+        .select('suppressed')
+        .eq('email', userSettings.email)
+        .eq('suppressed', true)
+        .maybeSingle();
+
+      if (bounceRecord) {
+        console.log('[send-email-notification] Skipping (email suppressed due to bounces):', userSettings.email);
+        return new Response(
+          JSON.stringify({ message: 'Email suppressed due to previous bounces' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Build email HTML
@@ -276,6 +323,12 @@ Deno.serve(async (req) => {
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    // Log the send for cooldown tracking
+    await supabase.from('email_send_log').insert({
+      user_id: user_id,
+      notification_kind: notification_kind,
+    });
 
     console.log('[send-email-notification] Success:', resendResult);
 

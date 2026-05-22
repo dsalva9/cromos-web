@@ -330,6 +330,21 @@ Deno.serve(async (req) => {
       }
 
       const email = authUser.user.email;
+
+      // Bounce suppression: skip if email has been suppressed
+      const { data: bounceRecord } = await supabase
+        .from('email_bounces')
+        .select('suppressed')
+        .eq('email', email)
+        .eq('suppressed', true)
+        .maybeSingle();
+
+      if (bounceRecord) {
+        console.log(`[send-unread-digest] Skipped (bounced/suppressed): ${userData.nickname} (${email})`);
+        skipped++;
+        continue;
+      }
+
       const senderNames = Array.from(userData.sender_names);
 
       if (senderNames.length === 0) {

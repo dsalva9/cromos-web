@@ -660,6 +660,19 @@ Deno.serve(async (req) => {
 
         for (const recipient of recipients) {
             try {
+                // Bounce suppression: skip if email has been suppressed
+                const { data: bounceRecord } = await supabase
+                    .from('email_bounces')
+                    .select('suppressed')
+                    .eq('email', recipient.email)
+                    .eq('suppressed', true)
+                    .maybeSingle();
+
+                if (bounceRecord) {
+                    console.log('[send-user-summary-email] Skipped (bounced/suppressed):', recipient.email);
+                    continue;
+                }
+
                 const resendResponse = await fetch('https://api.resend.com/emails', {
                     method: 'POST',
                     headers: {
