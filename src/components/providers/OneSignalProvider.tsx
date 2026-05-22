@@ -253,7 +253,8 @@ export function OneSignalProvider({ children }: { children: React.ReactNode }) {
             }
           });
         } catch (error) {
-          logger.error('[OneSignal] Web initialization error:', error);
+          // Demoted to warnLocal to avoid sending expected client-side issues (adblockers, private browsing) to Sentry
+          logger.warnLocal('[OneSignal] Web initialization error (expected if using adblocker or private browsing):', error);
         }
       });
     };
@@ -295,7 +296,8 @@ export function requestPushPermission() {
       await OneSignal.Slidedown.promptPush();
       logger.info('[OneSignal] Push permission requested via custom banner');
     } catch (error) {
-      logger.error('[OneSignal] Error requesting push permission:', error);
+      // Demoted to warnLocal to avoid sending expected client-side issues to Sentry
+      logger.warnLocal('[OneSignal] Error requesting push permission:', error);
     }
   });
 }
