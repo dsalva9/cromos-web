@@ -51,7 +51,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
         </div>
 
         {/* Patrocinado Badge Overlay: Hidden on mobile, shown on desktop */}
-        <div className="absolute top-2 right-2 z-20 pointer-events-none hidden sm:block">
+        <div className="absolute top-2 right-2 z-20 pointer-events-none hidden md:block">
           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/40 uppercase tracking-wider">
             {t('badge')}
           </span>
@@ -68,7 +68,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
         </div>
 
         {/* Title & Tagline: Hidden on mobile, visible on desktop */}
-        <div className="hidden sm:block min-h-[2.5rem] sm:min-h-[3rem]">
+        <div className="hidden md:block min-h-[2.5rem] sm:min-h-[3rem]">
           <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-xs sm:text-sm group-hover:text-primary transition-colors">
             {t('title')}
           </h3>
