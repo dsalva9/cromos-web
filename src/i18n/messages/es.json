@@ -1162,21 +1162,21 @@
       "title": "Explorar Cromos",
       "description": "Explora cromos disponibles para intercambio y venta. Encuentra los cromos que necesitas en la comunidad de coleccionistas más activa de España.",
       "jsonLdName": "Explorar Cromos — Cambiocromos"
-    }
-  },
-  "explorar.detail": {
-    "meta": {
-      "notFoundTitle": "Anuncio no encontrado",
-      "notFoundDesc": "Este anuncio puede haber sido eliminado o ya no está disponible.",
-      "stickerFromCollection": "Cromo de la colección",
-      "numberPrefix": "número #",
-      "forSale": "en venta",
-      "forTradeAndSale": "disponible para intercambio y venta",
-      "forTrade": "disponible para intercambio",
-      "forPrice": "por {price} €",
-      "communitySuffix": "en Cambio Cromos, la comunidad de coleccionistas de cromos.",
-      "jsonLdDescFallbackSticker": "Cromo",
-      "jsonLdDescFallbackFrom": "de"
+    },
+    "detail": {
+      "meta": {
+        "notFoundTitle": "Anuncio no encontrado",
+        "notFoundDesc": "Este anuncio puede haber sido eliminado o ya no está disponible.",
+        "stickerFromCollection": "Cromo de la colección",
+        "numberPrefix": "número #",
+        "forSale": "en venta",
+        "forTradeAndSale": "disponible para intercambio y venta",
+        "forTrade": "disponible para intercambio",
+        "forPrice": "por {price} €",
+        "communitySuffix": "en Cambio Cromos, la comunidad de coleccionistas de cromos.",
+        "jsonLdDescFallbackSticker": "Cromo",
+        "jsonLdDescFallbackFrom": "de"
+      }
     }
   },
   "favorites": {
