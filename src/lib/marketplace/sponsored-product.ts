@@ -5,7 +5,7 @@ export interface SponsoredProduct {
 }
 
 export const SPONSORED_PRODUCT: SponsoredProduct = {
-  imageUrl: "/assets/ultra-pro-sleeves.png",
+  imageUrl: "/assets/sponsored-banner.jpg",
   rating: 4.6,
   amazonUrl: "https://amzn.to/3Rgmd0g"
 };
