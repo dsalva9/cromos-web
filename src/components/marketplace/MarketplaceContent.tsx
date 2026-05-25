@@ -39,6 +39,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     const [hasRestored, setHasRestored] = useState(false);
     const scrollRestoredRef = useRef(false);
+    const [restoredLimit, setRestoredLimit] = useState(19);
 
     // 1. Restore state on mount
     useEffect(() => {
@@ -85,6 +86,15 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
             const savedTypeFilter = sessionStorage.getItem('marketplace_listingTypeFilter');
             if (savedTypeFilter !== null) setListingTypeFilter(savedTypeFilter as any);
+
+            // Restore pagination limit to fetch all loaded items at once
+            const savedCount = sessionStorage.getItem('marketplace_loaded_count');
+            if (savedCount) {
+                const count = parseInt(savedCount, 10);
+                if (count > 19) {
+                    setRestoredLimit(count);
+                }
+            }
         } else {
             // Fresh visit: clear saved state to start clean
             sessionStorage.removeItem('marketplace_searchQuery');
@@ -93,6 +103,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             sessionStorage.removeItem('marketplace_showFilters');
             sessionStorage.removeItem('marketplace_listingTypeFilter');
             sessionStorage.removeItem('marketplace_scroll_position');
+            sessionStorage.removeItem('marketplace_loaded_count');
         }
 
         setHasRestored(true);
@@ -108,6 +119,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         sessionStorage.setItem('marketplace_showFilters', String(showFilters));
         sessionStorage.setItem('marketplace_listingTypeFilter', listingTypeFilter);
     }, [searchQuery, sortByDistance, selectedCollectionIds, showFilters, listingTypeFilter, hasRestored]);
+
+
 
     // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet)
     useEffect(() => {
@@ -159,7 +172,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     // Pass server data as initialData - hook will skip initial fetch if filters are at defaults
     const { listings: fetchedListings, loading, error, hasMore, loadMore } = useListings({
         search: searchQuery,
-        limit: 19,
+        limit: restoredLimit, // Use our restored dynamic limit!
         sortByDistance: sortByDistance && hasPostcode,
         viewerPostcode: initialUserPostcode,
         collectionIds: selectedCollectionIds,
@@ -192,6 +205,12 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         : fetchedListings.filter(listing =>
             listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
         );
+
+    // 2.5. Persist the number of loaded listings
+    useEffect(() => {
+        if (typeof window === 'undefined' || !hasRestored || listings.length === 0) return;
+        sessionStorage.setItem('marketplace_loaded_count', String(listings.length));
+    }, [listings.length, hasRestored]);
 
     // 3. Track scroll position in real-time
     useEffect(() => {
@@ -235,7 +254,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     }, [listings.length, loading, hasRestored]);
 
     // Loading state logic - show skeletons only when we have no data
-    const showSkeletons = loading && listings.length === 0;
+    const showSkeletons = !hasRestored || (loading && listings.length === 0);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
