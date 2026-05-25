@@ -13,6 +13,9 @@ export type NotificationKind =
   | 'proposal_accepted'
   | 'proposal_rejected'
   | 'finalization_requested'
+  // Trade confirmations
+  | 'trade_confirmation_request'
+  | 'trade_confirmed'
   // Marketplace listing notifications
   | 'listing_chat'
   | 'listing_reserved'
@@ -175,7 +178,7 @@ export interface GroupedNotifications {
  */
 
 export function isListingNotification(kind: NotificationKind): boolean {
-  return ['listing_chat', 'listing_reserved', 'listing_completed'].includes(kind);
+  return ['listing_chat', 'listing_reserved', 'listing_completed', 'trade_confirmation_request', 'trade_confirmed'].includes(kind);
 }
 
 export function isTemplateNotification(kind: NotificationKind): boolean {
@@ -228,6 +231,10 @@ export function getNotificationIcon(kind: NotificationKind): string {
       return 'XCircle';
     case 'finalization_requested':
       return 'AlertCircle';
+    case 'trade_confirmation_request':
+      return 'Mail';
+    case 'trade_confirmed':
+      return 'Check';
     case 'admin_action':
       return 'Shield';
     default:

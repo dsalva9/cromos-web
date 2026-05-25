@@ -129,6 +129,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             distance_km: item.distance_km,
             is_group: item.is_group,
             group_count: item.group_count,
+            author_completed_trades: item.author_completed_trades,
         }));
 
         return { listings: listings as Listing[], userPostcode };

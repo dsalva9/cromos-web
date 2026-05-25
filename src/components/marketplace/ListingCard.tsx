@@ -192,13 +192,23 @@ export function ListingCard({ listing }: ListingCardProps) {
           </div>
 
           <div className="flex flex-col min-w-0 z-20 relative">
-            <UserLink
-              userId={listing.user_id}
-              nickname={listing.author_nickname}
-              variant="default"
-              className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
-              forceSpan={false}
-            />
+            <div className="flex items-center gap-1.5 min-w-0">
+              <UserLink
+                userId={listing.user_id}
+                nickname={listing.author_nickname}
+                variant="default"
+                className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
+                forceSpan={false}
+              />
+              {listing.author_completed_trades && listing.author_completed_trades > 0 ? (
+                <span
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm"
+                  title={`${listing.author_completed_trades} intercambios completados`}
+                >
+                  ⭐ {listing.author_completed_trades}
+                </span>
+              ) : null}
+            </div>
             <div className="flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
               {listing.distance_km !== undefined && listing.distance_km !== null && (
                 <span className="flex items-center">

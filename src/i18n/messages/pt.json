@@ -1306,10 +1306,18 @@
       "saving": "Guardando...",
       "save": "Guardar cambios"
     },
+    "reputation": {
+      "novato": "Novato",
+      "coleccionista": "Colecionador",
+      "experto": "Experiente",
+      "veterano": "Veterano",
+      "leyenda": "Lenda"
+    },
     "stats": {
-      "activeListings": "Anuncios activos",
+      "activeListings": "Anúncios ativos",
       "favorites": "Favoritos",
-      "ratings": "Avaliacoes"
+      "ratings": "Avaliações",
+      "completedTrades": "Trocas"
     },
     "ratings": {
       "title": "Avaliacoes",
@@ -2075,5 +2083,27 @@
       "followUs": "Siga-nos nas redes sociais!",
       "installApp": "Baixe o app e comece a trocar!"
     }
+  },
+  "tradeConfirmations": {
+    "nudgeTitle": "Vocês completaram alguma troca? 📬",
+    "nudgeConfirm": "Sim, confirmar troca",
+    "nudgeNotYet": "Ainda não",
+    "stickerCountLabel": "Quantas figurinhas vocês trocaram? (opcional)",
+    "stickerCountPlaceholder": "Ex: 5",
+    "submitConfirmation": "Enviar confirmação",
+    "bannerTitle": "{nickname} diz que vocês completaram uma troca. Confirma?",
+    "bannerConfirm": "Confirmar ✅",
+    "bannerDismiss": "Não, ainda não",
+    "toastRequested": "Solicitação de confirmação enviada",
+    "toastConfirmed": "Troca confirmada! 🎉",
+    "toastDismissed": "Confirmação descartada",
+    "manualButton": "Confirmar troca",
+    "tierNovato": "Novato",
+    "tierColeccionista": "Colecionador",
+    "tierExperto": "Experiente",
+    "tierVeterano": "Veterano",
+    "tierLeyenda": "Lenda",
+    "completedTrades": "{count} troca{count, plural, one {} other {s}} concluída{count, plural, one {} other {s}}",
+    "profileBadge": "{tier} · {count} trocas concluídas"
   }
 }

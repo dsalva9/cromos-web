@@ -38,6 +38,7 @@ import {
 } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { cn } from '@/lib/utils';
 import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2 } from 'lucide-react';
 import {
   AvatarPicker,
@@ -561,6 +562,34 @@ export default function UserProfilePage() {
                         </a>
                       </div>
 
+                      {/* Reputation badge */}
+                      {profile.completed_trades > 0 && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className={cn(
+                            'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                            profile.trade_reputation_tier === 'novato' && 'bg-gray-100 text-gray-700',
+                            profile.trade_reputation_tier === 'coleccionista' && 'bg-blue-100 text-blue-800',
+                            profile.trade_reputation_tier === 'experto' && 'bg-green-100 text-green-800',
+                            profile.trade_reputation_tier === 'veterano' && 'bg-yellow-100 text-yellow-800',
+                            profile.trade_reputation_tier === 'leyenda' && 'bg-purple-100 text-purple-800'
+                          )}>
+                            <span>
+                              {profile.trade_reputation_tier === 'novato' && '🌱'}
+                              {profile.trade_reputation_tier === 'coleccionista' && '📦'}
+                              {profile.trade_reputation_tier === 'experto' && '⭐'}
+                              {profile.trade_reputation_tier === 'veterano' && '🏆'}
+                              {profile.trade_reputation_tier === 'leyenda' && '👑'}
+                            </span>
+                            <span>
+                              {t(`reputation.${profile.trade_reputation_tier}`)}
+                            </span>
+                          </span>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                            · {profile.completed_trades} {profile.completed_trades === 1 ? 'intercambio' : 'intercambios'} completado{profile.completed_trades === 1 ? '' : 's'}
+                          </span>
+                        </div>
+                      )}
+
                       {/* Badges - Admin and suspension badges only visible to admins */}
                       <div className="flex gap-2 mt-3">
                         {profile.is_admin && isCurrentUserAdmin && (
@@ -720,7 +749,7 @@ export default function UserProfilePage() {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     {renderStatCard(
                       <Package className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       statusCounts.active,
@@ -733,6 +762,12 @@ export default function UserProfilePage() {
                       profile.favorites_count,
                       t('stats.favorites'),
                       isOwnProfile ? '/favorites' : undefined
+                    )}
+
+                    {renderStatCard(
+                      <span className="text-2xl block text-center mb-1">📬</span>,
+                      profile.completed_trades,
+                      t('stats.completedTrades')
                     )}
 
                     <a

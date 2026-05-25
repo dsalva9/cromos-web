@@ -37,6 +37,20 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     category: 'marketplace',
     priority: 'high',
   },
+  {
+    kind: 'trade_confirmation_request',
+    label: 'Confirmación de intercambio',
+    description: 'Cuando alguien solicita que confirmes un intercambio',
+    category: 'marketplace',
+    priority: 'high',
+  },
+  {
+    kind: 'trade_confirmed',
+    label: 'Intercambio confirmado',
+    description: 'Cuando se confirma un intercambio solicitado',
+    category: 'marketplace',
+    priority: 'high',
+  },
 
   // Digest notifications (periodic summaries)
   {

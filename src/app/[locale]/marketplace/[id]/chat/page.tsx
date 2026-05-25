@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useListingChat } from '@/hooks/marketplace/useListingChat';
+import { useTradeConfirmations } from '@/hooks/marketplace/useTradeConfirmations';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -90,6 +91,34 @@ function ListingChatPageContent() {
     participantId: selectedParticipant || undefined,
   });
 
+  // Trade Confirmations state
+  const t_tc = useTranslations('tradeConfirmations');
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const [showNudgeForm, setShowNudgeForm] = useState(false);
+  const [nudgeStickerCount, setNudgeStickerCount] = useState<string>('');
+  const [nudgeNote, setNudgeNote] = useState<string>('');
+
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualStickerCount, setManualStickerCount] = useState<string>('');
+  const [manualNote, setManualNote] = useState<string>('');
+
+  const effectiveParticipantId = isOwner ? selectedParticipant : listingOwner;
+
+  const {
+    pendingConfirmation,
+    pendingForMe,
+    pendingByMe,
+    shouldShowNudge,
+    requestConfirmation,
+    confirmTrade,
+    dismissConfirmation,
+    submitting: confirmationSubmitting,
+  } = useTradeConfirmations({
+    listingId,
+    participantId: effectiveParticipantId || '',
+    messages,
+  });
+
   // Fetch listing details
   useEffect(() => {
     async function fetchListing() {
@@ -128,7 +157,7 @@ function ListingChatPageContent() {
       // Get author info including suspension and deletion status
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('nickname, avatar_url, is_suspended, deleted_at, is_admin')
+        .select('nickname, avatar_url, is_suspended, deleted_at, is_admin, completed_trades')
         .eq('id', listingData.user_id)
         .single();
 
@@ -163,6 +192,7 @@ function ListingChatPageContent() {
         status: listingData.status as 'active' | 'sold' | 'removed',
         views_count: 0, // Not needed for chat view
         created_at: listingData.created_at ?? '',
+        author_completed_trades: profileData?.completed_trades || 0,
       };
 
       setListing(fullListing);
@@ -1114,6 +1144,53 @@ function ListingChatPageContent() {
                     </div>
                   ) : (
                     <>
+                      {/* Top Confirmation Banner (when pendingForMe is true) */}
+                      {pendingConfirmation && pendingForMe && (
+                        <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
+                          <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl">📬</span>
+                            <div className="text-left">
+                              <p className="font-semibold">
+                                {t_tc('bannerTitle', { nickname: pendingConfirmation.requester_id === listingOwner ? (listing?.author_nickname || 'Usuario') : (participants.find(p => p.user_id === pendingConfirmation.requester_id)?.nickname || 'Un usuario') })}
+                              </p>
+                              {(pendingConfirmation.sticker_count || pendingConfirmation.note) && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                  {pendingConfirmation.sticker_count && `Cromos: ${pendingConfirmation.sticker_count}`}
+                                  {pendingConfirmation.sticker_count && pendingConfirmation.note && ' · '}
+                                  {pendingConfirmation.note && `Nota: "${pendingConfirmation.note}"`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <Button
+                              size="sm"
+                              onClick={() => confirmTrade(pendingConfirmation.id)}
+                              disabled={confirmationSubmitting}
+                              className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1 sm:flex-initial"
+                            >
+                              {t_tc('bannerConfirm')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => dismissConfirmation(pendingConfirmation.id)}
+                              disabled={confirmationSubmitting}
+                              className="text-gray-500 hover:text-gray-900 dark:hover:text-white flex-1 sm:flex-initial"
+                            >
+                              {t_tc('bannerDismiss')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Banner when I requested it and it is still pending */}
+                      {pendingConfirmation && pendingByMe && (
+                        <div className="bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-4 text-xs text-center text-gray-500 dark:text-gray-400">
+                          📬 Solicitud de confirmación de intercambio pendiente de aprobación por el otro usuario.
+                        </div>
+                      )}
+
                       {messages.map(message => {
                         // System messages render differently
                         if (message.is_system) {
@@ -1235,6 +1312,91 @@ function ListingChatPageContent() {
                               {'⭐'.repeat(counterpartyRating.rating)} ({counterpartyRating.rating}/5)
                               {counterpartyRating.comment && ` y ha comentado: "${counterpartyRating.comment}"`}
                             </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Nudge card */}
+                      {shouldShowNudge && !nudgeDismissed && (
+                        <div className="flex justify-center my-4 w-full">
+                          <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[85%] text-center space-y-3">
+                            <p className="font-bold text-gray-900 dark:text-white">
+                              {t_tc('nudgeTitle')}
+                            </p>
+                            {!showNudgeForm ? (
+                              <div className="flex justify-center gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => setShowNudgeForm(true)}
+                                  className="bg-gold text-black hover:bg-yellow-400 font-bold"
+                                >
+                                  {t_tc('nudgeConfirm')}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => setNudgeDismissed(true)}
+                                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                                >
+                                  {t_tc('nudgeNotYet')}
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="space-y-3 text-left">
+                                <div>
+                                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                    {t_tc('stickerCountLabel')}
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={nudgeStickerCount}
+                                    onChange={(e) => setNudgeStickerCount(e.target.value)}
+                                    placeholder={t_tc('stickerCountPlaceholder')}
+                                    className="w-full text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-1.5 focus:border-gold focus:outline-none"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                    Nota (opcional)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={nudgeNote}
+                                    onChange={(e) => setNudgeNote(e.target.value)}
+                                    placeholder="Ej: Trato en mano, Correos..."
+                                    className="w-full text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-1.5 focus:border-gold focus:outline-none"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    disabled={confirmationSubmitting}
+                                    onClick={async () => {
+                                      const success = await requestConfirmation(
+                                        nudgeStickerCount ? parseInt(nudgeStickerCount, 10) : undefined,
+                                        nudgeNote || undefined
+                                      );
+                                      if (success) {
+                                        setNudgeDismissed(true);
+                                        setShowNudgeForm(false);
+                                      }
+                                    }}
+                                    className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1"
+                                  >
+                                    {confirmationSubmitting ? 'Enviando...' : t_tc('submitConfirmation')}
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setShowNudgeForm(false)}
+                                    className="text-gray-500"
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
@@ -1409,6 +1571,19 @@ function ListingChatPageContent() {
                             <Camera className="h-5 w-5" />
                           </button>
 
+                          {/* Manual confirmation trigger button */}
+                          {messages.length >= 4 && !pendingConfirmation && (
+                            <button
+                              type="button"
+                              onClick={() => setShowManualModal(true)}
+                              className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                              title={t_tc('manualButton')}
+                              aria-label={t_tc('manualButton')}
+                            >
+                              <span className="text-lg">📬</span>
+                            </button>
+                          )}
+
                           <textarea
                             value={messageText}
                             onChange={e => setMessageText(e.target.value)}
@@ -1496,6 +1671,73 @@ function ListingChatPageContent() {
                 style={{ touchAction: 'pinch-zoom' }}
               />
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Manual Confirmation Dialog */}
+        <Dialog open={showManualModal} onOpenChange={setShowManualModal}>
+          <DialogContent className="max-w-md bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>📬</span> {t_tc('manualButton')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                ¿Habéis completado un intercambio? Envía una solicitud de confirmación al otro usuario. Una vez que la confirme, vuestra reputación aumentará.
+              </p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  {t_tc('stickerCountLabel')}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={manualStickerCount}
+                  onChange={(e) => setManualStickerCount(e.target.value)}
+                  placeholder={t_tc('stickerCountPlaceholder')}
+                  className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-2 focus:border-gold focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Nota (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={manualNote}
+                  onChange={(e) => setManualNote(e.target.value)}
+                  placeholder="Ej: Trato en mano, 3 repetidos..."
+                  className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-2 focus:border-gold focus:outline-none"
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button
+                  disabled={confirmationSubmitting}
+                  onClick={async () => {
+                    const success = await requestConfirmation(
+                      manualStickerCount ? parseInt(manualStickerCount, 10) : undefined,
+                      manualNote || undefined
+                    );
+                    if (success) {
+                      setShowManualModal(false);
+                      setManualStickerCount('');
+                      setManualNote('');
+                    }
+                  }}
+                  className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1"
+                >
+                  {confirmationSubmitting ? 'Enviando...' : t_tc('submitConfirmation')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowManualModal(false)}
+                  className="text-gray-500"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
 

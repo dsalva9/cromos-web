@@ -1306,10 +1306,18 @@
       "saving": "Guardando...",
       "save": "Guardar cambios"
     },
+    "reputation": {
+      "novato": "Novato",
+      "coleccionista": "Coleccionista",
+      "experto": "Experto",
+      "veterano": "Veterano",
+      "leyenda": "Leyenda"
+    },
     "stats": {
       "activeListings": "Anuncios activos",
       "favorites": "Favoritos",
-      "ratings": "Valoraciones"
+      "ratings": "Valoraciones",
+      "completedTrades": "Intercambios"
     },
     "ratings": {
       "title": "Valoraciones",
@@ -2075,5 +2083,27 @@
       "followUs": "¡Síguenos en redes sociales!",
       "installApp": "¡Descarga la app y empieza a intercambiar!"
     }
+  },
+  "tradeConfirmations": {
+    "nudgeTitle": "¿Habéis completado algún intercambio? 📬",
+    "nudgeConfirm": "Sí, confirmar intercambio",
+    "nudgeNotYet": "Todavía no",
+    "stickerCountLabel": "¿Cuántos cromos habéis intercambiado? (opcional)",
+    "stickerCountPlaceholder": "Ej: 5",
+    "submitConfirmation": "Enviar confirmación",
+    "bannerTitle": "{nickname} dice que habéis completado un intercambio. ¿Confirmas?",
+    "bannerConfirm": "Confirmar ✅",
+    "bannerDismiss": "No, todavía no",
+    "toastRequested": "Solicitud de confirmación enviada",
+    "toastConfirmed": "¡Intercambio confirmado! 🎉",
+    "toastDismissed": "Confirmación descartada",
+    "manualButton": "Confirmar intercambio",
+    "tierNovato": "Novato",
+    "tierColeccionista": "Coleccionista",
+    "tierExperto": "Experto",
+    "tierVeterano": "Veterano",
+    "tierLeyenda": "Leyenda",
+    "completedTrades": "{count} intercambio{count, plural, one {} other {s}} completado{count, plural, one {} other {s}}",
+    "profileBadge": "{tier} · {count} intercambios completados"
   }
 }

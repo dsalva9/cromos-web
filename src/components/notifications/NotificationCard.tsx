@@ -24,6 +24,8 @@ import {
   XCircle,
   AlertCircle,
   Shield,
+  Mail,
+  Check,
 } from 'lucide-react';
 
 interface NotificationCardProps {
@@ -43,6 +45,8 @@ const iconMap = {
   XCircle,
   AlertCircle,
   Shield,
+  Mail,
+  Check,
 };
 
 export function NotificationCard({

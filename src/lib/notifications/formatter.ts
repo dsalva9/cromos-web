@@ -89,6 +89,24 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
         href: notification.templateId ? `/templates/${notification.templateId}` : null,
       };
 
+    case 'trade_confirmation_request':
+      return {
+        title: 'Confirma un intercambio',
+        body: `${actorName} dice que habéis completado un intercambio sobre "${notification.listingTitle || 'un artículo'}". ¿Confirmas?`,
+        href: notification.listingId
+          ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
+          : null,
+      };
+
+    case 'trade_confirmed':
+      return {
+        title: '¡Intercambio confirmado!',
+        body: `${actorName} ha confirmado vuestro intercambio sobre "${notification.listingTitle || 'un artículo'}"`,
+        href: notification.listingId
+          ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
+          : null,
+      };
+
     case 'chat_unread':
       return {
         title: 'Mensaje de intercambio',

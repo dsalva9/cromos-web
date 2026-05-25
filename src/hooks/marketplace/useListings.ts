@@ -31,6 +31,7 @@ interface RpcListingResponse {
   match_score?: number;
   is_group?: boolean;
   group_count?: number;
+  author_completed_trades?: number;
 }
 
 interface UseListingsParams {
@@ -67,6 +68,7 @@ function transformRow(item: RpcListingResponse): Listing {
     distance_km: item.distance_km,
     is_group: item.is_group,
     group_count: item.group_count,
+    author_completed_trades: item.author_completed_trades,
   };
 }
 

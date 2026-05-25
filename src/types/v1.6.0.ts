@@ -54,7 +54,9 @@ export interface Listing {
   // Listing type
   listing_type?: 'intercambio' | 'venta' | 'ambos';
   price?: number | null;
+  author_completed_trades?: number | null;
 }
+
 
 export interface Template {
   id: number;

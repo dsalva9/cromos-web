@@ -25,7 +25,8 @@ export function useListing(listingId: string) {
             is_suspended,
             deleted_at,
             postcode,
-            country_code
+            country_code,
+            completed_trades
           )
         `
         )
@@ -89,6 +90,7 @@ export function useListing(listingId: string) {
           // Listing type (exchange/sale/both) — cast through any until DB types are regenerated
           listing_type: (data as any).listing_type || 'intercambio',
           price: (data as any).price,
+          author_completed_trades: Number(data.author.completed_trades ?? 0),
         });
       }
     } catch (err) {

@@ -15,6 +15,8 @@ interface UserProfile {
   postcode: string | null;
   country_code: string;
   location_label: string | null;
+  completed_trades: number;
+  trade_reputation_tier: string;
 }
 
 export function useUserProfile(userId: string) {
@@ -83,6 +85,8 @@ export function useUserProfile(userId: string) {
         postcode: profileData.postcode ?? null,
         country_code: profileData.country_code ?? 'ES',
         location_label: locationLabel,
+        completed_trades: Number(profileData.completed_trades ?? 0),
+        trade_reputation_tier: profileData.trade_reputation_tier ?? 'novato',
       };
 
       setProfile(normalizedProfile);

@@ -1306,10 +1306,18 @@
       "saving": "Guardando...",
       "save": "Guardar cambios"
     },
+    "reputation": {
+      "novato": "Novice",
+      "coleccionista": "Collector",
+      "experto": "Expert",
+      "veterano": "Veteran",
+      "leyenda": "Legend"
+    },
     "stats": {
-      "activeListings": "Anuncios activos",
-      "favorites": "Favoritos",
-      "ratings": "Ratings"
+      "activeListings": "Active listings",
+      "favorites": "Favorites",
+      "ratings": "Ratings",
+      "completedTrades": "Trades"
     },
     "ratings": {
       "title": "Ratings",
@@ -2057,5 +2065,27 @@
       "followUs": "Follow us on social media!",
       "installApp": "Download the app and start trading!"
     }
+  },
+  "tradeConfirmations": {
+    "nudgeTitle": "Have you completed a trade? 📬",
+    "nudgeConfirm": "Yes, confirm trade",
+    "nudgeNotYet": "Not yet",
+    "stickerCountLabel": "How many stickers did you trade? (optional)",
+    "stickerCountPlaceholder": "E.g.: 5",
+    "submitConfirmation": "Send confirmation",
+    "bannerTitle": "{nickname} says you have completed a trade. Do you confirm?",
+    "bannerConfirm": "Confirm ✅",
+    "bannerDismiss": "No, not yet",
+    "toastRequested": "Confirmation request sent",
+    "toastConfirmed": "Trade confirmed! 🎉",
+    "toastDismissed": "Confirmation dismissed",
+    "manualButton": "Confirm trade",
+    "tierNovato": "Novice",
+    "tierColeccionista": "Collector",
+    "tierExperto": "Expert",
+    "tierVeterano": "Veteran",
+    "tierLeyenda": "Legend",
+    "completedTrades": "{count} trade{count, plural, one {} other {s}} completed",
+    "profileBadge": "{tier} · {count} trades completed"
   }
 }
