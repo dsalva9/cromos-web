@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 export function ThemeSettingsSection() {
   const t = useTranslations('settings');
+  const t = useTranslations('settings');
   const { theme, setTheme, resolvedTheme } = useTheme();
 
   const options = [

@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl';
 
 export function NotificationSettingsTab() {
   const t = useTranslations('settings');
+  const t = useTranslations('settings');
   const [preferences, setPreferences] = useState<GranularNotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

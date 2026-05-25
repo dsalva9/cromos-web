@@ -1410,7 +1410,7 @@
           "description": "Cuando se confirma un intercambio solicitado"
         },
         "chat_unread": {
-          "label": "Resumen semanal de mensagens sin leer",
+          "label": "Resumen semanal de mensajes sin leer",
           "description": "Recordatorio semanal si tienes mensajes sin leer"
         },
         "user_rated": {
@@ -1510,7 +1510,7 @@
       "title": "Apariencia",
       "description": "Personaliza cómo se ve la aplicación",
       "light": "Claro",
-      "dark": "Escuro",
+      "dark": "Oscuro",
       "system": "Sistema"
     }
   },

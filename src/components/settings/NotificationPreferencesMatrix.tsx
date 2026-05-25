@@ -23,6 +23,7 @@ import {
 } from '@/lib/notifications/config';
 import { toggleNotificationPreference } from '@/lib/supabase/notification-preferences';
 import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 interface NotificationPreferencesMatrixProps {
   preferences: GranularNotificationPreferences;

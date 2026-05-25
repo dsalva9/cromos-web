@@ -151,7 +151,7 @@ locales.forEach(locale => {
               "description": locale === 'en' ? "When a requested trade is confirmed" : locale === 'pt' ? "Quando uma troca solicitada é confirmada" : "Cuando se confirma un intercambio solicitado"
           },
           "chat_unread": {
-              "label": locale === 'en' ? "Weekly unread messages digest" : locale === 'pt' ? "Resumo semanal de mensagens não lidas" : "Resumen semanal de mensagens sin leer",
+              "label": locale === 'en' ? "Weekly unread messages digest" : locale === 'pt' ? "Resumo semanal de mensagens não lidas" : "Resumen semanal de mensajes sin leer",
               "description": locale === 'en' ? "Weekly reminder if you have unread messages" : locale === 'pt' ? "Lembrete semanal se você tiver mensagens não lidas" : "Recordatorio semanal si tienes mensajes sin leer"
           },
           "user_rated": {
@@ -182,7 +182,7 @@ locales.forEach(locale => {
       "title": locale === 'en' ? "Appearance" : locale === 'pt' ? "Aparência" : "Apariencia",
       "description": locale === 'en' ? "Customize how the app looks" : locale === 'pt' ? "Personalize a aparência do aplicativo" : "Personaliza cómo se ve la aplicación",
       "light": locale === 'en' ? "Light" : locale === 'pt' ? "Claro" : "Claro",
-      "dark": locale === 'en' ? "Dark" : locale === 'pt' ? "Escuro" : "Escuro",
+      "dark": locale === 'en' ? "Dark" : locale === 'pt' ? "Escuro" : "Oscuro",
       "system": locale === 'en' ? "System" : locale === 'pt' ? "Sistema" : "Sistema"
   };
 
