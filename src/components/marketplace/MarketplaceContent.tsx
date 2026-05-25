@@ -217,7 +217,9 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         if (typeof window === 'undefined') return;
 
         const handleScroll = () => {
-            if (hasRestored) {
+            // ONLY track and update scroll position once we have successfully finished restoring it!
+            // This prevents initial layout height changes and browser clamping from wiping out the saved position with 0.
+            if (hasRestored && scrollRestoredRef.current) {
                 sessionStorage.setItem('marketplace_scroll_position', String(window.scrollY));
             }
         };
@@ -237,13 +239,22 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             if (savedPosition) {
                 const targetScrollY = parseInt(savedPosition, 10);
                 if (targetScrollY > 0 && listings.length > 0) {
-                    requestAnimationFrame(() => {
+                    let attempts = 0;
+                    const maxAttempts = 10; // Try 10 times over 500ms (every 50ms) to ensure layout shifts are settled
+                    
+                    const restoreInterval = setInterval(() => {
                         window.scrollTo({
                             top: targetScrollY,
                             behavior: 'instant' as ScrollBehavior,
                         });
-                        scrollRestoredRef.current = true;
-                    });
+                        attempts++;
+                        
+                        if (attempts >= maxAttempts) {
+                            clearInterval(restoreInterval);
+                            // Enable scroll tracking only after restoration settles down fully
+                            scrollRestoredRef.current = true;
+                        }
+                    }, 50);
                 } else {
                     scrollRestoredRef.current = true;
                 }
