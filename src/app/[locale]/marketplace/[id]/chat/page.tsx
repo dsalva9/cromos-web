@@ -1144,52 +1144,6 @@ function ListingChatPageContent() {
                     </div>
                   ) : (
                     <>
-                      {/* Top Confirmation Banner (when pendingForMe is true) */}
-                      {pendingConfirmation && pendingForMe && (
-                        <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
-                          <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
-                            <span className="text-xl">📬</span>
-                            <div className="text-left">
-                              <p className="font-semibold">
-                                {t_tc('bannerTitle', { nickname: pendingConfirmation.requester_id === listingOwner ? (listing?.author_nickname || 'Usuario') : (participants.find(p => p.user_id === pendingConfirmation.requester_id)?.nickname || 'Un usuario') })}
-                              </p>
-                              {(pendingConfirmation.sticker_count || pendingConfirmation.note) && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                  {pendingConfirmation.sticker_count && `Cromos: ${pendingConfirmation.sticker_count}`}
-                                  {pendingConfirmation.sticker_count && pendingConfirmation.note && ' · '}
-                                  {pendingConfirmation.note && `Nota: "${pendingConfirmation.note}"`}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex gap-2 w-full sm:w-auto">
-                            <Button
-                              size="sm"
-                              onClick={() => confirmTrade(pendingConfirmation.id)}
-                              disabled={confirmationSubmitting}
-                              className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1 sm:flex-initial"
-                            >
-                              {t_tc('bannerConfirm')}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => dismissConfirmation(pendingConfirmation.id)}
-                              disabled={confirmationSubmitting}
-                              className="text-gray-500 hover:text-gray-900 dark:hover:text-white flex-1 sm:flex-initial"
-                            >
-                              {t_tc('bannerDismiss')}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Banner when I requested it and it is still pending */}
-                      {pendingConfirmation && pendingByMe && (
-                        <div className="bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-4 text-xs text-center text-gray-500 dark:text-gray-400">
-                          📬 Solicitud de confirmación de intercambio pendiente de aprobación por el otro usuario.
-                        </div>
-                      )}
 
                       {messages.map(message => {
                         // System messages render differently
@@ -1313,6 +1267,53 @@ function ListingChatPageContent() {
                               {counterpartyRating.comment && ` y ha comentado: "${counterpartyRating.comment}"`}
                             </p>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Top Confirmation Banner (when pendingForMe is true) */}
+                      {pendingConfirmation && pendingForMe && (
+                        <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
+                          <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl">📬</span>
+                            <div className="text-left">
+                              <p className="font-semibold">
+                                {t_tc('bannerTitle', { nickname: pendingConfirmation.requester_id === listingOwner ? (listing?.author_nickname || 'Usuario') : (participants.find(p => p.user_id === pendingConfirmation.requester_id)?.nickname || 'Un usuario') })}
+                              </p>
+                              {(pendingConfirmation.sticker_count || pendingConfirmation.note) && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                  {pendingConfirmation.sticker_count && `Cromos: ${pendingConfirmation.sticker_count}`}
+                                  {pendingConfirmation.sticker_count && pendingConfirmation.note && ' · '}
+                                  {pendingConfirmation.note && `Nota: "${pendingConfirmation.note}"`}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 w-full sm:w-auto">
+                            <Button
+                              size="sm"
+                              onClick={() => confirmTrade(pendingConfirmation.id)}
+                              disabled={confirmationSubmitting}
+                              className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1 sm:flex-initial"
+                            >
+                              {t_tc('bannerConfirm')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => dismissConfirmation(pendingConfirmation.id)}
+                              disabled={confirmationSubmitting}
+                              className="text-gray-500 hover:text-gray-900 dark:hover:text-white flex-1 sm:flex-initial"
+                            >
+                              {t_tc('bannerDismiss')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Banner when I requested it and it is still pending */}
+                      {pendingConfirmation && pendingByMe && (
+                        <div className="bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-4 text-xs text-center text-gray-500 dark:text-gray-400">
+                          📬 Solicitud de confirmación de intercambio pendiente de aprobación por el otro usuario.
                         </div>
                       )}
 
