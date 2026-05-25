@@ -236,30 +236,25 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
           {(slot.status === 'owned' || slot.status === 'duplicate') && (
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
               {/* Counter */}
-              <div className="flex items-center justify-between rounded-lg p-1 shadow-sm"
-                style={{
-                  background: 'var(--surface-0)',
-                  border: '1px solid var(--border)',
-                }}
-              >
+              <div className="flex items-center justify-between rounded-lg p-1 shadow-sm bg-white/80 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-800 backdrop-blur-[1px]">
                 <button
                   onClick={() => handleCountChange(-1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded transition-colors"
-                  style={{ color: 'var(--muted)' }}
+                  className="w-6 h-6 flex items-center justify-center rounded transition-all text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-90 disabled:opacity-30 disabled:pointer-events-none"
+                  aria-label="Disminuir cantidad"
                 >
-                  <Minus className="w-3 h-3" />
+                  <Minus className="w-3.5 h-3.5" strokeWidth={3} />
                 </button>
-                <span className="text-sm font-bold font-mono" style={{ color: 'var(--foreground)' }}>
+                <span className="text-sm font-bold font-mono text-gray-900 dark:text-white px-2">
                   {slot.status === 'owned' ? '1' : localCount}
                 </span>
                 <button
                   onClick={() => handleCountChange(1)}
                   disabled={updating}
-                  className="w-6 h-6 flex items-center justify-center rounded transition-colors"
-                  style={{ color: 'var(--muted)' }}
+                  className="w-6 h-6 flex items-center justify-center rounded transition-all text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-90 disabled:opacity-30 disabled:pointer-events-none"
+                  aria-label="Aumentar cantidad"
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="w-3.5 h-3.5" strokeWidth={3} />
                 </button>
               </div>
 

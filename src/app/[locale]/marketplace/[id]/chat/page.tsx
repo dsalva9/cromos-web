@@ -1324,80 +1324,23 @@ function ListingChatPageContent() {
                             <p className="font-bold text-gray-900 dark:text-white">
                               {t_tc('nudgeTitle')}
                             </p>
-                            {!showNudgeForm ? (
-                              <div className="flex flex-col sm:flex-row justify-center gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => setShowNudgeForm(true)}
-                                  className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:w-auto"
-                                >
-                                  {t_tc('nudgeConfirm')}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => setNudgeDismissed(true)}
-                                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white w-full sm:w-auto"
-                                >
-                                  {t_tc('nudgeNotYet')}
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="space-y-3 text-left">
-                                <div>
-                                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                    {t_tc('stickerCountLabel')}
-                                  </label>
-                                  <input
-                                    type="number"
-                                    min="1"
-                                    value={nudgeStickerCount}
-                                    onChange={(e) => setNudgeStickerCount(e.target.value)}
-                                    placeholder={t_tc('stickerCountPlaceholder')}
-                                    className="w-full text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-1.5 focus:border-gold focus:outline-none"
-                                  />
-                                </div>
-                                <div>
-                                  <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                                    Nota (opcional)
-                                  </label>
-                                  <input
-                                    type="text"
-                                    value={nudgeNote}
-                                    onChange={(e) => setNudgeNote(e.target.value)}
-                                    placeholder="Ej: Trato en mano, Correos..."
-                                    className="w-full text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-1.5 focus:border-gold focus:outline-none"
-                                  />
-                                </div>
-                                <div className="flex flex-col sm:flex-row gap-2">
-                                  <Button
-                                    size="sm"
-                                    disabled={confirmationSubmitting}
-                                    onClick={async () => {
-                                      const success = await requestConfirmation(
-                                        nudgeStickerCount ? parseInt(nudgeStickerCount, 10) : undefined,
-                                        nudgeNote || undefined
-                                      );
-                                      if (success) {
-                                        setNudgeDismissed(true);
-                                        setShowNudgeForm(false);
-                                      }
-                                    }}
-                                    className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:flex-1"
-                                  >
-                                    {confirmationSubmitting ? 'Enviando...' : t_tc('submitConfirmation')}
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => setShowNudgeForm(false)}
-                                    className="text-gray-500 w-full sm:w-auto"
-                                  >
-                                    Cancelar
-                                  </Button>
-                                </div>
-                              </div>
-                            )}
+                            <div className="flex flex-col sm:flex-row justify-center gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => setShowNudgeForm(true)}
+                                className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:w-auto"
+                              >
+                                {t_tc('nudgeConfirm')}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setNudgeDismissed(true)}
+                                className="text-gray-500 hover:text-gray-900 dark:hover:text-white w-full sm:w-auto"
+                              >
+                                {t_tc('nudgeNotYet')}
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1780,6 +1723,72 @@ function ListingChatPageContent() {
                   variant="ghost"
                   onClick={() => setShowManualModal(false)}
                   className="text-gray-500"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Nudge Confirmation Dialog */}
+        <Dialog open={showNudgeForm} onOpenChange={setShowNudgeForm}>
+          <DialogContent className="max-w-md bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>📬</span> {t_tc('manualButton')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                ¿Habéis completado un intercambio? Envía una solicitud de confirmación al otro usuario. Una vez que la confirme, vuestra reputación aumentará.
+              </p>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  {t_tc('stickerCountLabel')}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={nudgeStickerCount}
+                  onChange={(e) => setNudgeStickerCount(e.target.value)}
+                  placeholder={t_tc('stickerCountPlaceholder')}
+                  className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-2 focus:border-gold focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  Nota (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={nudgeNote}
+                  onChange={(e) => setNudgeNote(e.target.value)}
+                  placeholder="Ej: Trato en mano, Correos..."
+                  className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-2 focus:border-gold focus:outline-none"
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <Button
+                  disabled={confirmationSubmitting}
+                  onClick={async () => {
+                    const success = await requestConfirmation(
+                      nudgeStickerCount ? parseInt(nudgeStickerCount, 10) : undefined,
+                      nudgeNote || undefined
+                    );
+                    if (success) {
+                      setNudgeDismissed(true);
+                      setShowNudgeForm(false);
+                    }
+                  }}
+                  className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:flex-1"
+                >
+                  {confirmationSubmitting ? 'Enviando...' : t_tc('submitConfirmation')}
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowNudgeForm(false)}
+                  className="text-gray-500 w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
