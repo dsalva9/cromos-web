@@ -1320,16 +1320,16 @@ function ListingChatPageContent() {
                       {/* Nudge card */}
                       {shouldShowNudge && !nudgeDismissed && (
                         <div className="flex justify-center my-4 w-full">
-                          <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[85%] text-center space-y-3">
+                          <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[95%] sm:max-w-[85%] text-center space-y-3">
                             <p className="font-bold text-gray-900 dark:text-white">
                               {t_tc('nudgeTitle')}
                             </p>
                             {!showNudgeForm ? (
-                              <div className="flex justify-center gap-2">
+                              <div className="flex flex-col sm:flex-row justify-center gap-2">
                                 <Button
                                   size="sm"
                                   onClick={() => setShowNudgeForm(true)}
-                                  className="bg-gold text-black hover:bg-yellow-400 font-bold"
+                                  className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:w-auto"
                                 >
                                   {t_tc('nudgeConfirm')}
                                 </Button>
@@ -1337,7 +1337,7 @@ function ListingChatPageContent() {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => setNudgeDismissed(true)}
-                                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                                  className="text-gray-500 hover:text-gray-900 dark:hover:text-white w-full sm:w-auto"
                                 >
                                   {t_tc('nudgeNotYet')}
                                 </Button>
@@ -1369,7 +1369,7 @@ function ListingChatPageContent() {
                                     className="w-full text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded border border-gray-300 dark:border-gray-700 px-3 py-1.5 focus:border-gold focus:outline-none"
                                   />
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <Button
                                     size="sm"
                                     disabled={confirmationSubmitting}
@@ -1383,7 +1383,7 @@ function ListingChatPageContent() {
                                         setShowNudgeForm(false);
                                       }
                                     }}
-                                    className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1"
+                                    className="bg-gold text-black hover:bg-yellow-400 font-bold w-full sm:flex-1"
                                   >
                                     {confirmationSubmitting ? 'Enviando...' : t_tc('submitConfirmation')}
                                   </Button>
@@ -1391,7 +1391,7 @@ function ListingChatPageContent() {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => setShowNudgeForm(false)}
-                                    className="text-gray-500"
+                                    className="text-gray-500 w-full sm:w-auto"
                                   >
                                     Cancelar
                                   </Button>
@@ -1540,71 +1540,117 @@ function ListingChatPageContent() {
                           </div>
                         )}
 
-                        <div className="flex gap-2">
-                          {/* Attach image button */}
-                          <button
-                            type="button"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={sending || uploading}
-                            className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label={t('attachImage')}
-                            title={t('attachImage')}
-                          >
-                            <Paperclip className="h-5 w-5" />
-                          </button>
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileSelect}
-                            className="hidden"
-                          />
-
-                          {/* Camera button */}
-                          <button
-                            type="button"
-                            onClick={() => setShowCameraModal(true)}
-                            disabled={sending || uploading}
-                            className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label={t('takePhoto')}
-                            title={t('takePhoto')}
-                          >
-                            <Camera className="h-5 w-5" />
-                          </button>
-
-                          {/* Manual confirmation trigger button */}
-                          {messages.length >= 4 && !pendingConfirmation && (
+                        <div className="flex flex-col gap-2">
+                          {/* Mobile-only attachment and confirmation action bar */}
+                          <div className="flex md:hidden items-center gap-2 pb-1">
+                            {/* Attach image button */}
                             <button
                               type="button"
-                              onClick={() => setShowManualModal(true)}
-                              className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                              title={t_tc('manualButton')}
-                              aria-label={t_tc('manualButton')}
+                              onClick={() => fileInputRef.current?.click()}
+                              disabled={sending || uploading}
+                              className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              aria-label={t('attachImage')}
+                              title={t('attachImage')}
                             >
-                              <span className="text-lg">📬</span>
+                              <Paperclip className="h-5 w-5" />
                             </button>
-                          )}
 
-                          <textarea
-                            value={messageText}
-                            onChange={e => setMessageText(e.target.value)}
-                            placeholder={t('writeMessage')}
-                            maxLength={500}
-                            rows={2}
-                            className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-gold focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={sending || uploading}
-                          />
-                          <Button
-                            onClick={handleSend}
-                            disabled={(!messageText.trim() && !pendingImage) || sending || uploading}
-                            className="bg-gold text-black hover:bg-yellow-400 font-bold"
-                          >
-                            {uploading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Send className="h-4 w-4" />
+                            {/* Camera button */}
+                            <button
+                              type="button"
+                              onClick={() => setShowCameraModal(true)}
+                              disabled={sending || uploading}
+                              className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              aria-label={t('takePhoto')}
+                              title={t('takePhoto')}
+                            >
+                              <Camera className="h-5 w-5" />
+                            </button>
+
+                            {/* Manual confirmation trigger button */}
+                            {messages.length >= 4 && !pendingConfirmation && (
+                              <button
+                                type="button"
+                                onClick={() => setShowManualModal(true)}
+                                className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                title={t_tc('manualButton')}
+                                aria-label={t_tc('manualButton')}
+                              >
+                                <span className="text-lg">📬</span>
+                              </button>
                             )}
-                          </Button>
+                          </div>
+
+                          <div className="flex gap-2">
+                            {/* Desktop-only attachment and confirmation action bar */}
+                            <div className="hidden md:flex items-center gap-2">
+                              {/* Attach image button */}
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={sending || uploading}
+                                className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                aria-label={t('attachImage')}
+                                title={t('attachImage')}
+                              >
+                                <Paperclip className="h-5 w-5" />
+                              </button>
+
+                              {/* Camera button */}
+                              <button
+                                type="button"
+                                onClick={() => setShowCameraModal(true)}
+                                disabled={sending || uploading}
+                                className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                aria-label={t('takePhoto')}
+                                title={t('takePhoto')}
+                              >
+                                <Camera className="h-5 w-5" />
+                              </button>
+
+                              {/* Manual confirmation trigger button */}
+                              {messages.length >= 4 && !pendingConfirmation && (
+                                <button
+                                  type="button"
+                                  onClick={() => setShowManualModal(true)}
+                                  className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                  title={t_tc('manualButton')}
+                                  aria-label={t_tc('manualButton')}
+                                >
+                                  <span className="text-lg">📬</span>
+                                </button>
+                              )}
+                            </div>
+
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileSelect}
+                              className="hidden"
+                            />
+
+                            <textarea
+                              value={messageText}
+                              onChange={e => setMessageText(e.target.value)}
+                              placeholder={t('writeMessage')}
+                              maxLength={500}
+                              rows={2}
+                              className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-gold focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={sending || uploading}
+                            />
+                            <Button
+                              onClick={handleSend}
+                              disabled={(!messageText.trim() && !pendingImage) || sending || uploading}
+                              className="bg-gold text-black hover:bg-yellow-400 font-bold"
+                            >
+                              {uploading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Send className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
                         </div>
                       </>
                     )}
