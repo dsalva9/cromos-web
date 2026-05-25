@@ -134,9 +134,9 @@ export function useListings({
   const collectionIdsRef = useRef(collectionIds);
   collectionIdsRef.current = collectionIds;
 
-  // Only use initialData when filters are at their defaults.
-  // When filters are active, the server data is unfiltered and would be wrong.
-  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0;
+  // Only use initialData when filters are at their defaults and limit is the default (19).
+  // When filters or limit are modified (e.g. during restoration), the server data is unfiltered or the wrong size.
+  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0 && limit === 19;
   const effectiveInitialData = isDefaultQuery && initialData && initialData.length > 0
     ? { initialData: { pages: [initialData], pageParams: [0] } }
     : {};
