@@ -29,8 +29,8 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
         aria-label={t('title')}
       />
 
-      {/* Image Container */}
-      <div className="relative aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700">
+      {/* Image Container: flex-1 on mobile to expand and make graphic bigger, aspect-square on desktop */}
+      <div className="relative flex-1 md:flex-none md:aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700 min-h-[200px]">
         <div className="relative w-full h-full bg-white dark:bg-white rounded-xl flex items-center justify-center p-1">
           <Image
             src={product.imageUrl}
@@ -50,8 +50,8 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
           </span>
         </div>
 
-        {/* Patrocinado Badge Overlay */}
-        <div className="absolute top-2 right-2 z-20 pointer-events-none">
+        {/* Patrocinado Badge Overlay: Hidden on mobile, shown on desktop */}
+        <div className="absolute top-2 right-2 z-20 pointer-events-none hidden sm:block">
           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/40 uppercase tracking-wider">
             {t('badge')}
           </span>
@@ -59,7 +59,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-3 flex flex-col flex-1 gap-2">
+      <div className="p-3 flex flex-col flex-none md:flex-1 gap-2">
         {/* Best Seller Badge */}
         <div className="flex items-center">
           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black bg-[#C45500]/10 text-[#C45500] dark:bg-[#FF9900]/25 dark:text-[#ffaa33] border border-[#C45500]/15 dark:border-[#FF9900]/25 shadow-sm uppercase tracking-wider">
@@ -67,8 +67,8 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
           </span>
         </div>
 
-        {/* Title & Tagline */}
-        <div className="min-h-[2.5rem] sm:min-h-[3rem]">
+        {/* Title & Tagline: Hidden on mobile, visible on desktop */}
+        <div className="hidden sm:block min-h-[2.5rem] sm:min-h-[3rem]">
           <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-xs sm:text-sm group-hover:text-primary transition-colors">
             {t('title')}
           </h3>
