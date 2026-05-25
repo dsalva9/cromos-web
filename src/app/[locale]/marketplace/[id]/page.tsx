@@ -41,6 +41,7 @@ import { Loader2 } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { getCurrencySymbol } from '@/constants/countries';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { ShareButton } from '@/components/marketplace/ShareButton';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -554,6 +555,12 @@ export default function ListingDetailPage() {
               {user && !isOwner && (
                 <div className="mt-4 flex items-center gap-2">
                   <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12" />
+                  <ShareButton
+                    listingId={listing.id}
+                    listingTitle={listing.title}
+                    collectionName={listing.collection_name}
+                    variant="icon"
+                  />
                   <ReportButton
                     entityType="listing"
                     entityId={String(listing.id)}
@@ -567,6 +574,13 @@ export default function ListingDetailPage() {
               {isOwner && (
                 <div className="text-center space-y-4">
                   <p className="text-gray-600 dark:text-gray-400 text-sm">{t('yourListing')}</p>
+                  <ShareButton
+                    listingId={listing.id}
+                    listingTitle={listing.title}
+                    collectionName={listing.collection_name}
+                    variant="full"
+                    className="w-full"
+                  />
                   {hasConversations ? (
                     <Button
                       size="lg"

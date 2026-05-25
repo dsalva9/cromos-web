@@ -9,6 +9,7 @@ import { Calendar, ArrowRight, ArrowLeft, Trash } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { useState } from 'react';
 import { Listing } from '@/types/v1.6.0';
+import { ShareButton } from '@/components/marketplace/ShareButton';
 
 interface ListingDetailContentProps {
   listing: Listing | null;
@@ -93,14 +94,22 @@ export function ListingDetailContent({ listing, error, currencySymbol = '€' }:
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
-        {/* Back link */}
-        <Link
-          href="/explorar"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gold transition-colors mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver al listado
-        </Link>
+        {/* Header with back link and share */}
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            href="/explorar"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gold transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al listado
+          </Link>
+          <ShareButton
+            listingId={listing.id}
+            listingTitle={listing.title}
+            collectionName={listing.collection_name}
+            variant="icon"
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Image */}
