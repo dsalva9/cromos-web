@@ -1179,7 +1179,7 @@ function ListingChatPageContent() {
                                     src={message.thumbnail_url}
                                     alt={t('imageMessage')}
                                     loading="lazy"
-                                    className="max-w-[240px] max-h-[240px] rounded-md object-cover"
+                                    className="max-w-[240px] max-h-[240px] rounded-md"
                                   />
                                 </button>
                               )}
