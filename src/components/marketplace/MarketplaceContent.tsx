@@ -37,6 +37,78 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
     const searchParams = useSearchParams();
 
+    const [hasRestored, setHasRestored] = useState(false);
+    const scrollRestoredRef = useRef(false);
+
+    // 1. Restore state on mount
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const referrer = document.referrer;
+        let isComingFromSubpage = false;
+        try {
+            if (referrer) {
+                const referrerUrl = new URL(referrer);
+                const pathSegments = referrerUrl.pathname.split('/').filter(Boolean);
+                const marketplaceIdx = pathSegments.indexOf('marketplace');
+                if (marketplaceIdx !== -1 && pathSegments.length > marketplaceIdx + 1) {
+                    isComingFromSubpage = true;
+                }
+            }
+        } catch (e) {
+            console.error('Error parsing referrer:', e);
+        }
+
+        const navigationEntries = performance.getEntriesByType('navigation');
+        const isBackForward = navigationEntries.length > 0 && 
+            (navigationEntries[0] as PerformanceNavigationTiming).type === 'back_forward';
+
+        if (isComingFromSubpage || isBackForward) {
+            // Restore filters from sessionStorage
+            const savedSearch = sessionStorage.getItem('marketplace_searchQuery');
+            if (savedSearch !== null) setSearchQuery(savedSearch);
+
+            const savedSort = sessionStorage.getItem('marketplace_sortByDistance');
+            if (savedSort !== null) setSortByDistance(savedSort === 'true');
+
+            const savedCollections = sessionStorage.getItem('marketplace_selectedCollectionIds');
+            if (savedCollections) {
+                try {
+                    setSelectedCollectionIds(JSON.parse(savedCollections));
+                } catch (e) {
+                    console.error('Error parsing saved collections:', e);
+                }
+            }
+
+            const savedShowFilters = sessionStorage.getItem('marketplace_showFilters');
+            if (savedShowFilters !== null) setShowFilters(savedShowFilters === 'true');
+
+            const savedTypeFilter = sessionStorage.getItem('marketplace_listingTypeFilter');
+            if (savedTypeFilter !== null) setListingTypeFilter(savedTypeFilter as any);
+        } else {
+            // Fresh visit: clear saved state to start clean
+            sessionStorage.removeItem('marketplace_searchQuery');
+            sessionStorage.removeItem('marketplace_sortByDistance');
+            sessionStorage.removeItem('marketplace_selectedCollectionIds');
+            sessionStorage.removeItem('marketplace_showFilters');
+            sessionStorage.removeItem('marketplace_listingTypeFilter');
+            sessionStorage.removeItem('marketplace_scroll_position');
+        }
+
+        setHasRestored(true);
+    }, []);
+
+    // 2. Persist state changes
+    useEffect(() => {
+        if (typeof window === 'undefined' || !hasRestored) return;
+
+        sessionStorage.setItem('marketplace_searchQuery', searchQuery);
+        sessionStorage.setItem('marketplace_sortByDistance', String(sortByDistance));
+        sessionStorage.setItem('marketplace_selectedCollectionIds', JSON.stringify(selectedCollectionIds));
+        sessionStorage.setItem('marketplace_showFilters', String(showFilters));
+        sessionStorage.setItem('marketplace_listingTypeFilter', listingTypeFilter);
+    }, [searchQuery, sortByDistance, selectedCollectionIds, showFilters, listingTypeFilter, hasRestored]);
+
     // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet)
     useEffect(() => {
         const collectionParam = searchParams.get('collection');
@@ -120,6 +192,47 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         : fetchedListings.filter(listing =>
             listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
         );
+
+    // 3. Track scroll position in real-time
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const handleScroll = () => {
+            if (hasRestored) {
+                sessionStorage.setItem('marketplace_scroll_position', String(window.scrollY));
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [hasRestored]);
+
+    // 4. Restore scroll position once listings are rendered
+    useEffect(() => {
+        if (typeof window === 'undefined' || !hasRestored || scrollRestoredRef.current) return;
+
+        if (listings.length > 0 || !loading) {
+            const savedPosition = sessionStorage.getItem('marketplace_scroll_position');
+            if (savedPosition) {
+                const targetScrollY = parseInt(savedPosition, 10);
+                if (targetScrollY > 0 && listings.length > 0) {
+                    requestAnimationFrame(() => {
+                        window.scrollTo({
+                            top: targetScrollY,
+                            behavior: 'instant' as ScrollBehavior,
+                        });
+                        scrollRestoredRef.current = true;
+                    });
+                } else {
+                    scrollRestoredRef.current = true;
+                }
+            } else {
+                scrollRestoredRef.current = true;
+            }
+        }
+    }, [listings.length, loading, hasRestored]);
 
     // Loading state logic - show skeletons only when we have no data
     const showSkeletons = loading && listings.length === 0;
