@@ -1423,11 +1423,17 @@
       "matrix": {
         "restore": "Restore defaults",
         "cancel": "Cancel",
+        "save": "Save changes",
         "saving": "Saving...",
-        "type": "Notification type",
+        "type": "Notification Type",
         "uncheckAll": "Uncheck all",
         "checkAll": "Check all",
-        "notAvailable": "Not available"
+        "notAvailable": "Not available",
+        "aria": {
+          "disable": "Disable",
+          "enable": "Enable",
+          "for": "for"
+        }
       },
       "messages": {
         "errorLoad": "Error loading preferences",
@@ -1435,98 +1441,70 @@
         "errorSave": "Error saving preferences"
       },
       "channels": {
-        "in_app": "In-App",
+        "in_app": "In App",
         "push": "Push",
         "email": "Email"
       },
       "categories": {
         "marketplace": {
           "label": "Marketplace",
-          "description": "Notifications about listings, reservations, and transactions"
+          "description": "Notifications about listings and transactions"
         },
         "community": {
           "label": "Community",
-          "description": "Interactions with other users"
-        },
-        "trades": {
-          "label": "Trades",
-          "description": "Updates on your sticker trades"
+          "description": "Ratings, achievements, and collections"
         },
         "system": {
           "label": "System",
-          "description": "Important platform and account updates"
-        },
-        "templates": {
-          "label": "Templates",
-          "description": "Updates related to album templates"
+          "description": "System messages and levels"
         }
       },
       "types": {
-        "marketplace_message": {
-          "label": "Messages",
-          "description": "When someone sends you a message",
-          "category": "Marketplace"
+        "listing_chat": {
+          "label": "Chat messages",
+          "description": "New messages about your listings"
         },
         "listing_reserved": {
-          "label": "Listing reserved",
+          "label": "Item reserved",
           "description": "When someone reserves your listing"
         },
         "listing_completed": {
           "label": "Transaction completed",
           "description": "When a transaction is completed"
         },
-        "achievement_earned": {
-          "label": "Achievement earned",
-          "description": "When you unlock a new achievement",
-          "category": "Account"
+        "trade_confirmation_request": {
+          "label": "Trade confirmation request",
+          "description": "When someone requests you to confirm a trade"
         },
-        "system_alert": {
-          "label": "System alerts",
-          "description": "Important platform updates and security notices",
-          "category": "System"
-        },
-        "weekly_summary": {
-          "label": "Weekly summary",
-          "description": "A summary of your weekly activity and unread messages",
-          "category": "System"
-        },
-        "listing_chat": {
-          "label": "Chat messages",
-          "description": "New messages about your listings"
+        "trade_confirmed": {
+          "label": "Trade confirmed",
+          "description": "When a requested trade is confirmed"
         },
         "chat_unread": {
-          "label": "Weekly message summary",
+          "label": "Weekly unread messages digest",
           "description": "Weekly reminder if you have unread messages"
         },
         "user_rated": {
-          "label": "You were rated",
+          "label": "You have been rated",
           "description": "When another user rates you"
         },
         "badge_earned": {
           "label": "Achievement earned",
-          "description": "When you earn a new achievement"
+          "description": "When you get a new achievement"
         },
         "template_rated": {
-          "label": "Collection rated",
+          "label": "Collection rating",
           "description": "When someone rates your collection"
         },
         "system_message": {
           "label": "System message",
           "description": "Important system messages"
+        },
+        "level_up": {
+          "label": "Level up",
+          "description": "When you level up"
         }
-      },
-      "actions": {
-        "cancel": "Cancel",
-        "saving": "Saving...",
-        "saveChanges": "Save changes",
-        "enableAll": "Enable all",
-        "disableAll": "Disable all",
-        "noTypesAvailable": "No notification types available for this channel."
-      },
-      "saveChanges": "Save changes",
-      "activate": "Enable",
-      "deactivate": "Disable",
-      "for": "for"
+      }
     },
     "theme": {
       "title": "Appearance",

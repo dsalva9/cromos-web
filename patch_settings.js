@@ -142,6 +142,14 @@ locales.forEach(locale => {
               "label": locale === 'en' ? "Transaction completed" : locale === 'pt' ? "Transação concluída" : "Transacción completada",
               "description": locale === 'en' ? "When a transaction is completed" : locale === 'pt' ? "Quando uma transação é concluída" : "Cuando una transacción se completa"
           },
+          "trade_confirmation_request": {
+              "label": locale === 'en' ? "Trade confirmation request" : locale === 'pt' ? "Confirmação de troca" : "Confirmación de intercambio",
+              "description": locale === 'en' ? "When someone requests you to confirm a trade" : locale === 'pt' ? "Quando alguém solicita que você confirme uma troca" : "Cuando alguien solicita que confirmes un intercambio"
+          },
+          "trade_confirmed": {
+              "label": locale === 'en' ? "Trade confirmed" : locale === 'pt' ? "Troca confirmada" : "Intercambio confirmado",
+              "description": locale === 'en' ? "When a requested trade is confirmed" : locale === 'pt' ? "Quando uma troca solicitada é confirmada" : "Cuando se confirma un intercambio solicitado"
+          },
           "chat_unread": {
               "label": locale === 'en' ? "Weekly unread messages digest" : locale === 'pt' ? "Resumo semanal de mensagens não lidas" : "Resumen semanal de mensagens sin leer",
               "description": locale === 'en' ? "Weekly reminder if you have unread messages" : locale === 'pt' ? "Lembrete semanal se você tiver mensagens não lidas" : "Recordatorio semanal si tienes mensajes sin leer"

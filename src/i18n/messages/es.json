@@ -1349,43 +1349,68 @@
       "legal": "Legal"
     },
     "notifications": {
-      "title": "Preferencias de Notificación",
-      "description": "Elige cómo quieres que te notifiquemos sobre la actividad en la plataforma.",
+      "matrix": {
+        "restore": "Restaurar valores por defecto",
+        "cancel": "Cancelar",
+        "save": "Guardar cambios",
+        "saving": "Guardando...",
+        "type": "Tipo de Notificación",
+        "uncheckAll": "Desmarcar todas",
+        "checkAll": "Marcar todas",
+        "notAvailable": "No disponible",
+        "aria": {
+          "disable": "Desactivar",
+          "enable": "Activar",
+          "for": "para"
+        }
+      },
+      "messages": {
+        "errorLoad": "Error al cargar las preferencias",
+        "success": "Preferencias actualizadas correctamente",
+        "errorSave": "Error al guardar las preferencias"
+      },
+      "channels": {
+        "in_app": "En la App",
+        "push": "Push",
+        "email": "Email"
+      },
+      "categories": {
+        "marketplace": {
+          "label": "Marketplace",
+          "description": "Notificaciones sobre listados y transacciones"
+        },
+        "community": {
+          "label": "Comunidad",
+          "description": "Valoraciones, logros y colecciones"
+        },
+        "system": {
+          "label": "Sistema",
+          "description": "Mensajes del sistema y niveles"
+        }
+      },
       "types": {
-        "marketplace_message": {
-          "label": "Mensajes",
-          "description": "Cuando alguien te envía un mensaje",
-          "category": "Marketplace"
-        },
-        "listing_reserved": {
-          "label": "Anuncio reservado",
-          "description": "Cuando alguien reserva tu anuncio"
-        },
-        "listing_completed": {
-          "label": "Anuncio completado",
-          "description": "Cuando una transacción se completa"
-        },
-        "achievement_earned": {
-          "label": "Logro ganado",
-          "description": "Cuando desbloqueas un nuevo logro",
-          "category": "Cuenta"
-        },
-        "system_alert": {
-          "label": "Alertas del sistema",
-          "description": "Actualizaciones importantes de la plataforma y avisos de seguridad",
-          "category": "Sistema"
-        },
-        "weekly_summary": {
-          "label": "Resumen semanal",
-          "description": "Un resumen de tu actividad semanal y mensajes no leídos",
-          "category": "Sistema"
-        },
         "listing_chat": {
           "label": "Mensajes de chat",
           "description": "Nuevos mensajes sobre tus listados"
         },
+        "listing_reserved": {
+          "label": "Artículo reservado",
+          "description": "Cuando alguien reserva tu listado"
+        },
+        "listing_completed": {
+          "label": "Transacción completada",
+          "description": "Cuando una transacción se completa"
+        },
+        "trade_confirmation_request": {
+          "label": "Confirmación de intercambio",
+          "description": "Cuando alguien solicita que confirmes un intercambio"
+        },
+        "trade_confirmed": {
+          "label": "Intercambio confirmado",
+          "description": "Cuando se confirma un intercambio solicitado"
+        },
         "chat_unread": {
-          "label": "Resumen semanal de mensajes",
+          "label": "Resumen semanal de mensagens sin leer",
           "description": "Recordatorio semanal si tienes mensajes sin leer"
         },
         "user_rated": {
@@ -1403,132 +1428,64 @@
         "system_message": {
           "label": "Mensaje del sistema",
           "description": "Mensajes importantes del sistema"
+        },
+        "level_up": {
+          "label": "Subida de nivel",
+          "description": "Cuando subes de nivel"
         }
-      },
-      "items": {
-        "chat_message": {
-          "title": "Mensajes de Chat",
-          "description": "Te avisa cuando recibes un nuevo mensaje en el chat."
-        },
-        "referral_used": {
-          "title": "Código de Referido",
-          "description": "Te avisa cuando se utiliza tu código de referido."
-        },
-        "marketplace_match": {
-          "title": "Coincidencia en Marketplace",
-          "description": "Te avisa de nuevos artículos que coinciden con tus búsquedas."
-        },
-        "price_drop": {
-          "title": "Bajada de Precio",
-          "description": "Te avisa cuando baja el precio de un cromo."
-        },
-        "weekly_digest": {
-          "title": "Resumen Semanal",
-          "description": "Recibe un resumen de tu actividad semanal."
-        },
-        "achievement_earned": {
-          "title": "Logros",
-          "description": "Te avisa cuando desbloqueas un nuevo logro."
-        }
-      },
-      "actions": {
-        "cancel": "Cancelar",
-        "saving": "Guardando...",
-        "saveChanges": "Guardar cambios",
-        "enableAll": "Activar todas",
-        "disableAll": "Desactivar todas",
-        "noTypesAvailable": "No hay tipos de notificación disponibles para este canal."
-      },
-      "channels": {
-        "in_app": "En la App",
-        "push": "Push",
-        "email": "Email"
-      },
-      "categories": {
-        "marketplace": {
-          "label": "Mercado",
-          "description": "Notificaciones sobre anuncios, reservas y transacciones"
-        },
-        "community": {
-          "label": "Comunidad",
-          "description": "Interacciones con otros usuarios"
-        },
-        "trades": {
-          "label": "Intercambios",
-          "description": "Actualizaciones sobre tus intercambios de cromos"
-        },
-        "system": {
-          "label": "Sistema",
-          "description": "Actualizaciones importantes de la plataforma y la cuenta"
-        },
-        "templates": {
-          "label": "Plantillas",
-          "description": "Actualizaciones relacionadas con plantillas de álbumes"
-        }
-      },
-      "saveChanges": "Guardar cambios",
-      "activate": "Activar",
-      "deactivate": "Desactivar",
-      "for": "para",
-      "matrix": {
-        "restore": "Restaurar valores por defecto",
-        "cancel": "Cancelar",
-        "saving": "Guardando...",
-        "type": "Tipo de notificación",
-        "uncheckAll": "Desmarcar todo",
-        "checkAll": "Marcar todo",
-        "notAvailable": "No disponible"
       }
     },
     "system": {
       "reactivateTips": {
-        "title": "Reactivar Consejos",
-        "description": "Vuelve a activar todos los consejos ocultos y mensajes de ayuda.",
-        "button": "Reactivar Consejos",
+        "title": "Consejos de ayuda",
+        "description": "Muestra consejos contextuales en las distintas secciones de la app para ayudarte a usar todas las funciones.",
+        "button": "Reactivar consejos",
         "success": "Consejos reactivados correctamente",
-        "error": "Error al reactivar consejos"
+        "error": "Error al reactivar los consejos"
       },
       "signOutAll": {
-        "title": "Cerrar Sesión en Todos los Dispositivos",
-        "description": "Cierra todas las sesiones activas excepto la actual.",
-        "buttonMobile": "Cerrar en Todos",
-        "loading": "Cerrando...",
-        "success": "Sesión cerrada en todos los dispositivos",
+        "title": "Cerrar sesión en todos los dispositivos",
+        "description": "Cierra tu sesión en todos los dispositivos donde hayas iniciado sesión, incluyendo este. Tendrás que volver a iniciar sesión.",
+        "button": "Cerrar sesión en todos los dispositivos",
+        "buttonMobile": "Cerrar sesión en todos",
+        "loading": "Cerrando sesión...",
+        "success": "Se ha cerrado sesión en todos los dispositivos",
         "error": "Error al cerrar sesión en todos los dispositivos"
       },
       "deleteAccount": {
-        "title": "Eliminar Cuenta",
-        "description": "Acción irreversible. Esto eliminará permanentemente tu cuenta y todos los datos asociados.",
-        "warning": "Atención: La eliminación de la cuenta es definitiva y no se puede deshacer.",
+        "title": "Eliminar mi cuenta",
+        "description": "Esta acción programará tu cuenta para eliminación permanente en 90 días. Durante este período puedes cancelar la eliminación. Perderás:",
         "list": {
-          "data": "Todos los datos de tu perfil",
-          "history": "Historial de transacciones",
-          "listings": "Anuncios del marketplace",
-          "collections": "Colecciones",
-          "messages": "Mensajes",
-          "reviews": "Valoraciones"
-        }
+          "data": "Todos tus datos de usuario",
+          "history": "Historial de intercambios",
+          "listings": "Todos tus anuncios del marketplace",
+          "collections": "Tus colecciones y plantillas",
+          "messages": "Mensajes y conversaciones",
+          "reviews": "Valoraciones y comentarios"
+        },
+        "warning": "Esta acción es irreversible",
+        "button": "Eliminar mi cuenta"
       }
     },
     "legal": {
-      "version": "Versión",
       "terms": {
-        "title": "Términos de Uso",
-        "description": "Lee nuestros términos de uso."
+        "title": "Términos de Servicio",
+        "description": "Normas de la comunidad y condiciones de uso"
       },
       "privacy": {
         "title": "Política de Privacidad",
-        "description": "Lee nuestra política de privacidad."
+        "description": "Cómo gestionamos y protegemos tus datos"
       },
       "cookies": {
         "title": "Política de Cookies",
-        "description": "Lee nuestra política de cookies."
-      }
+        "description": "Uso de cookies y tecnologías similares"
+      },
+      "version": "Versión"
     },
     "ignored": {
       "empty": {
         "title": "No tienes usuarios bloqueados",
-        "description": "Cuando bloquees usuarios, aparecerán aquí para que puedas gestionarlos."
+        "description": "Cuando bloquees a usuarios, aparecerán aquí para que puedas gestionarlos."
       },
       "retry": "Reintentar",
       "unblock": {
@@ -1551,9 +1508,9 @@
     },
     "theme": {
       "title": "Apariencia",
-      "description": "Personaliza el aspecto de la aplicación",
+      "description": "Personaliza cómo se ve la aplicación",
       "light": "Claro",
-      "dark": "Oscuro",
+      "dark": "Escuro",
       "system": "Sistema"
     }
   },
