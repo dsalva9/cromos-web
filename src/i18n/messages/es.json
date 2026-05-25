@@ -2033,7 +2033,16 @@
     "listingReservedOther": "Este anuncio está reservado para otro usuario",
     "selectToRespond": "Selecciona una conversación para responder",
     "tosAccept": "Acepto los ",
-    "characters": "caracteres"
+    "characters": "caracteres",
+    "attachImage": "Adjuntar imagen",
+    "takePhoto": "Tomar foto",
+    "removeImage": "Quitar imagen",
+    "sendingImage": "Enviando imagen...",
+    "imageTooLarge": "La imagen no puede superar 5MB",
+    "imageUploadError": "Error al subir la imagen",
+    "viewFullImage": "Ver imagen completa",
+    "closeImage": "Cerrar",
+    "imageMessage": "📷 Imagen"
   },
   "marketplaceCreate": {
     "title": "Crear Anuncio",

@@ -11,6 +11,7 @@ import {
   ListingChatMessage,
   ChatParticipant,
 } from '@/lib/supabase/listings/chat';
+import { processImageBeforeUpload, generateThumbnail } from '@/lib/images/processImageBeforeUpload';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 
@@ -34,6 +35,7 @@ export function useListingChat({
   const [participants, setParticipants] = useState<ChatParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -80,10 +82,10 @@ export function useListingChat({
     setParticipants(data);
   }, [supabase, listingId]);
 
-  // Send a message
+  // Send a message (with optional image)
   const sendMessage = useCallback(
-    async (text: string, receiverId?: string) => {
-      if (!user || !text.trim()) return;
+    async (text: string, receiverId?: string, imageFile?: File | Blob | null) => {
+      if (!user || (!text.trim() && !imageFile)) return;
 
       // Determine receiver
       let targetReceiverId = receiverId;
@@ -102,26 +104,93 @@ export function useListingChat({
 
       setSending(true);
 
+      // Upload image if provided
+      let imageUrl: string | null = null;
+      let thumbnailUrl: string | null = null;
+
+      if (imageFile) {
+        setUploading(true);
+        try {
+          // Convert Blob to File if needed (from camera capture)
+          const file = imageFile instanceof File
+            ? imageFile
+            : new File([imageFile], 'chat-image.webp', { type: imageFile.type || 'image/webp' });
+
+          // Process image: 1200px max, 500KB target, WebP
+          const processed = await processImageBeforeUpload(file, {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1200,
+            quality: 0.82,
+          });
+
+          // Generate thumbnail: 300px wide
+          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7);
+
+          // Build storage paths
+          const timestamp = Date.now();
+          const basePath = `chat-images/${listingId}/${user.id}/${timestamp}`;
+          const imagePath = `${basePath}.webp`;
+          const thumbPath = `${basePath}-thumb.webp`;
+
+          // Upload both in parallel
+          const [imageUpload, thumbUpload] = await Promise.all([
+            supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
+              contentType: 'image/webp',
+              upsert: false,
+            }),
+            supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+              contentType: 'image/webp',
+              upsert: false,
+            }),
+          ]);
+
+          if (imageUpload.error) throw imageUpload.error;
+          if (thumbUpload.error) throw thumbUpload.error;
+
+          // Get public URLs
+          const { data: imageUrlData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
+          const { data: thumbUrlData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+
+          imageUrl = imageUrlData.publicUrl;
+          thumbnailUrl = thumbUrlData.publicUrl;
+        } catch (uploadError) {
+          logger.error('Error uploading chat image:', uploadError);
+          toast.error('Error al subir la imagen');
+          setSending(false);
+          setUploading(false);
+          return;
+        } finally {
+          setUploading(false);
+        }
+      }
+
       const { messageId, error: sendError } = await sendListingMessage(
         supabase,
         listingId,
         targetReceiverId,
-        text
+        text,
+        imageUrl,
+        thumbnailUrl
       );
 
       if (sendError) {
         toast.error(sendError.message);
       } else if (messageId) {
+        // Determine display message (placeholder for image-only)
+        const displayMessage = !text.trim() && imageUrl ? '📷 Imagen' : text.trim();
+
         // Optimistically add message
         const optimisticMessage: ListingChatMessage = {
           id: messageId,
           sender_id: user.id,
           receiver_id: targetReceiverId,
           sender_nickname: 'Tú',
-          message: text.trim(),
+          message: displayMessage,
           is_read: false,
           is_system: false,
           created_at: new Date().toISOString(),
+          image_url: imageUrl,
+          thumbnail_url: thumbnailUrl,
         };
         setMessages(prev => [...prev, optimisticMessage]);
 
@@ -185,6 +254,7 @@ export function useListingChat({
     participants,
     loading,
     sending,
+    uploading,
     error,
     sendMessage,
     fetchParticipants,

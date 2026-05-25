@@ -2015,7 +2015,16 @@
     "listingReservedOther": "This listing is reserved for another user",
     "selectToRespond": "Select a conversation to respond",
     "tosAccept": "I accept the ",
-    "characters": "characters"
+    "characters": "characters",
+    "attachImage": "Attach image",
+    "takePhoto": "Take photo",
+    "removeImage": "Remove image",
+    "sendingImage": "Sending image...",
+    "imageTooLarge": "Image cannot exceed 5MB",
+    "imageUploadError": "Error uploading image",
+    "viewFullImage": "View full image",
+    "closeImage": "Close",
+    "imageMessage": "📷 Image"
   },
   "marketplaceCreate": {
     "title": "Create Listing",

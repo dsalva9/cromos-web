@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
@@ -26,6 +26,7 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 
 import { logger } from '@/lib/logger';
 import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
+import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -65,13 +66,21 @@ function ListingChatPageContent() {
   // If a participant was pre-selected from the URL, start with the list hidden
   const [showConversationList, setShowConversationList] = useState(!participantFromUrl);
 
+  // Image attachment state
+  const [pendingImage, setPendingImage] = useState<File | Blob | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Lightbox state
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const {
     messages,
     participants,
     loading,
     sending,
+    uploading,
     sendMessage,
     fetchParticipants,
     messagesEndRef,
@@ -321,7 +330,7 @@ function ListingChatPageContent() {
   }, [loading, messages, user, isOwner, listingOwner, selectedParticipant, markAsRead]);
 
   const handleSend = async () => {
-    if (!messageText.trim() || sending) return;
+    if ((!messageText.trim() && !pendingImage) || sending) return;
 
     // Check ToS acceptance for buyers sending first message
     if (!isOwner && messages.length === 0 && !tosAccepted) {
@@ -333,8 +342,51 @@ function ListingChatPageContent() {
       ? selectedParticipant || undefined
       : listingOwner || undefined;
 
-    await sendMessage(messageText, receiverId);
+    await sendMessage(messageText, receiverId, pendingImage);
     setMessageText('');
+    // Clear pending image
+    if (pendingImage) {
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+      setPendingImage(null);
+      setImagePreviewUrl(null);
+    }
+  };
+
+  // Handle file selection from file picker
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Pre-validate size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('imageTooLarge'));
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // Revoke old preview URL if exists
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+
+    setPendingImage(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+    e.target.value = ''; // Reset input so same file can be re-selected
+  };
+
+  // Handle camera capture
+  const handleCameraCapture = (blob: Blob, _fileName: string) => {
+    // Revoke old preview URL if exists
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+
+    setPendingImage(blob);
+    setImagePreviewUrl(URL.createObjectURL(blob));
+    setShowCameraModal(false);
+  };
+
+  // Remove pending image
+  const handleRemoveImage = () => {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+    setPendingImage(null);
+    setImagePreviewUrl(null);
   };
 
   const handleReserve = async () => {
@@ -1115,9 +1167,28 @@ function ListingChatPageContent() {
                                   )}
                                 </p>
                               )}
-                              <p className="whitespace-pre-wrap break-words">
-                                {message.message}
-                              </p>
+                              {/* Image attachment */}
+                              {message.thumbnail_url && (
+                                <button
+                                  type="button"
+                                  onClick={() => setLightboxUrl(message.image_url || message.thumbnail_url || null)}
+                                  className="block mb-1 rounded-md overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                                  aria-label={t('viewFullImage')}
+                                >
+                                  <img
+                                    src={message.thumbnail_url}
+                                    alt={t('imageMessage')}
+                                    loading="lazy"
+                                    className="max-w-[240px] max-h-[240px] rounded-md object-cover"
+                                  />
+                                </button>
+                              )}
+                              {/* Message text (hide placeholder for image-only messages) */}
+                              {!(message.thumbnail_url && message.message === '📷 Imagen') && (
+                                <p className="whitespace-pre-wrap break-words">
+                                  {message.message}
+                                </p>
+                              )}
                               <p className="text-xs mt-1 opacity-60">
                                 {new Date(message.created_at).toLocaleTimeString('es-ES', {
                                   hour: '2-digit',
@@ -1278,7 +1349,66 @@ function ListingChatPageContent() {
                           </div>
                         )}
 
+                        {/* Image preview chip */}
+                        {imagePreviewUrl && (
+                          <div className="mb-3 flex items-center gap-2">
+                            <div className="relative w-[60px] h-[60px] rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600">
+                              <img
+                                src={imagePreviewUrl}
+                                alt={t('attachImage')}
+                                className="w-full h-full object-cover"
+                              />
+                              {uploading && (
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                  <Loader2 className="h-5 w-5 text-white animate-spin" />
+                                </div>
+                              )}
+                            </div>
+                            {!uploading && (
+                              <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                className="p-1 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                aria-label={t('removeImage')}
+                              >
+                                <X className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+
                         <div className="flex gap-2">
+                          {/* Attach image button */}
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={sending || uploading}
+                            className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label={t('attachImage')}
+                            title={t('attachImage')}
+                          >
+                            <Paperclip className="h-5 w-5" />
+                          </button>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                          />
+
+                          {/* Camera button */}
+                          <button
+                            type="button"
+                            onClick={() => setShowCameraModal(true)}
+                            disabled={sending || uploading}
+                            className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label={t('takePhoto')}
+                            title={t('takePhoto')}
+                          >
+                            <Camera className="h-5 w-5" />
+                          </button>
+
                           <textarea
                             value={messageText}
                             onChange={e => setMessageText(e.target.value)}
@@ -1286,14 +1416,18 @@ function ListingChatPageContent() {
                             maxLength={500}
                             rows={2}
                             className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md px-4 py-2 border-2 border-gray-200 dark:border-gray-700 focus:border-gold focus:outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={sending}
+                            disabled={sending || uploading}
                           />
                           <Button
                             onClick={handleSend}
-                            disabled={!messageText.trim() || sending}
+                            disabled={(!messageText.trim() && !pendingImage) || sending || uploading}
                             className="bg-gold text-black hover:bg-yellow-400 font-bold"
                           >
-                            <Send className="h-4 w-4" />
+                            {uploading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Send className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                       </>
@@ -1342,6 +1476,35 @@ function ListingChatPageContent() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Image Lightbox Dialog */}
+        <Dialog open={!!lightboxUrl} onOpenChange={() => setLightboxUrl(null)}>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none overflow-hidden flex items-center justify-center">
+            <button
+              type="button"
+              onClick={() => setLightboxUrl(null)}
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+              aria-label={t('closeImage')}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            {lightboxUrl && (
+              <img
+                src={lightboxUrl}
+                alt={t('viewFullImage')}
+                className="max-w-full max-h-[90vh] object-contain select-none"
+                style={{ touchAction: 'pinch-zoom' }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Camera Capture Modal */}
+        <CameraCaptureModal
+          open={showCameraModal}
+          onClose={() => setShowCameraModal(false)}
+          onCapture={handleCameraCapture}
+        />
 
 
       </div>

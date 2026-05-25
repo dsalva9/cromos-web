@@ -13,6 +13,8 @@ const listingChatMessageSchema = z.object({
   is_read: z.boolean(),
   is_system: z.boolean().default(false),
   created_at: z.string(),
+  image_url: z.string().nullable().optional().default(null),
+  thumbnail_url: z.string().nullable().optional().default(null),
 });
 
 const chatParticipantSchema = z.object({
@@ -84,21 +86,30 @@ export async function sendListingMessage(
   supabase: SupabaseClient,
   listingId: number,
   receiverId: string,
-  message: string
+  message: string,
+  imageUrl?: string | null,
+  thumbnailUrl?: string | null
 ): Promise<{ messageId: number | null; error: Error | null }> {
   try {
-    if (!message.trim()) {
+    // For image-only messages, use a placeholder text
+    const finalMessage = !message.trim() && imageUrl
+      ? '📷 Imagen'
+      : message;
+
+    if (!finalMessage.trim()) {
       throw new Error('El mensaje no puede estar vacío');
     }
 
-    if (message.length > 500) {
+    if (finalMessage.length > 500) {
       throw new Error('El mensaje no puede exceder 500 caracteres');
     }
 
     const { data, error } = await supabase.rpc('send_listing_message', {
       p_listing_id: listingId,
       p_receiver_id: receiverId,
-      p_message: message.trim(),
+      p_message: finalMessage.trim(),
+      p_image_url: imageUrl ?? null,
+      p_thumbnail_url: thumbnailUrl ?? null,
     });
 
     if (error) throw error;
