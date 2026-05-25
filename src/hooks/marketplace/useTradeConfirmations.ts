@@ -48,8 +48,10 @@ export function useTradeConfirmations({
         .from('trade_confirmations')
         .select('*')
         .eq('listing_id', listingId)
-        .eq('status', 'pending')
+        .in('status', ['pending', 'confirmed'])
         .or(`and(requester_id.eq.${user.id},confirmer_id.eq.${participantId}),and(requester_id.eq.${participantId},confirmer_id.eq.${user.id})`)
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
 
       if (error) {
@@ -162,8 +164,8 @@ export function useTradeConfirmations({
   );
 
   // Computed states
-  const pendingForMe = pendingConfirmation?.confirmer_id === user?.id;
-  const pendingByMe = pendingConfirmation?.requester_id === user?.id;
+  const pendingForMe = pendingConfirmation?.status === 'pending' && pendingConfirmation?.confirmer_id === user?.id;
+  const pendingByMe = pendingConfirmation?.status === 'pending' && pendingConfirmation?.requester_id === user?.id;
 
   // Determine if nudge card should show (>= 4 messages, oldest message >= 5 days ago, and no pending/active confirmation exists)
   const oldestMessage = messages[0];
