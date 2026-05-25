@@ -510,16 +510,26 @@ export default function ListingDetailPage() {
                         );
                       })()}
                       <div>
-                        <p className="font-bold text-gray-900 dark:text-white">
-                          {listing.author_nickname}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-gray-900 dark:text-white">
+                            {listing.author_nickname}
+                          </p>
+                          {listing.author_completed_trades && listing.author_completed_trades > 0 ? (
+                            <span
+                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm"
+                              title={`${listing.author_completed_trades} intercambios completados`}
+                            >
+                              ⭐ {listing.author_completed_trades}
+                            </span>
+                          ) : null}
+                        </div>
                         {listing.author_location && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
                             <MapPin className="h-3 w-3 flex-shrink-0" />
                             {listing.author_location}
                           </p>
                         )}
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('viewProfile')}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{t('viewProfile')}</p>
                       </div>
                     </div>
                   </Link>
