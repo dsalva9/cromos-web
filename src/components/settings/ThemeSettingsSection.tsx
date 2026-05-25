@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export function ThemeSettingsSection() {
-  const t = useTranslations('settings');
   const t = useTranslations('settings');
   const { theme, setTheme, resolvedTheme } = useTheme();
 

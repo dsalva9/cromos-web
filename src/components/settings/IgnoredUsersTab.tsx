@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import Link from '@/components/ui/link';
@@ -12,11 +12,9 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { useTranslations } from 'next-intl';
-import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 export function IgnoredUsersTab() {
-  const t = useTranslations('settings');
   const t = useTranslations('settings');
   const { user } = useUser();
   const supabase = useSupabaseClient();

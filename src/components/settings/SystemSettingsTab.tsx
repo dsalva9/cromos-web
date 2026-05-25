@@ -10,11 +10,9 @@ import { toast } from 'sonner';
 import { DeleteAccountDialog } from '@/components/deletion';
 import { ThemeSettingsSection } from './ThemeSettingsSection';
 import { useTranslations } from 'next-intl';
-import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
 
 export function SystemSettingsTab() {
-  const t = useTranslations('settings');
   const t = useTranslations('settings');
   const supabase = useSupabaseClient();
   const router = useRouter();

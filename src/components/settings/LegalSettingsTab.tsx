@@ -1,13 +1,11 @@
-﻿'use client';
+'use client';
 
 import Link from '@/components/ui/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Shield, FileText, Cookie, ChevronRight, ExternalLink } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useTranslations } from 'next-intl';
 
 export function LegalSettingsTab() {
-    const t = useTranslations('settings');
     const t = useTranslations('settings');
     return (
         <div className="space-y-4 md:space-y-6">
