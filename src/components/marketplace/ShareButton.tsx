@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { siteConfig } from '@/config/site';
+import { useLocale } from 'next-intl';
 
 // ── SVG brand icons (inline for zero-dependency) ────────────────────────
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -72,8 +73,9 @@ export function ShareButton({
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
+  const locale = useLocale();
 
-  const shareUrl = `${siteConfig.url}/explorar/${listingId}`;
+  const shareUrl = `${siteConfig.url}/${locale}/explorar/${listingId}`;
 
   // Build share text – short and punchy for social
   const shareText = collectionName
