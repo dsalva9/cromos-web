@@ -16,7 +16,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
     <motion.div
       whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.15)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className="group relative h-full w-full flex flex-col bg-gradient-to-br from-amber-400 to-orange-500 dark:from-amber-500/40 dark:to-orange-600/40 p-[1.5px] rounded-2xl overflow-hidden shadow-sm dark:shadow-md transition-colors duration-300 aspect-[681/1024] cursor-pointer"
+      className="group relative h-fit self-start w-full flex flex-col bg-gradient-to-br from-amber-400 to-orange-500 dark:from-amber-500/40 dark:to-orange-600/40 p-[1.5px] rounded-2xl overflow-hidden shadow-sm dark:shadow-md transition-colors duration-300 aspect-[681/1024] cursor-pointer"
     >
       {/* Invisible link overlay covering the card */}
       <a
