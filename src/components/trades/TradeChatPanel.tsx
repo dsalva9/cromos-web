@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { useTradeChat } from '@/hooks/trades/useTradeChat';
@@ -138,12 +138,12 @@ export function TradeChatPanel({
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-gray-900 rounded-lg border-2 border-black shadow-xl">
+    <div className="flex flex-col h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-black shadow-xl">
       {/* Chat Header */}
-      <div className="bg-gray-800 border-b-2 border-black px-4 py-3 flex-shrink-0">
+      <div className="bg-gray-100 dark:bg-gray-800 border-b-2 border-black px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 text-sm font-bold">
+            <span className="text-gray-600 dark:text-gray-400 text-sm font-bold">
               Conversación con:
             </span>
             <UserLink
@@ -194,7 +194,7 @@ export function TradeChatPanel({
               size="sm"
               onClick={loadMore}
               disabled={loading}
-              className="bg-gray-800 border-2 border-black hover:bg-gray-700 text-white font-bold uppercase text-xs"
+              className="bg-gray-200 dark:bg-gray-800 border-2 border-black hover:bg-gray-300 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold uppercase text-xs"
             >
               {loading ? (
                 <>
@@ -217,14 +217,14 @@ export function TradeChatPanel({
 
         {/* Error state */}
         {error && (
-          <div className="text-center text-[#E84D4D] font-bold p-4 bg-gray-800 rounded-md border-2 border-black">
+          <div className="text-center text-[#E84D4D] font-bold p-4 bg-gray-100 dark:bg-gray-800 rounded-md border-2 border-black">
             {error}
           </div>
         )}
 
         {/* Empty state */}
         {!loading && messages.length === 0 && !error && (
-          <div className="flex items-center justify-center h-32 text-gray-400 font-bold text-center px-4">
+          <div className="flex items-center justify-center h-32 text-gray-500 dark:text-gray-400 font-bold text-center px-4">
             Aún no hay mensajes en esta propuesta.
             <br />
             ¡Sé el primero en saludar!
@@ -244,11 +244,11 @@ export function TradeChatPanel({
                   'max-w-[70%] rounded-lg p-3 border-2 border-black shadow-md',
                   isMine
                     ? 'bg-gold text-gray-900'
-                    : 'bg-gray-800 text-white'
+                    : 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
                 )}
               >
                 {!isMine && (
-                  <p className="text-xs font-bold text-gray-400 mb-1">
+                  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">
                     <UserLink
                       userId={message.sender_id ?? ''}
                       nickname={message.sender_nickname ?? ''}
@@ -294,7 +294,7 @@ export function TradeChatPanel({
       )}
 
       {/* Composer - fixed height, no scroll */}
-      <div className="border-t-2 border-black p-4 bg-gray-800 flex-shrink-0">
+      <div className="border-t-2 border-black p-4 bg-gray-100 dark:bg-gray-800 flex-shrink-0">
         <div className="flex flex-col space-y-2">
           <Textarea
             ref={textareaRef}
@@ -308,7 +308,7 @@ export function TradeChatPanel({
             disabled={!isProposalActive || sending}
             maxLength={500}
             rows={2}
-            className="resize-none bg-gray-900 text-white border-2 border-black font-medium placeholder:text-gray-500"
+            className="resize-none bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-2 border-black font-medium placeholder:text-gray-400 dark:placeholder:text-gray-500"
           />
           <div className="flex justify-between items-center">
             <span

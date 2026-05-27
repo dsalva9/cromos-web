@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import {
@@ -188,6 +188,9 @@ export function ProposalDetailModal({
     const newStatus = await respond(proposalId, action);
     if (newStatus) {
       onStatusChange(proposalId, newStatus);
+
+      // Re-fetch detail so local status updates and buttons refresh
+      await fetchDetail(proposalId);
 
       // If accepted, switch to Mensajes tab instead of closing modal
       if (action === 'accept') {
