@@ -135,7 +135,7 @@ test.describe('Phase 3 Matching Discovery Hub QA Validation', () => {
       await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'filters_expanded.png'), fullPage: true });
 
       // Clear filters
-      const clearBtn = page.getByRole('button', { name: /limpiar filtros/i });
+      const clearBtn = page.getByRole('button', { name: /limpiar filtros/i }).first();
       if (await clearBtn.isVisible()) {
         await clearBtn.click();
         await page.waitForTimeout(1000);
