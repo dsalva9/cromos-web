@@ -2075,6 +2075,19 @@
       "theyHaveForYou": "Te pueden dar",
       "youHaveForThem": "Tú les das",
       "cta": "Proponer intercambio"
+    },
+    "hub": {
+      "title": "Mis Intercambios",
+      "desc": "Gestiona tus propuestas de intercambio de cromos",
+      "tabInbox": "Recibidas",
+      "tabOutbox": "Enviadas",
+      "emptyInbox": "No tienes propuestas recibidas",
+      "emptyOutbox": "No has enviado ninguna propuesta",
+      "emptyInboxDesc": "Cuando alguien te proponga un intercambio, aparecerá aquí.",
+      "emptyOutboxDesc": "Busca coincidencias con otros coleccionistas y envía tu primera propuesta.",
+      "findMatchesCta": "Buscar coincidencias",
+      "comingSoon": "Estamos preparando esta sección. ¡Muy pronto podrás ver todas tus propuestas de intercambio aquí!",
+      "comingSoonTitle": "Próximamente"
     }
   }
 }

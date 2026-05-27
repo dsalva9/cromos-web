@@ -2075,6 +2075,19 @@
       "theyHaveForYou": "Eles têm para você",
       "youHaveForThem": "Você tem para eles",
       "cta": "Propor troca"
+    },
+    "hub": {
+      "title": "Minhas Trocas",
+      "desc": "Gerencie suas propostas de troca de figurinhas",
+      "tabInbox": "Recebidas",
+      "tabOutbox": "Enviadas",
+      "emptyInbox": "Nenhuma proposta recebida",
+      "emptyOutbox": "Você não enviou nenhuma proposta",
+      "emptyInboxDesc": "Quando alguém propor uma troca, ela aparecerá aqui.",
+      "emptyOutboxDesc": "Encontre coincidências com outros colecionadores e envie sua primeira proposta.",
+      "findMatchesCta": "Buscar coincidências",
+      "comingSoon": "Estamos preparando esta seção. Em breve você poderá ver todas as suas propostas de troca aqui!",
+      "comingSoonTitle": "Em breve"
     }
   }
 }

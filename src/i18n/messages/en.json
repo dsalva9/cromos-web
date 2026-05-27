@@ -2078,6 +2078,19 @@
       "theyHaveForYou": "They have for you",
       "youHaveForThem": "You have for them",
       "cta": "Propose trade"
+    },
+    "hub": {
+      "title": "My Trades",
+      "desc": "Manage your sticker trade proposals",
+      "tabInbox": "Received",
+      "tabOutbox": "Sent",
+      "emptyInbox": "No proposals received",
+      "emptyOutbox": "You haven't sent any proposals",
+      "emptyInboxDesc": "When someone proposes a trade, it will appear here.",
+      "emptyOutboxDesc": "Find matches with other collectors and send your first proposal.",
+      "findMatchesCta": "Find matches",
+      "comingSoon": "We're preparing this section. Soon you'll be able to see all your trade proposals here!",
+      "comingSoonTitle": "Coming soon"
     }
   }
 }

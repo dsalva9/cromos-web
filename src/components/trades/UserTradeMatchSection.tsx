@@ -25,6 +25,9 @@ interface UserTradeMatchSectionProps {
  * Displays a glassmorphism highlight card on another user's profile
  * showing mutual sticker overlap and a CTA to start a trade.
  *
+ * Uses the `get_user_trade_overlap` SECURITY DEFINER RPC to bypass RLS
+ * and calculate overlap server-side.
+ *
  * Renders nothing if:
  * - No overlap exists
  * - Not logged in
@@ -48,71 +51,33 @@ export function UserTradeMatchSection({ userId, nickname }: UserTradeMatchSectio
 
     async function fetchOverlap() {
       try {
-        // 1. Find shared collections between both users
-        const [myCollections, theirCollections] = await Promise.all([
-          supabase
-            .from('user_template_copies')
-            .select('id, template_id, templates!inner(name)')
-            .eq('user_id', user!.id),
-          supabase
-            .from('user_template_copies')
-            .select('id, template_id')
-            .eq('user_id', userId),
-        ]);
+        const { data, error } = await supabase.rpc('get_user_trade_overlap', {
+          p_my_user_id: user!.id,
+          p_their_user_id: userId,
+        });
 
-        if (myCollections.error || theirCollections.error) {
-          logger.error('Error fetching collections:', myCollections.error || theirCollections.error);
+        if (error) {
+          logger.error('Error fetching trade overlap:', error);
           return;
         }
 
-        const myTemplateIds = (myCollections.data?.map(c => c.template_id) || []).filter((id): id is number => id != null);
-        const theirTemplateIds = new Set((theirCollections.data?.map(c => c.template_id) || []).filter((id): id is number => id != null));
-
-        // Find shared template IDs
-        const sharedTemplateIds = myTemplateIds.filter(id => theirTemplateIds.has(id));
-
-        if (sharedTemplateIds.length === 0) {
-          if (!cancelled) setOverlaps([]);
-          return;
-        }
-
-        // 2. For each shared collection, call find_mutual_traders scoped to this user
-        const results: CollectionOverlap[] = [];
-
-        for (const templateId of sharedTemplateIds) {
-          const { data, error } = await supabase.rpc('find_mutual_traders', {
-            p_user_id: user!.id,
-            p_collection_id: templateId,
-            p_min_overlap: 1,
-            p_limit: 1,
-            p_offset: 0,
-          });
-
-          if (error) {
-            logger.error(`Error finding traders for template ${templateId}:`, error);
-            continue;
-          }
-
-          // Find the specific match for this user
-          const match = data?.find((m: { match_user_id: string }) => m.match_user_id === userId);
-
-          if (match && match.total_mutual_overlap > 0) {
-            const collectionData = myCollections.data?.find(c => c.template_id === templateId);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const collectionName = (collectionData?.templates as any)?.name || 'Álbum';
-
-            results.push({
-              collectionId: templateId,
-              collectionName,
-              theyHaveForYou: match.overlap_from_them_to_me || 0,
-              youHaveForThem: match.overlap_from_me_to_them || 0,
-              totalOverlap: match.total_mutual_overlap || 0,
-            });
-          }
-        }
-
-        if (!cancelled) {
-          setOverlaps(results.sort((a, b) => b.totalOverlap - a.totalOverlap));
+        if (!cancelled && data) {
+          const results: CollectionOverlap[] = data.map(
+            (row: {
+              template_id: number;
+              collection_name: string;
+              they_have_for_you: number;
+              you_have_for_them: number;
+              total_overlap: number;
+            }) => ({
+              collectionId: row.template_id,
+              collectionName: row.collection_name,
+              theyHaveForYou: row.they_have_for_you,
+              youHaveForThem: row.you_have_for_them,
+              totalOverlap: row.total_overlap,
+            })
+          );
+          setOverlaps(results);
         }
       } catch (err) {
         logger.error('Error in UserTradeMatchSection:', err);
@@ -132,9 +97,6 @@ export function UserTradeMatchSection({ userId, nickname }: UserTradeMatchSectio
   if (!user || user.id === userId || loading || overlaps.length === 0) {
     return null;
   }
-
-  const totalStickers = overlaps.reduce((sum, o) => sum + o.totalOverlap, 0);
-  const bestOverlap = overlaps[0]; // Already sorted by totalOverlap desc
 
   return (
     <div className="mt-8 space-y-4">

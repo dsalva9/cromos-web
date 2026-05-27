@@ -3326,6 +3326,16 @@ export type Database = {
           rating_distribution: Json
         }[]
       }
+      get_user_trade_overlap: {
+        Args: { p_my_user_id: string; p_their_user_id: string }
+        Returns: {
+          template_id: number
+          collection_name: string
+          they_have_for_you: number
+          you_have_for_them: number
+          total_overlap: number
+        }[]
+      }
       get_user_ratings: {
         Args: { p_limit?: number; p_offset?: number; p_user_id: string }
         Returns: {
