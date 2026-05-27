@@ -46,12 +46,14 @@ export function ProfileCompletionGuard({
 
   // Helper to check if on exempt route
   const getIsExemptRoute = useCallback(() => {
+    // usePathname() from next/navigation returns locale-prefixed paths
+    // (e.g. /es/profile/completar), so use .endsWith() for matching.
     const isOnCompletionRoute =
-      pathname === completionRoute ||
-      pathname?.startsWith(`${completionRoute}/`);
+      pathname?.endsWith(completionRoute) ||
+      pathname?.includes(`${completionRoute}/`);
     const isAuthFlow = pathname?.startsWith('/auth');
-    const isAuthPage = pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
-    const isResetPassword = pathname === '/profile/reset-password';
+    const isAuthPage = pathname?.endsWith('/login') || pathname?.endsWith('/signup') || pathname?.endsWith('/forgot-password');
+    const isResetPassword = pathname?.endsWith('/profile/reset-password');
     return isOnCompletionRoute || isAuthFlow || isAuthPage || isResetPassword;
   }, [pathname]);
 
@@ -71,7 +73,7 @@ export function ProfileCompletionGuard({
 
     // Detect if user just navigated away from /profile/completar (i.e. just saved)
     const justLeftCompletionRoute =
-      previousPathname === completionRoute && pathname !== completionRoute;
+      previousPathname?.endsWith(completionRoute) && !pathname?.endsWith(completionRoute);
 
     // Track state transitions to reset warning flag and stabilization counter
     if (previousCompleteRef.current === false && isComplete === true) {
@@ -112,7 +114,10 @@ export function ProfileCompletionGuard({
         );
       }
       // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
-      window.location.href = completionRoute;
+      // Include locale prefix to avoid an extra middleware redirect hop.
+      const localeMatch = pathname?.match(/^\/(es|en|pt)(?=\/|$)/);
+      const localePrefix = localeMatch ? `/${localeMatch[1]}` : '';
+      window.location.href = `${localePrefix}${completionRoute}`;
     }
     // router intentionally excluded — using window.location.href for redirect (Next.js 16 transition bug)
   }, [authLoading, getIsExemptRoute, initialFetchDone, isComplete, loading, pathname, profile, user]);

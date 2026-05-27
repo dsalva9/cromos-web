@@ -22,6 +22,12 @@ interface SessionWithAMR {
 const RESET_PASSWORD_ROUTE = '/profile/reset-password';
 const RECOVERY_FLAG_KEY = 'password_recovery_required';
 
+/** Extract the locale prefix (e.g. '/es') from a pathname, or '' if none. */
+function getLocalePrefix(path: string): string {
+  const match = path.match(/^\/(es|en|pt)(?=\/|$)/);
+  return match ? `/${match[1]}` : '';
+}
+
 interface PasswordRecoveryGuardProps {
   children: React.ReactNode;
 }
@@ -33,13 +39,16 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
   useEffect(() => {
     const checkRecoveryState = async () => {
       try {
+        const isOnResetPage = pathname.endsWith(RESET_PASSWORD_ROUTE);
+
         // Check if there's a recovery flag in session storage
         const recoveryRequired = sessionStorage.getItem(RECOVERY_FLAG_KEY);
 
-        if (recoveryRequired === 'true' && !pathname.endsWith(RESET_PASSWORD_ROUTE)) {
+        if (recoveryRequired === 'true' && !isOnResetPage) {
           logger.info('Password recovery required, redirecting to reset page');
+          const localePrefix = getLocalePrefix(pathname);
           // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
-          window.location.href = RESET_PASSWORD_ROUTE;
+          window.location.href = `${localePrefix}${RESET_PASSWORD_ROUTE}`;
           return;
         }
 
@@ -51,13 +60,14 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           const amr = (session as unknown as SessionWithAMR).amr ?? [];
           const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
 
-          if (hasRecoveryAuth && !pathname.endsWith(RESET_PASSWORD_ROUTE)) {
+          if (hasRecoveryAuth && !isOnResetPage) {
             if (recoveryRequired !== 'true') {
               sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
             }
             logger.info('Recovery session detected via AMR, redirecting to reset page');
+            const localePrefix = getLocalePrefix(pathname);
             // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
-            window.location.href = RESET_PASSWORD_ROUTE;
+            window.location.href = `${localePrefix}${RESET_PASSWORD_ROUTE}`;
             return;
           }
         }
