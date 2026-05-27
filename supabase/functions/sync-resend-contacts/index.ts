@@ -84,12 +84,10 @@ Deno.serve(async (req) => {
 
     console.log(`[sync-resend-contacts] Starting bulk sync (admins_only: ${adminsOnly})`);
 
-    // Query users to sync
+    // Query users to sync using the newsletter_eligible_profiles view
     let query = supabase
-      .from('profiles')
-      .select('id, nickname')
-      .is('deleted_at', null)
-      .eq('is_suspended', false);
+      .from('newsletter_eligible_profiles')
+      .select('id, nickname, email, is_admin');
 
     if (adminsOnly) {
       query = query.eq('is_admin', true);
@@ -119,24 +117,8 @@ Deno.serve(async (req) => {
     let errors = 0;
 
     for (const p of profiles) {
-      // Get email from auth.users
-      const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(p.id);
-
-      if (authError || !authUser?.user?.email) {
-        console.log(`[sync-resend-contacts] Skipped (no email): ${p.nickname}`);
-        skipped++;
-        continue;
-      }
-
-      // Skip unconfirmed emails
-      if (!authUser.user.email_confirmed_at) {
-        console.log(`[sync-resend-contacts] Skipped (unconfirmed): ${p.nickname}`);
-        skipped++;
-        continue;
-      }
-
       const contactPayload: Record<string, unknown> = {
-        email: authUser.user.email,
+        email: p.email,
         firstName: p.nickname || '',
         unsubscribed: false,
       };
@@ -157,7 +139,7 @@ Deno.serve(async (req) => {
 
         if (response.ok) {
           created++;
-          console.log(`[sync-resend-contacts] ✓ Synced: ${p.nickname} (${authUser.user.email})`);
+          console.log(`[sync-resend-contacts] ✓ Synced: ${p.nickname} (${p.email})`);
         } else {
           const err = await response.json();
           // "contact_already_exists" is fine — it's an upsert
@@ -174,8 +156,8 @@ Deno.serve(async (req) => {
         console.error(`[sync-resend-contacts] ✗ Error: ${p.nickname}`, err);
       }
 
-      // Rate limiting: 200ms delay (5 req/sec Resend limit)
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Rate limiting: 100ms delay (10 req/sec Resend limit for Contacts API)
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     const summary = { created, skipped, errors, total: profiles.length };
