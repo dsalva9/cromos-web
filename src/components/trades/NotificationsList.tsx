@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect } from 'react';
 import {
@@ -121,7 +121,7 @@ export function NotificationsList({
       const tab = isSender ? 'sent' : undefined; // undefined defaults to inbox
 
       // Build URL with tradeId and optionally tab
-      const url = new URL(`/trades/proposals`, window.location.origin);
+      const url = new URL(`/intercambios`, window.location.origin);
       url.searchParams.set('tradeId', notification.trade_id.toString());
       if (tab) {
         url.searchParams.set('tab', tab);

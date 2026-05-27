@@ -1068,6 +1068,7 @@
     "myAlbums": "My Albums",
     "chats": "Chats",
     "favorites": "Favorites",
+    "trades": "Trades",
     "login": "Log In",
     "signup": "Sign Up",
     "completeProfile": "Complete your profile to access this section",
@@ -1611,6 +1612,7 @@
     "loggingOut": "Logging out...",
     "logoutSuccess": "Successfully logged out",
     "logoutError": "Error logging out",
+    "favorites": "Favorites",
     "incompleteProfile": "You need to complete your profile to start trading stickers!"
   },
   "createListing": {
@@ -1896,7 +1898,8 @@
     "faq": "FAQ",
     "contact": "Contact",
     "about": "About Us",
-    "blog": "Blog"
+    "blog": "Blog",
+    "favorites": "Favorites"
   },
   "notificationsDropdown": {
     "title": "Notifications",
@@ -2067,5 +2070,14 @@
     "tierLeyenda": "Legend",
     "completedTrades": "{count} trade{count, plural, one {} other {s}} completed",
     "profileBadge": "{tier} · {count} trades completed"
+  },
+  "trades": {
+    "matchSection": {
+      "title": "⚡ You have matches with {nickname}!",
+      "thisUser": "this user",
+      "theyHaveForYou": "They have for you",
+      "youHaveForThem": "You have for them",
+      "cta": "Propose trade"
+    }
   }
 }

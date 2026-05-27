@@ -1068,6 +1068,7 @@
     "myAlbums": "Meus Álbuns",
     "chats": "Chats",
     "favorites": "Favoritos",
+    "trades": "Trocas",
     "login": "Iniciar Sessão",
     "signup": "Criar Conta",
     "completeProfile": "Complete seu perfil para acessar esta seção",
@@ -1611,6 +1612,7 @@
     "loggingOut": "Saindo...",
     "logoutSuccess": "Sessão encerrada com sucesso",
     "logoutError": "Erro ao sair da sessão",
+    "favorites": "Favoritos",
     "incompleteProfile": "Você precisa completar seu perfil para começar a trocar figurinhas!"
   },
   "createListing": {
@@ -1893,7 +1895,8 @@
     "faq": "FAQ",
     "contact": "Contato",
     "about": "Sobre Nós",
-    "blog": "Blog"
+    "blog": "Blog",
+    "favorites": "Favoritos"
   },
   "notificationsDropdown": {
     "title": "Notificações",
@@ -2064,5 +2067,14 @@
     "tierLeyenda": "Lenda",
     "completedTrades": "{count} troca{count, plural, one {} other {s}} concluída{count, plural, one {} other {s}}",
     "profileBadge": "{tier} · {count} trocas concluídas"
+  },
+  "trades": {
+    "matchSection": {
+      "title": "⚡ Você tem coincidências com {nickname}!",
+      "thisUser": "este usuário",
+      "theyHaveForYou": "Eles têm para você",
+      "youHaveForThem": "Você tem para eles",
+      "cta": "Propor troca"
+    }
   }
 }

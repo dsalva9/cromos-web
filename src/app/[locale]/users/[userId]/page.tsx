@@ -50,6 +50,7 @@ import { SUPPORTED_COUNTRIES } from '@/constants/countries';
 import { validatePostcode, getPostcodeRule } from '@/lib/validations/postcode';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { useTranslations } from 'next-intl';
+import { UserTradeMatchSection } from '@/components/trades/UserTradeMatchSection';
 import { getSupportMailtoUrl } from '@/lib/utils';
 
 type ListingFilter = 'active' | 'reserved' | 'sold' | 'removed';
@@ -798,7 +799,10 @@ export default function UserProfilePage() {
               </div>
             </div>
           </div>
-        </div>
+      </div>
+
+      {/* Trade Match Section — shows overlap with this user */}
+      <UserTradeMatchSection userId={userId} nickname={profile?.nickname} />
 
       {/* Active Listings Section */}
       {(isOwnProfile || statusCounts.active > 0) && (

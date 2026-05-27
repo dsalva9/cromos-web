@@ -10,6 +10,7 @@
     "myAlbums": "Mis Álbumes",
     "chats": "Chats",
     "favorites": "Favoritos",
+    "trades": "Intercambios",
     "login": "Iniciar Sesión",
     "signup": "Crear Cuenta",
     "completeProfile": "Completa tu perfil para acceder a esta sección",
@@ -1611,6 +1612,7 @@
     "loggingOut": "Cerrando sesión...",
     "logoutSuccess": "Sesión cerrada correctamente",
     "logoutError": "Error al cerrar sesión",
+    "favorites": "Favoritos",
     "incompleteProfile": "¡Necesitas completar tu perfil para empezar a cambiar cromos!"
   },
   "createListing": {
@@ -1893,7 +1895,8 @@
     "faq": "FAQ",
     "contact": "Contacto",
     "about": "Sobre Nosotros",
-    "blog": "Blog"
+    "blog": "Blog",
+    "favorites": "Favoritos"
   },
   "notificationsDropdown": {
     "title": "Notificaciones",
@@ -2064,5 +2067,14 @@
     "tierLeyenda": "Leyenda",
     "completedTrades": "{count} intercambio{count, plural, one {} other {s}} completado{count, plural, one {} other {s}}",
     "profileBadge": "{tier} · {count} intercambios completados"
+  },
+  "trades": {
+    "matchSection": {
+      "title": "⚡ ¡Tienes coincidencias con {nickname}!",
+      "thisUser": "este usuario",
+      "theyHaveForYou": "Te pueden dar",
+      "youHaveForThem": "Tú les das",
+      "cta": "Proponer intercambio"
+    }
   }
 }

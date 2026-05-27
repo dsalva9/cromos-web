@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Store, Library, MessageCircle, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen } from 'lucide-react';
+import { Store, Library, MessageCircle, ArrowLeftRight, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
@@ -10,6 +10,7 @@ import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 
 /** Strip the locale prefix from a pathname for active-state matching. */
 function stripLocale(path: string): string {
@@ -54,6 +55,7 @@ export function MobileBottomNav() {
 
   const { hapticImpact } = useHaptic();
   const { isAdmin } = useProfileCompletion();
+  const { totalUnread } = useGlobalUnreadBadge();
 
   const handleNavClick = (href: string) => {
     hapticImpact();
@@ -114,15 +116,20 @@ export function MobileBottomNav() {
           </a>
 
           <a
-            href="/favorites"
-            onClick={(e) => { e.preventDefault(); handleNavClick('/favorites'); }}
+            href="/intercambios"
+            onClick={(e) => { e.preventDefault(); handleNavClick('/intercambios'); }}
             className={cn(
-              "flex items-center justify-center w-full h-full",
-              isActive('/favorites') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              "flex items-center justify-center w-full h-full relative",
+              isActive('/intercambios') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
-            aria-label="Favoritos"
+            aria-label="Intercambios"
           >
-            <Heart className="h-6 w-6" />
+            <ArrowLeftRight className="h-6 w-6" />
+            {totalUnread > 0 && (
+              <span className="absolute top-1 right-1/4 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+                {totalUnread > 9 ? '9+' : totalUnread}
+              </span>
+            )}
           </a>
 
           <button
@@ -185,6 +192,20 @@ export function MobileBottomNav() {
             >
               <BookOpen className="h-5 w-5 text-gold" />
               <span className="font-medium">{t('blog')}</span>
+            </a>
+
+            <a
+              href="/favorites"
+              onClick={(e) => {
+                e.preventDefault();
+                hapticImpact();
+                setIsMenuOpen(false);
+                window.location.href = lp('/favorites');
+              }}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <Heart className="h-5 w-5 text-gold" />
+              <span className="font-medium">{t('favorites')}</span>
             </a>
 
             <a

@@ -36,12 +36,28 @@ export function generateDeepLinkPath(data: NotificationData): string {
   // Route based on notification kind and associated IDs
   switch (data.notification_kind) {
     case 'chat_unread':
-    case 'proposal_accepted':
-    case 'proposal_rejected':
-    case 'finalization_requested':
-      // Trade routes don't exist yet, redirect to chats page
-      // TODO: Create dedicated /trades/[id] route for trade proposals
+      if (data.trade_id) {
+        return `/intercambios?tradeId=${data.trade_id}`;
+      }
       return '/chats';
+
+    case 'proposal_accepted':
+      if (data.trade_id) {
+        return `/intercambios?tradeId=${data.trade_id}&tab=outbox`;
+      }
+      return '/intercambios';
+
+    case 'proposal_rejected':
+      if (data.trade_id) {
+        return `/intercambios?tradeId=${data.trade_id}&tab=outbox`;
+      }
+      return '/intercambios';
+
+    case 'finalization_requested':
+      if (data.trade_id) {
+        return `/intercambios?tradeId=${data.trade_id}`;
+      }
+      return '/intercambios';
 
     case 'listing_chat':
       // For chat notifications, go directly to the chat
@@ -96,23 +112,25 @@ export function handleNotificationClick(data: NotificationData): void {
 
   logger.debug('[Deep Linking] Navigating to:', deepLinkPath);
 
+  // Detect current locale from URL path to prefix deep link paths
+  const localeMatch = window.location.pathname.match(/^\/(es|en|pt)(\/|$)/);
+  const locale = localeMatch?.[1] || 'es';
+  
+  // Ensure we don't double prefix if the path already starts with the locale
+  const sanitizedPath = deepLinkPath.startsWith(`/${locale}/`) 
+    ? deepLinkPath 
+    : `/${locale}${deepLinkPath.startsWith('/') ? deepLinkPath : '/' + deepLinkPath}`;
+
   // Check if running in a native app (Capacitor)
   const isNative = Capacitor.isNativePlatform();
 
   if (isNative) {
-    // For native apps, use pushState to navigate within the app
-    // This keeps the user in the app instead of opening the browser
-    window.history.pushState({}, '', deepLinkPath);
-
-    // Trigger a popstate event to let Next.js router handle the navigation
+    window.history.pushState({}, '', sanitizedPath);
     const popStateEvent = new PopStateEvent('popstate', { state: {} });
     window.dispatchEvent(popStateEvent);
-
-    // Also manually reload the page to ensure navigation happens
-    window.location.href = deepLinkPath;
+    window.location.href = sanitizedPath;
   } else {
-    // For web, just navigate normally
-    window.location.href = deepLinkPath;
+    window.location.href = sanitizedPath;
   }
 }
 

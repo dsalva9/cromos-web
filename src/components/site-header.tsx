@@ -111,7 +111,7 @@ export default function SiteHeader() {
     { href: '/marketplace', label: t('marketplace'), requiresCompletion: true },
     { href: '/mis-plantillas', label: t('myAlbums'), requiresCompletion: true },
     { href: '/chats', label: t('chats'), requiresCompletion: true },
-    { href: '/favorites', label: t('favorites'), requiresCompletion: true },
+    { href: '/intercambios', label: t('trades'), requiresCompletion: true },
     { href: '/blog', label: t('blog') },
   ];
 

@@ -93,46 +93,50 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
       return {
         title: 'Confirma un intercambio',
         body: `${actorName} dice que habéis completado un intercambio sobre "${notification.listingTitle || 'un artículo'}". ¿Confirmas?`,
-        href: notification.listingId
-          ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
-          : null,
+        href: notification.tradeId
+          ? `/intercambios?tradeId=${notification.tradeId}`
+          : notification.listingId
+            ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
+            : null,
       };
 
     case 'trade_confirmed':
       return {
         title: '¡Intercambio confirmado!',
         body: `${actorName} ha confirmado vuestro intercambio sobre "${notification.listingTitle || 'un artículo'}"`,
-        href: notification.listingId
-          ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
-          : null,
+        href: notification.tradeId
+          ? `/intercambios?tradeId=${notification.tradeId}`
+          : notification.listingId
+            ? `/marketplace/${notification.listingId}/chat?participant=${notification.actor?.id}`
+            : null,
       };
 
     case 'chat_unread':
       return {
         title: 'Mensaje de intercambio',
         body: `${actorName} te ha enviado un mensaje`,
-        href: notification.tradeId ? `/trades/${notification.tradeId}` : null,
+        href: notification.tradeId ? `/intercambios?tradeId=${notification.tradeId}&tab=inbox` : null,
       };
 
     case 'proposal_accepted':
       return {
         title: 'Propuesta aceptada',
         body: `${notification.toUserNickname || actorName} ha aceptado tu propuesta de intercambio`,
-        href: notification.tradeId ? `/trades/${notification.tradeId}` : null,
+        href: notification.tradeId ? `/intercambios?tradeId=${notification.tradeId}&tab=outbox` : null,
       };
 
     case 'proposal_rejected':
       return {
         title: 'Propuesta rechazada',
         body: `${notification.toUserNickname || actorName} ha rechazado tu propuesta de intercambio`,
-        href: notification.tradeId ? `/trades/${notification.tradeId}` : null,
+        href: notification.tradeId ? `/intercambios?tradeId=${notification.tradeId}&tab=outbox` : null,
       };
 
     case 'finalization_requested':
       return {
         title: 'Solicitud de finalización',
         body: `${actorName} ha solicitado finalizar el intercambio`,
-        href: notification.tradeId ? `/trades/${notification.tradeId}` : null,
+        href: notification.tradeId ? `/intercambios?tradeId=${notification.tradeId}&tab=inbox` : null,
       };
 
     case 'badge_earned':

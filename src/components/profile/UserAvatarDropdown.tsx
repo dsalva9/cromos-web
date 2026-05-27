@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { useRouter } from '@/hooks/use-router';
-import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate } from 'lucide-react';
+import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate, Heart } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -164,6 +164,15 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
               >
                 <LayoutTemplate className="h-4 w-4" />
                 <span>{t('collections')}</span>
+              </Link>
+
+              <Link
+                href="/favorites"
+                onClick={handleProtectedClick('/favorites', true)}
+                className="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <Heart className="h-4 w-4" />
+                <span>{t('favorites')}</span>
               </Link>
 
               <Link

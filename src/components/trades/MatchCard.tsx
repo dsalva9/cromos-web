@@ -1,4 +1,4 @@
-﻿import Link from '@/components/ui/link';
+import Link from '@/components/ui/link';
 import { UserLink } from '@/components/ui/user-link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import {
@@ -24,7 +24,7 @@ interface MatchCardProps {
 
 export function MatchCard({ match, collectionId }: MatchCardProps) {
   const displayName = match.nickname || 'Usuario';
-  const composeHref = `/trades/compose?userId=${match.match_user_id}&collectionId=${collectionId}`;
+  const composeHref = `/intercambios/componer?userId=${match.match_user_id}&collectionId=${collectionId}`;
 
   return (
     <Link
