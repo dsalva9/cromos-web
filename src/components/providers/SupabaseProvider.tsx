@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
+import { setPasswordRecoveryFlag, clearPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
 
 const AUTH_HINT_KEY = 'cc-was-authed';
 
@@ -49,12 +50,13 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
           supabase.auth.signOut();
           setUser(null);
           setLoading(false);
+          clearPasswordRecoveryFlag();
           return;
         }
 
         // Handle password recovery: redirect to reset page immediately
         if (event === 'PASSWORD_RECOVERY') {
-          sessionStorage.setItem('password_recovery_required', 'true');
+          setPasswordRecoveryFlag();
           // Extract locale from current URL path (e.g. /es/...) or fallback
           const pathLocale = window.location.pathname.match(/^\/(es|en|pt)(\/|$)/)?.[1] || 'es';
           window.location.href = `/${pathLocale}/profile/reset-password`;
@@ -76,6 +78,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(AUTH_HINT_KEY, '1');
           } else {
             localStorage.removeItem(AUTH_HINT_KEY);
+            clearPasswordRecoveryFlag();
           }
         } catch { /* ignore */ }
       }

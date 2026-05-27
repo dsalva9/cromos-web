@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
+import { setPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 const DEFAULT_LOCALE = 'es';
@@ -101,7 +102,7 @@ export default function AuthCallback() {
 
           // Check if this is a password recovery flow
           if (next === '/profile/reset-password') {
-            sessionStorage.setItem('password_recovery_required', 'true');
+            setPasswordRecoveryFlag();
             logger.info('Password recovery flag set');
           }
 

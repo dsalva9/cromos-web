@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect } from 'react';
@@ -9,6 +9,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import { useRouter } from '@/hooks/use-router';
 import { logger } from '@/lib/logger';
+import { setPasswordRecoveryFlag, clearPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
 
 export default function ResetPasswordPage() {
   const t = useTranslations('resetPassword');
@@ -50,7 +51,7 @@ export default function ResetPasswordPage() {
 
           if (data.session) {
             logger.debug('[ResetPassword] Session established successfully');
-            sessionStorage.setItem('password_recovery_required', 'true');
+            setPasswordRecoveryFlag();
             setCheckingSession(false);
             return;
           }
@@ -60,7 +61,7 @@ export default function ResetPasswordPage() {
         const { data: { session } } = await supabase.auth.getSession();
 
         if (session) {
-          sessionStorage.setItem('password_recovery_required', 'true');
+          setPasswordRecoveryFlag();
           logger.debug('[ResetPassword] Existing session found');
         } else {
           setError(t('errors.noSession'));
@@ -105,7 +106,7 @@ export default function ResetPasswordPage() {
       } else {
         setSuccess(true);
         // Clear the password recovery flag
-        sessionStorage.removeItem('password_recovery_required');
+        clearPasswordRecoveryFlag();
         // Redirect to home after 2 seconds
         setTimeout(() => {
           router.push('/');

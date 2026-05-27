@@ -20,7 +20,47 @@ interface SessionWithAMR {
 }
 
 const RESET_PASSWORD_ROUTE = '/profile/reset-password';
+
+// ── Cross-tab recovery flag (localStorage) ─────────────────────────────
+// Uses localStorage so the flag is visible across all tabs for the same
+// origin.  A timestamp is stored as the value; flags older than 1 hour
+// are treated as expired and silently cleaned up.
+
 const RECOVERY_FLAG_KEY = 'password_recovery_required';
+const RECOVERY_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
+
+/** Mark that the current session requires a password reset. */
+export function setPasswordRecoveryFlag() {
+  try {
+    localStorage.setItem(RECOVERY_FLAG_KEY, String(Date.now()));
+  } catch { /* storage unavailable */ }
+}
+
+/** Check whether the recovery flag is set and still valid (< 1 hour old). */
+export function isPasswordRecoveryRequired(): boolean {
+  try {
+    const raw = localStorage.getItem(RECOVERY_FLAG_KEY);
+    if (!raw) return false;
+    const ts = parseInt(raw, 10);
+    if (isNaN(ts)) return false;
+    if (Date.now() - ts > RECOVERY_MAX_AGE_MS) {
+      // Expired — clean up silently
+      localStorage.removeItem(RECOVERY_FLAG_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Clear the recovery flag (call after successful password reset or sign-out). */
+export function clearPasswordRecoveryFlag() {
+  try {
+    localStorage.removeItem(RECOVERY_FLAG_KEY);
+  } catch { /* storage unavailable */ }
+  logger.info('Password recovery flag cleared');
+}
 
 /** Extract the locale prefix (e.g. '/es') from a pathname, or '' if none. */
 function getLocalePrefix(path: string): string {
@@ -43,10 +83,13 @@ interface PasswordRecoveryGuardProps {
  * PasswordRecoveryGuard — blocks navigation away from the reset-password page
  * while a password-recovery session is active.
  *
- * Uses `useLayoutEffect` for the synchronous sessionStorage check so the
+ * Uses `useLayoutEffect` for the synchronous localStorage check so the
  * destination page content is never painted when the user tries to navigate away.
  * An additional `useEffect` runs an async AMR check as a fallback for cases
- * where the sessionStorage flag hasn't been set yet.
+ * where the localStorage flag hasn't been set yet.
+ *
+ * The flag is stored in `localStorage` (not `sessionStorage`) so it is enforced
+ * across all browser tabs for the same origin.
  */
 export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) {
   const supabase = useSupabaseClient();
@@ -63,13 +106,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
   // ── Synchronous check (fires before browser paint) ───────────────────
   useIsomorphicLayoutEffect(() => {
     const isOnResetPage = pathname?.endsWith(RESET_PASSWORD_ROUTE) ?? false;
-
-    let recoveryRequired = false;
-    try {
-      recoveryRequired = sessionStorage.getItem(RECOVERY_FLAG_KEY) === 'true';
-    } catch {
-      /* SSR or storage unavailable */
-    }
+    const recoveryRequired = isPasswordRecoveryRequired();
 
     if (recoveryRequired && !isOnResetPage) {
       setBlocked(true);
@@ -82,7 +119,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
   }, [pathname]);
 
   // ── Async AMR fallback ───────────────────────────────────────────────
-  // Catches cases where the sessionStorage flag hasn't been set yet but
+  // Catches cases where the localStorage flag hasn't been set yet but
   // the Supabase session contains a recovery AMR entry.
   useEffect(() => {
     const checkAMR = async () => {
@@ -99,11 +136,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
         const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
 
         if (hasRecoveryAuth) {
-          try {
-            sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
-          } catch {
-            /* storage unavailable */
-          }
+          setPasswordRecoveryFlag();
           setBlocked(true);
           const localePrefix = getLocalePrefix(pathname);
           logger.info(
@@ -137,14 +170,4 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
   }
 
   return <>{children}</>;
-}
-
-// Helper function to clear the recovery flag after password reset
-export function clearPasswordRecoveryFlag() {
-  try {
-    sessionStorage.removeItem(RECOVERY_FLAG_KEY);
-  } catch {
-    /* storage unavailable */
-  }
-  logger.info('Password recovery flag cleared');
 }
