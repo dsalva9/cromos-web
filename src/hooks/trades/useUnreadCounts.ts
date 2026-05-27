@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
@@ -36,6 +36,12 @@ export const useUnreadCounts = ({
   const channelRef = useRef<RealtimeChannel | null>(null);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Stabilize tradeIds dependency
+  const tradeIdsString = tradeIds ? tradeIds.join(',') : '';
+  const stableTradeIds = useMemo(() => {
+    return tradeIds;
+  }, [tradeIdsString]);
+
   // Fetch unread counts
   const fetchCounts = useCallback(async () => {
     if (!enabled || !user) {
@@ -49,7 +55,7 @@ export const useUnreadCounts = ({
     try {
       const { data, error: rpcError } = await supabase.rpc('get_unread_counts', {
         p_box: box,
-        p_trade_ids: tradeIds || undefined,
+        p_trade_ids: stableTradeIds || undefined,
       });
 
       if (rpcError) throw rpcError;
@@ -70,7 +76,7 @@ export const useUnreadCounts = ({
     } finally {
       setLoading(false);
     }
-  }, [supabase, user, box, tradeIds, enabled]);
+  }, [supabase, user, box, stableTradeIds, enabled]);
 
   // Refresh counts
   const refresh = useCallback(async () => {
@@ -150,7 +156,7 @@ export const useUnreadCounts = ({
           if (!isInCurrentBox) return;
 
           // If tradeIds filter is active, check if this trade is included
-          if (tradeIds && !tradeIds.includes(newMessage.trade_id)) {
+          if (stableTradeIds && !stableTradeIds.includes(newMessage.trade_id)) {
             // Message is in the opposite box or not in our filter, debounce refetch
             if (refreshTimeoutRef.current) {
               clearTimeout(refreshTimeoutRef.current);
@@ -178,7 +184,7 @@ export const useUnreadCounts = ({
       channel.unsubscribe();
       channelRef.current = null;
     };
-  }, [supabase, user, box, tradeIds, enabled, fetchCounts]);
+  }, [supabase, user, box, stableTradeIds, enabled, fetchCounts]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

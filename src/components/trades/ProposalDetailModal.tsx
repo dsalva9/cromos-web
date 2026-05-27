@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -122,10 +122,13 @@ export function ProposalDetailModal({
   // Get saved tab state or default to 'resumen'
   const [activeTab, setActiveTab] = useState<string>('resumen');
 
+  // Memoize tradeIds array to maintain stable reference
+  const tradeIds = useMemo(() => (proposalId ? [proposalId] : []), [proposalId]);
+
   // Track unread count for the Mensajes tab badge
   const { getCountForTrade } = useUnreadCounts({
     box: detail?.proposal.from_user_id === user?.id ? 'outbox' : 'inbox',
-    tradeIds: proposalId ? [proposalId] : [],
+    tradeIds,
     enabled: !!proposalId,
   });
 
@@ -268,7 +271,7 @@ export function ProposalDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] max-sm:max-h-[95vh] bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black shadow-xl flex flex-col">
+      <DialogContent className="sm:max-w-[700px] top-[5.5rem] sm:top-[6rem] translate-y-0 max-h-[calc(100vh-7rem)] sm:max-h-[calc(100vh-8rem)] bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black shadow-xl flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-lg sm:text-2xl font-bold uppercase pr-8">
             Detalle de la Propuesta

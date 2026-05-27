@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useProposals, type ProposalBox, type ProposalView } from '@/hooks/trades/useProposals';
 import { useUnreadCounts } from '@/hooks/trades/useUnreadCounts';
 import { ProposalCard } from './ProposalCard';
@@ -34,7 +34,7 @@ export function ProposalList({
   );
 
   // Get trade IDs for unread count fetching
-  const tradeIds = proposals.map(p => p.id);
+  const tradeIds = useMemo(() => proposals.map(p => p.id), [proposals]);
 
   // Only fetch unread counts for inbox/outbox, not history
   const {
