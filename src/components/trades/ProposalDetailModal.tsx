@@ -268,9 +268,9 @@ export function ProposalDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black shadow-xl flex flex-col">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] max-sm:max-h-[95vh] bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-black shadow-xl flex flex-col">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold uppercase">
+          <DialogTitle className="text-lg sm:text-2xl font-bold uppercase pr-8">
             Detalle de la Propuesta
           </DialogTitle>
           {detail && (
@@ -288,38 +288,40 @@ export function ProposalDetailModal({
           )}
         </DialogHeader>
 
-        {loading && <p className="font-bold">Cargando detalles...</p>}
-        {error && <p className="text-[#E84D4D] font-bold">{error}</p>}
+        {loading && <p className="font-bold px-4 sm:px-6">Cargando detalles...</p>}
+        {error && <p className="text-[#E84D4D] font-bold px-4 sm:px-6">{error}</p>}
 
         {detail && (
           <>
-            <SegmentedTabs
-              tabs={[
-                {
-                  value: 'resumen',
-                  label: 'Resumen',
-                  icon: <FileText className="h-4 w-4" />,
-                },
-                {
-                  value: 'mensajes',
-                  label: 'Mensajes',
-                  icon: <MessageSquare className="h-4 w-4" />,
-                  badge:
-                    unreadCount > 0 ? (
-                      <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </Badge>
-                    ) : undefined,
-                },
-              ]}
-              value={activeTab}
-              onValueChange={setActiveTab}
-              aria-label="Detalle de propuesta"
-            />
+            <div className="px-4 sm:px-6">
+              <SegmentedTabs
+                tabs={[
+                  {
+                    value: 'resumen',
+                    label: 'Resumen',
+                    icon: <FileText className="h-4 w-4" />,
+                  },
+                  {
+                    value: 'mensajes',
+                    label: 'Mensajes',
+                    icon: <MessageSquare className="h-4 w-4" />,
+                    badge:
+                      unreadCount > 0 ? (
+                        <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </Badge>
+                      ) : undefined,
+                  },
+                ]}
+                value={activeTab}
+                onValueChange={setActiveTab}
+                aria-label="Detalle de propuesta"
+              />
+            </div>
 
             <div
               className={cn(
-                'mt-4 flex-1 min-h-0',
+                'mt-4 flex-1 min-h-0 px-4 sm:px-6',
                 activeTab === 'resumen' ? 'overflow-y-auto' : 'overflow-hidden'
               )}
             >
@@ -406,6 +408,7 @@ export function ProposalDetailModal({
           </>
         )}
 
+        {activeTab === 'resumen' && (
         <DialogFooter>
           {respondError && (
             <p className="text-[#E84D4D] text-sm font-bold">{respondError}</p>
@@ -477,6 +480,7 @@ export function ProposalDetailModal({
             </Button>
           )}
         </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
