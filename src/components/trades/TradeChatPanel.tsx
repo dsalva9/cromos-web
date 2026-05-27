@@ -138,7 +138,7 @@ export function TradeChatPanel({
   }
 
   return (
-    <div className="flex flex-col h-[400px] sm:h-[600px] bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-black shadow-xl">
+    <div className="flex flex-col flex-1 min-h-0 bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-black shadow-xl">
       {/* Chat Header */}
       <div className="bg-gray-100 dark:bg-gray-800 border-b-2 border-black px-4 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">

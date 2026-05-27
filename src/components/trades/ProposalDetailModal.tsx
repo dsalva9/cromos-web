@@ -324,7 +324,7 @@ export function ProposalDetailModal({
 
             <div
               className={cn(
-                'mt-4 flex-1 min-h-0 px-4 sm:px-6',
+                'mt-4 flex-1 min-h-0 px-4 sm:px-6 flex flex-col',
                 activeTab === 'resumen' ? 'overflow-y-auto' : 'overflow-hidden'
               )}
             >

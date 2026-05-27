@@ -9825,7 +9825,7 @@ BEGIN
 
   -- Only notify if counterparty hasn't finalized yet
   IF NOT v_already_finalized THEN
-    INSERT INTO notifications (user_id, kind, trade_id, created_at, metadata)
+    INSERT INTO notifications (user_id, kind, trade_id, created_at, payload)
     VALUES (
       v_counterparty,
       'finalization_requested',
