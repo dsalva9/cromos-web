@@ -36,7 +36,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
         // Check if there's a recovery flag in session storage
         const recoveryRequired = sessionStorage.getItem(RECOVERY_FLAG_KEY);
 
-        if (recoveryRequired === 'true' && pathname !== RESET_PASSWORD_ROUTE) {
+        if (recoveryRequired === 'true' && !pathname.endsWith(RESET_PASSWORD_ROUTE)) {
           logger.info('Password recovery required, redirecting to reset page');
           // Hard redirect — router.replace gets stuck due to Next.js 16 transition bug
           window.location.href = RESET_PASSWORD_ROUTE;
@@ -51,7 +51,7 @@ export function PasswordRecoveryGuard({ children }: PasswordRecoveryGuardProps) 
           const amr = (session as unknown as SessionWithAMR).amr ?? [];
           const hasRecoveryAuth = amr.some((item) => item.method === 'otp');
 
-          if (hasRecoveryAuth && pathname !== RESET_PASSWORD_ROUTE) {
+          if (hasRecoveryAuth && !pathname.endsWith(RESET_PASSWORD_ROUTE)) {
             if (recoveryRequired !== 'true') {
               sessionStorage.setItem(RECOVERY_FLAG_KEY, 'true');
             }
