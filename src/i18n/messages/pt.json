@@ -2088,6 +2088,35 @@
       "findMatchesCta": "Buscar coincidências",
       "comingSoon": "Estamos preparando esta seção. Em breve você poderá ver todas as suas propostas de troca aqui!",
       "comingSoonTitle": "Em breve"
+    },
+    "proposalCard": {
+      "statusPending": "Pendente",
+      "statusAccepted": "Aceita",
+      "statusRejected": "Rejeitada",
+      "statusCancelled": "Cancelada",
+      "from": "De:",
+      "to": "Para:",
+      "offers": "Você oferece",
+      "requests": "Você pede",
+      "stickers": "{count} figurinhas"
+    },
+    "composer": {
+      "title": "Compor troca",
+      "backToHub": "Voltar para trocas",
+      "messagePlaceholder": "Adicione uma mensagem (opcional)",
+      "submitBtn": "Enviar proposta",
+      "submitting": "Enviando...",
+      "successTitle": "Proposta enviada!",
+      "successDesc": "Sua proposta foi enviada. Você pode acompanhar o status na caixa de enviadas.",
+      "comingSoon": "Compositor de trocas - Em breve",
+      "comingSoonDesc": "Estamos trabalhando nesta funcionalidade. Em breve você poderá compor trocas diretamente!",
+      "missingParams": "Faltam parâmetros necessários para compor a troca.",
+      "collection": "Coleção",
+      "offerer": "Ofertante",
+      "receiver": "Receptor"
+    },
+    "proposalList": {
+      "emptyInbox": "Não há propostas nesta caixa."
     }
   }
 }

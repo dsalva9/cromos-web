@@ -1,10 +1,19 @@
-﻿import { TradeProposalListItem } from '@/types';
+'use client';
+
+import { TradeProposalListItem } from '@/types';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { UserLink } from '@/components/ui/user-link';
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
 
 const UNREAD_BADGE_CAP = 9;
+
+const LOCALE_MAP: Record<string, string> = {
+  es: 'es-ES',
+  en: 'en-US',
+  pt: 'pt-BR',
+};
 
 interface ProposalCardProps {
   proposal: TradeProposalListItem;
@@ -13,21 +22,6 @@ interface ProposalCardProps {
   unreadCount?: number;
   isHighlighted?: boolean;
 }
-
-const getStatusLabel = (status: string): string => {
-  switch (status) {
-    case 'pending':
-      return 'Pendiente';
-    case 'accepted':
-      return 'Aceptada';
-    case 'rejected':
-      return 'Rechazada';
-    case 'cancelled':
-      return 'Cancelada';
-    default:
-      return status;
-  }
-};
 
 const getStatusBadgeVariant = (status: string) => {
   switch (status) {
@@ -50,6 +44,10 @@ export function ProposalCard({
   unreadCount = 0,
   isHighlighted = false,
 }: ProposalCardProps) {
+  const t = useTranslations('trades.proposalCard');
+  const locale = useLocale();
+  const dateLocale = LOCALE_MAP[locale] || 'es-ES';
+
   const isInbox = box === 'inbox';
   const counterpartNickname = isInbox
     ? proposal.from_user_nickname
@@ -62,6 +60,21 @@ export function ProposalCard({
     unreadCount > UNREAD_BADGE_CAP
       ? `${UNREAD_BADGE_CAP}+`
       : unreadCount.toString();
+
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'pending':
+        return t('statusPending');
+      case 'accepted':
+        return t('statusAccepted');
+      case 'rejected':
+        return t('statusRejected');
+      case 'cancelled':
+        return t('statusCancelled');
+      default:
+        return status;
+    }
+  };
 
   return (
     <div className="relative">
@@ -97,7 +110,7 @@ export function ProposalCard({
               ) : (
                 <ArrowLeft className="inline h-4 w-4 mr-2 text-blue-400" />
               )}
-              {isInbox ? 'De:' : 'Para:'}{' '}
+              {isInbox ? t('from') : t('to')}{' '}
               <UserLink
                 userId={counterpartUserId || ''}
                 nickname={counterpartNickname}
@@ -110,27 +123,27 @@ export function ProposalCard({
             </Badge>
           </div>
           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 mb-4">
-            {new Date(proposal.created_at).toLocaleDateString('es-ES', {
+            {new Date(proposal.created_at).toLocaleDateString(dateLocale, {
               day: 'numeric',
               month: 'long',
               year: 'numeric',
             })}
           </p>
           <div className="space-y-2 text-sm">
-            <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md border-2 border-black">
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-900 p-2 rounded-md border-2 border-black">
               <span className="text-green-400 flex items-center font-bold">
-                <ArrowDown className="h-4 w-4 mr-1" /> Ofreces
+                <ArrowDown className="h-4 w-4 mr-1" /> {t('offers')}
               </span>
-              <span className="font-bold text-gray-900">
-                {proposal.offer_item_count} cromos
+              <span className="font-bold text-gray-900 dark:text-white">
+                {t('stickers', { count: proposal.offer_item_count })}
               </span>
             </div>
-            <div className="flex items-center justify-between bg-gray-50 p-2 rounded-md border-2 border-black">
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-900 p-2 rounded-md border-2 border-black">
               <span className="text-blue-400 flex items-center font-bold">
-                <ArrowUp className="h-4 w-4 mr-1" /> Pides
+                <ArrowUp className="h-4 w-4 mr-1" /> {t('requests')}
               </span>
-              <span className="font-bold text-gray-900">
-                {proposal.request_item_count} cromos
+              <span className="font-bold text-gray-900 dark:text-white">
+                {t('stickers', { count: proposal.request_item_count })}
               </span>
             </div>
           </div>
