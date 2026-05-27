@@ -2,10 +2,22 @@
 
 import { useTranslations } from 'next-intl';
 import { ArrowLeftRight, Inbox, Send } from 'lucide-react';
+import { useUser } from '@/components/providers/SupabaseProvider';
 import AuthGuard from '@/components/AuthGuard';
 
 function IntercambiosContent() {
   const t = useTranslations('trades.hub');
+  const { user, loading } = useUser();
+
+  // Show spinner while auth is resolving or when not authenticated
+  // (AuthGuard handles the redirect, but we avoid flashing page content)
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
