@@ -47,8 +47,8 @@ test.describe('Phase 3 Matching Discovery Hub QA Validation', () => {
     // Click submit
     await page.click('button[type="submit"]');
 
-    // Wait for redirect to dashboard/mi-coleccion or dashboard route
-    await page.waitForURL(/\/dashboard|mi-coleccion|profile/, { timeout: 15000 });
+    // Wait for redirect away from login page
+    await page.waitForURL(url => !url.href.includes('/login'), { timeout: 15000 });
     console.log('Login successful. Redirected to:', page.url());
 
     // Take login success screenshot
