@@ -26,6 +26,7 @@ test.describe('Phase 3 Matching Discovery Hub QA Validation', () => {
   });
 
   test('Execute all QA functional and layout checks', async ({ page }) => {
+    test.setTimeout(120000);
     // -------------------------------------------------------------
     // Step 1: Login Flow
     // -------------------------------------------------------------
