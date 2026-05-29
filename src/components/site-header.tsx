@@ -227,13 +227,15 @@ export default function SiteHeader() {
                 </li>
               ))}
             </ul>
-            {!loading && user && (
+            {!loading && user ? (
               <div className="ml-4 flex items-center gap-2">
                 <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
+                {i18nEnabled && <LanguageSelector />}
                 <UserAvatarDropdown isAdmin={isAdmin} />
               </div>
+            ) : (
+              i18nEnabled && <LanguageSelector />
             )}
-            {i18nEnabled && <LanguageSelector />}
           </nav>
 
           <div className="flex items-center gap-2 md:hidden auth-dependent">
