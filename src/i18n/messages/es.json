@@ -2172,7 +2172,32 @@
       "distOver50": "> 50 km",
       "noPostcode": "Añade tu código postal en ajustes para ver la distancia",
       "metaTitle": "Buscar Intercambios | CambioCromos",
-      "metaDesc": "Encuentra coleccionistas con los que puedas intercambiar cromos. Filtra por colección, rareza, equipo y distancia."
+      "metaDesc": "Encuentra coleccionistas con los que puedas intercambiar cromos. Filtra por colección, rareza, equipo y distancia.",
+      "swipe": {
+        "matchIn": "⚡ ¡Match en {collection}!",
+        "theyHave": "Tiene {count} cromos que te faltan",
+        "youHave": "Tú tienes {count} que le faltan",
+        "pass": "Pasar",
+        "propose": "Proponer",
+        "viewDetail": "Ver detalle",
+        "counter": "{current} de {total}",
+        "radiusBadge": "Radio: {km} km",
+        "radiusUnlimited": "Sin límite de distancia",
+        "expandTitle": "No hay más en {km} km",
+        "expandPrompt": "¿Buscar hasta {nextKm} km?",
+        "expandCta": "Ampliar búsqueda",
+        "backToStart": "Volver al inicio",
+        "exhaustedTitle": "¡Has visto todos los matches!",
+        "exhaustedDesc": "Vuelve más tarde cuando más coleccionistas se unan.",
+        "resetSeen": "Ver todos de nuevo",
+        "changeCollection": "Cambiar colección",
+        "topStickers": "Cromos destacados",
+        "viewSpotlight": "Descubrir",
+        "viewGrid": "Lista",
+        "geoPrompt": "Activa tu ubicación para ver matches cercanos",
+        "swipeHint": "Desliza para decidir",
+        "keyboardHint": "← Pasar · → Proponer · Espacio = Detalle"
+      }
     }
   }
 }

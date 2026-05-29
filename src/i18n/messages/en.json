@@ -2175,7 +2175,32 @@
       "distOver50": "> 50 km",
       "noPostcode": "Add your postcode in settings to see distance",
       "metaTitle": "Find Trades | CambioCromos",
-      "metaDesc": "Find collectors you can trade stickers with. Filter by collection, rarity, team, and distance."
+      "metaDesc": "Find collectors you can trade stickers with. Filter by collection, rarity, team, and distance.",
+      "swipe": {
+        "matchIn": "⚡ Match in {collection}!",
+        "theyHave": "Has {count} stickers you need",
+        "youHave": "You have {count} they need",
+        "pass": "Pass",
+        "propose": "Propose",
+        "viewDetail": "View detail",
+        "counter": "{current} of {total}",
+        "radiusBadge": "Radius: {km} km",
+        "radiusUnlimited": "No distance limit",
+        "expandTitle": "No more within {km} km",
+        "expandPrompt": "Search up to {nextKm} km?",
+        "expandCta": "Expand search",
+        "backToStart": "Back to start",
+        "exhaustedTitle": "You've seen them all!",
+        "exhaustedDesc": "Come back when more collectors join.",
+        "resetSeen": "See all again",
+        "changeCollection": "Change collection",
+        "topStickers": "Top stickers",
+        "viewSpotlight": "Discover",
+        "viewGrid": "List",
+        "geoPrompt": "Enable location for nearby matches",
+        "swipeHint": "Swipe to decide",
+        "keyboardHint": "← Pass · → Propose · Space = Detail"
+      }
     }
   }
 }

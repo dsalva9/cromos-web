@@ -2172,7 +2172,32 @@
       "distOver50": "> 50 km",
       "noPostcode": "Adicione seu CEP nas configurações para ver a distância",
       "metaTitle": "Buscar Trocas | CambioCromos",
-      "metaDesc": "Encontre colecionadores com quem você possa trocar figurinhas. Filtre por coleção, raridade, equipe e distância."
+      "metaDesc": "Encontre colecionadores com quem você possa trocar figurinhas. Filtre por coleção, raridade, equipe e distância.",
+      "swipe": {
+        "matchIn": "⚡ Match em {collection}!",
+        "theyHave": "Tem {count} figurinhas que te faltam",
+        "youHave": "Você tem {count} que faltam a ele",
+        "pass": "Passar",
+        "propose": "Propor",
+        "viewDetail": "Ver detalhe",
+        "counter": "{current} de {total}",
+        "radiusBadge": "Raio: {km} km",
+        "radiusUnlimited": "Sem limite de distância",
+        "expandTitle": "Não há mais em {km} km",
+        "expandPrompt": "Buscar até {nextKm} km?",
+        "expandCta": "Ampliar busca",
+        "backToStart": "Voltar ao início",
+        "exhaustedTitle": "Você viu todos os matches!",
+        "exhaustedDesc": "Volte mais tarde quando mais colecionadores se juntarem.",
+        "resetSeen": "Ver todos novamente",
+        "changeCollection": "Mudar coleção",
+        "topStickers": "Figurinhas em destaque",
+        "viewSpotlight": "Descobrir",
+        "viewGrid": "Lista",
+        "geoPrompt": "Ative a localização para ver matches próximos",
+        "swipeHint": "Deslize para decidir",
+        "keyboardHint": "← Passar · → Propor · Espaço = Detalhe"
+      }
     }
   }
 }
