@@ -2171,6 +2171,14 @@
       "distAbout50": "~50 km",
       "distOver50": "> 50 km",
       "noPostcode": "Añade tu código postal en ajustes para ver la distancia",
+      "tipHowTo": {
+        "title": "¿Cómo funciona?",
+        "description": "Te mostramos un coleccionista a la vez que tiene cromos que te faltan. Desliza a la derecha (o pulsa Proponer) para iniciar un intercambio, o a la izquierda (Pasar) para ver el siguiente. También puedes cambiar a vista de lista con el botón de arriba."
+      },
+      "tipSetup": {
+        "title": "Antes de empezar",
+        "description": "Para encontrar matches necesitas tener al menos una colección activa con cromos completados. Ve a 'Mis colecciones', elige una plantilla, marca tus cromos como tenidos o repetidos, ¡y vuelve aquí para descubrir intercambios!"
+      },
       "metaTitle": "Buscar Intercambios | CambioCromos",
       "metaDesc": "Encuentra coleccionistas con los que puedas intercambiar cromos. Filtra por colección, rareza, equipo y distancia.",
       "swipe": {

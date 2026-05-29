@@ -2171,6 +2171,14 @@
       "distAbout50": "~50 km",
       "distOver50": "> 50 km",
       "noPostcode": "Adicione seu CEP nas configurações para ver a distância",
+      "tipHowTo": {
+        "title": "Como funciona?",
+        "description": "Mostramos um colecionador por vez que tem figurinhas que te faltam. Deslize para a direita (ou toque em Propor) para iniciar uma troca, ou para a esquerda (Passar) para ver o próximo. Você também pode alternar para a visualização em lista usando o botão acima."
+      },
+      "tipSetup": {
+        "title": "Antes de começar",
+        "description": "Para encontrar matches você precisa ter pelo menos uma coleção ativa com figurinhas preenchidas. Vá em 'Minhas Coleções', escolha um modelo, marque suas figurinhas como tidas ou repetidas, e volte aqui para descobrir trocas!"
+      },
       "metaTitle": "Buscar Trocas | CambioCromos",
       "metaDesc": "Encontre colecionadores com quem você possa trocar figurinhas. Filtre por coleção, raridade, equipe e distância.",
       "swipe": {

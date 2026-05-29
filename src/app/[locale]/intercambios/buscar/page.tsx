@@ -13,12 +13,15 @@ import {
   Layers,
   LayoutGrid,
   AlertCircle,
+  Lightbulb,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ContextualTip } from '@/components/ui/ContextualTip';
 import { MatchSpotlight } from '@/components/trades/MatchSpotlight';
 import { MatchGridView } from '@/components/trades/MatchGridView';
 import {
@@ -377,6 +380,22 @@ function MatchFinderContent() {
             )}
           </div>
         )}
+
+        {/* ===== Contextual Tips ===== */}
+        <ContextualTip
+          tipId="tip-matchfinder-howto"
+          icon={Sparkles}
+          title={t('tipHowTo.title')}
+          description={t('tipHowTo.description')}
+          className="mb-4"
+        />
+        <ContextualTip
+          tipId="tip-matchfinder-setup"
+          icon={Lightbulb}
+          title={t('tipSetup.title')}
+          description={t('tipSetup.description')}
+          className="mb-6"
+        />
 
         {/* ===== Error State ===== */}
         {swiper.error && (

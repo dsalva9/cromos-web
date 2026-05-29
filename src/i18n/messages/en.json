@@ -2174,6 +2174,14 @@
       "distAbout50": "~50 km",
       "distOver50": "> 50 km",
       "noPostcode": "Add your postcode in settings to see distance",
+      "tipHowTo": {
+        "title": "How does it work?",
+        "description": "We show you one collector at a time who has stickers you need. Swipe right (or tap Propose) to start a trade, or swipe left (Pass) to see the next one. You can also switch to list view using the toggle above."
+      },
+      "tipSetup": {
+        "title": "Before you start",
+        "description": "To find matches you need at least one active collection with stickers filled in. Go to 'My Collections', pick a template, mark your stickers as owned or duplicates, and come back here to discover trades!"
+      },
       "metaTitle": "Find Trades | CambioCromos",
       "metaDesc": "Find collectors you can trade stickers with. Filter by collection, rarity, team, and distance.",
       "swipe": {
