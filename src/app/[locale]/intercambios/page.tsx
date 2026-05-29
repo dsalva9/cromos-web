@@ -1,9 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { ArrowRightLeft, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from '@/components/ui/link';
+import { ArrowRightLeft } from 'lucide-react';
 import AuthGuard from '@/components/AuthGuard';
 
 function ComingSoonContent() {
@@ -30,16 +28,6 @@ function ComingSoonContent() {
             <p className="text-center text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
               {t('comingSoonDesc')}
             </p>
-
-            <Link href="/intercambios/buscar" className="block">
-              <Button
-                className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase py-4 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
-                size="lg"
-              >
-                <Sparkles className="w-5 h-5 mr-2" />
-                {t('comingSoonCta')}
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
