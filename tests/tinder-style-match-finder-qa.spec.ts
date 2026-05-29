@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 const SCREENSHOT_DIR = 'C:/Users/dsalv/.gemini/antigravity/brain/390af7b3-25e0-45fd-9a5b-9679a1ed90f5';
-const BASE_URL = 'https://cambiocromos.com';
+const BASE_URL = 'http://localhost:3000';
 
 // Ensure screenshot directory exists
 if (!fs.existsSync(SCREENSHOT_DIR)) {
@@ -15,6 +15,7 @@ const consoleErrors: string[] = [];
 const qaBugs: string[] = [];
 
 test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => {
+  test.use({ serviceWorkers: 'block' });
   test.beforeEach(async ({ page }) => {
     page.on('console', msg => {
       const text = msg.text();
@@ -126,6 +127,9 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     // Wait for the loader to clear
     await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 25000 });
 
+    // Take immediate screenshot of the loaded page to inspect its state!
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't2_desktop_load.png'), fullPage: true });
+
     // Expected: Header shows "BUSCAR COINCIDENCIAS" on desktop
     const desktopHeader = page.getByText('BUSCAR COINCIDENCIAS', { exact: false }).first();
     const isHeaderVisible = await desktopHeader.isVisible();
@@ -138,7 +142,7 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     await expect(collDropdownBtn).toBeVisible();
 
     // Expected: A filter icon button is visible in the header row
-    const filterIconBtn = page.locator('[data-testid="segmented-tabs"] + button, button:has(svg)').first();
+    const filterIconBtn = page.locator('button').filter({ has: page.locator('svg') }).filter({ hasText: /^$/ }).first();
     await expect(filterIconBtn).toBeVisible();
 
     // Expected: View toggle (Descubrir / Lista) is visible on desktop
@@ -245,7 +249,7 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     }
 
     // Open filter panel on mobile
-    const filterMobileBtn = page.locator('button:has(svg)').first();
+    const filterMobileBtn = page.locator('button').filter({ has: page.locator('svg') }).filter({ hasText: /^$/ }).first();
     await filterMobileBtn.click();
     await page.waitForTimeout(500);
 

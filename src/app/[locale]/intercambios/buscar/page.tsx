@@ -2,7 +2,10 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useIntlRouter } from '@/i18n/navigation';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
+import { ChatDrawer } from '@/components/chats/ChatDrawer';
+import { toast } from '@/lib/toast';
 import {
   MapPin,
   ArrowRightLeft,
@@ -92,7 +95,7 @@ function GeoPromptCard({
 function MatchFinderContent() {
   const t = useTranslations('trades.finder');
   const ts = useTranslations('trades.finder.swipe');
-  const router = useIntlRouter();
+  const supabase = useSupabaseClient();
 
   const swiper = useMatchSwiper();
 
@@ -107,20 +110,51 @@ function MatchFinderContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [isCollDropdownOpen, setIsCollDropdownOpen] = useState(false);
 
+  // ---- Chat drawer state ----
+  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
+  const [chatDrawerData, setChatDrawerData] = useState<{
+    conversationId: number;
+    otherNickname: string;
+    collectionTitle: string | null;
+    templateId: number | null;
+    otherUserId: string;
+    theyHaveCount?: number;
+    youHaveCount?: number;
+    distanceKm?: number | null;
+  } | null>(null);
+
   const hasActiveFilters =
     swiper.filters.team || swiper.filters.query || swiper.filters.minOverlap > 5;
 
   const selectedCollection = swiper.collections.find(c => c.copy_id === swiper.selectedCollectionId);
 
   // ---- Action handlers ----
-  const handlePropose = useCallback(() => {
+  const handlePropose = useCallback(async () => {
     const result = swiper.propose();
-    if (result) {
-      router.push(
-        `/intercambios/componer?userId=${result.userId}&collectionId=${result.collectionId}`
-      );
+    if (!result) return;
+
+    // Get or create a match conversation
+    const { data, error } = await getOrCreateMatchConversation(
+      supabase,
+      result.userId,
+      result.templateId
+    );
+
+    if (error || !data) {
+      toast.error('Error al abrir chat');
+      return;
     }
-  }, [swiper, router]);
+
+    setChatDrawerData({
+      conversationId: data.id,
+      otherNickname: result.nickname,
+      collectionTitle: selectedCollection?.title ?? null,
+      templateId: result.templateId,
+      otherUserId: result.userId,
+      distanceKm: result.distanceKm,
+    });
+    setChatDrawerOpen(true);
+  }, [swiper, supabase, selectedCollection]);
 
   const handleCollectionChange = useCallback(() => {
     setIsCollDropdownOpen(true);
@@ -158,6 +192,7 @@ function MatchFinderContent() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         {/* ===== Header Bar ===== */}
@@ -479,8 +514,24 @@ function MatchFinderContent() {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+
+      {/* ---- Chat Drawer ---- */}
+      <ChatDrawer
+        isOpen={chatDrawerOpen}
+        onClose={() => {
+          setChatDrawerOpen(false);
+          setChatDrawerData(null);
+        }}
+        conversationId={chatDrawerData?.conversationId ?? null}
+        otherNickname={chatDrawerData?.otherNickname ?? ''}
+        collectionTitle={chatDrawerData?.collectionTitle}
+        templateId={chatDrawerData?.templateId}
+        otherUserId={chatDrawerData?.otherUserId}
+        distanceKm={chatDrawerData?.distanceKm}
+      />
+    </>
   );
 }
 

@@ -1,0 +1,239 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useSupabaseClient,
+  useUser,
+} from '@/components/providers/SupabaseProvider';
+import {
+  getMatchChatMessages,
+  sendMatchMessage,
+  markMatchMessagesRead,
+  MatchChatMessage,
+} from '@/lib/supabase/matches/chat';
+import { processImageBeforeUpload, generateThumbnail } from '@/lib/images/processImageBeforeUpload';
+import { toast } from '@/lib/toast';
+import { logger } from '@/lib/logger';
+
+interface UseMatchChatOptions {
+  conversationId: number | null;
+  enableRealtime?: boolean;
+}
+
+export function useMatchChat({
+  conversationId,
+  enableRealtime = true,
+}: UseMatchChatOptions) {
+  const supabase = useSupabaseClient();
+  const { user } = useUser();
+
+  const [messages, setMessages] = useState<MatchChatMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // ---- Fetch messages ----
+  const fetchMessages = useCallback(async () => {
+    if (!user || !conversationId) return;
+
+    setLoading(true);
+    setError(null);
+
+    const { data, error: fetchError } = await getMatchChatMessages(
+      supabase,
+      conversationId
+    );
+
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      // Messages come in DESC order from RPC, reverse for display
+      setMessages(data.reverse());
+      setHasMore(data.length >= 50);
+
+      // Auto-mark as read
+      if (data.length > 0) {
+        const hasUnread = data.some(m => m.receiver_id === user.id && !m.is_read);
+        if (hasUnread) {
+          await markMatchMessagesRead(supabase, conversationId);
+        }
+      }
+    }
+
+    setLoading(false);
+  }, [supabase, conversationId, user]);
+
+  // ---- Load more (older messages) ----
+  const loadMore = useCallback(async () => {
+    if (!user || !conversationId || messages.length === 0) return;
+
+    const oldestMsg = messages[0];
+    const { data } = await getMatchChatMessages(
+      supabase,
+      conversationId,
+      oldestMsg.created_at
+    );
+
+    if (data.length > 0) {
+      setMessages(prev => [...data.reverse(), ...prev]);
+    }
+    setHasMore(data.length >= 50);
+  }, [supabase, conversationId, user, messages]);
+
+  // ---- Send message ----
+  const sendMessage = useCallback(
+    async (text: string, imageFile?: File | Blob | null) => {
+      if (!user || !conversationId || (!text.trim() && !imageFile)) return;
+
+      setSending(true);
+
+      // Upload image if provided
+      let imageUrl: string | null = null;
+      let thumbnailUrl: string | null = null;
+
+      if (imageFile) {
+        setUploading(true);
+        try {
+          const file = imageFile instanceof File
+            ? imageFile
+            : new File([imageFile], 'chat-image.webp', { type: imageFile.type || 'image/webp' });
+
+          const processed = await processImageBeforeUpload(file, {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 1200,
+            quality: 0.82,
+          });
+
+          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7);
+
+          const timestamp = Date.now();
+          const basePath = `chat-images/match/${conversationId}/${user.id}/${timestamp}`;
+          const imagePath = `${basePath}.webp`;
+          const thumbPath = `${basePath}-thumb.webp`;
+
+          const [imageUpload, thumbUpload] = await Promise.all([
+            supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
+              contentType: 'image/webp',
+              upsert: false,
+            }),
+            supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+              contentType: 'image/webp',
+              upsert: false,
+            }),
+          ]);
+
+          if (imageUpload.error) throw imageUpload.error;
+          if (thumbUpload.error) throw thumbUpload.error;
+
+          const { data: imgData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
+          const { data: thumbData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+
+          imageUrl = imgData.publicUrl;
+          thumbnailUrl = thumbData.publicUrl;
+        } catch (uploadError) {
+          logger.error('Error uploading chat image:', uploadError);
+          toast.error('Error al subir la imagen');
+          setSending(false);
+          setUploading(false);
+          return;
+        } finally {
+          setUploading(false);
+        }
+      }
+
+      const displayMessage = !text.trim() && imageUrl ? '📷 Imagen' : text.trim();
+
+      const { messageId, error: sendError } = await sendMatchMessage(
+        supabase,
+        conversationId,
+        text,
+        imageUrl,
+        thumbnailUrl
+      );
+
+      if (sendError) {
+        toast.error(sendError.message);
+      } else if (messageId) {
+        // Optimistic add
+        const optimisticMsg: MatchChatMessage = {
+          id: messageId,
+          sender_id: user.id,
+          receiver_id: null,
+          sender_nickname: 'Tú',
+          message: displayMessage,
+          is_read: false,
+          is_system: false,
+          created_at: new Date().toISOString(),
+          image_url: imageUrl,
+          thumbnail_url: thumbnailUrl,
+        };
+        setMessages(prev => [...prev, optimisticMsg]);
+
+        // Refresh after a short delay
+        setTimeout(() => {
+          void fetchMessages();
+        }, 500);
+      }
+
+      setSending(false);
+    },
+    [supabase, conversationId, user, fetchMessages]
+  );
+
+  // ---- Mark as read ----
+  const markAsRead = useCallback(async () => {
+    if (!conversationId) return;
+    await markMatchMessagesRead(supabase, conversationId);
+  }, [supabase, conversationId]);
+
+  // ---- Initial fetch ----
+  useEffect(() => {
+    if (conversationId) {
+      void fetchMessages();
+    } else {
+      setMessages([]);
+      setLoading(false);
+    }
+  }, [conversationId, fetchMessages]);
+
+  // ---- Realtime subscription ----
+  useEffect(() => {
+    if (!enableRealtime || !user || !conversationId) return;
+
+    const channel = supabase
+      .channel(`match-chat-${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'trade_chats',
+          filter: `match_conversation_id=eq.${conversationId}`,
+        },
+        () => {
+          void fetchMessages();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [supabase, conversationId, enableRealtime, user, fetchMessages]);
+
+  return {
+    messages,
+    loading,
+    sending,
+    uploading,
+    error,
+    hasMore,
+    sendMessage,
+    loadMore,
+    markAsRead,
+    messagesEndRef,
+    refetch: fetchMessages,
+  };
+}

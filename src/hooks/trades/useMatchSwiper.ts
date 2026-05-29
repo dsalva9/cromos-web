@@ -100,7 +100,7 @@ export interface UseMatchSwiperReturn {
 
   // Actions
   pass: () => void;
-  propose: () => { userId: string; collectionId: number } | null;
+  propose: () => { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null } | null;
   resetSeen: () => void;
   setCollection: (id: number) => void;
   setFilters: (f: Partial<MatchSwiperFilters>) => void;
@@ -256,13 +256,16 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     }
   }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen]);
 
-  const propose = useCallback((): { userId: string; collectionId: number } | null => {
+  const propose = useCallback((): { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null } | null => {
     if (!currentMatch || !selectedCopyId) return null;
     markSeen(currentMatch.match_user_id);
 
     const result = {
       userId: currentMatch.match_user_id,
       collectionId: selectedCopyId,
+      templateId: selectedTemplateId,
+      nickname: currentMatch.nickname || 'Usuario',
+      distanceKm: currentMatch.distance_km,
     };
 
     // Advance to next after returning
@@ -274,7 +277,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     }
 
     return result;
-  }, [currentMatch, selectedCopyId, currentIndex, unseenMatches, markSeen]);
+  }, [currentMatch, selectedCopyId, selectedTemplateId, currentIndex, unseenMatches, markSeen]);
 
   const setRadiusTier = useCallback((index: number) => {
     const clamped = Math.max(0, Math.min(index, RADIUS_TIERS.length - 1));

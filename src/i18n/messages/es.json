@@ -362,10 +362,14 @@
   },
   "chats": {
     "title": "Mis Chats",
-    "subtitle": "Todas tus conversaciones sobre anuncios del marketplace",
+    "subtitle": "Todas tus conversaciones",
+    "tabs": {
+      "marketplace": "Marketplace",
+      "match": "Match"
+    },
     "tip": {
       "title": "Tus conversaciones",
-      "description": "Aquí verás todos los chats sobre anuncios del Marketplace. También puedes marcar usuarios como favoritos para encontrarlos fácilmente después."
+      "description": "Aquí verás todos los chats: conversaciones sobre anuncios del Marketplace y chats de Match con otros coleccionistas."
     },
     "empty": {
       "title": "No tienes conversaciones activas",
@@ -379,6 +383,33 @@
     "roles": {
       "buyer": "Comprador:",
       "seller": "Vendedor:"
+    },
+    "match": {
+      "collection": "Colección: {name}",
+      "emptyTitle": "No tienes chats de match",
+      "emptyDesc": "Busca coincidencias y empieza a chatear",
+      "emptyCta": "Buscar matches"
+    }
+  },
+  "matchChat": {
+    "title": "Chat",
+    "placeholder": "Escribe un mensaje...",
+    "send": "Enviar",
+    "loadMore": "Cargar anteriores",
+    "imageAlt": "Imagen adjunta",
+    "uploading": "Subiendo imagen...",
+    "proposeTrade": "Proponer intercambio formal →",
+    "info": {
+      "title": "Info del match",
+      "collection": "Colección",
+      "theyHave": "Tiene {count} cromos que te faltan",
+      "youHave": "Tú tienes {count} que le faltan",
+      "distance": "Distancia",
+      "viewInFinder": "Ver en buscador",
+      "proposeTrade": "Proponer intercambio formal →"
+    },
+    "systemMsg": {
+      "matchStarted": "⚡ ¡Match en {collection}! {user} quiere intercambiar cromos"
     }
   },
   "templates": {

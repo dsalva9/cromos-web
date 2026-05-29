@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { ArrowRightLeft } from 'lucide-react';
+import Link from 'next/link';
 import AuthGuard from '@/components/AuthGuard';
 
 function ComingSoonContent() {
@@ -24,10 +25,16 @@ function ComingSoonContent() {
           </div>
 
           {/* Body */}
-          <div className="p-6 space-y-6">
-            <p className="text-center text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+          <div className="p-6 space-y-6 flex flex-col items-center">
+            <p className="text-center text-gray-700 dark:text-gray-300 font-medium leading-relaxed mb-2">
               {t('comingSoonDesc')}
             </p>
+            <Link
+              href="/es/intercambios/buscar"
+              className="w-full text-center bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase py-3 px-4 rounded-md shadow-lg transition-colors inline-block"
+            >
+              Buscar matches →
+            </Link>
           </div>
         </div>
       </div>

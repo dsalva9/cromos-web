@@ -338,10 +338,14 @@
   },
   "chats": {
     "title": "Meus Chats",
-    "subtitle": "Todas as suas conversas sobre anúncios do marketplace",
+    "subtitle": "Todas as suas conversas",
+    "tabs": {
+      "marketplace": "Marketplace",
+      "match": "Match"
+    },
     "tip": {
       "title": "As suas conversas",
-      "description": "Aqui verá todos os chats sobre anúncios do Marketplace. Também pode marcar utilizadores como favoritos para os encontrar facilmente depois."
+      "description": "Aqui verá todos os seus chats: conversas sobre anúncios do Marketplace e chats de Match com outros colecionadores."
     },
     "empty": {
       "title": "Não tem conversas ativas",
@@ -355,6 +359,33 @@
     "roles": {
       "buyer": "Comprador:",
       "seller": "Vendedor:"
+    },
+    "match": {
+      "collection": "Coleção: {name}",
+      "emptyTitle": "Sem chats de match",
+      "emptyDesc": "Encontre correspondências e comece a conversar",
+      "emptyCta": "Buscar matches"
+    }
+  },
+  "matchChat": {
+    "title": "Chat",
+    "placeholder": "Escreva uma mensagem...",
+    "send": "Enviar",
+    "loadMore": "Carregar anteriores",
+    "imageAlt": "Imagem anexada",
+    "uploading": "Enviando imagem...",
+    "proposeTrade": "Propor troca formal →",
+    "info": {
+      "title": "Info do match",
+      "collection": "Coleção",
+      "theyHave": "Tem {count} figurinhas que te faltam",
+      "youHave": "Você tem {count} que faltam a ele",
+      "distance": "Distância",
+      "viewInFinder": "Ver no buscador",
+      "proposeTrade": "Propor troca formal →"
+    },
+    "systemMsg": {
+      "matchStarted": "⚡ Match em {collection}! {user} quer trocar figurinhas"
     }
   },
   "templates": {

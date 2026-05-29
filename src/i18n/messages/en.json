@@ -338,10 +338,14 @@
   },
   "chats": {
     "title": "My Chats",
-    "subtitle": "All your marketplace listing conversations",
+    "subtitle": "All your conversations",
+    "tabs": {
+      "marketplace": "Marketplace",
+      "match": "Match"
+    },
     "tip": {
       "title": "Your conversations",
-      "description": "Here you will see all chats about Marketplace listings. You can also favorite users to find them easily later."
+      "description": "Here you'll find all your chats: Marketplace listing conversations and Match chats with fellow collectors."
     },
     "empty": {
       "title": "You have no active conversations",
@@ -355,6 +359,33 @@
     "roles": {
       "buyer": "Buyer:",
       "seller": "Seller:"
+    },
+    "match": {
+      "collection": "Collection: {name}",
+      "emptyTitle": "No match chats yet",
+      "emptyDesc": "Find matches and start chatting",
+      "emptyCta": "Find matches"
+    }
+  },
+  "matchChat": {
+    "title": "Chat",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "loadMore": "Load older",
+    "imageAlt": "Attached image",
+    "uploading": "Uploading image...",
+    "proposeTrade": "Propose formal trade →",
+    "info": {
+      "title": "Match info",
+      "collection": "Collection",
+      "theyHave": "Has {count} stickers you need",
+      "youHave": "You have {count} they need",
+      "distance": "Distance",
+      "viewInFinder": "View in finder",
+      "proposeTrade": "Propose formal trade →"
+    },
+    "systemMsg": {
+      "matchStarted": "⚡ Match in {collection}! {user} wants to trade stickers"
     }
   },
   "templates": {
