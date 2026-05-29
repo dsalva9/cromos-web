@@ -375,6 +375,9 @@
     "imageAlt": "Imagem anexada",
     "uploading": "Enviando imagem...",
     "proposeTrade": "Propor troca formal →",
+    "reportUser": "Reportar usuário",
+    "blockUser": "Bloquear usuário",
+    "reported": "Usuário reportado com sucesso",
     "info": {
       "title": "Info do match",
       "collection": "Coleção",
@@ -2143,6 +2146,8 @@
       "successDesc": "Sua proposta foi enviada. Você pode acompanhar o status na caixa de enviadas.",
       "comingSoon": "Compositor de trocas - Em breve",
       "comingSoonDesc": "Estamos trabalhando nesta funcionalidade. Em breve você poderá compor trocas diretamente!",
+      "comingSoonComposerDesc": "O compositor de trocas figurinha por figurinha estará disponível em breve. Enquanto isso, você pode combinar suas trocas diretamente pelo chat.",
+      "backToChat": "Voltar ao chat",
       "missingParams": "Faltam parâmetros necessários para compor a troca.",
       "collection": "Coleção",
       "offerer": "Ofertante",

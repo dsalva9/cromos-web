@@ -15,6 +15,7 @@ interface MatchInfoModalProps {
   distanceKm?: number | null;
   templateId?: number | null;
   otherUserId?: string;
+  conversationId?: number | null;
 }
 
 export function MatchInfoModal({
@@ -27,6 +28,7 @@ export function MatchInfoModal({
   distanceKm,
   templateId,
   otherUserId,
+  conversationId,
 }: MatchInfoModalProps) {
   const t = useTranslations('matchChat.info');
 
@@ -121,7 +123,7 @@ export function MatchInfoModal({
 
           {templateId && otherUserId && (
             <Link
-              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}`}
+              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}${conversationId ? `&conversation=${conversationId}` : ''}`}
               className="block"
             >
               <Button className="w-full bg-gold hover:bg-yellow-400 text-black font-bold text-sm">

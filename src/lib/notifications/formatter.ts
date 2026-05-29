@@ -155,6 +155,13 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
         href: null,
       };
 
+    case 'match_chat_message':
+      return {
+        title: '⚡ Nuevo match',
+        body: `${actorName} quiere intercambiar cromos contigo`,
+        href: '/chats?tab=match',
+      };
+
     default:
       return {
         title: 'Notificación',

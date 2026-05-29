@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, Info, ArrowLeft, ArrowRight } from 'lucide-react';
+import { X, Info, ArrowLeft, ArrowRight, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
@@ -11,6 +11,9 @@ import { MatchInfoModal } from './MatchInfoModal';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
+import { useIgnore } from '@/hooks/social/useIgnore';
+import { useReport } from '@/hooks/social/useReport';
+import { toast } from '@/lib/toast';
 
 interface ChatDrawerProps {
   isOpen: boolean;
@@ -43,7 +46,10 @@ export function ChatDrawer({
   const t = useTranslations('matchChat');
   const { user } = useUser();
   const [showInfo, setShowInfo] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { ignoreUser, loading: ignoreLoading } = useIgnore();
+  const { submitReport, loading: reportLoading } = useReport();
 
   const {
     messages,
@@ -153,6 +159,55 @@ export function ChatDrawer({
             <Info className="w-5 h-5" />
           </button>
 
+          {/* More menu (block/report) */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors p-1"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+            {showMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl min-w-[180px] py-1">
+                  <button
+                    disabled={reportLoading}
+                    onClick={async () => {
+                      if (!otherUserId) return;
+                      try {
+                        await submitReport('user', otherUserId, 'inappropriate_behavior', 'Reported from match chat');
+                        toast.success(t('reported'));
+                      } catch {
+                        toast.error('Error al reportar');
+                      }
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                  >
+                    <Flag className="w-4 h-4" />
+                    {t('reportUser')}
+                  </button>
+                  <button
+                    disabled={ignoreLoading}
+                    onClick={async () => {
+                      if (!otherUserId) return;
+                      const ok = await ignoreUser(otherUserId);
+                      if (ok) {
+                        setShowMenu(false);
+                        onClose();
+                      }
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                  >
+                    <Ban className="w-4 h-4" />
+                    {t('blockUser')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
           {/* Close button (desktop) */}
           <button
             onClick={onClose}
@@ -210,7 +265,7 @@ export function ChatDrawer({
         {templateId && otherUserId && (
           <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
             <Link
-              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}`}
+              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}&conversation=${conversationId}`}
               className="flex items-center justify-center gap-2 text-xs font-bold text-gold hover:text-yellow-500 transition-colors py-1"
             >
               {t('proposeTrade')}
@@ -239,6 +294,7 @@ export function ChatDrawer({
         distanceKm={distanceKm}
         templateId={templateId}
         otherUserId={otherUserId}
+        conversationId={conversationId}
       />
     </>
   );

@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
+import { getOrCreateMatchConversation, sendMatchMessage } from '@/lib/supabase/matches/chat';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { toast } from '@/lib/toast';
 import {
@@ -145,6 +145,13 @@ function MatchFinderContent() {
       return;
     }
 
+    // Auto-send system intro message for NEW conversations
+    if (data.is_new) {
+      const collTitle = selectedCollection?.title ?? 'una colección';
+      const systemMsg = `⚡ ¡Match en ${collTitle}! ${result.nickname} quiere intercambiar cromos`;
+      await sendMatchMessage(supabase, data.id, systemMsg);
+    }
+
     setChatDrawerData({
       conversationId: data.id,
       otherNickname: result.nickname,
@@ -227,6 +234,7 @@ function MatchFinderContent() {
                 type="button"
                 variant="outline"
                 size="sm"
+                data-testid="filter-toggle-btn"
                 onClick={() => setShowFilters(!showFilters)}
                 className={`text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-2 border-black font-bold uppercase text-xs rounded-md ${showFilters ? 'bg-gold text-gray-900' : 'hover:bg-gold hover:text-gray-900'}`}
               >

@@ -399,6 +399,9 @@
     "imageAlt": "Imagen adjunta",
     "uploading": "Subiendo imagen...",
     "proposeTrade": "Proponer intercambio formal →",
+    "reportUser": "Reportar usuario",
+    "blockUser": "Bloquear usuario",
+    "reported": "Usuario reportado correctamente",
     "info": {
       "title": "Info del match",
       "collection": "Colección",
@@ -2143,6 +2146,8 @@
       "successDesc": "Tu propuesta ha sido enviada. Puedes ver su estado en la bandeja de enviadas.",
       "comingSoon": "Compositor de intercambios - Próximamente",
       "comingSoonDesc": "Estamos trabajando en esta funcionalidad. ¡Pronto podrás componer intercambios directamente!",
+      "comingSoonComposerDesc": "El compositor de intercambios cromo a cromo estará disponible pronto. Mientras tanto, puedes acordar tus intercambios directamente por chat.",
+      "backToChat": "Volver al chat",
       "missingParams": "Faltan parámetros necesarios para componer el intercambio.",
       "collection": "Colección",
       "offerer": "Ofertante",

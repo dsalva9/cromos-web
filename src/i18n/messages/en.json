@@ -375,6 +375,9 @@
     "imageAlt": "Attached image",
     "uploading": "Uploading image...",
     "proposeTrade": "Propose formal trade →",
+    "reportUser": "Report user",
+    "blockUser": "Block user",
+    "reported": "User reported successfully",
     "info": {
       "title": "Match info",
       "collection": "Collection",
@@ -2146,6 +2149,8 @@
       "successDesc": "Your proposal has been sent. You can check its status in the outbox.",
       "comingSoon": "Trade composer - Coming soon",
       "comingSoonDesc": "We're working on this feature. Soon you'll be able to compose trades directly!",
+      "comingSoonComposerDesc": "The sticker-by-sticker trade composer will be available soon. In the meantime, you can arrange your trades directly via chat.",
+      "backToChat": "Back to chat",
       "missingParams": "Missing required parameters to compose the trade.",
       "collection": "Collection",
       "offerer": "Sender",

@@ -29,7 +29,9 @@ export type NotificationKind =
   | 'admin_action'
   // System notifications
   | 'system_message'
-  | 'level_up';
+  | 'level_up'
+  // Match chat notifications
+  | 'match_chat_message';
 
 /**
  * Notification channels
@@ -195,7 +197,7 @@ export function isRatingNotification(kind: NotificationKind): boolean {
 }
 
 export function isChatNotification(kind: NotificationKind): boolean {
-  return kind === 'listing_chat' || kind === 'chat_unread';
+  return kind === 'listing_chat' || kind === 'chat_unread' || kind === 'match_chat_message';
 }
 
 /**
@@ -237,6 +239,8 @@ export function getNotificationIcon(kind: NotificationKind): string {
       return 'Check';
     case 'admin_action':
       return 'Shield';
+    case 'match_chat_message':
+      return 'MessageSquare';
     default:
       return 'Bell';
   }

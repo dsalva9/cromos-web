@@ -174,7 +174,7 @@ export function NotificationCard({
                   asChild
                 >
                   <Link href={notification.href} onClick={onNavigate}>
-                    {notification.kind === 'listing_chat' || notification.kind === 'chat_unread'
+                    {notification.kind === 'listing_chat' || notification.kind === 'chat_unread' || notification.kind === 'match_chat_message'
                       ? t('goToChat')
                       : notification.kind === 'listing_completed' && notification.payload?.needs_confirmation
                       ? t('confirmTransaction')

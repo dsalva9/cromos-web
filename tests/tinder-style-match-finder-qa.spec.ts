@@ -33,10 +33,20 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     page.on('pageerror', err => {
       consoleErrors.push(`[Uncaught Page Error]: ${err.message}\nStack: ${err.stack}`);
     });
+    page.on('requestfailed', request => {
+      consoleErrors.push(`[Request Failed]: ${request.method()} ${request.url()} - ${request.failure()?.errorText}`);
+    });
+    page.on('response', response => {
+      if (response.status() >= 400) {
+        consoleErrors.push(`[Response ${response.status()}]: ${response.request().method()} ${response.url()}`);
+      }
+    });
   });
 
   test('Run Tinder-Style Match Finder UX Refinements Suite', async ({ page }) => {
     test.setTimeout(240000); // 4 minutes timeout
+
+    try {
 
     // -------------------------------------------------------------
     // PRE-FLIGHT: Login
@@ -56,6 +66,14 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
 
     await page.waitForURL(url => !url.href.includes('/login'), { timeout: 15000 });
     console.log('Login successful. Redirected to:', page.url());
+
+    // Dismiss cookie consent if visible to ensure a clean layout and no click interceptions
+    const acceptCookiesBtn = page.getByRole('button', { name: 'ACEPTAR TODAS', exact: false }).first();
+    if (await acceptCookiesBtn.isVisible()) {
+      console.log('Dismissing cookie consent banner...');
+      await acceptCookiesBtn.click();
+      await page.waitForTimeout(500);
+    }
 
     // -------------------------------------------------------------
     // PRE-FLIGHT: Verify collections exist via /es/mis-plantillas
@@ -86,13 +104,13 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
 
     // Expected: A "Próximamente" card with gold header, ArrowRightLeft icon, description text
     const proximamenteCard = page.getByText('Próximamente', { exact: false }).first();
-    const isCardVisible = await proximamenteCard.isVisible();
+    const isCardVisible = await proximamenteCard.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
     if (!isCardVisible) {
       qaBugs.push('Case 1: "Próximamente" card is missing on /es/intercambios/');
     }
 
-    const ctaButton = page.locator('a:has-text("Buscar matches"), button:has-text("Buscar matches"), a:has-text("Buscar matches →")').first();
-    const isCtaButtonVisible = await ctaButton.isVisible();
+    const ctaButton = page.locator('a[href*="/intercambios/buscar"]').first();
+    const isCtaButtonVisible = await ctaButton.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
     if (!isCtaButtonVisible) {
       console.log('Case 1 SOFT FAIL: "Buscar matches" CTA button is missing from the Coming Soon page.');
       qaBugs.push('Case 1: "Buscar matches" CTA button is missing from the Coming Soon page.');
@@ -113,19 +131,19 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     // -------------------------------------------------------------
     console.log('Case 2 — Match Finder Page Load (/es/intercambios/buscar)');
     await page.goto(`${BASE_URL}/es/intercambios/buscar`);
+    await page.evaluate(() => {
+      localStorage.setItem('matchfinder_geo', 'dismissed');
+      localStorage.setItem('dismissed-tips', '["tip-matchfinder-howto", "tip-matchfinder-setup"]');
+    });
+    await page.reload();
     await page.waitForLoadState('load');
     await page.setViewportSize({ width: 1440, height: 900 });
 
-    // Handle Geo Prompt on fresh page load if visible
-    const preFlightSkipBtn = page.getByRole('button', { name: 'Continuar sin ubicación', exact: false }).first();
-    if (await preFlightSkipBtn.isVisible()) {
-      console.log('Dismissing initial Geo Prompt...');
-      await preFlightSkipBtn.click();
-      await page.waitForTimeout(2000);
-    }
+    // Expected: A filter icon button is visible in the header row
+    const filterIconBtn = page.getByTestId('filter-toggle-btn').first();
 
-    // Wait for the loader to clear
-    await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 25000 });
+    // Wait for the page to finish loading and render (generous 45s timeout for local database queries)
+    await expect(filterIconBtn).toBeVisible({ timeout: 45000 });
 
     // Take immediate screenshot of the loaded page to inspect its state!
     await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't2_desktop_load.png'), fullPage: true });
@@ -140,10 +158,6 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     // Expected: A collection selector dropdown is visible below the header
     const collDropdownBtn = page.locator('button:has-text("📁"), button:has-text("Panini")').first();
     await expect(collDropdownBtn).toBeVisible();
-
-    // Expected: A filter icon button is visible in the header row
-    const filterIconBtn = page.locator('button').filter({ has: page.locator('svg') }).filter({ hasText: /^$/ }).first();
-    await expect(filterIconBtn).toBeVisible();
 
     // Expected: View toggle (Descubrir / Lista) is visible on desktop
     const viewToggle = (await page.locator('[data-testid="segmented-tabs"]').first().isVisible())
@@ -249,7 +263,7 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     }
 
     // Open filter panel on mobile
-    const filterMobileBtn = page.locator('button').filter({ has: page.locator('svg') }).filter({ hasText: /^$/ }).first();
+    const filterMobileBtn = page.getByTestId('filter-toggle-btn').first();
     await filterMobileBtn.click();
     await page.waitForTimeout(500);
 
@@ -284,7 +298,14 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     await page.waitForTimeout(500);
     const dropOptions = page.locator('div.absolute button, button[role="menuitem"]');
     const dropCount = await dropOptions.count();
-    await page.keyboard.press('Escape'); // close dropdown
+    
+    // Close dropdown safely by clicking the backdrop overlay if present
+    const backdrop = page.locator('div.fixed.inset-0.z-10').first();
+    if (await backdrop.isVisible()) {
+      await backdrop.click();
+    } else {
+      await page.keyboard.press('Escape');
+    }
     await page.waitForTimeout(500);
 
     for (let c = 0; c < Math.max(1, dropCount); c++) {
@@ -298,7 +319,7 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
       }
 
       // Expand search radius to ∞
-      const filterIcon = page.locator('[data-testid="segmented-tabs"] + button, button:has(svg)').first();
+      const filterIcon = page.locator('button').filter({ has: page.locator('svg') }).filter({ hasText: /^$/ }).first();
       await filterIcon.click();
       await page.waitForTimeout(500);
       const infiniteTick = page.getByText('∞', { exact: false }).first();
@@ -491,18 +512,23 @@ test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => 
     await page.emulateMedia({ colorScheme: 'light' });
     await page.waitForTimeout(1000);
 
-    // Final log of errors & bugs
-    console.log('Unique console errors collected:', [...new Set(consoleErrors)]);
-    console.log('QA Bugs collected:', qaBugs);
-    
-    fs.writeFileSync(
-      path.join(SCREENSHOT_DIR, 'matchfinder_errors.json'),
-      JSON.stringify(consoleErrors, null, 2)
-    );
-    
-    fs.writeFileSync(
-      path.join(SCREENSHOT_DIR, 'matchfinder_bugs.json'),
-      JSON.stringify(qaBugs, null, 2)
-    );
+    } finally {
+      // Capture failure/exit screenshot to visually debug the page state!
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 'failure_state.png'), fullPage: true }).catch(() => {});
+
+      // Final log of errors & bugs
+      console.log('Unique console errors collected:', [...new Set(consoleErrors)]);
+      console.log('QA Bugs collected:', qaBugs);
+      
+      fs.writeFileSync(
+        path.join(SCREENSHOT_DIR, 'matchfinder_errors.json'),
+        JSON.stringify(consoleErrors, null, 2)
+      );
+      
+      fs.writeFileSync(
+        path.join(SCREENSHOT_DIR, 'matchfinder_bugs.json'),
+        JSON.stringify(qaBugs, null, 2)
+      );
+    }
   });
 });
