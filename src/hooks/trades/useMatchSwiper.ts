@@ -20,7 +20,7 @@ export interface TradeMatch {
   score: number | null;
 }
 
-export type SwiperPhase = 'loading' | 'geo_prompt' | 'swiping' | 'expand' | 'exhausted';
+export type SwiperPhase = 'loading' | 'geo_prompt' | 'swiping' | 'exhausted';
 
 interface SeenData {
   ids: string[];
@@ -30,7 +30,8 @@ interface SeenData {
 // ------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------
-const RADIUS_TIERS = [10, 25, 50, null] as const;
+const RADIUS_TIERS = [5, 10, 25, 50, 100, 200, 500, 1000, null] as const;
+export { RADIUS_TIERS };
 const SEEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 const DEFAULT_MIN_OVERLAP = 5;
 const BATCH_SIZE = 50; // Fetch larger batches for swiping
@@ -71,7 +72,6 @@ function saveSeen(collectionId: number, ids: Set<string>): void {
 // Hook
 // ------------------------------------------------------------------
 export interface MatchSwiperFilters {
-  rarity: string;
   team: string;
   query: string;
   minOverlap: number;
@@ -85,6 +85,7 @@ export interface UseMatchSwiperReturn {
   totalMatches: number;
   radiusKm: number | null;
   radiusTierIndex: number;
+  selectedTemplateId: number | null;
   selectedCollectionId: number | null;
   selectedCollectionTitle: string | null;
   collections: ReturnType<typeof useUserCollections>['collections'];
@@ -100,10 +101,10 @@ export interface UseMatchSwiperReturn {
   // Actions
   pass: () => void;
   propose: () => { userId: string; collectionId: number } | null;
-  expandRadius: () => void;
   resetSeen: () => void;
   setCollection: (id: number) => void;
   setFilters: (f: Partial<MatchSwiperFilters>) => void;
+  setRadiusTier: (index: number) => void;
   requestGeo: () => void;
   dismissGeoPrompt: () => void;
   loadMore: () => void;
@@ -118,11 +119,10 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   // selectedCollectionId stores the copy_id (for UI/seen tracking)
   // but we also derive the template_id (for the RPC)
   const [selectedCopyId, setSelectedCopyId] = useState<number | null>(null);
-  const [radiusTierIndex, setRadiusTierIndex] = useState(0);
+  const [radiusTierIndex, setRadiusTierIndex] = useState(RADIUS_TIERS.length - 1); // default unlimited
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
   const [phase, setPhase] = useState<SwiperPhase>('loading');
   const [filters, setFiltersState] = useState<MatchSwiperFilters>({
-    rarity: '',
     team: '',
     query: '',
     minOverlap: DEFAULT_MIN_OVERLAP,
@@ -189,7 +189,6 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       userId: user.id,
       collectionId: selectedTemplateId,
       filters: {
-        rarity: filters.rarity || undefined,
         team: filters.team || undefined,
         query: filters.query || undefined,
         minOverlap: filters.minOverlap,
@@ -224,16 +223,11 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     setCurrentIndex(0);
 
     if (unseen.length === 0 && fetchedRef.current && !error) {
-      // No unseen matches — check if we can expand
-      if (radiusTierIndex < RADIUS_TIERS.length - 1) {
-        setPhase('expand');
-      } else {
-        setPhase('exhausted');
-      }
+      setPhase('exhausted');
     } else if (unseen.length > 0) {
       setPhase('swiping');
     }
-  }, [rawMatches, loading, seenIds, radiusTierIndex, error]);
+  }, [rawMatches, loading, seenIds, error]);
 
   // ---- Actions ----
   const markSeen = useCallback((userId: string) => {
@@ -255,16 +249,12 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       // All current batch seen
       const remaining = rawMatches.filter(m => !seenIds.has(m.match_user_id) && m.match_user_id !== currentMatch.match_user_id);
       if (remaining.length === 0) {
-        if (radiusTierIndex < RADIUS_TIERS.length - 1) {
-          setPhase('expand');
-        } else {
-          setPhase('exhausted');
-        }
+        setPhase('exhausted');
       }
     } else {
       setCurrentIndex(nextIndex);
     }
-  }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen, radiusTierIndex]);
+  }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen]);
 
   const propose = useCallback((): { userId: string; collectionId: number } | null => {
     if (!currentMatch || !selectedCopyId) return null;
@@ -278,29 +268,24 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     // Advance to next after returning
     const nextIndex = currentIndex + 1;
     if (nextIndex >= unseenMatches.length) {
-      if (radiusTierIndex < RADIUS_TIERS.length - 1) {
-        setPhase('expand');
-      } else {
-        setPhase('exhausted');
-      }
+      setPhase('exhausted');
     } else {
       setCurrentIndex(nextIndex);
     }
 
     return result;
-  }, [currentMatch, selectedCopyId, currentIndex, unseenMatches, markSeen, radiusTierIndex]);
+  }, [currentMatch, selectedCopyId, currentIndex, unseenMatches, markSeen]);
 
-  const expandRadius = useCallback(() => {
-    const nextTier = Math.min(radiusTierIndex + 1, RADIUS_TIERS.length - 1);
-    setRadiusTierIndex(nextTier);
+  const setRadiusTier = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(index, RADIUS_TIERS.length - 1));
+    setRadiusTierIndex(clamped);
     // doFetch will be triggered by the radiusKm change via useEffect
-  }, [radiusTierIndex]);
+  }, []);
 
   const resetSeen = useCallback(() => {
     if (!selectedCopyId) return;
     setSeenIds(new Set());
     localStorage.removeItem(getSeenKey(selectedCopyId));
-    setRadiusTierIndex(0);
     setCurrentIndex(0);
     fetchedRef.current = false;
     doFetch();
@@ -310,7 +295,6 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     setSelectedCopyId(id);
     setSeenIds(loadSeen(id));
     setCurrentIndex(0);
-    setRadiusTierIndex(0);
     fetchedRef.current = false;
     clearResults();
   }, [clearResults]);
@@ -347,7 +331,6 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       userId: user.id,
       collectionId: selectedTemplateId,
       filters: {
-        rarity: filters.rarity || undefined,
         team: filters.team || undefined,
         query: filters.query || undefined,
         minOverlap: filters.minOverlap,
@@ -369,6 +352,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     radiusKm,
     radiusTierIndex,
     selectedCollectionId,
+    selectedTemplateId,
     selectedCollectionTitle: selectedCollection?.title ?? null,
     collections,
     collectionsLoading,
@@ -381,10 +365,10 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
 
     pass,
     propose,
-    expandRadius,
     resetSeen,
     setCollection,
     setFilters,
+    setRadiusTier,
     requestGeo,
     dismissGeoPrompt,
     loadMore,

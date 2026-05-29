@@ -100,9 +100,9 @@ export function MatchDetailDrawer({
       const results = data || [];
       setTheyOffer(
         results
-          .filter((r: TradeSticker & { direction: string }) => r.direction === 'they_offer')
-          .map((r: TradeSticker & { direction: string }) => ({
-            sticker_id: r.sticker_id,
+          .filter((r: TradeSticker & { direction: string; slot_id?: number }) => r.direction === 'they_offer')
+          .map((r: TradeSticker & { direction: string; slot_id?: number }) => ({
+            sticker_id: r.slot_id ?? r.sticker_id,
             sticker_code: r.sticker_code,
             player_name: r.player_name,
             team_name: r.team_name,
@@ -112,9 +112,9 @@ export function MatchDetailDrawer({
       );
       setIOffer(
         results
-          .filter((r: TradeSticker & { direction: string }) => r.direction === 'i_offer')
-          .map((r: TradeSticker & { direction: string }) => ({
-            sticker_id: r.sticker_id,
+          .filter((r: TradeSticker & { direction: string; slot_id?: number }) => r.direction === 'i_offer')
+          .map((r: TradeSticker & { direction: string; slot_id?: number }) => ({
+            sticker_id: r.slot_id ?? r.sticker_id,
             sticker_code: r.sticker_code,
             player_name: r.player_name,
             team_name: r.team_name,
@@ -164,7 +164,7 @@ export function MatchDetailDrawer({
                 size="lg"
               >
                 <ArrowRightLeft className="w-5 h-5 mr-2" />
-                {t('proposeCta')}
+                {t('tradeCta')}
               </Button>
             </Link>
           </div>

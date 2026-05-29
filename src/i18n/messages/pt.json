@@ -2087,7 +2087,9 @@
       "emptyOutboxDesc": "Encontre coincidências com outros colecionadores e envie sua primeira proposta.",
       "findMatchesCta": "Buscar coincidências",
       "comingSoon": "Estamos preparando esta seção. Em breve você poderá ver todas as suas propostas de troca aqui!",
-      "comingSoonTitle": "Em breve"
+      "comingSoonTitle": "Em breve",
+      "comingSoonDesc": "Estamos trabalhando no sistema de trocas. Enquanto isso, você pode buscar colecionadores com figurinhas compatíveis.",
+      "comingSoonCta": "Buscar matches →"
     },
     "proposalCard": {
       "statusPending": "Pendente",
@@ -2120,6 +2122,7 @@
     },
     "finder": {
       "title": "Buscar coincidências",
+      "titleMobile": "Buscar Match",
       "desc": "Encontre outros colecionadores com quem você possa trocar figurinhas",
       "collectionLabel": "Coleção",
       "collectionPlaceholder": "Selecione uma coleção",
@@ -2135,6 +2138,10 @@
       "filterClear": "Limpar filtros",
       "filterMinOverlap": "Coincidências mínimas",
       "filterMinOverlapDesc": "Número mínimo de figurinhas que podem ser trocadas mutuamente",
+      "filterRadius": "Raio de busca",
+      "filterRadiusAll": "Todo o país",
+      "filterRadiusKm": "{km} km",
+      "filterViewMode": "Vista",
       "rarityAll": "Todas as raridades",
       "rarityCommon": "Comum",
       "rarityRare": "Rara",
@@ -2146,6 +2153,7 @@
       "mutualTrades": "{count} trocas mútuas",
       "proposeCtaShort": "Propor troca",
       "proposeCta": "Propor Troca →",
+      "tradeCta": "Trocar!",
       "viewDetail": "Ver detalhe",
       "theyOfferYouTitle": "{nickname} pode te oferecer",
       "youOfferThemTitle": "Você pode oferecer a {nickname}",
@@ -2186,7 +2194,7 @@
         "theyHave": "Tem {count} figurinhas que te faltam",
         "youHave": "Você tem {count} que faltam a ele",
         "pass": "Passar",
-        "propose": "Propor",
+        "propose": "Trocar!",
         "viewDetail": "Ver detalhe",
         "counter": "{current} de {total}",
         "radiusBadge": "Raio: {km} km",

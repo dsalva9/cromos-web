@@ -133,7 +133,7 @@ export function MatchSpotlight({
         })
         .slice(0, 5)
         .map((s: any) => ({
-          sticker_id: s.sticker_id,
+          sticker_id: s.slot_id ?? s.sticker_id,
           sticker_code: s.sticker_code,
           player_name: s.player_name,
           rarity: s.rarity,

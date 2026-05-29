@@ -2087,7 +2087,9 @@
       "emptyOutboxDesc": "Busca coincidencias con otros coleccionistas y envía tu primera propuesta.",
       "findMatchesCta": "Buscar coincidencias",
       "comingSoon": "Estamos preparando esta sección. ¡Muy pronto podrás ver todas tus propuestas de intercambio aquí!",
-      "comingSoonTitle": "Próximamente"
+      "comingSoonTitle": "Próximamente",
+      "comingSoonDesc": "Estamos trabajando en el sistema de intercambios. Mientras tanto, puedes buscar coleccionistas con cromos que coincidan.",
+      "comingSoonCta": "Buscar matches →"
     },
     "proposalCard": {
       "statusPending": "Pendiente",
@@ -2120,6 +2122,7 @@
     },
     "finder": {
       "title": "Buscar coincidencias",
+      "titleMobile": "Buscar Match",
       "desc": "Encuentra otros coleccionistas con los que puedas intercambiar cromos",
       "collectionLabel": "Colección",
       "collectionPlaceholder": "Selecciona una colección",
@@ -2135,6 +2138,10 @@
       "filterClear": "Limpiar filtros",
       "filterMinOverlap": "Coincidencias mínimas",
       "filterMinOverlapDesc": "Número mínimo de cromos que pueden intercambiarse mutuamente",
+      "filterRadius": "Radio de búsqueda",
+      "filterRadiusAll": "Todo el país",
+      "filterRadiusKm": "{km} km",
+      "filterViewMode": "Vista",
       "rarityAll": "Todas las rarezas",
       "rarityCommon": "Común",
       "rarityRare": "Rara",
@@ -2146,6 +2153,7 @@
       "mutualTrades": "{count} intercambios mutuos",
       "proposeCtaShort": "Proponer intercambio",
       "proposeCta": "Proponer Intercambio →",
+      "tradeCta": "¡Cambiar!",
       "viewDetail": "Ver detalle",
       "theyOfferYouTitle": "{nickname} te puede ofrecer",
       "youOfferThemTitle": "Tú puedes ofrecer a {nickname}",
@@ -2186,7 +2194,7 @@
         "theyHave": "Tiene {count} cromos que te faltan",
         "youHave": "Tú tienes {count} que le faltan",
         "pass": "Pasar",
-        "propose": "Proponer",
+        "propose": "¡Cambiar!",
         "viewDetail": "Ver detalle",
         "counter": "{current} de {total}",
         "radiusBadge": "Radio: {km} km",

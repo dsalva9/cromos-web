@@ -10,8 +10,6 @@ import {
   Filter,
   ChevronDown,
   X,
-  Layers,
-  LayoutGrid,
   AlertCircle,
   Lightbulb,
   Sparkles,
@@ -24,27 +22,20 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { MatchSpotlight } from '@/components/trades/MatchSpotlight';
 import { MatchGridView } from '@/components/trades/MatchGridView';
-import {
-  RadiusExpansionCard,
-  ExhaustedCard,
-} from '@/components/trades/RadiusExpansionCard';
-import { useMatchSwiper } from '@/hooks/trades/useMatchSwiper';
+import { ExhaustedCard } from '@/components/trades/RadiusExpansionCard';
+import { useMatchSwiper, RADIUS_TIERS } from '@/hooks/trades/useMatchSwiper';
 import AuthGuard from '@/components/AuthGuard';
 
 // ------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------
-const RADIUS_TIERS = [10, 25, 50, null];
 const MIN_OVERLAP_OPTIONS = [3, 5, 10, 20];
 
-function useRarityOptions(t: (key: string) => string) {
-  return [
-    { value: '', label: t('rarityAll') },
-    { value: 'common', label: t('rarityCommon') },
-    { value: 'rare', label: t('rarityRare') },
-    { value: 'epic', label: t('rarityEpic') },
-    { value: 'legendary', label: t('rarityLegendary') },
-  ];
+// Radius slider labels
+function getRadiusLabel(tierIndex: number, t: (key: string, values?: Record<string, string | number>) => string) {
+  const value = RADIUS_TIERS[tierIndex];
+  if (value === null || value === undefined) return t('filterRadiusAll');
+  return t('filterRadiusKm', { km: value });
 }
 
 // ------------------------------------------------------------------
@@ -102,7 +93,6 @@ function MatchFinderContent() {
   const t = useTranslations('trades.finder');
   const ts = useTranslations('trades.finder.swipe');
   const router = useIntlRouter();
-  const RARITY_OPTIONS = useRarityOptions(t);
 
   const swiper = useMatchSwiper();
 
@@ -112,14 +102,11 @@ function MatchFinderContent() {
   // ---- Filter UI state ----
   const [showFilters, setShowFilters] = useState(false);
   const [isCollDropdownOpen, setIsCollDropdownOpen] = useState(false);
-  const [isRarityDropdownOpen, setIsRarityDropdownOpen] = useState(false);
-  const [showCollSelector, setShowCollSelector] = useState(false);
 
   const hasActiveFilters =
-    swiper.filters.rarity || swiper.filters.team || swiper.filters.query || swiper.filters.minOverlap > 5;
+    swiper.filters.team || swiper.filters.query || swiper.filters.minOverlap > 5;
 
   const selectedCollection = swiper.collections.find(c => c.copy_id === swiper.selectedCollectionId);
-  const selectedRarity = RARITY_OPTIONS.find(r => r.value === swiper.filters.rarity);
 
   // ---- Action handlers ----
   const handlePropose = useCallback(() => {
@@ -132,7 +119,7 @@ function MatchFinderContent() {
   }, [swiper, router]);
 
   const handleCollectionChange = useCallback(() => {
-    setShowCollSelector(true);
+    setIsCollDropdownOpen(true);
   }, []);
 
   // ---- Loading state ----
@@ -171,28 +158,32 @@ function MatchFinderContent() {
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         {/* ===== Header Bar ===== */}
         <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white">
-                {t('title')}
+          <div className="flex items-center justify-between gap-2">
+            {/* Title — mobile: compact, desktop: full */}
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl font-black uppercase text-gray-900 dark:text-white truncate">
+                <span className="sm:hidden">{t('titleMobile')}</span>
+                <span className="hidden sm:inline">{t('title')}</span>
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t('desc')}</p>
+              <p className="hidden sm:block text-sm text-gray-600 dark:text-gray-400 mt-1">{t('desc')}</p>
             </div>
 
-            {/* Controls row */}
+            {/* Desktop: View toggle + filter button */}
             <div className="flex items-center gap-2 flex-shrink-0">
-              {/* View toggle */}
-              <SegmentedTabs
-                tabs={[
-                  { value: 'spotlight', label: ts('viewSpotlight') },
-                  { value: 'grid', label: ts('viewGrid') },
-                ]}
-                value={viewMode}
-                onValueChange={val => setViewMode(val as 'spotlight' | 'grid')}
-                aria-label="View mode"
-              />
+              {/* View toggle — desktop only */}
+              <div className="hidden sm:block">
+                <SegmentedTabs
+                  tabs={[
+                    { value: 'spotlight', label: ts('viewSpotlight') },
+                    { value: 'grid', label: ts('viewGrid') },
+                  ]}
+                  value={viewMode}
+                  onValueChange={val => setViewMode(val as 'spotlight' | 'grid')}
+                  aria-label="View mode"
+                />
+              </div>
 
-              {/* Filter button */}
+              {/* Filter button — always visible */}
               <Button
                 type="button"
                 variant="outline"
@@ -209,7 +200,7 @@ function MatchFinderContent() {
           </div>
 
           {/* Collection selector — always visible as a compact bar */}
-          <div className="mt-4 relative">
+          <div className="mt-3 relative">
             <button
               onClick={() => setIsCollDropdownOpen(!isCollDropdownOpen)}
               className="w-full sm:w-auto bg-white dark:bg-gray-800 border-2 border-black rounded-md px-4 py-2 text-left flex items-center justify-between gap-3 hover:border-gold focus:outline-none focus:ring-2 focus:ring-gold transition-colors text-gray-900 dark:text-white font-bold text-sm"
@@ -267,7 +258,7 @@ function MatchFinderContent() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => swiper.setFilters({ rarity: '', team: '', query: '', minOverlap: 5 })}
+                    onClick={() => swiper.setFilters({ team: '', query: '', minOverlap: 5 })}
                     className="text-gray-900 dark:text-white hover:bg-[#E84D4D] hover:text-white border-2 border-black font-bold uppercase text-xs rounded-md"
                   >
                     <X className="w-3 h-3 mr-1" />
@@ -286,38 +277,57 @@ function MatchFinderContent() {
               </div>
             </div>
 
-            {/* Rarity */}
-            <div>
+            {/* View mode toggle — mobile only (inside filters) */}
+            <div className="sm:hidden">
               <label className="block text-xs font-bold uppercase text-gray-900 dark:text-white mb-1">
-                {t('filterRarity')}
+                {t('filterViewMode')}
               </label>
-              <div className="relative">
-                <button
-                  onClick={() => setIsRarityDropdownOpen(!isRarityDropdownOpen)}
-                  className="w-full bg-gray-50 dark:bg-gray-700 border-2 border-black rounded-md px-3 py-2 text-left flex items-center justify-between hover:border-gold focus:outline-none transition-colors text-gray-900 dark:text-white font-medium text-sm"
-                >
-                  <span>{selectedRarity?.label || t('rarityAll')}</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isRarityDropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setIsRarityDropdownOpen(false)} />
-                    <div className="absolute z-20 w-full mt-1 bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl">
-                      {RARITY_OPTIONS.map(opt => (
-                        <button
-                          key={opt.value}
-                          onClick={() => {
-                            swiper.setFilters({ rarity: opt.value });
-                            setIsRarityDropdownOpen(false);
-                          }}
-                          className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium text-sm transition-colors border-b border-gray-200 dark:border-gray-700 last:border-b-0"
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
+              <SegmentedTabs
+                tabs={[
+                  { value: 'spotlight', label: ts('viewSpotlight') },
+                  { value: 'grid', label: ts('viewGrid') },
+                ]}
+                value={viewMode}
+                onValueChange={val => setViewMode(val as 'spotlight' | 'grid')}
+                aria-label="View mode"
+              />
+            </div>
+
+            {/* Radius Slider */}
+            <div>
+              <label className="block text-xs font-bold uppercase text-gray-900 dark:text-white mb-2">
+                {t('filterRadius')}
+              </label>
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min={0}
+                  max={RADIUS_TIERS.length - 1}
+                  step={1}
+                  value={swiper.radiusTierIndex}
+                  onChange={e => swiper.setRadiusTier(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-gold
+                    [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-gold [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-black [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
+                    [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-gold [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-black [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 font-mono px-0.5">
+                  {RADIUS_TIERS.map((v, i) => (
+                    <span
+                      key={i}
+                      className={`${i === swiper.radiusTierIndex ? 'text-gold font-bold text-xs' : ''}`}
+                    >
+                      {v === null ? '∞' : v}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <Badge
+                    variant="secondary"
+                    className="bg-gold/20 text-gray-900 dark:text-gold border border-gold/40 font-bold text-xs"
+                  >
+                    {getRadiusLabel(swiper.radiusTierIndex, t)}
+                  </Badge>
+                </div>
               </div>
             </div>
 
@@ -364,12 +374,6 @@ function MatchFinderContent() {
             {/* Active filter badges */}
             {hasActiveFilters && (
               <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-                {swiper.filters.rarity && (
-                  <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1 text-xs">
-                    {selectedRarity?.label}
-                    <button onClick={() => swiper.setFilters({ rarity: '' })} className="ml-1"><X className="w-3 h-3" /></button>
-                  </Badge>
-                )}
                 {swiper.filters.team && (
                   <Badge variant="secondary" className="bg-gold text-gray-900 border-2 border-black font-bold flex items-center gap-1 text-xs">
                     {swiper.filters.team}
@@ -419,27 +423,16 @@ function MatchFinderContent() {
                 <div className="flex flex-col items-center gap-4">
                   <Loader2 className="h-10 w-10 animate-spin text-gold" />
                 </div>
-              ) : swiper.phase === 'expand' ? (
-                <RadiusExpansionCard
-                  currentRadiusKm={swiper.radiusKm}
-                  nextRadiusKm={
-                    swiper.radiusTierIndex < RADIUS_TIERS.length - 1
-                      ? RADIUS_TIERS[swiper.radiusTierIndex + 1]
-                      : null
-                  }
-                  onExpand={swiper.expandRadius}
-                  onReset={swiper.resetSeen}
-                />
               ) : swiper.phase === 'exhausted' ? (
                 <ExhaustedCard
                   onReset={swiper.resetSeen}
                   onChangeCollection={handleCollectionChange}
                 />
-              ) : swiper.currentMatch && swiper.selectedCollectionId ? (
+              ) : swiper.currentMatch && swiper.selectedTemplateId ? (
                 <MatchSpotlight
                   match={swiper.currentMatch}
                   collectionTitle={swiper.selectedCollectionTitle || ''}
-                  collectionId={swiper.selectedCollectionId}
+                  collectionId={swiper.selectedTemplateId}
                   currentIndex={swiper.currentIndex}
                   totalMatches={swiper.totalMatches}
                   radiusKm={swiper.radiusKm}
@@ -461,7 +454,7 @@ function MatchFinderContent() {
             <div className="w-full">
               <MatchGridView
                 matches={swiper.allMatches}
-                collectionId={swiper.selectedCollectionId!}
+                collectionId={swiper.selectedTemplateId!}
                 loading={swiper.loading}
                 hasMore={swiper.hasMore}
                 totalCount={swiper.allMatches.length}

@@ -2090,7 +2090,9 @@
       "emptyOutboxDesc": "Find matches with other collectors and send your first proposal.",
       "findMatchesCta": "Find matches",
       "comingSoon": "We're preparing this section. Soon you'll be able to see all your trade proposals here!",
-      "comingSoonTitle": "Coming soon"
+      "comingSoonTitle": "Coming Soon",
+      "comingSoonDesc": "We're working on the trading system. In the meantime, you can search for collectors with matching stickers.",
+      "comingSoonCta": "Find matches →"
     },
     "proposalCard": {
       "statusPending": "Pending",
@@ -2123,6 +2125,7 @@
     },
     "finder": {
       "title": "Find matches",
+      "titleMobile": "Find Match",
       "desc": "Find other collectors you can trade stickers with",
       "collectionLabel": "Collection",
       "collectionPlaceholder": "Select a collection",
@@ -2138,6 +2141,10 @@
       "filterClear": "Clear filters",
       "filterMinOverlap": "Minimum matches",
       "filterMinOverlapDesc": "Minimum number of stickers that can be mutually traded",
+      "filterRadius": "Search radius",
+      "filterRadiusAll": "Whole country",
+      "filterRadiusKm": "{km} km",
+      "filterViewMode": "View",
       "rarityAll": "All rarities",
       "rarityCommon": "Common",
       "rarityRare": "Rare",
@@ -2149,6 +2156,7 @@
       "mutualTrades": "{count} mutual trades",
       "proposeCtaShort": "Propose trade",
       "proposeCta": "Propose Trade →",
+      "tradeCta": "Trade!",
       "viewDetail": "View detail",
       "theyOfferYouTitle": "{nickname} can offer you",
       "youOfferThemTitle": "You can offer {nickname}",
@@ -2189,7 +2197,7 @@
         "theyHave": "Has {count} stickers you need",
         "youHave": "You have {count} they need",
         "pass": "Pass",
-        "propose": "Propose",
+        "propose": "Trade!",
         "viewDetail": "View detail",
         "counter": "{current} of {total}",
         "radiusBadge": "Radius: {km} km",

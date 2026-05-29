@@ -1,93 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { Inbox, Send } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
-import { ProposalList } from '@/components/trades/ProposalList';
-import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { ArrowRightLeft, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from '@/components/ui/link';
 import AuthGuard from '@/components/AuthGuard';
-import type { ProposalBox } from '@/hooks/trades/useProposals';
 
-function IntercambiosContent() {
+function ComingSoonContent() {
   const t = useTranslations('trades.hub');
-  const { user, loading } = useUser();
-  const searchParams = useSearchParams();
-  const { totalUnread } = useGlobalUnreadBadge();
-
-  // Read initial tab and highlighted trade from URL params
-  const tabParam = searchParams.get('tab');
-  const tradeIdParam = searchParams.get('tradeId');
-
-  const [activeTab, setActiveTab] = useState<ProposalBox>(
-    tabParam === 'outbox' ? 'outbox' : 'inbox'
-  );
-
-  const highlightTradeId = tradeIdParam ? parseInt(tradeIdParam, 10) : null;
-
-  // Sync tab with URL param changes
-  useEffect(() => {
-    if (tabParam === 'outbox' || tabParam === 'inbox') {
-      setActiveTab(tabParam);
-    }
-  }, [tabParam]);
-
-  // Show spinner while auth is resolving or when not authenticated
-  if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-gold border-r-transparent rounded-full" />
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black uppercase text-gray-900 dark:text-white mb-2">
-            {t('title')}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            {t('desc')}
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="bg-white dark:bg-gray-800 border-2 border-black rounded-xl shadow-2xl overflow-hidden">
+          {/* Decorative header */}
+          <div className="bg-gradient-to-r from-gold via-yellow-400 to-gold p-8 border-b-2 border-black">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-lg">
+                <ArrowRightLeft className="w-10 h-10 text-gray-900" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-black uppercase text-gray-900 text-center">
+              {t('comingSoonTitle')}
+            </h1>
+          </div>
 
-        {/* Tabs */}
-        <div className="mb-6 max-w-md">
-          <SegmentedTabs
-            tabs={[
-              {
-                value: 'inbox',
-                label: t('tabInbox'),
-                icon: <Inbox className="h-4 w-4" />,
-                badge: totalUnread > 0 ? (
-                  <Badge className="ml-1 bg-[#E84D4D] text-white border border-black font-bold text-xs px-1.5 py-0.5">
-                    {totalUnread > 9 ? '9+' : totalUnread}
-                  </Badge>
-                ) : undefined,
-              },
-              {
-                value: 'outbox',
-                label: t('tabOutbox'),
-                icon: <Send className="h-4 w-4" />,
-              },
-            ]}
-            value={activeTab}
-            onValueChange={(val) => setActiveTab(val as ProposalBox)}
-            aria-label={t('title')}
-          />
-        </div>
+          {/* Body */}
+          <div className="p-6 space-y-6">
+            <p className="text-center text-gray-700 dark:text-gray-300 font-medium leading-relaxed">
+              {t('comingSoonDesc')}
+            </p>
 
-        {/* Proposal List */}
-        <ProposalList
-          box={activeTab}
-          highlightProposalId={highlightTradeId}
-        />
+            <Link href="/intercambios/buscar" className="block">
+              <Button
+                className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase py-4 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                size="lg"
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                {t('comingSoonCta')}
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -96,7 +50,7 @@ function IntercambiosContent() {
 export default function IntercambiosPage() {
   return (
     <AuthGuard>
-      <IntercambiosContent />
+      <ComingSoonContent />
     </AuthGuard>
   );
 }
