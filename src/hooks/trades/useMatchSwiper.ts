@@ -115,7 +115,9 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   const { matches: rawMatches, loading, error, hasMore, searchTrades, clearResults } = useFindTraders();
 
   // ---- Core state ----
-  const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
+  // selectedCollectionId stores the copy_id (for UI/seen tracking)
+  // but we also derive the template_id (for the RPC)
+  const [selectedCopyId, setSelectedCopyId] = useState<number | null>(null);
   const [radiusTierIndex, setRadiusTierIndex] = useState(0);
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
   const [phase, setPhase] = useState<SwiperPhase>('loading');
@@ -141,7 +143,9 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   // ---- Derived ----
   const radiusKm = RADIUS_TIERS[radiusTierIndex] ?? null;
   const currentMatch = unseenMatches[currentIndex] ?? null;
-  const selectedCollection = collections.find(c => c.copy_id === selectedCollectionId);
+  const selectedCollection = collections.find(c => c.copy_id === selectedCopyId);
+  const selectedCollectionId = selectedCopyId; // exposed as selectedCollectionId for API compat
+  const selectedTemplateId = selectedCollection?.template_id ?? null;
 
   // ---- Auto-select collection ----
   useEffect(() => {
@@ -149,7 +153,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       collectionInitRef.current = true;
       const active = collections.find(c => c.is_active);
       const id = active ? active.copy_id : collections[0].copy_id;
-      setSelectedCollectionId(id);
+      setSelectedCopyId(id);
       setSeenIds(loadSeen(id));
     }
   }, [collections]);
@@ -177,13 +181,13 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
 
   // ---- Fetch matches ----
   const doFetch = useCallback(() => {
-    if (!user || !selectedCollectionId) return;
+    if (!user || !selectedTemplateId) return;
     fetchedRef.current = true;
     setPhase('loading');
 
     searchTrades({
       userId: user.id,
-      collectionId: selectedCollectionId,
+      collectionId: selectedTemplateId,
       filters: {
         rarity: filters.rarity || undefined,
         team: filters.team || undefined,
@@ -197,11 +201,11 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       limit: BATCH_SIZE,
       offset: 0,
     });
-  }, [user, selectedCollectionId, filters, geoCoords, radiusKm, searchTrades]);
+  }, [user, selectedTemplateId, filters, geoCoords, radiusKm, searchTrades]);
 
   // ---- Trigger fetch when deps change ----
   useEffect(() => {
-    if (user && selectedCollectionId && geoChecked && !authLoading && !collectionsLoading) {
+    if (user && selectedTemplateId && geoChecked && !authLoading && !collectionsLoading) {
       // Check if we should show geo prompt first
       if (!geoCoords && !geoPromptDismissed && !localStorage.getItem('matchfinder_geo')) {
         setPhase('geo_prompt');
@@ -209,7 +213,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       }
       doFetch();
     }
-  }, [user, selectedCollectionId, geoChecked, geoCoords, geoPromptDismissed, authLoading, collectionsLoading, doFetch]);
+  }, [user, selectedTemplateId, geoChecked, geoCoords, geoPromptDismissed, authLoading, collectionsLoading, doFetch]);
 
   // ---- Process raw matches into unseen ----
   useEffect(() => {
@@ -233,14 +237,14 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
 
   // ---- Actions ----
   const markSeen = useCallback((userId: string) => {
-    if (!selectedCollectionId) return;
+    if (!selectedCopyId) return;
     setSeenIds(prev => {
       const next = new Set(prev);
       next.add(userId);
-      saveSeen(selectedCollectionId, next);
+      saveSeen(selectedCopyId, next);
       return next;
     });
-  }, [selectedCollectionId]);
+  }, [selectedCopyId]);
 
   const pass = useCallback(() => {
     if (!currentMatch) return;
@@ -263,12 +267,12 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen, radiusTierIndex]);
 
   const propose = useCallback((): { userId: string; collectionId: number } | null => {
-    if (!currentMatch || !selectedCollectionId) return null;
+    if (!currentMatch || !selectedCopyId) return null;
     markSeen(currentMatch.match_user_id);
 
     const result = {
       userId: currentMatch.match_user_id,
-      collectionId: selectedCollectionId,
+      collectionId: selectedCopyId,
     };
 
     // Advance to next after returning
@@ -284,7 +288,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     }
 
     return result;
-  }, [currentMatch, selectedCollectionId, currentIndex, unseenMatches, markSeen, radiusTierIndex]);
+  }, [currentMatch, selectedCopyId, currentIndex, unseenMatches, markSeen, radiusTierIndex]);
 
   const expandRadius = useCallback(() => {
     const nextTier = Math.min(radiusTierIndex + 1, RADIUS_TIERS.length - 1);
@@ -293,17 +297,17 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   }, [radiusTierIndex]);
 
   const resetSeen = useCallback(() => {
-    if (!selectedCollectionId) return;
+    if (!selectedCopyId) return;
     setSeenIds(new Set());
-    localStorage.removeItem(getSeenKey(selectedCollectionId));
+    localStorage.removeItem(getSeenKey(selectedCopyId));
     setRadiusTierIndex(0);
     setCurrentIndex(0);
     fetchedRef.current = false;
     doFetch();
-  }, [selectedCollectionId, doFetch]);
+  }, [selectedCopyId, doFetch]);
 
   const setCollection = useCallback((id: number) => {
-    setSelectedCollectionId(id);
+    setSelectedCopyId(id);
     setSeenIds(loadSeen(id));
     setCurrentIndex(0);
     setRadiusTierIndex(0);
@@ -338,10 +342,10 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   }, []);
 
   const loadMore = useCallback(() => {
-    if (!user || !selectedCollectionId) return;
+    if (!user || !selectedTemplateId) return;
     searchTrades({
       userId: user.id,
-      collectionId: selectedCollectionId,
+      collectionId: selectedTemplateId,
       filters: {
         rarity: filters.rarity || undefined,
         team: filters.team || undefined,
@@ -355,7 +359,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       limit: BATCH_SIZE,
       offset: rawMatches.length,
     });
-  }, [user, selectedCollectionId, filters, geoCoords, radiusKm, rawMatches.length, searchTrades]);
+  }, [user, selectedTemplateId, filters, geoCoords, radiusKm, rawMatches.length, searchTrades]);
 
   return {
     phase: authLoading || collectionsLoading ? 'loading' : phase,

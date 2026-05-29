@@ -5,6 +5,9 @@
 --   user_template_progress (replaces user_stickers)
 --   user_template_copies  (for collection ownership)
 --   template_pages        (for page/team filtering)
+--
+-- Also fixes: users with NULL distance (no postcode lat/lon) were being
+-- excluded when radius filtering was active. Now they're always included.
 
 CREATE OR REPLACE FUNCTION public.find_mutual_traders(
   p_user_id uuid,
@@ -129,9 +132,14 @@ BEGIN
       MAX(total_ov) OVER () AS max_ov
     FROM base
     WHERE
+      -- Always include users when no geo or no radius set
       p_lat IS NULL OR p_lon IS NULL
       OR p_radius_km IS NULL
+      -- Include users within radius
       OR (dist_km IS NOT NULL AND dist_km <= p_radius_km)
+      -- Also include users with unknown distance (no postcode/lat/lon)
+      -- so they aren't silently excluded from results
+      OR dist_km IS NULL
   ),
   scored AS (
     SELECT
