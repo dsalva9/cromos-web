@@ -30,7 +30,7 @@ interface SeenData {
 // ------------------------------------------------------------------
 // Constants
 // ------------------------------------------------------------------
-const RADIUS_TIERS = [5, 10, 25, 50, 100, 200, 500, 1000, null] as const;
+const RADIUS_TIERS = [5, 20, 50, 200, null] as const;
 export { RADIUS_TIERS };
 const SEEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 const DEFAULT_MIN_OVERLAP = 5;

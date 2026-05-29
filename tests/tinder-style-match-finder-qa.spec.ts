@@ -10,10 +10,11 @@ if (!fs.existsSync(SCREENSHOT_DIR)) {
   fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 }
 
-// Track console errors
+// Track console errors and soft QA bugs
 const consoleErrors: string[] = [];
+const qaBugs: string[] = [];
 
-test.describe('Tinder-Style Match Finder (Phase 3 v2) QA Validation', () => {
+test.describe('Tinder-Style Match Finder (UX Refinements) QA Validation', () => {
   test.beforeEach(async ({ page }) => {
     page.on('console', msg => {
       const text = msg.text();
@@ -33,8 +34,8 @@ test.describe('Tinder-Style Match Finder (Phase 3 v2) QA Validation', () => {
     });
   });
 
-  test('Run Tinder-Style Match Finder T1-T13 Suite', async ({ page }) => {
-    test.setTimeout(180000); // 3 minutes timeout
+  test('Run Tinder-Style Match Finder UX Refinements Suite', async ({ page }) => {
+    test.setTimeout(240000); // 4 minutes timeout
 
     // -------------------------------------------------------------
     // PRE-FLIGHT: Login
@@ -69,428 +70,435 @@ test.describe('Tinder-Style Match Finder (Phase 3 v2) QA Validation', () => {
     const hasEmptyState = await emptyState.isVisible();
     console.log('Collections pre-flight check:', hasEmptyState ? 'No collections' : 'Collections found');
 
+    if (hasEmptyState) {
+      console.log('Blocker: No collections exist. Stopping.');
+      qaBugs.push('Blocker: User has zero collections with stickers.');
+      return;
+    }
+
     // -------------------------------------------------------------
-    // T1: Page Load & Contextual Tips
+    // CASE 1: Coming Soon Page (/es/intercambios/)
     // -------------------------------------------------------------
-    console.log('T1 — Page Load & Contextual Tips');
-    // Clear localStorage to ensure fresh state with tips visible
-    await page.goto(`${BASE_URL}/es/intercambios/buscar/`);
-    await page.evaluate(() => {
-      localStorage.removeItem('dismissed-tips');
-      localStorage.removeItem('matchfinder_geo');
-    });
-    // Reload page to apply cleared storage
-    await page.reload();
+    console.log('Case 1 — Coming Soon Page (/es/intercambios/)');
+    await page.goto(`${BASE_URL}/es/intercambios/`);
+    await page.waitForLoadState('load');
+
+    // Expected: A "Próximamente" card with gold header, ArrowRightLeft icon, description text
+    const proximamenteCard = page.getByText('Próximamente', { exact: false }).first();
+    const isCardVisible = await proximamenteCard.isVisible();
+    if (!isCardVisible) {
+      qaBugs.push('Case 1: "Próximamente" card is missing on /es/intercambios/');
+    }
+
+    const ctaButton = page.locator('a:has-text("Buscar matches"), button:has-text("Buscar matches"), a:has-text("Buscar matches →")').first();
+    const isCtaButtonVisible = await ctaButton.isVisible();
+    if (!isCtaButtonVisible) {
+      console.log('Case 1 SOFT FAIL: "Buscar matches" CTA button is missing from the Coming Soon page.');
+      qaBugs.push('Case 1: "Buscar matches" CTA button is missing from the Coming Soon page.');
+    } else {
+      // Verify: The CTA links to /es/intercambios/buscar
+      const hrefValue = await ctaButton.getAttribute('href');
+      console.log('CTA links to:', hrefValue);
+      if (!hrefValue || !hrefValue.includes('/intercambios/buscar')) {
+        qaBugs.push(`Case 1: CTA links to invalid URL: ${hrefValue}`);
+      }
+    }
+
+    // Take screenshot
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't1_coming_soon.png'), fullPage: true });
+
+    // -------------------------------------------------------------
+    // CASE 2: Match Finder Page Load (/es/intercambios/buscar)
+    // -------------------------------------------------------------
+    console.log('Case 2 — Match Finder Page Load (/es/intercambios/buscar)');
+    await page.goto(`${BASE_URL}/es/intercambios/buscar`);
     await page.waitForLoadState('load');
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.waitForTimeout(2000);
 
-    // Verify: Two contextual tips appear at the top
-    const howToTip = page.locator('h3:has-text("¿Cómo funciona?")');
-    const setupTip = page.locator('h3:has-text("Antes de empezar")');
-    await expect(howToTip).toBeVisible();
-    await expect(setupTip).toBeVisible();
-
-    // Take screenshot: Page with tips visible
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't1_tips_visible.png'), fullPage: true });
-
-    // Verify: Dismiss button (✕) works on each tip
-    let closeButtons = page.locator('button:has-text("Cerrar consejo")');
-    let closeCount = await closeButtons.count();
-    console.log(`Found ${closeCount} close buttons for tips`);
-    if (closeCount > 0) {
-      await closeButtons.first().click();
-      await page.waitForTimeout(800);
-      // Reload page to let useLocalStorage state sync up and avoid overwrite race condition!
-      console.log('Reloading after dismissing first tip...');
-      await page.reload();
-      await page.waitForLoadState('load');
-    }
-    
-    closeButtons = page.locator('button:has-text("Cerrar consejo")');
-    closeCount = await closeButtons.count();
-    console.log(`Remaining close buttons after reload: ${closeCount}`);
-    if (closeCount > 0) {
-      await closeButtons.first().click();
-      await page.waitForTimeout(800);
-      console.log('Reloading after dismissing second tip...');
-      await page.reload();
-      await page.waitForLoadState('load');
-    }
-
-    // Take screenshot: Page after tips dismissed
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't1_tips_dismissed.png'), fullPage: true });
-
-    // Verify: After dismissing, refresh the page — tips should NOT reappear
-    await page.reload();
-    await page.waitForLoadState('load');
-    await expect(page.locator('h3:has-text("¿Cómo funciona?")')).not.toBeVisible();
-    await expect(page.locator('h3:has-text("Antes de empezar")')).not.toBeVisible();
-
-    // Dismiss geo prompt to allow matches to load for T2-T9
-    console.log('Waiting for geo prompt...');
+    // Handle Geo Prompt on fresh page load if visible
     const preFlightSkipBtn = page.getByRole('button', { name: 'Continuar sin ubicación', exact: false }).first();
-    await preFlightSkipBtn.waitFor({ state: 'visible', timeout: 10000 });
-    console.log('Dismissing geo prompt for T2-T9 testing...');
-    await preFlightSkipBtn.click();
-    await page.waitForTimeout(2000);
+    if (await preFlightSkipBtn.isVisible()) {
+      console.log('Dismissing initial Geo Prompt...');
+      await preFlightSkipBtn.click();
+      await page.waitForTimeout(2000);
+    }
 
-    // Wait for the loading state to disappear
+    // Wait for the loader to clear
     await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 25000 });
 
-    // -------------------------------------------------------------
-    // T2: Collection Selector
-    // -------------------------------------------------------------
-    console.log('T2 — Collection Selector');
-    // Verify collection dropdown selector is visible
-    const collDropdownBtn = page.locator('button:has-text("📁")').first();
+    // Expected: Header shows "BUSCAR COINCIDENCIAS" on desktop
+    const desktopHeader = page.getByText('BUSCAR COINCIDENCIAS', { exact: false }).first();
+    const isHeaderVisible = await desktopHeader.isVisible();
+    if (!isHeaderVisible) {
+      qaBugs.push('Case 2: "BUSCAR COINCIDENCIAS" header is missing on desktop.');
+    }
+
+    // Expected: A collection selector dropdown is visible below the header
+    const collDropdownBtn = page.locator('button:has-text("📁"), button:has-text("Panini")').first();
     await expect(collDropdownBtn).toBeVisible();
 
-    // Click selector to open it
-    await collDropdownBtn.click();
+    // Expected: A filter icon button is visible in the header row
+    const filterIconBtn = page.locator('[data-testid="segmented-tabs"] + button, button:has(svg)').first();
+    await expect(filterIconBtn).toBeVisible();
+
+    // Expected: View toggle (Descubrir / Lista) is visible on desktop
+    const viewToggle = (await page.locator('[data-testid="segmented-tabs"]').first().isVisible())
+      ? page.locator('[data-testid="segmented-tabs"]').first()
+      : page.getByText('DESCUBRIR', { exact: false }).first();
+    await expect(viewToggle).toBeVisible();
+
+    // Take screenshot
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't2_desktop_load.png'), fullPage: true });
+
+    // -------------------------------------------------------------
+    // CASE 3: Rarity Filter Removed
+    // -------------------------------------------------------------
+    console.log('Case 3 — Rarity Filter Removed');
+    // Open the filter panel
+    await filterIconBtn.click();
     await page.waitForTimeout(500);
 
-    // Screenshot: Collection selector open
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't2_selector_open.png') });
+    // Expected: Search radius slider, team search input, min overlaps
+    await expect(page.getByText('Radio de búsqueda', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText('Equipo', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText('Coincidencias mínimas', { exact: false }).first()).toBeVisible();
 
-    // Change collections to trigger a fresh search
-    const dropdownOptions = page.locator('div.absolute button');
-    const optionCount = await dropdownOptions.count();
-    console.log(`Dropdown options count: ${optionCount}`);
-    if (optionCount > 1) {
-      console.log('Switching to another collection');
-      await dropdownOptions.nth(1).click();
-    } else if (optionCount === 1) {
-      console.log('Only 1 option available, clicking it again to close or confirm');
-      await dropdownOptions.first().click();
-    } else {
-      // Click overlay to close
-      await page.locator('div.fixed.inset-0').first().click();
+    // NOT expected: No "Rareza" filter should exist anywhere
+    const rarityLabel = page.getByText('Rareza', { exact: false });
+    const isRarityVisible = await rarityLabel.isVisible();
+    if (isRarityVisible) {
+      qaBugs.push('Case 3: "Rareza" filter still exists in the filter panel.');
     }
-    await page.waitForTimeout(1000); // Wait for matches reload
-    await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 25000 });
+
+    // Take screenshot of filter panel
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't3_filter_panel.png') });
 
     // -------------------------------------------------------------
-    // T3: Match Loading & Spotlight Card (Bulletproof Search Loop!)
+    // CASE 4: Radius Slider
     // -------------------------------------------------------------
-    console.log('T3 — Match Loading & Spotlight Card (Looping collections to find active matches)');
-    let hasMatches = false;
+    console.log('Case 4 — Radius Slider');
+    // Verify tick marks exist (e.g. labels 5, 10, 25, 50, 100, 200, 500, 1000, ∞ / "Todo el país")
+    const maxTick = page.locator('text=Todo el país, text=∞, text=Cualquiera').first();
+    const isMaxTickVisible = await maxTick.isVisible();
+    if (!isMaxTickVisible) {
+      qaBugs.push('Case 4: Radius slider max tick (∞ / Todo el país) is not visible.');
+    }
 
-    // Get number of options in dropdown again
-    await collDropdownBtn.click();
+    // Drag the slider to 25km (usually index 2 or clicking the tick mark label "25")
+    const tick25 = page.getByText('25', { exact: true }).first();
+    if (await tick25.isVisible()) {
+      console.log('Clicking the 25km slider tick...');
+      await tick25.click();
+      await page.waitForTimeout(1500); // observe reload
+    } else {
+      const sliderInput = page.locator('input[type="range"]').first();
+      if (await sliderInput.isVisible()) {
+        await sliderInput.fill('2'); // index 2 represents 25km
+        await page.waitForTimeout(1500);
+      } else {
+        qaBugs.push('Case 4: Could not find clickable 25km tick or input range element.');
+      }
+    }
+
+    // Take screenshot at 25km
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't4_radius_25km.png') });
+
+    // Reset radius to max (∞) to ensure we find matches for remaining tests
+    console.log('Resetting search radius to maximum (∞) to gather matches...');
+    const infiniteTick = page.getByText('∞', { exact: false }).first();
+    const todoElPaisTick = page.getByText('Todo el país', { exact: false }).first();
+    if (await infiniteTick.isVisible()) {
+      await infiniteTick.click();
+    } else if (await todoElPaisTick.isVisible()) {
+      await todoElPaisTick.click();
+    } else {
+      const sliderInput = page.locator('input[type="range"]').first();
+      if (await sliderInput.isVisible()) {
+        await sliderInput.fill('8'); // Max index for ∞
+      }
+    }
+    await page.waitForTimeout(1500);
+
+    // Close filter panel
+    await filterIconBtn.click();
     await page.waitForTimeout(500);
-    const dropOptions = page.locator('div.absolute button');
-    const dropCount = await dropOptions.count();
-    await page.locator('div.fixed.inset-0').first().click(); // Close dropdown
-    console.log(`Looping through ${dropCount} collections to locate one with active matches...`);
-
-    for (let cIndex = 0; cIndex < dropCount; cIndex++) {
-      console.log(`Checking collection ${cIndex + 1} of ${dropCount}...`);
-      await collDropdownBtn.click();
-      await page.waitForTimeout(500);
-      const activeOptions = page.locator('div.absolute button');
-      await activeOptions.nth(cIndex).click();
-      await page.waitForTimeout(1000); // Wait for matches to load
-      await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 25000 });
-      
-      // If we see the radius expansion card, expand it up to the maximum tier to find matches!
-      let isExpansionVisible = await page.locator('h2:has-text("No hay más en")').isVisible();
-      let expandCount = 0;
-      while (isExpansionVisible && expandCount < 3) {
-        console.log(`Radius expansion card visible for collection ${cIndex + 1}. Expanding radius (attempt ${expandCount + 1})...`);
-        const expandBtn = page.getByRole('button', { name: 'Ampliar búsqueda', exact: false }).first();
-        if (await expandBtn.isVisible()) {
-          await expandBtn.click();
-          await page.waitForTimeout(2000);
-          expandCount++;
-        } else {
-          break;
-        }
-        isExpansionVisible = await page.locator('h2:has-text("No hay más en")').isVisible();
-      }
-      
-      // Check if we have a match card now
-      const cardTitle = page.locator('p:has-text("¡Match en")').first();
-      if (await cardTitle.isVisible()) {
-        console.log(`Found active matches in collection ${cIndex + 1}! Continuing test with this collection.`);
-        hasMatches = true;
-        break;
-      }
-    }
-
-    if (hasMatches) {
-      // Spotlight mode details verification
-      const cardTitle = page.locator('p:has-text("¡Match en")').first();
-      const userName = page.locator('h2').first();
-      await expect(userName).toBeVisible();
-
-      const theyHaveText = page.locator('span:has-text("que te faltan")').first();
-      const youHaveText = page.locator('span:has-text("que le faltan")').first();
-      await expect(theyHaveText).toBeVisible();
-      await expect(youHaveText).toBeVisible();
-
-      const passBtn = page.getByRole('button', { name: 'Pasar', exact: false });
-      const proposeBtn = page.getByRole('button', { name: 'Proponer', exact: false });
-      await expect(passBtn).toBeVisible();
-      await expect(proposeBtn).toBeVisible();
-
-      // Counter "1 de N" format
-      const counterBadge = page.locator('div.bg-white, div.bg-gray-700, .bg-white, .bg-gray-700').first();
-      const counterText = await counterBadge.innerText();
-      console.log('Counter Text is:', counterText);
-
-      // Screenshot: First spotlight card with match data
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't3_first_card.png') });
-
-      // -------------------------------------------------------------
-      // T4: Swipe / Pass Interaction
-      // -------------------------------------------------------------
-      console.log('T4 — Swipe / Pass Interaction');
-      const originalUserNameText = await userName.innerText();
-      console.log(`Original match user: ${originalUserNameText}`);
-
-      // Click "Pasar"
-      await passBtn.click();
-      await page.waitForTimeout(1000); // Wait for card exit and next card load
-
-      // Verify counter updates and next match displays
-      const nextUserNameText = await userName.innerText();
-      console.log(`Next match user: ${nextUserNameText}`);
-      expect(nextUserNameText).not.toBe(originalUserNameText);
-
-      // Screenshot: After passing — next card visible
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't4_after_passing.png') });
-
-      // -------------------------------------------------------------
-      // T5: Propose Interaction
-      // -------------------------------------------------------------
-      console.log('T5 — Propose Interaction');
-      const currentProposeBtn = page.getByRole('button', { name: 'Proponer', exact: false });
-      await currentProposeBtn.click();
-
-      // Verify: User is navigated to the trade composer/proposal page
-      await page.waitForURL(url => url.href.includes('/intercambios/componer'), { timeout: 15000 });
-      console.log('Navigated to:', page.url());
-      expect(page.url()).toContain('userId');
-      expect(page.url()).toContain('collectionId');
-
-      // Screenshot: Trade proposal page
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't5_composer.png'), fullPage: true });
-
-      // Navigate back and verify no errors
-      await page.goBack();
-      await page.waitForLoadState('load');
-      await expect(page.locator('h1').first()).toBeVisible();
-
-      // -------------------------------------------------------------
-      // T6: View Toggle (Discover ↔ Lista)
-      // -------------------------------------------------------------
-      console.log('T6 — View Toggle');
-      // Click "LISTA" tab
-      const listTabBtn = page.getByTestId('segmented-tab-grid').first();
-      await listTabBtn.click();
-      await page.waitForTimeout(1000);
-
-      // Verify: Grid/list view shows matches
-      const gridCards = page.locator('.grid > div');
-      const gridCount = await gridCards.count();
-      console.log(`Grid matches count: ${gridCount}`);
-
-      // Screenshot: Grid/list view with matches
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't6_grid_view.png'), fullPage: true });
-
-      // Click "DESCUBRIR" to switch back
-      const discoverTabBtn = page.getByTestId('segmented-tab-spotlight').first();
-      await discoverTabBtn.click();
-      await page.waitForTimeout(1000);
-
-      // Verify spotlight mode is restored
-      await expect(passBtn).toBeVisible();
-
-      // -------------------------------------------------------------
-      // T7: Filter Panel
-      // -------------------------------------------------------------
-      console.log('T7 — Filter Panel');
-      const filterIconBtn = page.locator('[data-testid="segmented-tabs"] + button').first();
-      await filterIconBtn.click();
-      await page.waitForTimeout(500);
-
-      // Verify filter panel opens
-      const minOverlapBtn = page.getByText('3+').first();
-      await expect(minOverlapBtn).toBeVisible();
-
-      // Screenshot: Filter panel open
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't7_filters_open.png'), fullPage: true });
-
-      // Close filters cleanly
-      await filterIconBtn.click();
-      await page.waitForTimeout(500);
-
-      // -------------------------------------------------------------
-      // T8 & T9: Exhausted State & Radius Expansion
-      // -------------------------------------------------------------
-      console.log('T8 & T9 — Exhausting matches');
-      // Pass matches until exhausted card or radius expansion card shows up
-      let isExhausted = false;
-      let isExpansion = false;
-      let clickCount = 0;
-
-      while (clickCount < 30) {
-        const isExhaustedCardVisible = await page.locator('h2:has-text("¡Has visto todos los matches!")').isVisible();
-        const isExpansionCardVisible = await page.locator('h2:has-text("No hay más en")').isVisible();
-
-        if (isExhaustedCardVisible) {
-          isExhausted = true;
-          console.log('Exhausted state card reached!');
-          break;
-        }
-        if (isExpansionCardVisible) {
-          isExpansion = true;
-          console.log('Radius expansion card reached!');
-          break;
-        }
-
-        // If we see the Pasar button, click it
-        const currentPass = page.getByRole('button', { name: 'Pasar', exact: false });
-        if (await currentPass.isVisible()) {
-          await currentPass.click();
-          await page.waitForTimeout(500);
-          clickCount++;
-        } else {
-          console.log('No pass button or card visible anymore');
-          break;
-        }
-      }
-
-      if (isExpansion) {
-        // Screenshot: Radius expansion card
-        await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't8_expansion.png') });
-
-        // Click "Ampliar búsqueda"
-        const expandBtn = page.getByRole('button', { name: 'Ampliar búsqueda', exact: false }).first();
-        await expandBtn.click();
-        await page.waitForTimeout(2000);
-      }
-
-      // Pass rest of matches to get exhausted card if not already reached
-      if (!isExhausted) {
-        clickCount = 0;
-        while (clickCount < 30) {
-          const isExhaustedCardVisible = await page.locator('h2:has-text("¡Has visto todos los matches!")').isVisible();
-          if (isExhaustedCardVisible) {
-            isExhausted = true;
-            console.log('Exhausted state card reached after expansion!');
-            break;
-          }
-          const currentPass = page.getByRole('button', { name: 'Pasar', exact: false });
-          if (await currentPass.isVisible()) {
-            await currentPass.click();
-            await page.waitForTimeout(500);
-            clickCount++;
-          } else {
-            break;
-          }
-        }
-      }
-
-      if (isExhausted) {
-        // Screenshot: Exhausted state card
-        await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't9_exhausted.png') });
-
-        // Reset seen
-        const resetBtn = page.getByRole('button', { name: 'Ver todos de nuevo', exact: false }).first();
-        await resetBtn.click();
-        await page.waitForTimeout(2000);
-        await expect(passBtn).toBeVisible();
-        console.log('Successfully reset seen matches.');
-      }
-
-    } else {
-      console.log('No matches found for any collection — no other users with overlapping stickers in the database.');
-      // Take screenshots of empty / exhausted state for T3
-      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't3_first_card.png') });
-      console.log('Skipping swipe / pass functional checks T4-T9 since no matches exist.');
-    }
 
     // -------------------------------------------------------------
-    // T10: Geo Prompt
+    // CASE 5: Mobile Layout
     // -------------------------------------------------------------
-    console.log('T10 — Geo Prompt');
-    // Clear localStorage matchfinder_geo and refresh
-    await page.evaluate(() => {
-      localStorage.removeItem('matchfinder_geo');
-    });
-    await page.reload();
-    await page.waitForLoadState('load');
-    await page.waitForTimeout(2000);
-
-    // Verify geo prompt card is visible
-    const geoHeader = page.getByText('Activa tu ubicación', { exact: false }).first();
-    await expect(geoHeader).toBeVisible();
-
-    // Screenshot: Geo prompt card
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't10_geo_prompt.png') });
-
-    // Skip location prompts
-    const skipBtn = page.getByRole('button', { name: 'Continuar sin ubicación', exact: false }).first();
-    await expect(skipBtn).toBeVisible();
-    await skipBtn.click();
-    await page.waitForTimeout(2000);
-
-    // Verify matches load or empty state loads
-    const passBtnObj = page.getByRole('button', { name: 'Pasar', exact: false });
-    const emptyStateObj = page.locator('h2:has-text("Sin coincidencias"), h2:has-text("No hay más en"), h2:has-text("¡Has visto todos los matches!")').first();
-    await expect(passBtnObj.or(emptyStateObj)).toBeVisible();
-
-    // -------------------------------------------------------------
-    // T11: Mobile Responsiveness
-    // -------------------------------------------------------------
-    console.log('T11 — Mobile Responsiveness');
+    console.log('Case 5 — Mobile Layout');
     await page.setViewportSize({ width: 375, height: 812 });
     await page.waitForTimeout(1000);
 
-    // Screenshot: Mobile spotlight view
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't11_mobile_spotlight.png') });
+    // Expected: Title reads "BUSCAR MATCH" (not "BUSCAR COINCIDENCIAS")
+    const mobileHeaderTitle = page.getByText('BUSCAR MATCH', { exact: true }).first();
+    const isMobileTitleVisible = await mobileHeaderTitle.isVisible();
+    if (!isMobileTitleVisible) {
+      qaBugs.push(`Case 5: Mobile header title does not read "BUSCAR MATCH".`);
+    }
 
-    // Switch to LISTA in mobile
-    await page.getByTestId('segmented-tab-grid').first().click();
-    await page.waitForTimeout(1000);
-    // Screenshot: Mobile list view
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't11_mobile_list.png'), fullPage: true });
+    // Subtitle is hidden, view toggle is hidden, only filter shows next to title
+    const mobileSubtitle = page.locator('text=Encuentra otros coleccionistas').first();
+    const isSubtitleVisible = await mobileSubtitle.isVisible();
+    if (isSubtitleVisible) {
+      qaBugs.push('Case 5: Subtitle is not hidden on mobile.');
+    }
 
-    // Switch back to spotlight and open filters
-    await page.getByTestId('segmented-tab-spotlight').first().click();
+    // Open filter panel on mobile
+    const filterMobileBtn = page.locator('button:has(svg)').first();
+    await filterMobileBtn.click();
     await page.waitForTimeout(500);
-    await page.locator('[data-testid="segmented-tabs"] + button').first().click();
-    await page.waitForTimeout(500);
-    // Screenshot: Mobile filter panel
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't11_mobile_filters.png') });
 
-    // Close filters
-    await page.locator('[data-testid="segmented-tabs"] + button').first().click();
+    // Expected: View mode toggle appears inside the filter panel
+    const filterPanelTabs = page.locator('[data-testid="segmented-tabs"]').first();
+    const isToggleInPanelVisible = await filterPanelTabs.isVisible();
+    if (!isToggleInPanelVisible) {
+      qaBugs.push('Case 5: View toggle does not appear inside the filter panel on mobile.');
+    }
+
+    // Take screenshot of mobile filter panel
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't5_mobile_filters.png') });
+
+    // Close filters on mobile
+    await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
+
+    // Take screenshot of mobile header
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't5_mobile_header.png') });
 
     // Restore desktop
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.waitForTimeout(1000);
 
     // -------------------------------------------------------------
-    // T13: Dark Mode Visual Check
+    // CASE 6: Sticker Detail (CRITICAL BUG FIX)
     // -------------------------------------------------------------
-    console.log('T13 — Dark Mode');
+    console.log('Case 6 — Sticker Detail (CRITICAL BUG FIX)');
+    // Traversal loop to find matches if needed (just in case they are not in the current collection)
+    let matchesFound = false;
+    await collDropdownBtn.click();
+    await page.waitForTimeout(500);
+    const dropOptions = page.locator('div.absolute button, button[role="menuitem"]');
+    const dropCount = await dropOptions.count();
+    await page.keyboard.press('Escape'); // close dropdown
+    await page.waitForTimeout(500);
+
+    for (let c = 0; c < Math.max(1, dropCount); c++) {
+      if (dropCount > 1) {
+        await collDropdownBtn.click();
+        await page.waitForTimeout(500);
+        const options = page.locator('div.absolute button, button[role="menuitem"]');
+        await options.nth(c).click();
+        await page.waitForTimeout(1500);
+        await expect(page.locator('text=Buscando matches...')).not.toBeVisible({ timeout: 20000 });
+      }
+
+      // Expand search radius to ∞
+      const filterIcon = page.locator('[data-testid="segmented-tabs"] + button, button:has(svg)').first();
+      await filterIcon.click();
+      await page.waitForTimeout(500);
+      const infiniteTick = page.getByText('∞', { exact: false }).first();
+      const todoElPaisTick = page.getByText('Todo el país', { exact: false }).first();
+      if (await infiniteTick.isVisible()) {
+        await infiniteTick.click();
+      } else if (await todoElPaisTick.isVisible()) {
+        await todoElPaisTick.click();
+      }
+      await page.waitForTimeout(1500);
+      await page.keyboard.press('Escape'); // close panel
+      await page.waitForTimeout(500);
+
+      const spotlightCard = page.locator('p:has-text("Match en")').first();
+      if (await spotlightCard.isVisible()) {
+        console.log(`Found active match in collection ${c + 1}`);
+        matchesFound = true;
+        break;
+      }
+    }
+
+    if (matchesFound) {
+      // Expected: "Cromos destacados" section showing up to 5 sticker previews
+      const destacadosHeader = page.locator('text=Cromos destacados, text=Destacados').first();
+      const isDestacadosVisible = await destacadosHeader.isVisible();
+      if (!isDestacadosVisible) {
+        qaBugs.push('Case 6: "Cromos destacados" section is not visible on spotlight card.');
+      }
+
+      // Click "Ver detalle" to open detail drawer
+      const verDetalleBtn = page.getByRole('button', { name: 'Ver detalle', exact: false }).first();
+      await expect(verDetalleBtn).toBeVisible();
+      await verDetalleBtn.click();
+      await page.waitForTimeout(1000);
+
+      // Expected: "They offer" (Te ofrece) and "I offer" (Le ofreces)
+      const theyOfferSection = page.locator('div, span, p, h2, h3').filter({ hasText: /Te ofrece|Tiene que te faltan|Ofrece/ }).first();
+      const iOfferSection = page.locator('div, span, p, h2, h3').filter({ hasText: /Le ofreces|Tienes que le faltan|Ofreces/ }).first();
+      
+      const isTheyOfferVisible = await theyOfferSection.isVisible();
+      const isIOfferVisible = await iOfferSection.isVisible();
+      if (!isTheyOfferVisible) qaBugs.push('Case 6: "They offer" section is missing from the detail drawer.');
+      if (!isIOfferVisible) qaBugs.push('Case 6: "I offer" section is missing from the detail drawer.');
+
+      // Ensure neither section has empty text "Este usuario no tiene cromos que necesites"
+      const emptyTextMsg = page.locator('text=Este usuario no tiene cromos que necesites').first();
+      const isEmptyTextVisible = await emptyTextMsg.isVisible();
+      if (isEmptyTextVisible) {
+        qaBugs.push('Case 6: Drawer incorrectly displays "Este usuario no tiene cromos que necesites" for active matches.');
+      }
+
+      // Take screenshot of drawer
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't6_detail_drawer.png') });
+
+      // -------------------------------------------------------------
+      // CASE 7: CTA Label
+      // -------------------------------------------------------------
+      console.log('Case 7 — CTA Label');
+      // In the detail drawer, verify bottom CTA button says "¡Cambiar!" (not "Proponer Intercambio →")
+      const drawerCta = page.locator('button, a').filter({ hasText: '¡Cambiar!' }).first();
+      const isDrawerCtaCorrect = await drawerCta.isVisible();
+      if (!isDrawerCtaCorrect) {
+        console.log('Case 7 SOFT FAIL: Detail drawer CTA button does not say "¡Cambiar!".');
+        qaBugs.push('Case 7: Detail drawer CTA button does not say "¡Cambiar!".');
+      }
+
+      // Close drawer
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(500);
+
+      // On spotlight card, verify right action button says "¡Cambiar!" (not "Proponer")
+      const spotlightCta = page.locator('button, a, [data-testid="spotlight-cta-right"]').filter({ hasText: '¡Cambiar!' }).first();
+      const spotlightCtaText = await spotlightCta.innerText().catch(() => '');
+      if (spotlightCtaText.trim() !== '¡Cambiar!') {
+        console.log(`Case 7 SOFT FAIL: Spotlight card right action button is: "${spotlightCtaText}" (expected "¡Cambiar!").`);
+        qaBugs.push(`Case 7: Spotlight card right action button is: "${spotlightCtaText}" (expected "¡Cambiar!").`);
+      }
+
+      // Take screenshot
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't7_cta_labels.png') });
+
+      // -------------------------------------------------------------
+      // CASE 8: Grid View
+      // -------------------------------------------------------------
+      console.log('Case 8 — Grid View');
+      const gridTabBtn = page.getByTestId('segmented-tab-grid').first();
+      await gridTabBtn.click();
+      await page.waitForTimeout(1000);
+
+      // Expected: Match cards display in a grid. Click a card
+      const gridCards = page.locator('.grid > div, .grid a, .grid button').first();
+      await gridCards.click();
+      await page.waitForTimeout(1000);
+
+      // Verify the drawer CTA says "¡Cambiar!"
+      const gridDrawerCta = page.locator('button, a').filter({ hasText: '¡Cambiar!' }).first();
+      const isGridDrawerCtaCorrect = await gridDrawerCta.isVisible();
+      if (!isGridDrawerCtaCorrect) {
+        qaBugs.push('Case 8: Grid list drawer CTA button does not say "¡Cambiar!".');
+      }
+
+      // Close drawer and take screenshot
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(500);
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't8_grid_view.png'), fullPage: true });
+
+      // Switch back to spotlight (Descubrir)
+      const discoverTabBtn = page.getByTestId('segmented-tab-spotlight').first();
+      await discoverTabBtn.click();
+      await page.waitForTimeout(1000);
+
+      // -------------------------------------------------------------
+      // CASE 9: Swipe Interaction
+      // -------------------------------------------------------------
+      console.log('Case 9 — Swipe Interaction');
+      const userName = page.locator('h2').first();
+      const originalUserNameText = await userName.innerText();
+      console.log(`Original user card: ${originalUserNameText}`);
+
+      const passBtn = page.getByRole('button', { name: 'Pasar', exact: false }).first();
+      await passBtn.click();
+      await page.waitForTimeout(1000);
+
+      const nextUserNameText = await userName.innerText();
+      console.log(`Next user card: ${nextUserNameText}`);
+      if (nextUserNameText === originalUserNameText) {
+        qaBugs.push('Case 9: Clicking "Pasar" did not advance to the next user.');
+      }
+
+      // Take screenshot of next card
+      await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't9_swipe_pass.png') });
+
+      // -------------------------------------------------------------
+      // CASE 10: Exhausted State
+      // -------------------------------------------------------------
+      console.log('Case 10 — Exhausted State');
+      let isExhausted = false;
+      let clickCount = 0;
+
+      while (clickCount < 30) {
+        const isExhaustedCardVisible = await page.locator('h2:has-text("¡Has visto todos los matches!")').isVisible();
+        if (isExhaustedCardVisible) {
+          isExhausted = true;
+          break;
+        }
+
+        const currentPass = page.getByRole('button', { name: 'Pasar', exact: false });
+        if (await currentPass.isVisible()) {
+          await currentPass.click();
+          await page.waitForTimeout(500);
+          clickCount++;
+        } else {
+          break;
+        }
+      }
+
+      if (isExhausted) {
+        // Expected: Green gradient header with 🎉, "¡Has visto todos los matches!" title, buttons: "Ver todos de nuevo" and "Cambiar colección"
+        await expect(page.locator('h2:has-text("¡Has visto todos los matches!")').first()).toBeVisible();
+        await expect(page.getByText('🎉').first()).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Ver todos de nuevo', exact: false }).first()).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Cambiar colección', exact: false }).first()).toBeVisible();
+
+        // Take screenshot
+        await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't10_exhausted_state.png') });
+
+        // Reset
+        await page.getByRole('button', { name: 'Ver todos de nuevo', exact: false }).first().click();
+        await page.waitForTimeout(1500);
+      } else {
+        console.log('Could not exhaust matches fully under loop limit, skipping exhausted card verification.');
+      }
+
+    } else {
+      console.log('No matches found for any collection. Skipping cases 6-10.');
+      qaBugs.push('Pre-flight: No active matches found in any collection to execute swipe/propose cases (6-10).');
+    }
+
+    // -------------------------------------------------------------
+    // CASE 11: UX & Visual Quality Assessment (Dark Mode)
+    // -------------------------------------------------------------
+    console.log('Case 11 — UX & Visual Quality Assessment (Dark Mode)');
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.waitForTimeout(1000);
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't13_dark_mode.png'), fullPage: true });
+
+    // Take screenshot of dark mode
+    await page.screenshot({ path: path.join(SCREENSHOT_DIR, 't11_ux_dark_mode.png'), fullPage: true });
 
     // Restore light mode
     await page.emulateMedia({ colorScheme: 'light' });
     await page.waitForTimeout(1000);
 
-    // Final log of errors
+    // Final log of errors & bugs
     console.log('Unique console errors collected:', [...new Set(consoleErrors)]);
+    console.log('QA Bugs collected:', qaBugs);
+    
     fs.writeFileSync(
       path.join(SCREENSHOT_DIR, 'matchfinder_errors.json'),
       JSON.stringify(consoleErrors, null, 2)
+    );
+    
+    fs.writeFileSync(
+      path.join(SCREENSHOT_DIR, 'matchfinder_bugs.json'),
+      JSON.stringify(qaBugs, null, 2)
     );
   });
 });

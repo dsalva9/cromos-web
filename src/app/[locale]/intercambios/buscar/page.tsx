@@ -99,6 +99,10 @@ function MatchFinderContent() {
   // ---- View mode ----
   const [viewMode, setViewMode] = useState<'spotlight' | 'grid'>('spotlight');
 
+  // ---- Radius slider: visual preview updates instantly, fetch only on release ----
+  const [previewRadiusTier, setPreviewRadiusTier] = useState<number | null>(null);
+  const displayRadiusTier = previewRadiusTier ?? swiper.radiusTierIndex;
+
   // ---- Filter UI state ----
   const [showFilters, setShowFilters] = useState(false);
   const [isCollDropdownOpen, setIsCollDropdownOpen] = useState(false);
@@ -304,8 +308,20 @@ function MatchFinderContent() {
                   min={0}
                   max={RADIUS_TIERS.length - 1}
                   step={1}
-                  value={swiper.radiusTierIndex}
-                  onChange={e => swiper.setRadiusTier(Number(e.target.value))}
+                  value={displayRadiusTier}
+                  onChange={e => setPreviewRadiusTier(Number(e.target.value))}
+                  onPointerUp={() => {
+                    if (previewRadiusTier !== null) {
+                      swiper.setRadiusTier(previewRadiusTier);
+                      setPreviewRadiusTier(null);
+                    }
+                  }}
+                  onTouchEnd={() => {
+                    if (previewRadiusTier !== null) {
+                      swiper.setRadiusTier(previewRadiusTier);
+                      setPreviewRadiusTier(null);
+                    }
+                  }}
                   className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-gold
                     [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-gold [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-black [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer
                     [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:bg-gold [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-black [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:shadow-md [&::-moz-range-thumb]:cursor-pointer"
@@ -314,7 +330,7 @@ function MatchFinderContent() {
                   {RADIUS_TIERS.map((v, i) => (
                     <span
                       key={i}
-                      className={`${i === swiper.radiusTierIndex ? 'text-gold font-bold text-xs' : ''}`}
+                      className={`${i === displayRadiusTier ? 'text-gold font-bold text-xs' : ''}`}
                     >
                       {v === null ? '∞' : v}
                     </span>
@@ -325,7 +341,7 @@ function MatchFinderContent() {
                     variant="secondary"
                     className="bg-gold/20 text-gray-900 dark:text-gold border border-gold/40 font-bold text-xs"
                   >
-                    {getRadiusLabel(swiper.radiusTierIndex, t)}
+                    {getRadiusLabel(displayRadiusTier, t)}
                   </Badge>
                 </div>
               </div>
