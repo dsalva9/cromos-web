@@ -112,7 +112,7 @@ function MatchFinderContent() {
   const [isCollDropdownOpen, setIsCollDropdownOpen] = useState(false);
 
   // ---- Chat drawer state ----
-  const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
+   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const [chatDrawerData, setChatDrawerData] = useState<{
     conversationId: number;
     otherNickname: string;
@@ -125,12 +125,26 @@ function MatchFinderContent() {
     distanceKm?: number | null;
   } | null>(null);
 
+  // ---- Carousel history (last passed card for peek) ----
+  const [lastPassedMatch, setLastPassedMatch] = useState<typeof swiper.currentMatch>(null);
+
   const hasActiveFilters =
     swiper.filters.team || swiper.filters.query || swiper.filters.minOverlap > 5;
 
   const selectedCollection = swiper.collections.find(c => c.copy_id === swiper.selectedCollectionId);
 
   // ---- Action handlers ----
+  const handlePass = useCallback(() => {
+    const passed = swiper.pass();
+    if (passed) setLastPassedMatch(passed);
+  }, [swiper]);
+
+  const handleUndoPass = useCallback(() => {
+    if (!lastPassedMatch) return;
+    swiper.undoPass(lastPassedMatch);
+    setLastPassedMatch(null);
+  }, [lastPassedMatch, swiper]);
+
   const handlePropose = useCallback(async () => {
     const result = swiper.propose();
     if (!result) return;
@@ -472,7 +486,7 @@ function MatchFinderContent() {
         )}
 
         {/* ===== Main Content Area ===== */}
-        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 280px)' }}>
+        <div className="flex items-center justify-center overflow-hidden" style={{ minHeight: 'calc(100vh - 280px)' }}>
           {viewMode === 'spotlight' ? (
             // ---- SPOTLIGHT MODE ----
             <>
@@ -492,8 +506,9 @@ function MatchFinderContent() {
                 />
               ) : swiper.currentMatch && swiper.selectedTemplateId ? (
                 <MatchCarouselPeek
-                  matches={swiper.unseenMatches}
-                  currentIndex={swiper.currentIndex}
+                  passedMatch={lastPassedMatch}
+                  nextMatch={swiper.unseenMatches[swiper.currentIndex + 1] ?? null}
+                  onUndoPass={handleUndoPass}
                 >
                   <MatchSpotlight
                     match={swiper.currentMatch}
@@ -502,7 +517,7 @@ function MatchFinderContent() {
                     currentIndex={swiper.currentIndex}
                     totalMatches={swiper.totalMatches}
                     radiusKm={swiper.radiusKm}
-                    onPass={swiper.pass}
+                    onPass={handlePass}
                     onPropose={handlePropose}
                   />
                 </MatchCarouselPeek>

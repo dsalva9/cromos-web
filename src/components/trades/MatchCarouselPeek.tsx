@@ -1,62 +1,95 @@
 'use client';
 
 import type { TradeMatch } from '@/hooks/trades/useMatchSwiper';
-import { User, MapPin } from 'lucide-react';
+import { User, MapPin, X, Undo2 } from 'lucide-react';
 
 /**
- * MatchCarouselPeek — Desktop-only carousel that shows faded
- * previous / next cards alongside the active MatchSpotlight.
- *
- * Renders a peek card with avatar + nickname + basic stats,
- * scaled down and faded, positioned absolutely on either side.
+ * MatchCarouselPeek — Desktop-only carousel that shows:
+ * - LEFT: the last passed card (red-tinted, clickable to undo)
+ * - RIGHT: the next upcoming card (faded preview)
  */
 
 interface PeekCardProps {
   match: TradeMatch;
   side: 'left' | 'right';
+  variant: 'passed' | 'upcoming';
+  onClick?: () => void;
 }
 
-function PeekCard({ match, side }: PeekCardProps) {
+function PeekCard({ match, side, variant, onClick }: PeekCardProps) {
   const displayName = match.nickname || 'Usuario';
+  const isPassed = variant === 'passed';
 
   return (
     <div
       className={`
         absolute top-1/2 -translate-y-1/2
         ${side === 'left' ? 'right-[calc(100%+16px)]' : 'left-[calc(100%+16px)]'}
-        w-[260px] pointer-events-none select-none
-        transition-all duration-300
+        w-[240px] select-none
+        transition-all duration-500 ease-out
+        ${onClick ? 'cursor-pointer pointer-events-auto hover:opacity-60' : 'pointer-events-none'}
       `}
       style={{
-        opacity: 0.4,
-        transform: `translateY(-50%) scale(0.85)`,
+        opacity: isPassed ? 0.5 : 0.35,
+        transform: `translateY(-50%) scale(0.82)`,
       }}
+      onClick={onClick}
     >
-      <div className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-lg overflow-hidden">
-        {/* Mini gold header */}
-        <div className="bg-gradient-to-r from-gold/60 via-yellow-400/60 to-gold/60 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
-          <p className="text-[10px] font-bold uppercase text-gray-900/50 text-center truncate">
-            Match
-          </p>
+      <div className={`
+        bg-white dark:bg-gray-800 border-2 rounded-xl shadow-lg overflow-hidden relative
+        ${isPassed ? 'border-red-300 dark:border-red-700' : 'border-gray-300 dark:border-gray-600'}
+      `}>
+        {/* Tinted overlay for passed cards */}
+        {isPassed && (
+          <div className="absolute inset-0 bg-red-500/10 z-10 pointer-events-none" />
+        )}
+
+        {/* Mini header */}
+        <div className={`
+          px-3 py-2 border-b
+          ${isPassed
+            ? 'bg-gradient-to-r from-red-200/60 via-red-300/60 to-red-200/60 border-red-200 dark:border-red-800'
+            : 'bg-gradient-to-r from-gold/60 via-yellow-400/60 to-gold/60 border-gray-300 dark:border-gray-600'
+          }
+        `}>
+          <div className="flex items-center justify-center gap-1.5">
+            {isPassed ? (
+              <>
+                <Undo2 className="w-3 h-3 text-red-500/70" />
+                <p className="text-[10px] font-bold uppercase text-red-600/70 text-center truncate">
+                  Pasado
+                </p>
+              </>
+            ) : (
+              <p className="text-[10px] font-bold uppercase text-gray-900/50 text-center truncate">
+                Siguiente
+              </p>
+            )}
+          </div>
         </div>
 
         {/* User info */}
         <div className="px-3 py-3">
           <div className="flex items-center gap-2 mb-2">
-            {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gold/20 border border-gold/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className={`
+              w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden
+              ${isPassed ? 'bg-red-100 border border-red-300/50' : 'bg-gold/20 border border-gold/50'}
+            `}>
               {match.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={match.avatar_url} alt={displayName} className="w-full h-full object-cover" />
               ) : (
-                <User className="w-4 h-4 text-gold/60" />
+                <User className={`w-4 h-4 ${isPassed ? 'text-red-400/60' : 'text-gold/60'}`} />
               )}
             </div>
 
-            {/* Name */}
-            <p className="text-sm font-bold uppercase text-gray-600 dark:text-gray-400 truncate">
+            <p className={`text-sm font-bold uppercase truncate ${isPassed ? 'text-red-500/60 line-through' : 'text-gray-600 dark:text-gray-400'}`}>
               {displayName}
             </p>
+
+            {isPassed && (
+              <X className="w-4 h-4 text-red-400 flex-shrink-0 ml-auto" />
+            )}
           </div>
 
           {/* Stats */}
@@ -75,8 +108,8 @@ function PeekCard({ match, side }: PeekCardProps) {
         </div>
 
         {/* Faded action area */}
-        <div className="border-t border-gray-200 dark:border-gray-700 py-2.5 px-3">
-          <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded" />
+        <div className="border-t border-gray-200 dark:border-gray-700 py-2 px-3">
+          <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded" />
         </div>
       </div>
     </div>
@@ -84,21 +117,35 @@ function PeekCard({ match, side }: PeekCardProps) {
 }
 
 interface MatchCarouselPeekProps {
-  matches: TradeMatch[];
-  currentIndex: number;
+  /** Last card that was passed — shown on the left with red tint */
+  passedMatch?: TradeMatch | null;
+  /** Next upcoming card — shown on the right, faded */
+  nextMatch?: TradeMatch | null;
+  /** Callback when the passed (left) card is clicked to undo */
+  onUndoPass?: () => void;
   children: React.ReactNode;
 }
 
-export function MatchCarouselPeek({ matches, currentIndex, children }: MatchCarouselPeekProps) {
-  const prevMatch = currentIndex > 0 ? matches[currentIndex - 1] : null;
-  const nextMatch = currentIndex < matches.length - 1 ? matches[currentIndex + 1] : null;
-
+export function MatchCarouselPeek({ passedMatch, nextMatch, onUndoPass, children }: MatchCarouselPeekProps) {
   return (
     <div className="relative">
-      {/* Peek cards — absolutely positioned, desktop only */}
+      {/* Peek cards — desktop only */}
       <div className="hidden md:block">
-        {prevMatch && <PeekCard match={prevMatch} side="left" />}
-        {nextMatch && <PeekCard match={nextMatch} side="right" />}
+        {passedMatch && (
+          <PeekCard
+            match={passedMatch}
+            side="left"
+            variant="passed"
+            onClick={onUndoPass}
+          />
+        )}
+        {nextMatch && (
+          <PeekCard
+            match={nextMatch}
+            side="right"
+            variant="upcoming"
+          />
+        )}
       </div>
 
       {/* Active card (MatchSpotlight) — always visible */}

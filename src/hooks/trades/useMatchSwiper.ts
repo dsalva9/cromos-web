@@ -102,7 +102,8 @@ export interface UseMatchSwiperReturn {
   hasMore: boolean;
 
   // Actions
-  pass: () => void;
+  pass: () => TradeMatch | null;
+  undoPass: (match: TradeMatch) => void;
   propose: () => { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null; avatarUrl: string | null } | null;
   resetSeen: () => void;
   setCollection: (id: number) => void;
@@ -243,8 +244,9 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     });
   }, [selectedCopyId]);
 
-  const pass = useCallback(() => {
-    if (!currentMatch) return;
+  const pass = useCallback((): TradeMatch | null => {
+    if (!currentMatch) return null;
+    const passed = currentMatch;
     markSeen(currentMatch.match_user_id);
 
     const nextIndex = currentIndex + 1;
@@ -257,7 +259,22 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     } else {
       setCurrentIndex(nextIndex);
     }
+    return passed;
   }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen]);
+
+  const undoPass = useCallback((match: TradeMatch) => {
+    if (!selectedCopyId) return;
+    // Remove from seen
+    setSeenIds(prev => {
+      const next = new Set(prev);
+      next.delete(match.match_user_id);
+      saveSeen(selectedCopyId, next);
+      return next;
+    });
+    // Reset index to 0 so the unseen list recalculates and shows it
+    setCurrentIndex(0);
+    if (phase === 'exhausted') setPhase('swiping');
+  }, [selectedCopyId, phase]);
 
   const propose = useCallback((): { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null; avatarUrl: string | null } | null => {
     if (!currentMatch || !selectedCopyId) return null;
@@ -372,6 +389,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     hasMore,
 
     pass,
+    undoPass,
     propose,
     resetSeen,
     setCollection,
