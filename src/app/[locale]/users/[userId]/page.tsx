@@ -39,7 +39,7 @@ import {
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2 } from 'lucide-react';
+import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight } from 'lucide-react';
 import {
   AvatarPicker,
   AvatarSelection,
@@ -52,6 +52,7 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { useTranslations } from 'next-intl';
 import { UserTradeMatchSection } from '@/components/trades/UserTradeMatchSection';
 import { getSupportMailtoUrl } from '@/lib/utils';
+import { useMatchStats } from '@/hooks/social/useMatchStats';
 
 type ListingFilter = 'active' | 'reserved' | 'sold' | 'removed';
 interface Rating {
@@ -78,6 +79,28 @@ interface RatingSummary {
   rating_avg: number;
   rating_count: number;
   rating_distribution: RatingDistribution;
+}
+
+// Separate component to avoid hook rules violation (it's in a conditional render context)
+function MatchStatCard({
+  userId,
+  renderStatCard,
+}: {
+  userId: string;
+  renderStatCard: (icon: React.ReactElement, value: number | string, label: string, href?: string) => React.ReactNode;
+}) {
+  const t = useTranslations('profile.index.stats');
+  const { matchCount } = useMatchStats(userId);
+  return (
+    <>
+      {renderStatCard(
+        <ArrowLeftRight className="h-6 w-6 mx-auto mb-2 text-gold" />,
+        matchCount,
+        t('activeMatches'),
+        '/intercambios/buscar'
+      )}
+    </>
+  );
 }
 
 export default function UserProfilePage() {
@@ -750,7 +773,7 @@ export default function UserProfilePage() {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
                     {renderStatCard(
                       <Package className="h-6 w-6 mx-auto mb-2 text-gold" />,
                       statusCounts.active,
@@ -789,6 +812,8 @@ export default function UserProfilePage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">{t('ratings.title')}</p>
                       </div>
                     </a>
+
+                    <MatchStatCard userId={userId} renderStatCard={renderStatCard} />
                   </div>
 
                   {/* BADGES SUBSECTION */}

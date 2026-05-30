@@ -96,7 +96,8 @@
         "transactions": "Trocas Concluídas",
         "transactionsDesc": "Trocas com sucesso",
         "rating": "Avaliação da Comunidade",
-        "ratingDesc": "Com base em {count} avaliações"
+        "ratingDesc": "Com base em {count} avaliações",
+        "activeMatches": "Matches ativos"
       },
       "nickname": {
         "editLabel": "Mudar Nickname",
@@ -385,7 +386,7 @@
       "youHave": "Você tem {count} que faltam a ele",
       "distance": "Distância",
       "viewInFinder": "Ver no buscador",
-      "proposeTrade": "Propor troca formal →"
+      "viewProfile": "Ver perfil"
     },
     "systemMsg": {
       "matchStarted": "⚡ Match em {collection}! {user} quer trocar figurinhas"
@@ -1102,7 +1103,7 @@
     "myAlbums": "Meus Álbuns",
     "chats": "Chats",
     "favorites": "Favoritos",
-    "trades": "Trocas",
+    "trades": "Matches",
     "login": "Iniciar Sessão",
     "signup": "Criar Conta",
     "completeProfile": "Complete seu perfil para acessar esta seção",
@@ -2185,6 +2186,8 @@
       "rarityLegendary": "Lendária",
       "availableTrade": "Troca disponível",
       "theyOffer": "Eles oferecem",
+      "theyOfferShort": "te faltam",
+      "youOfferShort": "lhe faltam",
       "youOffer": "Você pode oferecer",
       "mutualTrades": "{count} trocas mútuas",
       "proposeCtaShort": "Propor troca",
@@ -2225,6 +2228,14 @@
       },
       "metaTitle": "Buscar Trocas | CambioCromos",
       "metaDesc": "Encontre colecionadores com quem você possa trocar figurinhas. Filtre por coleção, raridade, equipe e distância.",
+      "noMatchesRadius": "Nenhum match encontrado neste raio",
+      "increaseRadius": "Quer ampliar a busca?",
+      "increaseRadiusBtn": "Ampliar raio",
+      "noMatchesAtAll": "Nenhuma coincidência encontrada para esta coleção",
+      "noMatchesSuggestion": "Tente outra coleção ou explore novas",
+      "exploreCollections": "Explorar coleções",
+      "addFavorite": "Favorito",
+      "viewProfile": "Ver perfil",
       "swipe": {
         "matchIn": "⚡ Match em {collection}!",
         "theyHave": "Tem {count} figurinhas que te faltam",

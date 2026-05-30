@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 interface TradeMatch {
   match_user_id: string;
   nickname: string | null;
+  avatar_url?: string | null;
   overlap_from_them_to_me: number;
   overlap_from_me_to_them: number;
   total_mutual_overlap: number;

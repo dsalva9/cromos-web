@@ -1,6 +1,6 @@
 'use client';
 
-import { X, MapPin, ArrowRight } from 'lucide-react';
+import { X, MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
@@ -121,14 +121,14 @@ export function MatchInfoModal({
             </Button>
           </Link>
 
-          {templateId && otherUserId && (
+          {otherUserId && (
             <Link
-              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}${conversationId ? `&conversation=${conversationId}` : ''}`}
+              href={`/users/${otherUserId}`}
               className="block"
             >
               <Button className="w-full bg-gold hover:bg-yellow-400 text-black font-bold text-sm">
-                {t('proposeTrade')}
-                <ArrowRight className="w-4 h-4 ml-1" />
+                {t('viewProfile')}
+                <ExternalLink className="w-4 h-4 ml-1" />
               </Button>
             </Link>
           )}

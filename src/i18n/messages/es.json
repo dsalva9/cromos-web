@@ -10,7 +10,7 @@
     "myAlbums": "Mis Álbumes",
     "chats": "Chats",
     "favorites": "Favoritos",
-    "trades": "Intercambios",
+    "trades": "Matches",
     "login": "Iniciar Sesión",
     "signup": "Crear Cuenta",
     "completeProfile": "Completa tu perfil para acceder a esta sección",
@@ -120,7 +120,8 @@
         "transactions": "Intercambios Completados",
         "transactionsDesc": "Tratos exitosos",
         "rating": "Valoración de la Comunidad",
-        "ratingDesc": "Basado en {count} reseñas"
+        "ratingDesc": "Basado en {count} reseñas",
+        "activeMatches": "Matches activos"
       },
       "nickname": {
         "editLabel": "Cambiar Nickname",
@@ -409,7 +410,7 @@
       "youHave": "Tú tienes {count} que le faltan",
       "distance": "Distancia",
       "viewInFinder": "Ver en buscador",
-      "proposeTrade": "Proponer intercambio formal →"
+      "viewProfile": "Ver perfil"
     },
     "systemMsg": {
       "matchStarted": "⚡ ¡Match en {collection}! {user} quiere intercambiar cromos"
@@ -2185,6 +2186,8 @@
       "rarityLegendary": "Legendaria",
       "availableTrade": "Intercambio disponible",
       "theyOffer": "Te ofrecen",
+      "theyOfferShort": "te faltan",
+      "youOfferShort": "le faltan",
       "youOffer": "Puedes ofrecer",
       "mutualTrades": "{count} intercambios mutuos",
       "proposeCtaShort": "Proponer intercambio",
@@ -2225,6 +2228,14 @@
       },
       "metaTitle": "Buscar Intercambios | CambioCromos",
       "metaDesc": "Encuentra coleccionistas con los que puedas intercambiar cromos. Filtra por colección, rareza, equipo y distancia.",
+      "noMatchesRadius": "No hay matches en este radio",
+      "increaseRadius": "¿Quieres ampliar la búsqueda?",
+      "increaseRadiusBtn": "Ampliar radio",
+      "noMatchesAtAll": "No encontramos coincidencias para esta colección",
+      "noMatchesSuggestion": "Prueba con otra colección o explora nuevas",
+      "exploreCollections": "Explorar colecciones",
+      "addFavorite": "Favorito",
+      "viewProfile": "Ver perfil",
       "swipe": {
         "matchIn": "⚡ ¡Match en {collection}!",
         "theyHave": "Tiene {count} cromos que te faltan",

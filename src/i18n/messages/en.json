@@ -96,7 +96,8 @@
         "transactions": "Completed Trades",
         "transactionsDesc": "Successful trades",
         "rating": "Community Rating",
-        "ratingDesc": "Based on {count} reviews"
+        "ratingDesc": "Based on {count} reviews",
+        "activeMatches": "Active matches"
       },
       "nickname": {
         "editLabel": "Change Nickname",
@@ -385,7 +386,7 @@
       "youHave": "You have {count} they need",
       "distance": "Distance",
       "viewInFinder": "View in finder",
-      "proposeTrade": "Propose formal trade →"
+      "viewProfile": "View profile"
     },
     "systemMsg": {
       "matchStarted": "⚡ Match in {collection}! {user} wants to trade stickers"
@@ -1102,7 +1103,7 @@
     "myAlbums": "My Albums",
     "chats": "Chats",
     "favorites": "Favorites",
-    "trades": "Trades",
+    "trades": "Matches",
     "login": "Log In",
     "signup": "Sign Up",
     "completeProfile": "Complete your profile to access this section",
@@ -2188,6 +2189,8 @@
       "rarityLegendary": "Legendary",
       "availableTrade": "Trade available",
       "theyOffer": "They offer",
+      "theyOfferShort": "they have",
+      "youOfferShort": "you have",
       "youOffer": "You can offer",
       "mutualTrades": "{count} mutual trades",
       "proposeCtaShort": "Propose trade",
@@ -2228,6 +2231,14 @@
       },
       "metaTitle": "Find Trades | CambioCromos",
       "metaDesc": "Find collectors you can trade stickers with. Filter by collection, rarity, team, and distance.",
+      "noMatchesRadius": "No matches found within this radius",
+      "increaseRadius": "Want to expand your search?",
+      "increaseRadiusBtn": "Expand radius",
+      "noMatchesAtAll": "No matches found for this collection",
+      "noMatchesSuggestion": "Try another collection or explore new ones",
+      "exploreCollections": "Explore collections",
+      "addFavorite": "Favorite",
+      "viewProfile": "View profile",
       "swipe": {
         "matchIn": "⚡ Match in {collection}!",
         "theyHave": "Has {count} stickers you need",

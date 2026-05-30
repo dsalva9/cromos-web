@@ -116,13 +116,13 @@ export function MobileBottomNav() {
           </a>
 
           <a
-            href="/intercambios"
-            onClick={(e) => { e.preventDefault(); handleNavClick('/intercambios'); }}
+            href="/intercambios/buscar"
+            onClick={(e) => { e.preventDefault(); handleNavClick('/intercambios/buscar'); }}
             className={cn(
               "flex items-center justify-center w-full h-full relative",
               isActive('/intercambios') ? "text-gold" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             )}
-            aria-label="Intercambios"
+            aria-label="Matches"
           >
             <ArrowLeftRight className="h-6 w-6" />
             {totalUnread > 0 && (

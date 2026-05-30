@@ -499,13 +499,72 @@ function MatchFinderContent() {
                   onPropose={handlePropose}
                 />
               ) : (
-                <EmptyState
-                  icon={ArrowRightLeft}
-                  title={t('noResults')}
-                  description={t('noResultsDesc')}
-                  actionLabel={t('addCollectionCta')}
-                  actionHref="/marketplace"
-                />
+                /* Smart empty state — context-aware based on radius */
+                swiper.radiusKm !== null ? (
+                  // Radius filter is active — suggest expanding
+                  <div className="w-full max-w-md mx-auto">
+                    <div className="bg-white dark:bg-gray-800 border-2 border-black rounded-xl shadow-2xl overflow-hidden">
+                      <div className="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400 p-5 border-b-2 border-black">
+                        <div className="flex justify-center mb-3">
+                          <div className="w-14 h-14 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-lg">
+                            <MapPin className="w-7 h-7 text-orange-500" />
+                          </div>
+                        </div>
+                        <h2 className="text-lg font-black uppercase text-gray-900 text-center">
+                          {t('noMatchesRadius')}
+                        </h2>
+                      </div>
+                      <div className="p-5 space-y-3">
+                        <p className="text-center text-gray-600 dark:text-gray-400 font-medium text-sm">
+                          {t('increaseRadius')}
+                        </p>
+                        <Button
+                          onClick={() => {
+                            // Jump to next tier
+                            const currentTierIdx = swiper.radiusTierIndex;
+                            if (currentTierIdx < RADIUS_TIERS.length - 1) {
+                              swiper.setRadiusTier(currentTierIdx + 1);
+                            }
+                          }}
+                          className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase py-4 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                          size="lg"
+                        >
+                          <MapPin className="w-5 h-5 mr-2" />
+                          {t('increaseRadiusBtn')}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Unlimited radius — no matches at all
+                  <div className="w-full max-w-md mx-auto">
+                    <div className="bg-white dark:bg-gray-800 border-2 border-black rounded-xl shadow-2xl overflow-hidden">
+                      <div className="bg-gradient-to-r from-gray-400 via-gray-500 to-gray-400 p-5 border-b-2 border-black">
+                        <div className="flex justify-center mb-3">
+                          <div className="w-14 h-14 bg-white border-2 border-black rounded-full flex items-center justify-center shadow-lg">
+                            <ArrowRightLeft className="w-7 h-7 text-gray-500" />
+                          </div>
+                        </div>
+                        <h2 className="text-lg font-black uppercase text-white text-center">
+                          {t('noMatchesAtAll')}
+                        </h2>
+                      </div>
+                      <div className="p-5 space-y-3">
+                        <p className="text-center text-gray-600 dark:text-gray-400 font-medium text-sm">
+                          {t('noMatchesSuggestion')}
+                        </p>
+                        <Button
+                          onClick={() => window.location.href = '/templates'}
+                          className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase py-4 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+                          size="lg"
+                        >
+                          <Sparkles className="w-5 h-5 mr-2" />
+                          {t('exploreCollections')}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )
               )}
             </>
           ) : (

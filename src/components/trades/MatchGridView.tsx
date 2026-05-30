@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MapPin, ArrowRightLeft, Loader2, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { MatchCard } from '@/components/trades/MatchCard';
-import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 import type { TradeMatch } from '@/hooks/trades/useMatchSwiper';
+import Link from '@/components/ui/link';
 
 // ------------------------------------------------------------------
 // Distance bucket helper
@@ -45,8 +44,6 @@ export function MatchGridView({
   onLoadMore,
 }: MatchGridViewProps) {
   const t = useTranslations('trades.finder');
-  const [selectedMatch, setSelectedMatch] = useState<TradeMatch | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   if (loading && matches.length === 0) {
     return (
@@ -85,19 +82,16 @@ export function MatchGridView({
           const isHighOverlap = match.total_mutual_overlap >= 10;
 
           return (
-            <div
+            <Link
               key={match.match_user_id}
+              href={`/users/${match.match_user_id}`}
               className={`
-                group relative transition-all duration-200 cursor-pointer
+                group relative transition-all duration-200
                 hover:-translate-y-1 hover:shadow-2xl
-                rounded-md
+                rounded-md block
                 ${isTopMatch ? 'ring-2 ring-gold ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900' : ''}
                 ${isHighOverlap && !isTopMatch ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-gray-50 dark:ring-offset-gray-900' : ''}
               `}
-              onClick={() => {
-                setSelectedMatch(match);
-                setDrawerOpen(true);
-              }}
             >
               {/* Top Match badge */}
               {isTopMatch && (
@@ -121,7 +115,7 @@ export function MatchGridView({
               <div className="pointer-events-none">
                 <MatchCard match={match} collectionId={collectionId} />
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
@@ -146,14 +140,6 @@ export function MatchGridView({
           </Button>
         </div>
       )}
-
-      {/* Detail Drawer */}
-      <MatchDetailDrawer
-        match={selectedMatch}
-        collectionId={collectionId}
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-      />
     </>
   );
 }

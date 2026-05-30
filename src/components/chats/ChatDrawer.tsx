@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, Info, ArrowLeft, ArrowRight, MoreVertical, Flag, Ban } from 'lucide-react';
+import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
@@ -100,28 +100,29 @@ export function ChatDrawer({
 
   return (
     <>
-      {/* Overlay — desktop only (sidebar-style on desktop) */}
+      {/* Overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm sm:bg-black/20"
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Drawer panel */}
+      {/* Panel: fullscreen mobile, centered modal desktop */}
       <div
         className={cn(
           'fixed z-50 flex flex-col bg-white dark:bg-gray-900',
           // Mobile: full screen
           'inset-0',
-          // Desktop: right side drawer
-          'sm:inset-y-0 sm:left-auto sm:right-0 sm:w-[420px] sm:border-l sm:border-gray-200 sm:dark:border-gray-700 sm:shadow-2xl'
+          // Desktop: centered modal
+          'sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
+          'sm:w-[500px] sm:h-[600px] sm:max-h-[80vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl'
         )}
       >
         {/* ---- Header ---- */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-          {/* Back button (mobile) */}
+          {/* Back button (mobile) / Close button */}
           <button
             onClick={onClose}
-            className="sm:hidden text-gray-500 hover:text-gray-900 dark:hover:text-white"
+            className="text-gray-500 hover:text-gray-900 dark:hover:text-white sm:hidden"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -138,11 +139,17 @@ export function ChatDrawer({
             )}
           </div>
 
-          {/* Name + collection */}
+          {/* Name + collection — name links to profile */}
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
-              {otherNickname}
-            </p>
+            {otherUserId ? (
+              <Link href={`/users/${otherUserId}`} className="font-bold text-gray-900 dark:text-white truncate text-sm block hover:text-gold transition-colors">
+                {otherNickname}
+              </Link>
+            ) : (
+              <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                {otherNickname}
+              </p>
+            )}
             {collectionTitle && (
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {collectionTitle}
@@ -211,7 +218,7 @@ export function ChatDrawer({
           {/* Close button (desktop) */}
           <button
             onClick={onClose}
-            className="hidden sm:block text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+            className="hidden sm:flex text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <X className="w-5 h-5" />
           </button>
@@ -261,18 +268,7 @@ export function ChatDrawer({
           )}
         </div>
 
-        {/* ---- Propose trade bar ---- */}
-        {templateId && otherUserId && (
-          <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
-            <Link
-              href={`/intercambios/componer?partner=${otherUserId}&template=${templateId}&conversation=${conversationId}`}
-              className="flex items-center justify-center gap-2 text-xs font-bold text-gold hover:text-yellow-500 transition-colors py-1"
-            >
-              {t('proposeTrade')}
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        )}
+
 
         {/* ---- Composer ---- */}
         <ChatComposer
