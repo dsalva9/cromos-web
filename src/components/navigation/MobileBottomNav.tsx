@@ -126,7 +126,7 @@ export function MobileBottomNav() {
           >
             <ArrowLeftRight className="h-6 w-6" />
             {totalUnread === 0 && (
-              <span className="absolute -top-0.5 right-[18%] px-1 py-[1px] rounded text-[7px] font-black uppercase bg-red-500 text-white leading-none">
+              <span className="absolute top-0.5 right-[18%] px-1 py-[1px] rounded text-[7px] font-black uppercase bg-red-500 text-white leading-none">
                 NEW
               </span>
             )}
