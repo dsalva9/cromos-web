@@ -94,12 +94,14 @@ export function MatchCarouselPeek({ matches, currentIndex, children }: MatchCaro
   const nextMatch = currentIndex < matches.length - 1 ? matches[currentIndex + 1] : null;
 
   return (
-    <div className="relative hidden md:block">
-      {/* Peek cards — absolutely positioned, hidden on mobile */}
-      {prevMatch && <PeekCard match={prevMatch} side="left" />}
-      {nextMatch && <PeekCard match={nextMatch} side="right" />}
+    <div className="relative">
+      {/* Peek cards — absolutely positioned, desktop only */}
+      <div className="hidden md:block">
+        {prevMatch && <PeekCard match={prevMatch} side="left" />}
+        {nextMatch && <PeekCard match={nextMatch} side="right" />}
+      </div>
 
-      {/* Active card (MatchSpotlight) */}
+      {/* Active card (MatchSpotlight) — always visible */}
       {children}
     </div>
   );
