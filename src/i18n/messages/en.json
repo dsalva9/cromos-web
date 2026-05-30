@@ -2219,7 +2219,10 @@
       "distAbout10": "~10 km",
       "distAbout20": "~20 km",
       "distAbout50": "~50 km",
-      "distOver50": "> 50 km",
+      "distAbout100": "~100 km",
+      "distAbout200": "~200 km",
+      "distAbout500": "~500 km",
+      "distOver500": "> 500 km",
       "noPostcode": "Add your postcode in settings to see distance",
       "tipHowTo": {
         "title": "How does it work?",

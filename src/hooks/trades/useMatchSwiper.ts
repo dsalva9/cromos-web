@@ -97,11 +97,13 @@ export interface UseMatchSwiperReturn {
   loading: boolean;
   // For grid mode
   allMatches: TradeMatch[];
+  // For carousel peek
+  unseenMatches: TradeMatch[];
   hasMore: boolean;
 
   // Actions
   pass: () => void;
-  propose: () => { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null } | null;
+  propose: () => { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null; avatarUrl: string | null } | null;
   resetSeen: () => void;
   setCollection: (id: number) => void;
   setFilters: (f: Partial<MatchSwiperFilters>) => void;
@@ -257,7 +259,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     }
   }, [currentMatch, currentIndex, unseenMatches, rawMatches, seenIds, markSeen]);
 
-  const propose = useCallback((): { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null } | null => {
+  const propose = useCallback((): { userId: string; collectionId: number; templateId: number | null; nickname: string; distanceKm: number | null; avatarUrl: string | null } | null => {
     if (!currentMatch || !selectedCopyId) return null;
     markSeen(currentMatch.match_user_id);
 
@@ -267,6 +269,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
       templateId: selectedTemplateId,
       nickname: currentMatch.nickname || 'Usuario',
       distanceKm: currentMatch.distance_km,
+      avatarUrl: currentMatch.avatar_url ?? null,
     };
 
     // Advance to next after returning
@@ -365,6 +368,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     error,
     loading,
     allMatches: rawMatches,
+    unseenMatches,
     hasMore,
 
     pass,

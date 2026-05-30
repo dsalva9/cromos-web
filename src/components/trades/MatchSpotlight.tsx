@@ -28,7 +28,10 @@ function formatDistance(km: number | null, t: (key: string) => string): string |
   if (km < 15) return t('distAbout10');
   if (km < 35) return t('distAbout20');
   if (km < 75) return t('distAbout50');
-  return t('distOver50');
+  if (km < 150) return t('distAbout100');
+  if (km < 350) return t('distAbout200');
+  if (km < 750) return t('distAbout500');
+  return t('distOver500');
 }
 
 // ------------------------------------------------------------------
@@ -174,7 +177,7 @@ export function MatchSpotlight({
   const proposeOpacity = Math.max(0, Math.min(1, dragX / SWIPE_THRESHOLD));
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="relative w-full max-w-md sm:max-w-lg mx-auto">
       {/* Counter + Radius */}
       <div className="flex items-center justify-between mb-3 px-1">
         <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-black font-bold text-xs">
@@ -222,33 +225,35 @@ export function MatchSpotlight({
           </span>
         </div>
 
-        {/* Card body — COMPACT */}
+        {/* Card body — responsive: compact mobile, spacious desktop */}
         <div className="bg-white dark:bg-gray-800 border-2 border-black rounded-xl shadow-2xl overflow-hidden">
-          {/* Gold header — compact */}
-          <div className="bg-gradient-to-r from-gold via-yellow-400 to-gold px-4 py-2.5 border-b-2 border-black">
-            <p className="text-xs font-black uppercase text-gray-900/70 text-center">
+          {/* Gold header */}
+          <div className="bg-gradient-to-r from-gold via-yellow-400 to-gold px-4 py-2.5 sm:py-3.5 border-b-2 border-black">
+            <p className="text-xs sm:text-sm font-black uppercase text-gray-900/70 text-center">
               ⚡ {ts('matchIn', { collection: collectionTitle })}
             </p>
           </div>
 
-          {/* User info — horizontal layout */}
-          <div className="px-4 pt-4 pb-3">
-            <div className="flex items-center gap-3 mb-3">
-              {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+          {/* User info — horizontal layout, responsive sizing */}
+          <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-5">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              {/* Avatar — bigger on desktop */}
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {match.avatar_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={match.avatar_url} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-5 h-5 text-gold" />
+                  <User className="w-5 h-5 sm:w-7 sm:h-7 text-gold" />
                 )}
               </div>
 
-              {/* Name */}
+              {/* Name — links to profile */}
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-black uppercase text-gray-900 dark:text-white truncate leading-tight">
-                  {displayName}
-                </h2>
+                <Link href={`/users/${match.match_user_id}`} className="block">
+                  <h2 className="text-lg sm:text-xl font-black uppercase text-gray-900 dark:text-white truncate leading-tight hover:text-gold transition-colors">
+                    {displayName}
+                  </h2>
+                </Link>
               </div>
 
               {/* Distance badge */}
@@ -260,8 +265,8 @@ export function MatchSpotlight({
               )}
             </div>
 
-            {/* Stats — single inline row */}
-            <div className="flex items-center gap-2 text-sm font-bold mb-3">
+            {/* Stats — single inline row, responsive text */}
+            <div className="flex items-center gap-2 text-sm sm:text-base font-bold mb-3 sm:mb-4">
               <span className="text-green-600 dark:text-green-400">
                 🟢 {match.overlap_from_them_to_me} {t('theyOfferShort')}
               </span>
@@ -272,24 +277,24 @@ export function MatchSpotlight({
             </div>
 
             {/* Quick action buttons — Favorite + View Profile */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={handleToggleFav}
                 disabled={favLoading}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border-2 text-sm font-bold transition-all ${
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-lg border-2 text-sm sm:text-base font-bold transition-all ${
                   isFav
                     ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400'
                     : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-red-300 hover:text-red-500'
                 }`}
               >
-                <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${isFav ? 'fill-current' : ''}`} />
                 {t('addFavorite')}
               </button>
               <Link
                 href={`/users/${match.match_user_id}`}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:border-gold hover:text-gold text-sm font-bold transition-all"
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 sm:py-2.5 rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:border-gold hover:text-gold text-sm sm:text-base font-bold transition-all"
               >
-                <ExternalLink className="w-4 h-4" />
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                 {t('viewProfile')}
               </Link>
             </div>
@@ -305,7 +310,7 @@ export function MatchSpotlight({
                   setExitDirection(null);
                 }, 250);
               }}
-              className="rounded-none rounded-bl-xl bg-gray-100 dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 border-r-2 border-black font-black uppercase text-base py-5 transition-colors"
+              className="rounded-none rounded-bl-xl bg-gray-100 dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 border-r-2 border-black font-black uppercase text-base sm:text-lg py-5 sm:py-6 transition-colors"
               variant="ghost"
               size="lg"
             >
@@ -320,7 +325,7 @@ export function MatchSpotlight({
                   setExitDirection(null);
                 }, 250);
               }}
-              className="rounded-none rounded-br-xl bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase text-base py-5 transition-colors"
+              className="rounded-none rounded-br-xl bg-gold hover:bg-yellow-400 text-gray-900 font-black uppercase text-base sm:text-lg py-5 sm:py-6 transition-colors"
               variant="ghost"
               size="lg"
             >

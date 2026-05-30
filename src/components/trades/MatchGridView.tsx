@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { MapPin, ArrowRightLeft, Loader2, TrendingUp } from 'lucide-react';
+import { ArrowRightLeft, Loader2, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -20,7 +20,10 @@ function formatDistance(km: number | null, t: (key: string) => string): string |
   if (km < 15) return t('distAbout10');
   if (km < 35) return t('distAbout20');
   if (km < 75) return t('distAbout50');
-  return t('distOver50');
+  if (km < 150) return t('distAbout100');
+  if (km < 350) return t('distAbout200');
+  if (km < 750) return t('distAbout500');
+  return t('distOver500');
 }
 
 // ------------------------------------------------------------------
@@ -75,8 +78,8 @@ export function MatchGridView({
         </div>
       )}
 
-      {/* Cards grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      {/* Cards grid — 1 col mobile, 2 tablet, 3 desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
         {matches.map((match, index) => {
           const isTopMatch = index === 0 && matches.length > 1;
           const isHighOverlap = match.total_mutual_overlap >= 10;
@@ -102,18 +105,8 @@ export function MatchGridView({
                 </div>
               )}
 
-              {/* Distance badge */}
-              {match.distance_km != null && (
-                <div className="absolute -top-3 right-4 z-10">
-                  <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold text-[10px] px-2 py-0.5 shadow">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    {formatDistance(match.distance_km, t)}
-                  </Badge>
-                </div>
-              )}
-
               <div className="pointer-events-none">
-                <MatchCard match={match} collectionId={collectionId} />
+                <MatchCard match={match} collectionId={collectionId} rank={index} />
               </div>
             </Link>
           );

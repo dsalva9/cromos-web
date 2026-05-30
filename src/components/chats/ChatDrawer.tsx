@@ -119,12 +119,13 @@ export function ChatDrawer({
       >
         {/* ---- Header ---- */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
-          {/* Back button (mobile) / Close button */}
+          {/* Back button (mobile) */}
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-900 dark:hover:text-white sm:hidden"
+            className="flex items-center gap-1 text-gold hover:text-yellow-600 font-bold text-sm sm:hidden"
           >
             <ArrowLeft className="w-5 h-5" />
+            <span>Volver</span>
           </button>
 
           {/* Avatar */}

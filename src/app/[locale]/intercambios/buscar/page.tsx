@@ -24,6 +24,7 @@ import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { MatchSpotlight } from '@/components/trades/MatchSpotlight';
+import { MatchCarouselPeek } from '@/components/trades/MatchCarouselPeek';
 import { MatchGridView } from '@/components/trades/MatchGridView';
 import { ExhaustedCard } from '@/components/trades/RadiusExpansionCard';
 import { useMatchSwiper, RADIUS_TIERS } from '@/hooks/trades/useMatchSwiper';
@@ -118,6 +119,7 @@ function MatchFinderContent() {
     collectionTitle: string | null;
     templateId: number | null;
     otherUserId: string;
+    avatarUrl?: string | null;
     theyHaveCount?: number;
     youHaveCount?: number;
     distanceKm?: number | null;
@@ -159,6 +161,7 @@ function MatchFinderContent() {
       templateId: result.templateId,
       otherUserId: result.userId,
       distanceKm: result.distanceKm,
+      avatarUrl: result.avatarUrl,
     });
     setChatDrawerOpen(true);
   }, [swiper, supabase, selectedCollection]);
@@ -488,16 +491,21 @@ function MatchFinderContent() {
                   onChangeCollection={handleCollectionChange}
                 />
               ) : swiper.currentMatch && swiper.selectedTemplateId ? (
-                <MatchSpotlight
-                  match={swiper.currentMatch}
-                  collectionTitle={swiper.selectedCollectionTitle || ''}
-                  collectionId={swiper.selectedTemplateId}
+                <MatchCarouselPeek
+                  matches={swiper.unseenMatches}
                   currentIndex={swiper.currentIndex}
-                  totalMatches={swiper.totalMatches}
-                  radiusKm={swiper.radiusKm}
-                  onPass={swiper.pass}
-                  onPropose={handlePropose}
-                />
+                >
+                  <MatchSpotlight
+                    match={swiper.currentMatch}
+                    collectionTitle={swiper.selectedCollectionTitle || ''}
+                    collectionId={swiper.selectedTemplateId}
+                    currentIndex={swiper.currentIndex}
+                    totalMatches={swiper.totalMatches}
+                    radiusKm={swiper.radiusKm}
+                    onPass={swiper.pass}
+                    onPropose={handlePropose}
+                  />
+                </MatchCarouselPeek>
               ) : (
                 /* Smart empty state — context-aware based on radius */
                 swiper.radiusKm !== null ? (
@@ -593,6 +601,7 @@ function MatchFinderContent() {
         }}
         conversationId={chatDrawerData?.conversationId ?? null}
         otherNickname={chatDrawerData?.otherNickname ?? ''}
+        otherAvatarUrl={chatDrawerData?.avatarUrl}
         collectionTitle={chatDrawerData?.collectionTitle}
         templateId={chatDrawerData?.templateId}
         otherUserId={chatDrawerData?.otherUserId}

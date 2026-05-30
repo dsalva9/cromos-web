@@ -2216,7 +2216,10 @@
       "distAbout10": "~10 km",
       "distAbout20": "~20 km",
       "distAbout50": "~50 km",
-      "distOver50": "> 50 km",
+      "distAbout100": "~100 km",
+      "distAbout200": "~200 km",
+      "distAbout500": "~500 km",
+      "distOver500": "> 500 km",
       "noPostcode": "Adicione seu CEP nas configurações para ver a distância",
       "tipHowTo": {
         "title": "Como funciona?",
