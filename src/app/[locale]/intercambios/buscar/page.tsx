@@ -486,7 +486,7 @@ function MatchFinderContent() {
         )}
 
         {/* ===== Main Content Area ===== */}
-        <div className="flex items-center justify-center overflow-hidden" style={{ minHeight: 'calc(100vh - 280px)' }}>
+        <div className="flex items-start md:items-center justify-center overflow-hidden pt-4 md:pt-0" style={{ minHeight: 'calc(100vh - 280px)' }}>
           {viewMode === 'spotlight' ? (
             // ---- SPOTLIGHT MODE ----
             <>

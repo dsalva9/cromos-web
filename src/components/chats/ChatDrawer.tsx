@@ -102,14 +102,14 @@ export function ChatDrawer({
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Panel: fullscreen mobile, centered modal desktop */}
       <div
         className={cn(
-          'fixed z-50 flex flex-col bg-white dark:bg-gray-900',
+          'fixed z-[110] flex flex-col bg-white dark:bg-gray-900',
           // Mobile: full screen
           'inset-0',
           // Desktop: centered modal

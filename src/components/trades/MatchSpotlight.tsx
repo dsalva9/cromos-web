@@ -177,7 +177,7 @@ export function MatchSpotlight({
   const proposeOpacity = Math.max(0, Math.min(1, dragX / SWIPE_THRESHOLD));
 
   return (
-    <div className="relative w-full max-w-md sm:max-w-lg mx-auto">
+    <div className="relative w-full sm:max-w-lg mx-auto px-2 sm:px-0">
       {/* Counter + Radius */}
       <div className="flex items-center justify-between mb-3 px-1">
         <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-black font-bold text-xs">
