@@ -827,7 +827,7 @@ export default function UserProfilePage() {
       </div>
 
       {/* Trade Match Section — shows overlap with this user */}
-      <UserTradeMatchSection userId={userId} nickname={profile?.nickname} />
+      <UserTradeMatchSection userId={userId} nickname={profile?.nickname} avatarUrl={displayAvatarUrl} />
 
       {/* Active Listings Section */}
       {(isOwnProfile || statusCounts.active > 0) && (
