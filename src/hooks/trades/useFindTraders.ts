@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { logger } from '@/lib/logger';
 
 interface TradeMatch {
@@ -87,7 +88,10 @@ export function useFindTraders() {
           throw new Error('Error al buscar intercambios disponibles');
         }
 
-        const results = data || [];
+        const results: TradeMatch[] = (data || []).map((m: TradeMatch) => ({
+          ...m,
+          avatar_url: resolveAvatarUrl(m.avatar_url, supabase),
+        }));
 
         // Update state
         if (offset === 0) {
