@@ -177,21 +177,21 @@ export function MatchSpotlight({
   const proposeOpacity = Math.max(0, Math.min(1, dragX / SWIPE_THRESHOLD));
 
   return (
-    <div className="relative w-full sm:max-w-lg mx-auto px-2 sm:px-0">
+    <div className="relative w-full sm:max-w-lg mx-auto px-2 sm:px-0 overflow-hidden">
       {/* Counter + Radius */}
-      <div className="flex items-center justify-between mb-3 px-1">
-        <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-black font-bold text-xs">
+      <div className="flex items-center justify-between mb-3 px-1 gap-2">
+        <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-black font-bold text-xs flex-shrink-0">
           {ts('counter', { current: currentIndex + 1, total: totalMatches })}
         </Badge>
         {radiusKm != null ? (
-          <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold text-xs">
-            <MapPin className="w-3 h-3 mr-1" />
-            {ts('radiusBadge', { km: radiusKm })}
+          <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold text-xs truncate min-w-0">
+            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="truncate">{ts('radiusBadge', { km: radiusKm })}</span>
           </Badge>
         ) : (
-          <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold text-xs">
-            <MapPin className="w-3 h-3 mr-1" />
-            {ts('radiusUnlimited')}
+          <Badge variant="secondary" className="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold text-xs truncate min-w-0">
+            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="truncate">{ts('radiusUnlimited')}</span>
           </Badge>
         )}
       </div>
