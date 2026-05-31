@@ -118,7 +118,10 @@ export function ChatDrawer({
         )}
       >
         {/* ---- Header ---- */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
+        <div
+          className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0"
+          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+        >
           {/* Back button (mobile) */}
           <button
             onClick={onClose}
@@ -272,12 +275,14 @@ export function ChatDrawer({
 
 
         {/* ---- Composer ---- */}
-        <ChatComposer
-          onSend={sendMessage}
-          sending={sending}
-          uploading={uploading}
-          disabled={!conversationId}
-        />
+        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <ChatComposer
+            onSend={sendMessage}
+            sending={sending}
+            uploading={uploading}
+            disabled={!conversationId}
+          />
+        </div>
       </div>
 
       {/* ---- Info modal ---- */}
