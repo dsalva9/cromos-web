@@ -386,7 +386,10 @@
       "youHave": "Você tem {count} que faltam a ele",
       "distance": "Distância",
       "viewInFinder": "Ver no buscador",
-      "viewProfile": "Ver perfil"
+      "viewProfile": "Ver perfil",
+      "viewDetail": "Ver detalhe dos cromos",
+      "theyHaveShort": "Te faltam",
+      "youHaveShort": "Lhes faltam"
     },
     "systemMsg": {
       "matchStarted": "⚡ Match em {collection}! {user} quer trocar figurinhas"

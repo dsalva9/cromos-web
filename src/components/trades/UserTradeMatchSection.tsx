@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Zap, ArrowLeftRight } from 'lucide-react';
+import { Zap, ArrowLeftRight, ChevronRight } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
+import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 import { toast } from '@/lib/toast';
 
 interface CollectionOverlap {
@@ -46,6 +47,10 @@ export function UserTradeMatchSection({ userId, nickname, avatarUrl }: UserTrade
     youHaveCount: number;
   } | null>(null);
   const [proposing, setProposing] = useState(false);
+
+  // Detail drawer state — for viewing sticker-level overlap
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailOverlap, setDetailOverlap] = useState<CollectionOverlap | null>(null);
 
   useEffect(() => {
     if (!user || user.id === userId) {
@@ -165,16 +170,24 @@ export function UserTradeMatchSection({ userId, nickname, avatarUrl }: UserTrade
             </h3>
           </div>
 
-          {/* Collection rows */}
+          {/* Collection rows — clickable to see sticker detail */}
           <div className="space-y-3 mb-4">
             {overlaps.map((overlap) => (
-              <div
+              <button
                 key={overlap.collectionId}
-                className="rounded-xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 p-3"
+                type="button"
+                onClick={() => {
+                  setDetailOverlap(overlap);
+                  setDetailOpen(true);
+                }}
+                className="w-full text-left rounded-xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 p-3 hover:border-gold/50 hover:bg-gold/5 transition-all cursor-pointer group"
               >
-                <p className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-2">
-                  {overlap.collectionName}
-                </p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">
+                    {overlap.collectionName}
+                  </p>
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-gold transition-colors" />
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="text-center">
                     <p className="text-xl font-black text-gold">{overlap.theyHaveForYou}</p>
@@ -189,7 +202,7 @@ export function UserTradeMatchSection({ userId, nickname, avatarUrl }: UserTrade
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -228,6 +241,28 @@ export function UserTradeMatchSection({ userId, nickname, avatarUrl }: UserTrade
           otherUserId={userId}
           theyHaveCount={chatData.theyHaveCount}
           youHaveCount={chatData.youHaveCount}
+        />
+      )}
+
+      {/* Sticker detail drawer — opened from collection row tap */}
+      {detailOverlap && (
+        <MatchDetailDrawer
+          match={{
+            match_user_id: userId,
+            nickname: nickname || 'Usuario',
+            overlap_from_them_to_me: detailOverlap.theyHaveForYou,
+            overlap_from_me_to_them: detailOverlap.youHaveForThem,
+            total_mutual_overlap: detailOverlap.totalOverlap,
+            distance_km: null,
+            postcode: null,
+            score: null,
+          }}
+          collectionId={detailOverlap.collectionId}
+          open={detailOpen}
+          onOpenChange={(open) => {
+            setDetailOpen(open);
+            if (!open) setDetailOverlap(null);
+          }}
         />
       )}
     </>

@@ -386,7 +386,10 @@
       "youHave": "You have {count} they need",
       "distance": "Distance",
       "viewInFinder": "View in finder",
-      "viewProfile": "View profile"
+      "viewProfile": "View profile",
+      "viewDetail": "View sticker detail",
+      "theyHaveShort": "They have",
+      "youHaveShort": "You have"
     },
     "systemMsg": {
       "matchStarted": "⚡ Match in {collection}! {user} wants to trade stickers"

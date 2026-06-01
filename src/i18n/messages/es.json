@@ -410,7 +410,10 @@
       "youHave": "Tú tienes {count} que le faltan",
       "distance": "Distancia",
       "viewInFinder": "Ver en buscador",
-      "viewProfile": "Ver perfil"
+      "viewProfile": "Ver perfil",
+      "viewDetail": "Ver detalle de cromos",
+      "theyHaveShort": "Te faltan",
+      "youHaveShort": "Les faltan"
     },
     "systemMsg": {
       "matchStarted": "⚡ ¡Match en {collection}! {user} quiere intercambiar cromos"
