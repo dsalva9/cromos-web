@@ -177,31 +177,13 @@ export const useNotifications = (): UseNotificationsReturn => {
     }
   }, [user, fetchUnreadCount]);
 
-  // Subscribe to notifications changes to keep count in sync
+  // Poll for notification count updates every 30s (replaces realtime subscription).
+  // OneSignal push notifications handle instant user awareness.
   useEffect(() => {
     if (!user) return;
-
-    const channel = supabase
-      .channel('notifications-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          // Refresh unread count whenever notifications change
-          fetchUnreadCount();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, supabase, fetchUnreadCount]);
+    const interval = setInterval(fetchUnreadCount, 30_000);
+    return () => clearInterval(interval);
+  }, [user, fetchUnreadCount]);
 
   return {
     notifications,

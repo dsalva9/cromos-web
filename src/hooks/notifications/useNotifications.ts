@@ -7,9 +7,9 @@
  * Realtime subscriptions trigger cache invalidation.
  */
 
-import { useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
+import { useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { QUERY_KEYS } from '@/lib/queryKeys';
 import type { AppNotification, FormattedNotification } from '@/types/notifications';
@@ -53,7 +53,6 @@ interface UseNotificationsReturn {
 }
 
 export function useNotifications(): UseNotificationsReturn {
-  const supabase = useSupabaseClient();
   const { user } = useUser();
   const queryClient = useQueryClient();
 
@@ -73,6 +72,8 @@ export function useNotifications(): UseNotificationsReturn {
     },
     enabled: !!user,
     staleTime: 30_000, // 30s — notifications should feel fresh
+    refetchInterval: 30_000, // Poll every 30s instead of realtime
+    refetchIntervalInBackground: false, // Don't poll in background tabs
   });
 
   // ── Preferences query ──
@@ -222,42 +223,8 @@ export function useNotifications(): UseNotificationsReturn {
     [user, queryClient]
   );
 
-  // ── Realtime subscription ──
-  useEffect(() => {
-    if (!user) return;
-
-    const channel = supabase
-      .channel(`notifications:${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user.id}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user, supabase, queryClient]);
+  // Notifications use 30s polling via refetchInterval above.
+  // OneSignal push notifications handle instant user awareness.
 
   const loading = isLoading;
   const error = queryError

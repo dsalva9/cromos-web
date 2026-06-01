@@ -6,7 +6,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getUserBadges, getTopUserBadges } from '@/lib/supabase/badges';
-import { createClient } from '@/lib/supabase/client';
 import type { UserBadge } from '@/types/badges';
 import { logger } from '@/lib/logger';
 
@@ -40,34 +39,8 @@ export function useUserBadges(userId: string | undefined) {
     fetchBadges();
   }, [fetchBadges]);
 
-  // Set up real-time subscription for badge updates
-  useEffect(() => {
-    if (!userId) return;
-
-    const supabase = createClient();
-
-    const channel = supabase
-      .channel(`user-badges-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'user_badges',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          logger.debug('New badge earned:', payload);
-          // Refetch badges
-          fetchBadges();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId, fetchBadges]);
+  // Badge awards are rare events. Data is refetched on
+  // component mount — no realtime or polling needed.
 
   return {
     badges,

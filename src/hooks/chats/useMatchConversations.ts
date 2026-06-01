@@ -46,29 +46,12 @@ export function useMatchConversations() {
     void fetchConversations();
   }, [fetchConversations]);
 
-  // Realtime: listen for updates to match_conversations
+  // Poll for conversation updates every 10s (replaces unfiltered realtime subscription)
   useEffect(() => {
     if (!user) return;
-
-    const channel = supabase
-      .channel(`match-conversations-${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'match_conversations',
-        },
-        () => {
-          void fetchConversations();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [supabase, user, fetchConversations]);
+    const interval = setInterval(() => { void fetchConversations(); }, 10_000);
+    return () => clearInterval(interval);
+  }, [user, fetchConversations]);
 
   return {
     conversations,

@@ -6,7 +6,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getBadgeProgress } from '@/lib/supabase/badges';
-import { createClient } from '@/lib/supabase/client';
 import type { BadgeProgress } from '@/types/badges';
 import { logger } from '@/lib/logger';
 
@@ -45,34 +44,8 @@ export function useBadgeProgress(userId: string | undefined) {
     fetchProgress();
   }, [fetchProgress]);
 
-  // Set up real-time subscription for progress updates
-  useEffect(() => {
-    if (!userId) return;
-
-    const supabase = createClient();
-
-    const channel = supabase
-      .channel(`badge-progress-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_badge_progress',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          logger.debug('Badge progress updated:', payload);
-          // Refetch progress
-          fetchProgress();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId, fetchProgress]);
+  // Badge progress updates are rare events. Data is refetched
+  // on component mount — no realtime or polling needed.
 
   return {
     progress,

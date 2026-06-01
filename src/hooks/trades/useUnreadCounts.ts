@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
-import type { RealtimeChannel } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
 export interface UnreadCount {
@@ -33,8 +32,7 @@ export const useUnreadCounts = ({
   const [counts, setCounts] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const channelRef = useRef<RealtimeChannel | null>(null);
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
 
   // Stabilize tradeIds dependency
   const tradeIdsString = tradeIds ? tradeIds.join(',') : '';
@@ -107,93 +105,12 @@ export const useUnreadCounts = ({
     }
   }, [fetchCounts, enabled, user]);
 
-  // Realtime subscription for new messages
+  // Poll for unread count updates every 15s (replaces unfiltered realtime subscription)
   useEffect(() => {
     if (!enabled || !user) return;
-
-    // Clean up existing channel
-    if (channelRef.current) {
-      channelRef.current.unsubscribe();
-      channelRef.current = null;
-    }
-
-    const channel = supabase
-      .channel('unread-counts-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'trade_chats',
-        },
-        async payload => {
-          const newMessage = payload.new as {
-            id: number;
-            trade_id: number;
-            sender_id: string;
-            message: string;
-            created_at: string;
-          };
-
-          // Only update if the message is from the counterparty
-          if (newMessage.sender_id === user.id) {
-            return;
-          }
-
-          // Check if this trade belongs to the current box
-          const { data: proposalData } = await supabase
-            .from('trade_proposals')
-            .select('from_user, to_user')
-            .eq('id', newMessage.trade_id)
-            .single();
-
-          if (!proposalData) return;
-
-          const isInCurrentBox =
-            (box === 'inbox' && proposalData.to_user === user.id) ||
-            (box === 'outbox' && proposalData.from_user === user.id);
-
-          if (!isInCurrentBox) return;
-
-          // If tradeIds filter is active, check if this trade is included
-          if (stableTradeIds && !stableTradeIds.includes(newMessage.trade_id)) {
-            // Message is in the opposite box or not in our filter, debounce refetch
-            if (refreshTimeoutRef.current) {
-              clearTimeout(refreshTimeoutRef.current);
-            }
-            refreshTimeoutRef.current = setTimeout(() => {
-              fetchCounts();
-            }, 2000);
-            return;
-          }
-
-          // Increment count for this trade
-          setCounts(prev => {
-            const newCounts = new Map(prev);
-            const currentCount = newCounts.get(newMessage.trade_id) || 0;
-            newCounts.set(newMessage.trade_id, currentCount + 1);
-            return newCounts;
-          });
-        }
-      )
-      .subscribe();
-
-    channelRef.current = channel;
-
-    return () => {
-      channel.unsubscribe();
-      channelRef.current = null;
-    };
-  }, [supabase, user, box, stableTradeIds, enabled, fetchCounts]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-    };
-  }, []);
+    const interval = setInterval(fetchCounts, 15_000);
+    return () => clearInterval(interval);
+  }, [enabled, user, fetchCounts]);
 
   return {
     counts,
