@@ -2190,6 +2190,7 @@
       "availableTrade": "Trade available",
       "theyOffer": "They offer",
       "theyOfferShort": "they have",
+      "matchQuality": "Match quality",
       "youOfferShort": "you have",
       "youOffer": "You can offer",
       "mutualTrades": "{count} mutual trades",

@@ -2187,6 +2187,7 @@
       "availableTrade": "Intercambio disponible",
       "theyOffer": "Te ofrecen",
       "theyOfferShort": "te faltan",
+      "matchQuality": "Compatibilidad",
       "youOfferShort": "le faltan",
       "youOffer": "Puedes ofrecer",
       "mutualTrades": "{count} intercambios mutuos",
