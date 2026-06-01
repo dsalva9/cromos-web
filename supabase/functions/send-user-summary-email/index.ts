@@ -92,6 +92,9 @@ interface MessagingActivity {
     messages_per_day: number;
     busiest_hour: number | null;
     top_senders: { nickname: string; message_count: number }[];
+    match_conversations_opened: number;
+    match_active_users: number;
+    match_messages_sent: number;
 }
 
 interface Recipient {
@@ -444,6 +447,10 @@ Deno.serve(async (req) => {
                 ? `${String(messagingData.busiest_hour).padStart(2, '0')}:00 UTC`
                 : 'N/A';
 
+            const matchConversationsOpened = Number(messagingData.match_conversations_opened || 0);
+            const matchMessagesSent = Number(messagingData.match_messages_sent || 0);
+            const matchActiveUsers = Number(messagingData.match_active_users || 0);
+
             messagingHtml = `
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div style="flex: 1; min-width: 100px; background: #f0f9ff; border-radius: 8px; padding: 16px; text-align: center;">
@@ -463,6 +470,24 @@ Deno.serve(async (req) => {
             <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Media/día</div>
           </div>
         </div>
+
+        <!-- Matches specific statistics section -->
+        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Interacciones de Matches (Coincidencias):</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
+            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchConversationsOpened}</div>
+            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Nuevos Chats de Match</div>
+          </div>
+          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
+            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchMessagesSent}</div>
+            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Mensajes de Match</div>
+          </div>
+          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
+            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchActiveUsers}</div>
+            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Usuarios de Match Activos</div>
+          </div>
+        </div>
+
         <p style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">
           Hora más activa: <strong>${busiestHourStr}</strong> · Receptores únicos: <strong>${messagingData.unique_receivers}</strong>
         </p>

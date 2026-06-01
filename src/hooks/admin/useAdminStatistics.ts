@@ -52,6 +52,9 @@ export type MessagingSummary = {
   messages_per_day: number;
   busiest_hour: number;
   top_senders: unknown;
+  match_conversations_opened?: number;
+  match_active_users?: number;
+  match_messages_sent?: number;
 };
 
 export type MessagingByCountry = {

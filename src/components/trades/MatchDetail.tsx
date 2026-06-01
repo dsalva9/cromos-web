@@ -34,11 +34,11 @@ function StickerList({
   headerColor,
 }: StickerListProps) {
   return (
-    <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl">
+    <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl overflow-hidden w-full max-w-full">
       <div className={`${headerColor} px-3 py-2.5 sm:p-4 rounded-t-md border-b-2 border-black`}>
-        <div className="flex items-center space-x-2">
-          {icon}
-          <h3 className="text-sm sm:text-lg font-bold uppercase text-white flex-1 min-w-0 truncate">{title}</h3>
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="flex-shrink-0">{icon}</span>
+          <h3 className="text-xs sm:text-base font-bold uppercase text-white flex-1 min-w-0 truncate">{title}</h3>
           <span className="bg-gray-50 border-2 border-black text-gray-900 text-xs font-bold px-2 py-0.5 rounded-md flex-shrink-0">
             {stickers.length}
           </span>
@@ -57,7 +57,7 @@ function StickerList({
               >
                 {/* Row: code + count */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] sm:text-xs font-mono text-gray-900 dark:text-white bg-gray-200 px-1.5 py-0.5 rounded border border-black/30 font-bold truncate">
+                  <span className="text-[11px] sm:text-xs font-mono text-gray-900 dark:text-white bg-gray-200 px-1.5 py-0.5 rounded border border-black/30 font-bold truncate min-w-0">
                     #{sticker.sticker_code}
                   </span>
                   {sticker.count > 1 && (
@@ -86,7 +86,7 @@ export function MatchDetail({
   targetUserNickname,
 }: MatchDetailProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-4 sm:gap-6 md:grid-cols-2 overflow-hidden w-full max-w-full">
       {/* What they can offer me */}
       <StickerList
         stickers={theyOffer}

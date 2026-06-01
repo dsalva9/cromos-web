@@ -217,7 +217,7 @@ export function MatchDetailDrawer({
             {t('mutualTrades', { count: match?.total_mutual_overlap ?? 0 })}
           </DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto p-3 pb-[env(safe-area-inset-bottom,0px)]">{content}</div>
+        <div className="overflow-y-auto overflow-x-hidden p-3 pb-[env(safe-area-inset-bottom,0px)]">{content}</div>
       </DrawerContent>
     </Drawer>
   ) : (
@@ -238,13 +238,13 @@ export function MatchDetailDrawer({
 
   return (
     <>
-      {/* Force detail drawer above chat drawer (z-120) */}
+      {/* Force detail drawer above chat drawer (z-110) */}
       {open && (
         <style>{`
-          [data-slot="dialog-overlay"] { z-index: 130 !important; }
-          [data-slot="dialog-content"] { z-index: 130 !important; }
-          [data-vaul-drawer-wrapper] + [data-vaul-overlay] { z-index: 130 !important; }
-          [data-vaul-drawer] { z-index: 130 !important; }
+          [data-slot="dialog-overlay"],
+          [data-slot="dialog-content"],
+          [vaul-overlay],
+          [vaul-drawer] { z-index: 130 !important; }
         `}</style>
       )}
       {drawerUI}
