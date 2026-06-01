@@ -208,7 +208,7 @@ export function MatchDetailDrawer({
 
   const drawerUI = isMobile ? (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] bg-white dark:bg-gray-900 border-t-2 border-black">
+      <DrawerContent className="max-h-[85vh] bg-white dark:bg-gray-900 border-t-2 border-black !z-[130]">
         <DrawerHeader className="border-b border-gray-200 dark:border-gray-700 py-3">
           <DrawerTitle className="font-black uppercase text-gray-900 dark:text-white text-base">
             {displayName}
@@ -222,7 +222,7 @@ export function MatchDetailDrawer({
     </Drawer>
   ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 border-2 border-black">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 border-2 border-black !z-[130] [&+[data-slot=dialog-overlay]]:!z-[130]">
         <DialogHeader>
           <DialogTitle className="font-black uppercase text-gray-900 dark:text-white">
             {displayName}
@@ -238,6 +238,15 @@ export function MatchDetailDrawer({
 
   return (
     <>
+      {/* Force detail drawer above chat drawer (z-120) */}
+      {open && (
+        <style>{`
+          [data-slot="dialog-overlay"] { z-index: 130 !important; }
+          [data-slot="dialog-content"] { z-index: 130 !important; }
+          [data-vaul-drawer-wrapper] + [data-vaul-overlay] { z-index: 130 !important; }
+          [data-vaul-drawer] { z-index: 130 !important; }
+        `}</style>
+      )}
       {drawerUI}
 
       {/* Chat drawer — opened from CTA */}
