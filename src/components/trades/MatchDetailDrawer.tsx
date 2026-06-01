@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
-import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,6 +21,9 @@ import {
 import { MatchDetail } from './MatchDetail';
 import { ArrowRightLeft, Loader2 } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
+import { ChatDrawer } from '@/components/chats/ChatDrawer';
+import { toast } from '@/lib/toast';
 
 interface TradeSticker {
   sticker_id: number;
@@ -46,6 +48,7 @@ interface TradeMatch {
 interface MatchDetailDrawerProps {
   match: TradeMatch | null;
   collectionId: number;
+  collectionTitle?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -68,6 +71,7 @@ function useIsMobile() {
 export function MatchDetailDrawer({
   match,
   collectionId,
+  collectionTitle,
   open,
   onOpenChange,
 }: MatchDetailDrawerProps) {
@@ -79,6 +83,11 @@ export function MatchDetailDrawer({
   const [theyOffer, setTheyOffer] = useState<TradeSticker[]>([]);
   const [iOffer, setIOffer] = useState<TradeSticker[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Chat drawer state
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatConversationId, setChatConversationId] = useState<number | null>(null);
+  const [proposing, setProposing] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!match || !user) return;
@@ -138,13 +147,33 @@ export function MatchDetailDrawer({
     }
   }, [open, match, fetchDetail]);
 
+  const handleOpenChat = useCallback(async () => {
+    if (proposing || !match) return;
+    setProposing(true);
+    try {
+      const { data, error } = await getOrCreateMatchConversation(
+        supabase,
+        match.match_user_id,
+        collectionId,
+      );
+      if (error || !data) {
+        toast.error('Error al abrir chat');
+        return;
+      }
+      setChatConversationId(data.id);
+      onOpenChange(false); // close detail drawer
+      setChatOpen(true);
+    } catch {
+      toast.error('Error al abrir chat');
+    } finally {
+      setProposing(false);
+    }
+  }, [supabase, match, collectionId, proposing, onOpenChange]);
+
   const displayName = match?.nickname || 'Usuario';
-  const composeHref = match
-    ? `/intercambios/componer?userId=${match.match_user_id}&collectionId=${collectionId}`
-    : '#';
 
   const content = (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-gold" />
@@ -158,40 +187,40 @@ export function MatchDetailDrawer({
           />
 
           <div className="px-1 pb-2">
-            <Link href={composeHref} className="block">
-              <Button
-                className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase text-sm py-3 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
-                size="lg"
-              >
+            <Button
+              onClick={() => void handleOpenChat()}
+              disabled={proposing}
+              className="w-full bg-gold hover:bg-yellow-400 text-gray-900 border-2 border-black font-black uppercase text-sm py-3 rounded-md shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5"
+              size="lg"
+            >
+              {proposing ? (
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
                 <ArrowRightLeft className="w-5 h-5 mr-2" />
-                {t('tradeCta')}
-              </Button>
-            </Link>
+              )}
+              {t('tradeCta')}
+            </Button>
           </div>
         </>
       )}
     </div>
   );
 
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[85vh] bg-white dark:bg-gray-900 border-t-2 border-black">
-          <DrawerHeader className="border-b-2 border-gray-200 dark:border-gray-700">
-            <DrawerTitle className="font-black uppercase text-gray-900 dark:text-white">
-              {displayName}
-            </DrawerTitle>
-            <DrawerDescription className="text-gray-600 dark:text-gray-400">
-              {t('mutualTrades', { count: match?.total_mutual_overlap ?? 0 })}
-            </DrawerDescription>
-          </DrawerHeader>
-          <div className="overflow-y-auto p-4">{content}</div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
-  return (
+  const drawerUI = isMobile ? (
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="max-h-[85vh] bg-white dark:bg-gray-900 border-t-2 border-black">
+        <DrawerHeader className="border-b border-gray-200 dark:border-gray-700 py-3">
+          <DrawerTitle className="font-black uppercase text-gray-900 dark:text-white text-base">
+            {displayName}
+          </DrawerTitle>
+          <DrawerDescription className="text-gray-600 dark:text-gray-400 text-sm">
+            {t('mutualTrades', { count: match?.total_mutual_overlap ?? 0 })}
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="overflow-y-auto p-3 pb-[env(safe-area-inset-bottom,0px)]">{content}</div>
+      </DrawerContent>
+    </Drawer>
+  ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 border-2 border-black">
         <DialogHeader>
@@ -206,4 +235,26 @@ export function MatchDetailDrawer({
       </DialogContent>
     </Dialog>
   );
+
+  return (
+    <>
+      {drawerUI}
+
+      {/* Chat drawer — opened from CTA */}
+      {chatConversationId && match && (
+        <ChatDrawer
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+          conversationId={chatConversationId}
+          otherNickname={displayName}
+          collectionTitle={collectionTitle || null}
+          templateId={collectionId}
+          otherUserId={match.match_user_id}
+          theyHaveCount={match.overlap_from_them_to_me}
+          youHaveCount={match.overlap_from_me_to_them}
+        />
+      )}
+    </>
+  );
 }
+

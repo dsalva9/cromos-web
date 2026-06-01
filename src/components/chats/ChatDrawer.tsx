@@ -7,7 +7,7 @@ import { useUser } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
 import { MessageBubble } from './MessageBubble';
 import { ChatComposer } from './ChatComposer';
-import { MatchInfoModal } from './MatchInfoModal';
+import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
@@ -285,19 +285,25 @@ export function ChatDrawer({
         </div>
       </div>
 
-      {/* ---- Info modal ---- */}
-      <MatchInfoModal
-        isOpen={showInfo}
-        onClose={() => setShowInfo(false)}
-        otherNickname={otherNickname}
-        collectionTitle={collectionTitle}
-        theyHaveCount={theyHaveCount}
-        youHaveCount={youHaveCount}
-        distanceKm={distanceKm}
-        templateId={templateId}
-        otherUserId={otherUserId}
-        conversationId={conversationId}
-      />
+      {/* ---- Detail drawer (sticker-level) ---- */}
+      {templateId && otherUserId && (
+        <MatchDetailDrawer
+          match={{
+            match_user_id: otherUserId,
+            nickname: otherNickname,
+            overlap_from_them_to_me: theyHaveCount ?? 0,
+            overlap_from_me_to_them: youHaveCount ?? 0,
+            total_mutual_overlap: (theyHaveCount ?? 0) + (youHaveCount ?? 0),
+            distance_km: distanceKm ?? null,
+            postcode: null,
+            score: null,
+          }}
+          collectionId={templateId}
+          collectionTitle={collectionTitle ?? undefined}
+          open={showInfo}
+          onOpenChange={setShowInfo}
+        />
+      )}
     </>
   );
 }

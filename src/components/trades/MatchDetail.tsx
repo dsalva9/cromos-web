@@ -1,4 +1,4 @@
-﻿import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
+import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
@@ -64,11 +64,11 @@ function StickerList({
 }: StickerListProps) {
   return (
     <ModernCard className="bg-white dark:bg-gray-800 border-2 border-black shadow-xl">
-      <div className={`${headerColor} p-4 rounded-t-md border-b-2 border-black`}>
+      <div className={`${headerColor} px-3 py-2.5 sm:p-4 rounded-t-md border-b-2 border-black`}>
         <div className="flex items-center space-x-2">
           {icon}
-          <h3 className="text-lg font-bold uppercase text-white">{title}</h3>
-          <Badge variant="secondary" className="bg-gray-50 border-2 border-black text-gray-900">
+          <h3 className="text-sm sm:text-lg font-bold uppercase text-white flex-1 min-w-0 truncate">{title}</h3>
+          <Badge variant="secondary" className="bg-gray-50 border-2 border-black text-gray-900 flex-shrink-0">
             {stickers.length}
           </Badge>
         </div>
@@ -78,16 +78,16 @@ function StickerList({
         {stickers.length === 0 ? (
           <div className="p-6 text-center text-gray-600 dark:text-gray-400">{emptyMessage}</div>
         ) : (
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-60 sm:max-h-96 overflow-y-auto">
             {stickers.map((sticker, index) => (
               <div
                 key={`${sticker.sticker_id}-${index}`}
-                className="p-4 border-b-2 border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
+                className="px-3 py-2.5 sm:p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <span className="text-sm font-mono text-gray-900 dark:text-white bg-gray-200 px-2 py-1 rounded-md border-2 border-black font-bold">
+                      <span className="text-xs sm:text-sm font-mono text-gray-900 dark:text-white bg-gray-200 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md border border-black font-bold">
                         #{sticker.sticker_code}
                       </span>
                       <Badge
@@ -98,11 +98,11 @@ function StickerList({
                       </Badge>
                     </div>
 
-                    <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                    <h4 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white truncate">
                       {sticker.player_name}
                     </h4>
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                       {sticker.team_name}
                     </p>
                   </div>

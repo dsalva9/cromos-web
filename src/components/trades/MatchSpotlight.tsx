@@ -16,6 +16,7 @@ import {
 import type { TradeMatch } from '@/hooks/trades/useMatchSwiper';
 import { useFavorites } from '@/hooks/social/useFavorites';
 import Link from '@/components/ui/link';
+import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 
 // ------------------------------------------------------------------
 // Distance bucket
@@ -61,6 +62,9 @@ export function MatchSpotlight({
   const t = useTranslations('trades.finder');
   const ts = useTranslations('trades.finder.swipe');
   const { user } = useUser();
+
+  // ---- Detail drawer state ----
+  const [detailOpen, setDetailOpen] = useState(false);
 
   // ---- Favorite state ----
   const { checkFavorite, toggleFavorite, loading: favLoading } = useFavorites();
@@ -292,24 +296,32 @@ export function MatchSpotlight({
               </div>
             )}
 
-            {/* Stats — visual cards */}
+            {/* Stats — visual cards — clickable for detail */}
             <div className="grid grid-cols-2 gap-2 mb-4">
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 text-center">
+              <button
+                type="button"
+                onClick={() => setDetailOpen(true)}
+                className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 text-center hover:border-green-400 hover:shadow-md transition-all cursor-pointer active:scale-[0.97]"
+              >
                 <p className="text-2xl sm:text-2xl font-black text-green-600 dark:text-green-400 leading-none">
                   {match.overlap_from_them_to_me}
                 </p>
                 <p className="text-[10px] sm:text-xs font-bold text-green-600/70 dark:text-green-400/70 mt-1 uppercase">
                   {t('theyOfferShort')}
                 </p>
-              </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-center">
+              </button>
+              <button
+                type="button"
+                onClick={() => setDetailOpen(true)}
+                className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-center hover:border-blue-400 hover:shadow-md transition-all cursor-pointer active:scale-[0.97]"
+              >
                 <p className="text-2xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 leading-none">
                   {match.overlap_from_me_to_them}
                 </p>
                 <p className="text-[10px] sm:text-xs font-bold text-blue-600/70 dark:text-blue-400/70 mt-1 uppercase">
                   {t('youOfferShort')}
                 </p>
-              </div>
+              </button>
             </div>
 
             {/* Quick action buttons — Favorite + View Profile */}
@@ -381,6 +393,24 @@ export function MatchSpotlight({
       <div className="mt-3 text-center hidden md:block">
         <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">{ts('keyboardHint')}</p>
       </div>
+
+      {/* Detail drawer — sticker-level overlap */}
+      <MatchDetailDrawer
+        match={{
+          match_user_id: match.match_user_id,
+          nickname: match.nickname,
+          overlap_from_them_to_me: match.overlap_from_them_to_me,
+          overlap_from_me_to_them: match.overlap_from_me_to_them,
+          total_mutual_overlap: match.overlap_from_them_to_me + match.overlap_from_me_to_them,
+          distance_km: match.distance_km,
+          postcode: match.postcode,
+          score: match.score,
+        }}
+        collectionId={collectionId}
+        collectionTitle={collectionTitle}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+      />
     </div>
   );
 }
