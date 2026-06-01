@@ -10,10 +10,20 @@ interface ChatComposerProps {
   sending: boolean;
   uploading: boolean;
   disabled?: boolean;
+  onManualConfirm?: () => void;
+  showConfirmButton?: boolean;
 }
 
-export function ChatComposer({ onSend, sending, uploading, disabled }: ChatComposerProps) {
+export function ChatComposer({
+  onSend,
+  sending,
+  uploading,
+  disabled,
+  onManualConfirm,
+  showConfirmButton,
+}: ChatComposerProps) {
   const t = useTranslations('matchChat');
+  const t_tc = useTranslations('tradeConfirmations');
   const [text, setText] = useState('');
   const [pendingImage, setPendingImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +112,22 @@ export function ChatComposer({ onSend, sending, uploading, disabled }: ChatCompo
         >
           <ImageIcon className="w-5 h-5" />
         </Button>
+
+        {/* Manual confirmation trigger button */}
+        {showConfirmButton && onManualConfirm && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 flex-shrink-0 text-gray-500 hover:text-gold transition-colors"
+            onClick={onManualConfirm}
+            disabled={isBusy || disabled}
+            title={t_tc('manualButton')}
+            aria-label={t_tc('manualButton')}
+          >
+            <span className="text-lg">📬</span>
+          </Button>
+        )}
         <input
           ref={fileInputRef}
           type="file"

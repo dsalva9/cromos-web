@@ -1303,14 +1303,15 @@ export type Database = {
           },
         ]
       }
-      trade_confirmations: {
+       trade_confirmations: {
         Row: {
           confirmed_at: string | null
           confirmer_id: string
           created_at: string
           expired_at: string | null
           id: number
-          listing_id: number
+          listing_id: number | null
+          match_conversation_id: number | null
           note: string | null
           requested_at: string
           requester_id: string
@@ -1323,7 +1324,8 @@ export type Database = {
           created_at?: string
           expired_at?: string | null
           id?: never
-          listing_id: number
+          listing_id?: number | null
+          match_conversation_id?: number | null
           note?: string | null
           requested_at?: string
           requester_id: string
@@ -1336,7 +1338,8 @@ export type Database = {
           created_at?: string
           expired_at?: string | null
           id?: never
-          listing_id?: number
+          listing_id?: number | null
+          match_conversation_id?: number | null
           note?: string | null
           requested_at?: string
           requester_id?: string
@@ -3644,6 +3647,15 @@ export type Database = {
       refresh_leaderboard: { Args: never; Returns: undefined }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }
+      request_match_trade_confirmation: {
+        Args: {
+          p_confirmer_id: string
+          p_match_conversation_id: number
+          p_note?: string
+          p_sticker_count?: number
+        }
+        Returns: number
+      }
       request_trade_confirmation: {
         Args: {
           p_confirmer_id: string

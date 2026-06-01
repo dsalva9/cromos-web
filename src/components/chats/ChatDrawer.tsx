@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
+import { useTradeConfirmations } from '@/hooks/marketplace/useTradeConfirmations';
 import { MessageBubble } from './MessageBubble';
 import { ChatComposer } from './ChatComposer';
 import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
@@ -14,6 +15,12 @@ import Link from '@/components/ui/link';
 import { useIgnore } from '@/hooks/social/useIgnore';
 import { useReport } from '@/hooks/social/useReport';
 import { toast } from '@/lib/toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface ChatDrawerProps {
   isOpen: boolean;
@@ -63,6 +70,32 @@ export function ChatDrawer({
   } = useMatchChat({
     conversationId: isOpen ? conversationId : null,
     enableRealtime: isOpen,
+  });
+
+  // Trade Confirmations state
+  const t_tc = useTranslations('tradeConfirmations');
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const [showNudgeForm, setShowNudgeForm] = useState(false);
+  const [nudgeStickerCount, setNudgeStickerCount] = useState<string>('');
+  const [nudgeNote, setNudgeNote] = useState<string>('');
+
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [manualStickerCount, setManualStickerCount] = useState<string>('');
+  const [manualNote, setManualNote] = useState<string>('');
+
+  const {
+    pendingConfirmation,
+    pendingForMe,
+    pendingByMe,
+    shouldShowNudge,
+    requestConfirmation,
+    confirmTrade,
+    dismissConfirmation,
+    submitting: confirmationSubmitting,
+  } = useTradeConfirmations({
+    matchConversationId: isOpen && conversationId ? conversationId : undefined,
+    participantId: otherUserId || '',
+    messages,
   });
 
   // Auto-scroll to bottom when messages change
@@ -267,6 +300,140 @@ export function ChatDrawer({
                 />
               ))}
 
+              {/* Top Confirmation Banner (when pendingForMe is true) */}
+              {pendingConfirmation && pendingForMe && (
+                <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
+                    <span className="text-xl">📬</span>
+                    <div className="text-left">
+                      <p className="font-semibold">
+                        {t_tc('bannerTitle', { nickname: otherNickname })}
+                      </p>
+                      {(pendingConfirmation.sticker_count || pendingConfirmation.note) && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {pendingConfirmation.sticker_count && `Cromos: ${pendingConfirmation.sticker_count}`}
+                          {pendingConfirmation.sticker_count && pendingConfirmation.note && ' · '}
+                          {pendingConfirmation.note && `Nota: "${pendingConfirmation.note}"`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      size="sm"
+                      onClick={() => confirmTrade(pendingConfirmation.id)}
+                      disabled={confirmationSubmitting}
+                      className="bg-gold text-black hover:bg-yellow-400 font-bold flex-1 sm:flex-initial"
+                    >
+                      {t_tc('bannerConfirm')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => dismissConfirmation(pendingConfirmation.id)}
+                      disabled={confirmationSubmitting}
+                      className="text-gray-500 hover:text-gray-900 dark:hover:text-white flex-1 sm:flex-initial"
+                    >
+                      {t_tc('bannerDismiss')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Banner when I requested it and it is still pending */}
+              {pendingConfirmation && pendingByMe && (
+                <div className="bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-4 text-xs text-center text-gray-500 dark:text-gray-400">
+                  📬 Solicitud de confirmación de intercambio pendiente de aprobación por el otro usuario.
+                </div>
+              )}
+
+              {/* Nudge card */}
+              {shouldShowNudge && !nudgeDismissed && !showNudgeForm && (
+                <div className="flex justify-center my-4 w-full">
+                  <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[95%] sm:max-w-[85%] text-center space-y-3">
+                    <p className="font-bold text-gray-900 dark:text-white">
+                      {t_tc('nudgeTitle')}
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setShowNudgeForm(true)}
+                        className="bg-gold text-gold-foreground font-bold w-full sm:w-auto"
+                      >
+                        {t_tc('nudgeConfirm')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setNudgeDismissed(true)}
+                        className="text-gray-500 hover:text-gray-900 dark:hover:text-white w-full sm:w-auto"
+                      >
+                        {t_tc('nudgeNotYet')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Nudge count/note Form */}
+              {shouldShowNudge && !nudgeDismissed && showNudgeForm && (
+                <div className="bg-yellow-50/30 dark:bg-yellow-950/10 border-2 border-gold rounded-lg p-4 mb-4 space-y-3 text-sm">
+                  <h4 className="font-bold text-gray-900 dark:text-white text-center">
+                    {t_tc('nudgeConfirm')}
+                  </h4>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                      {t_tc('stickerCountLabel')}
+                    </label>
+                    <input
+                      type="number"
+                      value={nudgeStickerCount}
+                      onChange={(e) => setNudgeStickerCount(e.target.value)}
+                      placeholder={t_tc('stickerCountPlaceholder')}
+                      className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                      Nota (opcional)
+                    </label>
+                    <input
+                      type="text"
+                      value={nudgeNote}
+                      onChange={(e) => setNudgeNote(e.target.value)}
+                      placeholder="Ej: Intercambio de 5 cromos de la copa"
+                      className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md px-3 py-1.5 text-sm"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-gold text-gold-foreground font-bold flex-1"
+                      disabled={confirmationSubmitting}
+                      onClick={async () => {
+                        const count = nudgeStickerCount ? parseInt(nudgeStickerCount, 10) : undefined;
+                        await requestConfirmation(count, nudgeNote || undefined);
+                        setShowNudgeForm(false);
+                        setNudgeDismissed(true);
+                      }}
+                    >
+                      {t_tc('submitConfirmation')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="flex-1"
+                      onClick={() => {
+                        setShowNudgeForm(false);
+                        setNudgeDismissed(true);
+                      }}
+                    >
+                      {t_tc('bannerDismiss')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div ref={messagesEndRef} />
             </>
           )}
@@ -281,6 +448,8 @@ export function ChatDrawer({
             sending={sending}
             uploading={uploading}
             disabled={!conversationId}
+            showConfirmButton={messages.length >= 4 && !pendingConfirmation}
+            onManualConfirm={() => setShowManualModal(true)}
           />
         </div>
       </div>
@@ -304,6 +473,70 @@ export function ChatDrawer({
           onOpenChange={setShowInfo}
         />
       )}
+
+      {/* Manual Confirmation Dialog */}
+      <Dialog open={showManualModal} onOpenChange={setShowManualModal}>
+        <DialogContent className="border-2 border-black max-w-[90%] sm:max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 z-[120]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-white">
+              <span>📬</span> {t_tc('manualButton')}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {t_tc('stickerCountLabel')}
+              </label>
+              <input
+                type="number"
+                value={manualStickerCount}
+                onChange={(e) => setManualStickerCount(e.target.value)}
+                placeholder={t_tc('stickerCountPlaceholder')}
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gold/50"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Nota (opcional)
+              </label>
+              <input
+                type="text"
+                value={manualNote}
+                onChange={(e) => setManualNote(e.target.value)}
+                placeholder="Ej: Intercambio de 5 cromos de la copa"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gold/50"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowManualModal(false)}
+              className="rounded-xl border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+            >
+              {t_tc('bannerDismiss')}
+            </Button>
+            <Button
+              disabled={confirmationSubmitting}
+              onClick={async () => {
+                const count = manualStickerCount ? parseInt(manualStickerCount, 10) : undefined;
+                const success = await requestConfirmation(count, manualNote || undefined);
+                if (success) {
+                  setShowManualModal(false);
+                  setManualStickerCount('');
+                  setManualNote('');
+                }
+              }}
+              className="bg-gold text-black hover:bg-yellow-400 font-bold rounded-xl"
+            >
+              {t_tc('submitConfirmation')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

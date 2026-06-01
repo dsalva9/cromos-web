@@ -7,14 +7,16 @@ import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 
 interface UseTradeConfirmationsOptions {
-  listingId: number;
+  listingId?: number;
+  matchConversationId?: number;
   participantId: string;
   messages: any[];
 }
 
 export interface TradeConfirmation {
   id: number;
-  listing_id: number;
+  listing_id: number | null;
+  match_conversation_id?: number | null;
   requester_id: string;
   confirmer_id: string;
   status: 'pending' | 'confirmed' | 'expired';
@@ -28,6 +30,7 @@ export interface TradeConfirmation {
 
 export function useTradeConfirmations({
   listingId,
+  matchConversationId,
   participantId,
   messages,
 }: UseTradeConfirmationsOptions) {
@@ -38,16 +41,23 @@ export function useTradeConfirmations({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch active pending confirmation between current user and participant for this listing
+  // Fetch active pending confirmation between current user and participant for this listing/match conversation
   const fetchPendingConfirmation = useCallback(async () => {
     if (!user || !participantId) return;
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      let dbQuery = supabase
         .from('trade_confirmations')
-        .select('*')
-        .eq('listing_id', listingId)
+        .select('*');
+
+      if (matchConversationId) {
+        dbQuery = dbQuery.eq('match_conversation_id', matchConversationId);
+      } else if (listingId) {
+        dbQuery = dbQuery.eq('listing_id', listingId);
+      }
+
+      const { data, error } = await dbQuery
         .in('status', ['pending', 'confirmed'])
         .or(`and(requester_id.eq.${user.id},confirmer_id.eq.${participantId}),and(requester_id.eq.${participantId},confirmer_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
@@ -64,7 +74,7 @@ export function useTradeConfirmations({
     } finally {
       setLoading(false);
     }
-  }, [supabase, listingId, participantId, user]);
+  }, [supabase, listingId, matchConversationId, participantId, user]);
 
   useEffect(() => {
     void fetchPendingConfirmation();
@@ -77,12 +87,19 @@ export function useTradeConfirmations({
 
       setSubmitting(true);
       try {
-        const { data, error } = await supabase.rpc('request_trade_confirmation', {
-          p_listing_id: listingId,
-          p_confirmer_id: participantId,
-          p_sticker_count: stickerCount || undefined,
-          p_note: note || undefined,
-        });
+        const { data, error } = matchConversationId
+          ? await supabase.rpc('request_match_trade_confirmation', {
+              p_match_conversation_id: matchConversationId,
+              p_confirmer_id: participantId,
+              p_sticker_count: stickerCount || undefined,
+              p_note: note || undefined,
+            })
+          : await supabase.rpc('request_trade_confirmation', {
+              p_listing_id: listingId!,
+              p_confirmer_id: participantId,
+              p_sticker_count: stickerCount || undefined,
+              p_note: note || undefined,
+            });
 
         if (error) {
           toast.error(error.message);
@@ -100,7 +117,7 @@ export function useTradeConfirmations({
         setSubmitting(false);
       }
     },
-    [supabase, listingId, participantId, user, fetchPendingConfirmation]
+    [supabase, listingId, matchConversationId, participantId, user, fetchPendingConfirmation]
   );
 
   // Confirm a pending trade
