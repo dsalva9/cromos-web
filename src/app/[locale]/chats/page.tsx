@@ -99,8 +99,8 @@ function ChatsPageContent() {
   const closeDrawer = useCallback(() => {
     setDrawerOpen(false);
     setActiveMatchConv(null);
-    // Refresh conversations to update unread counts
-    void matchConvs.refresh();
+    // Refresh conversations silently to update unread counts
+    void matchConvs.refresh({ silent: true });
   }, [matchConvs]);
 
   // Loading state

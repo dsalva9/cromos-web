@@ -42,6 +42,14 @@ export interface CreateConversationResult {
 // RPC wrappers
 // ------------------------------------------------------------------
 
+function isAuthError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const msg = error.message.toLowerCase();
+    return msg.includes('not authenticated') || msg.includes('jwt') || msg.includes('token');
+  }
+  return false;
+}
+
 export async function getOrCreateMatchConversation(
   supabase: SupabaseClient,
   otherUserId: string,
@@ -57,7 +65,11 @@ export async function getOrCreateMatchConversation(
     if (error) throw error;
     return { data: data as CreateConversationResult, error: null };
   } catch (error) {
-    logger.error('Error creating match conversation:', error);
+    if (isAuthError(error)) {
+      logger.warn('Unauthenticated request to getOrCreateMatchConversation:', error);
+    } else {
+      logger.error('Error creating match conversation:', error);
+    }
     return {
       data: null,
       error: error instanceof Error ? error : new Error('Failed to create conversation'),
@@ -74,7 +86,11 @@ export async function getMatchConversations(
     if (error) throw error;
     return { data: (data || []) as MatchConversation[], error: null };
   } catch (error) {
-    logger.error('Error fetching match conversations:', error);
+    if (isAuthError(error)) {
+      logger.warn('Unauthenticated request to getMatchConversations:', error);
+    } else {
+      logger.error('Error fetching match conversations:', error);
+    }
     return { data: [], error: error instanceof Error ? error : new Error('Failed to fetch conversations') };
   }
 }
@@ -96,7 +112,11 @@ export async function getMatchChatMessages(
     if (error) throw error;
     return { data: (data || []) as MatchChatMessage[], error: null };
   } catch (error) {
-    logger.error('Error fetching match chat messages:', error);
+    if (isAuthError(error)) {
+      logger.warn('Unauthenticated request to getMatchChatMessages:', error);
+    } else {
+      logger.error('Error fetching match chat messages:', error);
+    }
     return { data: [], error: error instanceof Error ? error : new Error('Failed to fetch messages') };
   }
 }
@@ -129,7 +149,11 @@ export async function sendMatchMessage(
     if (error) throw error;
     return { messageId: data as number, error: null };
   } catch (error) {
-    logger.error('Error sending match message:', error);
+    if (isAuthError(error)) {
+      logger.warn('Unauthenticated request to sendMatchMessage:', error);
+    } else {
+      logger.error('Error sending match message:', error);
+    }
     return {
       messageId: null,
       error: error instanceof Error ? error : new Error('No se pudo enviar el mensaje'),
@@ -150,7 +174,11 @@ export async function markMatchMessagesRead(
     if (error) throw error;
     return { count: (data as number) || 0, error: null };
   } catch (error) {
-    logger.error('Error marking match messages as read:', error);
+    if (isAuthError(error)) {
+      logger.warn('Unauthenticated request to markMatchMessagesRead:', error);
+    } else {
+      logger.error('Error marking match messages as read:', error);
+    }
     return { count: 0, error: error instanceof Error ? error : new Error('Failed to mark as read') };
   }
 }

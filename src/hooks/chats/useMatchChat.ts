@@ -33,12 +33,19 @@ export function useMatchChat({
   const [hasMore, setHasMore] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // ---- Fetch messages ----
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (options?: { silent?: boolean }) => {
     if (!user || !conversationId) return;
 
-    setLoading(true);
+    if (!options?.silent && messagesRef.current.length === 0) {
+      setLoading(true);
+    }
     setError(null);
 
     const { data, error: fetchError } = await getMatchChatMessages(
@@ -106,32 +113,42 @@ export function useMatchChat({
             quality: 0.82,
           });
 
-          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7);
+          // Generate thumbnail: 300px wide (non-fatal, fallback to null)
+          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
+            logger.warn('Thumbnail generation failed (non-fatal):', err);
+            return null;
+          });
 
           const timestamp = Date.now();
           const basePath = `chat-images/match/${conversationId}/${user.id}/${timestamp}`;
           const imagePath = `${basePath}.webp`;
           const thumbPath = `${basePath}-thumb.webp`;
 
+          // Upload full image and conditionally upload thumbnail in parallel
           const [imageUpload, thumbUpload] = await Promise.all([
             supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
               contentType: 'image/webp',
-              upsert: false,
+              upsert: true,
             }),
-            supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-              contentType: 'image/webp',
-              upsert: false,
-            }),
+            thumbBlob
+              ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+                  contentType: 'image/webp',
+                  upsert: true,
+                })
+              : Promise.resolve({ data: null, error: null } as any),
           ]);
 
           if (imageUpload.error) throw imageUpload.error;
-          if (thumbUpload.error) throw thumbUpload.error;
 
           const { data: imgData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
-          const { data: thumbData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
-
           imageUrl = imgData.publicUrl;
-          thumbnailUrl = thumbData.publicUrl;
+
+          if (thumbBlob && !thumbUpload?.error) {
+            const { data: thumbData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+            thumbnailUrl = thumbData.publicUrl;
+          } else if (thumbUpload?.error) {
+            logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+          }
         } catch (uploadError) {
           logger.error('Error uploading chat image:', uploadError);
           toast.error('Error al subir la imagen');
@@ -171,9 +188,9 @@ export function useMatchChat({
         };
         setMessages(prev => [...prev, optimisticMsg]);
 
-        // Refresh after a short delay
+        // Refresh after a short delay silently
         setTimeout(() => {
-          void fetchMessages();
+          void fetchMessages({ silent: true });
         }, 500);
       }
 
@@ -213,7 +230,7 @@ export function useMatchChat({
           filter: `match_conversation_id=eq.${conversationId}`,
         },
         () => {
-          void fetchMessages();
+          void fetchMessages({ silent: true });
         }
       )
       .subscribe();

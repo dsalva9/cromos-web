@@ -19,10 +19,12 @@ export function useMatchConversations() {
   const [error, setError] = useState<string | null>(null);
   const [unreadTotal, setUnreadTotal] = useState(0);
 
-  const fetchConversations = useCallback(async () => {
+  const fetchConversations = useCallback(async (options?: { silent?: boolean }) => {
     if (!user) return;
 
-    setLoading(true);
+    if (!options?.silent) {
+      setLoading(true);
+    }
     setError(null);
 
     const [convResult, unread] = await Promise.all([
@@ -32,7 +34,14 @@ export function useMatchConversations() {
 
     if (convResult.error) {
       setError(convResult.error.message);
-      logger.error('Error fetching match conversations:', convResult.error);
+      const isAuthError = convResult.error.message.toLowerCase().includes('not authenticated') ||
+                          convResult.error.message.toLowerCase().includes('jwt') ||
+                          convResult.error.message.toLowerCase().includes('token');
+      if (isAuthError) {
+        logger.warn('Unauthenticated attempt in useMatchConversations (silent fallback):', convResult.error.message);
+      } else {
+        logger.error('Error fetching match conversations:', convResult.error);
+      }
     } else {
       setConversations(convResult.data);
     }
@@ -49,7 +58,7 @@ export function useMatchConversations() {
   // Poll for conversation updates every 10s (replaces unfiltered realtime subscription)
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(() => { void fetchConversations(); }, 10_000);
+    const interval = setInterval(() => { void fetchConversations({ silent: true }); }, 10_000);
     return () => clearInterval(interval);
   }, [user, fetchConversations]);
 

@@ -39,12 +39,19 @@ export function useListingChat({
   const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef(messages);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // Fetch initial messages
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (options?: { silent?: boolean }) => {
     if (!user) return;
 
-    setLoading(true);
+    if (!options?.silent && messagesRef.current.length === 0) {
+      setLoading(true);
+    }
     setError(null);
 
     const { data, error: fetchError } = await getListingChats(
@@ -123,8 +130,11 @@ export function useListingChat({
             quality: 0.82,
           });
 
-          // Generate thumbnail: 300px wide
-          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7);
+          // Generate thumbnail: 300px wide (non-fatal, fallback to null)
+          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
+            logger.warn('Thumbnail generation failed (non-fatal):', err);
+            return null;
+          });
 
           // Build storage paths
           const timestamp = Date.now();
@@ -132,27 +142,32 @@ export function useListingChat({
           const imagePath = `${basePath}.webp`;
           const thumbPath = `${basePath}-thumb.webp`;
 
-          // Upload both in parallel
+          // Upload full image and conditionally upload thumbnail in parallel
           const [imageUpload, thumbUpload] = await Promise.all([
             supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
               contentType: 'image/webp',
-              upsert: false,
+              upsert: true,
             }),
-            supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-              contentType: 'image/webp',
-              upsert: false,
-            }),
+            thumbBlob
+              ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+                  contentType: 'image/webp',
+                  upsert: true,
+                })
+              : Promise.resolve({ data: null, error: null } as any),
           ]);
 
           if (imageUpload.error) throw imageUpload.error;
-          if (thumbUpload.error) throw thumbUpload.error;
 
           // Get public URLs
           const { data: imageUrlData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
-          const { data: thumbUrlData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
-
           imageUrl = imageUrlData.publicUrl;
-          thumbnailUrl = thumbUrlData.publicUrl;
+
+          if (thumbBlob && !thumbUpload?.error) {
+            const { data: thumbUrlData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+            thumbnailUrl = thumbUrlData.publicUrl;
+          } else if (thumbUpload?.error) {
+            logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+          }
         } catch (uploadError) {
           logger.error('Error uploading chat image:', uploadError);
           toast.error('Error al subir la imagen');
@@ -194,9 +209,9 @@ export function useListingChat({
         };
         setMessages(prev => [...prev, optimisticMessage]);
 
-        // Refresh to get actual data
+        // Refresh to get actual data silently
         setTimeout(() => {
-          void fetchMessages();
+          void fetchMessages({ silent: true });
         }, 500);
       }
 
@@ -235,8 +250,8 @@ export function useListingChat({
           filter: `listing_id=eq.${listingId}`,
         },
         () => {
-          // Refresh messages when new message arrives
-          void fetchMessages();
+          // Refresh messages when new message arrives silently
+          void fetchMessages({ silent: true });
         }
       )
       .subscribe();
