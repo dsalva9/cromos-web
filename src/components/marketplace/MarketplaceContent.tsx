@@ -16,7 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
 import { AnimatedList } from '@/components/ui/AnimatedList';
 import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
-import { SPONSORED_PRODUCT } from '@/lib/marketplace/sponsored-product';
+import { SPONSORED_PRODUCT_CUBE, SPONSORED_PRODUCT_ALBUM } from '@/lib/marketplace/sponsored-product';
 import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
 import { useTranslations } from 'next-intl';
 
@@ -39,7 +39,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     const [hasRestored, setHasRestored] = useState(false);
     const scrollRestoredRef = useRef(false);
-    const [restoredLimit, setRestoredLimit] = useState(19);
+    const [restoredLimit, setRestoredLimit] = useState(18);
 
     // 1. Restore state on mount
     useEffect(() => {
@@ -91,7 +91,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             const savedCount = sessionStorage.getItem('marketplace_loaded_count');
             if (savedCount) {
                 const count = parseInt(savedCount, 10);
-                if (count > 19) {
+                if (count > 18) {
                     setRestoredLimit(count);
                 }
             }
@@ -177,6 +177,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         viewerPostcode: initialUserPostcode,
         collectionIds: selectedCollectionIds,
         initialData: initialListings,
+        listingTypeFilter: listingTypeFilter,
     });
 
     // Simple handlers - hook manages state now
@@ -199,12 +200,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     };
 
     // Hook now initializes with server data, so just use fetchedListings directly
-    // Apply client-side type filter
-    const listings = listingTypeFilter === 'all'
-        ? fetchedListings
-        : fetchedListings.filter(listing =>
-            listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
-        );
+    const listings = fetchedListings;
 
     // 2.5. Persist the number of loaded listings
     useEffect(() => {
@@ -485,11 +481,18 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 ) : (
                     <AnimatedList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                         {listings.length > 0 && !searchQuery.trim() && (
-                            <SponsoredCard product={SPONSORED_PRODUCT} />
+                            <SponsoredCard key="sponsored-cube-card" product={SPONSORED_PRODUCT_CUBE} />
                         )}
-                        {listings.map((listing: Listing) => (
-                            <ListingCard key={listing.id} listing={listing} />
-                        ))}
+                        {listings.flatMap((listing: Listing, index: number) => {
+                            const card = <ListingCard key={listing.id} listing={listing} />;
+                            if (index === 17 && !searchQuery.trim()) {
+                                return [
+                                    card,
+                                    <SponsoredCard key="sponsored-album-card" product={SPONSORED_PRODUCT_ALBUM} />
+                                ];
+                            }
+                            return [card];
+                        })}
                     </AnimatedList>
                 )}
 

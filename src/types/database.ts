@@ -3524,6 +3524,7 @@ export type Database = {
         Args: {
           p_collection_ids?: number[]
           p_country_code?: string
+          p_is_group?: boolean
           p_limit?: number
           p_offset?: number
           p_search?: string

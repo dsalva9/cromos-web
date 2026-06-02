@@ -41,6 +41,7 @@ interface UseListingsParams {
   viewerPostcode?: string | null;
   collectionIds?: number[];
   initialData?: Listing[];
+  listingTypeFilter?: 'all' | 'cromo' | 'pack';
 }
 
 /** Transform raw RPC row into the app-level Listing type */
@@ -111,11 +112,12 @@ function transformRow(item: RpcListingResponse): Listing {
  */
 export function useListings({
   search = '',
-  limit = 19,
+  limit = 18,
   sortByDistance = false,
   viewerPostcode = null,
   collectionIds = [],
   initialData,
+  listingTypeFilter = 'all',
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
   const { profile } = useProfileCompletion();
@@ -134,9 +136,9 @@ export function useListings({
   const collectionIdsRef = useRef(collectionIds);
   collectionIdsRef.current = collectionIds;
 
-  // Only use initialData when filters are at their defaults and limit is the default (19).
+  // Only use initialData when filters are at their defaults and limit is the default (18).
   // When filters or limit are modified (e.g. during restoration), the server data is unfiltered or the wrong size.
-  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0 && limit === 19;
+  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0 && limit === 18 && listingTypeFilter === 'all';
   const effectiveInitialData = isDefaultQuery && initialData && initialData.length > 0
     ? { initialData: { pages: [initialData], pageParams: [0] } }
     : {};
@@ -150,7 +152,7 @@ export function useListings({
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode),
+    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter),
     queryFn: async ({ pageParam = 0 }) => {
       const currentIds = collectionIdsRef.current;
       const hasCollectionFilter = currentIds && currentIds.length > 0;
@@ -161,6 +163,7 @@ export function useListings({
         p_viewer_postcode: viewerPostcode,
         p_sort_by_distance: sortByDistance,
         p_collection_ids: hasCollectionFilter ? currentIds : null,
+        p_is_group: listingTypeFilter === 'all' ? null : (listingTypeFilter === 'pack'),
         ...(countryCode ? { p_country_code: countryCode } : {}),
       };
 

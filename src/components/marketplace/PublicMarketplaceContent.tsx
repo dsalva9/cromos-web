@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { LeanListingCard } from '@/components/home/LeanListingCard';
 import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
-import { SPONSORED_PRODUCT } from '@/lib/marketplace/sponsored-product';
+import { SPONSORED_PRODUCT_CUBE, SPONSORED_PRODUCT_ALBUM } from '@/lib/marketplace/sponsored-product';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { Button } from '@/components/ui/button';
 import { Filter, Package, ArrowRight } from 'lucide-react';
@@ -65,11 +65,12 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
 
     const { listings: fetchedListings, loading, error, hasMore, loadMore } = useListings({
         search: searchQuery,
-        limit: 19,
+        limit: 18,
         sortByDistance: false,
         viewerPostcode: null,
         collectionIds: [],
         initialData: initialListings,
+        listingTypeFilter: listingTypeFilter,
     });
 
     const handleSearchChange = (value: string) => {
@@ -80,12 +81,8 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
         setListingTypeFilter(type);
     };
 
-    // Apply client-side type filter
-    const listings = listingTypeFilter === 'all'
-        ? fetchedListings
-        : fetchedListings.filter(listing =>
-            listingTypeFilter === 'pack' ? listing.is_group : !listing.is_group
-        );
+    // Hook now initializes with server data, so just use fetchedListings directly
+    const listings = fetchedListings;
 
     const showSkeletons = loading && listings.length === 0;
 
@@ -229,11 +226,18 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                 ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                         {listings.length > 0 && !searchQuery.trim() && (
-                            <SponsoredCard product={SPONSORED_PRODUCT} />
+                            <SponsoredCard key="sponsored-cube-card" product={SPONSORED_PRODUCT_CUBE} />
                         )}
-                        {listings.map((listing: Listing) => (
-                            <LeanListingCard key={listing.id} listing={listing} href={`/explorar/${listing.id}`} />
-                        ))}
+                        {listings.flatMap((listing: Listing, index: number) => {
+                            const card = <LeanListingCard key={listing.id} listing={listing} href={`/explorar/${listing.id}`} />;
+                            if (index === 17 && !searchQuery.trim()) {
+                                return [
+                                    card,
+                                    <SponsoredCard key="sponsored-album-card" product={SPONSORED_PRODUCT_ALBUM} />
+                                ];
+                            }
+                            return [card];
+                        })}
                     </div>
                 )}
 

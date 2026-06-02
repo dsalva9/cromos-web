@@ -17,8 +17,9 @@ export const QUERY_KEYS = {
         collectionIdsKey: string,
         limit: number = 20,
         countryCode?: string,
+        listingTypeFilter?: string,
     ) =>
-        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode }] as const,
+        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter }] as const,
 
     listingsAll: () => ['listings'] as const,
 
