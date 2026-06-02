@@ -212,7 +212,9 @@
       "cubeTagline": "Caixa oficial de 50 envelopes para iniciar a sua coleção",
       "albumTitle": "Panini - FIFA WC 2026 Álbum",
       "albumTagline": "Álbum oficial de colecionador para guardar as suas figurinhas da Copa do Mundo 2026",
-      "ctaTeFaltan": "Faltam figurinhas?"
+      "ctaTeFaltan": "Faltam figurinhas?",
+      "teFaltanMuchos": "Faltam muitas figurinhas?",
+      "completarAlbum": "Completar meu álbum"
     },
     "public": {
       "title": "Explorar Cromos",

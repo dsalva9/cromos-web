@@ -212,7 +212,9 @@
       "cubeTagline": "Official sticker box with 50 packs to start your collection",
       "albumTitle": "Panini - FIFA WC 2026 Album",
       "albumTagline": "Official collector album to store your World Cup 2026 stickers",
-      "ctaTeFaltan": "Missing stickers?"
+      "ctaTeFaltan": "Missing stickers?",
+      "teFaltanMuchos": "Missing many stickers?",
+      "completarAlbum": "Complete my album"
     },
     "public": {
       "title": "Explorar Cromos",

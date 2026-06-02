@@ -236,7 +236,9 @@
       "cubeTagline": "Caja oficial de 50 sobres para empezar tu colección",
       "albumTitle": "Panini - FIFA WC 2026 Álbum",
       "albumTagline": "Álbum oficial de coleccionista para guardar tus cromos de la Copa Mundial 2026",
-      "ctaTeFaltan": "¿Te faltan cromos?"
+      "ctaTeFaltan": "¿Te faltan cromos?",
+      "teFaltanMuchos": "¿Te faltan muchos cromos?",
+      "completarAlbum": "Completar mi álbum"
     },
     "public": {
       "title": "Explorar Cromos",

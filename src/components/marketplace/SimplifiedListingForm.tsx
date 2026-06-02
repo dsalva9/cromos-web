@@ -15,8 +15,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
+import { SponsoredBanner } from '@/components/marketplace/SponsoredBanner';
+import { logger } from '@/lib/logger';
 
 // Simplified listing schema with is_group support (extends base marketplace schema)
 const baseSimplifiedListingSchema = z.object({
@@ -233,6 +234,7 @@ export function SimplifiedListingForm({
 
   return (
     <form onSubmit={handleSubmit(submitHandler)} noValidate>
+      <SponsoredBanner />
       <ModernCard>
         <ModernCardContent className="p-6 space-y-6">
           {/* Listing Type Toggle */}
