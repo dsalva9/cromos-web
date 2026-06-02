@@ -28,20 +28,14 @@ export function SponsoredBanner() {
   };
 
   return (
-    <motion.div
+    <motion.a
+      href="https://amzn.to/4fll9SB"
+      target="_blank"
+      rel="noopener sponsored nofollow"
       whileHover={{ y: -1, boxShadow: '0 6px 15px -5px rgba(83, 63, 198, 0.12)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className="group relative w-full border border-purple-100 dark:border-purple-900/30 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm overflow-hidden mb-6 select-none"
+      className="group block relative w-full border border-purple-100 dark:border-purple-900/30 bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm overflow-hidden mb-6 select-none cursor-pointer"
     >
-      {/* Invisible link overlay covering the entire banner */}
-      <a
-        href="https://amzn.to/4fll9SB"
-        target="_blank"
-        rel="noopener sponsored nofollow"
-        className="absolute inset-0 z-10"
-        aria-label={t('cubeTitle')}
-      />
-
       {/* Background soft glowing blur */}
       <div className="absolute top-0 right-1/4 w-24 h-24 bg-purple-200/20 dark:bg-purple-900/10 rounded-full blur-xl pointer-events-none" />
 
@@ -82,12 +76,12 @@ export function SponsoredBanner() {
               {renderStars(4.4, "h-3 w-3")}
             </div>
 
-            {/* CTA Button */}
-            <button className="bg-[#533FC6] text-white font-black text-[9px] uppercase py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm shrink-0">
+            {/* CTA Div (styled as button) */}
+            <div className="bg-[#533FC6] text-white font-black text-[9px] uppercase py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm shrink-0">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
               <span>{t('completarAlbum')}</span>
               <ChevronRight className="h-3 w-3" />
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -138,14 +132,14 @@ export function SponsoredBanner() {
             {renderStars(4.4, "h-3.5 w-3.5")}
           </div>
 
-          {/* CTA Button */}
-          <button className="bg-[#533FC6] hover:bg-[#4332A6] text-white font-black text-[10px] uppercase py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all duration-200 shadow-sm hover:scale-[1.02] shrink-0">
+          {/* CTA Div (styled as button) */}
+          <div className="bg-[#533FC6] text-white font-black text-[10px] uppercase py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all duration-200 shadow-sm group-hover:bg-[#4332A6] shrink-0">
             <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 shrink-0" />
             <span>{t('completarAlbum')}</span>
             <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-          </button>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </motion.a>
   );
 }

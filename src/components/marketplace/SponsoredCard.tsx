@@ -15,19 +15,15 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
   const locale = useLocale();
 
   return (
-    <motion.div
+    <motion.a
+      href={product.amazonUrl}
+      target="_blank"
+      rel="noopener sponsored nofollow"
+      aria-label={t(product.titleKey as any)}
       whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15), 0 8px 10px -6px rgba(0,0,0,0.15)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      className="group relative h-full w-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm dark:shadow-md transition-colors duration-300"
+      className="group block relative h-full w-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm dark:shadow-md transition-colors duration-300 cursor-pointer"
     >
-      {/* Invisible link overlay covering the card */}
-      <a
-        href={product.amazonUrl}
-        target="_blank"
-        rel="noopener sponsored nofollow"
-        className="absolute inset-0 z-10"
-        aria-label={t(product.titleKey as any)}
-      />
 
       {/* Image Container: flex-1 on mobile to expand and make graphic bigger, aspect-square on desktop */}
       <div className="relative flex-1 md:flex-none md:aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700 min-h-[200px]">
@@ -107,16 +103,16 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
 
         {/* Premium CTA Button */}
         <div className="mt-2 z-20 relative">
-          <button className="w-full bg-[#533FC6] hover:bg-[#4332A6] text-white font-black text-[10px] sm:text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow flex items-center justify-between px-3 sm:px-3.5 gap-1.5 cursor-pointer">
+          <div className="w-full bg-[#533FC6] group-hover:bg-[#4332A6] text-white font-black text-[10px] sm:text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm flex items-center justify-between px-3 sm:px-3.5 gap-1.5 shrink-0">
             <div className="flex items-center gap-1.5">
               <Star className="h-3.5 w-3.5 fill-yellow-400 stroke-yellow-400 text-yellow-400" />
               <span>{t(product.ctaKey as any)}</span>
             </div>
             <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </button>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </motion.a>
   );
 }
 
