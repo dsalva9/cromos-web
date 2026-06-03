@@ -25,10 +25,6 @@ import { formatNotification, groupNotificationsByCategory } from '@/lib/notifica
 import { fetchNotificationPreferences, checkNotificationEnabled } from '@/lib/supabase/notification-preferences';
 import type { GranularNotificationPreferences } from '@/types/notifications';
 
-interface NotificationsData {
-  notifications: AppNotification[];
-  unreadCount: number;
-}
 
 interface UseNotificationsReturn {
   // Data
@@ -56,25 +52,35 @@ export function useNotifications(): UseNotificationsReturn {
   const { user } = useUser();
   const queryClient = useQueryClient();
 
-  // ── Main data query ──
+  // ── Lightweight count poll ──
+  // Only polls the cheap COUNT(*) query every 60s for the header badge.
+  // OneSignal push handles instant user awareness.
   const {
-    data: notificationsData,
+    data: unreadCountData,
+  } = useQuery({
+    queryKey: QUERY_KEYS.notificationCount(),
+    queryFn: fetchUnreadCount,
+    enabled: !!user,
+    staleTime: 60_000, // 60s — count is cheap, no need to refetch aggressively
+    refetchInterval: 60_000, // Poll count only every 60s
+    refetchIntervalInBackground: false,
+  });
+
+  // ── Full notification list (on-demand) ──
+  // Only fetches when the user opens the notification dropdown or navigates
+  // to the notifications page. Does NOT auto-poll.
+  const {
+    data: notificationsList,
     error: queryError,
     isLoading,
   } = useQuery({
     queryKey: QUERY_KEYS.notifications(),
-    queryFn: async (): Promise<NotificationsData> => {
-      const [notifications, unreadCount] = await Promise.all([
-        fetchNotifications(),
-        fetchUnreadCount(),
-      ]);
-      return { notifications, unreadCount };
-    },
+    queryFn: fetchNotifications,
     enabled: !!user,
-    staleTime: 30_000, // 30s — notifications should feel fresh
-    refetchInterval: 30_000, // Poll every 30s instead of realtime
-    refetchIntervalInBackground: false, // Don't poll in background tabs
+    staleTime: 30_000, // 30s — fresh enough for the dropdown
+    // No refetchInterval — only refetches on invalidation or window focus
   });
+
 
   // ── Preferences query ──
   const { data: preferences } = useQuery({
@@ -91,11 +97,11 @@ export function useNotifications(): UseNotificationsReturn {
     staleTime: 5 * 60 * 1000, // 5 min — preferences rarely change
   });
 
-  const unreadCount = notificationsData?.unreadCount ?? 0;
+  const unreadCount = unreadCountData ?? 0;
 
   // ── Format & filter by preferences ──
   const formattedNotifications = useMemo(() => {
-    const rawNotifications = notificationsData?.notifications ?? [];
+    const rawNotifications = notificationsList ?? [];
     const formatted = rawNotifications.map(formatNotification);
 
     if (preferences) {
@@ -105,7 +111,7 @@ export function useNotifications(): UseNotificationsReturn {
     }
 
     return formatted;
-  }, [notificationsData, preferences]);
+  }, [notificationsList, preferences]);
 
   const unreadNotifications = useMemo(
     () => formattedNotifications.filter((n) => !n.readAt),
@@ -127,28 +133,26 @@ export function useNotifications(): UseNotificationsReturn {
   const handleMarkAllAsRead = useCallback(async () => {
     if (!user) return;
 
-    // Optimistic update
-    queryClient.setQueryData<NotificationsData>(QUERY_KEYS.notifications(), (old) => {
+    // Optimistic update — list
+    queryClient.setQueryData<AppNotification[]>(QUERY_KEYS.notifications(), (old) => {
       if (!old) return old;
-      return {
-        notifications: old.notifications.map((n) => ({
-          ...n,
-          readAt: n.readAt || new Date().toISOString(),
-        })),
-        unreadCount: 0,
-      };
+      return old.map((n) => ({
+        ...n,
+        readAt: n.readAt || new Date().toISOString(),
+      }));
     });
+    // Optimistic update — count
+    queryClient.setQueryData<number>(QUERY_KEYS.notificationCount(), 0);
 
     try {
       await markAllRead();
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Error al marcar como leídas';
-      // Underlying function already logs specifics; warn here to avoid Sentry noise
       logger.warnLocal('Error marking all as read:', errorMessage);
-      // Only rollback on non-network errors; network errors keep the optimistic update
       if (!isTransientNetworkError(err)) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notificationCount() });
       }
     }
   }, [user, queryClient]);
@@ -157,29 +161,29 @@ export function useNotifications(): UseNotificationsReturn {
     async (notificationId: number) => {
       if (!user) return;
 
-      // Optimistic update
-      queryClient.setQueryData<NotificationsData>(QUERY_KEYS.notifications(), (old) => {
+      // Optimistic update — list
+      queryClient.setQueryData<AppNotification[]>(QUERY_KEYS.notifications(), (old) => {
         if (!old) return old;
-        return {
-          notifications: old.notifications.map((n) =>
-            n.id === notificationId
-              ? { ...n, readAt: n.readAt || new Date().toISOString() }
-              : n
-          ),
-          unreadCount: Math.max(0, old.unreadCount - 1),
-        };
+        return old.map((n) =>
+          n.id === notificationId
+            ? { ...n, readAt: n.readAt || new Date().toISOString() }
+            : n
+        );
       });
+      // Optimistic update — count
+      queryClient.setQueryData<number>(QUERY_KEYS.notificationCount(), (old) =>
+        Math.max(0, (old ?? 0) - 1)
+      );
 
       try {
         await markRead(notificationId);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar como leída';
-        // Underlying function already logs specifics; warn here to avoid Sentry noise
         logger.warnLocal('Error marking notification as read:', errorMessage);
-        // Only rollback on non-network errors; network errors keep the optimistic update
         if (!isTransientNetworkError(err)) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notificationCount() });
         }
       }
     },
@@ -190,33 +194,30 @@ export function useNotifications(): UseNotificationsReturn {
     async (listingId: number, participantId: string) => {
       if (!user) return;
 
-      // Optimistic update
-      queryClient.setQueryData<NotificationsData>(QUERY_KEYS.notifications(), (old) => {
+      // Optimistic update — list
+      queryClient.setQueryData<AppNotification[]>(QUERY_KEYS.notifications(), (old) => {
         if (!old) return old;
-        return {
-          notifications: old.notifications.map((n) =>
-            n.kind === 'listing_chat' &&
-              n.listingId === listingId &&
-              n.actor?.id === participantId
-              ? { ...n, readAt: n.readAt || new Date().toISOString() }
-              : n
-          ),
-          unreadCount: old.unreadCount, // Will be corrected by refetch below
-        };
+        return old.map((n) =>
+          n.kind === 'listing_chat' &&
+            n.listingId === listingId &&
+            n.actor?.id === participantId
+            ? { ...n, readAt: n.readAt || new Date().toISOString() }
+            : n
+        );
       });
 
       try {
         await markListingChatNotificationsRead(listingId, participantId);
-        // Refetch to get accurate count
+        // Refetch both to get accurate state
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notificationCount() });
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Error al marcar chat como leído';
-        // Underlying function already logs specifics; warn here to avoid Sentry noise
         logger.warnLocal('Error marking listing chat as read:', errorMessage);
-        // Only rollback on non-network errors; network errors keep the optimistic update
         if (!isTransientNetworkError(err)) {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notificationCount() });
         }
       }
     },
@@ -240,13 +241,15 @@ export function useNotifications(): UseNotificationsReturn {
     loading,
     error,
     refresh: async () => {
-      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notificationCount() }),
+      ]);
     },
     markAllAsRead: handleMarkAllAsRead,
     markAsRead: handleMarkAsRead,
     markListingChatAsRead: handleMarkListingChatAsRead,
     clearError: () => {
-      // Error is derived from queryError; clearing requires a refetch
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.notifications() });
     },
   };

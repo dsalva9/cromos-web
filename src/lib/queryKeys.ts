@@ -38,6 +38,7 @@ export const QUERY_KEYS = {
 
     /* ─── notifications ─── */
     notifications: () => ['notifications'] as const,
+    notificationCount: () => ['notifications', 'count'] as const,
     notificationPreferences: () => ['notificationPreferences'] as const,
 
     /* ─── trade chat ─── */

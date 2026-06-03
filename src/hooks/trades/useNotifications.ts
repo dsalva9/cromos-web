@@ -177,11 +177,11 @@ export const useNotifications = (): UseNotificationsReturn => {
     }
   }, [user, fetchUnreadCount]);
 
-  // Poll for notification count updates every 30s (replaces realtime subscription).
+  // Poll for notification count updates every 60s (replaces realtime subscription).
   // OneSignal push notifications handle instant user awareness.
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(fetchUnreadCount, 30_000);
+    const interval = setInterval(fetchUnreadCount, 60_000);
     return () => clearInterval(interval);
   }, [user, fetchUnreadCount]);
 
