@@ -18,11 +18,18 @@ export function isTransientNetworkError(error: unknown): boolean {
   const err = error as Record<string, unknown>;
   const message = String(err.message || '');
   const name = String(err.name || '');
+  // Supabase PostgrestError puts details in `.details`; check both fields
+  const details = String(err.details || '');
+  const combined = `${message} ${details}`;
   return (
-    message.includes('Load failed') ||
-    message.includes('Failed to fetch') ||
+    combined.includes('Load failed') ||
+    combined.includes('Failed to fetch') ||
     name === 'AbortError' ||
-    message.includes('signal is aborted')
+    combined.includes('AbortError') ||
+    combined.includes('signal is aborted') ||
+    combined.includes('The user aborted a request') ||
+    combined.includes('network error') ||
+    combined.includes('NetworkError')
   );
 }
 
@@ -97,9 +104,9 @@ export async function fetchNotifications(): Promise<AppNotification[]> {
   if (error) {
     if (isTransientNetworkError(error)) {
       logger.warnLocal('Transient network error fetching notifications:', error);
-    } else {
-      logger.error('Error fetching notifications:', error);
+      return []; // Graceful fallback for aborted/network errors
     }
+    logger.error('Error fetching notifications:', error);
     throw new Error('Error al cargar las notificaciones');
   }
 
