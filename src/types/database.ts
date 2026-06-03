@@ -2368,6 +2368,15 @@ export type Database = {
           users: Json
         }[]
       }
+      admin_get_new_users_counts: {
+        Args: { p_days?: number; p_since?: string }
+        Returns: {
+          country_code: string
+          total_users: number
+          with_listings: number
+          with_messages: number
+        }[]
+      }
       admin_get_new_users_summary: {
         Args: { p_days?: number; p_since?: string }
         Returns: {

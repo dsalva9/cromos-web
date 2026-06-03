@@ -33,15 +33,11 @@ export function getTodaySince(): string {
 }
 
 // ── Response types ────────────────────────────────────────────────────
-export type NewUserRow = {
-  user_id: string;
-  nickname: string;
-  email: string;
-  created_at: string;
-  listings_count: number;
-  albums_count: number;
-  chat_messages_count: number;
+export type NewUserCounts = {
   country_code: string;
+  total_users: number;
+  with_listings: number;
+  with_messages: number;
 };
 
 export type MessagingSummary = {
@@ -76,7 +72,7 @@ export type ListingsByCountry = {
 };
 
 export type AdminStatisticsData = {
-  newUsers: NewUserRow[];
+  newUserCounts: NewUserCounts[];
   messagingSummary: MessagingSummary | null;
   messagingByCountry: MessagingByCountry[];
   listingStatusStats: ListingStatusStat[];
@@ -86,7 +82,7 @@ export type AdminStatisticsData = {
 export function useAdminStatistics(period: TimePeriodKey) {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<AdminStatisticsData>({
-    newUsers: [],
+    newUserCounts: [],
     messagingSummary: null,
     messagingByCountry: [],
     listingStatusStats: [],
@@ -111,7 +107,7 @@ export function useAdminStatistics(period: TimePeriodKey) {
 
       const [usersRes, msgSummaryRes, msgCountryRes, listingStatusRes, listingCountryRes] =
         await Promise.all([
-          supabase.rpc('admin_get_new_users_summary', params).limit(10000),
+          supabase.rpc('admin_get_new_users_counts', params),
           supabase.rpc('admin_get_messaging_activity_summary', params),
           supabase.rpc('admin_get_messaging_activity_by_country', params),
           supabase.rpc('admin_get_listing_status_stats', params),
@@ -126,7 +122,7 @@ export function useAdminStatistics(period: TimePeriodKey) {
       }
 
       setData({
-        newUsers: (usersRes.data as NewUserRow[]) || [],
+        newUserCounts: (usersRes.data as NewUserCounts[]) || [],
         messagingSummary: ((msgSummaryRes.data as MessagingSummary[])?.[0]) || null,
         messagingByCountry: (msgCountryRes.data as MessagingByCountry[]) || [],
         listingStatusStats: (listingStatusRes.data as ListingStatusStat[]) || [],

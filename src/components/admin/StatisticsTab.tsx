@@ -61,17 +61,31 @@ export default function StatisticsTab() {
   // Derive unique country list from all data sources
   const countries = useMemo(() => {
     const set = new Set<string>();
-    data.newUsers.forEach(u => set.add(u.country_code));
+    data.newUserCounts.forEach(c => set.add(c.country_code));
     data.messagingByCountry.forEach(m => set.add(m.country_code));
     data.listingsByCountry.forEach(l => set.add(l.country_code));
     return Array.from(set).sort();
   }, [data]);
 
   // ── Filtered / aggregated metrics ──────────────────────────────
-  const filteredUsers = useMemo(() => {
-    if (country === 'ALL') return data.newUsers;
-    return data.newUsers.filter(u => u.country_code === country);
-  }, [data.newUsers, country]);
+  const userMetrics = useMemo(() => {
+    if (country === 'ALL') {
+      return data.newUserCounts.reduce(
+        (acc, curr) => ({
+          totalUsers: acc.totalUsers + Number(curr.total_users),
+          withListings: acc.withListings + Number(curr.with_listings),
+          withMessages: acc.withMessages + Number(curr.with_messages),
+        }),
+        { totalUsers: 0, withListings: 0, withMessages: 0 },
+      );
+    }
+    const match = data.newUserCounts.find(c => c.country_code === country);
+    return {
+      totalUsers: match ? Number(match.total_users) : 0,
+      withListings: match ? Number(match.with_listings) : 0,
+      withMessages: match ? Number(match.with_messages) : 0,
+    };
+  }, [data.newUserCounts, country]);
 
   const messagingMetrics = useMemo(() => {
     if (country === 'ALL') {
@@ -205,61 +219,22 @@ export default function StatisticsTab() {
               <StatCard
                 icon={<Users className="h-4 w-4" />}
                 label={t('newUsers')}
-                value={filteredUsers.length}
+                value={userMetrics.totalUsers.toLocaleString()}
                 color="gold"
               />
               <StatCard
                 icon={<TrendingUp className="h-4 w-4" />}
                 label={t('withListings')}
-                value={filteredUsers.filter(u => u.listings_count > 0).length}
+                value={userMetrics.withListings.toLocaleString()}
                 color="green"
               />
               <StatCard
                 icon={<MessageSquare className="h-4 w-4" />}
                 label={t('withMessages')}
-                value={filteredUsers.filter(u => u.chat_messages_count > 0).length}
+                value={userMetrics.withMessages.toLocaleString()}
                 color="blue"
               />
             </div>
-
-            {/* Recent signups table */}
-            {filteredUsers.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm bg-[#2D3748] text-white border-2 border-black rounded-md">
-                  <thead>
-                    <tr className="bg-gray-700">
-                      <th className="px-3 py-2 text-left border-b border-black">{t('colNickname')}</th>
-                      <th className="px-3 py-2 text-left border-b border-black">{t('colEmail')}</th>
-                      <th className="px-3 py-2 text-left border-b border-black">{t('colCountry')}</th>
-                      <th className="px-3 py-2 text-left border-b border-black">{t('colJoined')}</th>
-                      <th className="px-3 py-2 text-right border-b border-black">{t('colListings')}</th>
-                      <th className="px-3 py-2 text-right border-b border-black">{t('colMessages')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.slice(0, 200).map(u => (
-                      <tr key={u.user_id} className="odd:bg-[#2D3748] even:bg-[#253044]">
-                        <td className="px-3 py-1.5 border-b border-black font-medium">{u.nickname}</td>
-                        <td className="px-3 py-1.5 border-b border-black text-gray-400">{u.email}</td>
-                        <td className="px-3 py-1.5 border-b border-black">
-                          {countryFlag(u.country_code)} {u.country_code}
-                        </td>
-                        <td className="px-3 py-1.5 border-b border-black whitespace-nowrap text-gray-300">
-                          {new Date(u.created_at).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-1.5 border-b border-black text-right">{u.listings_count}</td>
-                        <td className="px-3 py-1.5 border-b border-black text-right">{u.chat_messages_count}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {filteredUsers.length > 200 && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    {t('showingFirst', { count: 200, total: filteredUsers.length })}
-                  </p>
-                )}
-              </div>
-            )}
           </section>
 
           {/* ── 1b. Spain User Map ──────────────────────────────── */}
