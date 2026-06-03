@@ -130,7 +130,7 @@ function CompleteProfileContent() {
       }
 
       if (existingNickname) {
-        setErrorMessage(t('errors.usernameTaken'));
+        setErrorMessage(t('errors.nicknameTaken'));
         setSaving(false);
         return;
       }
@@ -168,7 +168,7 @@ function CompleteProfileContent() {
 
       if (updateError) {
         if ('code' in updateError && updateError.code === '23505') {
-          setErrorMessage(t('errors.usernameTaken'));
+          setErrorMessage(t('errors.nicknameTaken'));
           setSaving(false);
           return;
         }
@@ -205,9 +205,9 @@ function CompleteProfileContent() {
       if (error && typeof error === 'object' && 'code' in error) {
         const dbError = error as { code: string; message?: string };
         if (dbError.code === 'P0001' && dbError.message?.toLowerCase().includes('postcode')) {
-          setErrorMessage(t('errors.invalidPostcodeFormat'));
+          setErrorMessage(t('errors.invalidPostcode'));
         } else if (dbError.code === '23505') {
-          setErrorMessage(t('errors.usernameTaken'));
+          setErrorMessage(t('errors.nicknameTaken'));
         } else {
           setErrorMessage('profile_save_error');
         }
@@ -306,7 +306,7 @@ function CompleteProfileContent() {
                 <div className="bg-red-600/80 border-2 border-black rounded-md px-4 py-3 text-sm font-bold text-white">
                   {errorMessage === 'profile_save_error' ? (
                     <>
-                      {t('errors.saveError')}
+                      {t('errors.saveFailed')}
                       <br />
                       <br />
                       {tErrors('contactSupport')}{' '}
