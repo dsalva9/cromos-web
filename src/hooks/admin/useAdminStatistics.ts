@@ -111,7 +111,7 @@ export function useAdminStatistics(period: TimePeriodKey) {
 
       const [usersRes, msgSummaryRes, msgCountryRes, listingStatusRes, listingCountryRes] =
         await Promise.all([
-          supabase.rpc('admin_get_new_users_summary', params),
+          supabase.rpc('admin_get_new_users_summary', params).limit(10000),
           supabase.rpc('admin_get_messaging_activity_summary', params),
           supabase.rpc('admin_get_messaging_activity_by_country', params),
           supabase.rpc('admin_get_listing_status_stats', params),
