@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
 import { Listing } from '@/types/v1.6.0';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 interface GetMarketplaceDataParams {
     search?: string;
@@ -100,7 +101,11 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
         );
 
         if (error) {
-            logger.error('Error fetching listings on server:', error);
+            if (isTransientNetworkError(error)) {
+                logger.warnLocal('Transient network error fetching listings on server:', error);
+            } else {
+                logger.error('Error fetching listings on server:', error);
+            }
             return { listings: [], userPostcode };
         }
 
@@ -134,7 +139,11 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
 
         return { listings: listings as Listing[], userPostcode };
     } catch (error) {
-        logger.error('Exception fetching marketplace data on server:', error);
+        if (isTransientNetworkError(error)) {
+            logger.warnLocal('Transient network error fetching marketplace data on server:', error);
+        } else {
+            logger.error('Exception fetching marketplace data on server:', error);
+        }
         return { listings: [], userPostcode: null };
     }
 }

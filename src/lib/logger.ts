@@ -70,16 +70,38 @@ export const logger = {
    */
   error: (...args: unknown[]) => {
     // Check if this is a transient network error (not a real application error)
-    const NETWORK_ERROR_PATTERNS = ['Failed to fetch', 'AbortError', 'Load failed', 'ChunkLoadError', 'Failed to load chunk'];
+    const NETWORK_ERROR_PATTERNS = [
+      'failed to fetch',
+      'fetch failed',
+      'aborterror',
+      'load failed',
+      'chunkloaderror',
+      'failed to load chunk',
+      'socket hang up',
+      'econnreset',
+      'etimedout',
+      'the user aborted a request',
+      'signal is aborted',
+      'networkerror',
+      'network error'
+    ];
     const isNetworkError = args.some((arg) => {
       if (typeof arg === 'string') {
-        return NETWORK_ERROR_PATTERNS.some((p) => arg.includes(p));
+        const lowerArg = arg.toLowerCase();
+        return NETWORK_ERROR_PATTERNS.some((p) => lowerArg.includes(p));
       }
       if (arg && typeof arg === 'object') {
         const obj = arg as Record<string, unknown>;
-        const details = String(obj.details || '');
-        const message = String(obj.message || '');
-        return NETWORK_ERROR_PATTERNS.some((p) => details.includes(p) || message.includes(p));
+        const details = String(obj.details || '').toLowerCase();
+        const message = String(obj.message || '').toLowerCase();
+        const name = String(obj.name || '').toLowerCase();
+        const code = String(obj.code || '').toLowerCase();
+        return NETWORK_ERROR_PATTERNS.some((p) => 
+          details.includes(p) || 
+          message.includes(p) || 
+          name.includes(p) || 
+          code.includes(p)
+        );
       }
       return false;
     });

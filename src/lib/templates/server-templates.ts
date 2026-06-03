@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
+import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 export interface Template {
     id: number;
@@ -102,13 +103,21 @@ export async function getPublicTemplates(params: GetTemplatesParams = {}) {
         );
 
         if (error) {
+            if (isTransientNetworkError(error)) {
+                logger.warnLocal('Transient network error fetching public templates on server:', error);
+                return [];
+            }
             logger.error('Error fetching public templates on server:', error);
             throw new Error(error.message);
         }
 
         return (data || []) as Template[];
     } catch (error) {
-        logger.error('Exception fetching public templates on server:', error);
+        if (isTransientNetworkError(error)) {
+            logger.warnLocal('Transient network error fetching public templates on server:', error);
+        } else {
+            logger.error('Exception fetching public templates on server:', error);
+        }
         return [];
     }
 }
