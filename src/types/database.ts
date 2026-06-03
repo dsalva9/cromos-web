@@ -662,6 +662,7 @@ export type Database = {
           id: number
           kind: string
           listing_id: number | null
+          match_conversation_id: number | null
           payload: Json
           rating_id: number | null
           read_at: string | null
@@ -675,6 +676,7 @@ export type Database = {
           id?: number
           kind: string
           listing_id?: number | null
+          match_conversation_id?: number | null
           payload?: Json
           rating_id?: number | null
           read_at?: string | null
@@ -688,6 +690,7 @@ export type Database = {
           id?: number
           kind?: string
           listing_id?: number | null
+          match_conversation_id?: number | null
           payload?: Json
           rating_id?: number | null
           read_at?: string | null
