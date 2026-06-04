@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import {
   Eye,
@@ -24,6 +24,11 @@ export function AdvertiseClient() {
   const t = useTranslations('advertise');
   const locale = useLocale();
   const formatSectionRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to top on mount to prevent Next.js layout-shift scroll preservation bugs
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
