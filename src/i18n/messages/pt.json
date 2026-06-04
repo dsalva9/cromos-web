@@ -1762,7 +1762,10 @@
     "goToChat": "Ir para o chat",
     "confirmTransaction": "Confirmar transação",
     "viewRating": "Ver avaliação",
-    "viewDetails": "Ver detalhes"
+    "viewDetails": "Ver detalhes",
+    "new_one": "nova",
+    "new_other": "novas",
+    "andMore": "e {count} mais..."
   },
   "pwa": {
     "installPrompt": "📲 Para uma melhor experiência, instale o app CambioCromos!",
