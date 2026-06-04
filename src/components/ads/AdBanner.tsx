@@ -42,7 +42,7 @@ export function AdBanner() {
     <>
       {/* ═══════ MOBILE BANNER (below bottom nav) ═══════ */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white/95 dark:bg-gray-900/95"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <a
