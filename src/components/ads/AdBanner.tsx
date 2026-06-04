@@ -51,6 +51,7 @@ export function AdBanner() {
             group flex items-center gap-2 w-full
             bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm
             border-t border-gold/30 dark:border-gold/20
+            border-b border-b-gray-200 dark:border-b-gray-800
             px-3 h-[44px]
             transition-colors duration-200
             hover:bg-gray-50 dark:hover:bg-gray-800/95
