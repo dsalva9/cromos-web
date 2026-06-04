@@ -2355,5 +2355,12 @@
       "errorEmail": "Please enter a valid email address.",
       "errorGeneric": "An error occurred while sending the request. Please try again or write directly to info@cambiocromos.com."
     }
+  },
+  "adBanner": {
+    "title": "📣 Want to advertise here?",
+    "titleDesktop": "📣 This ad space could be yours",
+    "subtitle": "Reach thousands of real collectors every month",
+    "subtitleDesktop": "Reach thousands of active collectors every day",
+    "cta": "Info"
   }
 }

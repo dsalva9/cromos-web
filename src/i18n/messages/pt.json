@@ -2355,5 +2355,12 @@
       "errorEmail": "Por favor, insira um endereço de e-mail válido.",
       "errorGeneric": "Ocorreu um erro ao enviar a solicitação. Por favor, tente novamente ou escreva diretamente para info@cambiocromos.com."
     }
+  },
+  "adBanner": {
+    "title": "📣 Quer anunciar aqui?",
+    "titleDesktop": "📣 Este espaço publicitário pode ser seu",
+    "subtitle": "Alcance milhares de colecionadores reais todos os meses",
+    "subtitleDesktop": "Alcance milhares de colecionadores ativos todos os dias",
+    "cta": "Info"
   }
 }

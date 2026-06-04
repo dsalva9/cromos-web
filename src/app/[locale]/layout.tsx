@@ -13,6 +13,7 @@ import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
+import { AdBanner } from '@/components/ads/AdBanner';
 import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
 import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
@@ -75,12 +76,13 @@ export default async function LocaleLayout({ children, params }: Props) {
             <SiteHeader />
           </header>
           <AccountDeletionBanner />
-          <main id="main-content" role="main" className="flex-1 pb-20 md:pb-0" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
+          <main id="main-content" role="main" className="flex-1 pb-32 md:pb-16" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))' }}>
             <PasswordRecoveryGuard>
               <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
             </PasswordRecoveryGuard>
           </main>
           <MobileBottomNav />
+          <AdBanner />
           <FloatingActionBtn />
           <SiteFooter />
           <CookieConsentBanner />
