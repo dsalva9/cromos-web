@@ -31,7 +31,6 @@ type NavigationLink = {
   href: string;
   label: string;
   requiresCompletion?: boolean;
-  isNew?: boolean;
 };
 
 // Simplified Avatar component for mobile that links directly to profile
@@ -112,7 +111,7 @@ export default function SiteHeader() {
     { href: '/marketplace', label: t('marketplace'), requiresCompletion: true },
     { href: '/mis-plantillas', label: t('myAlbums'), requiresCompletion: true },
     { href: '/chats', label: t('chats'), requiresCompletion: true },
-    { href: '/intercambios/buscar', label: t('trades'), requiresCompletion: true, isNew: true },
+    { href: '/intercambios/buscar', label: t('trades'), requiresCompletion: true },
     { href: '/blog', label: t('blog') },
   ];
 
@@ -224,11 +223,6 @@ export default function SiteHeader() {
                     onClick={handleProtectedNavigation(link.requiresCompletion)}
                   >
                     {link.label}
-                    {link.isNew && (
-                      <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase bg-red-500 text-white leading-none animate-pulse">
-                        NEW
-                      </span>
-                    )}
                   </NavLink>
                 </li>
               ))}

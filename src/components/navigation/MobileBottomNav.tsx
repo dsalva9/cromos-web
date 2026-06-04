@@ -139,11 +139,6 @@ export function MobileBottomNav() {
             aria-label="Matches"
           >
             <ArrowLeftRight className="h-6 w-6" />
-            {totalUnread === 0 && (
-              <span className="absolute top-0.5 right-[18%] px-1 py-[1px] rounded text-[7px] font-black uppercase bg-red-500 text-white leading-none">
-                NEW
-              </span>
-            )}
             {totalUnread > 0 && (
               <span className="absolute top-1 right-1/4 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
                 {totalUnread > 9 ? '9+' : totalUnread}
