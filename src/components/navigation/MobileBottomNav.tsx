@@ -10,6 +10,7 @@ import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { AD_BANNER_HIDDEN_PATHS } from '@/components/ads/AdBanner';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 
 /** Strip the locale prefix from a pathname for active-state matching. */
@@ -69,6 +70,9 @@ export function MobileBottomNav() {
     setIsMenuOpen(true);
   };
 
+  // Check if the ad banner is hidden on this page
+  const isBannerHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
+
   // If user is not logged in (and wasn't previously authed), do not show the bottom nav
   // Before mount, always return null to match SSR output and avoid hydration mismatch
   if (!hasMounted || (!user && !wasAuthed)) {
@@ -77,7 +81,17 @@ export function MobileBottomNav() {
 
   return (
     <>
-      <nav className="md:hidden fixed left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]" style={{ bottom: 'calc(44px + env(safe-area-inset-bottom, 0px))' }}>
+      <nav
+        className="md:hidden fixed left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]"
+        style={{
+          bottom: isBannerHidden
+            ? '0px'
+            : 'calc(44px + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: isBannerHidden
+            ? 'env(safe-area-inset-bottom, 0px)'
+            : undefined,
+        }}
+      >
         <div className="flex justify-around items-center h-16">
           <a
             href="/marketplace"

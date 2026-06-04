@@ -11,7 +11,7 @@ function stripLocale(path: string): string {
 }
 
 /** Pages where the ad banner should be hidden */
-const HIDDEN_PATHS = ['/login', '/register', '/advertise', '/admin'];
+export const AD_BANNER_HIDDEN_PATHS = ['/login', '/register', '/advertise', '/admin'];
 
 /**
  * Height of the ad banner content (without safe-area).
@@ -32,7 +32,7 @@ export function AdBanner() {
   if (!hasMounted) return null;
 
   // Hide on specific pages
-  if (HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'))) {
+  if (AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'))) {
     return null;
   }
 
@@ -42,19 +42,19 @@ export function AdBanner() {
     <>
       {/* ═══════ MOBILE BANNER (below bottom nav) ═══════ */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-gray-900/95"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white/95 dark:bg-gray-900/95"
         style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         <a
           href={advertiseUrl}
           className="
             group flex items-center gap-2 w-full
-            bg-gray-900/95 backdrop-blur-sm
-            border-t border-gold/20
+            bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm
+            border-t border-gold/30 dark:border-gold/20
             px-3 h-[44px]
             transition-colors duration-200
-            hover:bg-gray-800/95
-            active:bg-gray-800
+            hover:bg-gray-50 dark:hover:bg-gray-800/95
+            active:bg-gray-100 dark:active:bg-gray-800
           "
         >
           {/* Gold accent line at top */}
@@ -64,7 +64,7 @@ export function AdBanner() {
           <Megaphone className="h-4 w-4 text-gold shrink-0" />
 
           {/* Single-line text */}
-          <p className="flex-1 min-w-0 text-[12px] font-semibold text-white leading-none truncate">
+          <p className="flex-1 min-w-0 text-[12px] font-semibold text-gray-800 dark:text-white leading-none truncate">
             {t('titleShort')}
           </p>
 
