@@ -41,22 +41,21 @@ export function AdBanner() {
   return (
     <>
       {/* ═══════ MOBILE BANNER (below bottom nav) ═══════ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)]">
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-gray-900/95"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      >
         <a
           href={advertiseUrl}
           className="
             group flex items-center gap-2 w-full
             bg-gray-900/95 backdrop-blur-sm
             border-t border-gold/20
-            px-3
+            px-3 h-[44px]
             transition-colors duration-200
             hover:bg-gray-800/95
             active:bg-gray-800
           "
-          style={{
-            height: `${AD_BANNER_HEIGHT}px`,
-            paddingBottom: 'env(safe-area-inset-bottom)',
-          }}
         >
           {/* Gold accent line at top */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold/0 via-gold to-gold/0" />
