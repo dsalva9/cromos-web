@@ -24,7 +24,8 @@
     "faq": "FAQ",
     "contact": "Contacto",
     "about": "Sobre Nosotros",
-    "blog": "Blog"
+    "blog": "Blog",
+    "advertise": "Anúnciate"
   },
   "language": {
     "change": "Cambiar idioma"
@@ -1944,7 +1945,8 @@
     "contact": "Contacto",
     "about": "Sobre Nosotros",
     "blog": "Blog",
-    "favorites": "Favoritos"
+    "favorites": "Favoritos",
+    "advertise": "Anúnciate"
   },
   "notificationsDropdown": {
     "title": "Notificaciones",
@@ -2278,6 +2280,80 @@
         "swipeHint": "Desliza para decidir",
         "keyboardHint": "← Pasar · → Proponer · Espacio = Detalle"
       }
+    }
+  },
+  "advertise": {
+    "title": "Anúnciate en CambioCromos",
+    "metaTitle": "Anúnciate con nosotros",
+    "metaDescription": "Llega a miles de coleccionistas reales cada mes. Promociona tu marca, tienda o producto en la comunidad líder en España.",
+    "heroBadge": "ANÚNCIATE EN CAMBIOCROMOS",
+    "heroTitle": "Llega a miles de coleccionistas reales cada mes",
+    "heroSubtitle": "Promociona tu marca, tienda o producto en la comunidad líder de intercambio de cromos y coleccionismo en España.",
+    "stats": {
+      "visits": "visitas mensuales",
+      "activeUsers": "usuarios activos",
+      "last30m": "en los últimos 30 minutos",
+      "registered": "usuarios registrados",
+      "last2m": "en los últimos 2 meses",
+      "andRising": "y subiendo"
+    },
+    "cta": {
+      "info": "Solicita información",
+      "howItWorks": "Ver cómo funciona",
+      "bannerTitle": "¿Quieres llegar a miles de coleccionistas?",
+      "bannerSubtitle": "Solicita información y te enviaremos disponibilidad y tarifas sin compromiso."
+    },
+    "chart": {
+      "visitsLabel": "VISITAS",
+      "activeUsersLabel": "USUARIOS ACTIVOS",
+      "month": "JUNIO"
+    },
+    "audience": {
+      "sectionBadge": "NUESTRA AUDIENCIA",
+      "title": "Una comunidad apasionada y en constante crecimiento",
+      "subtitle": "Miles de coleccionistas activos cada día buscando, comprando, vendiendo e intercambiando cromos.",
+      "bullet1": "Cromos de fútbol",
+      "bullet2": "Adrenalyn XL",
+      "bullet3": "Pokémon",
+      "bullet4": "Mundial de fútbol",
+      "bullet5": "Álbumes y accesorios",
+      "bullet6": "Cartas coleccionables"
+    },
+    "media": {
+      "sectionBadge": "HEMOS APARECIDO EN",
+      "title": "CambioCromos en los medios",
+      "description": "Nuestra comunidad ha sido destacada por diversos medios de comunicación nacionales y regionales gracias a su crecimiento y especialización en el mundo del coleccionismo.",
+      "link": "Ver apariciones en prensa"
+    },
+    "format": {
+      "sectionBadge": "NUESTRO FORMATO PUBLICITARIO",
+      "title": "Un único formato. Máxima visibilidad.",
+      "subtitle": "Banner flotante en footer",
+      "description": "Tu anuncio aparecerá fijo en la parte inferior de la pantalla durante toda la navegación del usuario.",
+      "bullet1": "Visible en todas las páginas",
+      "bullet2": "Presencia permanente durante la navegación",
+      "bullet3": "Compatible con móvil y ordenador",
+      "bullet4": "Formato discreto y efectivo",
+      "bullet5": "Máxima exposición para tu marca",
+      "previewText": "TU ANUNCIO AQUÍ",
+      "previewSubtext": "Tu marca visible por miles de coleccionistas",
+      "previewCta": "Conoce más",
+      "alwaysVisible": "Siempre visible en la parte inferior"
+    },
+    "modal": {
+      "title": "Solicitar información publicitaria",
+      "description": "Completa el formulario y nos pondremos en contacto contigo a la brevedad. También puedes escribirnos directamente a",
+      "labelName": "Nombre de contacto",
+      "labelCompany": "Nombre de la empresa (Opcional)",
+      "labelEmail": "Correo electrónico",
+      "labelMessage": "Mensaje o consulta",
+      "placeholderMessage": "Cuéntanos sobre tu marca y qué tipo de promoción te interesa...",
+      "submit": "Enviar solicitud",
+      "sending": "Enviando...",
+      "success": "¡Solicitud enviada con éxito! Nos pondremos en contacto contigo lo antes posible.",
+      "errorRequired": "Por favor, rellena todos los campos requeridos.",
+      "errorEmail": "Por favor, introduce un correo electrónico válido.",
+      "errorGeneric": "Ocurrió un error al enviar la solicitud. Por favor, vuelve a intentarlo o escribe directamente a info@cambiocromos.com."
     }
   }
 }

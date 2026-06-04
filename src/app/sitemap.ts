@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { path: '/legal/cookies', changeFrequency: 'monthly' as const, priority: 0.3 },
         { path: '/legal/privacy', changeFrequency: 'monthly' as const, priority: 0.3 },
         { path: '/legal/terms', changeFrequency: 'monthly' as const, priority: 0.3 },
+        { path: '/advertise', changeFrequency: 'monthly' as const, priority: 0.3 },
     ];
 
     // Generate one entry per locale per static route

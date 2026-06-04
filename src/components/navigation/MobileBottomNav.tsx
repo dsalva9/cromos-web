@@ -306,6 +306,14 @@ export function MobileBottomNav() {
               >
                 {t('about')}
               </a>
+              <span>·</span>
+              <a
+                href="/advertise"
+                onClick={(e) => { e.preventDefault(); hapticImpact(); setIsMenuOpen(false); window.location.href = lp('/advertise'); }}
+                className="hover:text-gold transition-colors"
+              >
+                {t('advertise')}
+              </a>
             </div>
             <p className="text-center text-[10px] text-gray-300 dark:text-gray-600 pb-1">v1.0 Beta</p>
           </div>

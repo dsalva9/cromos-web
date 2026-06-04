@@ -1127,7 +1127,8 @@
     "faq": "FAQ",
     "contact": "Contact",
     "about": "About Us",
-    "blog": "Blog"
+    "blog": "Blog",
+    "advertise": "Advertise"
   },
   "language": {
     "change": "Change language"
@@ -1944,7 +1945,8 @@
     "contact": "Contact",
     "about": "About Us",
     "blog": "Blog",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "advertise": "Advertise"
   },
   "notificationsDropdown": {
     "title": "Notifications",
@@ -2278,6 +2280,80 @@
         "swipeHint": "Swipe to decide",
         "keyboardHint": "← Pass · → Propose · Space = Detail"
       }
+    }
+  },
+  "advertise": {
+    "title": "Advertise on CambioCromos",
+    "metaTitle": "Advertise with Us",
+    "metaDescription": "Reach thousands of real collectors every month. Promote your brand, store, or product in the leading community in Spain.",
+    "heroBadge": "ADVERTISE ON CAMBIOCROMOS",
+    "heroTitle": "Reach thousands of real collectors every month",
+    "heroSubtitle": "Promote your brand, store, or product in the leading community for sticker exchange and collecting in Spain.",
+    "stats": {
+      "visits": "monthly visits",
+      "activeUsers": "active users",
+      "last30m": "in the last 30 minutes",
+      "registered": "registered users",
+      "last2m": "in the last 2 months",
+      "andRising": "and rising"
+    },
+    "cta": {
+      "info": "Request information",
+      "howItWorks": "See how it works",
+      "bannerTitle": "Want to reach thousands of collectors?",
+      "bannerSubtitle": "Request information and we will send you availability and rates without obligation."
+    },
+    "chart": {
+      "visitsLabel": "VISITS",
+      "activeUsersLabel": "ACTIVE USERS",
+      "month": "JUNE"
+    },
+    "audience": {
+      "sectionBadge": "OUR AUDIENCE",
+      "title": "A passionate and constantly growing community",
+      "subtitle": "Thousands of active collectors every day searching, buying, selling, and trading stickers.",
+      "bullet1": "Football stickers",
+      "bullet2": "Adrenalyn XL",
+      "bullet3": "Pokémon",
+      "bullet4": "World Cup stickers",
+      "bullet5": "Albums & accessories",
+      "bullet6": "Trading cards"
+    },
+    "media": {
+      "sectionBadge": "WE HAVE BEEN FEATURED IN",
+      "title": "CambioCromos in the media",
+      "description": "Our community has been highlighted by various national and regional media outlets thanks to its growth and specialization in the world of collecting.",
+      "link": "See media appearances"
+    },
+    "format": {
+      "sectionBadge": "OUR ADVERTISING FORMAT",
+      "title": "A single format. Maximum visibility.",
+      "subtitle": "Floating footer banner",
+      "description": "Your ad will appear fixed at the bottom of the screen during all user navigation.",
+      "bullet1": "Visible on all pages",
+      "bullet2": "Permanent presence during navigation",
+      "bullet3": "Mobile and desktop compatible",
+      "bullet4": "Discreet and effective format",
+      "bullet5": "Maximum exposure for your brand",
+      "previewText": "YOUR AD HERE",
+      "previewSubtext": "Your brand visible to thousands of collectors",
+      "previewCta": "Learn more",
+      "alwaysVisible": "Always visible at the bottom"
+    },
+    "modal": {
+      "title": "Request Advertising Information",
+      "description": "Complete the form below and we will contact you shortly. Alternatively, you can write directly to",
+      "labelName": "Contact name",
+      "labelCompany": "Company name (Optional)",
+      "labelEmail": "Email address",
+      "labelMessage": "Message or inquiry",
+      "placeholderMessage": "Tell us about your brand and what kind of promotion you are interested in...",
+      "submit": "Send request",
+      "sending": "Sending...",
+      "success": "Request sent successfully! We will get in touch with you as soon as possible.",
+      "errorRequired": "Please fill in all required fields.",
+      "errorEmail": "Please enter a valid email address.",
+      "errorGeneric": "An error occurred while sending the request. Please try again or write directly to info@cambiocromos.com."
     }
   }
 }
