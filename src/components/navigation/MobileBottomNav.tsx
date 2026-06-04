@@ -77,7 +77,7 @@ export function MobileBottomNav() {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-[50px] left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]">
+      <nav className="md:hidden fixed left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]" style={{ bottom: 'calc(44px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex justify-around items-center h-16">
           <a
             href="/marketplace"

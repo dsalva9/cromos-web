@@ -42,7 +42,7 @@ export function FloatingActionBtn() {
 
   // Hide on desktop
   return (
-    <div className="md:hidden fixed bottom-[calc(4rem+50px+1rem)] right-4 z-40">
+    <div className="md:hidden fixed right-4 z-40" style={{ bottom: 'calc(4rem + 44px + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
       <Link
         href={actionLink}
         className={cn(

@@ -2358,6 +2358,7 @@
   },
   "adBanner": {
     "title": "📣 ¿Quieres anunciarte aquí?",
+    "titleShort": "¿Quieres anunciarte aquí?",
     "titleDesktop": "📣 Este espacio publicitario puede ser tuyo",
     "subtitle": "Llega a miles de coleccionistas reales cada mes",
     "subtitleDesktop": "Llega a miles de coleccionistas activos cada día",

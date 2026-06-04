@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Megaphone, ChevronRight, Sparkles } from 'lucide-react';
+import { Megaphone, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 /** Strip the locale prefix from a pathname. */
@@ -12,6 +12,12 @@ function stripLocale(path: string): string {
 
 /** Pages where the ad banner should be hidden */
 const HIDDEN_PATHS = ['/login', '/register', '/advertise', '/admin'];
+
+/**
+ * Height of the ad banner content (without safe-area).
+ * Exported so other components can reference it for offset calculations.
+ */
+export const AD_BANNER_HEIGHT = 44; // px — mobile
 
 export function AdBanner() {
   const rawPathname = usePathname();
@@ -39,39 +45,34 @@ export function AdBanner() {
         <a
           href={advertiseUrl}
           className="
-            group flex items-center gap-3 w-full
+            group flex items-center gap-2 w-full
             bg-gray-900/95 backdrop-blur-sm
             border-t border-gold/20
-            px-4 h-[50px]
+            px-3
             transition-colors duration-200
             hover:bg-gray-800/95
             active:bg-gray-800
           "
-          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          style={{
+            height: `${AD_BANNER_HEIGHT}px`,
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
         >
           {/* Gold accent line at top */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold/0 via-gold to-gold/0" />
 
           {/* Icon */}
-          <div className="relative shrink-0">
-            <Megaphone className="h-5 w-5 text-gold" />
-            <Sparkles className="absolute -top-1 -right-1 h-2.5 w-2.5 text-gold/80 animate-pulse" />
-          </div>
+          <Megaphone className="h-4 w-4 text-gold shrink-0" />
 
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-bold text-white leading-tight truncate">
-              {t('title')}
-            </p>
-            <p className="text-[10px] text-gray-400 leading-tight truncate">
-              {t('subtitle')}
-            </p>
-          </div>
+          {/* Single-line text */}
+          <p className="flex-1 min-w-0 text-[12px] font-semibold text-white leading-none truncate">
+            {t('titleShort')}
+          </p>
 
-          {/* CTA */}
-          <div className="shrink-0 flex items-center gap-1 bg-gold/15 border border-gold/30 text-gold text-[11px] font-bold uppercase px-3 py-1.5 rounded-full transition-all duration-200 group-hover:bg-gold/25 group-hover:border-gold/50">
+          {/* CTA pill */}
+          <div className="shrink-0 flex items-center gap-0.5 bg-gold text-black text-[10px] font-bold uppercase px-2.5 py-1 rounded-full transition-all duration-200 group-hover:bg-gold-light">
             <span>{t('cta')}</span>
-            <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+            <ChevronRight className="h-3 w-3" />
           </div>
         </a>
       </div>
@@ -94,10 +95,7 @@ export function AdBanner() {
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-60 dark:opacity-100" />
 
           {/* Icon */}
-          <div className="relative shrink-0">
-            <Megaphone className="h-5 w-5 text-gold" />
-            <Sparkles className="absolute -top-1.5 -right-1.5 h-3 w-3 text-gold/70 animate-pulse" />
-          </div>
+          <Megaphone className="h-5 w-5 text-gold shrink-0" />
 
           {/* Text */}
           <div className="flex items-center gap-2">
