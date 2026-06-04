@@ -238,7 +238,7 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          <div className="flex items-center gap-2 md:hidden auth-dependent">
+          <div className="flex items-center gap-1 min-[350px]:gap-2 md:hidden auth-dependent">
             {i18nEnabled && <LanguageSelector />}
             {!hasMounted || loading ? (
               /* Invisible spacer to prevent layout shift while auth loads */

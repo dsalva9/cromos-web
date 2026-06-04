@@ -87,7 +87,7 @@ export function AdvertiseClient() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
       
       {/* 1. Hero Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white py-16 lg:py-24 border-b border-indigo-950">
+      <section className="relative overflow-x-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white py-16 lg:py-24 border-b border-indigo-950">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent pointer-events-none" />
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -98,7 +98,7 @@ export function AdvertiseClient() {
                 <Megaphone className="w-3.5 h-3.5" />
                 {t('heroBadge')}
               </span>
-              <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight uppercase">
+              <h1 className="text-[1.75rem] sm:text-4xl md:text-5xl font-black tracking-tight leading-tight uppercase">
                 {t('heroTitle')}
               </h1>
               <p className="text-lg sm:text-xl text-indigo-200/90 font-medium leading-relaxed max-w-2xl">
@@ -604,7 +604,7 @@ export function AdvertiseClient() {
             </div>
 
             {/* Footer Buttons */}
-            <div className="flex flex-row justify-end gap-3 pt-3 border-t border-gray-150 dark:border-gray-750">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t border-gray-150 dark:border-gray-750">
               <Button
                 type="button"
                 variant="secondary"
