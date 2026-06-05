@@ -184,7 +184,7 @@ export default function SiteHeader() {
 
 
       <div className="container mx-auto px-4" style={{ paddingRight: 'max(1rem, var(--sar, 0px))', paddingLeft: 'max(1rem, var(--sal, 0px))' }}>
-        <div className="flex h-16 sm:h-20 items-center justify-between overflow-hidden">
+        <div className="flex h-16 sm:h-20 items-center justify-between">
           <NavLink
             href={user ? '/dashboard' : '/'}
             className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1 min-w-0 shrink"
