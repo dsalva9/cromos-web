@@ -183,11 +183,11 @@ export default function SiteHeader() {
     <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
 
 
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 sm:h-20 items-center justify-between">
+      <div className="container mx-auto px-4" style={{ paddingRight: 'max(1rem, var(--sar, 0px))', paddingLeft: 'max(1rem, var(--sal, 0px))' }}>
+        <div className="flex h-16 sm:h-20 items-center justify-between overflow-hidden">
           <NavLink
             href={user ? '/dashboard' : '/'}
-            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1"
+            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1 min-w-0 shrink"
             onClick={closeMenu}
           >
             <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
@@ -238,11 +238,14 @@ export default function SiteHeader() {
             )}
           </nav>
 
-          <div className="flex items-center gap-1 min-[350px]:gap-2 md:hidden auth-dependent">
+          <div className="flex items-center gap-1 min-[350px]:gap-2 md:hidden auth-dependent shrink-0">
             {i18nEnabled && <LanguageSelector />}
             {!hasMounted || loading ? (
-              /* Invisible spacer to prevent layout shift while auth loads */
-              <div className="w-10 h-10" />
+              /* Invisible spacer — match the actual width of bell + avatar to prevent layout shift */
+              <div className="flex items-center gap-1 min-[350px]:gap-2">
+                <div className="w-10 h-10" />
+                <div className="w-10 h-10" />
+              </div>
             ) : (
               user ? (
                 <>
