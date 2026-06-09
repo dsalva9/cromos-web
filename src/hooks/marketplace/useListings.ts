@@ -156,8 +156,10 @@ export function useListings({
     queryFn: async ({ pageParam = 0 }) => {
       const currentIds = collectionIdsRef.current;
       const hasCollectionFilter = currentIds && currentIds.length > 0;
+      const currentLimit = pageParam === 0 ? limit : 20;
+
       const rpcParams: Record<string, unknown> = {
-        p_limit: limit,
+        p_limit: currentLimit,
         p_offset: pageParam,
         p_search: search || null,
         p_viewer_postcode: viewerPostcode,
@@ -178,8 +180,10 @@ export function useListings({
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
-      // If the last page returned fewer items than the limit, there are no more
-      if (lastPage.length < limit) return undefined;
+      // If the last page returned fewer items than the limit used for that page, there are no more
+      const pageIndex = allPages.length - 1;
+      const expectedLimit = pageIndex === 0 ? limit : 20;
+      if (lastPage.length < expectedLimit) return undefined;
       // Otherwise the next offset is the total number of items fetched so far
       return allPages.reduce((total, page) => total + page.length, 0);
     },

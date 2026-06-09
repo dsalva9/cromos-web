@@ -202,7 +202,7 @@ export function ListingCard({ listing }: ListingCardProps) {
               />
               {listing.author_completed_trades && listing.author_completed_trades > 0 ? (
                 <span
-                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm"
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm whitespace-nowrap shrink-0"
                   title={`${listing.author_completed_trades} intercambios completados`}
                 >
                   ⭐ {listing.author_completed_trades}
