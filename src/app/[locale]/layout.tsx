@@ -22,6 +22,7 @@ import PWASplashScreen from '@/components/pwa/PWASplashScreen';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 import { NotificationPromptBanner } from '@/components/notifications/NotificationPromptBanner';
+import PWAInstallQueryHandler from '@/components/pwa/PWAInstallQueryHandler';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -87,6 +88,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <SiteFooter />
           <CookieConsentBanner />
           <NotificationPromptBanner />
+          <PWAInstallQueryHandler />
           <Toaster
             position="top-right"
             richColors
