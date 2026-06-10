@@ -424,27 +424,34 @@ export default function UserProfilePage() {
       }
       await refetch();
     } catch (updateErr) {
-      logger.error('Profile update failed', updateErr);
+      let isValidationError = false;
 
-      // Handle specific postcode validation errors
       if (
         updateErr &&
-        typeof updateErr === 'object' &&
-        'message' in updateErr
+        typeof updateErr === 'object'
       ) {
-        const errorMessage = String(updateErr.message);
+        const msg = 'message' in updateErr ? String(updateErr.message).toLowerCase() : '';
+        const code = 'code' in updateErr ? String((updateErr as { code: string }).code) : '';
 
-        // Check if it's a postcode validation error from the database
         if (
-          errorMessage.includes('codigo postal') ||
-          errorMessage.includes('postcode')
+          msg.includes('codigo postal') ||
+          msg.includes('postcode') ||
+          code === 'P0001'
         ) {
+          logger.warnLocal('Postcode validation error on profile update:', updateErr);
           toast.error(t('toast.postcodeApiError'));
-          return;
+          isValidationError = true;
+        } else if (code === '23505') {
+          logger.warnLocal('Nickname unique constraint error on profile update:', updateErr);
+          toast.error('Ese usuario ya está en uso. Prueba con otro.');
+          isValidationError = true;
         }
       }
 
-      toast.error(t('toast.updateError'));
+      if (!isValidationError) {
+        logger.error('Profile update failed', updateErr);
+        toast.error(t('toast.updateError'));
+      }
     } finally {
       setSavingProfile(false);
       setUploadingAvatar(false);

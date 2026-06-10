@@ -117,7 +117,19 @@ export const logger = {
     // Send errors to Sentry in production
     if (isSentryEnabled) {
       const firstArg = args[0];
-      if (firstArg instanceof Error) {
+      const errorArg = args.find(
+        (arg) =>
+          arg instanceof Error ||
+          (arg && typeof arg === 'object' && 'stack' in arg && 'message' in arg)
+      );
+
+      if (errorArg) {
+        Sentry.captureException(errorArg, {
+          tags: {
+            logger_message: typeof firstArg === 'string' ? firstArg : undefined,
+          },
+        });
+      } else if (firstArg instanceof Error) {
         Sentry.captureException(firstArg);
       } else {
         Sentry.captureException(new Error(String(firstArg)));

@@ -199,19 +199,23 @@ function CompleteProfileContent() {
         router.push('/marketplace');
       }
     } catch (error) {
-      logger.error('Error completing profile', error);
-
       // Extract user-friendly error from Supabase DB errors
+      let isValidationError = false;
       if (error && typeof error === 'object' && 'code' in error) {
         const dbError = error as { code: string; message?: string };
         if (dbError.code === 'P0001' && dbError.message?.toLowerCase().includes('postcode')) {
           setErrorMessage(t('errors.invalidPostcode'));
+          isValidationError = true;
         } else if (dbError.code === '23505') {
           setErrorMessage(t('errors.nicknameTaken'));
-        } else {
-          setErrorMessage('profile_save_error');
+          isValidationError = true;
         }
+      }
+
+      if (isValidationError) {
+        logger.warnLocal('Validation error completing profile:', error);
       } else {
+        logger.error('Error completing profile', error);
         setErrorMessage('profile_save_error');
       }
     } finally {
