@@ -23,9 +23,14 @@ export async function ensureSquare(
 
   // Use object URL instead of data URL to avoid base64 encoding overhead
   const objectUrl = URL.createObjectURL(file);
+  let currentUrl = objectUrl;
 
   return new Promise<EnsureSquareResult>((resolve, reject) => {
-    const cleanup = () => URL.revokeObjectURL(objectUrl);
+    const cleanup = () => {
+      if (currentUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentUrl);
+      }
+    };
     const img = new window.Image();
 
     img.onload = () => {
@@ -88,12 +93,38 @@ export async function ensureSquare(
     };
 
     img.onerror = () => {
-      cleanup();
-      reject(
-        new Error(
-          `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
-        )
-      );
+      if (currentUrl.startsWith('blob:')) {
+        // Fallback to FileReader data URL
+        cleanup();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target?.result;
+          if (typeof dataUrl === 'string') {
+            currentUrl = dataUrl;
+            img.src = dataUrl;
+          } else {
+            reject(
+              new Error(
+                `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+              )
+            );
+          }
+        };
+        reader.onerror = () => {
+          reject(
+            new Error(
+              `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+            )
+          );
+        };
+        reader.readAsDataURL(file);
+      } else {
+        reject(
+          new Error(
+            `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+          )
+        );
+      }
     };
 
     img.src = objectUrl;

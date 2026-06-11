@@ -48,9 +48,14 @@ export async function processImageBeforeUpload(
   // Use object URL instead of data URL to avoid base64 encoding overhead
   // (data URLs are ~33% larger, which can cause OOM on low-memory Android devices)
   const objectUrl = URL.createObjectURL(file);
+  let currentUrl = objectUrl;
 
   return new Promise<ProcessImageResult>((resolve, reject) => {
-    const cleanup = () => URL.revokeObjectURL(objectUrl);
+    const cleanup = () => {
+      if (currentUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentUrl);
+      }
+    };
     const img = new window.Image();
 
     img.onload = () => {
@@ -149,12 +154,38 @@ export async function processImageBeforeUpload(
     };
 
     img.onerror = () => {
-      cleanup();
-      reject(
-        new Error(
-          `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
-        )
-      );
+      if (currentUrl.startsWith('blob:')) {
+        // Fallback to FileReader data URL
+        cleanup();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target?.result;
+          if (typeof dataUrl === 'string') {
+            currentUrl = dataUrl;
+            img.src = dataUrl;
+          } else {
+            reject(
+              new Error(
+                `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+              )
+            );
+          }
+        };
+        reader.onerror = () => {
+          reject(
+            new Error(
+              `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+            )
+          );
+        };
+        reader.readAsDataURL(file);
+      } else {
+        reject(
+          new Error(
+            `No se pudo cargar la imagen (type=${file.type}, size=${(file.size / 1024).toFixed(0)}KB)`
+          )
+        );
+      }
     };
 
     img.src = objectUrl;
@@ -192,9 +223,14 @@ export async function generateThumbnail(
       : new File([source], 'thumb.webp', { type: source.type || 'image/webp' });
 
   const objectUrl = URL.createObjectURL(file);
+  let currentUrl = objectUrl;
 
   return new Promise<Blob>((resolve, reject) => {
-    const cleanup = () => URL.revokeObjectURL(objectUrl);
+    const cleanup = () => {
+      if (currentUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(currentUrl);
+      }
+    };
     const img = new window.Image();
 
     img.onload = () => {
@@ -235,8 +271,26 @@ export async function generateThumbnail(
     };
 
     img.onerror = () => {
-      cleanup();
-      reject(new Error('No se pudo cargar la imagen para el thumbnail'));
+      if (currentUrl.startsWith('blob:')) {
+        // Fallback to FileReader data URL
+        cleanup();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataUrl = e.target?.result;
+          if (typeof dataUrl === 'string') {
+            currentUrl = dataUrl;
+            img.src = dataUrl;
+          } else {
+            reject(new Error('No se pudo cargar la imagen para el thumbnail'));
+          }
+        };
+        reader.onerror = () => {
+          reject(new Error('No se pudo cargar la imagen para el thumbnail'));
+        };
+        reader.readAsDataURL(file);
+      } else {
+        reject(new Error('No se pudo cargar la imagen para el thumbnail'));
+      }
     };
 
     img.src = objectUrl;
