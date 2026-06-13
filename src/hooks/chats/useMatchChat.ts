@@ -150,7 +150,14 @@ export function useMatchChat({
             logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
           }
         } catch (uploadError) {
-          logger.error('Error uploading chat image:', uploadError);
+          if (uploadError instanceof Error && (
+            uploadError.message.includes('excede el límite') ||
+            uploadError.message.includes('No se pudo cargar la imagen')
+          )) {
+            logger.warnLocal('Validation error uploading chat image:', uploadError.message);
+          } else {
+            logger.error('Error uploading chat image:', uploadError);
+          }
           toast.error('Error al subir la imagen');
           setSending(false);
           setUploading(false);

@@ -38,6 +38,9 @@ interface TemplateProgressGridProps {
     status: string,
     count: number
   ) => Promise<void>;
+  onUpdateMultipleSlots?: (
+    updates: { slotId: number; status: string; count: number }[]
+  ) => Promise<void>;
   copyId: string;
   customFields?: CustomField[];
   marketplaceSlotIds?: Set<number>;
@@ -46,6 +49,7 @@ interface TemplateProgressGridProps {
 export function TemplateProgressGrid({
   progress,
   onUpdateSlot,
+  onUpdateMultipleSlots,
   copyId,
   customFields = [],
   marketplaceSlotIds,
@@ -112,10 +116,21 @@ export function TemplateProgressGrid({
         slot => slot.status === 'missing'
       );
 
-      // Update all missing slots to owned (count 1)
-      await Promise.all(
-        slotsToUpdate.map(slot => onUpdateSlot(slot.slot_id, 'owned', 1))
-      );
+      if (onUpdateMultipleSlots) {
+        // Bulk update all missing slots in a single DB query
+        await onUpdateMultipleSlots(
+          slotsToUpdate.map(slot => ({
+            slotId: slot.slot_id,
+            status: 'owned',
+            count: 0,
+          }))
+        );
+      } else {
+        // Fallback to sequential updates (instead of Promise.all) to prevent connection pool exhaustion
+        for (const slot of slotsToUpdate) {
+          await onUpdateSlot(slot.slot_id, 'owned', 0);
+        }
+      }
 
       setConfirmDialogOpen(false);
     } catch (error) {

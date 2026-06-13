@@ -404,17 +404,20 @@ export function useStickerOwnership(
 
                 const slotIds = (templateSlots as { id: number }[] | null) ?? [];
 
-                // 2. Bulk update each slot to 'owned' via update_template_progress
-                await Promise.all(
-                    slotIds.map((slot) =>
-                        legacyRpc(supabase, 'update_template_progress', {
-                            p_copy_id: collectionId,
-                            p_slot_id: slot.id,
-                            p_status: 'owned',
-                            p_count: 1,
-                        })
-                    )
-                );
+                // 2. Bulk update each slot to 'owned' via direct table upsert
+                const { error: upsertError } = await supabase
+                    .from('user_template_progress')
+                    .upsert(
+                        slotIds.map((slot) => ({
+                            user_id: user.id,
+                            copy_id: collectionId,
+                            slot_id: slot.id,
+                            status: 'owned',
+                            count: 0,
+                        }))
+                    );
+
+                if (upsertError) throw upsertError;
 
                 logger.debug(
                     `Page complete: ${missingStickerIds.length} stickers marked via bulk slot update`

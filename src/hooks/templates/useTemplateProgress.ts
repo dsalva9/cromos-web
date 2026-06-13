@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import type { SlotProgress, ItemFieldDefinition } from '@/types/v1.6.0';
 
@@ -19,6 +19,7 @@ interface TemplateCopy {
 
 export function useTemplateProgress(copyId: string) {
   const supabase = useSupabaseClient();
+  const { user } = useUser();
   const [copy, setCopy] = useState<TemplateCopy | null>(null);
   const [progress, setProgress] = useState<SlotProgress[]>([]);
   const [customFields, setCustomFields] = useState<ItemFieldDefinition[]>([]);
@@ -174,6 +175,68 @@ export function useTemplateProgress(copyId: string) {
     [supabase, copyId, progress]
   );
 
+  const updateMultipleSlotsStatus = useCallback(
+    async (updates: { slotId: number; status: string; count: number }[]) => {
+      if (!user) return;
+      try {
+        const { error: updateError } = await supabase
+          .from('user_template_progress')
+          .upsert(
+            updates.map(u => ({
+              user_id: user.id,
+              copy_id: parseInt(copyId),
+              slot_id: u.slotId,
+              status: u.status,
+              count: u.status === 'duplicate' ? u.count : 0,
+            }))
+          );
+
+        if (updateError) throw updateError;
+
+        // Optimistic update
+        setProgress(prev =>
+          prev.map(slot => {
+            const update = updates.find(u => u.slotId === slot.slot_id);
+            if (update) {
+              return {
+                ...slot,
+                status: update.status as 'missing' | 'owned' | 'duplicate',
+                count: update.status === 'duplicate' ? update.count : 0,
+              };
+            }
+            return slot;
+          })
+        );
+
+        // Update copy stats
+        setCopy(prev => {
+          if (!prev) return prev;
+
+          const updatedProgress = progress.map(slot => {
+            const update = updates.find(u => u.slotId === slot.slot_id);
+            if (update) {
+              return {
+                ...slot,
+                status: update.status as 'missing' | 'owned' | 'duplicate',
+                count: update.status === 'duplicate' ? update.count : 0,
+              };
+            }
+            return slot;
+          });
+
+          const completed = updatedProgress.filter(
+            s => s.status === 'owned' || s.status === 'duplicate'
+          ).length;
+
+          return { ...prev, completed_slots: completed };
+        });
+      } catch (err) {
+        throw err;
+      }
+    },
+    [supabase, copyId, progress, user]
+  );
+
   const deleteTemplateCopy = useCallback(async () => {
     try {
       const { error: deleteError } = await supabase.rpc('delete_template_copy', {
@@ -193,6 +256,7 @@ export function useTemplateProgress(copyId: string) {
     loading,
     error,
     updateSlotStatus,
+    updateMultipleSlotsStatus,
     deleteTemplateCopy,
     refetch: fetchProgress,
   };

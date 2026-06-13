@@ -33,7 +33,7 @@ function TemplateProgressContent() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { copy, progress, customFields, loading, error, updateSlotStatus, deleteTemplateCopy } =
+  const { copy, progress, customFields, loading, error, updateSlotStatus, updateMultipleSlotsStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
   const { hapticImpact } = useHaptic();
 
@@ -199,6 +199,7 @@ function TemplateProgressContent() {
         <TemplateProgressGrid
           progress={progress}
           onUpdateSlot={updateSlotStatus}
+          onUpdateMultipleSlots={updateMultipleSlotsStatus}
           copyId={copyId}
           customFields={customFields}
           marketplaceSlotIds={marketplaceSlotIds}

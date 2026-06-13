@@ -69,8 +69,8 @@ export const logger = {
    * Automatically sends to Sentry in production
    */
   error: (...args: unknown[]) => {
-    // Check if this is a transient network error (not a real application error)
-    const NETWORK_ERROR_PATTERNS = [
+    // Check if this is a transient network error or validation error (not a real application error)
+    const IGNORED_PATTERNS = [
       'failed to fetch',
       'fetch failed',
       'aborterror',
@@ -83,12 +83,19 @@ export const logger = {
       'the user aborted a request',
       'signal is aborted',
       'networkerror',
-      'network error'
+      'network error',
+      'excede el límite',
+      'no se pudo cargar la imagen',
+      'la imagen está vacía',
+      'no se pudo crear el contexto del canvas',
+      'no se pudo convertir el canvas',
+      'no se pudo generar el thumbnail',
+      'no se pudo cargar la imagen para el thumbnail'
     ];
-    const isNetworkError = args.some((arg) => {
+    const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {
         const lowerArg = arg.toLowerCase();
-        return NETWORK_ERROR_PATTERNS.some((p) => lowerArg.includes(p));
+        return IGNORED_PATTERNS.some((p) => lowerArg.includes(p));
       }
       if (arg && typeof arg === 'object') {
         const obj = arg as Record<string, unknown>;
@@ -96,7 +103,7 @@ export const logger = {
         const message = String(obj.message || '').toLowerCase();
         const name = String(obj.name || '').toLowerCase();
         const code = String(obj.code || '').toLowerCase();
-        return NETWORK_ERROR_PATTERNS.some((p) => 
+        return IGNORED_PATTERNS.some((p) => 
           details.includes(p) || 
           message.includes(p) || 
           name.includes(p) || 
@@ -111,8 +118,8 @@ export const logger = {
       console.error('[ERROR]', ...args);
     }
 
-    // Skip Sentry for transient network errors
-    if (isNetworkError) return;
+    // Skip Sentry for transient network errors or validation errors
+    if (shouldIgnore) return;
 
     // Send errors to Sentry in production
     if (isSentryEnabled) {
@@ -120,13 +127,19 @@ export const logger = {
       const errorArg = args.find(
         (arg) =>
           arg instanceof Error ||
-          (arg && typeof arg === 'object' && 'stack' in arg && 'message' in arg)
+          (arg && typeof arg === 'object' && ('stack' in arg || 'message' in arg || 'code' in arg))
       );
 
       if (errorArg) {
-        Sentry.captureException(errorArg, {
+        const exceptionToCapture = errorArg instanceof Error
+          ? errorArg
+          : new Error((errorArg as Record<string, unknown>).message as string || String(errorArg));
+
+        Sentry.captureException(exceptionToCapture, {
           tags: {
             logger_message: typeof firstArg === 'string' ? firstArg : undefined,
+            error_code: (errorArg as Record<string, unknown>).code as string || undefined,
+            error_details: (errorArg as Record<string, unknown>).details as string || undefined,
           },
         });
       } else if (firstArg instanceof Error) {
