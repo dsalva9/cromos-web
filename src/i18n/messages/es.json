@@ -2447,6 +2447,11 @@
     "titleDesktop": "📣 Este espacio publicitario puede ser tuyo",
     "subtitle": "Llega a miles de coleccionistas reales cada mes",
     "subtitleDesktop": "Llega a miles de coleccionistas activos cada día",
-    "cta": "Info"
+    "cta": "Info",
+    "adBlocker": {
+      "title": "Detector de AdBlocker activo",
+      "description": "Cambio Cromos necesita los anuncios para seguir siendo gratuito y sostenible. Os pedimos por favor que desactivéis vuestro bloqueador de anuncios para este sitio y recarguéis la página.",
+      "cta": "Recargar página"
+    }
   }
 }

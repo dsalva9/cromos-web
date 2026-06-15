@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Megaphone, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 /** Strip the locale prefix from a pathname. */
 function stripLocale(path: string): string {
@@ -31,11 +32,55 @@ export function AdBanner() {
 
   // Defer to client to avoid SSR hydration mismatch
   const [hasMounted, setHasMounted] = useState(false);
+  const [showAdBlockerModal, setShowAdBlockerModal] = useState(false);
+
   useEffect(() => { setHasMounted(true); }, []);
 
   const isHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
 
-  // Inject mobile ad script
+  // Adblocker detection
+  useEffect(() => {
+    if (!hasMounted || isHidden) return;
+
+    let isCheckActive = true;
+
+    const performCheck = async () => {
+      // 1. Bait element check (detects CSS-blocking adblockers)
+      const bait = document.createElement('div');
+      bait.className = 'adsbox ads-box ad-zone ad-space doubleclick-ad';
+      bait.setAttribute('style', 'position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px;');
+      document.body.appendChild(bait);
+      
+      const baitBlocked = bait.offsetHeight === 0 || bait.clientHeight === 0 || window.getComputedStyle?.(bait).display === 'none';
+      document.body.removeChild(bait);
+
+      if (baitBlocked) {
+        if (isCheckActive) setShowAdBlockerModal(true);
+        return;
+      }
+
+      // 2. Fetch-based check (detects network/DNS blocking like Pi-hole or Brave Shields)
+      try {
+        const url = 'https://www.highperformanceformat.com/cda4bca11f2cef504a11b56506742be3/invoke.js';
+        await fetch(new Request(url), {
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-store'
+        });
+      } catch (error) {
+        if (isCheckActive) setShowAdBlockerModal(true);
+      }
+    };
+
+    const timer = setTimeout(performCheck, 1000);
+
+    return () => {
+      isCheckActive = false;
+      clearTimeout(timer);
+    };
+  }, [hasMounted, isHidden]);
+
+  // Inject mobile ad script and setup sandbox observer
   useEffect(() => {
     if (!hasMounted || isHidden) return;
 
@@ -43,6 +88,23 @@ export function AdBanner() {
     if (!container) return;
 
     container.innerHTML = '';
+
+    // Create mutation observer to sandbox dynamically injected iframe and prevent popup spam / window hijacking
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof HTMLIFrameElement) {
+            node.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+          } else if (node instanceof HTMLElement) {
+            const iframes = node.getElementsByTagName('iframe');
+            for (let i = 0; i < iframes.length; i++) {
+              iframes[i].setAttribute('sandbox', 'allow-scripts allow-same-origin');
+            }
+          }
+        });
+      });
+    });
+    observer.observe(container, { childList: true, subtree: true });
 
     const optionsScript = document.createElement('script');
     optionsScript.text = `
@@ -62,6 +124,7 @@ export function AdBanner() {
     container.appendChild(invokeScript);
 
     return () => {
+      observer.disconnect();
       container.innerHTML = '';
     };
   }, [hasMounted, isHidden, pathname]);
@@ -103,6 +166,31 @@ export function AdBanner() {
 
   return (
     <>
+      {showAdBlockerModal && (
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-2xl max-w-md w-full p-6 shadow-2xl text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-950/50 rounded-full flex items-center justify-center mx-auto border-2 border-black dark:border-white">
+              <Megaphone className="h-8 w-8 text-red-600 dark:text-red-400 animate-bounce" />
+            </div>
+            
+            <div className="space-y-2">
+              <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                {t('adBlocker.title')}
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                {t('adBlocker.description')}
+              </p>
+            </div>
+
+            <Button
+              onClick={() => window.location.reload()}
+              className="w-full bg-gold hover:bg-gold-light text-black font-bold h-11 border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] transition-all"
+            >
+              {t('adBlocker.cta')}
+            </Button>
+          </div>
+        </div>
+      )}
       {/* ═══════ MOBILE STACK (below bottom nav) ═══════ */}
       <div
         className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900"

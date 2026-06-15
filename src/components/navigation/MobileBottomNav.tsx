@@ -10,7 +10,7 @@ import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
-import { AD_BANNER_HIDDEN_PATHS } from '@/components/ads/AdBanner';
+import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 
 /** Strip the locale prefix from a pathname for active-state matching. */
@@ -86,7 +86,7 @@ export function MobileBottomNav() {
         style={{
           bottom: isBannerHidden
             ? '0px'
-            : 'calc(44px + env(safe-area-inset-bottom, 0px))',
+            : `calc(${AD_BANNER_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
           paddingBottom: isBannerHidden
             ? 'env(safe-area-inset-bottom, 0px)'
             : undefined,

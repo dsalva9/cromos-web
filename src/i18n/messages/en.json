@@ -2447,6 +2447,11 @@
     "titleDesktop": "📣 This ad space could be yours",
     "subtitle": "Reach thousands of real collectors every month",
     "subtitleDesktop": "Reach thousands of active collectors every day",
-    "cta": "Info"
+    "cta": "Info",
+    "adBlocker": {
+      "title": "AdBlocker Detected",
+      "description": "Cambio Cromos needs ads to stay free and sustainable. We kindly ask you to disable your adblocker for this site and reload the page.",
+      "cta": "Reload Page"
+    }
   }
 }
