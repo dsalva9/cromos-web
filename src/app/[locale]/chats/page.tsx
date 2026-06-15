@@ -6,7 +6,7 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { MessageCircle, Lightbulb, Sparkles } from 'lucide-react';
+import { MessageCircle, Lightbulb, Sparkles, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
@@ -15,6 +15,7 @@ import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
 // ------------------------------------------------------------------
 // Types
@@ -49,6 +50,7 @@ function ChatsPageContent() {
   // ---- Marketplace conversations ----
   const [marketplaceConvs, setMarketplaceConvs] = useState<Conversation[]>([]);
   const [mpLoading, setMpLoading] = useState(true);
+  const [hidingId, setHidingId] = useState<string | null>(null);
 
   // ---- Match conversations ----
   const matchConvs = useMatchConversations();
@@ -82,6 +84,35 @@ function ChatsPageContent() {
 
     void fetchConversations();
   }, [user, supabase]);
+
+  // Hide a marketplace conversation
+  const handleHideConversation = useCallback(async (
+    e: React.MouseEvent,
+    conv: Conversation
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const key = `${conv.listing_id}-${conv.counterparty_id}`;
+    setHidingId(key);
+    try {
+      const { error } = await supabase.rpc('hide_conversation', {
+        p_listing_id: conv.listing_id,
+        p_counterparty_id: conv.counterparty_id,
+      });
+      if (error) throw error;
+      setMarketplaceConvs(prev =>
+        prev.filter(c =>
+          !(c.listing_id === conv.listing_id && c.counterparty_id === conv.counterparty_id)
+        )
+      );
+      toast.success(t('hide.success'));
+    } catch (err) {
+      logger.error('Error hiding conversation:', err);
+      toast.error(t('hide.error'));
+    } finally {
+      setHidingId(null);
+    }
+  }, [supabase, t]);
 
   // Open match chat drawer
   const openMatchChat = useCallback((conv: typeof matchConvs.conversations[0]) => {
@@ -183,8 +214,18 @@ function ChatsPageContent() {
                     key={`${conv.listing_id}-${conv.counterparty_id}`}
                     href={`/marketplace/${conv.listing_id}/chat${conv.is_seller ? `?participant=${conv.counterparty_id}` : ''}`}
                   >
-                    <ModernCard className="hover:border-gold transition-colors cursor-pointer">
+                    <ModernCard className="hover:border-gold transition-colors cursor-pointer relative group">
                       <ModernCardContent className="p-4">
+                        {/* Hide conversation button */}
+                        <button
+                          onClick={(e) => void handleHideConversation(e, conv)}
+                          disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}`}
+                          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
+                          title={t('hide.button')}
+                        >
+                          <EyeOff className="h-4 w-4" />
+                        </button>
+
                         <div className="flex gap-4">
                           {conv.listing_image_url && (
                             <div className="relative w-20 h-20 flex-shrink-0">

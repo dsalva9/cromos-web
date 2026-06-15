@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Image from 'next/image';
 import Link from '@/components/ui/link';
-import { Eye, Edit, AlertTriangle, Trash2 } from 'lucide-react';
+import { Eye, Edit, AlertTriangle, Trash2, Clock } from 'lucide-react';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useSoftDeleteListing } from '@/hooks/marketplace/useSoftDeleteListing';
 import { useHardDeleteListing } from '@/hooks/marketplace/useHardDeleteListing';
 import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
@@ -42,6 +43,9 @@ interface MyListing {
   // Deletion metadata
   deleted_at?: string | null;
   scheduled_for?: string | null;
+  // Expiration metadata
+  expiry_scheduled_at?: string | null;
+  expiry_warning_sent_at?: string | null;
 }
 
 interface MyListingCardProps {
@@ -51,11 +55,13 @@ interface MyListingCardProps {
 }
 
 export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardProps) {
+  const supabase = useSupabaseClient();
   const { softDeleteListing, loading: softDeleteLoading } = useSoftDeleteListing();
   const { hardDeleteListing, loading: hardDeleteLoading } = useHardDeleteListing();
   const { restoreListing, loading: restoreLoading } = useRestoreListing();
   const [showSoftDeleteModal, setShowSoftDeleteModal] = useState(false);
   const [showHardDeleteModal, setShowHardDeleteModal] = useState(false);
+  const [reactivating, setReactivating] = useState(false);
 
   const handleSoftDelete = async () => {
     try {
@@ -92,6 +98,23 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
     } catch (error) {
       // Error handling is done in hook
       logger.error('Restore failed:', error);
+    }
+  };
+
+  const handleReactivate = async () => {
+    try {
+      setReactivating(true);
+      const { error } = await supabase.rpc('reactivate_listing', {
+        p_listing_id: listing.listing_id,
+      });
+      if (error) throw error;
+      toast.success('Anuncio reactivado correctamente');
+      onUpdate();
+    } catch (error) {
+      logger.error('Reactivate failed:', error);
+      toast.error('Error al reactivar el anuncio');
+    } finally {
+      setReactivating(false);
     }
   };
 
@@ -179,6 +202,32 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 <AlertDescription className="text-red-800 dark:text-red-200">
                   Ya no tienes repetidos de este cromo. Considera eliminar este anuncio.
                 </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Expiration Warning (active listings about to expire) */}
+            {listing.status === 'active' && listing.expiry_scheduled_at && (
+              <Alert className="bg-amber-100 dark:bg-amber-900/20 border-amber-400 dark:border-amber-600">
+                <div className="flex items-start gap-2">
+                  <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <AlertDescription className="text-amber-800 dark:text-amber-200">
+                      Este anuncio se eliminará automáticamente el{' '}
+                      <strong>{formatDate(listing.expiry_scheduled_at)}</strong>.{' '}
+                      Haz clic en Reactivar para mantenerlo activo 30 días más.
+                    </AlertDescription>
+                    <Button
+                      size="sm"
+                      onClick={handleReactivate}
+                      disabled={reactivating}
+                      className="mt-2 bg-green-600 text-white hover:bg-green-700"
+                      data-testid="reactivate-button"
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      {reactivating ? 'Reactivando...' : 'Reactivar'}
+                    </Button>
+                  </div>
+                </div>
               </Alert>
             )}
 

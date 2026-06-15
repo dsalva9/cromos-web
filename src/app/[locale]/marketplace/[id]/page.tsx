@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { IntlLink as Link } from '@/i18n/navigation';
-import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin } from 'lucide-react';
+import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin, EyeOff } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   useUser,
@@ -62,6 +62,7 @@ export default function ListingDetailPage() {
   const { isAdmin } = useProfileCompletion();
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const viewIncrementedRef = useRef<string | null>(null);
+  const [ignoringListing, setIgnoringListing] = useState(false);
 
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
@@ -73,6 +74,24 @@ export default function ListingDetailPage() {
   const [showAdminDeleteDialog, setShowAdminDeleteDialog] = useState(false);
   const [adminDeleteReason, setAdminDeleteReason] = useState('');
   const [adminDeleteLoading, setAdminDeleteLoading] = useState(false);
+
+  const handleIgnoreListing = async () => {
+    if (!listing) return;
+    setIgnoringListing(true);
+    try {
+      const { error } = await supabase.rpc('ignore_listing', {
+        p_listing_id: listing.id,
+      });
+      if (error) throw error;
+      toast.success(t('ignoreListing.success'));
+      router.push('/marketplace');
+    } catch (err) {
+      logger.error('Error ignoring listing:', err);
+      toast.error(t('ignoreListing.error'));
+    } finally {
+      setIgnoringListing(false);
+    }
+  };
 
   useEffect(() => {
     async function checkConversations() {
@@ -568,6 +587,16 @@ export default function ListingDetailPage() {
                     size="default"
                     className="h-10 md:h-12"
                   />
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="h-10 md:h-12"
+                    onClick={() => void handleIgnoreListing()}
+                    disabled={ignoringListing}
+                    title={t('ignoreListing.button')}
+                  >
+                    <EyeOff className="h-4 w-4" />
+                  </Button>
                 </div>
               )}
 

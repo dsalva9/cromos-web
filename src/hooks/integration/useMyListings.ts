@@ -29,6 +29,9 @@ interface MyListing {
   // Deletion metadata
   deleted_at?: string | null;
   scheduled_for?: string | null;
+  // Expiration metadata
+  expiry_scheduled_at?: string | null;
+  expiry_warning_sent_at?: string | null;
 }
 
 export interface MyListingWithAttention extends MyListing {

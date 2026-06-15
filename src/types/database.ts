@@ -2949,6 +2949,18 @@ export type Database = {
         }[]
       }
       get_ignored_users_count: { Args: never; Returns: number }
+      get_ignored_listings: {
+        Args: never
+        Returns: {
+          listing_id: number
+          listing_title: string
+          listing_image_url: string
+          listing_status: string
+          collection_name: string
+          author_nickname: string
+          ignored_at: string
+        }[]
+      }
       get_listing_chat_participants: {
         Args: { p_listing_id: number }
         Returns: {
@@ -3068,6 +3080,8 @@ export type Database = {
           template_title: string
           title: string
           views_count: number
+          expiry_scheduled_at: string
+          expiry_warning_sent_at: string
         }[]
       }
       get_my_template_copies: {
@@ -3393,6 +3407,14 @@ export type Database = {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
+      hide_conversation: {
+        Args: { p_listing_id: number; p_counterparty_id: string }
+        Returns: undefined
+      }
+      ignore_listing: {
+        Args: { p_listing_id: number }
+        Returns: undefined
+      }
       ignore_user: { Args: { p_ignored_user_id: string }; Returns: boolean }
       increment_badge_progress: {
         Args: { p_category: string; p_user_id: string }
@@ -3657,6 +3679,10 @@ export type Database = {
         Args: { p_is_public: boolean; p_template_id: number }
         Returns: undefined
       }
+      reactivate_listing: {
+        Args: { p_listing_id: number }
+        Returns: undefined
+      }
       refresh_leaderboard: { Args: never; Returns: undefined }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }
@@ -3787,6 +3813,14 @@ export type Database = {
       toggle_favourite: {
         Args: { p_target_id: string; p_target_type: string }
         Returns: boolean
+      }
+      unhide_conversation: {
+        Args: { p_listing_id: number; p_counterparty_id: string }
+        Returns: undefined
+      }
+      unignore_listing: {
+        Args: { p_listing_id: number }
+        Returns: undefined
       }
       unignore_user: { Args: { p_ignored_user_id: string }; Returns: boolean }
       unreserve_listing: { Args: { p_listing_id: number }; Returns: boolean }

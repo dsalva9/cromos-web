@@ -119,7 +119,11 @@
       "postcodeLabel": "Postal Code",
       "postcodePlaceholder": "E.g. 28001",
       "postcodeDesc": "Used to find nearby collectors",
+      "postcodeNote": "Your postal code is not shared publicly, it's only used to calculate approximate distances.",
+      "usernameLabel": "Username",
       "loading": "Loading...",
+      "saving": "Saving...",
+      "saveButton": "Save changes",
       "submitButton": "Complete Profile",
       "submitButtonLoading": "Saving...",
       "successMessage": "Profile updated successfully!",
@@ -373,6 +377,11 @@
       "emptyTitle": "No match chats yet",
       "emptyDesc": "Find matches and start chatting",
       "emptyCta": "Find matches"
+    },
+    "hide": {
+      "button": "Hide conversation",
+      "success": "Conversation hidden. It will reappear if you receive a new message.",
+      "error": "Error hiding conversation"
     }
   },
   "matchChat": {
@@ -1394,6 +1403,7 @@
     "tabs": {
       "notifications": "Notifications",
       "blocked": "Blocked",
+      "ignoredListings": "Listings",
       "system": "System",
       "legal": "Legal"
     },
@@ -1466,6 +1476,32 @@
         "weekAgo": "{count} week ago",
         "monthsAgo": "{count} months ago",
         "monthAgo": "{count} month ago"
+      }
+    },
+    "ignoredListings": {
+      "errorLoad": "Error loading ignored listings",
+      "retry": "Retry",
+      "empty": {
+        "title": "You have no ignored listings",
+        "description": "When you ignore listings, they will appear here so you can manage them."
+      },
+      "by": "By",
+      "time": {
+        "ignored": "Ignored",
+        "today": "today",
+        "yesterday": "yesterday",
+        "daysAgo": "{count} days ago",
+        "dayAgo": "{count} day ago",
+        "weeksAgo": "{count} weeks ago",
+        "weekAgo": "{count} week ago",
+        "monthsAgo": "{count} months ago",
+        "monthAgo": "{count} month ago"
+      },
+      "unignore": {
+        "button": "Show",
+        "loading": "Removing...",
+        "success": "\"{title}\" removed from your ignored listings",
+        "error": "Error restoring listing"
       }
     },
     "notifications": {
@@ -1606,7 +1642,12 @@
     "createFirst": "Create Your First Listing",
     "noReserved": "You have no reserved listings",
     "noCompleted": "You have no completed listings",
-    "noDeleted": "You have no deleted listings"
+    "noDeleted": "You have no deleted listings",
+    "expirationWarning": "This listing will be automatically deleted on {date}. Click Reactivate to keep it active for 30 more days.",
+    "reactivateBtn": "Reactivate",
+    "reactivating": "Reactivating...",
+    "reactivateSuccess": "Listing reactivated successfully",
+    "reactivateError": "Error reactivating listing"
   },
   "notificationsCenter": {
     "title": "Notifications",
@@ -2008,7 +2049,12 @@
     "adminDeleteError": "Error deleting the listing",
     "pleaseEnterReason": "Please enter a reason for deletion",
     "restoreSuccess": "Listing restored successfully",
-    "restoreError": "Error restoring the listing"
+    "restoreError": "Error restoring the listing",
+    "ignoreListing": {
+      "button": "Ignore listing",
+      "success": "Listing ignored. It will no longer appear in your searches.",
+      "error": "Error ignoring listing"
+    }
   },
   "marketplaceChat": {
     "backToChats": "Back to my chats",

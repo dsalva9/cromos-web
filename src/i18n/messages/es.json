@@ -144,7 +144,11 @@
       "postcodeLabel": "Código Postal",
       "postcodePlaceholder": "Ej. 28001",
       "postcodeDesc": "Se usará para encontrar coleccionistas cercanos",
+      "postcodeNote": "Tu código postal no se comparte públicamente, solo se usa para calcular distancias aproximadas.",
+      "usernameLabel": "Nombre de usuario",
       "loading": "Cargando...",
+      "saving": "Guardando...",
+      "saveButton": "Guardar cambios",
       "submitButton": "Completar Perfil",
       "submitButtonLoading": "Guardando...",
       "successMessage": "¡Perfil actualizado con éxito!",
@@ -398,6 +402,11 @@
       "emptyTitle": "No tienes chats de match",
       "emptyDesc": "Busca coincidencias y empieza a chatear",
       "emptyCta": "Buscar matches"
+    },
+    "hide": {
+      "button": "Ocultar conversación",
+      "success": "Conversación ocultada. Volverá a aparecer si recibes un nuevo mensaje.",
+      "error": "Error al ocultar la conversación"
     }
   },
   "matchChat": {
@@ -1394,6 +1403,7 @@
     "tabs": {
       "notifications": "Notificaciones",
       "blocked": "Bloqueados",
+      "ignoredListings": "Anuncios",
       "system": "Sistema",
       "legal": "Legal"
     },
@@ -1561,6 +1571,32 @@
       "light": "Claro",
       "dark": "Oscuro",
       "system": "Sistema"
+    },
+    "ignoredListings": {
+      "errorLoad": "Error al cargar los anuncios ignorados",
+      "retry": "Reintentar",
+      "empty": {
+        "title": "No tienes anuncios ignorados",
+        "description": "Cuando ignores anuncios, aparecerán aquí para que puedas gestionarlos."
+      },
+      "by": "Por",
+      "time": {
+        "ignored": "Ignorado",
+        "today": "hoy",
+        "yesterday": "ayer",
+        "daysAgo": "hace {count} días",
+        "dayAgo": "hace {count} día",
+        "weeksAgo": "hace {count} semanas",
+        "weekAgo": "hace {count} semana",
+        "monthsAgo": "hace {count} meses",
+        "monthAgo": "hace {count} mes"
+      },
+      "unignore": {
+        "button": "Mostrar",
+        "loading": "Eliminando...",
+        "success": "\"{title}\" eliminado de tu lista de anuncios ignorados",
+        "error": "Error al restaurar el anuncio"
+      }
     }
   },
   "myCollection": {
@@ -1606,7 +1642,12 @@
     "createFirst": "Crear Tu Primer Anuncio",
     "noReserved": "No tienes anuncios reservados",
     "noCompleted": "No tienes anuncios completados",
-    "noDeleted": "No tienes anuncios eliminados"
+    "noDeleted": "No tienes anuncios eliminados",
+    "expirationWarning": "Este anuncio se eliminará automáticamente el {date}. Haz clic en Reactivar para mantenerlo activo 30 días más.",
+    "reactivateBtn": "Reactivar",
+    "reactivating": "Reactivando...",
+    "reactivateSuccess": "Anuncio reactivado correctamente",
+    "reactivateError": "Error al reactivar el anuncio"
   },
   "notificationsCenter": {
     "title": "Notificaciones",
@@ -2008,7 +2049,12 @@
     "adminDeleteError": "Error al eliminar el listado",
     "pleaseEnterReason": "Por favor ingresa un motivo para eliminar",
     "restoreSuccess": "Anuncio restaurado correctamente",
-    "restoreError": "Error al restaurar el anuncio"
+    "restoreError": "Error al restaurar el anuncio",
+    "ignoreListing": {
+      "button": "Ignorar anuncio",
+      "success": "Anuncio ignorado. Ya no aparecerá en tus búsquedas.",
+      "error": "Error al ignorar el anuncio"
+    }
   },
   "marketplaceChat": {
     "backToChats": "Volver a mis chats",
