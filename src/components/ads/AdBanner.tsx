@@ -80,7 +80,7 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden]);
 
-  // Inject mobile ad script and setup sandbox observer
+  // Inject mobile ad script inside a sandboxed iframe
   useEffect(() => {
     if (!hasMounted || isHidden) return;
 
@@ -89,42 +89,50 @@ export function AdBanner() {
 
     container.innerHTML = '';
 
-    // Create mutation observer to sandbox dynamically injected iframe and prevent popup spam / window hijacking
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node instanceof HTMLIFrameElement) {
-            node.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-          } else if (node instanceof HTMLElement) {
-            const iframes = node.getElementsByTagName('iframe');
-            for (let i = 0; i < iframes.length; i++) {
-              iframes[i].setAttribute('sandbox', 'allow-scripts allow-same-origin');
-            }
-          }
-        });
-      });
-    });
-    observer.observe(container, { childList: true, subtree: true });
+    const iframe = document.createElement('iframe');
+    iframe.style.width = '320px';
+    iframe.style.height = '50px';
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
 
-    const optionsScript = document.createElement('script');
-    optionsScript.text = `
-      atOptions = {
-        'key' : '207f77c777a93d9b339e6e77660a9707',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    `;
+    container.appendChild(iframe);
 
-    const invokeScript = document.createElement('script');
-    invokeScript.src = 'https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js';
-
-    container.appendChild(optionsScript);
-    container.appendChild(invokeScript);
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              html, body {
+                margin: 0;
+                padding: 0;
+                width: 320px;
+                height: 50px;
+                overflow: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <script type="text/javascript">
+              atOptions = {
+                'key' : '207f77c777a93d9b339e6e77660a9707',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+              };
+            </script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js"></script>
+          </body>
+        </html>
+      `);
+      doc.close();
+    }
 
     return () => {
-      observer.disconnect();
       container.innerHTML = '';
     };
   }, [hasMounted, isHidden, pathname]);
