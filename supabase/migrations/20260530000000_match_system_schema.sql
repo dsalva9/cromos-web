@@ -1,0 +1,586 @@
+-- Phase 4: Match Chat System — Database Migration
+-- Defines the match_conversations schema, columns, RLS policies, functions, and triggers
+
+-- 1. Create match_conversations table
+CREATE TABLE IF NOT EXISTS public.match_conversations (
+  id            bigserial PRIMARY KEY,
+  created_at    timestamptz DEFAULT now() NOT NULL,
+  user_a_id     uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_b_id     uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  template_id   integer REFERENCES public.collection_templates(id) ON DELETE SET NULL,
+  last_message          text,
+  last_message_at       timestamptz,
+  last_message_sender_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL
+);
+
+-- Unique index on user pair (order-independent)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_match_conv_user_pair
+  ON public.match_conversations(LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_match_conv_user_a ON public.match_conversations(user_a_id);
+CREATE INDEX IF NOT EXISTS idx_match_conv_user_b ON public.match_conversations(user_b_id);
+CREATE INDEX IF NOT EXISTS idx_match_conv_last_msg ON public.match_conversations(last_message_at DESC NULLS LAST);
+
+-- RLS policies for match_conversations
+ALTER TABLE public.match_conversations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own conversations"
+  ON public.match_conversations FOR SELECT
+  USING (auth.uid() = user_a_id OR auth.uid() = user_b_id);
+
+CREATE POLICY "Users can insert conversations they're part of"
+  ON public.match_conversations FOR INSERT
+  WITH CHECK (auth.uid() = user_a_id OR auth.uid() = user_b_id);
+
+CREATE POLICY "Users can update their own conversations"
+  ON public.match_conversations FOR UPDATE
+  USING (auth.uid() = user_a_id OR auth.uid() = user_b_id);
+
+-- 2. Add match_conversation_id to trade_chats
+ALTER TABLE public.trade_chats ADD COLUMN IF NOT EXISTS match_conversation_id bigint
+  REFERENCES public.match_conversations(id) ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_trade_chats_match_conv 
+  ON public.trade_chats(match_conversation_id) WHERE match_conversation_id IS NOT NULL;
+
+-- 3. Add match_conversation_id column to notifications
+ALTER TABLE public.notifications
+  ADD COLUMN IF NOT EXISTS match_conversation_id bigint
+  REFERENCES public.match_conversations(id) ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_notifications_match_conversation_id
+  ON public.notifications (match_conversation_id);
+
+-- 4. Alter trade_confirmations table
+ALTER TABLE public.trade_confirmations ALTER COLUMN listing_id DROP NOT NULL;
+
+ALTER TABLE public.trade_confirmations 
+  ADD COLUMN IF NOT EXISTS match_conversation_id BIGINT REFERENCES public.match_conversations(id) ON DELETE CASCADE;
+
+ALTER TABLE public.trade_confirmations DROP CONSTRAINT IF EXISTS trade_confirmations_target_check;
+ALTER TABLE public.trade_confirmations ADD CONSTRAINT trade_confirmations_target_check 
+  CHECK (
+    (listing_id IS NOT NULL AND match_conversation_id IS NULL) OR 
+    (listing_id IS NULL AND match_conversation_id IS NOT NULL)
+  );
+
+DROP INDEX IF EXISTS public.trade_confirmations_unique_pending;
+CREATE UNIQUE INDEX trade_confirmations_unique_pending 
+  ON public.trade_confirmations (listing_id, requester_id, confirmer_id) 
+  WHERE status = 'pending' AND listing_id IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS trade_confirmations_match_unique_pending 
+  ON public.trade_confirmations (match_conversation_id, requester_id, confirmer_id) 
+  WHERE status = 'pending' AND match_conversation_id IS NOT NULL;
+
+
+-- ============================================================
+-- RPC Functions
+-- ============================================================
+
+-- get_or_create_match_conversation
+CREATE OR REPLACE FUNCTION public.get_or_create_match_conversation(
+  p_other_user_id uuid,
+  p_template_id integer DEFAULT NULL
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+  v_conv match_conversations%ROWTYPE;
+  v_user_a uuid;
+  v_user_b uuid;
+BEGIN
+  IF v_me IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+  
+  IF v_me = p_other_user_id THEN
+    RAISE EXCEPTION 'Cannot chat with yourself';
+  END IF;
+
+  -- Normalize order for the unique constraint
+  v_user_a := LEAST(v_me, p_other_user_id);
+  v_user_b := GREATEST(v_me, p_other_user_id);
+
+  -- Try to find existing conversation
+  SELECT * INTO v_conv
+  FROM match_conversations
+  WHERE LEAST(user_a_id, user_b_id) = v_user_a
+    AND GREATEST(user_a_id, user_b_id) = v_user_b;
+
+  IF v_conv.id IS NOT NULL THEN
+    -- Update template_id if a new one is provided
+    IF p_template_id IS NOT NULL AND (v_conv.template_id IS NULL OR v_conv.template_id != p_template_id) THEN
+      UPDATE match_conversations SET template_id = p_template_id WHERE id = v_conv.id;
+      v_conv.template_id := p_template_id;
+    END IF;
+    
+    RETURN jsonb_build_object(
+      'id', v_conv.id,
+      'created_at', v_conv.created_at,
+      'other_user_id', p_other_user_id,
+      'template_id', v_conv.template_id,
+      'is_new', false
+    );
+  END IF;
+
+  -- Create new conversation
+  INSERT INTO match_conversations (user_a_id, user_b_id, template_id)
+  VALUES (v_user_a, v_user_b, p_template_id)
+  RETURNING * INTO v_conv;
+
+  RETURN jsonb_build_object(
+    'id', v_conv.id,
+    'created_at', v_conv.created_at,
+    'other_user_id', p_other_user_id,
+    'template_id', v_conv.template_id,
+    'is_new', true
+  );
+END;
+$$;
+
+-- get_match_conversations
+CREATE OR REPLACE FUNCTION public.get_match_conversations()
+RETURNS TABLE (
+  id bigint,
+  created_at timestamptz,
+  other_user_id uuid,
+  other_nickname text,
+  other_avatar_url text,
+  template_id integer,
+  template_title text,
+  last_message text,
+  last_message_at timestamptz,
+  unread_count bigint
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+BEGIN
+  IF v_me IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    mc.id,
+    mc.created_at,
+    CASE WHEN mc.user_a_id = v_me THEN mc.user_b_id ELSE mc.user_a_id END AS other_user_id,
+    p.nickname::text AS other_nickname,
+    p.avatar_url::text AS other_avatar_url,
+    mc.template_id,
+    t.title::text AS template_title,
+    mc.last_message::text,
+    mc.last_message_at,
+    COALESCE((
+      SELECT COUNT(*)
+      FROM trade_chats tc
+      WHERE tc.match_conversation_id = mc.id
+        AND tc.receiver_id = v_me
+        AND tc.is_read = false
+    ), 0) AS unread_count
+  FROM match_conversations mc
+  JOIN profiles p ON p.id = CASE WHEN mc.user_a_id = v_me THEN mc.user_b_id ELSE mc.user_a_id END
+  LEFT JOIN collection_templates t ON t.id = mc.template_id
+  WHERE mc.user_a_id = v_me OR mc.user_b_id = v_me
+  ORDER BY mc.last_message_at DESC NULLS LAST, mc.created_at DESC;
+END;
+$$;
+
+-- get_match_chat_messages
+CREATE OR REPLACE FUNCTION public.get_match_chat_messages(
+  p_conversation_id bigint,
+  p_cursor timestamptz DEFAULT NULL,
+  p_limit integer DEFAULT 50
+)
+RETURNS TABLE (
+  id bigint,
+  sender_id uuid,
+  receiver_id uuid,
+  sender_nickname text,
+  message text,
+  is_read boolean,
+  is_system boolean,
+  created_at timestamptz,
+  image_url text,
+  thumbnail_url text
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+BEGIN
+  IF v_me IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Verify user is a participant
+  IF NOT EXISTS (
+    SELECT 1 FROM match_conversations
+    WHERE match_conversations.id = p_conversation_id
+      AND (user_a_id = v_me OR user_b_id = v_me)
+  ) THEN
+    RAISE EXCEPTION 'Conversation not found or access denied';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    tc.id,
+    tc.sender_id,
+    tc.receiver_id,
+    COALESCE(p.nickname, 'Usuario')::text AS sender_nickname,
+    tc.message::text,
+    tc.is_read,
+    tc.is_system,
+    tc.created_at,
+    tc.image_url::text,
+    tc.thumbnail_url::text
+  FROM trade_chats tc
+  LEFT JOIN profiles p ON p.id = tc.sender_id
+  WHERE tc.match_conversation_id = p_conversation_id
+    AND (p_cursor IS NULL OR tc.created_at < p_cursor)
+  ORDER BY tc.created_at DESC
+  LIMIT p_limit;
+END;
+$$;
+
+-- send_match_message
+CREATE OR REPLACE FUNCTION public.send_match_message(
+  p_conversation_id bigint,
+  p_message text,
+  p_image_url text DEFAULT NULL,
+  p_thumbnail_url text DEFAULT NULL
+)
+RETURNS bigint
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+  v_other_user_id uuid;
+  v_msg_id bigint;
+BEGIN
+  IF v_me IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  IF length(trim(p_message)) = 0 AND p_image_url IS NULL THEN
+    RAISE EXCEPTION 'Message cannot be empty';
+  END IF;
+
+  IF length(p_message) > 500 THEN
+    RAISE EXCEPTION 'Message too long (max 500 chars)';
+  END IF;
+
+  -- Get other user from conversation
+  SELECT CASE WHEN user_a_id = v_me THEN user_b_id ELSE user_a_id END
+  INTO v_other_user_id
+  FROM match_conversations
+  WHERE match_conversations.id = p_conversation_id
+    AND (user_a_id = v_me OR user_b_id = v_me);
+
+  IF v_other_user_id IS NULL THEN
+    RAISE EXCEPTION 'Conversation not found or access denied';
+  END IF;
+
+  -- Insert message
+  INSERT INTO trade_chats (
+    match_conversation_id, sender_id, receiver_id,
+    message, image_url, thumbnail_url, is_read, is_system
+  )
+  VALUES (
+    p_conversation_id, v_me, v_other_user_id,
+    trim(p_message), p_image_url, p_thumbnail_url, false, false
+  )
+  RETURNING trade_chats.id INTO v_msg_id;
+
+  -- Update conversation denormalized fields
+  UPDATE match_conversations
+  SET last_message = trim(p_message),
+      last_message_at = now(),
+      last_message_sender_id = v_me
+  WHERE match_conversations.id = p_conversation_id;
+
+  RETURN v_msg_id;
+END;
+$$;
+
+-- mark_match_messages_read
+CREATE OR REPLACE FUNCTION public.mark_match_messages_read(
+  p_conversation_id bigint
+)
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+  v_count integer;
+BEGIN
+  IF v_me IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Mark all messages sent TO me as read
+  UPDATE trade_chats
+  SET is_read = true
+  WHERE match_conversation_id = p_conversation_id
+    AND receiver_id = v_me
+    AND is_read = false;
+
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+  RETURN v_count;
+END;
+$$;
+
+-- get_match_unread_total
+CREATE OR REPLACE FUNCTION public.get_match_unread_total()
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_me uuid := auth.uid();
+  v_total integer;
+BEGIN
+  IF v_me IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  SELECT COUNT(*)::integer INTO v_total
+  FROM trade_chats tc
+  JOIN match_conversations mc ON mc.id = tc.match_conversation_id
+  WHERE tc.receiver_id = v_me
+    AND tc.is_read = false
+    AND (mc.user_a_id = v_me OR mc.user_b_id = v_me);
+
+  RETURN COALESCE(v_total, 0);
+END;
+$$;
+
+-- get_match_count
+CREATE OR REPLACE FUNCTION public.get_match_count(p_user_id uuid)
+RETURNS integer
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT COALESCE(COUNT(*)::integer, 0)
+  FROM match_conversations
+  WHERE user_a_id = p_user_id OR user_b_id = p_user_id;
+$$;
+
+-- request_match_trade_confirmation
+CREATE OR REPLACE FUNCTION public.request_match_trade_confirmation(
+  p_match_conversation_id BIGINT,
+  p_confirmer_id UUID,
+  p_sticker_count INT DEFAULT NULL,
+  p_note TEXT DEFAULT NULL
+)
+RETURNS BIGINT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth, extensions
+AS $$
+DECLARE
+  v_requester_id UUID;
+  v_confirmation_id BIGINT;
+  v_messages_from_requester INT;
+  v_messages_from_confirmer INT;
+begin
+  -- Get authenticated user ID
+  v_requester_id := auth.uid();
+  IF v_requester_id IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Validate requester is not confirmer
+  IF v_requester_id = p_confirmer_id THEN
+    RAISE EXCEPTION 'You cannot request trade confirmation from yourself';
+  END IF;
+
+  -- Validate messages exchanged on this match conversation
+  SELECT COUNT(*) INTO v_messages_from_requester
+  FROM public.trade_chats
+  where match_conversation_id = p_match_conversation_id 
+    and sender_id = v_requester_id 
+    and receiver_id = p_confirmer_id;
+
+  SELECT COUNT(*) INTO v_messages_from_confirmer
+  FROM public.trade_chats
+  where match_conversation_id = p_match_conversation_id 
+    and sender_id = p_confirmer_id 
+    and receiver_id = v_requester_id;
+
+  IF v_messages_from_requester = 0 OR v_messages_from_confirmer = 0 THEN
+    RAISE EXCEPTION 'Debe haber un intercambio de mensajes previo en el chat para solicitar confirmación';
+  END IF;
+
+  -- Check if duplicate pending confirmation exists
+  IF EXISTS (
+    SELECT 1 FROM public.trade_confirmations
+    WHERE match_conversation_id = p_match_conversation_id
+      AND requester_id = v_requester_id
+      AND confirmer_id = p_confirmer_id
+      AND status = 'pending'
+  ) THEN
+    RAISE EXCEPTION 'Ya hay una solicitud de confirmación pendiente';
+  END IF;
+
+  -- Insert into trade_confirmations
+  INSERT INTO public.trade_confirmations (
+    match_conversation_id, requester_id, confirmer_id, status, sticker_count, note, requested_at
+  )
+  VALUES (
+    p_match_conversation_id, v_requester_id, p_confirmer_id, 'pending', p_sticker_count, p_note, now()
+  )
+  RETURNING id INTO v_confirmation_id;
+
+  -- Insert notification for confirmer
+  INSERT INTO public.notifications (
+    user_id, kind, actor_id, created_at, payload
+  )
+  VALUES (
+    p_confirmer_id,
+    'trade_confirmation_request',
+    v_requester_id,
+    now(),
+    jsonb_build_object(
+      'sticker_count', p_sticker_count,
+      'note', p_note,
+      'confirmation_id', v_confirmation_id,
+      'match_conversation_id', p_match_conversation_id
+    )
+  );
+
+  RETURN v_confirmation_id;
+END;
+$$;
+
+
+-- ============================================================
+-- Match Chat Notification Trigger & Trigger Function
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.notify_match_chat_message()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_conv          match_conversations%ROWTYPE;
+  v_counterparty  uuid;
+  v_template_title text;
+BEGIN
+  -- Only proceed if this is a match-conversation message
+  IF NEW.match_conversation_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Skip system messages (same as marketplace)
+  IF NEW.is_system THEN
+    RETURN NEW;
+  END IF;
+
+  -- Get conversation details
+  SELECT * INTO v_conv
+  FROM match_conversations
+  WHERE id = NEW.match_conversation_id;
+
+  IF v_conv IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  -- Determine counterparty (the other user in the conversation)
+  IF NEW.sender_id = v_conv.user_a_id THEN
+    v_counterparty := v_conv.user_b_id;
+  ELSIF NEW.sender_id = v_conv.user_b_id THEN
+    v_counterparty := v_conv.user_a_id;
+  ELSE
+    -- Sender is not a participant (shouldn't happen, but be safe)
+    RETURN NEW;
+  END IF;
+
+  -- Get template title (may be NULL)
+  IF v_conv.template_id IS NOT NULL THEN
+    SELECT title INTO v_template_title
+    FROM collection_templates
+    WHERE id = v_conv.template_id;
+  END IF;
+
+  -- Upsert notification for the counterparty
+  INSERT INTO notifications (
+    user_id,
+    kind,
+    match_conversation_id,
+    actor_id,
+    created_at,
+    payload
+  )
+  VALUES (
+    v_counterparty,
+    'match_chat_message',
+    NEW.match_conversation_id,
+    NEW.sender_id,
+    NOW(),
+    jsonb_build_object(
+      'match_conversation_id', NEW.match_conversation_id,
+      'template_title', COALESCE(v_template_title, ''),
+      'message_preview', LEFT(COALESCE(NEW.message, ''), 100)
+    )
+  )
+  ON CONFLICT (
+    user_id,
+    kind,
+    COALESCE(listing_id, 0),
+    COALESCE(template_id, 0),
+    COALESCE(rating_id, 0),
+    COALESCE(trade_id, 0),
+    COALESCE(match_conversation_id, 0)
+  )
+  WHERE read_at IS NULL
+  DO UPDATE SET
+    created_at = NOW(),
+    actor_id   = NEW.sender_id,
+    payload    = jsonb_build_object(
+      'match_conversation_id', NEW.match_conversation_id,
+      'template_title', COALESCE(v_template_title, ''),
+      'message_preview', LEFT(COALESCE(NEW.message, ''), 100),
+      'last_message_at', NOW()
+    );
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_notify_match_chat_message ON public.trade_chats;
+CREATE TRIGGER trg_notify_match_chat_message
+  AFTER INSERT ON public.trade_chats
+  FOR EACH ROW
+  WHEN (NEW.match_conversation_id IS NOT NULL)
+  EXECUTE FUNCTION public.notify_match_chat_message();
+
+-- Grant permissions
+GRANT EXECUTE ON FUNCTION public.get_or_create_match_conversation TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_conversations TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_chat_messages TO authenticated;
+GRANT EXECUTE ON FUNCTION public.send_match_message TO authenticated;
+GRANT EXECUTE ON FUNCTION public.mark_match_messages_read TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_unread_total TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_count TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_count TO anon;
+GRANT EXECUTE ON FUNCTION public.request_match_trade_confirmation TO authenticated;

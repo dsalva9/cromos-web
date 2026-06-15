@@ -220,7 +220,7 @@ function ChatsPageContent() {
                         <button
                           onClick={(e) => void handleHideConversation(e, conv)}
                           disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}`}
-                          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-100 md:opacity-0 md:group-hover:opacity-100 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
+                          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
                           title={t('hide.button')}
                         >
                           <EyeOff className="h-4 w-4" />

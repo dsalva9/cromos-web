@@ -1,6 +1,7 @@
--- Add listing_type and price columns to trade_listings
--- listing_type: 'intercambio' (exchange), 'venta' (sale), 'ambos' (both)
--- price: required when listing_type is 'venta' or 'ambos'
+-- 1. Drop old overloaded functions to prevent COMMENT conflicts
+DROP FUNCTION IF EXISTS "public"."create_trade_listing"(text, text, text, text, text, bigint, bigint, integer, text, text, integer, boolean, integer);
+DROP FUNCTION IF EXISTS "public"."publish_duplicate_to_marketplace"(bigint, bigint, text, text, text);
+DROP FUNCTION IF EXISTS "public"."update_trade_listing"(bigint, text, text, text, text, text);
 
 -- 1. Add columns
 ALTER TABLE trade_listings

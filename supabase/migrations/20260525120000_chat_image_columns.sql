@@ -1,7 +1,5 @@
--- Migration: Add image support to trade_chats
--- Adds image_url and thumbnail_url columns for chat image attachments.
--- Updates get_listing_chats to return image columns.
--- Updates send_listing_message to accept optional image params.
+DROP FUNCTION IF EXISTS "public"."get_listing_chats"(bigint, uuid);
+DROP FUNCTION IF EXISTS "public"."send_listing_message"(bigint, uuid, text);
 
 -- ============================================================
 -- 1. Add image columns to trade_chats
