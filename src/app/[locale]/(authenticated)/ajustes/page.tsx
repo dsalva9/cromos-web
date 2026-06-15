@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { NotificationSettingsTab } from '@/components/settings/NotificationSettingsTab';
 import { IgnoredUsersTab } from '@/components/settings/IgnoredUsersTab';
 import { IgnoredListingsTab } from '@/components/settings/IgnoredListingsTab';
+import { HiddenChatsTab } from '@/components/settings/HiddenChatsTab';
 import { SystemSettingsTab } from '@/components/settings/SystemSettingsTab';
 import { LegalSettingsTab } from '@/components/settings/LegalSettingsTab';
 import {
@@ -76,6 +77,9 @@ export default function AjustesPage() {
               <TabsTrigger value="anuncios-ignorados" className="flex-1">
                 {t('tabs.ignoredListings')}
               </TabsTrigger>
+              <TabsTrigger value="chats-ocultos" className="flex-1">
+                {t('tabs.hiddenChats')}
+              </TabsTrigger>
               <TabsTrigger value="sistema" className="flex-1">
                 {t('tabs.system')}
               </TabsTrigger>
@@ -94,6 +98,10 @@ export default function AjustesPage() {
 
             <TabsContent value="anuncios-ignorados">
               <IgnoredListingsTab />
+            </TabsContent>
+
+            <TabsContent value="chats-ocultos">
+              <HiddenChatsTab />
             </TabsContent>
 
             <TabsContent value="sistema">

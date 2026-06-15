@@ -2961,6 +2961,18 @@ export type Database = {
           ignored_at: string
         }[]
       }
+      get_hidden_conversations: {
+        Args: never
+        Returns: {
+          listing_id: number
+          listing_title: string
+          listing_image_url: string
+          counterparty_id: string
+          counterparty_nickname: string
+          counterparty_avatar_url: string
+          hidden_at: string
+        }[]
+      }
       get_listing_chat_participants: {
         Args: { p_listing_id: number }
         Returns: {

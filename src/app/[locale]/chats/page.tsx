@@ -16,6 +16,15 @@ import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 // ------------------------------------------------------------------
 // Types
@@ -85,15 +94,16 @@ function ChatsPageContent() {
     void fetchConversations();
   }, [user, supabase]);
 
-  // Hide a marketplace conversation
-  const handleHideConversation = useCallback(async (
-    e: React.MouseEvent,
-    conv: Conversation
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // State for hide confirmation dialog
+  const [hideConfirmConv, setHideConfirmConv] = useState<Conversation | null>(null);
+
+  // Hide a marketplace conversation (called after confirmation)
+  const confirmHideConversation = useCallback(async () => {
+    const conv = hideConfirmConv;
+    if (!conv) return;
     const key = `${conv.listing_id}-${conv.counterparty_id}`;
     setHidingId(key);
+    setHideConfirmConv(null);
     try {
       const { error } = await supabase.rpc('hide_conversation', {
         p_listing_id: conv.listing_id,
@@ -112,7 +122,7 @@ function ChatsPageContent() {
     } finally {
       setHidingId(null);
     }
-  }, [supabase, t]);
+  }, [hideConfirmConv, supabase, t]);
 
   // Open match chat drawer
   const openMatchChat = useCallback((conv: typeof matchConvs.conversations[0]) => {
@@ -218,7 +228,11 @@ function ChatsPageContent() {
                       <ModernCardContent className="p-4">
                         {/* Hide conversation button */}
                         <button
-                          onClick={(e) => void handleHideConversation(e, conv)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setHideConfirmConv(conv);
+                          }}
                           disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}`}
                           className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
                           title={t('hide.button')}
@@ -388,6 +402,27 @@ function ChatsPageContent() {
         templateId={activeMatchConv?.templateId}
         otherUserId={activeMatchConv?.otherUserId}
       />
+
+      {/* Hide conversation confirmation dialog */}
+      <Dialog open={!!hideConfirmConv} onOpenChange={(open) => !open && setHideConfirmConv(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('hide.confirmTitle')}</DialogTitle>
+            <DialogDescription>{t('hide.confirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setHideConfirmConv(null)}>
+              {t('hide.cancelButton')}
+            </Button>
+            <Button
+              onClick={() => void confirmHideConversation()}
+              className="bg-gold hover:bg-gold-light text-black"
+            >
+              {t('hide.confirmButton')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

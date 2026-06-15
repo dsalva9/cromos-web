@@ -201,7 +201,10 @@
         "yesterday": "yesterday",
         "days": "{count}d ago"
       },
-      "viewDetails": "View Details"
+      "viewDetails": "View Details",
+      "ignore": "Ignore listing",
+      "ignoreSuccess": "Listing ignored. You can restore it from Settings.",
+      "ignoreError": "Error ignoring listing"
     },
     "sponsored": {
       "badge": "Sponsored",
@@ -380,8 +383,12 @@
     },
     "hide": {
       "button": "Hide conversation",
-      "success": "Conversation hidden. It will reappear if you receive a new message.",
-      "error": "Error hiding conversation"
+      "success": "Conversation hidden. You can restore it from Settings.",
+      "error": "Error hiding conversation",
+      "confirmTitle": "Hide this conversation?",
+      "confirmDescription": "The conversation will disappear from your chat list. You can restore it from Settings > Hidden chats.",
+      "confirmButton": "Hide",
+      "cancelButton": "Cancel"
     }
   },
   "matchChat": {
@@ -1404,6 +1411,7 @@
       "notifications": "Notifications",
       "blocked": "Blocked",
       "ignoredListings": "Listings",
+      "hiddenChats": "Hidden chats",
       "system": "System",
       "legal": "Legal"
     },
@@ -1502,6 +1510,32 @@
         "loading": "Removing...",
         "success": "\"{title}\" removed from your ignored listings",
         "error": "Error restoring listing"
+      }
+    },
+    "hiddenChats": {
+      "errorLoad": "Error loading hidden chats",
+      "retry": "Retry",
+      "empty": {
+        "title": "You have no hidden chats",
+        "description": "Chats you hide from the chats page will appear here. You can restore them at any time."
+      },
+      "by": "With",
+      "time": {
+        "hidden": "Hidden",
+        "today": "today",
+        "yesterday": "yesterday",
+        "dayAgo": "{count} day ago",
+        "daysAgo": "{count} days ago",
+        "weekAgo": "{count} week ago",
+        "weeksAgo": "{count} weeks ago",
+        "monthAgo": "{count} month ago",
+        "monthsAgo": "{count} months ago"
+      },
+      "unhide": {
+        "button": "Show",
+        "loading": "Showing...",
+        "success": "Chat restored: {title}",
+        "error": "Error restoring chat"
       }
     },
     "notifications": {
@@ -2051,10 +2085,15 @@
     "restoreSuccess": "Listing restored successfully",
     "restoreError": "Error restoring the listing",
     "ignoreListing": {
-      "button": "Ignore listing",
+      "button": "Ignore",
       "success": "Listing ignored. It will no longer appear in your searches.",
-      "error": "Error ignoring listing"
-    }
+      "error": "Error ignoring listing",
+      "confirmTitle": "Ignore this listing?",
+      "confirmDescription": "The listing will no longer appear in your searches and chats. You can restore it from Settings > Ignored listings.",
+      "confirmButton": "Ignore",
+      "cancelButton": "Cancel"
+    },
+    "share": "Share"
   },
   "marketplaceChat": {
     "backToChats": "Back to my chats",

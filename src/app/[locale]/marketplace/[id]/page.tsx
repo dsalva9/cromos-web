@@ -63,6 +63,7 @@ export default function ListingDetailPage() {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const viewIncrementedRef = useRef<string | null>(null);
   const [ignoringListing, setIgnoringListing] = useState(false);
+  const [showIgnoreConfirm, setShowIgnoreConfirm] = useState(false);
 
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
@@ -578,7 +579,7 @@ export default function ListingDetailPage() {
                     listingId={listing.id}
                     listingTitle={listing.title}
                     collectionName={listing.collection_name}
-                    variant="icon"
+                    variant="full"
                     className="h-10 md:h-12 md:flex-1"
                   />
                   <ReportButton
@@ -592,11 +593,12 @@ export default function ListingDetailPage() {
                     variant="outline"
                     size="default"
                     className="h-10 md:h-12 md:flex-1"
-                    onClick={() => void handleIgnoreListing()}
+                    onClick={() => setShowIgnoreConfirm(true)}
                     disabled={ignoringListing}
                     title={t('ignoreListing.button')}
                   >
                     <EyeOff className="h-4 w-4" />
+                    <span>{t('ignoreListing.button')}</span>
                   </Button>
                 </div>
               )}
@@ -764,6 +766,46 @@ export default function ListingDetailPage() {
                 </>
               ) : (
                 <>{t('confirmDelete')}</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Ignore Listing Confirmation Dialog */}
+      <Dialog open={showIgnoreConfirm} onOpenChange={setShowIgnoreConfirm}>
+        <DialogContent className="bg-slate-800 text-white border-slate-700">
+          <DialogHeader>
+            <DialogTitle>{t('ignoreListing.confirmTitle')}</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              {t('ignoreListing.confirmDescription')}
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowIgnoreConfirm(false)}
+              disabled={ignoringListing}
+              className="border-slate-600 text-white hover:bg-slate-700"
+            >
+              {t('ignoreListing.cancelButton')}
+            </Button>
+            <Button
+              onClick={() => {
+                setShowIgnoreConfirm(false);
+                void handleIgnoreListing();
+              }}
+              disabled={ignoringListing}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {ignoringListing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t('ignoreListing.confirmButton')}
+                </>
+              ) : (
+                <>{t('ignoreListing.confirmButton')}</>
               )}
             </Button>
           </DialogFooter>

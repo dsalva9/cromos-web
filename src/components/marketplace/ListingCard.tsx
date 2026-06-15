@@ -1,9 +1,10 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { MapPin, Ban, Trash2, Flame } from 'lucide-react';
+import { MapPin, Ban, Trash2, Flame, EyeOff } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 import '@/styles/highlight-animation.css';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -13,6 +14,9 @@ import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatar
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ListingCardProps {
   listing: Listing;
@@ -38,12 +42,35 @@ function formatRelativeTime(dateString: string): string {
 export function ListingCard({ listing }: ListingCardProps) {
   const t = useTranslations('marketplace.card');
   const { user } = useUser();
-  const supabase = useSupabaseClient(); // For avatar resolution if needed
+  const supabase = useSupabaseClient();
   const { isAdmin } = useProfileCompletion();
+  const queryClient = useQueryClient();
+  const [ignored, setIgnored] = useState(false);
 
   const isNew = isNewListing(listing.created_at);
   const avatarUrl = resolveAvatarUrl(listing.author_avatar_url, supabase);
   const fallback = getAvatarFallback(listing.author_nickname);
+  const isOwner = user?.id === listing.user_id;
+
+  const handleIgnore = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const { error } = await supabase.rpc('ignore_listing', {
+        p_listing_id: listing.id,
+      });
+      if (error) throw error;
+      setIgnored(true);
+      toast.success(t('ignoreSuccess'));
+      // Invalidate the listings cache so the card disappears on next render
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+    } catch (err) {
+      logger.error('Error ignoring listing:', err);
+      toast.error(t('ignoreError'));
+    }
+  }, [supabase, listing.id, t, queryClient]);
+
+  if (ignored) return null;
 
   const getStatusColor = (status: string, isPack: boolean = false) => {
     switch (status) {
@@ -148,6 +175,20 @@ export function ListingCard({ listing }: ListingCardProps) {
             </span>
           )}
         </div>
+
+        {/* Quick Ignore Button (bottom-right, away from badges) */}
+        {user && !isOwner && (
+          <div className="absolute bottom-2 right-2 z-20">
+            <button
+              onClick={handleIgnore}
+              className="p-1.5 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-700 transition-all duration-200 shadow-sm opacity-40 group-hover:opacity-100"
+              title={t('ignore')}
+              aria-label={t('ignore')}
+            >
+              <EyeOff className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}

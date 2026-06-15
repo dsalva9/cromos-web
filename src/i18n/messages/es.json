@@ -226,7 +226,10 @@
         "yesterday": "ayer",
         "days": "hace {count}d"
       },
-      "viewDetails": "Ver Detalles"
+      "viewDetails": "Ver Detalles",
+      "ignore": "Ignorar anuncio",
+      "ignoreSuccess": "Anuncio ignorado. Puedes restaurarlo desde Ajustes.",
+      "ignoreError": "Error al ignorar el anuncio"
     },
     "sponsored": {
       "badge": "Patrocinado",
@@ -405,8 +408,12 @@
     },
     "hide": {
       "button": "Ocultar conversación",
-      "success": "Conversación ocultada. Volverá a aparecer si recibes un nuevo mensaje.",
-      "error": "Error al ocultar la conversación"
+      "success": "Conversación ocultada. Puedes restaurarla desde Ajustes.",
+      "error": "Error al ocultar la conversación",
+      "confirmTitle": "¿Ocultar esta conversación?",
+      "confirmDescription": "La conversación desaparecerá de tu lista de chats. Podrás restaurarla desde Ajustes > Chats ocultos.",
+      "confirmButton": "Ocultar",
+      "cancelButton": "Cancelar"
     }
   },
   "matchChat": {
@@ -1404,6 +1411,7 @@
       "notifications": "Notificaciones",
       "blocked": "Bloqueados",
       "ignoredListings": "Anuncios",
+      "hiddenChats": "Chats ocultos",
       "system": "Sistema",
       "legal": "Legal"
     },
@@ -1596,6 +1604,32 @@
         "loading": "Eliminando...",
         "success": "\"{title}\" eliminado de tu lista de anuncios ignorados",
         "error": "Error al restaurar el anuncio"
+      }
+    },
+    "hiddenChats": {
+      "errorLoad": "Error al cargar los chats ocultos",
+      "retry": "Reintentar",
+      "empty": {
+        "title": "No tienes chats ocultos",
+        "description": "Los chats que ocultes desde la página de chats aparecerán aquí. Podrás restaurarlos en cualquier momento."
+      },
+      "by": "Con",
+      "time": {
+        "hidden": "Oculto",
+        "today": "hoy",
+        "yesterday": "ayer",
+        "dayAgo": "hace {count} día",
+        "daysAgo": "hace {count} días",
+        "weekAgo": "hace {count} semana",
+        "weeksAgo": "hace {count} semanas",
+        "monthAgo": "hace {count} mes",
+        "monthsAgo": "hace {count} meses"
+      },
+      "unhide": {
+        "button": "Mostrar",
+        "loading": "Mostrando...",
+        "success": "Chat restaurado: {title}",
+        "error": "Error al restaurar el chat"
       }
     }
   },
@@ -2051,10 +2085,15 @@
     "restoreSuccess": "Anuncio restaurado correctamente",
     "restoreError": "Error al restaurar el anuncio",
     "ignoreListing": {
-      "button": "Ignorar anuncio",
+      "button": "Ignorar",
       "success": "Anuncio ignorado. Ya no aparecerá en tus búsquedas.",
-      "error": "Error al ignorar el anuncio"
-    }
+      "error": "Error al ignorar el anuncio",
+      "confirmTitle": "¿Ignorar este anuncio?",
+      "confirmDescription": "El anuncio dejará de aparecer en tus búsquedas y chats. Podrás restaurarlo desde Ajustes > Anuncios ignorados.",
+      "confirmButton": "Ignorar",
+      "cancelButton": "Cancelar"
+    },
+    "share": "Compartir"
   },
   "marketplaceChat": {
     "backToChats": "Volver a mis chats",
