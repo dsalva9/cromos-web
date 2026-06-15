@@ -98,7 +98,8 @@ export async function proxy(request: NextRequest) {
         || pathname === '/robots.txt'
         || pathname === '/sitemap.xml'
         || pathname === '/manifest.json'
-        || pathname === '/icon.png';
+        || pathname === '/icon.png'
+        || pathname === '/ad-frame.html';
 
     let intlHeaders: Headers | null = null;
 
@@ -182,6 +183,6 @@ export const config = {
          * - favicon.ico (favicon file)
          * - Static assets (images, etc.)
          */
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|txt|xml)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|txt|xml|html)$).*)',
     ],
 };
