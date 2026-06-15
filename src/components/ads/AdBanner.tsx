@@ -33,8 +33,19 @@ export function AdBanner() {
   // Defer to client to avoid SSR hydration mismatch
   const [hasMounted, setHasMounted] = useState(false);
   const [showAdBlockerModal, setShowAdBlockerModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => { setHasMounted(true); }, []);
+  useEffect(() => {
+    setHasMounted(true);
+    if (typeof window !== 'undefined') {
+      const checkViewport = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      checkViewport();
+      window.addEventListener('resize', checkViewport);
+      return () => window.removeEventListener('resize', checkViewport);
+    }
+  }, []);
 
   const isHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
 
@@ -80,9 +91,9 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden]);
 
-  // Inject mobile ad script inside a sandboxed iframe
+  // Inject mobile ad script inside a sandboxed iframe using a local same-domain src
   useEffect(() => {
-    if (!hasMounted || isHidden) return;
+    if (!hasMounted || isHidden || !isMobile) return;
 
     const container = mobileAdRef.current;
     if (!container) return;
@@ -90,6 +101,7 @@ export function AdBanner() {
     container.innerHTML = '';
 
     const iframe = document.createElement('iframe');
+    iframe.src = '/ad-frame.html';
     iframe.width = '320';
     iframe.height = '50';
     iframe.style.width = '320px';
@@ -101,45 +113,14 @@ export function AdBanner() {
 
     container.appendChild(iframe);
 
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (doc) {
-      const body = doc.body;
-      if (body) {
-        body.style.margin = '0';
-        body.style.padding = '0';
-        body.style.width = '320px';
-        body.style.height = '50px';
-        body.style.overflow = 'hidden';
-
-        const optionsScript = doc.createElement('script');
-        optionsScript.type = 'text/javascript';
-        optionsScript.text = `
-          atOptions = {
-            'key' : '207f77c777a93d9b339e6e77660a9707',
-            'format' : 'iframe',
-            'height' : 50,
-            'width' : 320,
-            'params' : {}
-          };
-        `;
-
-        const invokeScript = doc.createElement('script');
-        invokeScript.type = 'text/javascript';
-        invokeScript.src = 'https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js';
-
-        body.appendChild(optionsScript);
-        body.appendChild(invokeScript);
-      }
-    }
-
     return () => {
       container.innerHTML = '';
     };
-  }, [hasMounted, isHidden, pathname]);
+  }, [hasMounted, isHidden, isMobile, pathname]);
 
-  // Inject desktop ad script
+  // Inject desktop ad script (only runs on desktop viewports)
   useEffect(() => {
-    if (!hasMounted || isHidden) return;
+    if (!hasMounted || isHidden || isMobile) return;
 
     const container = desktopAdRef.current;
     if (!container) return;
@@ -166,7 +147,7 @@ export function AdBanner() {
     return () => {
       container.innerHTML = '';
     };
-  }, [hasMounted, isHidden, pathname]);
+  }, [hasMounted, isHidden, isMobile, pathname]);
 
   if (!hasMounted || isHidden) return null;
 
