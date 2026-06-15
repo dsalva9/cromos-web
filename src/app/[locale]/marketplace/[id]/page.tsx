@@ -573,7 +573,7 @@ export default function ListingDetailPage() {
 
               {/* Favorite Button - shown to all authenticated non-owners */}
               {user && !isOwner && (
-                <div className="mt-4 grid grid-cols-4 gap-2 w-full">
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2 w-full">
                   <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12 w-full text-xs md:text-sm px-1.5 md:px-3" />
                   <ShareButton
                     listingId={listing.id}
