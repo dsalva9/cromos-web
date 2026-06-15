@@ -1,7 +1,7 @@
 -- Migration: Schedule daily cron job for listing expiration processing
 -- Runs at 4:00 AM UTC every day
 
-DO $$
+DO $do$
 BEGIN
     -- Only create the cron job if it doesn't already exist
     IF NOT EXISTS (
@@ -24,11 +24,12 @@ BEGIN
         );
     END IF;
 END
-$$;
+$do$;
 
 -- ============================================================
 -- Update get_my_listings_with_progress to include expiration columns
 -- ============================================================
+DROP FUNCTION IF EXISTS public.get_my_listings_with_progress(text);
 CREATE OR REPLACE FUNCTION public.get_my_listings_with_progress(p_status text DEFAULT NULL)
 RETURNS TABLE(
     id bigint,
