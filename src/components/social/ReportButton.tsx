@@ -29,9 +29,9 @@ export function ReportButton({
         size={size}
 
         onClick={() => setOpen(true)}
-        className={`text-gray-400 hover:text-red-500 ${className}`} // Append className
+        className={`text-gray-400 hover:text-red-500 text-xs md:text-sm px-1.5 md:px-3 ${className || ''}`} // Append className
       >
-        <Flag className="h-4 w-4 mr-2" />
+        <Flag className="h-4 w-4 mr-1 md:mr-2" />
         Denunciar
       </Button>
 

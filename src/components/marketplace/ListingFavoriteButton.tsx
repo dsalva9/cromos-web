@@ -116,13 +116,12 @@ export function ListingFavoriteButton({
       onClick={handleToggle}
       disabled={loading}
       variant={favorited ? 'default' : 'outline'}
-      className={`${favorited ? 'bg-red-600 hover:bg-red-700 text-white' : ''} ${className || ''}`}
+      className={`${favorited ? 'bg-red-600 hover:bg-red-700 text-white' : ''} text-xs md:text-sm px-1.5 md:px-3 ${className || ''}`}
     >
       <Heart
-        className={`mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`}
+        className={`mr-1 md:mr-2 h-4 w-4 ${favorited ? 'fill-current' : ''}`}
       />
-      <span className="md:hidden">Favoritos</span>
-      <span className="hidden md:inline">{favorited ? 'En favoritos' : 'Agregar a favoritos'}</span>
+      <span>Favoritos</span>
     </Button>
   );
 }

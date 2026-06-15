@@ -191,7 +191,7 @@ export function ShareButton({
     >
       <Share2 className="h-4 w-4 md:h-5 md:w-5" />
       {variant === 'full' && (
-        <span className="ml-1 text-xs md:text-sm">Compartir</span>
+        <span className="ml-1 md:ml-2 text-xs md:text-sm">Compartir</span>
       )}
     </Button>
   );

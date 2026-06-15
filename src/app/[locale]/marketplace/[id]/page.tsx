@@ -573,31 +573,31 @@ export default function ListingDetailPage() {
 
               {/* Favorite Button - shown to all authenticated non-owners */}
               {user && !isOwner && (
-                <div className="mt-4 grid grid-cols-2 md:flex md:flex-row gap-2">
-                  <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12 md:flex-1" />
+                <div className="mt-4 grid grid-cols-4 gap-2 w-full">
+                  <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12 w-full text-xs md:text-sm px-1.5 md:px-3" />
                   <ShareButton
                     listingId={listing.id}
                     listingTitle={listing.title}
                     collectionName={listing.collection_name}
                     variant="full"
-                    className="h-10 md:h-12 md:flex-1"
+                    className="h-10 md:h-12 w-full text-xs md:text-sm px-1.5 md:px-3"
                   />
                   <ReportButton
                     entityType="listing"
                     entityId={String(listing.id)}
                     variant="outline"
                     size="default"
-                    className="h-10 md:h-12 md:flex-1"
+                    className="h-10 md:h-12 w-full text-xs md:text-sm px-1.5 md:px-3"
                   />
                   <Button
                     variant="outline"
                     size="default"
-                    className="h-10 md:h-12 md:flex-1"
+                    className="h-10 md:h-12 w-full text-xs md:text-sm px-1.5 md:px-3"
                     onClick={() => setShowIgnoreConfirm(true)}
                     disabled={ignoringListing}
                     title={t('ignoreListing.button')}
                   >
-                    <EyeOff className="h-4 w-4" />
+                    <EyeOff className="h-4 w-4 mr-1 md:mr-2" />
                     <span>{t('ignoreListing.button')}</span>
                   </Button>
                 </div>
