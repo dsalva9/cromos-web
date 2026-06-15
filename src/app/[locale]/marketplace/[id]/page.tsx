@@ -572,25 +572,26 @@ export default function ListingDetailPage() {
 
               {/* Favorite Button - shown to all authenticated non-owners */}
               {user && !isOwner && (
-                <div className="mt-4 flex items-center gap-2">
-                  <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12" />
+                <div className="mt-4 grid grid-cols-2 md:flex md:flex-row gap-2">
+                  <ListingFavoriteButton listingId={listing.id} variant="full" className="h-10 md:h-12 md:flex-1" />
                   <ShareButton
                     listingId={listing.id}
                     listingTitle={listing.title}
                     collectionName={listing.collection_name}
                     variant="icon"
+                    className="h-10 md:h-12 md:flex-1"
                   />
                   <ReportButton
                     entityType="listing"
                     entityId={String(listing.id)}
                     variant="outline"
                     size="default"
-                    className="h-10 md:h-12"
+                    className="h-10 md:h-12 md:flex-1"
                   />
                   <Button
                     variant="outline"
                     size="default"
-                    className="h-10 md:h-12"
+                    className="h-10 md:h-12 md:flex-1"
                     onClick={() => void handleIgnoreListing()}
                     disabled={ignoringListing}
                     title={t('ignoreListing.button')}
