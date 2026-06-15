@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
 
 /** Strip the locale prefix from a pathname for matching. */
 function stripLocale(path: string): string {
@@ -40,9 +41,15 @@ export function FloatingActionBtn() {
   // If no action defined for this page, don't render
   if (!actionLink) return null;
 
+  // Check if the ad banner is hidden on this page
+  const isBannerHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
+  const bottomOffset = isBannerHidden
+    ? 'calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem)'
+    : `calc(4rem + ${AD_BANNER_HEIGHT}px + env(safe-area-inset-bottom, 0px) + 1rem)`;
+
   // Hide on desktop
   return (
-    <div className="md:hidden fixed right-4 z-40" style={{ bottom: 'calc(4rem + 44px + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+    <div className="md:hidden fixed right-4 z-40" style={{ bottom: bottomOffset }}>
       <Link
         href={actionLink}
         className={cn(
