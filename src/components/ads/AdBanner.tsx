@@ -90,46 +90,46 @@ export function AdBanner() {
     container.innerHTML = '';
 
     const iframe = document.createElement('iframe');
+    iframe.width = '320';
+    iframe.height = '50';
     iframe.style.width = '320px';
     iframe.style.height = '50px';
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
 
     container.appendChild(iframe);
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (doc) {
-      doc.open();
-      doc.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              html, body {
-                margin: 0;
-                padding: 0;
-                width: 320px;
-                height: 50px;
-                overflow: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <script type="text/javascript">
-              atOptions = {
-                'key' : '207f77c777a93d9b339e6e77660a9707',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-              };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js"></script>
-          </body>
-        </html>
-      `);
-      doc.close();
+      const body = doc.body;
+      if (body) {
+        body.style.margin = '0';
+        body.style.padding = '0';
+        body.style.width = '320px';
+        body.style.height = '50px';
+        body.style.overflow = 'hidden';
+
+        const optionsScript = doc.createElement('script');
+        optionsScript.type = 'text/javascript';
+        optionsScript.text = `
+          atOptions = {
+            'key' : '207f77c777a93d9b339e6e77660a9707',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
+        `;
+
+        const invokeScript = doc.createElement('script');
+        invokeScript.type = 'text/javascript';
+        invokeScript.src = 'https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js';
+
+        body.appendChild(optionsScript);
+        body.appendChild(invokeScript);
+      }
     }
 
     return () => {
