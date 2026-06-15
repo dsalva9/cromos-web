@@ -55,24 +55,10 @@ interface UserEmail {
   email: string;
 }
 
-function buildExpirationEmailHtml(listings: StaleListing[]): string {
-  const listingRows = listings
-    .map((listing) => {
-      const listingUrl = `${BASE_URL}/es/marketplace/${listing.id}`;
-      return `
-        <tr>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-            <a href="${escapeHtml(listingUrl)}" style="color: #1f2937; text-decoration: none; font-weight: 500;">${escapeHtml(listing.title)}</a>
-          </td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-            <a href="${escapeHtml(listingUrl)}" style="color: #FFC000; text-decoration: none; font-weight: bold;">Ver →</a>
-          </td>
-        </tr>`;
-    })
-    .join('');
-
-  const myListingsUrl = `${BASE_URL}/es/marketplace/my-listings`;
-
+/**
+ * Common email shell used by both warning and removal emails.
+ */
+function emailShell(headerColor: string, body: string): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -89,7 +75,7 @@ function buildExpirationEmailHtml(listings: StaleListing[]): string {
             padding: 20px;
           }
           .header {
-            background: linear-gradient(135deg, #FFC000 0%, #FF8C00 100%);
+            background: ${headerColor};
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -151,37 +137,24 @@ function buildExpirationEmailHtml(listings: StaleListing[]): string {
             color: #9A3412;
             margin: 0;
           }
+          .info-box {
+            background: #EFF6FF;
+            border: 1px solid #60A5FA;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+          }
+          .info-box p {
+            color: #1E40AF;
+            margin: 0;
+          }
         </style>
       </head>
       <body>
         <div class="header">
           <h1>CambioCromos</h1>
         </div>
-        <div class="content">
-          <h2>⏰ Tus anuncios van a caducar</h2>
-          <p>Hola,</p>
-          <p>Los siguientes anuncios llevan más de 25 días sin actividad y serán <strong>eliminados automáticamente en 5 días</strong> si no los reactivas:</p>
-          
-          <table>
-            <thead>
-              <tr>
-                <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Anuncio</th>
-                <th style="padding: 12px 16px; text-align: right; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Enlace</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${listingRows}
-            </tbody>
-          </table>
-
-          <div class="warning-box">
-            <p>⚠️ Para mantener tus anuncios activos, solo tienes que hacer clic en <strong>Reactivar</strong> desde la página de Mis Anuncios.</p>
-          </div>
-
-          <div style="text-align: center;">
-            <a href="${escapeHtml(myListingsUrl)}" class="button">Ir a Mis Anuncios</a>
-          </div>
-        </div>
+        ${body}
         <div class="footer">
           <p>Este es un mensaje automático de CambioCromos</p>
           <p>Si no deseas recibir estos correos, puedes ajustar tus preferencias en la configuración de la app</p>
@@ -191,10 +164,186 @@ function buildExpirationEmailHtml(listings: StaleListing[]): string {
   `;
 }
 
+function buildListingRows(listings: StaleListing[]): string {
+  return listings
+    .map((listing) => {
+      const listingUrl = `${BASE_URL}/es/marketplace/${listing.id}`;
+      return `
+        <tr>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
+            <a href="${escapeHtml(listingUrl)}" style="color: #1f2937; text-decoration: none; font-weight: 500;">${escapeHtml(listing.title)}</a>
+          </td>
+          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right;">
+            <a href="${escapeHtml(listingUrl)}" style="color: #FFC000; text-decoration: none; font-weight: bold;">Ver →</a>
+          </td>
+        </tr>`;
+    })
+    .join('');
+}
+
+function buildExpirationEmailHtml(listings: StaleListing[]): string {
+  const myListingsUrl = `${BASE_URL}/es/marketplace/my-listings`;
+  const body = `
+    <div class="content">
+      <h2>⏰ Tus anuncios van a caducar</h2>
+      <p>Hola,</p>
+      <p>Los siguientes anuncios llevan más de 25 días sin actividad y serán <strong>eliminados automáticamente en 5 días</strong> si no los reactivas:</p>
+      <table>
+        <thead>
+          <tr>
+            <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Anuncio</th>
+            <th style="padding: 12px 16px; text-align: right; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Enlace</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${buildListingRows(listings)}
+        </tbody>
+      </table>
+      <div class="warning-box">
+        <p>⚠️ Para mantener tus anuncios activos, solo tienes que hacer clic en <strong>Reactivar</strong> desde la página de Mis Anuncios.</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="${escapeHtml(myListingsUrl)}" class="button">Ir a Mis Anuncios</a>
+      </div>
+    </div>`;
+  return emailShell('linear-gradient(135deg, #FFC000 0%, #FF8C00 100%)', body);
+}
+
+function buildRemovalEmailHtml(listings: StaleListing[]): string {
+  const myListingsUrl = `${BASE_URL}/es/marketplace/my-listings`;
+  const body = `
+    <div class="content">
+      <h2>🗑️ Tus anuncios han sido eliminados</h2>
+      <p>Hola,</p>
+      <p>Los siguientes anuncios han sido movidos a <strong>Eliminados</strong> por inactividad:</p>
+      <table>
+        <thead>
+          <tr>
+            <th style="padding: 12px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Anuncio</th>
+            <th style="padding: 12px 16px; text-align: right; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 12px; text-transform: uppercase;">Enlace</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${buildListingRows(listings)}
+        </tbody>
+      </table>
+      <div class="info-box">
+        <p>ℹ️ Puedes ver y <strong>restaurar</strong> estos anuncios desde la pestaña "Eliminados" en <strong>Mis Anuncios</strong>.</p>
+      </div>
+      <div class="warning-box">
+        <p>⚠️ Si no los restauras, serán <strong>eliminados permanentemente</strong> de acuerdo con nuestra política de retención de datos.</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="${escapeHtml(myListingsUrl)}" class="button">Ir a Mis Anuncios</a>
+      </div>
+    </div>`;
+  return emailShell('linear-gradient(135deg, #DC2626 0%, #991B1B 100%)', body);
+}
+
+/**
+ * Sends one batched email per user for a list of listings.
+ * Returns { sent, errors } counts.
+ */
+async function sendBatchedEmails(
+  supabase: ReturnType<typeof createClient>,
+  listingsByUser: Map<string, StaleListing[]>,
+  buildHtml: (listings: StaleListing[]) => string,
+  buildSubject: (count: number) => string,
+  notificationKind: string,
+): Promise<{ sent: number; errors: number }> {
+  let sent = 0;
+  let errors = 0;
+
+  if (!RESEND_API_KEY) {
+    console.error('[process-listing-expiration] Resend API key not configured');
+    return { sent, errors: listingsByUser.size };
+  }
+
+  // Collect all user IDs and fetch emails
+  const userIds = Array.from(listingsByUser.keys());
+  const userEmailMap = new Map<string, string>();
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id')
+    .in('id', userIds);
+
+  if (profiles) {
+    for (const profile of profiles) {
+      const { data: authUser } = await supabase.auth.admin.getUserById(profile.id);
+      if (authUser?.user?.email) {
+        userEmailMap.set(profile.id, authUser.user.email);
+      }
+    }
+  }
+
+  for (const [userId, userListings] of listingsByUser.entries()) {
+    const userEmail = userEmailMap.get(userId);
+    if (!userEmail) {
+      console.log(`[process-listing-expiration] No email for user ${userId}, skipping`);
+      continue;
+    }
+
+    // Check bounce suppression
+    const { data: bounceRecord } = await supabase
+      .from('email_bounces')
+      .select('suppressed')
+      .eq('email', userEmail)
+      .eq('suppressed', true)
+      .maybeSingle();
+
+    if (bounceRecord) {
+      console.log(`[process-listing-expiration] Skipping suppressed email: ${userEmail}`);
+      continue;
+    }
+
+    const htmlContent = buildHtml(userListings);
+    const subject = buildSubject(userListings.length);
+
+    try {
+      const resendResponse = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: FROM_EMAIL,
+          to: userEmail,
+          subject,
+          html: htmlContent,
+          text: stripHtml(htmlContent),
+        }),
+      });
+
+      const resendResult = await resendResponse.json();
+
+      if (!resendResponse.ok) {
+        console.error(`[process-listing-expiration] Resend error for ${userEmail}:`, resendResult);
+        errors++;
+      } else {
+        console.log(`[process-listing-expiration] Email sent to ${userEmail}:`, resendResult);
+        sent++;
+
+        await supabase.from('email_send_log').insert({
+          user_id: userId,
+          notification_kind: notificationKind,
+        });
+      }
+    } catch (emailError) {
+      console.error(`[process-listing-expiration] Email error for ${userEmail}:`, emailError);
+      errors++;
+    }
+  }
+
+  return { sent, errors };
+}
+
 Deno.serve(async (_req) => {
   const startTime = Date.now();
   const results = {
     expired: 0,
+    expiredEmailsSent: 0,
+    expiredEmailErrors: 0,
     flagged: 0,
     emailsSent: 0,
     emailErrors: 0,
@@ -229,6 +378,33 @@ Deno.serve(async (_req) => {
     } else {
       results.expired = expiredListings?.length ?? 0;
       console.log(`[process-listing-expiration] Expired ${results.expired} listings`);
+    }
+
+    // ================================================================
+    // Step 1B: Send removal notification emails for expired listings
+    // ================================================================
+    if (expiredListings && expiredListings.length > 0) {
+      console.log('[process-listing-expiration] Step 1B: Sending removal notifications...');
+
+      const expiredByUser = new Map<string, StaleListing[]>();
+      for (const listing of expiredListings) {
+        const existing = expiredByUser.get(listing.user_id) || [];
+        existing.push(listing);
+        expiredByUser.set(listing.user_id, existing);
+      }
+
+      const removalResult = await sendBatchedEmails(
+        supabase,
+        expiredByUser,
+        buildRemovalEmailHtml,
+        (count) => count === 1
+          ? 'Tu anuncio ha sido eliminado por inactividad'
+          : `${count} anuncios han sido eliminados por inactividad`,
+        'listing_expiration_removed',
+      );
+
+      results.expiredEmailsSent = removalResult.sent;
+      results.expiredEmailErrors = removalResult.errors;
     }
 
     // ================================================================
@@ -267,7 +443,7 @@ Deno.serve(async (_req) => {
     console.log(`[process-listing-expiration] Found ${results.flagged} stale listings`);
 
     // ================================================================
-    // Step 3: Group by user and send batched emails
+    // Step 3: Group by user and send batched warning emails
     // ================================================================
     console.log('[process-listing-expiration] Step 3: Sending warning emails...');
 
@@ -279,98 +455,18 @@ Deno.serve(async (_req) => {
       listingsByUser.set(listing.user_id, existing);
     }
 
-    // Fetch emails for all affected users
-    const userIds = Array.from(listingsByUser.keys());
-    const { data: usersWithEmails, error: usersError } = await supabase
-      .from('profiles')
-      .select('id')
-      .in('id', userIds);
+    const warningResult = await sendBatchedEmails(
+      supabase,
+      listingsByUser,
+      buildExpirationEmailHtml,
+      (count) => count === 1
+        ? 'Tu anuncio va a caducar en 5 días'
+        : `${count} anuncios van a caducar en 5 días`,
+      'listing_expiration_warning',
+    );
 
-    if (usersError) {
-      console.error('[process-listing-expiration] Error fetching user profiles:', usersError);
-      results.errors.push(`Users step: ${usersError.message}`);
-    }
-
-    // Fetch actual emails from auth.users via service role
-    const userEmailMap = new Map<string, string>();
-    if (usersWithEmails) {
-      for (const profile of usersWithEmails) {
-        const { data: authUser } = await supabase.auth.admin.getUserById(profile.id);
-        if (authUser?.user?.email) {
-          userEmailMap.set(profile.id, authUser.user.email);
-        }
-      }
-    }
-
-    // Check Resend API key
-    if (!RESEND_API_KEY) {
-      console.error('[process-listing-expiration] Resend API key not configured');
-      results.errors.push('Resend API key not configured');
-    } else {
-      // Send one email per user with all their expiring listings
-      for (const [userId, userListings] of listingsByUser.entries()) {
-        const userEmail = userEmailMap.get(userId);
-        if (!userEmail) {
-          console.log(`[process-listing-expiration] No email for user ${userId}, skipping`);
-          continue;
-        }
-
-        // Check bounce suppression
-        const { data: bounceRecord } = await supabase
-          .from('email_bounces')
-          .select('suppressed')
-          .eq('email', userEmail)
-          .eq('suppressed', true)
-          .maybeSingle();
-
-        if (bounceRecord) {
-          console.log(`[process-listing-expiration] Skipping suppressed email: ${userEmail}`);
-          continue;
-        }
-
-        const htmlContent = buildExpirationEmailHtml(userListings);
-        const listingCount = userListings.length;
-        const subject = listingCount === 1
-          ? 'Tu anuncio va a caducar en 5 días'
-          : `${listingCount} anuncios van a caducar en 5 días`;
-
-        try {
-          const resendResponse = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${RESEND_API_KEY}`,
-            },
-            body: JSON.stringify({
-              from: FROM_EMAIL,
-              to: userEmail,
-              subject,
-              html: htmlContent,
-              text: stripHtml(htmlContent),
-            }),
-          });
-
-          const resendResult = await resendResponse.json();
-
-          if (!resendResponse.ok) {
-            console.error(`[process-listing-expiration] Resend error for ${userEmail}:`, resendResult);
-            results.emailErrors++;
-          } else {
-            console.log(`[process-listing-expiration] Email sent to ${userEmail}:`, resendResult);
-            results.emailsSent++;
-
-            // Log the send
-            await supabase.from('email_send_log').insert({
-              user_id: userId,
-              notification_kind: 'listing_expiration_warning',
-            });
-          }
-        } catch (emailError) {
-          console.error(`[process-listing-expiration] Email error for ${userEmail}:`, emailError);
-          results.emailErrors++;
-        }
-      }
-    }
+    results.emailsSent = warningResult.sent;
+    results.emailErrors = warningResult.errors;
 
     // ================================================================
     // Step 4: Update all flagged listings with expiry schedule
