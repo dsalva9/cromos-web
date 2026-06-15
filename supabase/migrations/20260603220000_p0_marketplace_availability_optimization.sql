@@ -13,7 +13,7 @@
 -- After:  counts mode = 9ms mean, slots mode = 8ms mean
 
 -- 1. Covering index for the marketplace availability function
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_trade_listings_availability
+CREATE INDEX IF NOT EXISTS idx_trade_listings_availability
 ON public.trade_listings (collection_name, sticker_number)
 INCLUDE (user_id, page_title, is_group)
 WHERE status = 'active' AND deleted_at IS NULL;

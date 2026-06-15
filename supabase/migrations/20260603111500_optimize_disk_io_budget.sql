@@ -18,6 +18,8 @@
 -- for index-only scans, dramatically reducing the intermediate result set and
 -- eliminating the temp file spills that consumed ~6 GB of disk IO.
 -- ---------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS public.find_mutual_traders(uuid, integer, text, text, text, integer, double precision, double precision, double precision, text, integer, integer);
+
 CREATE OR REPLACE FUNCTION public.find_mutual_traders(
   p_user_id uuid,
   p_collection_id integer,

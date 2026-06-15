@@ -239,24 +239,10 @@ function ChatsPageContent() {
                           )}
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2 mb-1">
+                            <div className="flex items-start gap-2 mb-1 pr-8">
                               <h3 className="font-bold text-gray-900 dark:text-white truncate">
                                 {conv.listing_title}
                               </h3>
-                              <span
-                                className={cn(
-                                  'px-2 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
-                                  conv.listing_status === 'active' && 'bg-green-100 text-green-700',
-                                  conv.listing_status === 'reserved' && 'bg-yellow-100 text-yellow-700',
-                                  conv.listing_status === 'completed' && 'bg-blue-100 text-blue-700',
-                                  conv.listing_status === 'sold' && 'bg-gray-200 text-gray-700'
-                                )}
-                              >
-                                {conv.listing_status === 'active' && t('status.active')}
-                                {conv.listing_status === 'reserved' && t('status.reserved')}
-                                {conv.listing_status === 'completed' && t('status.completed')}
-                                {conv.listing_status === 'sold' && t('status.completed')}
-                              </span>
                             </div>
 
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
