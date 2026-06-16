@@ -36,6 +36,8 @@ if (SENTRY_DSN) {
             'Non-Error promise rejection captured with value: undefined',
             // Third-party scripts, Facebook WebView autofill, and extension TypeErrors
             "Cannot read properties of undefined (reading 'value')",
+            // Third-party Monetag / ad network unhandled promise rejections
+            /^he$/i,
         ],
 
         beforeSend(event, hint) {
@@ -53,11 +55,40 @@ if (SENTRY_DSN) {
                 return null;
             }
 
-            // Drop Facebook in-app browser autofill bridge errors —
-            // originates from app://autofill_test_android, not our code.
+            // Drop unhandled rejection "he" directly if it matches
+            if (message === 'he' || message === 'Error: he') {
+                return null;
+            }
+
             const frames = event.exception?.values?.flatMap(
                 (v) => v.stacktrace?.frames ?? [],
             ) ?? [];
+
+            // Drop call stack size errors that do not originate from our codebase.
+            // This filters out stack overflows caused by third-party ad networks (e.g. highperformanceformat.com).
+            const isStackOverflow =
+                message.toLowerCase().includes('maximum call stack size exceeded') ||
+                message.toLowerCase().includes('too much recursion') ||
+                message.toLowerCase().includes('stack size') ||
+                type === 'RangeError';
+
+            if (isStackOverflow) {
+                const hasAppFrames = frames.some((f) => {
+                    const file = f.filename || '';
+                    return (
+                        file.includes('_next/static') ||
+                        file.includes('/src/') ||
+                        file.includes('chunks/') ||
+                        file.includes('cambiocromos.com')
+                    );
+                });
+                if (!hasAppFrames) {
+                    return null;
+                }
+            }
+
+            // Drop Facebook in-app browser autofill bridge errors —
+            // originates from app://autofill_test_android, not our code.
             const hasFbAutofill = frames.some((f) =>
                 f.filename?.includes('autofill_test_android'),
             );
