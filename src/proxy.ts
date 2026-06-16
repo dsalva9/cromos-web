@@ -99,7 +99,8 @@ export async function proxy(request: NextRequest) {
         || pathname === '/sitemap.xml'
         || pathname === '/manifest.json'
         || pathname === '/icon.png'
-        || pathname === '/ad-frame.html';
+        || pathname === '/ad-frame.html'
+        || pathname === '/ad-frame-desktop.html';
 
     let intlHeaders: Headers | null = null;
 

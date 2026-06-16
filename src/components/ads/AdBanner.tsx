@@ -118,7 +118,7 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden, isMobile, pathname]);
 
-  // Inject desktop ad script (only runs on desktop viewports)
+  // Inject desktop ad script inside a sandboxed iframe (same approach as mobile)
   useEffect(() => {
     if (!hasMounted || isHidden || isMobile) return;
 
@@ -127,22 +127,18 @@ export function AdBanner() {
 
     container.innerHTML = '';
 
-    const optionsScript = document.createElement('script');
-    optionsScript.text = `
-      atOptions = {
-        'key' : 'cda4bca11f2cef504a11b56506742be3',
-        'format' : 'iframe',
-        'height' : 90,
-        'width' : 728,
-        'params' : {}
-      };
-    `;
+    const iframe = document.createElement('iframe');
+    iframe.src = '/ad-frame-desktop.html';
+    iframe.width = '728';
+    iframe.height = '90';
+    iframe.style.width = '728px';
+    iframe.style.height = '90px';
+    iframe.style.border = 'none';
+    iframe.style.overflow = 'hidden';
+    // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
 
-    const invokeScript = document.createElement('script');
-    invokeScript.src = 'https://www.highperformanceformat.com/cda4bca11f2cef504a11b56506742be3/invoke.js';
-
-    container.appendChild(optionsScript);
-    container.appendChild(invokeScript);
+    container.appendChild(iframe);
 
     return () => {
       container.innerHTML = '';
