@@ -14,12 +14,9 @@ BEGIN
             SELECT
               net.http_post(
                 url := 'https://cuzuzitadwmrlocqhhtu.supabase.co/functions/v1/process-listing-expiration',
-                headers := jsonb_build_object(
-                  'Content-Type', 'application/json',
-                  'Authorization', 'Bearer ' || current_setting('supabase.service_role_key')
-                ),
+                headers := '{"Content-Type": "application/json"}'::jsonb,
                 body := '{}'::jsonb
-              ) AS request_id;
+              );
             $$
         );
     END IF;
