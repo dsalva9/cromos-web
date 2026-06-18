@@ -548,6 +548,12 @@ export function ReportDetailModal({
                     {history.total_listings}
                   </p>
                 </div>
+                <div className="bg-green-500/10 border border-green-500/20 rounded-md p-2 -m-1">
+                  <p className="text-green-400 font-medium">🤝 Completed Transactions</p>
+                  <p className="text-green-300 font-bold text-lg">
+                    {(history as any).completed_transactions ?? 0}
+                  </p>
+                </div>
                 <div>
                   <p className="text-gray-600 dark:text-gray-400">Templates Created</p>
                   <p className="text-gray-900 dark:text-white font-bold">

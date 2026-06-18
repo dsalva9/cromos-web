@@ -90,7 +90,10 @@ export const logger = {
       'no se pudo crear el contexto del canvas',
       'no se pudo convertir el canvas',
       'no se pudo generar el thumbnail',
-      'no se pudo cargar la imagen para el thumbnail'
+      'no se pudo cargar la imagen para el thumbnail',
+      'listing not found',
+      'not authenticated',
+      'jwt expired',
     ];
     const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {

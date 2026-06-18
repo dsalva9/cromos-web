@@ -108,13 +108,25 @@ export default function ListingDetailPage() {
         );
 
         if (participantsError) {
-          logger.error('Error checking conversations:', participantsError);
+          const errMsg = String(participantsError.message || '').toLowerCase();
+          const isExpected = errMsg.includes('listing not found') || errMsg.includes('not authenticated') || errMsg.includes('jwt');
+          if (isExpected) {
+            logger.warnLocal('Expected error checking conversations:', participantsError.message);
+          } else {
+            logger.error('Error checking conversations:', participantsError);
+          }
           setHasConversations(false);
         } else {
           setHasConversations(data && data.length > 0);
         }
       } catch (err) {
-        logger.error('Error checking conversations:', err);
+        const errMsg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+        const isExpected = errMsg.includes('listing not found') || errMsg.includes('not authenticated') || errMsg.includes('jwt');
+        if (isExpected) {
+          logger.warnLocal('Expected error checking conversations:', err);
+        } else {
+          logger.error('Error checking conversations:', err);
+        }
         setHasConversations(false);
       } finally {
         setCheckingConversations(false);

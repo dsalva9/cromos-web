@@ -43,11 +43,14 @@ export interface CreateConversationResult {
 // ------------------------------------------------------------------
 
 function isAuthError(error: unknown): boolean {
+  let msg = '';
   if (error instanceof Error) {
-    const msg = error.message.toLowerCase();
-    return msg.includes('not authenticated') || msg.includes('jwt') || msg.includes('token');
+    msg = error.message.toLowerCase();
+  } else if (error && typeof error === 'object' && 'message' in error) {
+    // Handle PostgrestError (plain object with message property)
+    msg = String((error as { message: string }).message).toLowerCase();
   }
-  return false;
+  return msg.includes('not authenticated') || msg.includes('jwt') || msg.includes('token');
 }
 
 export async function getOrCreateMatchConversation(
@@ -66,7 +69,7 @@ export async function getOrCreateMatchConversation(
     return { data: data as CreateConversationResult, error: null };
   } catch (error) {
     if (isAuthError(error)) {
-      logger.warn('Unauthenticated request to getOrCreateMatchConversation:', error);
+      logger.warnLocal('Unauthenticated request to getOrCreateMatchConversation:', error);
     } else {
       logger.error('Error creating match conversation:', error);
     }
@@ -87,7 +90,7 @@ export async function getMatchConversations(
     return { data: (data || []) as MatchConversation[], error: null };
   } catch (error) {
     if (isAuthError(error)) {
-      logger.warn('Unauthenticated request to getMatchConversations:', error);
+      logger.warnLocal('Unauthenticated request to getMatchConversations:', error);
     } else {
       logger.error('Error fetching match conversations:', error);
     }
@@ -113,7 +116,7 @@ export async function getMatchChatMessages(
     return { data: (data || []) as MatchChatMessage[], error: null };
   } catch (error) {
     if (isAuthError(error)) {
-      logger.warn('Unauthenticated request to getMatchChatMessages:', error);
+      logger.warnLocal('Unauthenticated request to getMatchChatMessages:', error);
     } else {
       logger.error('Error fetching match chat messages:', error);
     }
@@ -150,7 +153,7 @@ export async function sendMatchMessage(
     return { messageId: data as number, error: null };
   } catch (error) {
     if (isAuthError(error)) {
-      logger.warn('Unauthenticated request to sendMatchMessage:', error);
+      logger.warnLocal('Unauthenticated request to sendMatchMessage:', error);
     } else {
       logger.error('Error sending match message:', error);
     }
@@ -175,7 +178,7 @@ export async function markMatchMessagesRead(
     return { count: (data as number) || 0, error: null };
   } catch (error) {
     if (isAuthError(error)) {
-      logger.warn('Unauthenticated request to markMatchMessagesRead:', error);
+      logger.warnLocal('Unauthenticated request to markMatchMessagesRead:', error);
     } else {
       logger.error('Error marking match messages as read:', error);
     }
