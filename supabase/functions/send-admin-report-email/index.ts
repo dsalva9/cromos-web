@@ -35,10 +35,20 @@ function escapeHtml(str: string): string {
 
 interface ReportPayload {
   report_id: number;
+  reporter_id: string;
   target_type: string;
   target_id: string;
   reason: string;
   description: string | null;
+  created_at: string;
+}
+
+interface ChatMessage {
+  id: number;
+  sender_id: string;
+  message: string | null;
+  image_url: string | null;
+  is_system: boolean;
   created_at: string;
 }
 
@@ -69,6 +79,83 @@ function getTargetTypeLabel(type: string): string {
   return labels[type] || type;
 }
 
+/** Render chat messages as styled HTML chat bubbles */
+function renderChatHtml(
+  messages: ChatMessage[],
+  reporterNickname: string,
+  targetNickname: string,
+  reporterId: string
+): string {
+  if (!messages || messages.length === 0) {
+    return `
+      <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e7eb;">
+        <h3 style="margin: 0 0 8px 0; font-size: 15px; color: #374151;">💬 Conversación entre los usuarios</h3>
+        <p style="margin: 0; font-size: 13px; color: #6b7280; font-style: italic;">No se encontraron mensajes entre estos usuarios.</p>
+      </div>
+    `;
+  }
+
+  let chatBubblesHtml = '';
+
+  for (const msg of messages) {
+    const timestamp = new Date(msg.created_at).toLocaleString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    if (msg.is_system) {
+      // System message — centered, italic
+      chatBubblesHtml += `
+        <div style="text-align: center; margin: 6px 0;">
+          <span style="font-size: 12px; color: #9ca3af; font-style: italic;">
+            ${escapeHtml(msg.message || '[mensaje del sistema]')}
+          </span>
+          <br><span style="font-size: 10px; color: #d1d5db;">${timestamp}</span>
+        </div>
+      `;
+    } else {
+      const isReporter = msg.sender_id === reporterId;
+      const senderName = isReporter ? reporterNickname : targetNickname;
+      const alignment = isReporter ? 'right' : 'left';
+      const bgColor = isReporter ? '#dbeafe' : '#f3f4f6';
+      const borderColor = isReporter ? '#93c5fd' : '#d1d5db';
+      const labelColor = isReporter ? '#2563eb' : '#dc2626';
+      const label = isReporter ? '📢 Reportador' : '⚠️ Reportado';
+
+      let messageContent = '';
+      if (msg.message) {
+        messageContent = `<p style="margin: 0; font-size: 13px; color: #111827; word-break: break-word;">${escapeHtml(msg.message)}</p>`;
+      }
+      if (msg.image_url) {
+        messageContent += `<p style="margin: 4px 0 0 0; font-size: 12px;"><a href="${escapeHtml(msg.image_url)}" style="color: #2563eb; text-decoration: underline;">📷 Ver imagen adjunta</a></p>`;
+      }
+
+      chatBubblesHtml += `
+        <div style="text-align: ${alignment}; margin: 8px 0;">
+          <div style="display: inline-block; max-width: 80%; text-align: left; background-color: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 12px; padding: 10px 14px;">
+            <p style="margin: 0 0 4px 0; font-size: 11px; color: ${labelColor}; font-weight: 600;">${label} — ${escapeHtml(senderName)}</p>
+            ${messageContent}
+            <p style="margin: 4px 0 0 0; font-size: 10px; color: #9ca3af; text-align: right;">${timestamp}</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  return `
+    <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e7eb;">
+      <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #374151;">💬 Conversación completa entre los usuarios</h3>
+      <p style="margin: 0 0 12px 0; font-size: 12px; color: #6b7280;">${messages.length} mensaje(s) encontrado(s)</p>
+      <div style="max-height: 600px; overflow-y: auto; background-color: #ffffff; border-radius: 8px; padding: 12px; border: 1px solid #e5e7eb;">
+        ${chatBubblesHtml}
+      </div>
+    </div>
+  `;
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -93,10 +180,11 @@ Deno.serve(async (req) => {
 
     // Parse payload
     const payload: ReportPayload = await req.json();
-    const { report_id, target_type, target_id, reason, description, created_at } = payload;
+    const { report_id, reporter_id, target_type, target_id, reason, description, created_at } = payload;
 
     console.log('[send-admin-report-email] Received report alert:', {
       report_id,
+      reporter_id,
       target_type,
       target_id,
       reason,
@@ -116,8 +204,34 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Fetch reporter's nickname
+    let reporterNickname = 'Desconocido';
+    if (reporter_id) {
+      const { data: reporterProfile } = await supabase
+        .from('profiles')
+        .select('nickname')
+        .eq('id', reporter_id)
+        .maybeSingle();
+      if (reporterProfile?.nickname) {
+        reporterNickname = reporterProfile.nickname;
+      }
+    }
+
+    // Fetch prior report history for the target user
+    let priorReportCount = 0;
+    if (target_type === 'user') {
+      const { data: priorReports, count } = await supabase
+        .from('reports')
+        .select('id', { count: 'exact' })
+        .eq('target_type', 'user')
+        .eq('target_id', target_id)
+        .neq('id', report_id);
+      priorReportCount = count || 0;
+    }
+
     // Resolve extra details depending on target_type
     let targetDetailsHtml = '';
+    let targetNickname = 'Usuario';
     
     if (target_type === 'message') {
       // Fetch message content and sender nickname
@@ -163,10 +277,75 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (profileRecord) {
+        targetNickname = profileRecord.nickname || 'Usuario';
         targetDetailsHtml = `
           <p style="margin: 8px 0 0 0; font-size: 13px; color: #4b5563;"><strong>Usuario reportado:</strong> ${escapeHtml(profileRecord.nickname || '')} (ID: ${target_id})</p>
         `;
       }
+    }
+
+    // Fetch chat conversation between reporter and reported user
+    let chatHtml = '';
+    if (target_type === 'user' && reporter_id) {
+      try {
+        // Fetch listing chat messages between the two users
+        const { data: listingMessages } = await supabase
+          .from('trade_chats')
+          .select('id, sender_id, message, image_url, is_system, created_at')
+          .or(`and(sender_id.eq.${reporter_id},receiver_id.eq.${target_id}),and(sender_id.eq.${target_id},receiver_id.eq.${reporter_id})`)
+          .order('created_at', { ascending: true });
+
+        // Also check match conversations
+        const { data: matchConvs } = await supabase
+          .from('match_conversations')
+          .select('id')
+          .or(`and(user_a_id.eq.${reporter_id},user_b_id.eq.${target_id}),and(user_a_id.eq.${target_id},user_b_id.eq.${reporter_id})`);
+
+        let allMessages: ChatMessage[] = (listingMessages || []) as ChatMessage[];
+
+        if (matchConvs && matchConvs.length > 0) {
+          const convIds = matchConvs.map(c => c.id);
+          const { data: matchMessages } = await supabase
+            .from('trade_chats')
+            .select('id, sender_id, message, image_url, is_system, created_at')
+            .in('match_conversation_id', convIds)
+            .order('created_at', { ascending: true });
+
+          if (matchMessages) {
+            allMessages = [...allMessages, ...(matchMessages as ChatMessage[])];
+          }
+        }
+
+        // Sort all messages chronologically
+        allMessages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+        chatHtml = renderChatHtml(allMessages, reporterNickname, targetNickname, reporter_id);
+      } catch (chatErr) {
+        console.error('[send-admin-report-email] Error fetching chat history:', chatErr);
+        chatHtml = `
+          <div style="background-color: #fef2f2; padding: 12px; border-radius: 8px; margin-top: 20px; border: 1px solid #fecaca;">
+            <p style="margin: 0; font-size: 13px; color: #991b1b;">⚠️ No se pudo cargar el historial de chat.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Build prior reports warning banner
+    let priorReportsBanner = '';
+    if (target_type === 'user' && priorReportCount > 0) {
+      priorReportsBanner = `
+        <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 14px; margin-bottom: 16px; text-align: center;">
+          <p style="margin: 0; font-size: 15px; font-weight: bold; color: #92400e;">⚠️ Este usuario ha sido reportado ${priorReportCount} ${priorReportCount === 1 ? 'vez' : 'veces'} anteriormente</p>
+        </div>
+      `;
+    }
+
+    // Build reporter info section
+    let reporterInfoHtml = '';
+    if (reporter_id) {
+      reporterInfoHtml = `
+        <p style="margin: 0 0 12px 0; font-size: 13px; color: #4b5563;"><strong>Reportado por:</strong> ${escapeHtml(reporterNickname)} <span style="color: #9ca3af; font-size: 11px;">(${reporter_id})</span></p>
+      `;
     }
 
     const adminPanelUrl = `https://cromos-web.vercel.app/admin/reports`;
@@ -186,8 +365,13 @@ Deno.serve(async (req) => {
             <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Notificación Urgente de Reporte</p>
           </div>
           <div style="background: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; border-top: none;">
+            
+            ${priorReportsBanner}
+
             <h2 style="color: #111827; font-size: 18px; margin-top: 0; margin-bottom: 16px;">Detalles del Reporte #${report_id}</h2>
             
+            ${reporterInfoHtml}
+
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
               <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #6b7280; width: 120px;"><strong>Tipo de entidad:</strong></td>
@@ -208,6 +392,8 @@ Deno.serve(async (req) => {
             </table>
 
             ${targetDetailsHtml}
+
+            ${chatHtml}
 
             <div style="text-align: center; margin-top: 30px;">
               <a href="${adminPanelUrl}" style="display: inline-block; padding: 12px 24px; background-color: #ef4444; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Ir al Panel de Moderación</a>
