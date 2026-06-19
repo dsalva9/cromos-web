@@ -7,9 +7,10 @@ import { useTemplateProgress } from '@/hooks/templates/useTemplateProgress';
 import { TemplateProgressGrid } from '@/components/templates/TemplateProgressGrid';
 import { TemplateSummaryHeader } from '@/components/templates/TemplateSummaryHeader';
 import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
+import { ListingsModal } from '@/components/templates/ListingsModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb, Plus } from 'lucide-react';
+import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb, Plus, List } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useMarketplaceAvailabilitySlots } from '@/hooks/marketplace/useMarketplaceAvailability';
@@ -24,14 +25,18 @@ import {
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { useHaptic } from '@/hooks/useHaptic';
+import { useTranslations } from 'next-intl';
 
 function TemplateProgressContent() {
   const params = useParams();
   const router = useRouter();
   const copyId = params.copyId as string;
   const [quickEntryOpen, setQuickEntryOpen] = useState(false);
+  const [listingsOpen, setListingsOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const tListings = useTranslations('templates.listings');
 
   const { copy, progress, customFields, loading, error, updateSlotStatus, updateMultipleSlotsStatus, deleteTemplateCopy } =
     useTemplateProgress(copyId);
@@ -171,6 +176,16 @@ function TemplateProgressContent() {
               </Button>
             )}
 
+            {/* Listados Button */}
+            <Button
+              onClick={() => setListingsOpen(true)}
+              variant="outline"
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold w-full sm:w-auto"
+            >
+              <List className="mr-2 h-4 w-4" />
+              {tListings('buttonLabel')}
+            </Button>
+
             {/* Delete Button */}
             <Button
               onClick={() => setDeleteDialogOpen(true)}
@@ -226,6 +241,14 @@ function TemplateProgressContent() {
           onUpdateProgress={async (slotId, status, count = 0) => {
             await updateSlotStatus(slotId, status, count);
           }}
+        />
+
+        {/* Listings Modal */}
+        <ListingsModal
+          open={listingsOpen}
+          onOpenChange={setListingsOpen}
+          progress={progress}
+          copy={copy}
         />
 
         {/* Delete Confirmation Dialog */}
