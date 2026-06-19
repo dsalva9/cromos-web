@@ -1,13 +1,5 @@
 import { SlotProgress } from '@/types/v1.6.0';
 
-// Emoji constants — kept in JS source (not JSON translations) to avoid UTF-8 encoding issues
-const EMOJI = {
-  dupes: '\u{1F504}',    // 🔄
-  missing: '\u{274C}',   // ❌
-  cta: '\u{1F4F2}',      // 📲
-  all: '\u{1F4CB}',      // 📋
-} as const;
-
 export interface GenerateShareTextOptions {
   type: 'dupes' | 'missing' | 'all';
   progress: SlotProgress[];
@@ -63,7 +55,7 @@ function formatSlotList(
       const base = `${s.slot_number}${variant}`;
       if (isDupes) {
         const spareCount = s.count - 1;
-        return spareCount > 1 ? `${base} (\u{00D7}${spareCount})` : base;
+        return spareCount > 1 ? `${base} (x${spareCount})` : base;
       }
       return base;
     });
@@ -89,7 +81,7 @@ export function generateShareText({
   if (type === 'dupes') {
     if (dupesCount === 0) return translations.emptyList;
 
-    const header = `${EMOJI.dupes} ${translations.shareDupesHeader}`
+    const header = translations.shareDupesHeader
       .replace('{title}', copyTitle)
       .replace('{count}', dupesCount.toString());
 
@@ -99,14 +91,14 @@ export function generateShareText({
     if (isTruncated) {
       result += `\n... ${translations.shareTruncated.replace('{count}', remainingCount.toString())}`;
     }
-    result += `\n\n${EMOJI.cta} ${translations.shareDupesCTA}`;
+    result += `\n\n${translations.shareDupesCTA}`;
     return result;
   }
 
   if (type === 'missing') {
     if (missingCount === 0) return translations.emptyList;
 
-    const header = `${EMOJI.missing} ${translations.shareMissingHeader}`
+    const header = translations.shareMissingHeader
       .replace('{title}', copyTitle)
       .replace('{count}', missingCount.toString());
 
@@ -116,24 +108,25 @@ export function generateShareText({
     if (isTruncated) {
       result += `\n... ${translations.shareTruncated.replace('{count}', remainingCount.toString())}`;
     }
-    result += `\n\n${EMOJI.cta} ${translations.shareMissingCTA}`;
+    result += `\n\n${translations.shareMissingCTA}`;
     return result;
   }
 
   // type === 'all'
   if (dupesCount === 0 && missingCount === 0) return translations.emptyList;
 
-  const header = `${EMOJI.all} ${translations.shareAllHeader}`
+  const header = translations.shareAllHeader
     .replace('{title}', copyTitle);
 
   let result = header + '\n';
 
   // Dupes section
   if (dupesCount > 0) {
-    result += `\n${EMOJI.dupes} ${translations.shareDupesHeader
+    const dupesHeader = translations.shareDupesHeader
       .replace('{title}', '')
       .replace('{count}', dupesCount.toString())
-      .replace(/^\s*/, '')}\n`;
+      .replace(/^\s*/, '');
+    result += `\n${dupesHeader}\n`;
     const { pageLines, isTruncated, remainingCount } = formatSlotList(dupes, true, 100);
     result += pageLines.join('\n');
     if (isTruncated) {
@@ -143,10 +136,11 @@ export function generateShareText({
 
   // Missing section
   if (missingCount > 0) {
-    result += `\n\n${EMOJI.missing} ${translations.shareMissingHeader
+    const missingHeader = translations.shareMissingHeader
       .replace('{title}', '')
       .replace('{count}', missingCount.toString())
-      .replace(/^\s*/, '')}\n`;
+      .replace(/^\s*/, '');
+    result += `\n\n${missingHeader}\n`;
     const { pageLines, isTruncated, remainingCount } = formatSlotList(missing, false, 100);
     result += pageLines.join('\n');
     if (isTruncated) {
@@ -154,6 +148,6 @@ export function generateShareText({
     }
   }
 
-  result += `\n\n${EMOJI.cta} ${translations.shareAllCTA}`;
+  result += `\n\n${translations.shareAllCTA}`;
   return result;
 }

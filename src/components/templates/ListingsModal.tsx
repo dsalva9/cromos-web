@@ -11,7 +11,10 @@ import {
   Check, 
   Loader2, 
   List,
-  AlertCircle
+  AlertCircle,
+  ClipboardList,
+  RefreshCcw,
+  XCircle
 } from 'lucide-react';
 
 import { 
@@ -438,7 +441,7 @@ export function ListingsModal({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">{"\u{1F4CB}"}</span>
+                    <ClipboardList className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                     <span className="text-sm font-bold block">{t('allTitle')}</span>
                     <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 hover:bg-purple-100 font-bold border-purple-200 border text-xs">
                       {repesCount + missingCount}
@@ -457,7 +460,7 @@ export function ListingsModal({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">{"\u{1F504}"}</span>
+                    <RefreshCcw className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                     <span className="text-sm font-bold block">{t('dupesTitle')}</span>
                     <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-100 font-bold border-yellow-200 border text-xs">
                       {repesCount}
@@ -476,7 +479,7 @@ export function ListingsModal({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">{"\u{274C}"}</span>
+                    <XCircle className="w-6 h-6 text-red-600 dark:text-red-400" />
                     <span className="text-sm font-bold block">{t('missingTitle')}</span>
                     <Badge className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 hover:bg-red-100 font-bold border-red-200 border text-xs">
                       {missingCount}
