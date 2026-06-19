@@ -154,14 +154,31 @@ export function ListingsModal({
   }, [t]);
 
   // ── Share text generation ───────────────────────────────────────────
+  // Clipboard and native device sharing should be untruncated (never limited)
   const generatedShareText = useMemo(() => {
     return generateShareText({
       type: shareType,
       progress,
       copyTitle: copy.title,
       translations: utilTranslations,
+      limit: undefined, // no truncation
     });
   }, [shareType, progress, copy.title, utilTranslations]);
+
+  // Smart-truncated version for URLs to avoid hitting browser URL limits (approx 3000 chars)
+  const smartShareText = useMemo(() => {
+    const encoded = encodeURIComponent(generatedShareText);
+    if (encoded.length <= 3000) {
+      return generatedShareText;
+    }
+    return generateShareText({
+      type: shareType,
+      progress,
+      copyTitle: copy.title,
+      translations: utilTranslations,
+      limit: shareType === 'all' ? 150 : 200,
+    });
+  }, [generatedShareText, shareType, progress, copy.title, utilTranslations]);
 
   // ── Trigger Download ────────────────────────────────────────────────
   const handleDownload = async () => {
@@ -234,21 +251,21 @@ export function ListingsModal({
       label: 'WhatsApp',
       icon: <WhatsAppIcon className="h-5 w-5" />,
       colorClass: 'hover:bg-[#25D366]/15 text-[#25D366] border-[#25D366]/30',
-      url: `https://wa.me/?text=${encodeURIComponent(generatedShareText)}`,
+      url: `https://wa.me/?text=${encodeURIComponent(smartShareText)}`,
     },
     {
       key: 'telegram',
       label: 'Telegram',
       icon: <TelegramIcon className="h-5 w-5" />,
       colorClass: 'hover:bg-[#26A5E4]/15 text-[#26A5E4] border-[#26A5E4]/30',
-      url: `https://t.me/share/url?url=${encodeURIComponent(siteConfig.url)}&text=${encodeURIComponent(generatedShareText)}`,
+      url: `https://t.me/share/url?url=${encodeURIComponent(siteConfig.url)}&text=${encodeURIComponent(smartShareText)}`,
     },
     {
       key: 'x',
       label: 'X',
       icon: <XTwitterIcon className="h-5 w-5" />,
       colorClass: 'hover:bg-gray-500/15 text-gray-700 dark:text-gray-300 border-gray-500/30',
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(generatedShareText)}`,
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(smartShareText)}`,
     },
     {
       key: 'facebook',

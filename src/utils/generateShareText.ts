@@ -14,16 +14,18 @@ export interface GenerateShareTextOptions {
     shareTruncated: string;
     emptyList: string;
   };
+  limit?: number;
 }
 
 function formatSlotList(
   slots: SlotProgress[],
   isDupes: boolean,
-  limit: number,
+  limit?: number,
 ): { pageLines: string[]; isTruncated: boolean; remainingCount: number } {
-  const slicedSlots = slots.slice(0, limit);
-  const isTruncated = slots.length > limit;
-  const remainingCount = slots.length - limit;
+  const actualLimit = limit !== undefined ? limit : Infinity;
+  const slicedSlots = slots.slice(0, actualLimit);
+  const isTruncated = slots.length > actualLimit;
+  const remainingCount = slots.length - actualLimit;
 
   // Group by page_id
   const pageMap = new Map<number, { page_title: string; page_number: number; items: SlotProgress[] }>();
@@ -71,6 +73,7 @@ export function generateShareText({
   progress,
   copyTitle,
   translations,
+  limit,
 }: GenerateShareTextOptions): string {
   const dupes = progress.filter((s) => s.status === 'duplicate' && s.count > 1);
   const missing = progress.filter((s) => s.status === 'missing');
@@ -85,7 +88,7 @@ export function generateShareText({
       .replace('{title}', copyTitle)
       .replace('{count}', dupesCount.toString());
 
-    const { pageLines, isTruncated, remainingCount } = formatSlotList(dupes, true, 200);
+    const { pageLines, isTruncated, remainingCount } = formatSlotList(dupes, true, limit);
 
     let result = header + '\n\n' + pageLines.join('\n');
     if (isTruncated) {
@@ -102,7 +105,7 @@ export function generateShareText({
       .replace('{title}', copyTitle)
       .replace('{count}', missingCount.toString());
 
-    const { pageLines, isTruncated, remainingCount } = formatSlotList(missing, false, 200);
+    const { pageLines, isTruncated, remainingCount } = formatSlotList(missing, false, limit);
 
     let result = header + '\n\n' + pageLines.join('\n');
     if (isTruncated) {
@@ -120,6 +123,8 @@ export function generateShareText({
 
   let result = header + '\n';
 
+  const sectionLimit = limit !== undefined ? Math.max(10, Math.floor(limit / 2)) : undefined;
+
   // Dupes section
   if (dupesCount > 0) {
     const dupesHeader = translations.shareDupesHeader
@@ -127,7 +132,7 @@ export function generateShareText({
       .replace('{count}', dupesCount.toString())
       .replace(/^\s*/, '');
     result += `\n${dupesHeader}\n`;
-    const { pageLines, isTruncated, remainingCount } = formatSlotList(dupes, true, 100);
+    const { pageLines, isTruncated, remainingCount } = formatSlotList(dupes, true, sectionLimit);
     result += pageLines.join('\n');
     if (isTruncated) {
       result += `\n... ${translations.shareTruncated.replace('{count}', remainingCount.toString())}`;
@@ -141,7 +146,7 @@ export function generateShareText({
       .replace('{count}', missingCount.toString())
       .replace(/^\s*/, '');
     result += `\n\n${missingHeader}\n`;
-    const { pageLines, isTruncated, remainingCount } = formatSlotList(missing, false, 100);
+    const { pageLines, isTruncated, remainingCount } = formatSlotList(missing, false, sectionLimit);
     result += pageLines.join('\n');
     if (isTruncated) {
       result += `\n... ${translations.shareTruncated.replace('{count}', remainingCount.toString())}`;
