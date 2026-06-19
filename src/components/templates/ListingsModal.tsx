@@ -82,7 +82,7 @@ export function ListingsModal({
 
   const [activeTab, setActiveTab] = useState<'download' | 'share'>('download');
   const [downloadType, setDownloadType] = useState<'dupes' | 'missing' | 'summary'>('dupes');
-  const [shareType, setShareType] = useState<'dupes' | 'missing'>('dupes');
+  const [shareType, setShareType] = useState<'dupes' | 'missing' | 'all'>('all');
   const [format, setFormat] = useState<'pdf' | 'jpeg'>('pdf');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -102,7 +102,7 @@ export function ListingsModal({
         setDownloadType(missingCount > 0 ? 'missing' : 'summary');
       }
       if (repesCount === 0 && shareType === 'dupes') {
-        setShareType('missing');
+        setShareType(missingCount > 0 ? 'missing' : 'all');
       }
     }
   }, [open, repesCount, missingCount]);
@@ -120,8 +120,10 @@ export function ListingsModal({
     return {
       shareDupesHeader: t('shareDupesHeader'),
       shareMissingHeader: t('shareMissingHeader'),
+      shareAllHeader: t('shareAllHeader'),
       shareDupesCTA: t('shareDupesCTA'),
       shareMissingCTA: t('shareMissingCTA'),
+      shareAllCTA: t('shareAllCTA'),
       emptyList: t('emptyList'),
       pdfGeneratedOn: t('pdfGeneratedOn'),
       pdfFooterBranding: t('pdfFooterBranding'),
@@ -426,7 +428,23 @@ export function ListingsModal({
                 </label>
 
                 {/* Cards Grid */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Card: All */}
+                  <button
+                    onClick={() => setShareType('all')}
+                    className={`flex flex-col items-center justify-between p-4 rounded-xl border-2 transition-all text-center h-28 relative ${
+                      shareType === 'all'
+                        ? 'border-gold bg-gold/5 dark:bg-gold/10'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-xl">{"\u{1F4CB}"}</span>
+                    <span className="text-sm font-bold block">{t('allTitle')}</span>
+                    <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 hover:bg-purple-100 font-bold border-purple-200 border text-xs">
+                      {repesCount + missingCount}
+                    </Badge>
+                  </button>
+
                   {/* Card: Dupes */}
                   <button
                     disabled={repesCount === 0}
@@ -439,7 +457,7 @@ export function ListingsModal({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">🔄</span>
+                    <span className="text-xl">{"\u{1F504}"}</span>
                     <span className="text-sm font-bold block">{t('dupesTitle')}</span>
                     <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-100 font-bold border-yellow-200 border text-xs">
                       {repesCount}
@@ -458,7 +476,7 @@ export function ListingsModal({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">❌</span>
+                    <span className="text-xl">{"\u{274C}"}</span>
                     <span className="text-sm font-bold block">{t('missingTitle')}</span>
                     <Badge className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 hover:bg-red-100 font-bold border-red-200 border text-xs">
                       {missingCount}

@@ -539,7 +539,8 @@ export async function generateListingDocument({
     link.click();
     URL.revokeObjectURL(url);
   } else if (format === 'jpeg') {
-    const html2canvas = (await import('html2canvas')).default;
+    const html2canvasModule = await import('html2canvas');
+    const html2canvas = (html2canvasModule as any).default ?? html2canvasModule;
 
     // Create offscreen container
     const container = document.createElement('div');
@@ -662,7 +663,7 @@ export async function generateListingDocument({
       });
 
       canvas.toBlob(
-        (blob) => {
+        (blob: Blob | null) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
