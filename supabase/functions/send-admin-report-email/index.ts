@@ -288,38 +288,100 @@ Deno.serve(async (req) => {
     let chatHtml = '';
     if (target_type === 'user' && reporter_id) {
       try {
-        // Fetch listing chat messages between the two users
-        const { data: listingMessages } = await supabase
-          .from('trade_chats')
-          .select('id, sender_id, message, image_url, is_system, created_at')
-          .or(`and(sender_id.eq.${reporter_id},receiver_id.eq.${target_id}),and(sender_id.eq.${target_id},receiver_id.eq.${reporter_id})`)
-          .order('created_at', { ascending: true });
+        let userA = reporter_id;
+        let userB = target_id;
 
-        // Also check match conversations
-        const { data: matchConvs } = await supabase
-          .from('match_conversations')
-          .select('id')
-          .or(`and(user_a_id.eq.${reporter_id},user_b_id.eq.${target_id}),and(user_a_id.eq.${target_id},user_b_id.eq.${reporter_id})`);
+        const SYSTEM_REPORTER_ID = 'b644414f-73d8-4dc3-a36c-964a933e4eb8';
+        if (reporter_id === SYSTEM_REPORTER_ID && description) {
+          // It's an automated report, find the other user from the flagged message
+          const matches = Array.from(description.matchAll(/Mensaje ID:\s*(\d+)/g));
+          if (matches.length > 0) {
+            const lastMatch = matches[matches.length - 1];
+            const messageId = parseInt(lastMatch[1], 10);
+            if (!isNaN(messageId)) {
+              const { data: chatMsg } = await supabase
+                .from('trade_chats')
+                .select('sender_id, receiver_id, match_conversation_id')
+                .eq('id', messageId)
+                .maybeSingle();
 
-        let allMessages: ChatMessage[] = (listingMessages || []) as ChatMessage[];
-
-        if (matchConvs && matchConvs.length > 0) {
-          const convIds = matchConvs.map(c => c.id);
-          const { data: matchMessages } = await supabase
-            .from('trade_chats')
-            .select('id, sender_id, message, image_url, is_system, created_at')
-            .in('match_conversation_id', convIds)
-            .order('created_at', { ascending: true });
-
-          if (matchMessages) {
-            allMessages = [...allMessages, ...(matchMessages as ChatMessage[])];
+              if (chatMsg) {
+                if (chatMsg.match_conversation_id) {
+                  const { data: matchConv } = await supabase
+                    .from('match_conversations')
+                    .select('user_a_id, user_b_id')
+                    .eq('id', chatMsg.match_conversation_id)
+                    .maybeSingle();
+                  if (matchConv) {
+                    userA = matchConv.user_a_id === target_id ? matchConv.user_b_id : matchConv.user_a_id;
+                  }
+                } else if (chatMsg.receiver_id) {
+                  userA = chatMsg.sender_id === target_id ? chatMsg.receiver_id : chatMsg.sender_id;
+                }
+              }
+            }
           }
         }
 
-        // Sort all messages chronologically
-        allMessages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        // Only fetch if we have two valid users and they are not the same (or the system)
+        if (userA && userB && userA !== SYSTEM_REPORTER_ID && userA !== userB) {
+          // Fetch listing chat messages between the two users
+          const { data: listingMessages } = await supabase
+            .from('trade_chats')
+            .select('id, sender_id, message, image_url, is_system, created_at')
+            .or(`and(sender_id.eq.${userA},receiver_id.eq.${userB}),and(sender_id.eq.${userB},receiver_id.eq.${userA})`)
+            .order('created_at', { ascending: true });
 
-        chatHtml = renderChatHtml(allMessages, reporterNickname, targetNickname, reporter_id);
+          // Also check match conversations
+          const { data: matchConvs } = await supabase
+            .from('match_conversations')
+            .select('id')
+            .or(`and(user_a_id.eq.${userA},user_b_id.eq.${userB}),and(user_a_id.eq.${userB},user_b_id.eq.${userA})`);
+
+          let allMessages: ChatMessage[] = (listingMessages || []) as ChatMessage[];
+
+          if (matchConvs && matchConvs.length > 0) {
+            const convIds = matchConvs.map(c => c.id);
+            const { data: matchMessages } = await supabase
+              .from('trade_chats')
+              .select('id, sender_id, message, image_url, is_system, created_at')
+              .in('match_conversation_id', convIds)
+              .order('created_at', { ascending: true });
+
+            if (matchMessages) {
+              allMessages = [...allMessages, ...(matchMessages as ChatMessage[])];
+            }
+          }
+
+          // Sort all messages chronologically
+          allMessages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+          // Get nicknames for the two users
+          let userANickname = 'Desconocido';
+          let userBNickname = targetNickname;
+
+          if (userA === reporter_id) {
+            userANickname = reporterNickname;
+          } else {
+            const { data: profileA } = await supabase
+              .from('profiles')
+              .select('nickname')
+              .eq('id', userA)
+              .maybeSingle();
+            if (profileA?.nickname) {
+              userANickname = profileA.nickname;
+            }
+          }
+
+          chatHtml = renderChatHtml(allMessages, userANickname, userBNickname, userA);
+        } else {
+          chatHtml = `
+            <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; margin-top: 20px; border: 1px solid #e5e7eb;">
+              <h3 style="margin: 0 0 8px 0; font-size: 15px; color: #374151;">💬 Conversación entre los usuarios</h3>
+              <p style="margin: 0; font-size: 13px; color: #6b7280; font-style: italic;">No se encontraron mensajes entre estos usuarios.</p>
+            </div>
+          `;
+        }
       } catch (chatErr) {
         console.error('[send-admin-report-email] Error fetching chat history:', chatErr);
         chatHtml = `

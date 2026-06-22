@@ -111,13 +111,86 @@ export function ReportDetailModal({
 
   // Fetch chat context when we have details for user-type reports
   useEffect(() => {
-    if (details?.report?.entity_type === 'user' && reportMeta?.reporter_id && details.report.entity_id) {
-      fetchChat(reportMeta.reporter_id, details.report.entity_id);
-    }
+    let active = true;
+
+    const loadChatContext = async () => {
+      if (details?.report?.entity_type !== 'user' || !reportMeta?.reporter_id || !details.report.entity_id) {
+        return;
+      }
+
+      const reportedUserId = details.report.entity_id;
+      const SYSTEM_REPORTER_ID = 'b644414f-73d8-4dc3-a36c-964a933e4eb8';
+
+      if (reportMeta.reporter_id === SYSTEM_REPORTER_ID) {
+        // It's an automated report, find the other user from the flagged message
+        const desc = details.report.description || '';
+        const matches = [...desc.matchAll(/Mensaje ID:\s*(\d+)/g)];
+
+        if (matches.length > 0) {
+          const lastMatch = matches[matches.length - 1];
+          const messageId = parseInt(lastMatch[1], 10);
+
+          if (!isNaN(messageId)) {
+            try {
+              const { data: chatMsg } = await supabase
+                .from('trade_chats')
+                .select('sender_id, receiver_id, match_conversation_id')
+                .eq('id', messageId)
+                .single();
+
+              if (!active) return;
+
+              if (chatMsg) {
+                let otherUserId = null;
+
+                if (chatMsg.match_conversation_id) {
+                  const { data: matchConv } = await supabase
+                    .from('match_conversations')
+                    .select('user_a_id, user_b_id')
+                    .eq('id', chatMsg.match_conversation_id)
+                    .single();
+
+                  if (matchConv) {
+                    otherUserId = matchConv.user_a_id === reportedUserId ? matchConv.user_b_id : matchConv.user_a_id;
+                  }
+                } else if (chatMsg.receiver_id) {
+                  otherUserId = chatMsg.sender_id === reportedUserId ? chatMsg.receiver_id : chatMsg.sender_id;
+                }
+
+                if (otherUserId) {
+                  fetchChat(reportedUserId, otherUserId);
+                  return;
+                }
+              }
+            } catch (err) {
+              logger.error('Error fetching auto-report chat context:', err);
+            }
+          }
+        }
+
+        // Fallback: clear chat if we couldn't resolve other user
+        clearChat();
+      } else {
+        // Direct user-to-user report, fetch chat between reporter and reported user
+        fetchChat(reportMeta.reporter_id, reportedUserId);
+      }
+    };
+
+    loadChatContext();
+
     return () => {
+      active = false;
       clearChat();
     };
-  }, [details?.report?.entity_type, details?.report?.entity_id, reportMeta?.reporter_id, fetchChat, clearChat]);
+  }, [
+    details?.report?.entity_type,
+    details?.report?.entity_id,
+    details?.report?.description,
+    reportMeta?.reporter_id,
+    fetchChat,
+    clearChat,
+    supabase
+  ]);
 
   // Auto-scroll chat container
   useEffect(() => {

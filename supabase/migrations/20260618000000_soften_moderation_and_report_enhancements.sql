@@ -397,11 +397,9 @@ BEGIN
                           AND tl2.user_id::TEXT = rr.target_id_text
                     ),
                     'completed_transactions', (
-                        SELECT COUNT(*)
-                        FROM trade_listings tl3
-                        WHERE rr.target_id_text IS NOT NULL
-                          AND (tl3.user_id::TEXT = rr.target_id_text OR tl3.buyer_id::TEXT = rr.target_id_text)
-                          AND tl3.status = 'completed'
+                        SELECT completed_trades
+                        FROM profiles
+                        WHERE id = rr.target_id_text::uuid
                     ),
                     'total_templates_created', (
                         SELECT COUNT(*)
@@ -420,7 +418,7 @@ BEGIN
             ELSE NULL::jsonb
         END AS reported_user_history
     FROM report_row rr
-    JOIN profiles rp ON rr.reporter_id = rp.id;
+    LEFT JOIN profiles rp ON rr.reporter_id = rp.id;
 
     GET DIAGNOSTICS v_rowcount = ROW_COUNT;
 

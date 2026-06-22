@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -111,6 +111,13 @@ export type Database = {
             foreignKeyName: "audit_log_admin_id_fkey"
             columns: ["admin_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -120,6 +127,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "audit_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "audit_log_user_id_fkey"
@@ -207,6 +221,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "broadcast_log_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "broadcast_log_sent_by_fkey"
@@ -302,6 +323,13 @@ export type Database = {
             foreignKeyName: "collection_templates_author_id_fkey"
             columns: ["author_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_templates_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -316,10 +344,44 @@ export type Database = {
             foreignKeyName: "collection_templates_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_templates_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_bounces: {
+        Row: {
+          bounce_count: number
+          created_at: string
+          email: string
+          id: number
+          last_bounced_at: string
+          suppressed: boolean
+        }
+        Insert: {
+          bounce_count?: number
+          created_at?: string
+          email: string
+          id?: never
+          last_bounced_at?: string
+          suppressed?: boolean
+        }
+        Update: {
+          bounce_count?: number
+          created_at?: string
+          email?: string
+          id?: never
+          last_bounced_at?: string
+          suppressed?: boolean
+        }
+        Relationships: []
       }
       email_forwarding_addresses: {
         Row: {
@@ -361,10 +423,38 @@ export type Database = {
             foreignKeyName: "email_forwarding_addresses_added_by_fkey"
             columns: ["added_by"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_forwarding_addresses_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_send_log: {
+        Row: {
+          id: number
+          notification_kind: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: never
+          notification_kind: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: never
+          notification_kind?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       favourites: {
         Row: {
@@ -400,6 +490,13 @@ export type Database = {
             foreignKeyName: "favourites_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favourites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -428,6 +525,147 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      hidden_conversations: {
+        Row: {
+          counterparty_id: string | null
+          hidden_at: string
+          id: number
+          listing_id: number | null
+          match_conversation_id: number | null
+          user_id: string
+        }
+        Insert: {
+          counterparty_id?: string | null
+          hidden_at?: string
+          id?: number
+          listing_id?: number | null
+          match_conversation_id?: number | null
+          user_id: string
+        }
+        Update: {
+          counterparty_id?: string | null
+          hidden_at?: string
+          id?: number
+          listing_id?: number | null
+          match_conversation_id?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hidden_conversations_counterparty_id_fkey"
+            columns: ["counterparty_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_counterparty_id_fkey"
+            columns: ["counterparty_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_counterparty_id_fkey"
+            columns: ["counterparty_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_with_template_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "trade_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ignored_listings: {
+        Row: {
+          created_at: string
+          id: number
+          listing_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          listing_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          listing_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ignored_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_with_template_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ignored_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "trade_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ignored_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ignored_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ignored_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ignored_users: {
         Row: {
@@ -460,6 +698,13 @@ export type Database = {
             foreignKeyName: "ignored_users_ignored_user_id_fkey"
             columns: ["ignored_user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ignored_users_ignored_user_id_fkey"
+            columns: ["ignored_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -469,6 +714,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "ignored_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "ignored_users_user_id_fkey"
@@ -622,6 +874,13 @@ export type Database = {
             foreignKeyName: "listing_transactions_buyer_id_fkey"
             columns: ["buyer_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_transactions_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -649,6 +908,117 @@ export type Database = {
           {
             foreignKeyName: "listing_transactions_seller_id_fkey"
             columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_transactions_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_conversations: {
+        Row: {
+          created_at: string
+          id: number
+          last_message: string | null
+          last_message_at: string | null
+          last_message_sender_id: string | null
+          template_id: number | null
+          user_a_id: string
+          user_b_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          last_message?: string | null
+          last_message_at?: string | null
+          last_message_sender_id?: string | null
+          template_id?: number | null
+          user_a_id: string
+          user_b_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          last_message?: string | null
+          last_message_at?: string | null
+          last_message_sender_id?: string | null
+          template_id?: number | null
+          user_a_id?: string
+          user_b_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_conversations_last_message_sender_id_fkey"
+            columns: ["last_message_sender_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "match_conversations_last_message_sender_id_fkey"
+            columns: ["last_message_sender_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_last_message_sender_id_fkey"
+            columns: ["last_message_sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "collection_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_a_id_fkey"
+            columns: ["user_a_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_b_id_fkey"
+            columns: ["user_b_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_conversations_user_b_id_fkey"
+            columns: ["user_b_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -710,6 +1080,13 @@ export type Database = {
             foreignKeyName: "notifications_actor_id_fkey"
             columns: ["actor_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -725,6 +1102,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "trade_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_match_conversation_id_fkey"
+            columns: ["match_conversation_id"]
+            isOneToOne: false
+            referencedRelation: "match_conversations"
             referencedColumns: ["id"]
           },
           {
@@ -747,6 +1131,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "notifications_user_id_fkey"
@@ -923,6 +1314,13 @@ export type Database = {
             foreignKeyName: "profiles_suspended_by_fkey"
             columns: ["suspended_by"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_suspended_by_fkey"
+            columns: ["suspended_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -937,6 +1335,7 @@ export type Database = {
           id: number
           reason: string
           reporter_id: string
+          resolved_at: string | null
           status: string | null
           target_id: string
           target_type: string
@@ -950,6 +1349,7 @@ export type Database = {
           id?: number
           reason: string
           reporter_id: string
+          resolved_at?: string | null
           status?: string | null
           target_id: string
           target_type: string
@@ -963,6 +1363,7 @@ export type Database = {
           id?: number
           reason?: string
           reporter_id?: string
+          resolved_at?: string | null
           status?: string | null
           target_id?: string
           target_type?: string
@@ -980,6 +1381,13 @@ export type Database = {
             foreignKeyName: "reports_admin_id_fkey"
             columns: ["admin_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -989,6 +1397,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "reports_reporter_id_fkey"
@@ -1046,6 +1461,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "retention_schedule_initiated_by_fkey"
+            columns: ["initiated_by"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "retention_schedule_initiated_by_fkey"
@@ -1138,6 +1560,13 @@ export type Database = {
             foreignKeyName: "template_ratings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_ratings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1205,6 +1634,7 @@ export type Database = {
           is_read: boolean
           is_system: boolean
           listing_id: number | null
+          match_conversation_id: number | null
           message: string
           receiver_id: string | null
           sender_id: string | null
@@ -1219,6 +1649,7 @@ export type Database = {
           is_read?: boolean
           is_system?: boolean
           listing_id?: number | null
+          match_conversation_id?: number | null
           message: string
           receiver_id?: string | null
           sender_id?: string | null
@@ -1233,6 +1664,7 @@ export type Database = {
           is_read?: boolean
           is_system?: boolean
           listing_id?: number | null
+          match_conversation_id?: number | null
           message?: string
           receiver_id?: string | null
           sender_id?: string | null
@@ -1256,11 +1688,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "trade_chats_match_conversation_id_fkey"
+            columns: ["match_conversation_id"]
+            isOneToOne: false
+            referencedRelation: "match_conversations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "trade_chats_receiver_id_fkey"
             columns: ["receiver_id"]
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_chats_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_chats_receiver_id_fkey"
@@ -1275,6 +1721,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_chats_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_chats_sender_id_fkey"
@@ -1301,12 +1754,19 @@ export type Database = {
             foreignKeyName: "trade_chats_visible_to_user_id_fkey"
             columns: ["visible_to_user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_chats_visible_to_user_id_fkey"
+            columns: ["visible_to_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
-       trade_confirmations: {
+      trade_confirmations: {
         Row: {
           confirmed_at: string | null
           confirmer_id: string
@@ -1361,6 +1821,13 @@ export type Database = {
             foreignKeyName: "trade_confirmations_confirmer_id_fkey"
             columns: ["confirmer_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_confirmations_confirmer_id_fkey"
+            columns: ["confirmer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1379,11 +1846,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "trade_confirmations_match_conversation_id_fkey"
+            columns: ["match_conversation_id"]
+            isOneToOne: false
+            referencedRelation: "match_conversations"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "trade_confirmations_requester_id_fkey"
             columns: ["requester_id"]
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_confirmations_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_confirmations_requester_id_fkey"
@@ -1435,6 +1916,13 @@ export type Database = {
             foreignKeyName: "trade_finalizations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_finalizations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1450,11 +1938,14 @@ export type Database = {
           deleted_by: string | null
           deletion_type: string | null
           description: string | null
+          expiry_scheduled_at: string | null
+          expiry_warning_sent_at: string | null
           global_number: number | null
           group_count: number | null
           id: number
           image_url: string | null
           is_group: boolean | null
+          last_owner_interaction_at: string | null
           listing_type: string
           page_number: number | null
           page_title: string | null
@@ -1480,11 +1971,14 @@ export type Database = {
           deleted_by?: string | null
           deletion_type?: string | null
           description?: string | null
+          expiry_scheduled_at?: string | null
+          expiry_warning_sent_at?: string | null
           global_number?: number | null
           group_count?: number | null
           id?: number
           image_url?: string | null
           is_group?: boolean | null
+          last_owner_interaction_at?: string | null
           listing_type?: string
           page_number?: number | null
           page_title?: string | null
@@ -1510,11 +2004,14 @@ export type Database = {
           deleted_by?: string | null
           deletion_type?: string | null
           description?: string | null
+          expiry_scheduled_at?: string | null
+          expiry_warning_sent_at?: string | null
           global_number?: number | null
           group_count?: number | null
           id?: number
           image_url?: string | null
           is_group?: boolean | null
+          last_owner_interaction_at?: string | null
           listing_type?: string
           page_number?: number | null
           page_title?: string | null
@@ -1557,6 +2054,13 @@ export type Database = {
             foreignKeyName: "trade_listings_deleted_by_fkey"
             columns: ["deleted_by"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_listings_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1573,6 +2077,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_listings_user_id_fkey"
@@ -1658,6 +2169,13 @@ export type Database = {
             foreignKeyName: "trade_proposals_from_user_fkey"
             columns: ["from_user"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_proposals_from_user_fkey"
+            columns: ["from_user"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1667,6 +2185,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_proposals_to_user_fkey"
+            columns: ["to_user"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_proposals_to_user_fkey"
@@ -1707,6 +2232,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_reads_user_id_fkey"
@@ -1780,6 +2312,13 @@ export type Database = {
             foreignKeyName: "user_badge_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badge_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1835,6 +2374,13 @@ export type Database = {
             foreignKeyName: "user_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1870,6 +2416,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_feature_overrides_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_feature_overrides_user_id_fkey"
@@ -1923,6 +2476,13 @@ export type Database = {
             foreignKeyName: "user_ratings_rated_id_fkey"
             columns: ["rated_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_ratings_rated_id_fkey"
+            columns: ["rated_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1932,6 +2492,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_ratings_rater_id_fkey"
+            columns: ["rater_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_ratings_rater_id_fkey"
@@ -1987,6 +2554,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "user_template_copies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "user_template_copies_user_id_fkey"
@@ -2058,6 +2632,13 @@ export type Database = {
             foreignKeyName: "user_template_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_template_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2095,6 +2676,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "xp_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "xp_history_user_id_fkey"
@@ -2158,6 +2746,13 @@ export type Database = {
             foreignKeyName: "collection_templates_author_id_fkey"
             columns: ["template_author_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_templates_author_id_fkey"
+            columns: ["template_author_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2174,6 +2769,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "leaderboard_cache"
             referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "trade_listings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trade_listings_user_id_fkey"
@@ -2242,10 +2844,27 @@ export type Database = {
             foreignKeyName: "audit_log_admin_id_fkey"
             columns: ["admin_id"]
             isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      newsletter_eligible_profiles: {
+        Row: {
+          email: string | null
+          email_confirmed_at: string | null
+          id: string | null
+          is_admin: boolean | null
+          nickname: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {
@@ -2352,6 +2971,9 @@ export type Database = {
         Args: { p_days?: number; p_since?: string }
         Returns: {
           busiest_hour: number
+          match_active_users: number
+          match_conversations_opened: number
+          match_messages_sent: number
           messages_per_day: number
           top_senders: Json
           total_messages: number
@@ -2840,6 +3462,7 @@ export type Database = {
           p_user_id: string
         }
         Returns: {
+          avatar_url: string
           distance_km: number
           match_user_id: string
           nickname: string
@@ -2921,6 +3544,19 @@ export type Database = {
           tier: string
         }[]
       }
+      get_chat_between_users: {
+        Args: { p_user_a: string; p_user_b: string }
+        Returns: {
+          chat_type: string
+          created_at: string
+          id: number
+          image_url: string
+          is_system: boolean
+          message: string
+          sender_id: string
+          sender_nickname: string
+        }[]
+      }
       get_default_notification_preferences: { Args: never; Returns: Json }
       get_entity_moderation_history: {
         Args: { p_entity_id: number; p_entity_type: string }
@@ -2939,6 +3575,31 @@ export type Database = {
         Args: { p_target_id: string; p_target_type: string }
         Returns: number
       }
+      get_hidden_conversations: {
+        Args: never
+        Returns: {
+          counterparty_avatar_url: string
+          counterparty_id: string
+          counterparty_nickname: string
+          hidden_at: string
+          listing_id: number
+          listing_image_url: string
+          listing_title: string
+        }[]
+      }
+      get_ignored_listings: {
+        Args: never
+        Returns: {
+          author_nickname: string
+          collection_name: string
+          ignored_at: string
+          listing_description: string
+          listing_id: number
+          listing_image_url: string
+          listing_status: string
+          listing_title: string
+        }[]
+      }
       get_ignored_users: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -2949,30 +3610,6 @@ export type Database = {
         }[]
       }
       get_ignored_users_count: { Args: never; Returns: number }
-      get_ignored_listings: {
-        Args: never
-        Returns: {
-          listing_id: number
-          listing_title: string
-          listing_image_url: string
-          listing_status: string
-          collection_name: string
-          author_nickname: string
-          ignored_at: string
-        }[]
-      }
-      get_hidden_conversations: {
-        Args: never
-        Returns: {
-          listing_id: number
-          listing_title: string
-          listing_image_url: string
-          counterparty_id: string
-          counterparty_nickname: string
-          counterparty_avatar_url: string
-          hidden_at: string
-        }[]
-      }
       get_listing_chat_participants: {
         Args: { p_listing_id: number }
         Returns: {
@@ -3019,6 +3656,38 @@ export type Database = {
         Args: { p_copy_id?: number }
         Returns: Json
       }
+      get_match_chat_messages: {
+        Args: { p_conversation_id: number; p_cursor?: string; p_limit?: number }
+        Returns: {
+          created_at: string
+          id: number
+          image_url: string
+          is_read: boolean
+          is_system: boolean
+          message: string
+          receiver_id: string
+          sender_id: string
+          sender_nickname: string
+          thumbnail_url: string
+        }[]
+      }
+      get_match_conversations: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: number
+          last_message: string
+          last_message_at: string
+          other_avatar_url: string
+          other_nickname: string
+          other_user_id: string
+          template_id: number
+          template_title: string
+          unread_count: number
+        }[]
+      }
+      get_match_count: { Args: { p_user_id: string }; Returns: number }
+      get_match_unread_total: { Args: never; Returns: number }
       get_moderation_activity: {
         Args: { p_limit?: number }
         Returns: {
@@ -3066,6 +3735,22 @@ export type Database = {
           total_stickers: number
         }[]
       }
+      get_mutual_trade_detail: {
+        Args: {
+          p_collection_id: number
+          p_other_user_id: string
+          p_user_id: string
+        }
+        Returns: {
+          count: number
+          direction: string
+          player_name: string
+          rarity: string
+          slot_id: number
+          sticker_code: string
+          team_name: string
+        }[]
+      }
       get_my_listings_with_progress: {
         Args: { p_status?: string }
         Returns: {
@@ -3077,6 +3762,8 @@ export type Database = {
           current_status: string
           deleted_at: string
           description: string
+          expiry_scheduled_at: string
+          expiry_warning_sent_at: string
           global_number: number
           id: number
           image_url: string
@@ -3092,8 +3779,6 @@ export type Database = {
           template_title: string
           title: string
           views_count: number
-          expiry_scheduled_at: string
-          expiry_warning_sent_at: string
         }[]
       }
       get_my_template_copies: {
@@ -3152,6 +3837,10 @@ export type Database = {
           trade_id: number
           user_id: string
         }[]
+      }
+      get_or_create_match_conversation: {
+        Args: { p_other_user_id: string; p_template_id?: number }
+        Returns: Json
       }
       get_recent_reports: {
         Args: { p_limit?: number }
@@ -3367,16 +4056,6 @@ export type Database = {
           rating_distribution: Json
         }[]
       }
-      get_user_trade_overlap: {
-        Args: { p_my_user_id: string; p_their_user_id: string }
-        Returns: {
-          template_id: number
-          collection_name: string
-          they_have_for_you: number
-          you_have_for_them: number
-          total_overlap: number
-        }[]
-      }
       get_user_ratings: {
         Args: { p_limit?: number; p_offset?: number; p_user_id: string }
         Returns: {
@@ -3391,6 +4070,15 @@ export type Database = {
           rating: number
         }[]
       }
+      get_user_report_summary: {
+        Args: { p_user_id: string }
+        Returns: {
+          dismissed_reports: number
+          pending_reports: number
+          resolved_reports: number
+          total_reports: number
+        }[]
+      }
       get_user_reports: {
         Args: { p_limit?: number; p_offset?: number; p_status?: string }
         Returns: {
@@ -3403,6 +4091,16 @@ export type Database = {
           target_id: string
           target_type: string
           updated_at: string
+        }[]
+      }
+      get_user_trade_overlap: {
+        Args: { p_my_user_id: string; p_their_user_id: string }
+        Returns: {
+          collection_name: string
+          template_id: number
+          they_have_for_you: number
+          total_overlap: number
+          you_have_for_them: number
         }[]
       }
       hard_delete_listing: {
@@ -3420,13 +4118,10 @@ export type Database = {
         Returns: number
       }
       hide_conversation: {
-        Args: { p_listing_id: number; p_counterparty_id: string }
+        Args: { p_counterparty_id: string; p_listing_id: number }
         Returns: undefined
       }
-      ignore_listing: {
-        Args: { p_listing_id: number }
-        Returns: undefined
-      }
+      ignore_listing: { Args: { p_listing_id: number }; Returns: undefined }
       ignore_user: { Args: { p_ignored_user_id: string }; Returns: boolean }
       increment_badge_progress: {
         Args: { p_category: string; p_user_id: string }
@@ -3445,6 +4140,30 @@ export type Database = {
         Returns: boolean
       }
       is_user_suspended: { Args: { user_uuid: string }; Returns: boolean }
+      list_all_reports: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_reporter_user_id?: string
+          p_status?: string
+          p_target_user_id?: string
+        }
+        Returns: {
+          admin_nickname: string
+          admin_notes: string
+          created_at: string
+          description: string
+          entity_id: string
+          entity_title: string
+          entity_type: string
+          reason: string
+          report_id: number
+          reporter_id: string
+          reporter_nickname: string
+          resolved_at: string
+          status: string
+        }[]
+      }
       list_my_favorite_listings: {
         Args: { p_limit?: number; p_offset?: number }
         Returns: {
@@ -3659,6 +4378,10 @@ export type Database = {
         Args: { p_listing_id: number }
         Returns: undefined
       }
+      mark_match_messages_read: {
+        Args: { p_conversation_id: number }
+        Returns: number
+      }
       mark_notification_read: {
         Args: { p_notification_id: number }
         Returns: undefined
@@ -3691,10 +4414,7 @@ export type Database = {
         Args: { p_is_public: boolean; p_template_id: number }
         Returns: undefined
       }
-      reactivate_listing: {
-        Args: { p_listing_id: number }
-        Returns: undefined
-      }
+      reactivate_listing: { Args: { p_listing_id: number }; Returns: undefined }
       refresh_leaderboard: { Args: never; Returns: undefined }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }
@@ -3798,6 +4518,15 @@ export type Database = {
         }
         Returns: number
       }
+      send_match_message: {
+        Args: {
+          p_conversation_id: number
+          p_image_url?: string
+          p_message: string
+          p_thumbnail_url?: string
+        }
+        Returns: number
+      }
       should_send_notification: {
         Args: { p_channel: string; p_kind: string; p_user_id: string }
         Returns: boolean
@@ -3827,13 +4556,10 @@ export type Database = {
         Returns: boolean
       }
       unhide_conversation: {
-        Args: { p_listing_id: number; p_counterparty_id: string }
+        Args: { p_counterparty_id: string; p_listing_id: number }
         Returns: undefined
       }
-      unignore_listing: {
-        Args: { p_listing_id: number }
-        Returns: undefined
-      }
+      unignore_listing: { Args: { p_listing_id: number }; Returns: undefined }
       unignore_user: { Args: { p_ignored_user_id: string }; Returns: boolean }
       unreserve_listing: { Args: { p_listing_id: number }; Returns: boolean }
       unsuspend_user: {
