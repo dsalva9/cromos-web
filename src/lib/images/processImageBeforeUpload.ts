@@ -126,7 +126,11 @@ export async function processImageBeforeUpload(
 
           if (qrCode) {
             cleanup();
-            reject(new Error('No se permiten códigos QR en las imágenes de los listados.'));
+            reject(
+              new Error(
+                'Subida bloqueada: No se permiten códigos QR en las imágenes. / Upload blocked: QR codes are not allowed in listing images.'
+              )
+            );
             return;
           }
         } catch (scanError) {
@@ -319,3 +323,21 @@ export async function generateThumbnail(
     img.src = objectUrl;
   });
 }
+
+/**
+ * Helper to check if an error is due to a QR code being detected
+ */
+export function isQRCodeError(error: unknown): boolean {
+  if (!error) return false;
+  if (error instanceof Error) {
+    return error.message.includes('QR') || error.message.includes('código QR');
+  }
+  if (typeof error === 'object' && 'message' in error && typeof (error as any).message === 'string') {
+    return (error as any).message.includes('QR') || (error as any).message.includes('código QR');
+  }
+  if (typeof error === 'string') {
+    return error.includes('QR') || error.includes('código QR');
+  }
+  return false;
+}
+

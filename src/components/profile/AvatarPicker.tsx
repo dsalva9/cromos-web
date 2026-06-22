@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -84,9 +84,17 @@ export function AvatarPicker({
       toast.success('Imagen procesada correctamente');
     } catch (error) {
       logger.error('Error processing image:', error);
-      toast.error(
-        error instanceof Error ? error.message : 'Error al procesar la imagen'
-      );
+      if (isQRCodeError(error)) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
+        );
+      } else {
+        toast.error(
+          error instanceof Error ? error.message : 'Error al procesar la imagen'
+        );
+      }
     } finally {
       setProcessing(false);
       event.target.value = '';

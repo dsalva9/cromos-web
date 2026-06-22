@@ -11,7 +11,7 @@ import {
   ListingChatMessage,
   ChatParticipant,
 } from '@/lib/supabase/listings/chat';
-import { processImageBeforeUpload, generateThumbnail } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 
@@ -169,15 +169,27 @@ export function useListingChat({
             logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
           }
         } catch (uploadError) {
-          if (uploadError instanceof Error && (
-            uploadError.message.includes('excede el límite') ||
-            uploadError.message.includes('No se pudo cargar la imagen')
-          )) {
-            logger.warnLocal('Validation error uploading chat image:', uploadError.message);
+          if (isQRCodeError(uploadError)) {
+            toast.error(
+              uploadError instanceof Error
+                ? uploadError.message
+                : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
+            );
           } else {
-            logger.error('Error uploading chat image:', uploadError);
+            if (
+              uploadError instanceof Error &&
+              (uploadError.message.includes('excede el límite') ||
+                uploadError.message.includes('No se pudo cargar la imagen'))
+            ) {
+              logger.warnLocal(
+                'Validation error uploading chat image:',
+                uploadError.message
+              );
+            } else {
+              logger.error('Error uploading chat image:', uploadError);
+            }
+            toast.error('Error al subir la imagen');
           }
-          toast.error('Error al subir la imagen');
           setSending(false);
           setUploading(false);
           return;

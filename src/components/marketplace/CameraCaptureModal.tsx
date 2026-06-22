@@ -6,7 +6,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { Camera, X, RotateCcw } from 'lucide-react';
 import { toast } from '@/lib/toast';
-import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { logger } from '@/lib/logger';
 
 interface CameraCaptureModalProps {
@@ -173,7 +173,15 @@ export function CameraCaptureModal({
       onClose();
     } catch (error) {
       logger.info('Processing error:', error);
-      toast.error('Error al procesar la foto');
+      if (isQRCodeError(error)) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
+        );
+      } else {
+        toast.error('Error al procesar la foto');
+      }
     } finally {
       setProcessing(false);
     }

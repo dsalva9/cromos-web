@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
-import { processImageBeforeUpload, generateThumbnail } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -110,9 +110,17 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       toast.success('Imagen subida con éxito');
     } catch (error) {
       logger.error('Upload error:', error);
-      const message =
-        error instanceof Error ? error.message : 'Error al subir la imagen';
-      toast.error(message);
+      if (isQRCodeError(error)) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
+        );
+      } else {
+        const message =
+          error instanceof Error ? error.message : 'Error al subir la imagen';
+        toast.error(message);
+      }
     } finally {
       setUploading(false);
     }

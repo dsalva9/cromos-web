@@ -10,7 +10,7 @@ import { Upload, Camera, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import type { TemplateBasicInfoData } from '@/lib/validations/template.schemas';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
-import { processImageBeforeUpload } from '@/lib/images/processImageBeforeUpload';
+import { processImageBeforeUpload, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -69,7 +69,15 @@ export function TemplateBasicInfoForm({
       };
       reader.readAsDataURL(result.blob);
     } catch (error) {
-      toast.error(t('imageError'));
+      if (isQRCodeError(error)) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
+        );
+      } else {
+        toast.error(t('imageError'));
+      }
     }
   };
 
