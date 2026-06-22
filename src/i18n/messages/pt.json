@@ -184,7 +184,8 @@
         "quietDescriptionNoAuth": "Faça login para ver as melhores ofertas da comunidade",
         "publishFirst": "Publicar Primeiro Anúncio",
         "login": "Entrar"
-      }
+      },
+      "createAlert": "Criar alerta com esta pesquisa"
     },
     "card": {
       "new": "Novo",
@@ -502,7 +503,8 @@
       "countError": "Erro ao atualizar quantidade",
       "viewListing": "Ver anúncio",
       "createListing": "Publicar repetida",
-      "createListingTitle": "Você precisa de pelo menos 2 cópias para publicar"
+      "createListingTitle": "Você precisa de pelo menos 2 cópias para publicar",
+      "createAlert": "Criar alerta para este cromo"
     },
     "listings": {
       "buttonLabel": "Listagens",
@@ -1191,7 +1193,8 @@
     "signup": "Criar Conta",
     "completeProfile": "Complete seu perfil para acessar esta seção",
     "enter": "Entrar",
-    "blog": "Blog"
+    "blog": "Blog",
+    "alerts": "Alertas"
   },
   "footer": {
     "terms": "Termos",
@@ -2078,7 +2081,8 @@
     "about": "Sobre Nós",
     "blog": "Blog",
     "favorites": "Favoritos",
-    "advertise": "Anuncie"
+    "advertise": "Anuncie",
+    "alerts": "Alertas"
   },
   "notificationsDropdown": {
     "title": "Notificações",
@@ -2510,5 +2514,48 @@
       "description": "Cambio Cromos precisa de anúncios para continuar a ser gratuito e sustentável. Por favor, desative o seu bloqueador de anúncios para este site e recarregue a página.",
       "cta": "Recarregar página"
     }
+  },
+  "alerts": {
+    "title": "Alertas",
+    "subtitle": "Receba notificações quando surgirem cromos que procura",
+    "createTab": "Criar Alerta",
+    "editTab": "Editar Alerta",
+    "manageTab": "Meus Alertas",
+    "searchLabel": "Pesquisa",
+    "searchPlaceholder": "Ex: Messi, Euro 2024, Panini...",
+    "collectionLabel": "Coleção (opcional)",
+    "frequencyLabel": "Frequência",
+    "frequencyInstant": "Instantânea",
+    "frequencyDaily": "Diária",
+    "frequencyWeekly": "Semanal",
+    "channelsLabel": "Canais de notificação",
+    "channelEmail": "Email",
+    "channelPush": "Notificação push",
+    "channelInApp": "No app",
+    "channelRequired": "Selecione pelo menos um canal",
+    "createButton": "Criar Alerta",
+    "updateButton": "Salvar Alterações",
+    "cancelButton": "Cancelar",
+    "editButton": "Editar",
+    "pauseButton": "Pausar",
+    "resumeButton": "Retomar",
+    "deleteButton": "Excluir",
+    "deleteConfirmTitle": "Excluir este alerta?",
+    "deleteConfirmDescription": "Esta ação não pode ser desfeita. Você deixará de receber notificações para esta pesquisa.",
+    "pausedBadge": "Pausado",
+    "allListings": "Todos os anúncios",
+    "matchesCount": "{count} correspondências",
+    "stickerAlert": "Cromo #{number}{variant} de {album}",
+    "empty": "Sem alertas",
+    "emptyDescription": "Crie um alerta para ser notificado quando os cromos que procura aparecerem no Marketplace.",
+    "created": "Alerta criado com sucesso",
+    "updated": "Alerta atualizado",
+    "deleted": "Alerta excluído",
+    "paused": "Alerta pausado",
+    "resumed": "Alerta retomado",
+    "createError": "Erro ao criar alerta",
+    "updateError": "Erro ao atualizar alerta",
+    "deleteError": "Erro ao excluir alerta",
+    "toggleError": "Erro ao alterar estado do alerta"
   }
 }

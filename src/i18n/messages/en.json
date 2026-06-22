@@ -184,7 +184,8 @@
         "quietDescriptionNoAuth": "Log in to see the best offers from the community",
         "publishFirst": "Publish First Listing",
         "login": "Log In"
-      }
+      },
+      "createAlert": "Create alert from this search"
     },
     "card": {
       "new": "New",
@@ -502,7 +503,8 @@
       "countError": "Error updating count",
       "viewListing": "View listing",
       "createListing": "List duplicate",
-      "createListingTitle": "You need at least 2 copies to list"
+      "createListingTitle": "You need at least 2 copies to list",
+      "createAlert": "Create alert for this sticker"
     },
     "listings": {
       "buttonLabel": "Listings",
@@ -1191,7 +1193,8 @@
     "signup": "Sign Up",
     "completeProfile": "Complete your profile to access this section",
     "enter": "Enter",
-    "blog": "Blog"
+    "blog": "Blog",
+    "alerts": "Alerts"
   },
   "footer": {
     "terms": "Terms",
@@ -2078,7 +2081,8 @@
     "about": "About Us",
     "blog": "Blog",
     "favorites": "Favorites",
-    "advertise": "Advertise"
+    "advertise": "Advertise",
+    "alerts": "Alerts"
   },
   "notificationsDropdown": {
     "title": "Notifications",
@@ -2510,5 +2514,48 @@
       "description": "Cambio Cromos needs ads to stay free and sustainable. We kindly ask you to disable your adblocker for this site and reload the page.",
       "cta": "Reload Page"
     }
+  },
+  "alerts": {
+    "title": "Alerts",
+    "subtitle": "Get notified when stickers you're looking for appear",
+    "createTab": "Create Alert",
+    "editTab": "Edit Alert",
+    "manageTab": "My Alerts",
+    "searchLabel": "Search",
+    "searchPlaceholder": "E.g.: Messi, Euro 2024, Panini...",
+    "collectionLabel": "Collection (optional)",
+    "frequencyLabel": "Frequency",
+    "frequencyInstant": "Instant",
+    "frequencyDaily": "Daily",
+    "frequencyWeekly": "Weekly",
+    "channelsLabel": "Notification channels",
+    "channelEmail": "Email",
+    "channelPush": "Push notification",
+    "channelInApp": "In-app",
+    "channelRequired": "Select at least one channel",
+    "createButton": "Create Alert",
+    "updateButton": "Save Changes",
+    "cancelButton": "Cancel",
+    "editButton": "Edit",
+    "pauseButton": "Pause",
+    "resumeButton": "Resume",
+    "deleteButton": "Delete",
+    "deleteConfirmTitle": "Delete this alert?",
+    "deleteConfirmDescription": "This action cannot be undone. You will stop receiving notifications for this search.",
+    "pausedBadge": "Paused",
+    "allListings": "All listings",
+    "matchesCount": "{count} matches",
+    "stickerAlert": "Sticker #{number}{variant} from {album}",
+    "empty": "No alerts yet",
+    "emptyDescription": "Create an alert to get notified when stickers you're looking for appear in the Marketplace.",
+    "created": "Alert created successfully",
+    "updated": "Alert updated",
+    "deleted": "Alert deleted",
+    "paused": "Alert paused",
+    "resumed": "Alert resumed",
+    "createError": "Error creating alert",
+    "updateError": "Error updating alert",
+    "deleteError": "Error deleting alert",
+    "toggleError": "Error changing alert status"
   }
 }

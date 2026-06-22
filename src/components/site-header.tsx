@@ -112,6 +112,7 @@ export default function SiteHeader() {
     { href: '/mis-plantillas', label: t('myAlbums'), requiresCompletion: true },
     { href: '/chats', label: t('chats'), requiresCompletion: true },
     { href: '/intercambios/buscar', label: t('trades'), requiresCompletion: true },
+    { href: '/alertas', label: t('alerts'), requiresCompletion: true },
     { href: '/blog', label: t('blog') },
   ];
 

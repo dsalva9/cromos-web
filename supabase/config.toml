@@ -355,3 +355,9 @@ verify_jwt = false
 [functions.send-unread-digest]
 verify_jwt = false
 
+[functions.process-instant-alert]
+verify_jwt = false
+
+[functions.send-alert-digest]
+verify_jwt = false
+

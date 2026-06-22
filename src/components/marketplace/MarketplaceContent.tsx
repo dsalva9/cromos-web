@@ -7,7 +7,8 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb, BellPlus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useUser } from '@/components/providers/SupabaseProvider';
@@ -345,8 +346,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     />
                     <div ref={controlsBarRef} className="relative bg-white dark:bg-gray-800 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-lg">
                         <div className="flex flex-col md:flex-row gap-3">
-                            {/* Search */}
-                            <div className="flex-1">
+                            <div className="flex-1 flex gap-2">
+                                <div className="flex-1">
                                 <SearchBar
                                     value={searchQuery}
                                     onChange={handleSearchChange}
@@ -355,6 +356,28 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     onFocus={handleSearchFocus}
                                     onBlur={handleSearchBlur}
                                 />
+                                </div>
+                                {user && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            const params = new URLSearchParams();
+                                            if (searchQuery.trim()) params.set('search', searchQuery.trim());
+                                            if (selectedCollectionIds.length === 1) params.set('collection', String(selectedCollectionIds[0]));
+                                            window.location.href = `/${document.documentElement.lang || 'es'}/alertas${params.toString() ? '?' + params.toString() : ''}`;
+                                        }}
+                                        className={cn(
+                                            'flex-shrink-0 h-10 w-10 rounded-lg transition-all',
+                                            searchQuery.trim()
+                                                ? 'text-gold hover:bg-gold/10 hover:text-gold'
+                                                : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300'
+                                        )}
+                                        title={t('createAlert')}
+                                    >
+                                        <BellPlus className="w-5 h-5" />
+                                    </Button>
+                                )}
                             </div>
 
                             {/* Mobile Filter Toggle — hidden by default, shown when search bar is tapped */}

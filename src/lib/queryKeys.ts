@@ -48,4 +48,7 @@ export const QUERY_KEYS = {
     marketplaceAvailability: () => ['marketplaceAvailability'] as const,
     marketplaceAvailabilitySlots: (copyId: number) =>
         ['marketplaceAvailability', 'slots', copyId] as const,
+
+    /* ─── marketplace alerts ─── */
+    alerts: () => ['alerts'] as const,
 } as const;

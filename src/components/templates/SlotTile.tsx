@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag, BellPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from '@/components/ui/link';
@@ -40,9 +40,12 @@ interface SlotTileProps {
   listingsLoading?: boolean;
   customFields?: CustomField[];
   inMarketplace?: boolean;
+  templateId?: number;
+  collectionId?: number;
+  isAuthenticated?: boolean;
 }
 
-export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [], inMarketplace = false }: SlotTileProps) {
+export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [], inMarketplace = false, templateId, collectionId, isAuthenticated = false }: SlotTileProps) {
   const t = useTranslations('templates.slotTile');
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
@@ -176,6 +179,25 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
               : 'transparent'
         }}
       />
+
+      {/* Alert Bell Overlay */}
+      {isAuthenticated && templateId && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const params = new URLSearchParams();
+            params.set('template', String(templateId));
+            if (slot.slot_number) params.set('slot', String(slot.slot_number));
+            if (slot.slot_variant) params.set('variant', slot.slot_variant);
+            if (collectionId) params.set('collection', String(collectionId));
+            window.location.href = `/${document.documentElement.lang || 'es'}/alertas?${params.toString()}`;
+          }}
+          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-400 hover:text-gold z-10"
+          title={t('createAlert')}
+        >
+          <BellPlus className="w-3.5 h-3.5" />
+        </button>
+      )}
 
       <div className="p-3 flex flex-col h-full">
         {/* Header Info */}

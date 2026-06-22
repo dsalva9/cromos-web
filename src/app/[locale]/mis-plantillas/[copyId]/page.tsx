@@ -218,6 +218,9 @@ function TemplateProgressContent() {
           copyId={copyId}
           customFields={customFields}
           marketplaceSlotIds={marketplaceSlotIds}
+          templateId={copy?.template_id}
+          collectionId={copy?.template_id}
+          isAuthenticated={true}
         />
 
         {/* Mobile Delete Button */}

@@ -51,6 +51,20 @@ export const NOTIFICATION_TYPE_CONFIGS: NotificationTypeConfig[] = [
     category: 'marketplace',
     priority: 'high',
   },
+  {
+    kind: 'marketplace_alert',
+    label: 'Alertas de búsqueda (instantáneas)',
+    description: 'Avisos inmediatos al publicarse cromos que te interesan',
+    category: 'marketplace',
+    priority: 'high',
+  },
+  {
+    kind: 'marketplace_alert_digest',
+    label: 'Resumen de alertas (diario/semanal)',
+    description: 'Resumen periódico con los nuevos cromos que coinciden con tus alertas',
+    category: 'marketplace',
+    priority: 'high',
+  },
 
   // Digest notifications (periodic summaries)
   {

@@ -31,7 +31,10 @@ export type NotificationKind =
   | 'system_message'
   | 'level_up'
   // Match chat notifications
-  | 'match_chat_message';
+  | 'match_chat_message'
+  // Marketplace alert notifications
+  | 'marketplace_alert'
+  | 'marketplace_alert_digest';
 
 /**
  * Notification channels
@@ -180,7 +183,7 @@ export interface GroupedNotifications {
  */
 
 export function isListingNotification(kind: NotificationKind): boolean {
-  return ['listing_chat', 'listing_reserved', 'listing_completed', 'trade_confirmation_request', 'trade_confirmed'].includes(kind);
+  return ['listing_chat', 'listing_reserved', 'listing_completed', 'trade_confirmation_request', 'trade_confirmed', 'marketplace_alert', 'marketplace_alert_digest'].includes(kind);
 }
 
 export function isTemplateNotification(kind: NotificationKind): boolean {
@@ -241,6 +244,9 @@ export function getNotificationIcon(kind: NotificationKind): string {
       return 'Shield';
     case 'match_chat_message':
       return 'MessageSquare';
+    case 'marketplace_alert':
+    case 'marketplace_alert_digest':
+      return 'BellRing';
     default:
       return 'Bell';
   }

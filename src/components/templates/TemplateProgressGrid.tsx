@@ -44,6 +44,9 @@ interface TemplateProgressGridProps {
   copyId: string;
   customFields?: CustomField[];
   marketplaceSlotIds?: Set<number>;
+  templateId?: number;
+  collectionId?: number;
+  isAuthenticated?: boolean;
 }
 
 export function TemplateProgressGrid({
@@ -53,6 +56,9 @@ export function TemplateProgressGrid({
   copyId,
   customFields = [],
   marketplaceSlotIds,
+  templateId,
+  collectionId,
+  isAuthenticated,
 }: TemplateProgressGridProps) {
   const t = useTranslations('templates.progressGrid');
   const [selectedPage, setSelectedPage] = useState<number>(1);
@@ -226,6 +232,9 @@ export function TemplateProgressGrid({
             listingsLoading={listingsLoading}
             customFields={customFields}
             inMarketplace={marketplaceSlotIds?.has(slot.slot_id) ?? false}
+            templateId={templateId}
+            collectionId={collectionId}
+            isAuthenticated={isAuthenticated}
           />
         ))}
       </div>
