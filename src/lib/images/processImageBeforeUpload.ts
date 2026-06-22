@@ -3,6 +3,9 @@
  * Used by both marketplace listings and avatar uploads
  */
 
+import jsQR from 'jsqr';
+
+
 interface ProcessImageOptions {
   /** Maximum file size in MB (default: 2) */
   maxSizeMB?: number;
@@ -109,6 +112,26 @@ export async function processImageBeforeUpload(
         } else {
           // Standard resize
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+        }
+
+        // Check for QR code in the image
+        try {
+          const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+          const qrCode = jsQR(
+            imageData.data,
+            imageData.width,
+            imageData.height,
+            { inversionAttempts: 'dontInvert' }
+          );
+
+          if (qrCode) {
+            cleanup();
+            reject(new Error('No se permiten códigos QR en las imágenes de los listados.'));
+            return;
+          }
+        } catch (scanError) {
+          // Log scan error but don't block uploads if the scanner fails unexpectedly
+          console.error('Error scanning for QR code:', scanError);
         }
 
         cleanup();
