@@ -65,20 +65,30 @@ export function CameraCaptureModal({
           videoRef.current.srcObject = mediaStream;
         }
       } catch (error) {
-        // Permission denied / dismissed is expected user behavior — don't send to Sentry
-        const isPermissionError =
-          error instanceof DOMException &&
-          (error.name === 'NotAllowedError' || error.name === 'NotFoundError');
+        // Handle expected browser/device level errors gracefully without logging them to Sentry.
+        const errorName = error instanceof DOMException ? error.name : '';
+        const isPermissionError = errorName === 'NotAllowedError' || errorName === 'NotFoundError';
+        const isDeviceBlockedError = errorName === 'NotReadableError' || errorName === 'OverconstrainedError';
 
         if (isPermissionError) {
-          logger.info('Camera permission denied or no camera found');
+          logger.info(`Camera permission denied or no camera found (${errorName})`);
+        } else if (isDeviceBlockedError) {
+          logger.warn(`Camera is blocked or in use by another app (${errorName})`);
         } else {
-          logger.error('Camera error:', error);
+          logger.error('Unexpected camera error:', error);
         }
 
         if (isMounted) {
           setPermissionDenied(true);
-          toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
+          if (errorName === 'NotReadableError') {
+            toast.error('La cámara está siendo usada por otra aplicación. Por favor, ciérrala e inténtalo de nuevo.');
+          } else if (errorName === 'NotAllowedError') {
+            toast.error('Permiso denegado para usar la cámara. Verifica la configuración de tu navegador.');
+          } else if (errorName === 'NotFoundError') {
+            toast.error('No se encontró ninguna cámara en este dispositivo.');
+          } else {
+            toast.error('No se pudo acceder a la cámara. Verifica los permisos.');
+          }
         }
       }
     }

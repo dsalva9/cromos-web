@@ -38,12 +38,25 @@ if (SENTRY_DSN) {
             "Cannot read properties of undefined (reading 'value')",
             // Third-party Monetag / ad network unhandled promise rejections
             /^he$/i,
+            // Safari/WebKit throws SecurityError when storage/cookies are blocked
+            // or when history API limits are exceeded by browser environment.
+            'SecurityError: The operation is insecure.',
+            'The operation is insecure.',
         ],
 
         beforeSend(event, hint) {
             const exception = event.exception?.values?.[0];
             const message = exception?.value || '';
             const type = exception?.type || '';
+
+            // Drop Safari/WebKit SecurityError when storage/cookies are blocked or history limits hit
+            if (
+                message.includes('SecurityError: The operation is insecure') ||
+                message.includes('The operation is insecure') ||
+                type === 'SecurityError'
+            ) {
+                return null;
+            }
 
             // Drop standard aborted-fetch errors
             if (
