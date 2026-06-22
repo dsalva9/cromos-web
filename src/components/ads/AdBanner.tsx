@@ -73,31 +73,39 @@ export function AdBanner() {
     if (!hasMounted || isHidden) return;
 
     let isCheckActive = true;
+    let handleVisibilityChange: (() => void) | null = null;
 
-    const performCheck = async () => {
-      // 1. Bait element check (detects CSS-blocking adblockers)
+    const performCheck = () => {
+      if (!isCheckActive) return;
+
+      // Defer check if the document is not visible yet (to avoid offsetHeight === 0 false positives in background tabs)
+      if (document.visibilityState !== 'visible') {
+        handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+            if (handleVisibilityChange) {
+              document.removeEventListener('visibilitychange', handleVisibilityChange);
+              handleVisibilityChange = null;
+            }
+            if (isCheckActive) performCheck();
+          }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return;
+      }
+
+      // Bait element check (detects CSS-blocking/cosmetic-blocking adblockers)
       const bait = document.createElement('div');
       bait.className = 'adsbox ads-box ad-zone ad-space doubleclick-ad';
       bait.setAttribute('style', 'position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px;');
       document.body.appendChild(bait);
       
-      const baitBlocked = bait.offsetHeight === 0 || bait.clientHeight === 0 || window.getComputedStyle?.(bait).display === 'none';
+      const styles = window.getComputedStyle?.(bait);
+      const isCssBlocked = styles?.display === 'none' || styles?.visibility === 'hidden';
+      const isLayoutBlocked = bait.offsetHeight === 0 || bait.clientHeight === 0;
+      
       document.body.removeChild(bait);
 
-      if (baitBlocked) {
-        if (isCheckActive) setShowAdBlockerModal(true);
-        return;
-      }
-
-      // 2. Fetch-based check (detects network/DNS blocking like Pi-hole or Brave Shields)
-      try {
-        const url = 'https://www.highperformanceformat.com/cda4bca11f2cef504a11b56506742be3/invoke.js';
-        await fetch(new Request(url), {
-          method: 'HEAD',
-          mode: 'no-cors',
-          cache: 'no-store'
-        });
-      } catch (error) {
+      if (isCssBlocked || isLayoutBlocked) {
         if (isCheckActive) setShowAdBlockerModal(true);
       }
     };
@@ -107,6 +115,9 @@ export function AdBanner() {
     return () => {
       isCheckActive = false;
       clearTimeout(timer);
+      if (handleVisibilityChange) {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
     };
   }, [hasMounted, isHidden]);
 
