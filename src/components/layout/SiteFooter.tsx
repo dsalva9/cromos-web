@@ -5,7 +5,11 @@ import { useTranslations } from 'next-intl';
 export function SiteFooter() {
   const t = useTranslations('footer');
   return (
-    <footer role="contentinfo" className="hidden md:block border-t bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+    <footer
+      role="contentinfo"
+      className="hidden md:block border-t bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+      style={{ paddingBottom: 'var(--desktop-ad-height, 0px)' }}
+    >
       <div className="container mx-auto px-4 py-6 text-sm text-gray-600 dark:text-gray-400">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <span>

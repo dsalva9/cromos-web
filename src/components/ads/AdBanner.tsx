@@ -35,6 +35,8 @@ export function AdBanner() {
   const [showAdBlockerModal, setShowAdBlockerModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  const isHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
+
   useEffect(() => {
     setHasMounted(true);
     if (typeof window !== 'undefined') {
@@ -47,7 +49,24 @@ export function AdBanner() {
     }
   }, []);
 
-  const isHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
+  // Set desktop ad height CSS variable for the footer offset
+  useEffect(() => {
+    if (!hasMounted) return;
+
+    const updateAdHeight = () => {
+      const isMobileView = window.innerWidth < 768;
+      const height = (isHidden || isMobileView) ? '0px' : '146px';
+      document.documentElement.style.setProperty('--desktop-ad-height', height);
+    };
+
+    updateAdHeight();
+    window.addEventListener('resize', updateAdHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateAdHeight);
+      document.documentElement.style.removeProperty('--desktop-ad-height');
+    };
+  }, [hasMounted, isHidden]);
 
   // Adblocker detection
   useEffect(() => {
