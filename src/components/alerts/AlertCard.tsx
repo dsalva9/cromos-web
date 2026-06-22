@@ -176,10 +176,10 @@ export function AlertCard({ alert, onEdit, onDelete, onToggle }: AlertCardProps)
           onClick={() => onEdit(alert)}
           className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white"
         >
-          <Pencil className="w-3 h-3 mr-1" />
-          {t('editButton')}
+          <Pencil className="w-3 h-3" />
+          <span className="hidden sm:inline ml-1">{t('editButton')}</span>
         </Button>
-
+ 
         <Button
           variant="ghost"
           size="sm"
@@ -188,17 +188,19 @@ export function AlertCard({ alert, onEdit, onDelete, onToggle }: AlertCardProps)
           className="h-7 px-2 text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white"
         >
           {isToggling ? (
-            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            <Loader2 className="w-3 h-3 animate-spin" />
           ) : alert.is_active ? (
-            <Pause className="w-3 h-3 mr-1" />
+            <Pause className="w-3 h-3" />
           ) : (
-            <Play className="w-3 h-3 mr-1" />
+            <Play className="w-3 h-3" />
           )}
-          {alert.is_active ? t('pauseButton') : t('resumeButton')}
+          <span className="hidden sm:inline ml-1">
+            {alert.is_active ? t('pauseButton') : t('resumeButton')}
+          </span>
         </Button>
-
+ 
         <div className="flex-1" />
-
+ 
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
@@ -208,11 +210,11 @@ export function AlertCard({ alert, onEdit, onDelete, onToggle }: AlertCardProps)
               className="h-7 px-2 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
             >
               {isDeleting ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                <Loader2 className="w-3 h-3 animate-spin" />
               ) : (
-                <Trash2 className="w-3 h-3 mr-1" />
+                <Trash2 className="w-3 h-3" />
               )}
-              {t('deleteButton')}
+              <span className="hidden sm:inline ml-1">{t('deleteButton')}</span>
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
