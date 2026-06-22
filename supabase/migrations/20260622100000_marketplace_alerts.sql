@@ -665,6 +665,7 @@ ALTER TABLE public.notifications ADD CONSTRAINT notifications_kind_check CHECK (
   'level_up'::text,
   'trade_confirmation_request'::text,
   'trade_confirmed'::text,
+  'match_chat_message'::text,
   'marketplace_alert'::text,
   'marketplace_alert_digest'::text
 ]));
