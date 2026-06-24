@@ -456,7 +456,8 @@
       "selectAtLeastOne": "Selecciona al menos un cromo de cada lado",
       "willSplitInfo": "Se enviarán en 2 mensajes",
       "theyOfferTitle": "{nickname} te puede ofrecer",
-      "youOfferTitle": "Tú puedes ofrecer"
+      "youOfferTitle": "Tú puedes ofrecer",
+      "uncheckAll": "Deseleccionar todo"
     }
   },
   "templates": {

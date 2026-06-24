@@ -430,7 +430,8 @@
       "selectAtLeastOne": "Selecione pelo menos um cromo de cada lado",
       "willSplitInfo": "Será enviado em 2 mensagens",
       "theyOfferTitle": "{nickname} pode te oferecer",
-      "youOfferTitle": "Você pode oferecer"
+      "youOfferTitle": "Você pode oferecer",
+      "uncheckAll": "Desmarcar todos"
     }
   },
   "templates": {

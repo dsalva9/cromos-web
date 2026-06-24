@@ -430,7 +430,8 @@
       "selectAtLeastOne": "Select at least one sticker from each side",
       "willSplitInfo": "Will be sent in 2 messages",
       "theyOfferTitle": "{nickname} can offer you",
-      "youOfferTitle": "You can offer"
+      "youOfferTitle": "You can offer",
+      "uncheckAll": "Uncheck all"
     }
   },
   "templates": {
