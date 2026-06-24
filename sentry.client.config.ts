@@ -8,16 +8,10 @@ if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
     tracesSampleRate: 0.1,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0,
     debug: false,
 
-    integrations: [
-      Sentry.replayIntegration({
-        // Additional Replay configuration goes in here, for example:
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-    ],
+    integrations: [],
   });
 }

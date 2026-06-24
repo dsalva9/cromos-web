@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 import withSerwistInit from '@serwist/next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 // next-intl plugin — must wrap outermost
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
@@ -97,7 +98,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(withSerwist(withSentryConfig(nextConfig, {
+const withBundleAnalyzerConfig = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withNextIntl(withSerwist(withSentryConfig(withBundleAnalyzerConfig(nextConfig), {
   // Suppresses source map upload logs during build
   silent: true,
   // Prevent Sentry from wrapping console methods (we handle this via logger.ts)

@@ -4,7 +4,8 @@ import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+    const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'legal.about' });
     const url = `${siteConfig.url}/legal/about`;
 
