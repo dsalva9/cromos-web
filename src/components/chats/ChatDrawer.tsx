@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useUser } from '@/components/providers/SupabaseProvider';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
 import { useTradeConfirmations } from '@/hooks/marketplace/useTradeConfirmations';
 import { MessageBubble } from './MessageBubble';
 import { ChatComposer } from './ChatComposer';
 import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
+import { sendMatchMessage } from '@/lib/supabase/matches/chat';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
@@ -52,6 +53,7 @@ export function ChatDrawer({
 }: ChatDrawerProps) {
   const t = useTranslations('matchChat');
   const { user } = useUser();
+  const supabase = useSupabaseClient();
   const [showInfo, setShowInfo] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -471,6 +473,13 @@ export function ChatDrawer({
           collectionTitle={collectionTitle ?? undefined}
           open={showInfo}
           onOpenChange={setShowInfo}
+          onSendTradeMessage={async (messages) => {
+            if (!conversationId) return;
+            for (const text of messages) {
+              await sendMatchMessage(supabase, conversationId, text);
+            }
+            setShowInfo(false);
+          }}
         />
       )}
 

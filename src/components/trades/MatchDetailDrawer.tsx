@@ -19,20 +19,12 @@ import {
   DrawerDescription,
 } from '@/components/ui/drawer';
 import { MatchDetail } from './MatchDetail';
+import { TradeBuilder, TradeStickerExtended } from './TradeBuilder';
 import { ArrowRightLeft, Loader2 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { toast } from '@/lib/toast';
-
-interface TradeSticker {
-  sticker_id: number;
-  sticker_code: string;
-  player_name: string;
-  team_name: string;
-  rarity: string;
-  count: number;
-}
 
 interface TradeMatch {
   match_user_id: string;
@@ -51,10 +43,28 @@ interface MatchDetailDrawerProps {
   collectionTitle?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSendTradeMessage?: (messages: string[]) => Promise<void>;
+}
+
+interface RawTradeDetail {
+  slot_id: number;
+  sticker_id?: number;
+  sticker_code: string;
+  player_name: string;
+  team_name: string;
+  rarity: string;
+  count: number;
+  direction: 'they_offer' | 'i_offer';
+  slot_number: number | null;
+  global_number: number | null;
 }
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 767px)').matches
+      : false
+  );
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -74,15 +84,17 @@ export function MatchDetailDrawer({
   collectionTitle,
   open,
   onOpenChange,
+  onSendTradeMessage,
 }: MatchDetailDrawerProps) {
   const t = useTranslations('trades.finder');
   const supabase = useSupabaseClient();
   const { user } = useUser();
   const isMobile = useIsMobile();
 
-  const [theyOffer, setTheyOffer] = useState<TradeSticker[]>([]);
-  const [iOffer, setIOffer] = useState<TradeSticker[]>([]);
+  const [theyOffer, setTheyOffer] = useState<TradeStickerExtended[]>([]);
+  const [iOffer, setIOffer] = useState<TradeStickerExtended[]>([]);
   const [loading, setLoading] = useState(false);
+  const [submittingTrade, setSubmittingTrade] = useState(false);
 
   // Chat drawer state
   const [chatOpen, setChatOpen] = useState(false);
@@ -106,29 +118,33 @@ export function MatchDetailDrawer({
         return;
       }
 
-      const results = data || [];
+      const results = (data || []) as RawTradeDetail[];
       setTheyOffer(
         results
-          .filter((r: TradeSticker & { direction: string; slot_id?: number }) => r.direction === 'they_offer')
-          .map((r: TradeSticker & { direction: string; slot_id?: number }) => ({
-            sticker_id: r.slot_id ?? r.sticker_id,
+          .filter((r) => r.direction === 'they_offer')
+          .map((r) => ({
+            sticker_id: r.slot_id ?? r.sticker_id ?? 0,
             sticker_code: r.sticker_code,
             player_name: r.player_name,
             team_name: r.team_name,
             rarity: r.rarity,
             count: r.count,
+            slot_number: r.slot_number ?? null,
+            global_number: r.global_number ?? null,
           }))
       );
       setIOffer(
         results
-          .filter((r: TradeSticker & { direction: string; slot_id?: number }) => r.direction === 'i_offer')
-          .map((r: TradeSticker & { direction: string; slot_id?: number }) => ({
-            sticker_id: r.slot_id ?? r.sticker_id,
+          .filter((r) => r.direction === 'i_offer')
+          .map((r) => ({
+            sticker_id: r.slot_id ?? r.sticker_id ?? 0,
             sticker_code: r.sticker_code,
             player_name: r.player_name,
             team_name: r.team_name,
             rarity: r.rarity,
             count: r.count,
+            slot_number: r.slot_number ?? null,
+            global_number: r.global_number ?? null,
           }))
       );
     } catch (err) {
@@ -170,6 +186,20 @@ export function MatchDetailDrawer({
     }
   }, [supabase, match, collectionId, proposing, onOpenChange]);
 
+  const handleSendTrade = async (messages: string[]) => {
+    if (!onSendTradeMessage) return;
+    setSubmittingTrade(true);
+    try {
+      await onSendTradeMessage(messages);
+      onOpenChange(false);
+    } catch (err) {
+      logger.error('handleSendTrade error:', err);
+      toast.error('Error al enviar la propuesta');
+    } finally {
+      setSubmittingTrade(false);
+    }
+  };
+
   const displayName = match?.nickname || 'Usuario';
 
   const content = (
@@ -178,6 +208,14 @@ export function MatchDetailDrawer({
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-gold" />
         </div>
+      ) : onSendTradeMessage ? (
+        <TradeBuilder
+          theyOffer={theyOffer}
+          iOffer={iOffer}
+          targetUserNickname={displayName}
+          onSubmit={handleSendTrade}
+          submitting={submittingTrade}
+        />
       ) : (
         <>
           <MatchDetail
@@ -266,4 +304,3 @@ export function MatchDetailDrawer({
     </>
   );
 }
-

@@ -140,8 +140,8 @@ export async function sendMatchMessage(
     if (!finalMessage.trim()) {
       throw new Error('El mensaje no puede estar vacío');
     }
-    if (finalMessage.length > 500) {
-      throw new Error('El mensaje no puede exceder 500 caracteres');
+    if (finalMessage.length > 2000) {
+      throw new Error('El mensaje no puede exceder 2000 caracteres');
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

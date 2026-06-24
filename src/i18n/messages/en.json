@@ -421,6 +421,16 @@
     },
     "systemMsg": {
       "matchStarted": "⚡ Match in {collection}! {user} wants to trade stickers"
+    },
+    "tradeBuilder": {
+      "tradeProposalHeader": "🔄 Trade proposal",
+      "iOfferYou": "I offer you:",
+      "youGiveMe": "You give me:",
+      "offerTrade": "Offer trade",
+      "selectAtLeastOne": "Select at least one sticker from each side",
+      "willSplitInfo": "Will be sent in 2 messages",
+      "theyOfferTitle": "{nickname} can offer you",
+      "youOfferTitle": "You can offer"
     }
   },
   "templates": {

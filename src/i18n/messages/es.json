@@ -447,6 +447,16 @@
     },
     "systemMsg": {
       "matchStarted": "⚡ ¡Match en {collection}! {user} quiere intercambiar cromos"
+    },
+    "tradeBuilder": {
+      "tradeProposalHeader": "🔄 Propuesta de intercambio",
+      "iOfferYou": "Te ofrezco:",
+      "youGiveMe": "Tú me das:",
+      "offerTrade": "Ofrecer intercambio",
+      "selectAtLeastOne": "Selecciona al menos un cromo de cada lado",
+      "willSplitInfo": "Se enviarán en 2 mensajes",
+      "theyOfferTitle": "{nickname} te puede ofrecer",
+      "youOfferTitle": "Tú puedes ofrecer"
     }
   },
   "templates": {

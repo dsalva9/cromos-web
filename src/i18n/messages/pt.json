@@ -421,6 +421,16 @@
     },
     "systemMsg": {
       "matchStarted": "⚡ Match em {collection}! {user} quer trocar figurinhas"
+    },
+    "tradeBuilder": {
+      "tradeProposalHeader": "🔄 Proposta de troca",
+      "iOfferYou": "Eu te ofereço:",
+      "youGiveMe": "Você me dá:",
+      "offerTrade": "Oferecer troca",
+      "selectAtLeastOne": "Selecione pelo menos um cromo de cada lado",
+      "willSplitInfo": "Será enviado em 2 mensagens",
+      "theyOfferTitle": "{nickname} pode te oferecer",
+      "youOfferTitle": "Você pode oferecer"
     }
   },
   "templates": {
