@@ -248,8 +248,8 @@ export function MatchDetailDrawer({
 
   const drawerUI = isMobile ? (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] bg-white dark:bg-gray-900 border-t-2 border-black !z-[130]">
-        <DrawerHeader className="border-b border-gray-200 dark:border-gray-700 py-3">
+      <DrawerContent className="h-[80vh] bg-white dark:bg-gray-900 border-t-2 border-black !z-[130] flex flex-col overflow-hidden">
+        <DrawerHeader className="border-b border-gray-200 dark:border-gray-700 py-3 flex-shrink-0">
           <DrawerTitle className="font-black uppercase text-gray-900 dark:text-white text-base">
             {displayName}
           </DrawerTitle>
@@ -257,13 +257,15 @@ export function MatchDetailDrawer({
             {t('mutualTrades', { count: match?.total_mutual_overlap ?? 0 })}
           </DrawerDescription>
         </DrawerHeader>
-        <div className="overflow-y-auto overflow-x-hidden p-3 pb-[env(safe-area-inset-bottom,0px)]">{content}</div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pb-[env(safe-area-inset-bottom,16px)]">
+          {content}
+        </div>
       </DrawerContent>
     </Drawer>
   ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 border-2 border-black !z-[130] [&+[data-slot=dialog-overlay]]:!z-[130]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-2xl h-[750px] flex flex-col bg-white dark:bg-gray-800 border-2 border-black !z-[130] [&+[data-slot=dialog-overlay]]:!z-[130] p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <DialogTitle className="font-black uppercase text-gray-900 dark:text-white">
             {displayName}
           </DialogTitle>
@@ -271,7 +273,9 @@ export function MatchDetailDrawer({
             {t('mutualTrades', { count: match?.total_mutual_overlap ?? 0 })}
           </DialogDescription>
         </DialogHeader>
-        <div className="p-2">{content}</div>
+        <div className="flex-1 overflow-y-auto p-6">
+          {content}
+        </div>
       </DialogContent>
     </Dialog>
   );

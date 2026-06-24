@@ -131,7 +131,7 @@ function BuilderList({
       </div>
 
       <ModernCardContent className="p-0">
-        <div className="max-h-[30rem] overflow-y-auto overflow-x-hidden divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="max-h-60 sm:max-h-[30rem] overflow-y-auto overflow-x-hidden divide-y divide-gray-200 dark:divide-gray-700">
           {pageGroups.map((pageGroup) => {
             const pageStickerIds = pageGroup.stickers.map((s) => s.sticker_id);
             const checkedCount = pageStickerIds.filter((id) =>
