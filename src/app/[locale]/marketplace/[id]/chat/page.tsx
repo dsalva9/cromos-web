@@ -28,7 +28,7 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { logger } from '@/lib/logger';
 import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
-import { containsUrl } from '@/lib/validations/chat';
+import { containsUrl, downloadFile } from '@/lib/validations/chat';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -1210,19 +1210,18 @@ function ListingChatPageContent() {
                               )}
                               {/* File attachment */}
                               {message.image_url?.endsWith('.pdf') && (
-                                <a
-                                  href={message.image_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors text-current"
+                                <button
+                                  onClick={() => void downloadFile(message.image_url!, 'documento.pdf')}
+                                  type="button"
+                                  className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors text-left w-full text-current"
                                 >
                                   <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium truncate">Documento PDF</p>
-                                    <p className="text-xs opacity-60">Toca para abrir</p>
+                                    <p className="text-xs opacity-60">Toca para descargar</p>
                                   </div>
                                   <Download className="w-4 h-4 opacity-60 flex-shrink-0" />
-                                </a>
+                                </button>
                               )}
                               {/* Image attachment */}
                               {message.thumbnail_url && !message.image_url?.endsWith('.pdf') && (
