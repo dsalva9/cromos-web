@@ -12,6 +12,7 @@ import {
 import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { containsUrl, isPdfFile, MAX_PDF_SIZE_BYTES } from '@/lib/validations/chat';
 
 interface UseMatchChatOptions {
   conversationId: number | null;
@@ -94,9 +95,15 @@ export function useMatchChat({
     async (text: string, imageFile?: File | Blob | null) => {
       if (!user || !conversationId || (!text.trim() && !imageFile)) return;
 
+      // Block URLs in message text
+      if (text.trim() && containsUrl(text)) {
+        toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
+        return;
+      }
+
       setSending(true);
 
-      // Upload image if provided
+      // Upload file if provided
       let imageUrl: string | null = null;
       let thumbnailUrl: string | null = null;
 
@@ -105,49 +112,73 @@ export function useMatchChat({
         try {
           const file = imageFile instanceof File
             ? imageFile
-            : new File([imageFile], 'chat-image.webp', { type: imageFile.type || 'image/webp' });
+            : new File([imageFile], 'chat-file', { type: imageFile.type || 'image/webp' });
 
-          const processed = await processImageBeforeUpload(file, {
-            maxSizeMB: 0.5,
-            maxWidthOrHeight: 1200,
-            quality: 0.82,
-          });
+          const isPdf = isPdfFile(file);
 
-          // Generate thumbnail: 300px wide (non-fatal, fallback to null)
-          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
-            logger.warn('Thumbnail generation failed (non-fatal):', err);
-            return null;
-          });
+          if (isPdf) {
+            // --- PDF path: validate size, upload directly, no processing ---
+            if (file.size > MAX_PDF_SIZE_BYTES) {
+              toast.error('El archivo PDF no puede superar los 2MB');
+              setSending(false);
+              setUploading(false);
+              return;
+            }
 
-          const timestamp = Date.now();
-          const basePath = `chat-images/match/${conversationId}/${user.id}/${timestamp}`;
-          const imagePath = `${basePath}.webp`;
-          const thumbPath = `${basePath}-thumb.webp`;
+            const timestamp = Date.now();
+            const pdfPath = `chat-images/match/${conversationId}/${user.id}/${timestamp}.pdf`;
 
-          // Upload full image and conditionally upload thumbnail in parallel
-          const [imageUpload, thumbUpload] = await Promise.all([
-            supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
-              contentType: 'image/webp',
-              upsert: true,
-            }),
-            thumbBlob
-              ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-                  contentType: 'image/webp',
-                  upsert: true,
-                })
-              : Promise.resolve({ data: null, error: null } as any),
-          ]);
+            const { error: uploadError } = await supabase.storage
+              .from('sticker-images')
+              .upload(pdfPath, file, { contentType: 'application/pdf', upsert: true });
 
-          if (imageUpload.error) throw imageUpload.error;
+            if (uploadError) throw uploadError;
 
-          const { data: imgData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
-          imageUrl = imgData.publicUrl;
+            const { data: pdfData } = supabase.storage.from('sticker-images').getPublicUrl(pdfPath);
+            imageUrl = pdfData.publicUrl;
+            // No thumbnail for PDFs
+          } else {
+            // --- Image path: existing flow (unchanged) ---
+            const processed = await processImageBeforeUpload(file, {
+              maxSizeMB: 0.5,
+              maxWidthOrHeight: 1200,
+              quality: 0.82,
+            });
 
-          if (thumbBlob && !thumbUpload?.error) {
-            const { data: thumbData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
-            thumbnailUrl = thumbData.publicUrl;
-          } else if (thumbUpload?.error) {
-            logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+            const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
+              logger.warn('Thumbnail generation failed (non-fatal):', err);
+              return null;
+            });
+
+            const timestamp = Date.now();
+            const basePath = `chat-images/match/${conversationId}/${user.id}/${timestamp}`;
+            const imagePath = `${basePath}.webp`;
+            const thumbPath = `${basePath}-thumb.webp`;
+
+            const [imageUpload, thumbUpload] = await Promise.all([
+              supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
+                contentType: 'image/webp',
+                upsert: true,
+              }),
+              thumbBlob
+                ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+                    contentType: 'image/webp',
+                    upsert: true,
+                  })
+                : Promise.resolve({ data: null, error: null } as any),
+            ]);
+
+            if (imageUpload.error) throw imageUpload.error;
+
+            const { data: imgData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
+            imageUrl = imgData.publicUrl;
+
+            if (thumbBlob && !thumbUpload?.error) {
+              const { data: thumbData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+              thumbnailUrl = thumbData.publicUrl;
+            } else if (thumbUpload?.error) {
+              logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+            }
           }
         } catch (uploadError) {
           if (isQRCodeError(uploadError)) {
@@ -162,14 +193,11 @@ export function useMatchChat({
               (uploadError.message.includes('excede el límite') ||
                 uploadError.message.includes('No se pudo cargar la imagen'))
             ) {
-              logger.warnLocal(
-                'Validation error uploading chat image:',
-                uploadError.message
-              );
+              logger.warnLocal('Validation error uploading chat file:', uploadError.message);
             } else {
-              logger.error('Error uploading chat image:', uploadError);
+              logger.error('Error uploading chat file:', uploadError);
             }
-            toast.error('Error al subir la imagen');
+            toast.error('Error al subir el archivo');
           }
           setSending(false);
           setUploading(false);
@@ -179,7 +207,10 @@ export function useMatchChat({
         }
       }
 
-      const displayMessage = !text.trim() && imageUrl ? '📷 Imagen' : text.trim();
+      const isPdfUrl = imageUrl?.endsWith('.pdf');
+      const displayMessage = !text.trim() && imageUrl
+        ? (isPdfUrl ? '📄 PDF' : '📷 Imagen')
+        : text.trim();
 
       const { messageId, error: sendError } = await sendMatchMessage(
         supabase,

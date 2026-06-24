@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { Send, ImageIcon, Loader2 } from 'lucide-react';
+import { Send, Paperclip, Loader2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
+import { toast } from '@/lib/toast';
 
 interface ChatComposerProps {
   onSend: (text: string, imageFile?: File | Blob | null) => Promise<void>;
@@ -25,20 +26,20 @@ export function ChatComposer({
   const t = useTranslations('matchChat');
   const t_tc = useTranslations('tradeConfirmations');
   const [text, setText] = useState('');
-  const [pendingImage, setPendingImage] = useState<File | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSend = useCallback(async () => {
-    if ((!text.trim() && !pendingImage) || sending || uploading) return;
+    if ((!text.trim() && !pendingFile) || sending || uploading) return;
 
-    await onSend(text, pendingImage);
+    await onSend(text, pendingFile);
     setText('');
-    setPendingImage(null);
+    setPendingFile(null);
 
     // Refocus textarea
     textareaRef.current?.focus();
-  }, [text, pendingImage, onSend, sending, uploading]);
+  }, [text, pendingFile, onSend, sending, uploading]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -53,7 +54,13 @@ export function ChatComposer({
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPendingImage(file);
+      // Validate PDF size limit (2MB)
+      if (file.type === 'application/pdf' && file.size > 2 * 1024 * 1024) {
+        toast.error('El archivo PDF no puede superar los 2MB');
+        e.target.value = '';
+        return;
+      }
+      setPendingFile(file);
     }
     // Reset so same file can be re-selected
     e.target.value = '';
@@ -70,20 +77,24 @@ export function ChatComposer({
 
   return (
     <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-3">
-      {/* Pending image preview */}
-      {pendingImage && (
+      {/* Pending file preview */}
+      {pendingFile && (
         <div className="flex items-center gap-2 mb-2 px-1">
-          <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={URL.createObjectURL(pendingImage)}
-              alt="Preview"
-              className="w-full h-full object-cover"
-            />
+          <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden relative flex items-center justify-center">
+            {pendingFile.type === 'application/pdf' ? (
+              <FileText className="w-6 h-6 text-red-500" />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={URL.createObjectURL(pendingFile)}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
-          <span className="text-xs text-gray-500 truncate flex-1">{pendingImage.name}</span>
+          <span className="text-xs text-gray-500 truncate flex-1">{pendingFile.name}</span>
           <button
-            onClick={() => setPendingImage(null)}
+            onClick={() => setPendingFile(null)}
             className="text-gray-400 hover:text-red-500 text-xs font-bold"
           >
             ✕
@@ -95,13 +106,13 @@ export function ChatComposer({
       {uploading && (
         <div className="flex items-center gap-2 mb-2 px-1 text-xs text-gold">
           <Loader2 className="w-3 h-3 animate-spin" />
-          {t('uploading')}
+          {t('uploadingFile')}
         </div>
       )}
 
       {/* Input row */}
       <div className="flex items-end gap-2">
-        {/* Image attach button */}
+        {/* Attachment button */}
         <Button
           type="button"
           variant="ghost"
@@ -109,8 +120,9 @@ export function ChatComposer({
           className="h-9 w-9 flex-shrink-0 text-gray-500 hover:text-gold"
           onClick={() => fileInputRef.current?.click()}
           disabled={isBusy || disabled}
+          title={t('attachFile')}
         >
-          <ImageIcon className="w-5 h-5" />
+          <Paperclip className="w-5 h-5" />
         </Button>
 
         {/* Manual confirmation trigger button */}
@@ -131,8 +143,7 @@ export function ChatComposer({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
-          capture="environment"
+          accept="image/*,application/pdf"
           className="hidden"
           onChange={handleFileChange}
         />
@@ -157,7 +168,7 @@ export function ChatComposer({
           size="icon"
           className="h-9 w-9 flex-shrink-0 bg-gold hover:bg-yellow-400 text-black rounded-full"
           onClick={() => void handleSend()}
-          disabled={isBusy || disabled || (!text.trim() && !pendingImage)}
+          disabled={isBusy || disabled || (!text.trim() && !pendingFile)}
         >
           {isBusy ? (
             <Loader2 className="w-4 h-4 animate-spin" />

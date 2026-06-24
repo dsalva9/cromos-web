@@ -132,7 +132,10 @@ export async function sendMatchMessage(
   thumbnailUrl?: string | null
 ): Promise<{ messageId: number | null; error: Error | null }> {
   try {
-    const finalMessage = !message.trim() && imageUrl ? '📷 Imagen' : message;
+    const isPdf = imageUrl?.endsWith('.pdf');
+    const finalMessage = !message.trim() && imageUrl
+      ? (isPdf ? '📄 PDF' : '📷 Imagen')
+      : message;
 
     if (!finalMessage.trim()) {
       throw new Error('El mensaje no puede estar vacío');

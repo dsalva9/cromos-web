@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2, FileText, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
@@ -28,6 +28,7 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { logger } from '@/lib/logger';
 import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
+import { containsUrl } from '@/lib/validations/chat';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -362,6 +363,12 @@ function ListingChatPageContent() {
   const handleSend = async () => {
     if ((!messageText.trim() && !pendingImage) || sending) return;
 
+    // Block URLs in message text
+    if (messageText.trim() && containsUrl(messageText)) {
+      toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
+      return;
+    }
+
     // Check ToS acceptance for buyers sending first message
     if (!isOwner && messages.length === 0 && !tosAccepted) {
       toast.error('Debes aceptar los términos y condiciones antes de enviar un mensaje');
@@ -387,9 +394,11 @@ function ListingChatPageContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Pre-validate size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(t('imageTooLarge'));
+    // Pre-validate size: 5MB for images (will be compressed), 2MB for PDFs (no compression)
+    const isPdf = file.type === 'application/pdf';
+    const maxSize = isPdf ? 2 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error(isPdf ? 'El archivo PDF no puede superar los 2MB' : t('imageTooLarge'));
       e.target.value = ''; // Reset input
       return;
     }
@@ -398,7 +407,8 @@ function ListingChatPageContent() {
     if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
 
     setPendingImage(file);
-    setImagePreviewUrl(URL.createObjectURL(file));
+    // Only create object URL for images, not PDFs
+    setImagePreviewUrl(isPdf ? null : URL.createObjectURL(file));
     e.target.value = ''; // Reset input so same file can be re-selected
   };
 
@@ -1198,8 +1208,24 @@ function ListingChatPageContent() {
                                   )}
                                 </p>
                               )}
+                              {/* File attachment */}
+                              {message.image_url?.endsWith('.pdf') && (
+                                <a
+                                  href={message.image_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors text-current"
+                                >
+                                  <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">Documento PDF</p>
+                                    <p className="text-xs opacity-60">Toca para abrir</p>
+                                  </div>
+                                  <Download className="w-4 h-4 opacity-60 flex-shrink-0" />
+                                </a>
+                              )}
                               {/* Image attachment */}
-                              {message.thumbnail_url && (
+                              {message.thumbnail_url && !message.image_url?.endsWith('.pdf') && (
                                 <button
                                   type="button"
                                   onClick={() => setLightboxUrl(message.image_url || message.thumbnail_url || null)}
@@ -1214,8 +1240,8 @@ function ListingChatPageContent() {
                                   />
                                 </button>
                               )}
-                              {/* Message text (hide placeholder for image-only messages) */}
-                              {!(message.thumbnail_url && message.message === '📷 Imagen') && (
+                              {/* Message text (hide placeholder for image/PDF-only messages) */}
+                              {!(message.thumbnail_url && message.message === '📷 Imagen') && !(message.image_url?.endsWith('.pdf') && message.message === '📄 PDF') && (
                                 <p className="whitespace-pre-wrap break-words">
                                   {message.message}
                                 </p>
@@ -1455,21 +1481,29 @@ function ListingChatPageContent() {
                           </div>
                         )}
 
-                        {/* Image preview chip */}
-                        {imagePreviewUrl && (
+                        {/* File preview chip */}
+                        {(imagePreviewUrl || (pendingImage && pendingImage.type === 'application/pdf')) && (
                           <div className="mb-3 flex items-center gap-2">
-                            <div className="relative w-[60px] h-[60px] rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600">
-                              <img
-                                src={imagePreviewUrl}
-                                alt={t('attachImage')}
-                                className="w-full h-full object-cover"
-                              />
+                            <div className="relative w-[60px] h-[60px] rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                              {pendingImage?.type === 'application/pdf' ? (
+                                <FileText className="w-8 h-8 text-red-500" />
+                              ) : imagePreviewUrl ? (
+                                <img
+                                  src={imagePreviewUrl}
+                                  alt={t('attachImage')}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : null}
                               {uploading && (
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                   <Loader2 className="h-5 w-5 text-white animate-spin" />
                                 </div>
                               )}
                             </div>
+                            {/* Show filename for PDFs */}
+                            {pendingImage?.type === 'application/pdf' && pendingImage instanceof File && (
+                              <span className="text-xs text-gray-500 truncate max-w-[150px]">{pendingImage.name}</span>
+                            )}
                             {!uploading && (
                               <button
                                 type="button"
@@ -1568,7 +1602,7 @@ function ListingChatPageContent() {
                             <input
                               ref={fileInputRef}
                               type="file"
-                              accept="image/*"
+                              accept="image/*,application/pdf"
                               onChange={handleFileSelect}
                               className="hidden"
                             />

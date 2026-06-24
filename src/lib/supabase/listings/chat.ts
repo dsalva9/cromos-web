@@ -91,9 +91,9 @@ export async function sendListingMessage(
   thumbnailUrl?: string | null
 ): Promise<{ messageId: number | null; error: Error | null }> {
   try {
-    // For image-only messages, use a placeholder text
+    const isPdf = imageUrl?.endsWith('.pdf');
     const finalMessage = !message.trim() && imageUrl
-      ? '📷 Imagen'
+      ? (isPdf ? '📄 PDF' : '📷 Imagen')
       : message;
 
     if (!finalMessage.trim()) {

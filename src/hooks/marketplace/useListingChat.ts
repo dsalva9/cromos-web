@@ -14,6 +14,7 @@ import {
 import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { containsUrl, isPdfFile, MAX_PDF_SIZE_BYTES } from '@/lib/validations/chat';
 
 interface UseListingChatOptions {
   listingId: number;
@@ -94,6 +95,12 @@ export function useListingChat({
     async (text: string, receiverId?: string, imageFile?: File | Blob | null) => {
       if (!user || (!text.trim() && !imageFile)) return;
 
+      // Block URLs in message text
+      if (text.trim() && containsUrl(text)) {
+        toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
+        return;
+      }
+
       // Determine receiver
       let targetReceiverId = receiverId;
       if (!targetReceiverId) {
@@ -111,7 +118,7 @@ export function useListingChat({
 
       setSending(true);
 
-      // Upload image if provided
+      // Upload file if provided
       let imageUrl: string | null = null;
       let thumbnailUrl: string | null = null;
 
@@ -121,52 +128,73 @@ export function useListingChat({
           // Convert Blob to File if needed (from camera capture)
           const file = imageFile instanceof File
             ? imageFile
-            : new File([imageFile], 'chat-image.webp', { type: imageFile.type || 'image/webp' });
+            : new File([imageFile], 'chat-file', { type: imageFile.type || 'image/webp' });
 
-          // Process image: 1200px max, 500KB target, WebP
-          const processed = await processImageBeforeUpload(file, {
-            maxSizeMB: 0.5,
-            maxWidthOrHeight: 1200,
-            quality: 0.82,
-          });
+          const isPdf = isPdfFile(file);
 
-          // Generate thumbnail: 300px wide (non-fatal, fallback to null)
-          const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
-            logger.warn('Thumbnail generation failed (non-fatal):', err);
-            return null;
-          });
+          if (isPdf) {
+            // --- PDF path: validate size, upload directly, no processing ---
+            if (file.size > MAX_PDF_SIZE_BYTES) {
+              toast.error('El archivo PDF no puede superar los 2MB');
+              setSending(false);
+              setUploading(false);
+              return;
+            }
 
-          // Build storage paths
-          const timestamp = Date.now();
-          const basePath = `chat-images/${listingId}/${user.id}/${timestamp}`;
-          const imagePath = `${basePath}.webp`;
-          const thumbPath = `${basePath}-thumb.webp`;
+            const timestamp = Date.now();
+            const pdfPath = `chat-images/${listingId}/${user.id}/${timestamp}.pdf`;
 
-          // Upload full image and conditionally upload thumbnail in parallel
-          const [imageUpload, thumbUpload] = await Promise.all([
-            supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
-              contentType: 'image/webp',
-              upsert: true,
-            }),
-            thumbBlob
-              ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-                  contentType: 'image/webp',
-                  upsert: true,
-                })
-              : Promise.resolve({ data: null, error: null } as any),
-          ]);
+            const { error: uploadError } = await supabase.storage
+              .from('sticker-images')
+              .upload(pdfPath, file, { contentType: 'application/pdf', upsert: true });
 
-          if (imageUpload.error) throw imageUpload.error;
+            if (uploadError) throw uploadError;
 
-          // Get public URLs
-          const { data: imageUrlData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
-          imageUrl = imageUrlData.publicUrl;
+            const { data: pdfData } = supabase.storage.from('sticker-images').getPublicUrl(pdfPath);
+            imageUrl = pdfData.publicUrl;
+            // No thumbnail for PDFs
+          } else {
+            // --- Image path: existing flow (unchanged) ---
+            const processed = await processImageBeforeUpload(file, {
+              maxSizeMB: 0.5,
+              maxWidthOrHeight: 1200,
+              quality: 0.82,
+            });
 
-          if (thumbBlob && !thumbUpload?.error) {
-            const { data: thumbUrlData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
-            thumbnailUrl = thumbUrlData.publicUrl;
-          } else if (thumbUpload?.error) {
-            logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+            const thumbBlob = await generateThumbnail(processed.blob, 300, 0.7).catch((err) => {
+              logger.warn('Thumbnail generation failed (non-fatal):', err);
+              return null;
+            });
+
+            const timestamp = Date.now();
+            const basePath = `chat-images/${listingId}/${user.id}/${timestamp}`;
+            const imagePath = `${basePath}.webp`;
+            const thumbPath = `${basePath}-thumb.webp`;
+
+            const [imageUpload, thumbUpload] = await Promise.all([
+              supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
+                contentType: 'image/webp',
+                upsert: true,
+              }),
+              thumbBlob
+                ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
+                    contentType: 'image/webp',
+                    upsert: true,
+                  })
+                : Promise.resolve({ data: null, error: null } as any),
+            ]);
+
+            if (imageUpload.error) throw imageUpload.error;
+
+            const { data: imageUrlData } = supabase.storage.from('sticker-images').getPublicUrl(imagePath);
+            imageUrl = imageUrlData.publicUrl;
+
+            if (thumbBlob && !thumbUpload?.error) {
+              const { data: thumbUrlData } = supabase.storage.from('sticker-images').getPublicUrl(thumbPath);
+              thumbnailUrl = thumbUrlData.publicUrl;
+            } else if (thumbUpload?.error) {
+              logger.warn('Thumbnail upload failed (non-fatal):', thumbUpload.error);
+            }
           }
         } catch (uploadError) {
           if (isQRCodeError(uploadError)) {
@@ -181,14 +209,11 @@ export function useListingChat({
               (uploadError.message.includes('excede el límite') ||
                 uploadError.message.includes('No se pudo cargar la imagen'))
             ) {
-              logger.warnLocal(
-                'Validation error uploading chat image:',
-                uploadError.message
-              );
+              logger.warnLocal('Validation error uploading chat file:', uploadError.message);
             } else {
-              logger.error('Error uploading chat image:', uploadError);
+              logger.error('Error uploading chat file:', uploadError);
             }
-            toast.error('Error al subir la imagen');
+            toast.error('Error al subir el archivo');
           }
           setSending(false);
           setUploading(false);
@@ -210,8 +235,11 @@ export function useListingChat({
       if (sendError) {
         toast.error(sendError.message);
       } else if (messageId) {
-        // Determine display message (placeholder for image-only)
-        const displayMessage = !text.trim() && imageUrl ? '📷 Imagen' : text.trim();
+        // Determine display message (placeholder for image/PDF-only)
+        const isPdfUrl = imageUrl?.endsWith('.pdf');
+        const displayMessage = !text.trim() && imageUrl
+          ? (isPdfUrl ? '📄 PDF' : '📷 Imagen')
+          : text.trim();
 
         // Optimistically add message
         const optimisticMessage: ListingChatMessage = {

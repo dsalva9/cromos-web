@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ImageModal } from '@/components/ui/ImageModal';
 import type { MatchChatMessage } from '@/lib/supabase/matches/chat';
+import { FileText, Download } from 'lucide-react';
 
 interface MessageBubbleProps {
   message: MatchChatMessage;
@@ -31,7 +32,9 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
   });
 
   const hasImage = !!message.image_url;
-  const isImageOnly = hasImage && message.message === '📷 Imagen';
+  const isPdf = !!message.image_url?.endsWith('.pdf');
+  const isPdfOnly = isPdf && message.message === '📄 PDF';
+  const isImageOnly = hasImage && !isPdf && message.message === '📷 Imagen';
 
   return (
     <>
@@ -44,25 +47,43 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
               : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded-bl-md'
           )}
         >
-          {/* Image */}
+          {/* File attachment */}
           {hasImage && (
-            <button
-              onClick={() => setShowImageModal(true)}
-              className="block mb-1 rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <Image
-                src={message.thumbnail_url || message.image_url!}
-                alt="Imagen adjunta"
-                width={240}
-                height={180}
-                className="rounded-lg object-cover"
-                unoptimized
-              />
-            </button>
+            isPdf ? (
+              /* PDF document card */
+              <a
+                href={message.image_url!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors"
+              >
+                <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">Documento PDF</p>
+                  <p className="text-xs opacity-60">Toca para abrir</p>
+                </div>
+                <Download className="w-4 h-4 opacity-60 flex-shrink-0" />
+              </a>
+            ) : (
+              /* Image */
+              <button
+                onClick={() => setShowImageModal(true)}
+                className="block mb-1 rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                <Image
+                  src={message.thumbnail_url || message.image_url!}
+                  alt="Imagen adjunta"
+                  width={240}
+                  height={180}
+                  className="rounded-lg object-cover"
+                  unoptimized
+                />
+              </button>
+            )
           )}
 
           {/* Text */}
-          {!isImageOnly && (
+          {!isImageOnly && !isPdfOnly && (
             <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
               {message.message}
             </p>
@@ -81,7 +102,7 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
       </div>
 
       {/* Image lightbox */}
-      {hasImage && (
+      {hasImage && !isPdf && (
         <ImageModal
           isOpen={showImageModal}
           imageUrl={message.image_url!}
