@@ -101,15 +101,17 @@ export function MatchDetailDrawer({
   const [chatConversationId, setChatConversationId] = useState<number | null>(null);
   const [proposing, setProposing] = useState(false);
 
+  const matchUserId = match?.match_user_id;
+
   const fetchDetail = useCallback(async () => {
-    if (!match || !user) return;
+    if (!matchUserId || !user) return;
 
     setLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase.rpc as any)('get_mutual_trade_detail', {
         p_user_id: user.id,
-        p_other_user_id: match.match_user_id,
+        p_other_user_id: matchUserId,
         p_collection_id: collectionId,
       });
 
@@ -152,16 +154,16 @@ export function MatchDetailDrawer({
     } finally {
       setLoading(false);
     }
-  }, [match, user, supabase, collectionId]);
+  }, [matchUserId, user, supabase, collectionId]);
 
   useEffect(() => {
-    if (open && match) {
+    if (open && matchUserId) {
       fetchDetail();
-    } else {
+    } else if (!open) {
       setTheyOffer([]);
       setIOffer([]);
     }
-  }, [open, match, fetchDetail]);
+  }, [open, matchUserId, fetchDetail]);
 
   const handleOpenChat = useCallback(async () => {
     if (proposing || !match) return;
@@ -204,7 +206,7 @@ export function MatchDetailDrawer({
 
   const content = (
     <div className="space-y-4 sm:space-y-6">
-      {loading ? (
+      {loading && theyOffer.length === 0 && iOffer.length === 0 ? (
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-gold" />
         </div>

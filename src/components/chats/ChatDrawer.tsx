@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -59,6 +59,19 @@ export function ChatDrawer({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { ignoreUser, loading: ignoreLoading } = useIgnore();
   const { submitReport, loading: reportLoading } = useReport();
+  const matchObj = useMemo(() => {
+    if (!otherUserId) return null;
+    return {
+      match_user_id: otherUserId,
+      nickname: otherNickname,
+      overlap_from_them_to_me: theyHaveCount ?? 0,
+      overlap_from_me_to_them: youHaveCount ?? 0,
+      total_mutual_overlap: (theyHaveCount ?? 0) + (youHaveCount ?? 0),
+      distance_km: distanceKm ?? null,
+      postcode: null,
+      score: null,
+    };
+  }, [otherUserId, otherNickname, theyHaveCount, youHaveCount, distanceKm]);
 
   const {
     messages,
@@ -457,18 +470,9 @@ export function ChatDrawer({
       </div>
 
       {/* ---- Detail drawer (sticker-level) ---- */}
-      {templateId && otherUserId && (
+      {templateId && otherUserId && matchObj && (
         <MatchDetailDrawer
-          match={{
-            match_user_id: otherUserId,
-            nickname: otherNickname,
-            overlap_from_them_to_me: theyHaveCount ?? 0,
-            overlap_from_me_to_them: youHaveCount ?? 0,
-            total_mutual_overlap: (theyHaveCount ?? 0) + (youHaveCount ?? 0),
-            distance_km: distanceKm ?? null,
-            postcode: null,
-            score: null,
-          }}
+          match={matchObj}
           collectionId={templateId}
           collectionTitle={collectionTitle ?? undefined}
           open={showInfo}
