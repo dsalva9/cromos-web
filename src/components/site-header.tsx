@@ -2,6 +2,7 @@
 
 import { siteConfig } from '@/config/site';
 import { useState, useEffect, useRef, MouseEvent } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from '@/components/ui/link';
 import NavLink from '@/components/nav-link';
 import {
@@ -105,6 +106,53 @@ export default function SiteHeader() {
   const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => { mounted.current = true; setHasMounted(true); }, []);
 
+  const [isHidden, setIsHidden] = useState(false);
+  const rawPathname = usePathname();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const pathname = rawPathname.replace(/^\/(es|en|pt)/, '') || '/';
+    const isMarketplace = pathname === '/marketplace';
+    if (!isMarketplace) {
+      setIsHidden(false);
+      return;
+    }
+
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      if (window.innerWidth >= 768 || isMenuOpen) {
+        setIsHidden(false);
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      if (Math.abs(currentScrollY - lastScrollY) < 10) {
+        return;
+      }
+
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setIsHidden(true);
+      } else if (currentScrollY < lastScrollY) {
+        setIsHidden(false);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [rawPathname, isMenuOpen]);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      setIsHidden(false);
+    }
+  }, [isMenuOpen]);
+
   const closeMenu = () => setIsMenuOpen(false);
 
   const baseLinks: NavigationLink[] = [
@@ -181,7 +229,10 @@ export default function SiteHeader() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm" style={{ paddingTop: 'var(--sat, 0px)' }}>
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-transform duration-300 ease-in-out",
+      isHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
+    )} style={{ paddingTop: 'var(--sat, 0px)' }}>
 
 
       <div className="container mx-auto px-4" style={{ paddingRight: 'max(1rem, var(--sar, 0px))', paddingLeft: 'max(1rem, var(--sal, 0px))' }}>

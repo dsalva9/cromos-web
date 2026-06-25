@@ -271,7 +271,7 @@ export function ListingCard({ listing }: ListingCardProps) {
         </div>
 
         {/* Action Button */}
-        <div className="mt-2 z-20 relative">
+        <div className="hidden md:block mt-2 z-20 relative">
           <Link href={`/marketplace/${listing.id}`} className="block w-full">
             <button className="w-full bg-gold hover:bg-gold-light text-black font-black text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow">
               {t('viewDetails')}

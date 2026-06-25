@@ -36,6 +36,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [searchBarExpanded, setSearchBarExpanded] = useState(false);
     const controlsBarRef = useRef<HTMLDivElement>(null);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
+    const [isHeaderHidden, setIsHeaderHidden] = useState(false);
     const searchParams = useSearchParams();
 
     const [hasRestored, setHasRestored] = useState(false);
@@ -227,6 +228,38 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         };
     }, [hasRestored]);
 
+    // 3.5. Smart hide header & search bar on mobile scroll
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        let lastScrollY = window.scrollY;
+
+        const handleScroll = () => {
+            if (window.innerWidth >= 768) {
+                setIsHeaderHidden(false);
+                return;
+            }
+
+            const currentScrollY = window.scrollY;
+            if (Math.abs(currentScrollY - lastScrollY) < 10) {
+                return;
+            }
+
+            if (currentScrollY > lastScrollY && currentScrollY > 50) {
+                setIsHeaderHidden(true);
+            } else if (currentScrollY < lastScrollY) {
+                setIsHeaderHidden(false);
+            }
+
+            lastScrollY = currentScrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     // 4. Restore scroll position once listings are rendered
     useEffect(() => {
         if (typeof window === 'undefined' || !hasRestored || scrollRestoredRef.current) return;
@@ -337,7 +370,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
             <div className="container mx-auto px-4 pt-3 pb-6 md:py-6">
                 {/* Controls Bar with background cover to prevent content peeking through */}
-                <div className="sticky z-30 mb-6" style={{ top: 'calc(var(--header-height, 4rem) + var(--sat, 0px) + 0.5rem)' }}>
+                <div
+                    className={cn(
+                        "sticky z-30 mb-6 transition-transform duration-300 ease-in-out",
+                        isHeaderHidden ? "transform -translate-y-[calc(100%+6rem)] md:translate-y-0" : "transform translate-y-0"
+                    )}
+                    style={{ top: 'calc(var(--header-height, 4rem) + var(--sat, 0px) + 0.5rem)' }}
+                >
                     {/* Background cover that extends behind the sticky bar to hide scrolling content */}
                     <div
                         className="absolute -top-4 left-0 right-0 h-4 bg-gray-50 dark:bg-gray-900 -mx-4"

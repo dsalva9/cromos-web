@@ -29,7 +29,7 @@ export function ListingCardSkeleton() {
           <Skeleton className="h-3 w-20" />
 
           {/* CTA Button */}
-          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-10 w-full rounded-xl hidden md:block" />
         </div>
       </ModernCardContent>
     </ModernCard>
