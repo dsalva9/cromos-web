@@ -1,5 +1,6 @@
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { ArrowDown, ArrowUp } from 'lucide-react';
+import { cleanPlayerName } from '@/utils/cleanPlayerName';
 
 interface TradeSticker {
   sticker_id: number;
@@ -66,7 +67,7 @@ function StickerList({
                 </div>
                 {/* Name + team */}
                 <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate mt-0.5">
-                  {sticker.player_name}
+                  {cleanPlayerName(sticker.player_name, sticker.team_name)}
                   {sticker.team_name && (
                     <span className="text-gray-400 dark:text-gray-500"> · {sticker.team_name}</span>
                   )}

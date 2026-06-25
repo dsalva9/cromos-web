@@ -6,6 +6,7 @@ import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowDown, ArrowUp, Loader2, ChevronRight } from 'lucide-react';
+import { cleanPlayerName } from '@/utils/cleanPlayerName';
 
 export interface TradeStickerExtended {
   sticker_id: number;
@@ -28,7 +29,7 @@ interface TradeBuilderProps {
 
 function formatStickerLine(sticker: TradeStickerExtended): string {
   const numberVal = sticker.slot_number ?? sticker.global_number;
-  const label = sticker.player_name || sticker.sticker_code || '';
+  const label = cleanPlayerName(sticker.player_name || sticker.sticker_code || '', sticker.team_name);
   const hasTeamName = !!sticker.team_name && sticker.team_name.trim() !== '';
 
   const parts: string[] = [];
@@ -214,7 +215,7 @@ function BuilderList({
                               )}
                             </div>
                             <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate mt-0.5">
-                              {sticker.player_name}
+                              {cleanPlayerName(sticker.player_name, sticker.team_name)}
                             </p>
                           </div>
                         </div>

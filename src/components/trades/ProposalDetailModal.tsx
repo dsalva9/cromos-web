@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { cleanPlayerName } from '@/utils/cleanPlayerName';
 
 interface ProposalDetailModalProps {
   proposalId: number | null;
@@ -71,7 +72,7 @@ function ItemList({
               className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-md border-2 border-black"
             >
               <div>
-                <p className="font-bold text-gray-900 dark:text-white">{item.player_name}</p>
+                <p className="font-bold text-gray-900 dark:text-white">{cleanPlayerName(item.player_name, item.team_name)}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
                   {item.sticker_code} - {item.team_name}
                 </p>
