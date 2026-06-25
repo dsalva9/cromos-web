@@ -1,8 +1,8 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { Megaphone, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Megaphone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -19,12 +19,11 @@ export const AD_BANNER_HIDDEN_PATHS = ['/login', '/register', '/advertise', '/ad
  * Exported so other components can reference it for offset calculations.
  * Mobile: 50px ad + 44px self-promo. Desktop: 90px ad + 56px self-promo.
  */
-export const AD_BANNER_HEIGHT = 94; // px — mobile (50 + 44)
+export const AD_BANNER_HEIGHT = 25; // px — mobile (25px ad, no self-promo)
 
 export function AdBanner() {
   const rawPathname = usePathname();
   const pathname = stripLocale(rawPathname);
-  const locale = useLocale();
   const t = useTranslations('adBanner');
 
   const mobileAdRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,7 @@ export function AdBanner() {
 
     const updateAdHeight = () => {
       const isMobileView = window.innerWidth < 768;
-      const height = (isHidden || isMobileView) ? '0px' : '146px';
+      const height = (isHidden || isMobileView) ? '0px' : '45px';
       document.documentElement.style.setProperty('--desktop-ad-height', height);
     };
 
@@ -138,6 +137,11 @@ export function AdBanner() {
     iframe.style.height = '50px';
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
+    iframe.style.transform = 'scale(0.5)';
+    iframe.style.transformOrigin = 'top left';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
     // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
 
@@ -165,6 +169,11 @@ export function AdBanner() {
     iframe.style.height = '90px';
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
+    iframe.style.transform = 'scale(0.5)';
+    iframe.style.transformOrigin = 'top left';
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0';
+    iframe.style.left = '0';
     // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
     iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
 
@@ -177,7 +186,6 @@ export function AdBanner() {
 
   if (!hasMounted || isHidden) return null;
 
-  const advertiseUrl = `/${locale}/advertise`;
 
   return (
     <>
@@ -208,94 +216,31 @@ export function AdBanner() {
       )}
       {/* ═══════ MOBILE STACK (below bottom nav) ═══════ */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex items-center justify-center"
+        style={{
+          height: 'calc(25px + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
       >
-        {/* Third-party ad (320×50) */}
+        {/* Third-party ad (320×50 scaled to 160×25) */}
         <div
           ref={mobileAdRef}
-          className="flex items-center justify-center bg-gray-50 dark:bg-gray-800"
-          style={{ width: '100%', height: '50px', overflow: 'hidden' }}
+          className="relative mx-auto bg-gray-50 dark:bg-gray-800"
+          style={{ width: '160px', height: '25px', overflow: 'hidden' }}
         />
-
-        {/* Self-promo banner */}
-        <a
-          href={advertiseUrl}
-          className="
-            group flex items-center gap-2 w-full
-            bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm
-            border-t border-gold/30 dark:border-gold/20
-            border-b border-b-gray-200 dark:border-b-gray-800
-            px-3 h-[44px]
-            transition-colors duration-200
-            hover:bg-gray-50 dark:hover:bg-gray-800/95
-            active:bg-gray-100 dark:active:bg-gray-800
-          "
-        >
-          {/* Gold accent line at top */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold/0 via-gold to-gold/0" />
-
-          {/* Icon */}
-          <Megaphone className="h-4 w-4 text-gold shrink-0" />
-
-          {/* Single-line text */}
-          <p className="flex-1 min-w-0 text-[12px] font-semibold text-gray-800 dark:text-white leading-none truncate">
-            {t('titleShort')}
-          </p>
-
-          {/* CTA pill */}
-          <div className="shrink-0 flex items-center gap-0.5 bg-gold text-black text-[10px] font-bold uppercase px-2.5 py-1 rounded-full transition-all duration-200 group-hover:bg-gold-light">
-            <span>{t('cta')}</span>
-            <ChevronRight className="h-3 w-3" />
-          </div>
-        </a>
       </div>
 
       {/* ═══════ DESKTOP STACK (sticky bottom strip) ═══════ */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)]">
-        {/* Third-party ad (728×90) */}
+      <div
+        className="hidden md:flex fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white/80 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-gold/20 items-center justify-center"
+        style={{ height: '45px' }}
+      >
+        {/* Third-party ad (728×90 scaled to 364×45) */}
         <div
           ref={desktopAdRef}
-          className="flex items-center justify-center bg-gray-50 dark:bg-gray-800"
-          style={{ width: '100%', height: '90px', overflow: 'hidden' }}
+          className="relative mx-auto bg-gray-50 dark:bg-gray-800"
+          style={{ width: '364px', height: '45px', overflow: 'hidden' }}
         />
-
-        {/* Self-promo banner */}
-        <a
-          href={advertiseUrl}
-          className="
-            group flex items-center justify-center gap-4 w-full
-            bg-white/80 dark:bg-gray-900/95
-            backdrop-blur-lg
-            border-t border-gray-200/80 dark:border-gold/20
-            px-6 h-[56px]
-            transition-all duration-200
-            hover:bg-white/90 dark:hover:bg-gray-800/95
-          "
-        >
-          {/* Gold accent line at top */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-60 dark:opacity-100" />
-
-          {/* Icon */}
-          <Megaphone className="h-5 w-5 text-gold shrink-0" />
-
-          {/* Text */}
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-gray-900 dark:text-white">
-              {t('titleDesktop')}
-            </p>
-            <span className="text-gray-300 dark:text-gray-600">·</span>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('subtitleDesktop')}
-            </p>
-          </div>
-
-          {/* CTA */}
-          <div className="shrink-0 flex items-center gap-1.5 bg-gold text-black text-xs font-bold uppercase px-4 py-2 rounded-full transition-all duration-200 shadow-sm group-hover:shadow-md group-hover:bg-gold-light">
-            <span>{t('cta')}</span>
-            <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-          </div>
-        </a>
       </div>
     </>
   );
