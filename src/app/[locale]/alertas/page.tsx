@@ -68,6 +68,10 @@ function AlertasContent() {
       }
       // Switch to manage tab after success
       setActiveTab('manage');
+    } catch (error) {
+      // Caught to prevent unhandled promise rejection.
+      // Toast notification is already handled by useAlerts' onError callback.
+      console.error('Failed to save alert:', error);
     } finally {
       setIsSubmitting(false);
     }

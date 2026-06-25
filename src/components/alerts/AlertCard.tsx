@@ -81,6 +81,10 @@ export function AlertCard({ alert, onEdit, onDelete, onToggle }: AlertCardProps)
     setIsDeleting(true);
     try {
       await onDelete(alert.id);
+    } catch (error) {
+      // Caught to prevent unhandled promise rejection.
+      // Toast notification is already handled by useAlerts' onError callback.
+      console.error('Failed to delete alert:', error);
     } finally {
       setIsDeleting(false);
     }
@@ -90,6 +94,10 @@ export function AlertCard({ alert, onEdit, onDelete, onToggle }: AlertCardProps)
     setIsToggling(true);
     try {
       await onToggle(alert.id);
+    } catch (error) {
+      // Caught to prevent unhandled promise rejection.
+      // Toast notification is already handled by useAlerts' onError callback.
+      console.error('Failed to toggle alert:', error);
     } finally {
       setIsToggling(false);
     }
