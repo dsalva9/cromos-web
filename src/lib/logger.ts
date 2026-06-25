@@ -94,6 +94,9 @@ export const logger = {
       'listing not found',
       'not authenticated',
       'jwt expired',
+      'bad_code_verifier',
+      'code challenge does not match',
+      'pkce_code_verifier_not_found',
     ];
     const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {

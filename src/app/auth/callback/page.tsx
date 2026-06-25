@@ -64,11 +64,18 @@ export default function AuthCallback() {
             logger.info('Exchanging code for session...');
             const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
             if (exchangeError) {
-              // PKCE verifier can be lost on mobile (in-app browser switches context)
-              // or when cookies expire — downgrade to warn so it doesn't flood Sentry
-              if (exchangeError.code === 'pkce_code_verifier_not_found') {
-                logger.info('PKCE code verifier not found, will attempt session recovery', {
+              const isPkceError = 
+                exchangeError.code === 'pkce_code_verifier_not_found' || 
+                exchangeError.code === 'bad_code_verifier' ||
+                exchangeError.message?.toLowerCase().includes('code verifier') ||
+                exchangeError.message?.toLowerCase().includes('code challenge');
+
+              if (isPkceError) {
+                // PKCE verifier can be lost on mobile (in-app browser switches context)
+                // or when cookies expire — downgrade to info so it doesn't flood Sentry
+                logger.info('PKCE/code verifier error during exchange, will attempt session recovery', {
                   code: exchangeError.code,
+                  message: exchangeError.message,
                 });
                 hadPkceError = true;
               } else {

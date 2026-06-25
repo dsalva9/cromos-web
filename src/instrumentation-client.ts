@@ -36,12 +36,25 @@ if (SENTRY_DSN) {
             // or when history API limits are exceeded by browser environment.
             'SecurityError: The operation is insecure.',
             'The operation is insecure.',
+            // PKCE / OAuth verifier mismatch errors
+            'code challenge does not match previously saved code verifier',
+            'bad_code_verifier',
+            'pkce_code_verifier_not_found',
         ],
 
         beforeSend(event, hint) {
             const exception = event.exception?.values?.[0];
             const message = exception?.value || '';
             const type = exception?.type || '';
+
+            // Drop PKCE/code verifier errors
+            if (
+                message.includes('code challenge does not match') ||
+                message.includes('bad_code_verifier') ||
+                message.includes('pkce_code_verifier_not_found')
+            ) {
+                return null;
+            }
 
             // Drop Safari/WebKit SecurityError when storage/cookies are blocked or history limits hit
             if (
