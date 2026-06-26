@@ -46,6 +46,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
+
+    // Sync Capacitor native status bar style if running on a native platform
+    const syncStatusBar = async () => {
+      try {
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.isNativePlatform()) {
+          const { StatusBar, Style } = await import('@capacitor/status-bar');
+          // Style.Dark has white text/icons (for dark background)
+          // Style.Light has black text/icons (for light background)
+          await StatusBar.setStyle({
+            style: resolved === 'dark' ? Style.Dark : Style.Light,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to sync native status bar style:', err);
+      }
+    };
+    syncStatusBar();
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {

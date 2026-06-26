@@ -172,21 +172,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 6-hour cooldown for listing_chat emails to avoid spamming
-    if (notification_kind === 'listing_chat') {
+    // 6-hour cooldown for chat emails to avoid spamming
+    if (notification_kind === 'listing_chat' || notification_kind === 'match_chat_message') {
       const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
       const { data: recentSend, error: cooldownError } = await supabase
         .from('email_send_log')
         .select('id')
         .eq('user_id', user_id)
-        .eq('notification_kind', 'listing_chat')
+        .eq('notification_kind', notification_kind)
         .gte('sent_at', sixHoursAgo)
         .limit(1);
 
       if (!cooldownError && recentSend && recentSend.length > 0) {
-        console.log('[send-email-notification] Skipping listing_chat (cooldown active, last sent within 6h)');
+        console.log(`[send-email-notification] Skipping ${notification_kind} (cooldown active, last sent within 6h)`);
         return new Response(
-          JSON.stringify({ message: 'Cooldown active for listing_chat' }),
+          JSON.stringify({ message: `Cooldown active for ${notification_kind}` }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
         );
       }

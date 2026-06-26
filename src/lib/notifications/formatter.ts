@@ -162,6 +162,49 @@ function getNotificationFormat(notification: AppNotification): NotificationForma
         href: '/chats?tab=match',
       };
 
+    case 'system_message':
+      return {
+        title: 'Mensaje del sistema',
+        body: (notification.payload?.message as string) || 'Tienes un mensaje importante del sistema',
+        href: null,
+      };
+
+    case 'level_up':
+      return {
+        title: '¡Subiste de nivel!',
+        body: notification.payload?.new_level 
+          ? `¡Felicidades! Has alcanzado el nivel ${notification.payload.new_level}` 
+          : 'Has alcanzado un nuevo nivel',
+        href: '/profile',
+      };
+
+    case 'marketplace_alert': {
+      const listingTitle = notification.listingTitle || 'un cromo';
+      const collectionName = notification.payload?.collection_name || notification.templateName;
+      const slotInfo = notification.payload?.slot_info;
+      let criteria = '';
+      if (slotInfo && collectionName) {
+        criteria = ` (${slotInfo} de ${collectionName})`;
+      } else if (collectionName) {
+        criteria = ` de ${collectionName}`;
+      }
+      return {
+        title: '🔔 Alerta de búsqueda',
+        body: `Se ha publicado "${listingTitle}"${criteria} que coincide con tu alerta`,
+        href: notification.listingId ? `/marketplace/${notification.listingId}` : '/marketplace',
+      };
+    }
+
+    case 'marketplace_alert_digest': {
+      const count = notification.payload?.count || 1;
+      const freq = notification.payload?.frequency === 'weekly' ? 'semanal' : 'diario';
+      return {
+        title: '📋 Resumen de alertas',
+        body: `Tienes ${count} ${count === 1 ? 'nuevo cromo' : 'nuevos cromos'} en tu resumen ${freq}`,
+        href: '/alertas',
+      };
+    }
+
     default:
       return {
         title: 'Notificación',
