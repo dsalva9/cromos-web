@@ -33,6 +33,11 @@ public class NavigationBarPlugin extends Plugin {
                     
                     // Set window to draw system bar backgrounds
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+                    // Disable system contrast enforcement (scrim) on Android 10+ (API 29+)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.setNavigationBarContrastEnforced(false);
+                    }
                     
                     // Set navigation bar color if provided
                     if (colorHex != null) {
