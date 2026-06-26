@@ -25,8 +25,8 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
       className="group block relative h-full w-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200/60 dark:border-gray-700/50 shadow-sm dark:shadow-md transition-colors duration-300 cursor-pointer"
     >
 
-      {/* Image Container: flex-1 on mobile to expand and make graphic bigger, aspect-square on desktop */}
-      <div className="relative flex-1 md:flex-none md:aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700 min-h-[200px]">
+      {/* Image Container: aspect-square matches the aspect ratio of regular card listing images */}
+      <div className="relative aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="relative w-full h-full bg-white dark:bg-white rounded-xl flex items-center justify-center p-1">
           <Image
             src={product.imageUrl}
@@ -55,7 +55,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-3 flex flex-col flex-none md:flex-1 gap-2">
+      <div className="p-3 flex flex-col flex-1 gap-2">
         {/* Best Seller Badge */}
         <div className="flex items-center">
           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] sm:text-[9px] font-black bg-[#C45500]/10 text-[#C45500] dark:bg-[#FF9900]/25 dark:text-[#ffaa33] border border-[#C45500]/15 dark:border-[#FF9900]/25 shadow-sm uppercase tracking-wider">
@@ -102,7 +102,7 @@ export function SponsoredCard({ product }: SponsoredCardProps) {
         </div>
 
         {/* Premium CTA Button */}
-        <div className="mt-2 z-20 relative">
+        <div className="hidden md:block mt-2 z-20 relative">
           <div className="w-full bg-[#533FC6] group-hover:bg-[#4332A6] text-white font-black text-[10px] sm:text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm flex items-center justify-between px-3 sm:px-3.5 gap-1.5 shrink-0">
             <div className="flex items-center gap-1.5">
               <Star className="h-3.5 w-3.5 fill-yellow-400 stroke-yellow-400 text-yellow-400" />
