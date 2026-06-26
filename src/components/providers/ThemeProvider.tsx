@@ -47,23 +47,32 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.remove('dark');
     }
 
-    // Sync Capacitor native status bar style if running on a native platform
-    const syncStatusBar = async () => {
+    // Sync Capacitor native status bar and navigation bar styles if running on a native platform
+    const syncNativeBars = async () => {
       try {
         const { Capacitor } = await import('@capacitor/core');
         if (Capacitor.isNativePlatform()) {
+          // Status bar styling
           const { StatusBar, Style } = await import('@capacitor/status-bar');
           // Style.Dark has white text/icons (for dark background)
           // Style.Light has black text/icons (for light background)
           await StatusBar.setStyle({
             style: resolved === 'dark' ? Style.Dark : Style.Light,
           });
+
+          // Bottom navigation bar styling
+          const { registerPlugin } = await import('@capacitor/core');
+          const NavigationBar = registerPlugin<any>('NavigationBar');
+          await NavigationBar.setStyle({
+            style: resolved === 'dark' ? 'dark' : 'light',
+            color: resolved === 'dark' ? '#252525' : '#FFFFFF',
+          });
         }
       } catch (err) {
-        console.error('Failed to sync native status bar style:', err);
+        console.error('Failed to sync native system bars style:', err);
       }
     };
-    syncStatusBar();
+    syncNativeBars();
   }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
