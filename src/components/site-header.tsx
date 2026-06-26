@@ -109,6 +109,24 @@ export default function SiteHeader() {
   const [isHidden, setIsHidden] = useState(false);
   const rawPathname = usePathname();
 
+  // Prevent header from hiding on mobile scroll when user is focusing on an input/textarea
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleFocusIn = () => {
+      const isInputFocused = document.activeElement && 
+        (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+      if (isInputFocused) {
+        setIsHidden(false);
+      }
+    };
+
+    document.addEventListener('focusin', handleFocusIn);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+    };
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -123,6 +141,14 @@ export default function SiteHeader() {
 
     const handleScroll = () => {
       if (window.innerWidth >= 768 || isMenuOpen) {
+        setIsHidden(false);
+        return;
+      }
+
+      // Do not hide the header if any input/textarea is currently focused
+      const isInputFocused = document.activeElement && 
+        (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+      if (isInputFocused) {
         setIsHidden(false);
         return;
       }

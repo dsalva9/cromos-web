@@ -158,6 +158,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     const handleSearchFocus = useCallback(() => {
         setSearchBarExpanded(true);
+        setIsHeaderHidden(false); // Force show header on focus
     }, []);
 
     const handleSearchBlur = useCallback(() => {
@@ -240,6 +241,14 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 return;
             }
 
+            // Do not hide the header if the search bar is expanded (focused) or if any input/textarea is currently focused
+            const isInputFocused = document.activeElement && 
+                (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+            if (searchBarExpanded || isInputFocused) {
+                setIsHeaderHidden(false);
+                return;
+            }
+
             const currentScrollY = window.scrollY;
             if (Math.abs(currentScrollY - lastScrollY) < 10) {
                 return;
@@ -258,7 +267,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []);
+    }, [searchBarExpanded]);
 
     // 4. Restore scroll position once listings are rendered
     useEffect(() => {
@@ -296,6 +305,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     // Loading state logic - show skeletons only when we have no data
     const showSkeletons = !hasRestored || (loading && listings.length === 0);
+
+    const showMobileFilters = searchBarExpanded || searchQuery.trim() !== '';
 
     return (
         <div className="text-gray-900 dark:text-white">
@@ -419,31 +430,62 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 )}
                             </div>
 
-                            {/* Mobile Filter Toggle — hidden by default, shown when search bar is tapped */}
+                            {/* Mobile Filter Toggle — hidden by default, shown when search bar is tapped or text is active */}
                             <div
-                                className={`md:hidden flex gap-2 transition-all duration-200 ease-in-out overflow-hidden ${
-                                    searchBarExpanded
-                                        ? 'max-h-20 opacity-100'
-                                        : 'max-h-0 opacity-0'
-                                }`}
+                                className={cn(
+                                    "md:hidden flex gap-2 transition-all duration-200 ease-in-out overflow-hidden",
+                                    showMobileFilters
+                                        ? "max-h-20 opacity-100 mt-1"
+                                        : "max-h-0 opacity-0"
+                                )}
                             >
                                 <Button
                                     onClick={() => setShowFilters(!showFilters)}
                                     variant="outline"
-                                    className={`flex-1 ${showFilters ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
+                                    className={cn(
+                                        "flex-1 h-9 text-xs font-semibold",
+                                        showFilters 
+                                            ? "bg-gold/10 text-black dark:text-white border-gold/50" 
+                                            : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600"
+                                    )}
                                 >
-                                    <Filter className="mr-2 h-4 w-4" />
+                                    <Filter className="mr-1.5 h-3.5 w-3.5" />
                                     {t('buttons.filters')}
                                 </Button>
-                                <Button
-                                    onClick={handleSortChange}
-                                    variant="outline"
-                                    className={`flex-1 ${sortByDistance ? 'bg-gold/10 text-black dark:text-white border-gold/50' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'}`}
-                                    disabled={!hasPostcode}
-                                >
-                                    {sortByDistance ? <MapPin className="mr-2 h-4 w-4" /> : <Clock className="mr-2 h-4 w-4" />}
-                                    {sortByDistance ? t('buttons.near') : t('buttons.recent')}
-                                </Button>
+                                
+                                {/* Recent | Near toggle */}
+                                <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex border border-gray-200 dark:border-gray-600 h-9">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSortByDistance(false)}
+                                        className={cn(
+                                            "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
+                                            !sortByDistance
+                                                ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                                        )}
+                                    >
+                                        <Clock className="h-3.5 w-3.5" />
+                                        {t('buttons.recent')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (hasPostcode) setSortByDistance(true);
+                                        }}
+                                        disabled={!hasPostcode}
+                                        className={cn(
+                                            "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
+                                            sortByDistance
+                                                ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                        )}
+                                        title={!hasPostcode ? t('errors.distanceDisabled') : undefined}
+                                    >
+                                        <MapPin className="h-3.5 w-3.5" />
+                                        {t('buttons.near')}
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Desktop Filters */}
