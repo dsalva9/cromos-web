@@ -255,100 +255,108 @@ export default function SiteHeader() {
   }, []);
 
   return (
-    <header className={cn(
-      "fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-transform duration-300 ease-in-out",
-      isHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
-    )} style={{ paddingTop: 'var(--sat, 0px)' }}>
+    <>
+      {/* Safe Area Top Background Cover to prevent scrolling content from showing under status bar when header is hidden */}
+      <div 
+        className="fixed top-0 left-0 right-0 z-[101] bg-white dark:bg-gray-900 transition-colors duration-300 md:hidden"
+        style={{ height: 'var(--sat, 0px)' }}
+        aria-hidden="true"
+      />
+      <header className={cn(
+        "fixed top-0 left-0 right-0 z-[100] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm transition-transform duration-300 ease-in-out",
+        isHidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"
+      )} style={{ paddingTop: 'var(--sat, 0px)' }}>
 
 
-      <div className="container mx-auto px-4" style={{ paddingRight: 'max(1rem, var(--sar, 0px))', paddingLeft: 'max(1rem, var(--sal, 0px))' }}>
-        <div className="flex h-16 sm:h-20 items-center justify-between">
-          <NavLink
-            href={user ? '/dashboard' : '/'}
-            className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1 min-w-0 shrink"
-            onClick={closeMenu}
-          >
-            <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
-              <Image
-                src="/assets/LogoBlanco.png"
-                alt="Logo"
-                fill
-                priority
-                className="object-contain"
-              />
-            </div>
-            <span className="text-base sm:text-2xl truncate hidden min-[350px]:block">
-              {siteConfig.name}
-            </span>
-          </NavLink>
-
-          <nav
-            role="navigation"
-            aria-label="Main navigation"
-            className="hidden md:flex md:items-center md:space-x-2 auth-dependent"
-          >
-            <ul className="flex items-center space-x-2">
-              {navigationLinks.map(link => (
-                <li key={link.href} className="relative">
-                  <NavLink
-                    href={link.href}
-                    className={cn(
-                      'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
-                      'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900',
-                      'data-[current=page]:bg-gold data-[current=page]:text-black data-[current=page]:dark:text-black',
-                      'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gold dark:hover:text-gold'
-                    )}
-                    onClick={handleProtectedNavigation(link.requiresCompletion)}
-                  >
-                    {link.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-            {!loading && user ? (
-              <div className="ml-4 flex items-center gap-2">
-                <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
-                {i18nEnabled && <LanguageSelector />}
-                <UserAvatarDropdown isAdmin={isAdmin} />
+        <div className="container mx-auto px-4" style={{ paddingRight: 'max(1rem, var(--sar, 0px))', paddingLeft: 'max(1rem, var(--sal, 0px))' }}>
+          <div className="flex h-16 sm:h-20 items-center justify-between">
+            <NavLink
+              href={user ? '/dashboard' : '/'}
+              className="flex items-center gap-3 text-2xl font-black uppercase text-gray-900 dark:text-white hover:text-gold dark:hover:text-gold transition-colors focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 rounded-md px-2 py-1 min-w-0 shrink"
+              onClick={closeMenu}
+            >
+              <div className="relative w-10 h-10 sm:w-14 sm:h-14 shrink-0">
+                <Image
+                  src="/assets/LogoBlanco.png"
+                  alt="Logo"
+                  fill
+                  priority
+                  className="object-contain"
+                />
               </div>
-            ) : (
-              i18nEnabled && <LanguageSelector />
-            )}
-          </nav>
+              <span className="text-base sm:text-2xl truncate hidden min-[350px]:block">
+                {siteConfig.name}
+              </span>
+            </NavLink>
 
-          <div className="flex items-center gap-1 min-[350px]:gap-2 md:hidden auth-dependent shrink-0">
-            {i18nEnabled && <LanguageSelector />}
-            {!hasMounted || loading ? (
-              /* Invisible spacer — match the actual width of bell + avatar to prevent layout shift */
-              <div className="flex items-center gap-1 min-[350px]:gap-2">
-                <div className="w-10 h-10" />
-                <div className="w-10 h-10" />
-              </div>
-            ) : (
-              user ? (
-                <>
-                  <MobileNotificationIcon />
-                  <MobileUserAvatar userId={user.id} />
-                </>
+            <nav
+              role="navigation"
+              aria-label="Main navigation"
+              className="hidden md:flex md:items-center md:space-x-2 auth-dependent"
+            >
+              <ul className="flex items-center space-x-2">
+                {navigationLinks.map(link => (
+                  <li key={link.href} className="relative">
+                    <NavLink
+                      href={link.href}
+                      className={cn(
+                        'block px-4 py-2 rounded-md font-bold uppercase text-sm transition-all duration-200',
+                        'focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900',
+                        'data-[current=page]:bg-gold data-[current=page]:text-black data-[current=page]:dark:text-black',
+                        'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gold dark:hover:text-gold'
+                      )}
+                      onClick={handleProtectedNavigation(link.requiresCompletion)}
+                    >
+                      {link.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+              {!loading && user ? (
+                <div className="ml-4 flex items-center gap-2">
+                  <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
+                  {i18nEnabled && <LanguageSelector />}
+                  <UserAvatarDropdown isAdmin={isAdmin} />
+                </div>
               ) : (
-                !(hasMounted && Capacitor.isNativePlatform()) && (
-                  <Link
-                    href="/login"
-                    className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-gold hover:text-black transition-colors"
-                  >
-                    {t('enter')}
-                  </Link>
+                i18nEnabled && <LanguageSelector />
+              )}
+            </nav>
+
+            <div className="flex items-center gap-1 min-[350px]:gap-2 md:hidden auth-dependent shrink-0">
+              {i18nEnabled && <LanguageSelector />}
+              {!hasMounted || loading ? (
+                /* Invisible spacer — match the actual width of bell + avatar to prevent layout shift */
+                <div className="flex items-center gap-1 min-[350px]:gap-2">
+                  <div className="w-10 h-10" />
+                  <div className="w-10 h-10" />
+                </div>
+              ) : (
+                user ? (
+                  <>
+                    <MobileNotificationIcon />
+                    <MobileUserAvatar userId={user.id} />
+                  </>
+                ) : (
+                  !(hasMounted && Capacitor.isNativePlatform()) && (
+                    <Link
+                      href="/login"
+                      className="text-sm font-bold uppercase text-gray-900 dark:text-white px-3 py-1 border-2 border-black dark:border-white rounded-md hover:bg-gold hover:text-black transition-colors"
+                    >
+                      {t('enter')}
+                    </Link>
+                  )
                 )
-              )
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
 
 
-      {/* Rating Modal */}
-      {ratingModalElement}
-    </header>
+        {/* Rating Modal */}
+        {ratingModalElement}
+      </header>
+    </>
   );
 }

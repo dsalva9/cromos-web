@@ -9,7 +9,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #F3F4F6;
+  background: var(--background);
+  color: var(--foreground);
   width: 100%;
   /* Mobile-like feel: disable text selection by default */
   -webkit-tap-highlight-color: transparent;
