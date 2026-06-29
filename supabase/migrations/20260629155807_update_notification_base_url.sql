@@ -1,7 +1,7 @@
--- Migration: Fix Notification Triggers for Match Chats and Trade Confirmations
--- Created: 2026-06-26
+-- Migration: Update Notification Base URL to cambiocromos.com
+-- Created: 2026-06-29
 
--- 1. Redefine send_email_notification_trigger to handle match_chat_message, trade_confirmation_request, and trade_confirmed kinds
+-- 1. Redefine send_email_notification_trigger to use cambiocromos.com
 CREATE OR REPLACE FUNCTION public.send_email_notification_trigger() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public', 'extensions'
@@ -112,7 +112,7 @@ END;
 $$;
 
 
--- 2. Redefine send_push_notification_trigger to handle match_chat_message, trade_confirmation_request, and trade_confirmed kinds
+-- 2. Redefine send_push_notification_trigger to use cambiocromos.com
 CREATE OR REPLACE FUNCTION public.send_push_notification_trigger() RETURNS trigger
     LANGUAGE plpgsql SECURITY DEFINER
     SET search_path TO 'public', 'extensions'

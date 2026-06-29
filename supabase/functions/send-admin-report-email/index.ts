@@ -410,7 +410,7 @@ Deno.serve(async (req) => {
       `;
     }
 
-    const adminPanelUrl = `https://cromos-web.vercel.app/admin/reports`;
+    const adminPanelUrl = `https://cambiocromos.com/admin/reports`;
     const subject = `[CambioCromos] Moderación Urgente - Nuevo Reporte #${report_id}`;
 
     // Premium HTML Email Template
