@@ -58,8 +58,17 @@ export async function getListingChats(
       typeof (error as { message: unknown }).message === 'string' &&
       (error as { message: string }).message.includes('Listing not found');
 
+    const isUnauthorized =
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof (error as { message: unknown }).message === 'string' &&
+      (error as { message: string }).message.includes('You can only view your own conversation');
+
     if (isNotFound) {
       logger.warn('Listing not found for chat access:', { listingId });
+    } else if (isUnauthorized) {
+      logger.warn('Unauthorized attempt to access listing chat:', { listingId });
     } else if (isTransientNetworkError(error)) {
       logger.warn('Transient network error fetching listing chats:', error);
     } else {
@@ -70,11 +79,13 @@ export async function getListingChats(
       data: [],
       error: isNotFound
         ? new Error('LISTING_NOT_FOUND')
-        : isTransientNetworkError(error)
-          ? new Error('NETWORK_ERROR')
-          : error instanceof Error
-            ? error
-            : new Error('No se pudieron cargar los mensajes'),
+        : isUnauthorized
+          ? new Error('UNAUTHORIZED')
+          : isTransientNetworkError(error)
+            ? new Error('NETWORK_ERROR')
+            : error instanceof Error
+              ? error
+              : new Error('No se pudieron cargar los mensajes'),
     };
   }
 }

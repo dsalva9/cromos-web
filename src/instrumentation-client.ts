@@ -40,6 +40,12 @@ if (SENTRY_DSN) {
             'code challenge does not match previously saved code verifier',
             'bad_code_verifier',
             'pkce_code_verifier_not_found',
+            // WebKit/Safari IndexedDB bug: attempt to use transaction without an active one.
+            'Attempt to get a record from database without an in-progress transaction',
+            // OneSignal/external IndexedDB issue: transaction requested while DB connection is closing.
+            "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.",
+            // Chrome extension/port error injected into the page.
+            'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
         ],
 
         beforeSend(event, hint) {
@@ -118,3 +124,5 @@ if (SENTRY_DSN) {
         },
     });
 }
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
