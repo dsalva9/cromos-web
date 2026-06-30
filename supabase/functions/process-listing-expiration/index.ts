@@ -378,6 +378,28 @@ Deno.serve(async (_req) => {
     } else {
       results.expired = expiredListings?.length ?? 0;
       console.log(`[process-listing-expiration] Expired ${results.expired} listings`);
+
+      // Insert expired listings into retention_schedule
+      if (expiredListings && expiredListings.length > 0) {
+        console.log(`[process-listing-expiration] Inserting ${expiredListings.length} items into retention_schedule...`);
+        const retentionRows = expiredListings.map((l) => ({
+          entity_type: 'listing',
+          entity_id: String(l.id),
+          action: 'delete',
+          scheduled_for: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
+          reason: 'expired',
+          initiated_by_type: 'system',
+        }));
+
+        const { error: retentionError } = await supabase
+          .from('retention_schedule')
+          .upsert(retentionRows, { onConflict: 'entity_type,entity_id,action' });
+
+        if (retentionError) {
+          console.error('[process-listing-expiration] Error inserting into retention_schedule:', retentionError);
+          results.errors.push(`Retention schedule step: ${retentionError.message}`);
+        }
+      }
     }
 
     // ================================================================

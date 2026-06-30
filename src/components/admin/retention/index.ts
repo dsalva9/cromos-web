@@ -9,3 +9,4 @@ export { SuspendedUsersTable } from './SuspendedUsersTable';
 export { PendingDeletionUsersTable } from './PendingDeletionUsersTable';
 export { PendingDeletionListingsTable } from './PendingDeletionListingsTable';
 export { PendingDeletionTemplatesTable } from './PendingDeletionTemplatesTable';
+export { PendingDeletionExpiredListingsTable } from './PendingDeletionExpiredListingsTable';

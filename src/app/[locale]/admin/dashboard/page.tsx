@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useAdminStats } from '@/hooks/admin/useAdminStats';
 import { ModernCard, ModernCardContent, ModernCardHeader } from '@/components/ui/modern-card';
@@ -18,7 +18,8 @@ import {
   SuspendedUsersTable,
   PendingDeletionUsersTable,
   PendingDeletionListingsTable,
-  PendingDeletionTemplatesTable
+  PendingDeletionTemplatesTable,
+  PendingDeletionExpiredListingsTable
 } from '@/components/admin/retention';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -223,12 +224,15 @@ function AdminDashboardContent() {
           </ModernCardHeader>
           <ModernCardContent className="pt-4">
             <Tabs defaultValue="users" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-[#2D3748]">
+              <TabsList className="grid w-full grid-cols-4 bg-[#2D3748]">
                 <TabsTrigger value="users" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Users
                 </TabsTrigger>
                 <TabsTrigger value="listings" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Listings
+                </TabsTrigger>
+                <TabsTrigger value="expired" className="data-[state=active]:bg-gold data-[state=active]:text-black">
+                  Expired Listings
                 </TabsTrigger>
                 <TabsTrigger value="templates" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Templates
@@ -239,6 +243,9 @@ function AdminDashboardContent() {
               </TabsContent>
               <TabsContent value="listings" className="mt-4">
                 <PendingDeletionListingsTable />
+              </TabsContent>
+              <TabsContent value="expired" className="mt-4">
+                <PendingDeletionExpiredListingsTable />
               </TabsContent>
               <TabsContent value="templates" className="mt-4">
                 <PendingDeletionTemplatesTable />
