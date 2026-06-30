@@ -48,7 +48,7 @@ export function useRestoreListing() {
 
         if (error.message.includes('Permission denied')) {
           toast.error('No tienes permiso para restaurar este anuncio');
-        } else if (error.message.includes('ELIMINADO status')) {
+        } else if (error.message.includes('ELIMINADO')) {
           toast.error('Solo se pueden restaurar anuncios con estado ELIMINADO');
         } else if (error.message.includes('not found')) {
           toast.error('El anuncio no fue encontrado');

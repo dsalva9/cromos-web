@@ -68,7 +68,7 @@ export function useHardDeleteListing() {
         
         if (error.message.includes('Permission denied')) {
           toast.error('No tienes permiso para eliminar este anuncio');
-        } else if (error.message.includes('ELIMINADO status')) {
+        } else if (error.message.includes('ELIMINADO')) {
           toast.error('Solo se pueden eliminar permanentemente anuncios con estado ELIMINADO');
         } else if (error.message.includes('not found')) {
           toast.error('El anuncio no fue encontrado');
