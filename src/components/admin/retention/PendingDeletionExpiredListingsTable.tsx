@@ -42,7 +42,7 @@ export function PendingDeletionExpiredListingsTable() {
     item: {
       id: number;
       entity_type: string;
-      entity_id: number;
+      entity_id: string;
       scheduled_for: string;
       legal_hold_until: string | null;
       reason: string | null;
@@ -177,7 +177,7 @@ export function PendingDeletionExpiredListingsTable() {
                             item: {
                               id: listing.retention_schedule_id,
                               entity_type: 'listing',
-                              entity_id: listing.listing_id,
+                              entity_id: String(listing.listing_id),
                               scheduled_for: listing.scheduled_for,
                               legal_hold_until: listing.legal_hold_until,
                               reason: listing.deletion_reason,
