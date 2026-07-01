@@ -97,6 +97,7 @@ export const logger = {
       'bad_code_verifier',
       'code challenge does not match',
       'pkce_code_verifier_not_found',
+      'user relationship blocked',
     ];
     const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {
