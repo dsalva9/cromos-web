@@ -29,6 +29,8 @@ interface Profile {
   avatar_url: string | null;
   created_at: string | null;
   postcode: string | null;
+  is_patron?: boolean;
+  patron_since?: string | null;
 }
 
 interface CacheSnapshot {
@@ -219,7 +221,7 @@ export function useProfileData() {
       // Fetch user profile
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, nickname, avatar_url, created_at, postcode')
+        .select('id, nickname, avatar_url, created_at, postcode, is_patron, patron_since')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -233,6 +235,8 @@ export function useProfileData() {
         avatar_url: null,
         created_at: user.created_at,
         postcode: null,
+        is_patron: false,
+        patron_since: null,
       };
 
       setProfile(userProfile);

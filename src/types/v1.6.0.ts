@@ -11,6 +11,8 @@ export interface Profile {
   is_suspended: boolean;
   created_at: string | null;
   updated_at: string | null;
+  is_patron?: boolean;
+  patron_since?: string | null;
 }
 
 export interface ItemFieldDefinition {

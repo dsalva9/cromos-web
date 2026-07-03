@@ -306,7 +306,7 @@ function ProfileContent() {
 
         {/* BADGES SECTION */}
         <div className="mb-12">
-          <ProfileBadges userId={user.id} isOwnProfile={true} />
+          <ProfileBadges userId={user.id} isOwnProfile={true} isPatron={profile?.is_patron} />
         </div>
 
 
