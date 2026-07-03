@@ -31,7 +31,7 @@ import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal'
 import { containsUrl, downloadFile } from '@/lib/validations/chat';
 
 function BmacChatPrompt() {
-  const t = useTranslations('chat.bmac');
+  const t = useTranslations('marketplace.chat.bmac');
 
   return (
     <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 shadow-sm max-w-[85%] sm:max-w-[70%] text-center flex flex-col items-center gap-2.5 mx-auto">

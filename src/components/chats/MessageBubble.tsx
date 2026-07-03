@@ -10,7 +10,7 @@ import { downloadFile } from '@/lib/validations/chat';
 import { useTranslations } from 'next-intl';
 
 function BmacChatPrompt() {
-  const t = useTranslations('chat.bmac');
+  const t = useTranslations('marketplace.chat.bmac');
 
   return (
     <div className="flex justify-center my-4 w-full">
