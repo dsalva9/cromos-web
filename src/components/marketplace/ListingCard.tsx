@@ -126,9 +126,11 @@ export function ListingCard({ listing }: ListingCardProps) {
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
         "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border shadow-sm dark:shadow-md transition-colors duration-300",
-        isNew
-          ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
-          : "border-gray-200/60 dark:border-gray-700/50"
+        listing.author_is_patron
+          ? "border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
+          : isNew
+            ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
+            : "border-gray-200/60 dark:border-gray-700/50"
       )}
     >
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
@@ -156,8 +158,13 @@ export function ListingCard({ listing }: ListingCardProps) {
           <ListingFavoriteButton listingId={listing.id} variant="icon" />
         </div>
 
-        {/* Status / New Badge */}
+        {/* Status / New Badge / Patron Badge */}
         <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+          {listing.author_is_patron && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-100/90 text-amber-800 border border-amber-300/60 backdrop-blur-sm shadow-sm dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/40">
+              ☕ {t('patron')}
+            </span>
+          )}
           {isNew && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-orange-100/90 text-orange-700 border border-orange-300/60 backdrop-blur-sm shadow-sm dark:bg-orange-900/60 dark:text-orange-200 dark:border-orange-600/40">
               <Flame className="h-3 w-3" />

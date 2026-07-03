@@ -26,7 +26,8 @@ export function useListing(listingId: string) {
             deleted_at,
             postcode,
             country_code,
-            completed_trades
+            completed_trades,
+            is_patron
           )
         `
         )
@@ -91,6 +92,7 @@ export function useListing(listingId: string) {
           listing_type: (data as any).listing_type || 'intercambio',
           price: (data as any).price,
           author_completed_trades: Number(data.author.completed_trades ?? 0),
+          author_is_patron: data.author.is_patron,
         });
       }
     } catch (err) {

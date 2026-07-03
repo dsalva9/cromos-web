@@ -197,6 +197,7 @@
     },
     "card": {
       "new": "Novo",
+      "patron": "Patrono",
       "status": {
         "pack": "PACOTE",
         "sold": "VENDIDO",

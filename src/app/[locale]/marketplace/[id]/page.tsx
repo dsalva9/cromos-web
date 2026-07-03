@@ -40,7 +40,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { getCurrencySymbol } from '@/constants/countries';
-import { getSupportMailtoUrl } from '@/lib/utils';
+import { getSupportMailtoUrl, cn } from '@/lib/utils';
 import { ShareButton } from '@/components/marketplace/ShareButton';
 
 export default function ListingDetailPage() {
@@ -512,7 +512,7 @@ export default function ListingDetailPage() {
               </ModernCard>
 
               {/* Seller */}
-              <ModernCard className="mb-6">
+              <ModernCard className={cn("mb-6", listing.author_is_patron && "border-amber-300 dark:border-amber-900/50 shadow-[0_0_12px_rgba(245,158,11,0.08)] bg-gradient-to-r from-amber-50/10 to-transparent dark:from-amber-950/5")}>
                 <ModernCardContent className="p-4">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('seller')}</h3>
                   <Link href={`/users/${listing.user_id}`}>
@@ -532,11 +532,22 @@ export default function ListingDetailPage() {
                             alt={listing.author_nickname}
                             width={48}
                             height={48}
-                            className="rounded-full border-2 border-black"
+                            className={cn(
+                              "rounded-full border-2",
+                              listing.author_is_patron
+                                ? "border-amber-400 ring-2 ring-amber-400/50"
+                                : "border-black"
+                            )}
                           />
                         ) : (
                           <div
-                            className={`w-12 h-12 rounded-full border-2 border-black flex items-center justify-center text-black font-black text-lg ${fallback.gradientClass}`}
+                            className={cn(
+                              "w-12 h-12 rounded-full border-2 flex items-center justify-center text-black font-black text-lg",
+                              listing.author_is_patron
+                                ? "border-amber-400 ring-2 ring-amber-400/50"
+                                : "border-black",
+                              fallback.gradientClass
+                            )}
                           >
                             {fallback.initial}
                           </div>
@@ -547,6 +558,14 @@ export default function ListingDetailPage() {
                           <p className="font-bold text-gray-900 dark:text-white">
                             {listing.author_nickname}
                           </p>
+                          {listing.author_is_patron && (
+                            <span
+                              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm whitespace-nowrap shrink-0"
+                              title="Patrón de CambioCromos"
+                            >
+                              ☕
+                            </span>
+                          )}
                           {listing.author_completed_trades && listing.author_completed_trades > 0 ? (
                             <span
                               className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm whitespace-nowrap shrink-0"

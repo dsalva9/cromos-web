@@ -223,6 +223,7 @@
     },
     "card": {
       "new": "Nuevo",
+      "patron": "Patrón",
       "status": {
         "pack": "PACK",
         "sold": "VENDIDO",
