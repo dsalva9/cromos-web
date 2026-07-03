@@ -17,6 +17,7 @@ interface UserProfile {
   location_label: string | null;
   completed_trades: number;
   trade_reputation_tier: string;
+  is_patron: boolean;
 }
 
 export function useUserProfile(userId: string) {
@@ -87,6 +88,7 @@ export function useUserProfile(userId: string) {
         location_label: locationLabel,
         completed_trades: Number(profileData.completed_trades ?? 0),
         trade_reputation_tier: profileData.trade_reputation_tier ?? 'novato',
+        is_patron: Boolean(profileData.is_patron),
       };
 
       setProfile(normalizedProfile);

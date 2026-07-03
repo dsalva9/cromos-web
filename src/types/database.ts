@@ -1339,6 +1339,7 @@ export type Database = {
           deletion_reason: string | null
           id: string
           is_admin: boolean | null
+          is_patron: boolean
           is_suspended: boolean | null
           last_login_date: string | null
           level: number | null
@@ -1348,6 +1349,7 @@ export type Database = {
           nickname: string | null
           notification_preferences: Json | null
           onesignal_player_id: string[] | null
+          patron_since: string | null
           postcode: string | null
           rating_avg: number | null
           rating_count: number | null
@@ -1368,6 +1370,7 @@ export type Database = {
           deletion_reason?: string | null
           id: string
           is_admin?: boolean | null
+          is_patron?: boolean
           is_suspended?: boolean | null
           last_login_date?: string | null
           level?: number | null
@@ -1377,6 +1380,7 @@ export type Database = {
           nickname?: string | null
           notification_preferences?: Json | null
           onesignal_player_id?: string[] | null
+          patron_since?: string | null
           postcode?: string | null
           rating_avg?: number | null
           rating_count?: number | null
@@ -1397,6 +1401,7 @@ export type Database = {
           deletion_reason?: string | null
           id?: string
           is_admin?: boolean | null
+          is_patron?: boolean
           is_suspended?: boolean | null
           last_login_date?: string | null
           level?: number | null
@@ -1406,6 +1411,7 @@ export type Database = {
           nickname?: string | null
           notification_preferences?: Json | null
           onesignal_player_id?: string[] | null
+          patron_since?: string | null
           postcode?: string | null
           rating_avg?: number | null
           rating_count?: number | null

@@ -55,6 +55,7 @@ export interface Listing {
   listing_type?: 'intercambio' | 'venta' | 'ambos';
   price?: number | null;
   author_completed_trades?: number | null;
+  author_is_patron?: boolean;
 }
 
 

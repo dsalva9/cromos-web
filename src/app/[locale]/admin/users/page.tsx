@@ -28,6 +28,32 @@ function UserSearchContent() {
   const { users, loading, error, refetch } = useUserSearch(debouncedQuery, status);
   const { suspendUser, unsuspendUser, loading: actionLoading } = useSuspendUser();
   const [emailUser, setEmailUser] = useState<{ user_id: string; email: string; nickname: string } | null>(null);
+  const [togglingPatronId, setTogglingPatronId] = useState<string | null>(null);
+
+  const handleTogglePatron = async (userId: string, currentStatus: boolean, nickname: string) => {
+    const actionText = currentStatus ? 'Revoke' : 'Grant';
+    if (!confirm(`${actionText} Patron status for ${nickname}?`)) return;
+
+    setTogglingPatronId(userId);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          is_patron: !currentStatus,
+          patron_since: !currentStatus ? new Date().toISOString() : null
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      toast.success(`Patron status ${currentStatus ? 'revoked' : 'granted'} successfully`);
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update Patron status');
+    } finally {
+      setTogglingPatronId(null);
+    }
+  };
 
   const handleSuspend = async (userId: string, nickname: string) => {
     const reason = prompt(`Enter reason for suspending ${nickname}:`);
@@ -205,6 +231,9 @@ function UserSearchContent() {
                           {user.is_admin && (
                             <Badge className="bg-red-600 text-white">Admin</Badge>
                           )}
+                          {user.is_patron && (
+                            <Badge className="bg-amber-500 text-white">☕ Patron</Badge>
+                          )}
                           {user.is_pending_deletion ? (
                             <Badge className="bg-orange-600 text-white">Pending Deletion</Badge>
                           ) : user.is_suspended && (
@@ -262,6 +291,15 @@ function UserSearchContent() {
                           View Profile
                         </Button>
                       </Link>
+
+                      <Button
+                        size="sm"
+                        onClick={() => handleTogglePatron(user.user_id, user.is_patron, user.nickname)}
+                        disabled={togglingPatronId === user.user_id}
+                        className={user.is_patron ? "bg-[#B45309] hover:bg-[#92400E] text-white" : "bg-[#F59E0B] hover:bg-[#D97706] text-black font-semibold"}
+                      >
+                        ☕ {user.is_patron ? 'Revoke Patron' : 'Grant Patron'}
+                      </Button>
 
                       {!user.is_admin && (
                         <>

@@ -28,3 +28,13 @@ export const SPONSORED_PRODUCT_ALBUM: SponsoredProduct = {
   ctaKey: "ctaTeFaltan"
 };
 
+export const SPONSORED_PRODUCT_BOOK: SponsoredProduct = {
+  id: "sponsored-book",
+  imageUrl: "/assets/amazon_images/book.jpg",
+  rating: 4.8,
+  amazonUrl: "https://amzn.to/3QNkf7q",
+  titleKey: "bookTitle",
+  taglineKey: "bookTagline",
+  ctaKey: "ctaBook"
+};
+

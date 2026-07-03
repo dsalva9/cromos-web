@@ -74,6 +74,14 @@
     }
   },
   "profile": {
+    "patron": {
+      "badge": "Patrono",
+      "badgeTitle": "Patrono do CambioCromos",
+      "badgeDescription": "Este usuário é um colaborador oficial que ajuda a manter o projeto ativo.",
+      "ctaTitle": "Apoie o CambioCromos",
+      "ctaDescription": "Torne-se Patrono e mostre o seu emblema exclusivo na comunidade.",
+      "ctaButton": "Mais info →"
+    },
     "index": {
       "title": "Perfil",
       "editAvatar": "Editar Avatar",
@@ -208,6 +216,9 @@
       "ignoreError": "Erro ao ignorar o anúncio"
     },
     "sponsored": {
+      "bookTitle": "Coleções Panini Football da Copa do Mundo 1970-2026",
+      "bookTagline": "O livro oficial das coleções de cromos da Copa do Mundo da Panini",
+      "ctaBook": "Ver na Amazon",
       "badge": "Patrocinado",
       "recomendado": "Recomendado",
       "protegerCromos": "Proteger meus cromos",
@@ -304,6 +315,11 @@
       "reportListing": "Denunciar anúncio"
     },
     "chat": {
+      "bmac": {
+        "title": "Você gosta do CambioCromos?",
+        "subtitle": "Ajude-nos a continuar melhorando e mantendo o projeto ativo.",
+        "cta": "Pague-nos um café ☕"
+      },
       "backToChats": "Voltar aos meus chats",
       "seller": "Vendedor",
       "status": {
@@ -1799,6 +1815,7 @@
     }
   },
   "userMenu": {
+    "support": "Apoiar ☕",
     "myProfile": "Meu Perfil",
     "myListings": "Meus Anúncios",
     "collections": "Coleções",

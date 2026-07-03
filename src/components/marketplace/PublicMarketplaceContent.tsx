@@ -3,13 +3,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useListings } from '@/hooks/marketplace/useListings';
 import { LeanListingCard } from '@/components/home/LeanListingCard';
 import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
 import { SPONSORED_PRODUCT_CUBE, SPONSORED_PRODUCT_ALBUM } from '@/lib/marketplace/sponsored-product';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { Button } from '@/components/ui/button';
-import { Filter, Package, ArrowRight } from 'lucide-react';
+import { Filter, Package, ArrowRight, ChevronRight } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -99,25 +100,46 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
                                 </span>
                             </h1>
 
-                            {/* Stats Badges */}
-                            <div className="hidden md:flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
-                                    <span className="text-base md:text-lg">🔥</span>
-                                    <span className="font-bold text-black dark:text-white">{t('stats.active', { count: listings.length })}</span>
-                                </div>
-                                <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
-                                    <span className="text-base md:text-lg">👥</span>
-                                    <span className="hidden md:inline">{t('stats.community')}</span>
-                                    <span className="md:hidden">{t('stats.communityShort')}</span>
-                                </div>
-                                {!loading && listings.length > 0 && (
-                                    <div className="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-xs md:text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5 md:gap-2 whitespace-nowrap shrink-0">
-                                        <span className="text-base md:text-lg">⚡</span>
-                                        <span className="hidden md:inline">{t('stats.updated')}</span>
-                                        <span className="md:hidden">{t('stats.updatedShort')}</span>
+                            {/* Horizontal Sponsored Book Banner */}
+                            <div className="mt-2 md:mt-3 max-w-2xl w-full">
+                                <a
+                                    href="https://amzn.to/3QNkf7q"
+                                    target="_blank"
+                                    rel="noopener sponsored nofollow"
+                                    className="flex items-center gap-3 bg-gradient-to-r from-amber-50 to-orange-50/70 dark:from-amber-950/15 dark:to-orange-950/10 border border-amber-200/80 dark:border-amber-900/40 rounded-xl p-2.5 sm:p-3 shadow-sm hover:border-amber-300 dark:hover:border-amber-800 transition-all duration-300 cursor-pointer group"
+                                >
+                                    <div className="relative w-10 h-14 sm:w-12 sm:h-16 shrink-0 rounded-md overflow-hidden border border-gray-200/40 dark:border-gray-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,0.15)] bg-white dark:bg-gray-800 flex items-center justify-center p-0.5">
+                                        <Image
+                                            src="/assets/amazon_images/book.jpg"
+                                            alt={t('sponsored.bookTitle')}
+                                            fill
+                                            className="object-contain p-0.5 transition-transform duration-300 group-hover:scale-105"
+                                            sizes="(max-width: 640px) 40px, 48px"
+                                        />
                                     </div>
-                                )}
-                            </div>
+                                    <div className="flex-1 min-w-0 text-left">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/30 uppercase tracking-wider">
+                                                {t('sponsored.badge')}
+                                              </span>
+                                              <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
+                                                  ⭐⭐⭐⭐⭐ (4.8)
+                                              </span>
+                                          </div>
+                                          <h4 className="text-xs md:text-sm font-black text-amber-950 dark:text-amber-200 mt-1 truncate">
+                                              {t('sponsored.bookTitle')}
+                                          </h4>
+                                          <p className="text-[10px] md:text-xs text-amber-800/80 dark:text-amber-400/80 mt-0.5 truncate">
+                                              {t('sponsored.bookTagline')}
+                                          </p>
+                                      </div>
+                                      <div className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-black uppercase text-amber-600 dark:text-amber-400 gap-0.5 bg-amber-100/50 dark:bg-amber-900/30 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-amber-200/40 dark:border-amber-800/40 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 transition-all duration-200">
+                                          <span className="hidden sm:inline">{t('sponsored.ctaBook')}</span>
+                                          <span className="sm:hidden">Amazon</span>
+                                          <ChevronRight className="w-3.5 h-3.5" />
+                                      </div>
+                                  </a>
+                              </div>
                         </div>
 
                         {/* Register CTA */}

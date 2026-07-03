@@ -32,6 +32,7 @@ type UserProfile = {
   postcode: string | null;
   avatar_url: string | null;
   is_admin: boolean;
+  is_patron: boolean;
   suspended_at: string | null;
   deleted_at: string | null;
   country_code: string;
@@ -139,7 +140,7 @@ export function ProfileCompletionProvider({
       // Single query for ALL profile data - eliminates redundant queries
       const { data, error } = await supabase
         .from('profiles')
-        .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at, country_code')
+        .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at, country_code, is_patron')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -151,11 +152,12 @@ export function ProfileCompletionProvider({
           postcode: data.postcode ?? null,
           avatar_url: data.avatar_url ?? null,
           is_admin: data.is_admin ?? false,
+          is_patron: data.is_patron ?? false,
           suspended_at: data.suspended_at ?? null,
           deleted_at: data.deleted_at ?? null,
           country_code: data.country_code ?? 'ES',
         }
-        : { nickname: null, postcode: null, avatar_url: null, is_admin: false, suspended_at: null, deleted_at: null, country_code: 'ES' };
+        : { nickname: null, postcode: null, avatar_url: null, is_admin: false, is_patron: false, suspended_at: null, deleted_at: null, country_code: 'ES' };
 
       setProfile(profileData);
 
@@ -220,6 +222,7 @@ export function ProfileCompletionProvider({
           postcode: changes.postcode ?? prev?.postcode ?? null,
           avatar_url: changes.avatar_url ?? prev?.avatar_url ?? null,
           is_admin: changes.is_admin ?? prev?.is_admin ?? false,
+          is_patron: changes.is_patron ?? prev?.is_patron ?? false,
           suspended_at: changes.suspended_at ?? prev?.suspended_at ?? null,
           deleted_at: changes.deleted_at ?? prev?.deleted_at ?? null,
           country_code: changes.country_code ?? prev?.country_code ?? 'ES',

@@ -4,7 +4,7 @@ import { useState, MouseEvent } from 'react';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { useRouter } from '@/hooks/use-router';
-import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate, Heart } from 'lucide-react';
+import { User, Package, LogOut, ChevronDown, Settings, LayoutTemplate, Heart, Coffee } from 'lucide-react';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
@@ -183,6 +183,18 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
                 <Settings className="h-4 w-4" />
                 <span>{t('settings')}</span>
               </Link>
+
+              {!profile?.is_patron && (
+                <a
+                  href="https://buymeacoffee.com/cambiocromos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-2 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors font-semibold"
+                >
+                  <Coffee className="h-4 w-4" />
+                  <span>{t('support')}</span>
+                </a>
+              )}
 
               {isAdmin && (
                 <>

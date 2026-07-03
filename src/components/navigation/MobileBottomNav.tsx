@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Store, Library, MessageCircle, ArrowLeftRight, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen, BellPlus } from 'lucide-react';
+import { Store, Library, MessageCircle, ArrowLeftRight, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen, BellPlus, Coffee } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
@@ -23,6 +23,7 @@ export function MobileBottomNav() {
   const pathname = stripLocale(rawPathname);
   const locale = useLocale();
   const t = useTranslations('navigation');
+  const tu = useTranslations('userMenu');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const supabase = useSupabaseClient();
   const router = useRouter();
@@ -55,7 +56,7 @@ export function MobileBottomNav() {
   };
 
   const { hapticImpact } = useHaptic();
-  const { isAdmin } = useProfileCompletion();
+  const { isAdmin, profile } = useProfileCompletion();
   const { totalUnread } = useGlobalUnreadBadge();
 
   const handleNavClick = (href: string) => {
@@ -249,6 +250,22 @@ export function MobileBottomNav() {
               <Settings className="h-5 w-5 text-gold" />
               <span className="font-medium">{t('settings')}</span>
             </a>
+
+            {!profile?.is_patron && (
+              <a
+                href="https://buymeacoffee.com/cambiocromos"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  hapticImpact();
+                  setIsMenuOpen(false);
+                }}
+                className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors font-semibold"
+              >
+                <Coffee className="h-5 w-5" />
+                <span className="font-medium">{tu('support')}</span>
+              </a>
+            )}
 
             {isAdmin && (
               <a

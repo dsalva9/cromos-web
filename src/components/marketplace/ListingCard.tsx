@@ -209,7 +209,14 @@ export function ListingCard({ listing }: ListingCardProps) {
         <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
           <div className="z-20 relative block shrink-0">
             <Link href={`/users/${listing.user_id}`} className="block">
-              <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 ring-1 ring-gray-100 dark:ring-gray-700">
+              <div 
+                className={cn(
+                  "relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700",
+                  listing.author_is_patron 
+                    ? "ring-2 ring-amber-400 dark:ring-amber-500" 
+                    : "ring-1 ring-gray-100 dark:ring-gray-700"
+                )}
+              >
                 {avatarUrl ? (
                   <Image
                     src={avatarUrl}
@@ -241,6 +248,14 @@ export function ListingCard({ listing }: ListingCardProps) {
                 className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
                 forceSpan={false}
               />
+              {listing.author_is_patron && (
+                <span
+                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm whitespace-nowrap shrink-0"
+                  title="Patrón de CambioCromos"
+                >
+                  ☕
+                </span>
+              )}
               {listing.author_completed_trades && listing.author_completed_trades > 0 ? (
                 <span
                   className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-100 text-yellow-800 dark:bg-yellow-950/40 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 shadow-sm whitespace-nowrap shrink-0"

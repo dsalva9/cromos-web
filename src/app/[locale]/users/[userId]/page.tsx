@@ -105,6 +105,7 @@ function MatchStatCard({
 
 export default function UserProfilePage() {
   const t = useTranslations('userProfile');
+  const tp = useTranslations('profile');
   const params = useParams();
   const { user: currentUser } = useUser();
   const supabase = useSupabaseClient();
@@ -520,7 +521,14 @@ export default function UserProfilePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Profile Header */}
-          <div className="mb-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm transition-all duration-300">
+          <div 
+            className={cn(
+              "mb-8 rounded-2xl border shadow-sm transition-all duration-300",
+              profile.is_patron 
+                ? "border-amber-300 dark:border-amber-800 bg-gradient-to-br from-amber-50/40 via-white to-orange-50/30 dark:from-amber-950/20 dark:via-gray-800 dark:to-orange-950/15" 
+                : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+            )}
+          >
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Avatar */}
@@ -531,11 +539,23 @@ export default function UserProfilePage() {
                       alt={profile.nickname}
                       width={120}
                       height={120}
-                      className="rounded-full border border-gray-200 dark:border-gray-700 object-cover shadow-sm bg-gray-50 dark:bg-gray-800"
+                      className={cn(
+                        "rounded-full object-cover shadow-sm bg-gray-50 dark:bg-gray-800",
+                        profile.is_patron 
+                          ? "border-4 border-amber-400 dark:border-amber-500" 
+                          : "border border-gray-200 dark:border-gray-700"
+                      )}
                     />
                   ) : (
-                    <div className="w-30 h-30 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center">
-                      <User className="h-16 w-16 text-gray-400" />
+                    <div 
+                      className={cn(
+                        "w-[120px] h-[120px] rounded-full flex items-center justify-center",
+                        profile.is_patron 
+                          ? "border-4 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/20" 
+                          : "border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
+                      )}
+                    >
+                      <User className={cn("h-16 w-16", profile.is_patron ? "text-amber-500 dark:text-amber-400" : "text-gray-400")} />
                     </div>
                   )}
                 </div>
@@ -592,6 +612,16 @@ export default function UserProfilePage() {
                           </span>
                         </a>
                       </div>
+
+                      {/* Patron badge */}
+                      {profile.is_patron && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border-2 border-amber-400 dark:border-amber-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,1)]">
+                            <span>☕</span>
+                            <span>{tp('patron.badgeTitle')}</span>
+                          </span>
+                        </div>
+                      )}
 
                       {/* Reputation badge */}
                       {profile.completed_trades > 0 && (
@@ -823,8 +853,50 @@ export default function UserProfilePage() {
                     <MatchStatCard userId={userId} renderStatCard={renderStatCard} />
                   </div>
 
+                  {/* Patron CTA Card for own profile */}
+                  {isOwnProfile && !profile.is_patron && (
+                    <div className="mt-6 bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-orange-500/10 border-2 border-dashed border-amber-300 dark:border-amber-800 rounded-2xl p-5 shadow-sm">
+                      <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 text-2xl border border-amber-200 dark:border-amber-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,0.3)]">
+                          ☕
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-base font-black text-amber-950 dark:text-amber-300">
+                            {tp('patron.ctaTitle')}
+                          </h4>
+                          <p className="text-sm text-amber-800/80 dark:text-amber-400/80 mt-1 leading-relaxed">
+                            {tp('patron.ctaDescription')}
+                          </p>
+                        </div>
+                        <a
+                          href="https://buymeacoffee.com/cambiocromos"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm uppercase px-5 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow whitespace-nowrap shrink-0"
+                        >
+                          {tp('patron.ctaButton')}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
                   {/* BADGES SUBSECTION */}
                   <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    {profile.is_patron && (
+                      <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 flex items-center gap-4 shadow-sm">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 text-2xl border border-amber-200 dark:border-amber-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,0.5)]">
+                          ☕
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black text-amber-950 dark:text-amber-300">
+                            {tp('patron.badgeTitle')}
+                          </h4>
+                          <p className="text-xs text-amber-800/80 dark:text-amber-400/80 mt-1 leading-relaxed">
+                            {tp('patron.badgeDescription')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     <ProfileBadgesSimple userId={userId} isOwnProfile={isOwnProfile} />
                   </div>
                 </div>

@@ -74,6 +74,14 @@
     }
   },
   "profile": {
+    "patron": {
+      "badge": "Patron",
+      "badgeTitle": "CambioCromos Patron",
+      "badgeDescription": "This user is an official contributor who helps keep the project active.",
+      "ctaTitle": "Support CambioCromos",
+      "ctaDescription": "Become a Patron and show off your exclusive badge in the community.",
+      "ctaButton": "More info →"
+    },
     "index": {
       "title": "Profile",
       "editAvatar": "Edit Avatar",
@@ -208,6 +216,9 @@
       "ignoreError": "Error ignoring listing"
     },
     "sponsored": {
+      "bookTitle": "World Cup Panini Football Collections 1970-2026",
+      "bookTagline": "The official book of Panini World Cup sticker collections",
+      "ctaBook": "View on Amazon",
       "badge": "Sponsored",
       "recomendado": "Recommended",
       "protegerCromos": "Protect my stickers",
@@ -304,6 +315,11 @@
       "reportListing": "Report listing"
     },
     "chat": {
+      "bmac": {
+        "title": "Do you like CambioCromos?",
+        "subtitle": "Help us keep improving and maintaining the project active.",
+        "cta": "Buy us a coffee ☕"
+      },
       "backToChats": "Back to my chats",
       "seller": "Seller",
       "status": {
@@ -1799,6 +1815,7 @@
     }
   },
   "userMenu": {
+    "support": "Support ☕",
     "myProfile": "My Profile",
     "myListings": "My Listings",
     "collections": "Collections",

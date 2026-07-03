@@ -41,6 +41,7 @@ interface Conversation {
   last_message_at: string | null;
   unread_count: number;
   is_seller: boolean;
+  counterparty_is_patron?: boolean;
 }
 
 // ------------------------------------------------------------------
@@ -259,11 +260,14 @@ function ChatsPageContent() {
                               </h3>
                             </div>
 
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
                               {conv.is_seller ? (
                                 <>{t('roles.buyer')} {conv.counterparty_nickname}</>
                               ) : (
                                 <>{t('roles.seller')} {conv.counterparty_nickname}</>
+                              )}
+                              {conv.counterparty_is_patron && (
+                                <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
                               )}
                             </p>
 
@@ -347,8 +351,11 @@ function ChatsPageContent() {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-0.5">
-                              <h3 className="font-bold text-gray-900 dark:text-white truncate">
+                              <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1">
                                 {conv.other_nickname}
+                                {conv.other_is_patron && (
+                                  <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
+                                )}
                               </h3>
                               {conv.unread_count > 0 && (
                                 <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
