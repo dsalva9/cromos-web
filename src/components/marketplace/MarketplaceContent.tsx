@@ -29,6 +29,7 @@ interface MarketplaceContentProps {
 
 export function MarketplaceContent({ initialListings, initialUserPostcode }: MarketplaceContentProps) {
     const t = useTranslations('marketplace.index');
+    const ts = useTranslations('marketplace.sponsored');
     const { user } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
     const [sortByDistance, setSortByDistance] = useState(false);
@@ -345,7 +346,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     <div className="relative w-10 h-14 sm:w-12 sm:h-16 shrink-0 rounded-md overflow-hidden border border-gray-200/40 dark:border-gray-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,0.15)] bg-white dark:bg-gray-800 flex items-center justify-center p-0.5">
                                         <Image
                                             src="/assets/amazon_images/book.jpg"
-                                            alt={t('sponsored.bookTitle')}
+                                            alt={ts('bookTitle')}
                                             fill
                                             className="object-contain p-0.5 transition-transform duration-300 group-hover:scale-105"
                                             sizes="(max-width: 640px) 40px, 48px"
@@ -354,21 +355,21 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     <div className="flex-1 min-w-0 text-left">
                                         <div className="flex items-center gap-1.5 flex-wrap">
                                             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/30 uppercase tracking-wider">
-                                                {t('sponsored.badge')}
+                                                {ts('badge')}
                                             </span>
                                             <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold">
                                                 ⭐⭐⭐⭐⭐ (4.8)
                                             </span>
                                         </div>
                                         <h4 className="text-xs md:text-sm font-black text-amber-950 dark:text-amber-200 mt-1 truncate">
-                                            {t('sponsored.bookTitle')}
+                                            {ts('bookTitle')}
                                         </h4>
                                         <p className="text-[10px] md:text-xs text-amber-800/80 dark:text-amber-400/80 mt-0.5 truncate">
-                                            {t('sponsored.bookTagline')}
+                                            {ts('bookTagline')}
                                         </p>
                                     </div>
                                     <div className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-black uppercase text-amber-600 dark:text-amber-400 gap-0.5 bg-amber-100/50 dark:bg-amber-900/30 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-amber-200/40 dark:border-amber-800/40 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 transition-all duration-200">
-                                        <span className="hidden sm:inline">{t('sponsored.ctaBook')}</span>
+                                        <span className="hidden sm:inline">{ts('ctaBook')}</span>
                                         <span className="sm:hidden">Amazon</span>
                                         <ChevronRight className="w-3.5 h-3.5" />
                                     </div>
