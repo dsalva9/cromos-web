@@ -135,6 +135,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             is_group: item.is_group,
             group_count: item.group_count,
             author_completed_trades: item.author_completed_trades,
+            author_is_patron: item.author_is_patron,
         }));
 
         return { listings: listings as Listing[], userPostcode };

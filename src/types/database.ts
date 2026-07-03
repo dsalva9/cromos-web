@@ -4499,6 +4499,7 @@ export type Database = {
         Returns: {
           author_avatar_url: string
           author_completed_trades: number
+          author_is_patron: boolean
           author_nickname: string
           author_postcode: string
           collection_name: string
