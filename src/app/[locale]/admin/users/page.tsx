@@ -36,13 +36,10 @@ function UserSearchContent() {
 
     setTogglingPatronId(userId);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          is_patron: !currentStatus,
-          patron_since: !currentStatus ? new Date().toISOString() : null
-        })
-        .eq('id', userId);
+      const { error } = await (supabase.rpc as any)('admin_update_patron_status', {
+        p_user_id: userId,
+        p_is_patron: !currentStatus
+      });
 
       if (error) throw error;
 
