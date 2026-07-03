@@ -44,6 +44,9 @@ if (SENTRY_DSN) {
             'Attempt to get a record from database without an in-progress transaction',
             // OneSignal/external IndexedDB issue: transaction requested while DB connection is closing.
             "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.",
+            // WebKit/Safari IndexedDB internal database server crashes / process terminations
+            'An internal error was encountered in the Indexed Database server',
+            'Connection to Indexed Database server lost',
             // Chrome extension/port error injected into the page.
             'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
         ],
@@ -77,6 +80,16 @@ if (SENTRY_DSN) {
                 message.includes('AbortError') ||
                 message.includes('signal is aborted') ||
                 type === 'AbortError'
+            ) {
+                return null;
+            }
+
+            // Drop Safari/WebKit IndexedDB internal database server crashes and lost connections
+            if (
+                message.includes('Indexed Database server') ||
+                message.includes('Indexed Database') ||
+                message.includes('IndexedDB') ||
+                message.includes('Connection to Indexed Database server lost')
             ) {
                 return null;
             }
