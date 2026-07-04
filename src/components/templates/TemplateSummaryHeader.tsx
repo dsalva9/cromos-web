@@ -1,13 +1,11 @@
 'use client';
 
-import { Check, X, Copy as CopyIcon, Trophy, User, ShoppingBag, QrCode } from 'lucide-react';
+import { Check, X, Copy as CopyIcon, Trophy, User, ShoppingBag } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { ImageModal } from '@/components/ui/ImageModal';
 import { useTranslations } from 'next-intl';
-import { useUser } from '@/components/providers/SupabaseProvider';
-import { TradeQRModal } from '@/components/qr/TradeQRModal';
 
 interface TemplateCopy {
   copy_id: number;
@@ -40,8 +38,6 @@ export function TemplateSummaryHeader({
 }: TemplateSummaryHeaderProps) {
   const t = useTranslations('templates.summaryHeader');
   const [imageModalOpen, setImageModalOpen] = useState(false);
-  const [qrModalOpen, setQrModalOpen] = useState(false);
-  const { user } = useUser();
   const stats = useMemo(() => {
     // Count owned (tengo) - slots with status='owned' OR status='duplicate'
     // If you have duplicates, you still HAVE the cromo (it counts as owned)
@@ -215,30 +211,7 @@ export function TemplateSummaryHeader({
 
         </div>
 
-        {/* QR share button */}
-        {user && (
-          <div className="px-6 md:px-8 pb-5 -mt-2">
-            <button
-              onClick={() => setQrModalOpen(true)}
-              className="inline-flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-            >
-              <QrCode className="w-4 h-4" />
-              Compartir QR
-            </button>
-          </div>
-        )}
       </div>
-
-      {user && (
-        <TradeQRModal
-          open={qrModalOpen}
-          onOpenChange={setQrModalOpen}
-          userId={user.id}
-          copyId={copy.copy_id}
-          copyTitle={copy.title}
-          nickname={user.user_metadata?.nickname ?? user.email ?? 'yo'}
-        />
-      )}
     </div>
   );
 }

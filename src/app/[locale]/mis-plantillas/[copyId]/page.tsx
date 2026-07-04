@@ -10,7 +10,7 @@ import { QuickEntryModal } from '@/components/templates/QuickEntryModal';
 import { ListingsModal } from '@/components/templates/ListingsModal';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb, Plus, List } from 'lucide-react';
+import { ArrowLeft, Zap, Trash2, PackagePlus, Lightbulb, Plus, List, QrCode } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { useMarketplaceAvailabilitySlots } from '@/hooks/marketplace/useMarketplaceAvailability';
@@ -26,6 +26,8 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { TradeQRModal } from '@/components/qr/TradeQRModal';
 
 function TemplateProgressContent() {
   const params = useParams();
@@ -35,6 +37,8 @@ function TemplateProgressContent() {
   const [listingsOpen, setListingsOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+  const { user } = useUser();
 
   const tListings = useTranslations('templates.listings');
 
@@ -186,6 +190,18 @@ function TemplateProgressContent() {
               {tListings('buttonLabel')}
             </Button>
 
+            {/* Compartir QR */}
+            {user && (
+              <Button
+                onClick={() => setQrModalOpen(true)}
+                variant="outline"
+                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold w-full sm:w-auto"
+              >
+                <QrCode className="mr-2 h-4 w-4" />
+                Compartir QR
+              </Button>
+            )}
+
             {/* Delete Button */}
             <Button
               onClick={() => setDeleteDialogOpen(true)}
@@ -253,6 +269,18 @@ function TemplateProgressContent() {
           progress={progress}
           copy={copy}
         />
+
+        {/* Trade QR Modal */}
+        {user && (
+          <TradeQRModal
+            open={qrModalOpen}
+            onOpenChange={setQrModalOpen}
+            userId={user.id}
+            copyId={copy.copy_id}
+            copyTitle={copy.title}
+            nickname={user.user_metadata?.nickname ?? user.email ?? 'yo'}
+          />
+        )}
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
