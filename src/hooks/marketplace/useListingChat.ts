@@ -14,7 +14,7 @@ import {
 import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
-import { containsUrl, isPdfFile, MAX_PDF_SIZE_BYTES } from '@/lib/validations/chat';
+import { containsUrl, containsForbiddenAppText, isPdfFile, MAX_PDF_SIZE_BYTES } from '@/lib/validations/chat';
 
 interface UseListingChatOptions {
   listingId: number;
@@ -102,6 +102,12 @@ export function useListingChat({
       // Block URLs in message text
       if (text.trim() && containsUrl(text)) {
         toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
+        return;
+      }
+
+      // Block forbidden app text in message text
+      if (text.trim() && containsForbiddenAppText(text)) {
+        toast.error('No se permite publicidad de otras apps.');
         return;
       }
 

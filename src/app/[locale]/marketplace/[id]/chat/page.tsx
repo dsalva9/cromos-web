@@ -28,7 +28,7 @@ import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { logger } from '@/lib/logger';
 import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
-import { containsUrl, downloadFile } from '@/lib/validations/chat';
+import { containsUrl, containsForbiddenAppText, downloadFile } from '@/lib/validations/chat';
 
 import { BmacChatPrompt } from '@/components/chats/BmacChatPrompt';
 
@@ -368,6 +368,12 @@ function ListingChatPageContent() {
     // Block URLs in message text
     if (messageText.trim() && containsUrl(messageText)) {
       toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
+      return;
+    }
+
+    // Block forbidden app text in message text
+    if (messageText.trim() && containsForbiddenAppText(messageText)) {
+      toast.error('No se permite publicidad de otras apps.');
       return;
     }
 

@@ -847,7 +847,8 @@
     "pricePositive": "Price must be greater than 0",
     "priceMax": "Price cannot exceed 99999",
     "termsRequired": "You must accept the terms and conditions",
-    "priceRequired": "Price is required for sales"
+    "priceRequired": "Price is required for sales",
+    "forbiddenAppText": "Advertising other apps is not allowed"
   },
   "admin": {
     "index": {

@@ -13,6 +13,7 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { containsForbiddenAppText } from '@/lib/validations/chat';
 import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useTranslations } from 'next-intl';
@@ -34,8 +35,14 @@ const baseSimplifiedListingSchema = z.object({
 type SimplifiedListingFormData = z.infer<typeof baseSimplifiedListingSchema>;
 
 const getSimplifiedListingSchema = (t: (key: string) => string) => z.object({
-  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')),
-  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')),
+  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')).refine(
+    (val) => !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
+  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')).refine(
+    (val) => !val || !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
   image_url: z.string().min(1, t('imageRequired')),
   collection_name: z.string().optional().or(z.literal('')),
   is_group: z.boolean(),

@@ -14,6 +14,15 @@ export function containsUrl(text: string): boolean {
   return URL_PATTERN.test(text);
 }
 
+export function containsForbiddenAppText(text: string): boolean {
+  const normalized = text.toLowerCase();
+  return (
+    normalized.includes('figuritas app') ||
+    normalized.includes('app figuritas') ||
+    normalized.includes('figuritas.app')
+  );
+}
+
 /** Maximum PDF file size in bytes (2MB) */
 export const MAX_PDF_SIZE_BYTES = 2 * 1024 * 1024;
 

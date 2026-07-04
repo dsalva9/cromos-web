@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { containsForbiddenAppText } from './chat';
 
 const baseListingSchema = z.object({
   title: z.string(),
@@ -18,8 +19,14 @@ const baseListingSchema = z.object({
 export type ListingFormData = z.infer<typeof baseListingSchema>;
 
 export const getListingSchema = (t: (key: string) => string) => z.object({
-  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')),
-  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')),
+  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')).refine(
+    (val) => !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
+  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')).refine(
+    (val) => !val || !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
   sticker_number: z.string().max(50, t('stickerMax')).optional().or(z.literal('')),
   collection_name: z.string().max(100, t('collectionMax')).optional().or(z.literal('')),
   image_url: z.string().min(1, t('imageRequired')).url(t('imageInvalid')),
@@ -51,8 +58,14 @@ const baseEditListingSchema = z.object({
 export type EditListingFormData = z.infer<typeof baseEditListingSchema>;
 
 export const getEditListingSchema = (t: (key: string) => string) => z.object({
-  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')),
-  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')),
+  title: z.string().min(3, t('titleMin')).max(100, t('titleMax')).refine(
+    (val) => !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
+  description: z.string().max(1000, t('descriptionMax')).optional().or(z.literal('')).refine(
+    (val) => !val || !containsForbiddenAppText(val),
+    { message: t('forbiddenAppText') }
+  ),
   image_url: z.string().min(1, t('imageRequired')).url(t('imageInvalid')),
   listing_type: z.enum(['intercambio', 'venta', 'ambos']),
   price: z.number().positive(t('pricePositive')).max(99999, t('priceMax')).optional(),
