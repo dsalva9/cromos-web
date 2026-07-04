@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import jsQR from 'jsqr';
-import { ScanLine, X, Flashlight, FlashlightOff, AlertCircle } from 'lucide-react';
+import { ScanLine, X, Flashlight, FlashlightOff, AlertCircle, ImageUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,6 +24,7 @@ const MATCH_PATH_RE = /\/match\/([^/?]+)\/([^/?]+)/;
 export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const torchRef = useRef<boolean>(false);
@@ -33,6 +34,7 @@ export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
   const [torch, setTorch] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   const router = useRouter();
   const locale = useLocale();
@@ -112,6 +114,7 @@ export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
 
   const startCamera = useCallback(async () => {
     setError(null);
+    setFileError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -151,12 +154,51 @@ export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
     }
   }, []);
 
+  // ── File-based QR scanning ──────────────────────────────────────────
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileError(null);
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) { URL.revokeObjectURL(url); return; }
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) { URL.revokeObjectURL(url); return; }
+
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, {
+        inversionAttempts: 'attemptBoth',
+      });
+      if (code?.data) {
+        handleResult(code.data);
+      } else {
+        setFileError('No se encontró ningún código QR en la imagen. Asegúrate de que sea clara y esté bien encuadrada.');
+      }
+      // Reset input so the same file can be selected again if needed
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setFileError('No se pudo cargar la imagen.');
+    };
+    img.src = url;
+  }, [handleResult]);
+
   useEffect(() => {
     if (open) {
       startCamera();
     } else {
       stopCamera();
       setError(null);
+      setFileError(null);
       setTorch(false);
       torchRef.current = false;
     }
@@ -188,7 +230,7 @@ export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
             </div>
           ) : (
             <>
-              {/* Hidden canvas used for QR decoding */}
+              {/* Hidden canvas used for QR decoding (camera + file) */}
               <canvas ref={canvasRef} className="hidden" />
 
               {/* Video preview */}
@@ -245,11 +287,39 @@ export function QRScannerModal({ open, onOpenChange }: QRScannerModalProps) {
           )}
         </div>
 
-        {/* Close button */}
-        <div className="p-3">
+        {/* File error banner */}
+        {fileError && (
+          <div className="mx-3 mt-2 flex items-start gap-2 rounded-lg bg-red-950/60 border border-red-800 px-3 py-2">
+            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-300">{fileError}</p>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="p-3 flex gap-2">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {/* Upload QR image */}
           <Button
             variant="outline"
-            className="w-full border-gray-700 text-gray-300 hover:text-white hover:border-gray-500"
+            className="flex-1 border-gray-700 text-gray-300 hover:text-white hover:border-gray-500"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <ImageUp className="w-4 h-4 mr-2" />
+            Subir imagen
+          </Button>
+
+          {/* Cancel */}
+          <Button
+            variant="outline"
+            className="flex-1 border-gray-700 text-gray-300 hover:text-white hover:border-gray-500"
             onClick={() => onOpenChange(false)}
           >
             <X className="w-4 h-4 mr-2" />
