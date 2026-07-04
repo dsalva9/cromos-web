@@ -2,7 +2,7 @@
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
     LayoutGrid,
     Check,
@@ -10,12 +10,15 @@ import {
     User,
     Trophy,
     ArrowRight,
-    ShoppingBag
+    ShoppingBag,
+    QrCode,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TemplateCopy } from '@/lib/templates/server-my-templates';
 import { useMarketplaceAvailabilityCounts } from '@/hooks/marketplace/useMarketplaceAvailability';
 import { useTranslations } from 'next-intl';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { TradeQRModal } from '@/components/qr/TradeQRModal';
 
 interface MyTemplatesContentProps {
     copies: TemplateCopy[];
@@ -24,6 +27,10 @@ interface MyTemplatesContentProps {
 export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
     const { counts: availabilityCounts } = useMarketplaceAvailabilityCounts();
     const t = useTranslations('templates');
+    const { user } = useUser();
+
+    // QR modal state — tracks which copy's QR to show
+    const [qrCopy, setQrCopy] = useState<TemplateCopy | null>(null);
 
     // Build a lookup: copy_id → missing_in_marketplace count
     const availabilityMap = useMemo(() => {
@@ -35,7 +42,8 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
     }, [availabilityCounts]);
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <div className="container mx-auto px-4 py-8 md:py-12">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
@@ -187,9 +195,25 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                                                         <ArrowRight className="w-3.5 h-3.5 ml-auto text-gold transform group-hover/cta:translate-x-1 transition-transform" />
                                                     </Link>
                                                 )}
-                                                <div className="flex items-center justify-between text-sm font-black uppercase tracking-wide text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">
-                                                    <span>{t('myTemplates.manage')}</span>
-                                                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                                {/* QR + Manage row */}
+                                                <div className="flex items-center justify-between">
+                                                    {user && (
+                                                        <button
+                                                            onClick={(e: React.MouseEvent) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                setQrCopy(copy);
+                                                            }}
+                                                            className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                                                        >
+                                                            <QrCode className="w-3.5 h-3.5" />
+                                                            QR
+                                                        </button>
+                                                    )}
+                                                    <div className="flex items-center gap-2 text-sm font-black uppercase tracking-wide text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors ml-auto">
+                                                        <span>{t('myTemplates.manage')}</span>
+                                                        <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -201,5 +225,18 @@ export function MyTemplatesContent({ copies }: MyTemplatesContentProps) {
                 )}
             </div>
         </div>
+
+        {/* QR Modal — rendered once outside the list to avoid per-card DOM cost */}
+        {user && qrCopy && (
+            <TradeQRModal
+                open={!!qrCopy}
+                onOpenChange={(open) => { if (!open) setQrCopy(null); }}
+                userId={user.id}
+                copyId={Number(qrCopy.copy_id)}
+                copyTitle={qrCopy.title}
+                nickname={user.user_metadata?.nickname ?? user.email ?? 'yo'}
+            />
+        )}
+        </>
     );
 }

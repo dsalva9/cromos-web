@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Store, Library, MessageCircle, ArrowLeftRight, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen, BellPlus, Coffee } from 'lucide-react';
+import { Store, Library, MessageCircle, ArrowLeftRight, Heart, Menu, Package, FileText, Settings, LogOut, Shield, BookOpen, BellPlus, Coffee, ScanLine } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
@@ -12,6 +12,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
+import { QRScannerModal } from '@/components/qr/QRScannerModal';
 
 /** Strip the locale prefix from a pathname for active-state matching. */
 function stripLocale(path: string): string {
@@ -25,6 +26,7 @@ export function MobileBottomNav() {
   const t = useTranslations('navigation');
   const tu = useTranslations('userMenu');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const supabase = useSupabaseClient();
   const router = useRouter();
 
@@ -223,6 +225,20 @@ export function MobileBottomNav() {
               <span className="font-medium">{t('blog')}</span>
             </a>
 
+            {/* QR Scanner — opens inline, no navigation */}
+            <button
+              type="button"
+              onClick={() => {
+                hapticImpact();
+                setIsMenuOpen(false);
+                setScannerOpen(true);
+              }}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-full text-left"
+            >
+              <ScanLine className="h-5 w-5 text-gold" />
+              <span className="font-medium">Escanear QR</span>
+            </button>
+
             <a
               href="/favorites"
               onClick={(e) => {
@@ -359,6 +375,9 @@ export function MobileBottomNav() {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* QR Scanner — triggered from hamburger menu */}
+      <QRScannerModal open={scannerOpen} onOpenChange={setScannerOpen} />
     </>
   );
 }

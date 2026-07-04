@@ -14,7 +14,8 @@ import {
   AlertCircle,
   ClipboardList,
   RefreshCcw,
-  XCircle
+  XCircle,
+  QrCode,
 } from 'lucide-react';
 
 import { 
@@ -31,6 +32,8 @@ import { generateShareText } from '@/utils/generateShareText';
 import { generateListingDocument } from '@/utils/generateListingDocument';
 import type { SlotProgress } from '@/types/v1.6.0';
 import { siteConfig } from '@/config/site';
+import { useUser } from '@/components/providers/SupabaseProvider';
+import { TradeQRModal } from '@/components/qr/TradeQRModal';
 
 // ── SVG Brand Icons (from ShareButton.tsx) ────────────────────────
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -71,6 +74,7 @@ interface ListingsModalProps {
   progress: SlotProgress[];
   copy: {
     title: string;
+    copy_id?: number;
   };
 }
 
@@ -82,8 +86,10 @@ export function ListingsModal({
 }: ListingsModalProps) {
   const t = useTranslations('templates.listings');
   const locale = useLocale();
+  const { user } = useUser();
 
-  const [activeTab, setActiveTab] = useState<'download' | 'share'>('download');
+  const [activeTab, setActiveTab] = useState<'download' | 'share' | 'qr'>('download');
+  const [qrOpen, setQrOpen] = useState(false);
   const [downloadType, setDownloadType] = useState<'dupes' | 'missing' | 'summary'>('dupes');
   const [shareType, setShareType] = useState<'dupes' | 'missing' | 'all'>('all');
   const [format, setFormat] = useState<'pdf' | 'jpeg'>('pdf');
@@ -303,9 +309,13 @@ export function ListingsModal({
         {/* Tab content wrapper */}
         <div className="flex-1 overflow-y-auto p-6 pt-4">
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-            <TabsList className="grid grid-cols-2 mb-6">
+            <TabsList className="grid grid-cols-3 mb-6">
               <TabsTrigger value="download">📥 {t('downloadTab')}</TabsTrigger>
               <TabsTrigger value="share">📤 {t('shareTab')}</TabsTrigger>
+              <TabsTrigger value="qr">
+                <QrCode className="w-3.5 h-3.5 mr-1" />
+                QR
+              </TabsTrigger>
             </TabsList>
 
             {/* TAB: DOWNLOAD */}
@@ -569,8 +579,42 @@ export function ListingsModal({
                 </Button>
               </div>
             </TabsContent>
+
+            {/* TAB: QR */}
+            <TabsContent value="qr" className="space-y-4 outline-none">
+              {user && copy.copy_id ? (
+                <div className="flex flex-col items-center gap-4 py-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-xs">
+                    Genera tu código QR personal para que otro coleccionista lo escanee y vea instantáneamente qué cromos podéis intercambiar.
+                  </p>
+                  <Button
+                    className="bg-gold text-black hover:bg-yellow-400 font-bold px-8"
+                    onClick={() => setQrOpen(true)}
+                  >
+                    <QrCode className="w-4 h-4 mr-2" />
+                    Generar QR de intercambio
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
+                  Inicia sesión para generar tu QR de intercambio.
+                </p>
+              )}
+            </TabsContent>
           </Tabs>
         </div>
+
+        {/* QR Modal */}
+        {user && copy.copy_id && (
+          <TradeQRModal
+            open={qrOpen}
+            onOpenChange={setQrOpen}
+            userId={user.id}
+            copyId={copy.copy_id}
+            copyTitle={copy.title}
+            nickname={user.user_metadata?.nickname ?? user.email ?? 'yo'}
+          />
+        )}
 
       </DialogContent>
     </Dialog>

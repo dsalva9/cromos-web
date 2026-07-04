@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Lightbulb,
   Sparkles,
+  ScanLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +30,7 @@ import { MatchGridView } from '@/components/trades/MatchGridView';
 import { ExhaustedCard } from '@/components/trades/RadiusExpansionCard';
 import { useMatchSwiper, RADIUS_TIERS } from '@/hooks/trades/useMatchSwiper';
 import AuthGuard from '@/components/AuthGuard';
+import { QRScannerModal } from '@/components/qr/QRScannerModal';
 
 // ------------------------------------------------------------------
 // Constants
@@ -124,6 +126,9 @@ function MatchFinderContent() {
     youHaveCount?: number;
     distanceKm?: number | null;
   } | null>(null);
+
+  // ---- QR scanner ----
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   // ---- Carousel history (last passed card for peek) ----
   const [lastPassedMatch, setLastPassedMatch] = useState<typeof swiper.currentMatch>(null);
@@ -260,8 +265,21 @@ function MatchFinderContent() {
                   <span className="ml-1 w-2 h-2 bg-red-500 rounded-full inline-block" />
                 )}
               </Button>
+
+              {/* QR Scan button */}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setScannerOpen(true)}
+                className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 border-2 border-black font-bold uppercase text-xs rounded-md hover:bg-gold hover:text-gray-900"
+              >
+                <ScanLine className="w-4 h-4" />
+              </Button>
             </div>
           </div>
+
+          <QRScannerModal open={scannerOpen} onOpenChange={setScannerOpen} />
 
           {/* Collection selector — always visible as a compact bar */}
           <div className="mt-3 relative">

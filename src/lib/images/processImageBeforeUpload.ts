@@ -114,7 +114,8 @@ export async function processImageBeforeUpload(
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
         }
 
-        // Check for QR code in the image
+        // Check for QR code in the image.
+        // Exception: CambioCromos own trade-match QR codes are allowed.
         try {
           const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
           const qrCode = jsQR(
@@ -125,13 +126,19 @@ export async function processImageBeforeUpload(
           );
 
           if (qrCode) {
-            cleanup();
-            reject(
-              new Error(
-                'Subida bloqueada: No se permiten códigos QR en las imágenes. / Upload blocked: QR codes are not allowed in listing images.'
-              )
-            );
-            return;
+            const isOwnQR =
+              qrCode.data.includes('cambiocromos.com/match/') ||
+              qrCode.data.includes('localhost') && qrCode.data.includes('/match/');
+
+            if (!isOwnQR) {
+              cleanup();
+              reject(
+                new Error(
+                  'Subida bloqueada: No se permiten códigos QR en las imágenes. / Upload blocked: QR codes are not allowed in listing images.'
+                )
+              );
+              return;
+            }
           }
         } catch (scanError) {
           // Log scan error but don't block uploads if the scanner fails unexpectedly
