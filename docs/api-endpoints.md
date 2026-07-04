@@ -428,6 +428,114 @@ The following RPCs were part of the legacy collections system and have been remo
 
 ---
 
+## Trade Confirmation RPCs ✅ **v1.6.3 NEW**
+
+- `request_trade_confirmation`
+  ```sql
+  request_trade_confirmation(
+    p_listing_id BIGINT,
+    p_confirmer_id UUID,
+    p_sticker_count INTEGER,
+    p_note TEXT DEFAULT NULL
+  ) RETURNS BIGINT;
+  ```
+
+- `request_match_trade_confirmation`
+  ```sql
+  request_match_trade_confirmation(
+    p_match_conversation_id UUID,
+    p_confirmer_id UUID,
+    p_sticker_count INTEGER,
+    p_note TEXT DEFAULT NULL
+  ) RETURNS BIGINT;
+  ```
+
+- `confirm_trade`
+  ```sql
+  confirm_trade(p_confirmation_id BIGINT) RETURNS BOOLEAN;
+  ```
+
+- `dismiss_trade_confirmation`
+  ```sql
+  dismiss_trade_confirmation(p_confirmation_id BIGINT) RETURNS BOOLEAN;
+  ```
+
+---
+
+## Marketplace Alerts RPCs ✅ **v1.6.3 NEW**
+
+- `get_user_alerts`
+  ```sql
+  get_user_alerts()
+  RETURNS TABLE (
+    id BIGINT,
+    search_query TEXT,
+    collection_id BIGINT,
+    template_id BIGINT,
+    slot_number INTEGER,
+    slot_variant TEXT,
+    frequency TEXT,
+    channel_email BOOLEAN,
+    channel_push BOOLEAN,
+    channel_in_app BOOLEAN,
+    is_active BOOLEAN,
+    created_at TIMESTAMPTZ,
+    template_name TEXT
+  );
+  ```
+
+- `create_marketplace_alert`
+  ```sql
+  create_marketplace_alert(
+    p_search_query TEXT DEFAULT NULL,
+    p_collection_id BIGINT DEFAULT NULL,
+    p_template_id BIGINT DEFAULT NULL,
+    p_slot_number INTEGER DEFAULT NULL,
+    p_slot_variant TEXT DEFAULT NULL,
+    p_frequency TEXT DEFAULT 'weekly',
+    p_channel_email BOOLEAN DEFAULT TRUE,
+    p_channel_push BOOLEAN DEFAULT FALSE,
+    p_channel_in_app BOOLEAN DEFAULT TRUE
+  ) RETURNS BIGINT;
+  ```
+
+- `update_marketplace_alert`
+  ```sql
+  update_marketplace_alert(
+    p_alert_id BIGINT,
+    p_search_query TEXT DEFAULT NULL,
+    p_collection_id BIGINT DEFAULT NULL,
+    p_template_id BIGINT DEFAULT NULL,
+    p_slot_number INTEGER DEFAULT NULL,
+    p_slot_variant TEXT DEFAULT NULL,
+    p_frequency TEXT DEFAULT 'weekly',
+    p_channel_email BOOLEAN DEFAULT TRUE,
+    p_channel_push BOOLEAN DEFAULT FALSE,
+    p_channel_in_app BOOLEAN DEFAULT TRUE
+  ) RETURNS VOID;
+  ```
+
+- `delete_marketplace_alert`
+  ```sql
+  delete_marketplace_alert(p_alert_id BIGINT) RETURNS VOID;
+  ```
+
+- `toggle_marketplace_alert`
+  ```sql
+  toggle_marketplace_alert(p_alert_id BIGINT) RETURNS BOOLEAN;
+  ```
+
+---
+
+## GDPR & Retention RPCs ✅ **v1.6.3 NEW**
+
+- `process_retention_schedule`
+  ```sql
+  process_retention_schedule() RETURNS JSONB;
+  ```
+
+---
+
 ## Edge Functions
 
 ### `send-email-notification`

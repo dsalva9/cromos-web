@@ -688,12 +688,19 @@ Sprint 15 completely modernized the notifications system to support all major pl
 | Marketplace UI      | ✅      | ✅       | Complete  |
 | Templates Backend   | ✅      | ✅       | Complete  |
 | Templates UI        | ✅      | ✅       | Complete  |
-| Integration Backend | ✅      | ❌       | Complete  |
-| Integration UI      | ❌      | ❌       | Sprint 9  |
-| Social Backend      | ✅      | ❌       | Complete  |
-| Social UI           | ❌      | ❌       | Sprint 10 |
-| Admin Moderation    | ✅      | ❌       | Complete  |
-| Admin UI            | ❌      | ❌       | Sprint 11 |
+| Integration Backend | ✅      | ✅       | Complete  |
+| Integration UI      | ✅      | ✅       | Complete  |
+| Social Backend      | ✅      | ✅       | Complete  |
+| Social UI           | ✅      | ✅       | Complete  |
+| Admin Moderation    | ✅      | ✅       | Complete  |
+| Admin UI            | ✅      | ✅       | Complete  |
+| **Phase 1.5 - New** |         |          |           |
+| Marketplace Alerts  | ✅      | ✅       | Complete  |
+| XP & Levels System  | ✅      | ✅       | Complete  |
+| GDPR & Retention    | ✅      | ✅       | Complete  |
+| Geo-Matching & PCs  | ✅      | ✅       | Complete  |
+| User Ignore & Block | ✅      | ✅       | Complete  |
+| Adblocker & Ads     | ✅      | ✅       | Complete  |
 
 **Legend:**  
 ✅ Complete | 🚧 In Progress | ❌ Not Started
@@ -806,19 +813,18 @@ Sprint 15 completely modernized the notifications system to support all major pl
 - Complete UI for page-based navigation
 - Enhanced sticker management with WebP optimization
 
-**Current Status**: Database at v1.6.0-alpha ✅ | Frontend at v1.6.0
-**Next Focus**: Sprint 9: Integration UI
+**Current Status**: Database at v1.6.3 ✅ | Frontend at v1.6.3
+**Next Focus**: Maintenance, Optimization & Community Feedback
 
 ---
 
 ## 📚 Documentation Status
 
-- **database-schema.md**: ✅ Updated with all systems including admin moderation
-- **current-features.md**: ✅ Updated to reflect Sprint 5 completion
-- **CHANGELOG.md**: ✅ Updated with Sprint 5 progress
-- **TODO.md**: ✅ Updated with Sprint 5 completion
-- **api-endpoints.md**: ⏳ Needs update with admin moderation RPCs
-- **components-guide.md**: ⏳ Needs update for new components
+- **database-schema.md**: ✅ Updated with all tables (confirmations, alerts, GDPR, ignored users)
+- **current-features.md**: ✅ Updated to reflect v1.6.3 completion
+- **CHANGELOG.md**: ✅ Updated with latest releases
+- **api-endpoints.md**: ✅ Updated with all RPCs and custom functions
+- **components-guide.md**: ✅ Updated with modern components (ListingsModal, AdBanner, AlertForm)
 
 ---
 
@@ -850,6 +856,28 @@ Sprint 15 completely modernized the notifications system to support all major pl
 
 ---
 
-**Last Updated**: 2025-10-30 (Sprint 16 Complete)
-**Current Version**: v1.6.0
-**Status**: Phase 0 Complete ✅ | Sprints 1-16 Complete ✅ | **PRODUCTION READY** 🚀
+### Sprints 17-20: Advanced Business Systems ✅ **COMPLETE (2026-07-04)**
+
+**Transaction Validation & Reputation:**
+- ✅ Implemented `trade_confirmations` system requiring chat messages prior to validation request.
+- ✅ Integrated automatic reputation rank updates (`Novato` to `Leyenda`) based on confirmed trades.
+
+**Marketplace Alerts & Cooldowns:**
+- ✅ Created instantaneous notifications and daily/weekly digests via email, push, and in-app triggers.
+- ✅ Implemented a 1-hour cooldown constraint for instant alerts to prevent spamming.
+
+**GDPR Compliance & Retention Scheduler:**
+- ✅ Added `retention_schedule` for deferring hard deletions (90 days) and handling legal holds.
+- ✅ Automated database cleanup with `process_retention_schedule` running daily.
+
+**Geocoding & Autocomplete:**
+- ✅ Added multi-country postcode rules and database integrity checks for profiles (`validate_profile_postcode`).
+
+**Adblocker & Sponsored Content:**
+- ✅ Developed bait-element adblocker warning and integrated responsive Amazon affiliate banners.
+
+---
+
+**Last Updated**: 2026-07-04 (v1.6.3 Complete)
+**Current Version**: v1.6.3
+**Status**: Phase 0 Complete ✅ | Sprints 1-20 Complete ✅ | **PRODUCTION READY** 🚀

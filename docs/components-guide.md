@@ -1967,6 +1967,106 @@ Converts raw notifications into Spanish user-friendly messages.
 - "hace 2 semanas"
 - "hace 1 mes"
 
+## Advanced Business Components (v1.6.3) ✅ **COMPLETE**
+
+### ListingsModal
+
+**File:** `src/components/collection/ListingsModal.tsx`
+
+Allows collectors to export lists of duplicate or missing stickers as PDF or CSV files, or share them directly on social networks.
+
+```typescript
+interface ListingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  copyId: number;
+  collectionTitle: string;
+}
+```
+
+**Features:**
+- Filter by Dupes (Repetidos), Missing (Faltantes), or Summary (Resumen).
+- Client-side PDF generation with styled layout.
+- CSV generation for spreadsheet imports.
+- One-click share to WhatsApp, Telegram, Facebook, and Twitter/X.
+
 ---
 
-**Last Updated:** 2025-10-25 (Sprint 15 - Notifications System Complete)
+### AdBanner & Adblocker Detector
+
+**File:** `src/components/ads/AdBanner.tsx`
+
+Handles responsive banner delivery and detects active ad-blocking extensions on the client.
+
+```typescript
+export function AdBanner()
+```
+
+**Features:**
+- Sets CSS custom property `--desktop-ad-height` dynamically.
+- Automatically excludes paths like `/login`, `/admin`, `/advertise`.
+- Employs a bait element with standard ad classes (`doubleclick-ad`, `ad-space`) to verify if they are hidden.
+- Displays an adblocker dialog recommending disabling the blocker.
+
+---
+
+### AlertForm & AlertList
+
+**Files:**
+- `src/components/alerts/AlertForm.tsx`
+- `src/components/alerts/AlertList.tsx`
+
+UI components for configuring and managing marketplace listing notifications.
+
+```typescript
+interface AlertFormProps {
+  initialData?: MarketplaceAlert | null;
+  prefill?: CreateAlertPrefillParams;
+  onSubmit: (params: CreateAlertParams) => Promise<void>;
+  onCancel?: () => void;
+  isSubmitting?: boolean;
+}
+```
+
+**Features:**
+- Supports text inputs, templates, specific page/slot variations.
+- Cooldown and frequency selection (instant vs daily/weekly summaries).
+- Selection of channels (Email, Push, In-App).
+
+---
+
+### SponsoredCard
+
+**File:** `src/components/marketplace/SponsoredCard.tsx`
+
+A card listing representation that redirects to Amazon affiliate URLs.
+
+```typescript
+interface SponsoredCardProps {
+  product: SponsoredProduct;
+}
+```
+
+**Features:**
+- Responsive layout (looks identical to standard listing grids).
+- Displays rating stars with half-star support.
+- Renders tags like "Recomendado" and "Best Seller".
+
+---
+
+### BmacChatPrompt
+
+**File:** `src/components/chat/BmacChatPrompt.tsx`
+
+A prompt that encourages active users who are not patrons to support the platform.
+
+```typescript
+interface BmacChatPromptProps {
+  userId: string;
+  isPatron: boolean;
+}
+```
+
+---
+
+**Last Updated:** 2026-07-04 (v1.6.3 - Components Architecture Complete)

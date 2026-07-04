@@ -121,6 +121,11 @@ User profiles with ratings and admin status.
 - `login_streak_days` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
 - `last_login_date` DATE ✅ **v1.6.2 NEW**
 - `longest_login_streak` INTEGER DEFAULT 0 ✅ **v1.6.2 NEW**
+- `completed_trades` INTEGER DEFAULT 0 ✅ **v1.6.3 NEW**
+- `trade_reputation_tier` TEXT DEFAULT 'novato' ✅ **v1.6.3 NEW**
+- `is_patron` BOOLEAN DEFAULT FALSE ✅ **v1.6.3 NEW**
+- `patron_since` TIMESTAMPTZ DEFAULT NULL ✅ **v1.6.3 NEW**
+- `country_code` TEXT DEFAULT 'ES' ✅ **v1.6.3 NEW**
 
 **Indices:**
 
@@ -803,6 +808,136 @@ Materialized view for high-performance leaderboard queries.
 
 - `idx_leaderboard_user_id` UNIQUE ON (user_id)
 - `idx_leaderboard_rank` ON (rank)
+
+## Business & Advanced Systems ✅ **v1.6.3 NEW**
+
+### trade_confirmations
+
+Records formal confirmation requests and completions of physical trades between users.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('trade_confirmations_id_seq')
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE SET NULL
+- `match_conversation_id` UUID REFERENCES trade_conversations(id) ON DELETE SET NULL
+- `requester_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `confirmer_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `sticker_count` INTEGER DEFAULT 1 NOT NULL
+- `note` TEXT
+- `status` TEXT CHECK (status IN ('pending', 'confirmed', 'dismissed')) DEFAULT 'pending' NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `updated_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Indices:**
+
+- `idx_trade_confirmations_users` ON (requester_id, confirmer_id)
+- `idx_trade_confirmations_status` ON (status) WHERE status = 'pending'
+
+---
+
+### marketplace_alerts
+
+Stores alert parameters configured by users to notify them of new marketplace listings.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('marketplace_alerts_id_seq')
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `search_query` TEXT
+- `collection_id` BIGINT REFERENCES user_template_copies(id) ON DELETE CASCADE
+- `template_id` BIGINT REFERENCES collection_templates(id) ON DELETE CASCADE
+- `slot_number` INTEGER
+- `slot_variant` TEXT
+- `frequency` TEXT CHECK (frequency IN ('instant', 'daily', 'weekly')) DEFAULT 'weekly' NOT NULL
+- `channel_email` BOOLEAN DEFAULT TRUE NOT NULL
+- `channel_push` BOOLEAN DEFAULT FALSE NOT NULL
+- `channel_in_app` BOOLEAN DEFAULT TRUE NOT NULL
+- `is_active` BOOLEAN DEFAULT TRUE NOT NULL
+- `last_triggered_at` TIMESTAMPTZ
+- `last_digest_at` TIMESTAMPTZ
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `updated_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Indices:**
+
+- `idx_marketplace_alerts_user` ON (user_id)
+- `idx_marketplace_alerts_active_instant` ON (is_active, frequency)
+
+---
+
+### marketplace_alert_matches
+
+Tracks listings matching user alerts to build digests or deliver instant alerts.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('marketplace_alert_matches_id_seq')
+- `alert_id` BIGINT REFERENCES marketplace_alerts(id) ON DELETE CASCADE NOT NULL
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `notified_at` TIMESTAMPTZ
+
+---
+
+### ignored_users
+
+Tracks user blocks to filter content and prevent chats.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('ignored_users_id_seq')
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `ignored_user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Constraints:**
+
+- `ignored_users_unique` UNIQUE (user_id, ignored_user_id)
+
+---
+
+### ignored_listings
+
+Tracks listings that a user chooses to hide.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('ignored_listings_id_seq')
+- `user_id` UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL
+- `listing_id` BIGINT REFERENCES trade_listings(id) ON DELETE CASCADE NOT NULL
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Constraints:**
+
+- `ignored_listings_unique` UNIQUE (user_id, listing_id)
+
+---
+
+### retention_schedule
+
+Central planner for scheduled data anonymization/deletion to comply with GDPR.
+
+**Columns:**
+
+- `id` BIGINT PRIMARY KEY DEFAULT nextval('retention_schedule_id_seq')
+- `entity_type` TEXT CHECK (entity_type IN ('listing', 'template', 'user', 'message', 'report', 'rating', 'notification')) NOT NULL
+- `entity_id` TEXT NOT NULL
+- `action` TEXT CHECK (action IN ('delete', 'anonymize')) NOT NULL
+- `scheduled_for` TIMESTAMPTZ NOT NULL
+- `legal_hold_until` TIMESTAMPTZ
+- `initiated_by_type` TEXT CHECK (initiated_by_type IN ('user', 'admin', 'system')) NOT NULL
+- `initiated_by_id` UUID
+- `reason` TEXT
+- `processed_at` TIMESTAMPTZ
+- `error_log` TEXT
+- `created_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+- `updated_at` TIMESTAMPTZ DEFAULT NOW() NOT NULL
+
+**Indices:**
+
+- `idx_retention_schedule_pending` ON (scheduled_for) WHERE processed_at IS NULL
+
+---
 
 ## Storage Buckets
 
