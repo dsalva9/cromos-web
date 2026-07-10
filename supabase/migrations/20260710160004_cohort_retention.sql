@@ -68,16 +68,22 @@ BEGIN
 
     -- Loop over each month offset
     FOR v_month_offset IN 0..v_max_offset LOOP
-      v_target_month_start := (v_cohort_month + (v_month_offset || ' months')::INTERVAL);
-      v_target_month_end   := v_target_month_start + INTERVAL '1 month';
+      -- M+0 is always 100%: the act of registering = activation.
+      -- Checking last_activity_at for M+0 produces false zeros for backfilled data.
+      IF v_month_offset = 0 THEN
+        v_retained := v_cohort_size;
+      ELSE
+        v_target_month_start := (v_cohort_month + (v_month_offset || ' months')::INTERVAL);
+        v_target_month_end   := v_target_month_start + INTERVAL '1 month';
 
-      -- Retained: cohort users with any activity in the target month
-      SELECT COUNT(*) INTO v_retained
-      FROM public.profiles p
-      WHERE p.deleted_at IS NULL
-        AND DATE_TRUNC('month', p.created_at)::DATE = v_cohort_month
-        AND p.last_activity_at >= v_target_month_start
-        AND p.last_activity_at < v_target_month_end;
+        -- Retained: cohort users with any activity in the target month
+        SELECT COUNT(*) INTO v_retained
+        FROM public.profiles p
+        WHERE p.deleted_at IS NULL
+          AND DATE_TRUNC('month', p.created_at)::DATE = v_cohort_month
+          AND p.last_activity_at >= v_target_month_start
+          AND p.last_activity_at <  v_target_month_end;
+      END IF;
 
       INSERT INTO public.monthly_cohort_retention
         (cohort_month, months_after, cohort_size, retained_count, retention_pct, computed_at)
