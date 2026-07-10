@@ -215,9 +215,9 @@ function AdminDashboardContent() {
             <div className="flex items-center gap-2">
               <Clock className="h-6 w-6 text-red-500" />
               <div>
-                <h2 className="text-xl font-bold text-white">Items Pending Deletion</h2>
+                <h2 className="text-xl font-bold text-white">Items Pending Deletion & Archiving</h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Scheduled for permanent deletion with permanent delete option
+                  Scheduled for permanent deletion or archiving with manual override option
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ function AdminDashboardContent() {
                   Listings
                 </TabsTrigger>
                 <TabsTrigger value="expired" className="data-[state=active]:bg-gold data-[state=active]:text-black">
-                  Expired Listings
+                  Expired (Archiving)
                 </TabsTrigger>
                 <TabsTrigger value="templates" className="data-[state=active]:bg-gold data-[state=active]:text-black">
                   Templates

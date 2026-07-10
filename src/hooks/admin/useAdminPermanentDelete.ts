@@ -67,6 +67,33 @@ export function useAdminPermanentDelete() {
     }
   };
 
+  const archiveExpiredListing = async (
+    listingId: string,
+    listingTitle: string
+  ): Promise<{ success: boolean } | null> => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error: rpcError } = await supabase.rpc('admin_archive_expired_listing', {
+        p_listing_id: parseInt(listingId, 10),
+      });
+
+      if (rpcError) throw rpcError;
+
+      toast.success(`Anuncio "${listingTitle}" archivado correctamente`);
+      return data as unknown as { success: boolean };
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(errorMessage);
+      toast.error(`Error al archivar el anuncio: ${errorMessage}`);
+      logger.error('Error archiving expired listing:', err);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const permanentlyDeleteTemplate = async (
     templateId: string,
     templateTitle: string
@@ -98,6 +125,7 @@ export function useAdminPermanentDelete() {
     permanentlyDeleteUser,
     permanentlyDeleteListing,
     permanentlyDeleteTemplate,
+    archiveExpiredListing,
     loading,
     error,
   };

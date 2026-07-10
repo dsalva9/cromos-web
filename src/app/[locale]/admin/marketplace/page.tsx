@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useAdminListings } from '@/hooks/admin/useAdminListings';
@@ -82,7 +82,8 @@ function MarketplaceContent() {
       reserved: 'bg-blue-500/20 text-blue-500',
       completed: 'bg-gray-500/20 text-gray-500',
       suspended: 'bg-yellow-500/20 text-yellow-500',
-      removed: 'bg-red-500/20 text-red-500'
+      removed: 'bg-red-500/20 text-red-500',
+      archived: 'bg-purple-500/20 text-purple-400'
     };
     return variants[status as keyof typeof variants] || variants.active;
   };
@@ -123,6 +124,7 @@ function MarketplaceContent() {
               <SelectItem value="reserved">Reservado</SelectItem>
               <SelectItem value="completed">Completado</SelectItem>
               <SelectItem value="suspended">Suspendido</SelectItem>
+              <SelectItem value="archived">Archivado</SelectItem>
               <SelectItem value="removed">Eliminado</SelectItem>
             </SelectContent>
           </Select>

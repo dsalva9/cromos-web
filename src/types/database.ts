@@ -3048,6 +3048,10 @@ export type Database = {
         Args: { p_email: string }
         Returns: number
       }
+      admin_archive_expired_listing: {
+        Args: { p_listing_id: number }
+        Returns: Json
+      }
       admin_delete_collection: {
         Args: { p_collection_id: number }
         Returns: undefined
@@ -4281,7 +4285,6 @@ export type Database = {
         Returns: {
           counterparty_avatar_url: string
           counterparty_id: string
-          counterparty_is_patron: boolean
           counterparty_nickname: string
           is_seller: boolean
           last_message: string

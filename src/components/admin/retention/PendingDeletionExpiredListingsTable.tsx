@@ -21,13 +21,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Loader2, Package, AlertTriangle, Trash2, Shield, ExternalLink } from 'lucide-react';
+import { Loader2, Package, AlertTriangle, Shield, ExternalLink, Archive } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { LegalHoldControls } from './LegalHoldControls';
 
 export function PendingDeletionExpiredListingsTable() {
   const { listings, loading, error, refetch } = useAdminPendingDeletionExpiredListings();
-  const { permanentlyDeleteListing, loading: deleteLoading } = useAdminPermanentDelete();
+  const { archiveExpiredListing, loading: deleteLoading } = useAdminPermanentDelete();
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     listingId: string;
@@ -57,7 +57,7 @@ export function PendingDeletionExpiredListingsTable() {
   };
 
   const handleConfirmDelete = async () => {
-    const result = await permanentlyDeleteListing(
+    const result = await archiveExpiredListing(
       confirmDialog.listingId,
       confirmDialog.title
     );
@@ -88,7 +88,7 @@ export function PendingDeletionExpiredListingsTable() {
     return (
       <div className="text-center p-8 text-gray-400">
         <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No expired listings pending deletion</p>
+        <p>No expired listings pending archiving</p>
       </div>
     );
   }
@@ -110,7 +110,7 @@ export function PendingDeletionExpiredListingsTable() {
               <TableHead>Listing</TableHead>
               <TableHead>Collection</TableHead>
               <TableHead>Seller</TableHead>
-              <TableHead>Scheduled For</TableHead>
+              <TableHead>Scheduled For Archiving</TableHead>
               <TableHead>Days Remaining</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
@@ -189,11 +189,11 @@ export function PendingDeletionExpiredListingsTable() {
                       </Button>
                       <Button
                         size="sm"
-                        variant="destructive"
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
                         onClick={() => handleDeleteClick(String(listing.listing_id), listing.title)}
                         disabled={hasLegalHold || deleteLoading}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Archive className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -207,12 +207,12 @@ export function PendingDeletionExpiredListingsTable() {
       <Dialog open={confirmDialog.isOpen} onOpenChange={(open) => !open && setConfirmDialog({ isOpen: false, listingId: '', title: '' })}>
         <DialogContent className="bg-[#374151] border-2 border-black text-white">
           <DialogHeader>
-            <DialogTitle className="text-red-500 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Confirm Permanent Deletion
+            <DialogTitle className="text-purple-400 flex items-center gap-2">
+              <Archive className="h-5 w-5" />
+              Confirmar Archivado
             </DialogTitle>
             <DialogDescription className="text-gray-300">
-              This action is irreversible. The listing and all associated data will be permanently deleted.
+              El anuncio será archivado. Esto lo marcará como inactivo pero preservará su historial en el sistema.
             </DialogDescription>
           </DialogHeader>
           <div className="p-4 bg-[#1F2937] rounded-md border border-gray-700">
@@ -225,22 +225,22 @@ export function PendingDeletionExpiredListingsTable() {
               onClick={() => setConfirmDialog({ isOpen: false, listingId: '', title: '' })}
               disabled={deleteLoading}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
-              variant="destructive"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold"
               onClick={handleConfirmDelete}
               disabled={deleteLoading}
             >
               {deleteLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
+                  Archivando...
                 </>
               ) : (
                 <>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Permanently Delete
+                  <Archive className="h-4 w-4 mr-2" />
+                  Archivar ahora
                 </>
               )}
             </Button>
