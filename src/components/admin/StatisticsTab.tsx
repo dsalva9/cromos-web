@@ -168,7 +168,7 @@ function fmtWeek(d: string) {
 }
 
 /* ─── Known countries ─────────────────────────────────────────────── */
-const KNOWN_COUNTRIES = ['ES', 'AR', 'MX', 'CO', 'PT', 'BR', 'CL', 'PE', 'UY'];
+const KNOWN_COUNTRIES = ['ES', 'US', 'CO', 'MX', 'BR'];
 
 /* ─── Main component ──────────────────────────────────────────────── */
 export default function StatisticsTab() {
