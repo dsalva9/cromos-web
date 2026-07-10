@@ -547,15 +547,19 @@ Deno.serve(async (req) => {
         </div>
 
         <!-- Matches & Exchanges specific statistics section -->
-        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Matches e Intercambios del periodo:</h3>
+        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Matches e Intercambios:</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
           <div style="flex: 1; min-width: 150px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fbcfe8;">
             <div style="font-size: 24px; font-weight: bold; color: #db2777;">${periodTotals?.matches_generated ?? 0}</div>
-            <div style="font-size: 11px; color: #be185d; margin-top: 4px; font-weight: 600;">Matches Generados</div>
+            <div style="font-size: 11px; color: #be185d; margin-top: 4px; font-weight: 600;">Matches Generados (Periodo)</div>
           </div>
           <div style="flex: 1; min-width: 150px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #bbf7d0;">
             <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${periodTotals?.exchanges_completed ?? 0}</div>
-            <div style="font-size: 11px; color: #15803d; margin-top: 4px; font-weight: 600;">Intercambios Completados</div>
+            <div style="font-size: 11px; color: #15803d; margin-top: 4px; font-weight: 600;">Intercambios en Periodo</div>
+          </div>
+          <div style="flex: 1; min-width: 150px; background: #ecfdf5; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #a7f3d0;">
+            <div style="font-size: 24px; font-weight: bold; color: #047857;">${(mh?.completed_exchanges ?? 0).toLocaleString()}</div>
+            <div style="font-size: 11px; color: #065f46; margin-top: 4px; font-weight: 600;">Intercambios Totales (Histórico)</div>
           </div>
         </div>
 
