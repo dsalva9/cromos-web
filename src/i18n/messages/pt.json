@@ -61,7 +61,8 @@
       "resendCooldown": "Reenviar disponível em {seconds}s",
       "passwordTooShortHint": "A palavra-passe deve ter pelo menos 6 caracteres",
       "passwordHint": "Mínimo 6 caracteres",
-      "googleButton": "Registar-se com o Google"
+      "googleButton": "Registar-se com o Google",
+      "or": "OU"
     },
     "forgotPassword": {
       "title": "Recuperar Palavra-passe",

@@ -61,7 +61,8 @@
       "resendCooldown": "Resend available in {seconds}s",
       "passwordTooShortHint": "Password must be at least 6 characters",
       "passwordHint": "Minimum 6 characters",
-      "googleButton": "Sign up with Google"
+      "googleButton": "Sign up with Google",
+      "or": "OR"
     },
     "forgotPassword": {
       "title": "Recover Password",
