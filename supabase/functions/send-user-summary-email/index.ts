@@ -429,14 +429,11 @@ Deno.serve(async (req) => {
         `;
 
         if (usersList.length === 0) {
-            // Show all countries with 0
-            usersHtml = usersStatsHeaderHtml + SUPPORTED_COUNTRIES.map(country => `
-              <div style="margin-bottom: 16px;">
-                <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0;">
-                  ${country.flag} ${country.name} — <span style="color: #6b7280;">0 nuevos</span>
-                </h3>
+            usersHtml = usersStatsHeaderHtml + `
+              <div style="margin-bottom: 16px; font-size: 14px; color: #6b7280; font-style: italic;">
+                No hay nuevos registros de usuarios en ${periodLabel}.
               </div>
-            `).join('');
+            `;
         } else {
             // Group users by country
             const usersByCountry = new Map<string, NewUser[]>();
@@ -446,60 +443,30 @@ Deno.serve(async (req) => {
                 usersByCountry.get(code)!.push(user);
             }
 
-            // Build HTML for all supported countries (even those with 0 users)
             usersHtml = usersStatsHeaderHtml + `
               <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
                 Se han registrado <strong>${usersList.length}</strong> nuevos usuarios en ${periodLabel}:
               </p>
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
             `;
 
             for (const country of SUPPORTED_COUNTRIES) {
                 const countryUsers = usersByCountry.get(country.code) || [];
-                
-                usersHtml += `
-                  <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0; padding: 8px 12px; background: #f3f4f6; border-radius: 6px;">
-                      ${country.flag} ${country.name} — <strong>${countryUsers.length}</strong> ${countryUsers.length === 1 ? 'nuevo' : 'nuevos'}
-                    </h3>
-                `;
+                const count = countryUsers.length;
 
-                if (countryUsers.length === 0) {
-                    usersHtml += `
-                    <p style="color: #9ca3af; font-style: italic; padding: 8px 12px; font-size: 13px;">
-                      Sin actividad
-                    </p>
-                  </div>
-                    `;
-                } else {
-                    usersHtml += `
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
-                      <thead>
-                        <tr style="background: #f9fafb;">
-                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Nickname</th>
-                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Email</th>
-                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios</th>
-                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Álbumes</th>
-                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Mensajes</th>
-                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Registro</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${countryUsers.map((user, i) => `
-                          <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500; font-size: 13px;">${escapeHtml(user.nickname)}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${escapeHtml(user.email)}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.listings_count}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.albums_count}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${user.chat_messages_count}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 13px;">${new Date(user.created_at).toLocaleDateString('es-ES')}</td>
-                          </tr>
-                        `).join('')}
-                      </tbody>
-                    </table>
-                  </div>
-                    `;
+                // For other countries, if count is zero, skip showing them
+                if (country.code !== 'ES' && count === 0) {
+                    continue;
                 }
+
+                usersHtml += `
+                  <div style="margin-bottom: 8px; font-size: 14px; color: #374151;">
+                    ${country.flag} ${country.name} — <strong>${count}</strong> ${count === 1 ? 'nuevo' : 'nuevos'}
+                  </div>
+                `;
             }
+
+            usersHtml += `</div>`;
         }
 
         // ── Section 2: Reports ──
@@ -667,76 +634,38 @@ Deno.serve(async (req) => {
         `;
 
         if (totalListings === 0) {
-            listingsHtml = listingsStatsHeaderHtml + SUPPORTED_COUNTRIES.map(country => `
-              <div style="margin-bottom: 12px;">
-                <h3 style="font-size: 15px; color: #374151; margin: 0 0 4px 0;">
-                  ${country.flag} ${country.name} — <span style="color: #9ca3af;">0 anuncios</span>
-                </h3>
+            listingsHtml = listingsStatsHeaderHtml + `
+              <div style="margin-bottom: 16px; font-size: 14px; color: #6b7280; font-style: italic;">
+                No hay nuevos anuncios publicados en ${periodLabel}.
               </div>
-            `).join('');
+            `;
         } else {
             const listingsMap = new Map(listingsByCountry.map(c => [c.country_code, c]));
 
             listingsHtml = listingsStatsHeaderHtml + `
               <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
-                Se han publicado <strong>${totalListings}</strong> ${totalListings === 1 ? 'nuevo anuncio' : 'nuevos anuncios'} en ${periodLabel}:
+                Se han publicado <strong>${totalListings}</strong> nuevos anuncios en ${periodLabel}:
               </p>
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
             `;
 
             for (const country of SUPPORTED_COUNTRIES) {
                 const data = listingsMap.get(country.code);
                 const count = data ? data.total_listings : 0;
 
-                listingsHtml += `
-                  <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0; padding: 8px 12px; background: #f3f4f6; border-radius: 6px;">
-                      ${country.flag} ${country.name} — <strong>${count}</strong> ${count === 1 ? 'anuncio' : 'anuncios'}
-                    </h3>
-                `;
-
-                if (!data || count === 0) {
-                    listingsHtml += `
-                    <p style="color: #9ca3af; font-style: italic; padding: 8px 12px; font-size: 13px;">
-                      Sin actividad
-                    </p>
-                  </div>
-                    `;
-                } else {
-                    // Aggregate by user: count listings per nickname
-                    const userAgg = new Map<string, { count: number; titles: string[] }>();
-                    for (const item of data.users) {
-                        const existing = userAgg.get(item.nickname);
-                        if (existing) {
-                            existing.count++;
-                            if (existing.titles.length < 3) existing.titles.push(item.title || item.collection_name || '');
-                        } else {
-                            userAgg.set(item.nickname, { count: 1, titles: [item.title || item.collection_name || ''] });
-                        }
-                    }
-
-                    listingsHtml += `
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 4px;">
-                      <thead>
-                        <tr style="background: #f9fafb;">
-                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Usuario</th>
-                          <th style="padding: 8px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios</th>
-                          <th style="padding: 8px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Ejemplos</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        ${Array.from(userAgg.entries()).map(([nickname, info], i) => `
-                          <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 500; font-size: 13px;">${escapeHtml(nickname)}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${info.count}</td>
-                            <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 12px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${info.titles.filter(Boolean).map(t => escapeHtml(t)).join(', ')}</td>
-                          </tr>
-                        `).join('')}
-                      </tbody>
-                    </table>
-                  </div>
-                    `;
+                // For other countries, if count is zero, skip showing them
+                if (country.code !== 'ES' && count === 0) {
+                    continue;
                 }
+
+                listingsHtml += `
+                  <div style="margin-bottom: 8px; font-size: 14px; color: #374151;">
+                    ${country.flag} ${country.name} — <strong>${count}</strong> ${count === 1 ? 'anuncio' : 'anuncios'}
+                  </div>
+                `;
             }
+
+            listingsHtml += `</div>`;
         }
 
         let marketplaceHealthHtml = '';
