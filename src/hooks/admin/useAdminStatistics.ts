@@ -25,7 +25,6 @@ export function getTodaySince(): string {
   const today3am = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0),
   );
-  // If it's currently before 3 AM UTC, go back to yesterday's 3 AM
   if (now < today3am) {
     today3am.setUTCDate(today3am.getUTCDate() - 1);
   }
@@ -33,100 +32,168 @@ export function getTodaySince(): string {
 }
 
 // ── Response types ────────────────────────────────────────────────────
-export type NewUserCounts = {
-  country_code: string;
-  total_users: number;
-  with_listings: number;
-  with_messages: number;
+
+export type OverviewStats = {
+  total_registered: number;
+  mau: number;
+  wau: number;
+  dau: number;
+  active_listings: number;
+  retention_30d: number | null;
+  retention_90d: number | null;
 };
 
-export type MessagingSummary = {
+export type DayCount = {
+  day: string; // ISO date string e.g. "2026-07-10"
+  user_count?: number;
+  listing_count?: number;
+};
+
+export type WeekCount = {
+  week_start: string; // ISO date string
+  user_count: number;
+};
+
+export type DayMessages = {
+  day: string;
+  match_messages: number;
+  marketplace_messages: number;
   total_messages: number;
-  unique_senders: number;
-  unique_receivers: number;
-  unique_conversations: number;
-  messages_per_day: number;
-  busiest_hour: number;
-  top_senders: unknown;
-  match_conversations_opened?: number;
-  match_active_users?: number;
-  match_messages_sent?: number;
 };
 
-export type MessagingByCountry = {
-  country_code: string;
+export type PeriodTotals = {
+  new_users: number;
+  new_listings: number;
   total_messages: number;
-  unique_senders: number;
-  unique_conversations: number;
+  matches_generated: number;
+  exchanges_completed: number;
 };
 
-export type ListingStatusStat = {
-  status: string;
-  total: number;
-};
-
-export type ListingsByCountry = {
-  country_code: string;
-  total_listings: number;
-  users: unknown;
+export type ProvinceCount = {
+  province_code: string;
+  user_count: number;
 };
 
 export type AdminStatisticsData = {
-  newUserCounts: NewUserCounts[];
-  messagingSummary: MessagingSummary | null;
-  messagingByCountry: MessagingByCountry[];
-  listingStatusStats: ListingStatusStat[];
-  listingsByCountry: ListingsByCountry[];
+  overview: OverviewStats | null;
+  newUsersDaily: DayCount[];
+  newUsersWeekly: WeekCount[];
+  dailyListings: DayCount[];
+  dailyMessages: DayMessages[];
+  periodTotals: PeriodTotals | null;
+  spainCCAA: ProvinceCount[];
 };
 
-export function useAdminStatistics(period: TimePeriodKey) {
+// ── Hook ──────────────────────────────────────────────────────────────
+export function useAdminStatistics(
+  period: TimePeriodKey,
+  countryCode: string | null,
+) {
   const supabase = useSupabaseClient();
   const [data, setData] = useState<AdminStatisticsData>({
-    newUserCounts: [],
-    messagingSummary: null,
-    messagingByCountry: [],
-    listingStatusStats: [],
-    listingsByCountry: [],
+    overview: null,
+    newUsersDaily: [],
+    newUsersWeekly: [],
+    dailyListings: [],
+    dailyMessages: [],
+    periodTotals: null,
+    spainCCAA: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const days = TIME_PERIODS.find(p => p.key === period)?.days ?? 7;
+  const periodConfig = TIME_PERIODS.find(p => p.key === period) ?? TIME_PERIODS[3];
+  const days = periodConfig.days;
   const isToday = period === 'today';
+  const isAll = period === 'all';
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     setError(null);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabase as any;
+
     try {
-      // Build the RPC params: use p_since for "today", p_days for all others
-      const params: { p_days: number; p_since?: string } = { p_days: days };
+      // Build RPC params for time-filtered RPCs
+      const timeParams: { p_days: number; p_since?: string } = { p_days: days };
       if (isToday) {
-        params.p_since = getTodaySince();
+        timeParams.p_since = getTodaySince();
       }
 
-      const [usersRes, msgSummaryRes, msgCountryRes, listingStatusRes, listingCountryRes] =
-        await Promise.all([
-          supabase.rpc('admin_get_new_users_counts', params),
-          supabase.rpc('admin_get_messaging_activity_summary', params),
-          supabase.rpc('admin_get_messaging_activity_by_country', params),
-          supabase.rpc('admin_get_listing_status_stats', params),
-          supabase.rpc('admin_get_new_listings_by_country', params),
-        ]);
+      const countryParam = countryCode ?? undefined;
+
+      // All 7 RPCs in parallel (spain CCAA only when ES selected)
+      const [
+        overviewRes,
+        dailyUsersRes,
+        weeklyUsersRes,
+        dailyListingsRes,
+        dailyMessagesRes,
+        periodTotalsRes,
+        spainCCAARes,
+      ] = await Promise.all([
+        db.rpc('admin_stats_overview', {
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_new_users_daily', {
+          ...timeParams,
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_new_users_weekly', {
+          p_days: isAll ? 99999 : Math.max(days, 90),
+          ...(isToday ? { p_since: getTodaySince() } : {}),
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_daily_listings', {
+          ...timeParams,
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_daily_messages', {
+          ...timeParams,
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_period_totals', {
+          ...timeParams,
+          p_country_code: countryParam ?? null,
+        }),
+        // CCAA only needed for ES; for others return empty
+        countryCode === 'ES'
+          ? db.rpc('admin_stats_spain_ccaa')
+          : Promise.resolve({ data: [], error: null }),
+      ]);
 
       // Check for errors
-      const anyError = [usersRes, msgSummaryRes, msgCountryRes, listingStatusRes, listingCountryRes]
-        .find(r => r.error);
-      if (anyError?.error) {
-        throw new Error(anyError.error.message);
+      const results = [
+        overviewRes,
+        dailyUsersRes,
+        weeklyUsersRes,
+        dailyListingsRes,
+        dailyMessagesRes,
+        periodTotalsRes,
+        spainCCAARes,
+      ];
+      const firstError = results.find(r => r.error);
+      if (firstError?.error) {
+        throw new Error(firstError.error.message);
       }
 
+      const overviewRow = Array.isArray(overviewRes.data)
+        ? (overviewRes.data[0] as OverviewStats | undefined) ?? null
+        : null;
+
+      const periodRow = Array.isArray(periodTotalsRes.data)
+        ? (periodTotalsRes.data[0] as PeriodTotals | undefined) ?? null
+        : null;
+
       setData({
-        newUserCounts: (usersRes.data as NewUserCounts[]) || [],
-        messagingSummary: ((msgSummaryRes.data as MessagingSummary[])?.[0]) || null,
-        messagingByCountry: (msgCountryRes.data as MessagingByCountry[]) || [],
-        listingStatusStats: (listingStatusRes.data as ListingStatusStat[]) || [],
-        listingsByCountry: (listingCountryRes.data as ListingsByCountry[]) || [],
+        overview: overviewRow,
+        newUsersDaily: (dailyUsersRes.data as DayCount[]) ?? [],
+        newUsersWeekly: (weeklyUsersRes.data as WeekCount[]) ?? [],
+        dailyListings: (dailyListingsRes.data as DayCount[]) ?? [],
+        dailyMessages: (dailyMessagesRes.data as DayMessages[]) ?? [],
+        periodTotals: periodRow,
+        spainCCAA: (spainCCAARes.data as ProvinceCount[]) ?? [],
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load statistics';
@@ -135,7 +202,7 @@ export function useAdminStatistics(period: TimePeriodKey) {
     } finally {
       setLoading(false);
     }
-  }, [supabase, days, isToday]);
+  }, [supabase, days, isToday, isAll, countryCode]);
 
   useEffect(() => {
     void fetchAll();

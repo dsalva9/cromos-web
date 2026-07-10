@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -2554,6 +2554,27 @@ export type Database = {
           },
         ]
       }
+      user_login_history: {
+        Row: {
+          id: number
+          logged_in_at: string
+          login_date: string
+          user_id: string
+        }
+        Insert: {
+          id?: never
+          logged_in_at?: string
+          login_date?: string
+          user_id: string
+        }
+        Update: {
+          id?: never
+          logged_in_at?: string
+          login_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_ratings: {
         Row: {
           comment: string | null
@@ -3374,6 +3395,65 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      admin_stats_daily_listings: {
+        Args: { p_country_code?: string; p_days?: number; p_since?: string }
+        Returns: {
+          day: string
+          listing_count: number
+        }[]
+      }
+      admin_stats_daily_messages: {
+        Args: { p_country_code?: string; p_days?: number; p_since?: string }
+        Returns: {
+          day: string
+          marketplace_messages: number
+          match_messages: number
+          total_messages: number
+        }[]
+      }
+      admin_stats_new_users_daily: {
+        Args: { p_country_code?: string; p_days?: number; p_since?: string }
+        Returns: {
+          day: string
+          user_count: number
+        }[]
+      }
+      admin_stats_new_users_weekly: {
+        Args: { p_country_code?: string; p_days?: number; p_since?: string }
+        Returns: {
+          user_count: number
+          week_start: string
+        }[]
+      }
+      admin_stats_overview: {
+        Args: { p_country_code?: string }
+        Returns: {
+          active_listings: number
+          dau: number
+          mau: number
+          retention_30d: number
+          retention_90d: number
+          total_registered: number
+          wau: number
+        }[]
+      }
+      admin_stats_period_totals: {
+        Args: { p_country_code?: string; p_days?: number; p_since?: string }
+        Returns: {
+          exchanges_completed: number
+          matches_generated: number
+          new_listings: number
+          new_users: number
+          total_messages: number
+        }[]
+      }
+      admin_stats_spain_ccaa: {
+        Args: never
+        Returns: {
+          province_code: string
+          user_count: number
+        }[]
+      }
       admin_suspend_account: {
         Args: { p_reason: string; p_user_id: string }
         Returns: Json
@@ -3401,6 +3481,10 @@ export type Database = {
       }
       admin_update_listing_status: {
         Args: { p_listing_id: number; p_reason?: string; p_status: string }
+        Returns: undefined
+      }
+      admin_update_patron_status: {
+        Args: { p_is_patron: boolean; p_user_id: string }
         Returns: undefined
       }
       admin_update_summary_frequency: {
@@ -3855,6 +3939,7 @@ export type Database = {
           last_message: string
           last_message_at: string
           other_avatar_url: string
+          other_is_patron: boolean
           other_nickname: string
           other_user_id: string
           template_id: number
@@ -4196,6 +4281,7 @@ export type Database = {
         Returns: {
           counterparty_avatar_url: string
           counterparty_id: string
+          counterparty_is_patron: boolean
           counterparty_nickname: string
           is_seller: boolean
           last_message: string
@@ -4629,6 +4715,7 @@ export type Database = {
         Returns: undefined
       }
       reactivate_listing: { Args: { p_listing_id: number }; Returns: undefined }
+      record_user_login: { Args: never; Returns: undefined }
       refresh_leaderboard: { Args: never; Returns: undefined }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }
@@ -4703,17 +4790,14 @@ export type Database = {
         }
         Returns: {
           active_listings_count: number
-          albums_count: number
           avatar_url: string
-          country_code: string
           created_at: string
           deletion_scheduled_for: string
           email: string
           is_admin: boolean
+          is_patron: boolean
           is_pending_deletion: boolean
           is_suspended: boolean
-          messages_received: number
-          messages_sent: number
           nickname: string
           rating_avg: number
           rating_count: number
@@ -5009,3 +5093,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

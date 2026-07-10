@@ -72,6 +72,12 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         // Signal to CSS that auth has resolved (enables fade-in of auth-dependent UI)
         document.documentElement.setAttribute('data-auth-ready', '1');
 
+        // Record login for streak tracking + retention analytics (fire-and-forget)
+        if (currentUser && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+          // Fire-and-forget: PostgrestFilterBuilder is PromiseLike, not Promise
+          void Promise.resolve(supabase.rpc('record_user_login')).catch(() => { /* non-critical */ });
+        }
+
         // Persist auth hint for next hard navigation
         try {
           if (currentUser) {
