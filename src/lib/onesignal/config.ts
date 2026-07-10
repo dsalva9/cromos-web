@@ -3,8 +3,14 @@
  * Centralized config for OneSignal push notifications
  */
 
+const rawAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+const isAppIdValid = rawAppId && 
+                     rawAppId !== 'undefined' && 
+                     rawAppId !== 'null' && 
+                     rawAppId.trim() !== '';
+
 export const ONESIGNAL_CONFIG = {
-  appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || '3b9eb764-f440-404d-949a-1468356afc18',
+  appId: isAppIdValid ? rawAppId : '3b9eb764-f440-404d-949a-1468356afc18',
   
   // Safari Web ID (if different from app ID)
   safariWebId: undefined,
