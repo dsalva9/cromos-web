@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -8,12 +8,12 @@ import { logger } from '@/lib/logger';
 
 interface RetentionStats {
   pending_deletions: number;
-  next_deletion_date: string | null;
+  next_deletion: string | null;
   legal_holds: number;
   processed_today: number;
-  pending_accounts: number;
-  pending_listings: number;
-  pending_templates: number;
+  deleted_users: number;
+  deleted_listings: number;
+  deleted_templates: number;
 }
 
 export function RetentionDashboard() {
@@ -73,12 +73,12 @@ export function RetentionDashboard() {
         <ModernCardContent>
           <p className="text-3xl font-bold text-white">{stats?.pending_deletions || 0}</p>
           <p className="text-sm text-gray-400 mt-2">
-            Próxima: {formatDate(stats?.next_deletion_date || null)}
+            Próxima: {formatDate(stats?.next_deletion || null)}
           </p>
           <div className="mt-3 space-y-1 text-xs text-gray-500">
-            <div>Cuentas: {stats?.pending_accounts || 0}</div>
-            <div>Anuncios: {stats?.pending_listings || 0}</div>
-            <div>Plantillas: {stats?.pending_templates || 0}</div>
+            <div>Cuentas: {stats?.deleted_users || 0}</div>
+            <div>Anuncios: {stats?.deleted_listings || 0}</div>
+            <div>Plantillas: {stats?.deleted_templates || 0}</div>
           </div>
         </ModernCardContent>
       </ModernCard>
@@ -124,7 +124,7 @@ export function RetentionDashboard() {
           </div>
         </ModernCardHeader>
         <ModernCardContent>
-          <p className="text-3xl font-bold text-green-500">âœ“</p>
+          <p className="text-3xl font-bold text-green-500">✓</p>
           <p className="text-sm text-gray-400 mt-2">
             Sistema de retención operativo
           </p>
