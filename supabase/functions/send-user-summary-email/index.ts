@@ -152,6 +152,10 @@ interface HourlyActivity {
     activity_hour: number;
     new_registers: number;
     new_listings: number;
+    messages_sent: number;
+    new_chats: number;
+    exchanges_confirmed: number;
+    active_users: number;
 }
 
 interface Recipient {
@@ -747,13 +751,21 @@ Deno.serve(async (req) => {
         }
 
         let hourlyActivityHtml = '';
-        const activeHours = hourlyActivity.filter(h => Number(h.new_registers) > 0 || Number(h.new_listings) > 0);
+        const activeHours = hourlyActivity.filter(h => 
+            Number(h.new_registers) > 0 || 
+            Number(h.new_listings) > 0 || 
+            Number(h.messages_sent) > 0 || 
+            Number(h.new_chats) > 0 || 
+            Number(h.exchanges_confirmed) > 0
+        );
 
         if (activeHours.length > 0) {
             let peakRegistersHour = 'N/A';
             let maxRegisters = 0;
             let peakListingsHour = 'N/A';
             let maxListings = 0;
+            let peakMessagesHour = 'N/A';
+            let maxMessages = 0;
 
             for (const h of hourlyActivity) {
                 if (Number(h.new_registers) > maxRegisters) {
@@ -764,27 +776,39 @@ Deno.serve(async (req) => {
                     maxListings = Number(h.new_listings);
                     peakListingsHour = `${String(h.activity_hour).padStart(2, '0')}:00 UTC`;
                 }
+                if (Number(h.messages_sent) > maxMessages) {
+                    maxMessages = Number(h.messages_sent);
+                    peakMessagesHour = `${String(h.activity_hour).padStart(2, '0')}:00 UTC`;
+                }
             }
 
             hourlyActivityHtml = `
-            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px; overflow-x: auto;">
               <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; color: #4b5563;">
-                🔥 <strong>Horas pico del periodo:</strong> Registros: <strong>${peakRegistersHour}</strong> (${maxRegisters}) · Anuncios: <strong>${peakListingsHour}</strong> (${maxListings})
+                🔥 <strong>Picos del periodo:</strong> Registros: <strong>${peakRegistersHour}</strong> (${maxRegisters}) · Anuncios: <strong>${peakListingsHour}</strong> (${maxListings}) · Mensajes: <strong>${peakMessagesHour}</strong> (${maxMessages})
               </p>
-              <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 500px;">
                 <thead>
                   <tr style="background: #e5e7eb;">
-                    <th style="padding: 6px 12px; text-align: left; font-weight: bold; color: #4b5563;">Hora (UTC)</th>
-                    <th style="padding: 6px 12px; text-align: center; font-weight: bold; color: #4b5563;">👤 Registros</th>
-                    <th style="padding: 6px 12px; text-align: center; font-weight: bold; color: #4b5563;">📦 Anuncios</th>
+                    <th style="padding: 6px 8px; text-align: left; font-weight: bold; color: #4b5563;">Hora (UTC)</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">👤 Regs</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">📦 Anunc</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">💬 Msgs</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">💬 Chats</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">🤝 Trocas</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">👥 Activos</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${activeHours.map((h, i) => `
                     <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f3f4f6'};">
-                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb;">${String(h.activity_hour).padStart(2, '0')}:00</td>
-                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_registers) > 0 ? 'font-weight: bold; color: #d97706;' : 'color: #9ca3af;'}">${h.new_registers}</td>
-                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_listings) > 0 ? 'font-weight: bold; color: #16a34a;' : 'color: #9ca3af;'}">${h.new_listings}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; font-weight: 500;">${String(h.activity_hour).padStart(2, '0')}:00</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_registers) > 0 ? 'font-weight: bold; color: #d97706;' : 'color: #9ca3af;'}">${h.new_registers}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_listings) > 0 ? 'font-weight: bold; color: #16a34a;' : 'color: #9ca3af;'}">${h.new_listings}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.messages_sent) > 0 ? 'font-weight: bold; color: #2563eb;' : 'color: #9ca3af;'}">${h.messages_sent}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_chats) > 0 ? 'font-weight: bold; color: #0284c7;' : 'color: #9ca3af;'}">${h.new_chats}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.exchanges_confirmed) > 0 ? 'font-weight: bold; color: #059669;' : 'color: #9ca3af;'}">${h.exchanges_confirmed}</td>
+                      <td style="padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.active_users) > 0 ? 'font-weight: bold; color: #4b5563;' : 'color: #9ca3af;'}">${h.active_users}</td>
                     </tr>
                   `).join('')}
                 </tbody>
