@@ -148,6 +148,12 @@ interface EngagementStats {
     exchanges_in_period: number;
 }
 
+interface HourlyActivity {
+    activity_hour: number;
+    new_registers: number;
+    new_listings: number;
+}
+
 interface Recipient {
     id: number;
     email: string;
@@ -298,7 +304,8 @@ Deno.serve(async (req) => {
             periodTotalsResult,
             marketplaceHealthResult,
             activationFunnelResult,
-            engagementResult
+            engagementResult,
+            hourlyActivityResult
         ] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
@@ -310,6 +317,7 @@ Deno.serve(async (req) => {
             supabase.rpc('admin_stats_marketplace_health', { p_country_code: null }),
             supabase.rpc('admin_stats_activation_funnel', { p_country_code: null }),
             supabase.rpc('admin_stats_engagement', { p_days: days, p_country_code: null }),
+            supabase.rpc('admin_stats_hourly_activity', { p_days: days }),
         ]);
 
         if (usersResult.error) {
@@ -365,6 +373,11 @@ Deno.serve(async (req) => {
             // Non-fatal
         }
 
+        if (hourlyActivityResult.error) {
+            console.error('[send-user-summary-email] Error fetching hourly activity:', hourlyActivityResult.error);
+            // Non-fatal
+        }
+
         // Get recipients based on frequency
         let recipients: Recipient[] = [];
 
@@ -412,6 +425,7 @@ Deno.serve(async (req) => {
         const mh = (marketplaceHealthResult.data as MarketplaceHealth[])?.[0] || null;
         const af = (activationFunnelResult.data as ActivationFunnel[])?.[0] || null;
         const eng = (engagementResult.data as EngagementStats[])?.[0] || null;
+        const hourlyActivity = (hourlyActivityResult.data as HourlyActivity[]) || [];
 
         let usersHtml: string;
         const avgUsers = (Number(periodTotals?.new_users ?? 0) / days).toFixed(1);
@@ -732,6 +746,53 @@ Deno.serve(async (req) => {
             `;
         }
 
+        let hourlyActivityHtml = '';
+        const activeHours = hourlyActivity.filter(h => Number(h.new_registers) > 0 || Number(h.new_listings) > 0);
+
+        if (activeHours.length > 0) {
+            let peakRegistersHour = 'N/A';
+            let maxRegisters = 0;
+            let peakListingsHour = 'N/A';
+            let maxListings = 0;
+
+            for (const h of hourlyActivity) {
+                if (Number(h.new_registers) > maxRegisters) {
+                    maxRegisters = Number(h.new_registers);
+                    peakRegistersHour = `${String(h.activity_hour).padStart(2, '0')}:00 UTC`;
+                }
+                if (Number(h.new_listings) > maxListings) {
+                    maxListings = Number(h.new_listings);
+                    peakListingsHour = `${String(h.activity_hour).padStart(2, '0')}:00 UTC`;
+                }
+            }
+
+            hourlyActivityHtml = `
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+              <p style="margin-top: 0; margin-bottom: 12px; font-size: 13px; color: #4b5563;">
+                🔥 <strong>Horas pico del periodo:</strong> Registros: <strong>${peakRegistersHour}</strong> (${maxRegisters}) · Anuncios: <strong>${peakListingsHour}</strong> (${maxListings})
+              </p>
+              <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                  <tr style="background: #e5e7eb;">
+                    <th style="padding: 6px 12px; text-align: left; font-weight: bold; color: #4b5563;">Hora (UTC)</th>
+                    <th style="padding: 6px 12px; text-align: center; font-weight: bold; color: #4b5563;">👤 Registros</th>
+                    <th style="padding: 6px 12px; text-align: center; font-weight: bold; color: #4b5563;">📦 Anuncios</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${activeHours.map((h, i) => `
+                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f3f4f6'};">
+                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb;">${String(h.activity_hour).padStart(2, '0')}:00</td>
+                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_registers) > 0 ? 'font-weight: bold; color: #d97706;' : 'color: #9ca3af;'}">${h.new_registers}</td>
+                      <td style="padding: 6px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; ${Number(h.new_listings) > 0 ? 'font-weight: bold; color: #16a34a;' : 'color: #9ca3af;'}">${h.new_listings}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            `;
+        }
+
         const frequencyLabel = frequency === 'daily' ? 'Diario' : frequency === 'weekly' ? 'Semanal' : 'Manual';
         const subject = `[CambioCromos] Resumen de actividad - ${frequencyLabel}`;
 
@@ -793,6 +854,15 @@ Deno.serve(async (req) => {
 
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Hourly Activity Section -->
+            ${hourlyActivityHtml ? `
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              ⏰ Distribución Horaria de la Actividad
+            </h2>
+            ${hourlyActivityHtml}
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+            ` : ''}
 
             <!-- Marketplace Health Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
