@@ -6,6 +6,7 @@ import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { setPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
+import { getCallbackMessage, CallbackMessageKey } from '../callback-messages';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 const DEFAULT_LOCALE = 'es';
@@ -29,6 +30,9 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
   const hasRun = useRef(false);
   const mountedRef = useRef(true);
+
+  const locale = getStoredLocale();
+  const msg = (key: CallbackMessageKey) => getCallbackMessage(locale, key);
 
   useEffect(() => {
     // Always mark as mounted on every effect invocation (including StrictMode remount)
@@ -124,7 +128,7 @@ export default function AuthCallback() {
 
           if (sessionError) {
             logger.error('Error getting session:', sessionError);
-            setError('Error al procesar autenticación');
+            setError(msg('authError'));
             return;
           }
 
@@ -135,14 +139,14 @@ export default function AuthCallback() {
             if (hadPkceError) {
               logger.info('Session recovery failed after PKCE error, redirecting to login');
               if (mountedRef.current) {
-                setError('No se pudo completar el inicio de sesión. Por favor, inténtalo de nuevo.');
+                setError(msg('sessionFailed'));
                 // Auto-redirect to login after a short delay so the user sees the message
                 setTimeout(() => { if (mountedRef.current) router.push(lp('/login', getStoredLocale())); }, 3000);
               }
             } else {
               logger.warn('No authenticated user found after processing callback');
               if (mountedRef.current) {
-                setError('El enlace ha expirado o ya fue utilizado. Por favor, inicia sesión de nuevo.');
+                setError(msg('linkExpired'));
                 setTimeout(() => { if (mountedRef.current) router.push(lp('/login', getStoredLocale())); }, 3000);
               }
             }
@@ -182,9 +186,7 @@ export default function AuthCallback() {
           if (profile?.suspended_at || profile?.deleted_at) {
             await supabase.auth.signOut();
             if (mountedRef.current) {
-              setError(
-                'Tu cuenta ha sido suspendida. Por favor, contacta al administrador.'
-              );
+              setError(msg('accountSuspended'));
             }
             return;
           }
@@ -208,7 +210,7 @@ export default function AuthCallback() {
           if (mountedRef.current) router.push(lp(complete ? '/marketplace' : PROFILE_COMPLETION_ROUTE, userLocale));
         } catch (err) {
           logger.error('Unexpected error in auth callback:', err);
-          if (mountedRef.current) setError('Error inesperado al procesar autenticación');
+          if (mountedRef.current) setError(msg('unexpectedError'));
         }
       };
 
@@ -224,7 +226,7 @@ export default function AuthCallback() {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="bg-red-600 text-white px-6 py-4 rounded-md border-4 border-black max-w-md mx-auto">
-          <h2 className="text-xl font-black mb-2">Acceso Denegado</h2>
+          <h2 className="text-xl font-black mb-2">{msg('accessDenied')}</h2>
           <p>{error}</p>
         </div>
       </div>
@@ -233,7 +235,7 @@ export default function AuthCallback() {
 
   return (
     <div className="container mx-auto px-4 py-8 text-center">
-      <p className="text-white">Procesando autenticación...</p>
+      <p className="text-white">{msg('processing')}</p>
     </div>
   );
 }

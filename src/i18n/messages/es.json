@@ -80,7 +80,14 @@
       "successInstruction": "Haz clic en el enlace del email para activar tu cuenta y empezar a coleccionar cromos.",
       "successLogin": "Ir a iniciar sesión",
       "termsError": "Debes aceptar los terminos del servicio para crear tu cuenta",
-      "passwordMatchError": "Las contrasenas no coinciden"
+      "passwordMatchError": "Las contrasenas no coinciden",
+      "successHint": "Si no recibes el email, es posible que ya tengas una cuenta.",
+      "resendButton": "Reenviar email de confirmación",
+      "resendSuccess": "Email reenviado. Revisa tu bandeja de entrada.",
+      "resendCooldown": "Podrás reenviar en {seconds}s",
+      "passwordTooShortHint": "La contraseña debe tener al menos 6 caracteres",
+      "passwordHint": "Mínimo 6 caracteres",
+      "googleButton": "Registrarse con Google"
     },
     "forgotPassword": {
       "title": "Recuperar Contraseña",
@@ -96,7 +103,16 @@
       "suspended": "Tu cuenta está suspendida, por favor contacta con",
       "contactSupport": "Por favor contacta con",
       "unexpected": "Ocurrió un error inesperado",
-      "googleUnexpected": "Ocurrió un error inesperado durante el inicio de sesión con Google"
+      "googleUnexpected": "Ocurrió un error inesperado durante el inicio de sesión con Google",
+      "userAlreadyRegistered": "Este email ya está registrado",
+      "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+      "emailRateLimitExceeded": "Has excedido el límite de emails. Inténtalo en unos minutos",
+      "rateLimitExceeded": "Demasiados intentos. Por favor espera unos minutos",
+      "rateLimitCooldown": "Por seguridad, solo puedes solicitar esto una vez cada 60 segundos",
+      "invalidEmail": "El formato del email no es válido",
+      "signupDisabled": "El registro está temporalmente deshabilitado",
+      "emailNotConfirmed": "Debes confirmar tu email antes de iniciar sesión",
+      "invalidCredentials": "Email o contraseña incorrectos"
     }
   },
   "profile": {

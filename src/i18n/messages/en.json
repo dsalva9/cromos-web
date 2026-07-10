@@ -54,7 +54,14 @@
       "successInstruction": "Click the link in the email to activate your account and start collecting stickers.",
       "successLogin": "Go to login",
       "termsError": "You must accept the terms of service to create your account",
-      "passwordMatchError": "Passwords do not match"
+      "passwordMatchError": "Passwords do not match",
+      "successHint": "If you don't receive the email, you may already have an account.",
+      "resendButton": "Resend confirmation email",
+      "resendSuccess": "Email resent. Please check your inbox.",
+      "resendCooldown": "Resend available in {seconds}s",
+      "passwordTooShortHint": "Password must be at least 6 characters",
+      "passwordHint": "Minimum 6 characters",
+      "googleButton": "Sign up with Google"
     },
     "forgotPassword": {
       "title": "Recover Password",
@@ -70,7 +77,16 @@
       "suspended": "Your account is suspended, please contact",
       "contactSupport": "Please contact",
       "unexpected": "An unexpected error occurred",
-      "googleUnexpected": "An unexpected error occurred during Google Sign In"
+      "googleUnexpected": "An unexpected error occurred during Google Sign In",
+      "userAlreadyRegistered": "This email is already registered",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "emailRateLimitExceeded": "Email rate limit exceeded. Please try again in a few minutes.",
+      "rateLimitExceeded": "Too many attempts. Please wait a few minutes.",
+      "rateLimitCooldown": "For security, you can only request this once every 60 seconds",
+      "invalidEmail": "Invalid email address format",
+      "signupDisabled": "Signup is temporarily disabled",
+      "emailNotConfirmed": "You must confirm your email before logging in",
+      "invalidCredentials": "Invalid email or password"
     }
   },
   "profile": {

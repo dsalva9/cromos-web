@@ -2,24 +2,19 @@
 
 
 import { siteConfig } from '@/config/site';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { getSupportMailtoUrl } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import { GoogleIcon } from '@/components/ui/google-icon';
+import { Capacitor } from '@capacitor/core';
+import { logger } from '@/lib/logger';
+import { mapSupabaseError } from '@/lib/auth/auth-errors';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -27,12 +22,28 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isClientError, setIsClientError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+
   const t = useTranslations('auth.signup');
   const tErrors = useTranslations('auth.errors');
   const termsErrorMessage = t('termsError');
   const supabase = useSupabaseClient();
+
+  const MIN_PASSWORD_LENGTH = 6;
+
+  // Handle countdown for resend cooldown
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const handleTermsToggle = (value: boolean | 'indeterminate') => {
     const nextValue = value === true;
@@ -46,22 +57,32 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (!termsAccepted) {
+      setIsClientError(true);
       setError(termsErrorMessage);
       return;
     }
 
     if (password !== confirmPassword) {
+      setIsClientError(true);
       setError(t('passwordMatchError'));
       return;
     }
 
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setIsClientError(true);
+      setError(t('passwordTooShortHint'));
+      return;
+    }
+
+    setIsClientError(false);
     setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
+      const trimmedEmail = email.trim();
+      const { data, error } = await supabase.auth.signUp({
+        email: trimmedEmail,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -69,14 +90,81 @@ export default function SignupPage() {
       });
 
       if (error) {
-        setError(error.message);
+        const mappedKey = mapSupabaseError(error.message);
+        setError(mappedKey || error.message);
       } else {
+        // Log information about signup success
+        logger.debug('Signup initial success response:', data);
         setSuccess(true);
       }
-    } catch {
+    } catch (err) {
+      logger.error('Unexpected error in signup:', err);
       setError('unexpected');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const isNative = Capacitor.isNativePlatform();
+      const redirectTo = isNative
+        ? 'com.cambiocromos.app://auth/callback'
+        : `${window.location.origin}/auth/callback`;
+
+      logger.debug('Google signup redirect TO:', redirectTo);
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        const mappedKey = mapSupabaseError(error.message);
+        setError(mappedKey || error.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      logger.error('Unexpected error in Google signup:', err);
+      setError('googleUnexpected');
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0 || resending) return;
+    setResending(true);
+    setResendMessage(null);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        const mappedKey = mapSupabaseError(error.message);
+        setError(mappedKey || error.message);
+      } else {
+        setResendCooldown(60);
+        setResendMessage(t('resendSuccess'));
+      }
+    } catch (err) {
+      logger.error('Unexpected error in resend:', err);
+      setError('unexpected');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -119,6 +207,35 @@ export default function SignupPage() {
                   {t('successLogin')}
                 </Button>
               </Link>
+
+              <Button
+                variant="outline"
+                className="w-full bg-white dark:bg-gray-750 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 rounded-md shadow-lg border-2 border-black transition-all duration-200 text-sm"
+                onClick={handleResend}
+                disabled={resendCooldown > 0 || resending}
+              >
+                {resendCooldown > 0
+                  ? t('resendCooldown', { seconds: resendCooldown })
+                  : t('resendButton')}
+              </Button>
+
+              {resendMessage && (
+                <p className="text-xs text-green-600 dark:text-green-400 font-bold mt-2">
+                  {resendMessage}
+                </p>
+              )}
+
+              {error && !isClientError && (
+                <div className="bg-[#E84D4D] border-2 border-black rounded-md p-3 mt-2">
+                  <p className="text-xs text-white font-bold">
+                    {tErrors.has(error) ? tErrors(error) : error}
+                  </p>
+                </div>
+              )}
+
+              <p className="text-xs text-gray-500 mt-4 leading-relaxed">
+                {t('successHint')}
+              </p>
             </div>
           </div>
         </div>
@@ -183,9 +300,7 @@ export default function SignupPage() {
                 required
                 className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
-            </div>
-
-            <div className="space-y-2">
+            </div>            <div className="space-y-2">
               <label
                 htmlFor="password"
                 className="text-sm font-bold uppercase text-gray-900 dark:text-white"
@@ -201,6 +316,9 @@ export default function SignupPage() {
                 required
                 className="rounded-md bg-gray-50 dark:bg-gray-900 border-2 border-black text-gray-900 dark:text-white placeholder-gray-400 focus:border-gold focus:ring-gold"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('passwordHint')}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -263,17 +381,19 @@ export default function SignupPage() {
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
                 <p className="text-sm text-white font-bold">
-                  {error === 'unexpected' ? tErrors('unexpected') : error}
+                  {tErrors.has(error) ? tErrors(error) : error}
                 </p>
-                <p className="text-sm text-white font-bold mt-2">
-                  {tErrors('contactSupport')}{' '}
-                  <a
-                    href={getSupportMailtoUrl()}
-                    className="underline hover:text-gray-200"
-                  >
-                    soporte@cambiocromos.com
-                  </a>
-                </p>
+                {!isClientError && (
+                  <p className="text-sm text-white font-bold mt-2">
+                    {tErrors('contactSupport')}{' '}
+                    <a
+                      href={getSupportMailtoUrl()}
+                      className="underline hover:text-gray-200"
+                    >
+                      soporte@cambiocromos.com
+                    </a>
+                  </p>
+                )}
               </div>
             )}
 
@@ -285,6 +405,26 @@ export default function SignupPage() {
               {loading ? t('loading') : t('submitButton')}
             </Button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t-2 border-gray-200 dark:border-gray-700"></span>
+            </div>
+            <div className="relative flex justify-center text-sm uppercase">
+              <span className="bg-white dark:bg-gray-800 px-4 text-gray-500 font-bold text-xs">{t('or')}</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-bold h-10 sm:py-3 rounded-md shadow-lg border-2 border-black flex items-center justify-center gap-3 transition-all duration-200 text-sm"
+            onClick={handleGoogleSignup}
+            disabled={loading}
+          >
+            <GoogleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>{t('googleButton')}</span>
+          </Button>
 
           <div className="mt-8 text-center">
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-6">

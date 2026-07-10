@@ -14,6 +14,7 @@ import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { getSupportMailtoUrl } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
+import { mapSupabaseError } from '@/lib/auth/auth-errors';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -49,7 +50,8 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError(error.message);
+        const mappedKey = mapSupabaseError(error.message);
+        setError(mappedKey || error.message);
       } else {
         const userId = data?.user?.id;
 
@@ -68,21 +70,17 @@ export default function LoginPage() {
 
         logger.debug('Profile data:', profileData, 'Error:', profileError);
 
-        // If no profile data returned (null), user might have been signed out or doesn't exist
+        // If no profile data returned (null), redirect to profile completion
         if (!profileData && !profileError) {
-          logger.debug('No profile data, user may be suspended and already signed out');
-          await supabase.auth.signOut();
-          setLoading(false);
-          setError('suspended');
+          logger.debug('No profile data found, redirecting to profile completion');
+          window.location.href = `/${locale}/profile/completar`;
           return;
         }
 
-        // If profile query failed, it might be because user is suspended and can't access data
+        // If profile query failed, redirect to marketplace and let guards handle it
         if (profileError) {
-          logger.debug('Profile error detected, signing out');
-          await supabase.auth.signOut();
-          setLoading(false);
-          setError('suspended');
+          logger.warn('Profile query error during login, redirecting to marketplace', profileError);
+          window.location.href = `/${locale}/marketplace`;
           return;
         }
 
@@ -104,7 +102,8 @@ export default function LoginPage() {
         // Hard redirect — avoids App Router startTransition that gets stuck
         window.location.href = profileIsComplete ? `/${locale}/marketplace` : `/${locale}/profile/completar`;
       }
-    } catch {
+    } catch (err) {
+      logger.error('Unexpected login error:', err);
       setError('unexpected');
     } finally {
       setLoading(false);
@@ -229,7 +228,7 @@ export default function LoginPage() {
                     </>
                   ) : (
                     <>
-                      {error === 'unexpected' ? tErrors('unexpected') : error === 'googleUnexpected' ? tErrors('googleUnexpected') : error}
+                      {tErrors.has(error) ? tErrors(error) : error}
                       <br />
                       <br />
                       {tErrors('contactSupport')}{' '}

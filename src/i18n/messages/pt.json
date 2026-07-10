@@ -54,7 +54,14 @@
       "successInstruction": "Clique no link no email para ativar a sua conta e começar a colecionar cromos.",
       "successLogin": "Ir para iniciar sessão",
       "termsError": "Deve aceitar os termos de serviço para criar a sua conta",
-      "passwordMatchError": "As palavras-passe não coincidem"
+      "passwordMatchError": "As palavras-passe não coincidem",
+      "successHint": "Se não receber o email, é possível que já tenha uma conta.",
+      "resendButton": "Reenviar email de confirmação",
+      "resendSuccess": "Email reenviado. Por favor, verifique a sua caixa de entrada.",
+      "resendCooldown": "Reenviar disponível em {seconds}s",
+      "passwordTooShortHint": "A palavra-passe deve ter pelo menos 6 caracteres",
+      "passwordHint": "Mínimo 6 caracteres",
+      "googleButton": "Registar-se com o Google"
     },
     "forgotPassword": {
       "title": "Recuperar Palavra-passe",
@@ -70,7 +77,16 @@
       "suspended": "A sua conta está suspensa, por favor contacte",
       "contactSupport": "Por favor contacte",
       "unexpected": "Ocorreu um erro inesperado",
-      "googleUnexpected": "Ocorreu um erro inesperado durante o início de sessão com o Google"
+      "googleUnexpected": "Ocorreu um error inesperado durante o início de sessão com o Google",
+      "userAlreadyRegistered": "Este email já está registado",
+      "passwordTooShort": "A palavra-passe deve ter pelo menos 6 caracteres",
+      "emailRateLimitExceeded": "Limite de envio de emails excedido. Por favor, tente novamente em alguns minutos.",
+      "rateLimitExceeded": "Demasiadas tentativas. Por favor, aguarde alguns minutos.",
+      "rateLimitCooldown": "Por segurança, só pode solicitar isto uma vez a cada 60 segundos",
+      "invalidEmail": "Formato de email inválido",
+      "signupDisabled": "O registo está temporariamente desativado",
+      "emailNotConfirmed": "Deve confirmar o seu email antes de iniciar sessão",
+      "invalidCredentials": "Email ou palavra-passe incorretos"
     }
   },
   "profile": {
