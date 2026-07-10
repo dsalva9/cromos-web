@@ -97,6 +97,24 @@ interface MessagingActivity {
     match_messages_sent: number;
 }
 
+interface PlatformOverview {
+    total_registered: number;
+    mau: number;
+    wau: number;
+    dau: number;
+    active_listings: number;
+    retention_30d: number | null;
+    retention_90d: number | null;
+}
+
+interface PeriodTotals {
+    new_users: number;
+    new_listings: number;
+    total_messages: number;
+    matches_generated: number;
+    exchanges_completed: number;
+}
+
 interface Recipient {
     id: number;
     email: string;
@@ -119,10 +137,9 @@ interface ListingsByCountry {
 const SUPPORTED_COUNTRIES = [
     { code: 'ES', name: 'España', flag: '🇪🇸' },
     { code: 'US', name: 'United States', flag: '🇺🇸' },
-    { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
-    { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
     { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
     { code: 'MX', name: 'México', flag: '🇲🇽' },
+    { code: 'BR', name: 'Brasil', flag: '🇧🇷' },
 ];
 
 function getCountryInfo(code: string) {
@@ -238,12 +255,22 @@ Deno.serve(async (req) => {
         console.log('[send-user-summary-email] Processing:', { frequency, days });
 
         // ─── Fetch all data in parallel ───
-        const [usersResult, reportsResult, messagingResult, messagingByCountryResult, listingsByCountryResult] = await Promise.all([
+        const [
+            usersResult,
+            reportsResult,
+            messagingResult,
+            messagingByCountryResult,
+            listingsByCountryResult,
+            overviewResult,
+            periodTotalsResult
+        ] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
             supabase.rpc('admin_get_messaging_activity_summary', { p_days: days }),
             supabase.rpc('admin_get_messaging_activity_by_country', { p_days: days }),
             supabase.rpc('admin_get_new_listings_by_country', { p_days: days }),
+            supabase.rpc('admin_stats_overview', { p_country_code: null }),
+            supabase.rpc('admin_stats_period_totals', { p_days: days, p_country_code: null }),
         ]);
 
         if (usersResult.error) {
@@ -272,6 +299,16 @@ Deno.serve(async (req) => {
         if (listingsByCountryResult.error) {
             console.error('[send-user-summary-email] Error fetching listings by country:', listingsByCountryResult.error);
             // Non-fatal: continue without listings section
+        }
+
+        if (overviewResult.error) {
+            console.error('[send-user-summary-email] Error fetching platform overview:', overviewResult.error);
+            // Non-fatal
+        }
+
+        if (periodTotalsResult.error) {
+            console.error('[send-user-summary-email] Error fetching period totals:', periodTotalsResult.error);
+            // Non-fatal
         }
 
         // Get recipients based on frequency
@@ -316,11 +353,27 @@ Deno.serve(async (req) => {
         const messagingData = ((messagingResult.data as MessagingActivity[]) || [])[0] || null;
         const messagingByCountry = (messagingByCountryResult.data as MessagingByCountry[]) || [];
         const listingsByCountry = (listingsByCountryResult.data as ListingsByCountry[]) || [];
+        const overview = (overviewResult.data as PlatformOverview[])?.[0] || null;
+        const periodTotals = (periodTotalsResult.data as PeriodTotals[])?.[0] || null;
 
         let usersHtml: string;
+        const avgUsers = (Number(periodTotals?.new_users ?? 0) / days).toFixed(1);
+        const usersStatsHeaderHtml = `
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+              <div style="background: #fffbeb; border-radius: 6px; padding: 12px 16px; text-align: center; border: 1px solid #fef3c7; min-width: 140px;">
+                <div style="font-size: 20px; font-weight: bold; color: #d97706;">${periodTotals?.new_users ?? 0}</div>
+                <div style="font-size: 11px; color: #b45309; margin-top: 4px;">Nuevos en periodo</div>
+              </div>
+              <div style="background: #fffbeb; border-radius: 6px; padding: 12px 16px; text-align: center; border: 1px solid #fef3c7; min-width: 140px;">
+                <div style="font-size: 20px; font-weight: bold; color: #d97706;">${avgUsers}</div>
+                <div style="font-size: 11px; color: #b45309; margin-top: 4px;">Promedio diario</div>
+              </div>
+            </div>
+        `;
+
         if (usersList.length === 0) {
             // Show all countries with 0
-            usersHtml = SUPPORTED_COUNTRIES.map(country => `
+            usersHtml = usersStatsHeaderHtml + SUPPORTED_COUNTRIES.map(country => `
               <div style="margin-bottom: 16px;">
                 <h3 style="font-size: 15px; color: #374151; margin: 0 0 8px 0;">
                   ${country.flag} ${country.name} — <span style="color: #6b7280;">0 nuevos</span>
@@ -337,8 +390,8 @@ Deno.serve(async (req) => {
             }
 
             // Build HTML for all supported countries (even those with 0 users)
-            usersHtml = `
-              <p style="color: #4b5563; margin-bottom: 16px;">
+            usersHtml = usersStatsHeaderHtml + `
+              <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
                 Se han registrado <strong>${usersList.length}</strong> nuevos usuarios en ${periodLabel}:
               </p>
             `;
@@ -447,14 +500,12 @@ Deno.serve(async (req) => {
                 ? `${String(messagingData.busiest_hour).padStart(2, '0')}:00 UTC`
                 : 'N/A';
 
-            const matchConversationsOpened = Number(messagingData.match_conversations_opened || 0);
-            const matchMessagesSent = Number(messagingData.match_messages_sent || 0);
-            const matchActiveUsers = Number(messagingData.match_active_users || 0);
+            const avgMessages = (Number(periodTotals?.total_messages ?? 0) / days).toFixed(1);
 
             messagingHtml = `
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div style="flex: 1; min-width: 100px; background: #f0f9ff; border-radius: 8px; padding: 16px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: #1d4ed8;">${messagingData.total_messages}</div>
+            <div style="font-size: 24px; font-weight: bold; color: #1d4ed8;">${periodTotals?.total_messages ?? 0}</div>
             <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Mensajes</div>
           </div>
           <div style="flex: 1; min-width: 100px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center;">
@@ -466,25 +517,21 @@ Deno.serve(async (req) => {
             <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Conversaciones</div>
           </div>
           <div style="flex: 1; min-width: 100px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${messagingData.messages_per_day}</div>
+            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${avgMessages}</div>
             <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Media/día</div>
           </div>
         </div>
 
-        <!-- Matches specific statistics section -->
-        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Interacciones de Matches (Coincidencias):</h3>
+        <!-- Matches & Exchanges specific statistics section -->
+        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Matches e Intercambios:</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
-          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
-            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchConversationsOpened}</div>
-            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Nuevos Chats de Match</div>
+          <div style="flex: 1; min-width: 150px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fbcfe8;">
+            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${periodTotals?.matches_generated ?? 0}</div>
+            <div style="font-size: 11px; color: #be185d; margin-top: 4px; font-weight: 600;">Matches Generados</div>
           </div>
-          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
-            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchMessagesSent}</div>
-            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Mensajes de Match</div>
-          </div>
-          <div style="flex: 1; min-width: 150px; background: #fff1f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecdd3;">
-            <div style="font-size: 24px; font-weight: bold; color: #e11d48;">${matchActiveUsers}</div>
-            <div style="font-size: 11px; color: #9f1239; margin-top: 4px; font-weight: 600;">Usuarios de Match Activos</div>
+          <div style="flex: 1; min-width: 150px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #bbf7d0;">
+            <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${periodTotals?.exchanges_completed ?? 0}</div>
+            <div style="font-size: 11px; color: #15803d; margin-top: 4px; font-weight: 600;">Intercambios Completados</div>
           </div>
         </div>
 
@@ -548,8 +595,22 @@ Deno.serve(async (req) => {
         // ── Section 4: New Listings by Country ──
         let listingsHtml: string;
         const totalListings = listingsByCountry.reduce((sum, c) => sum + c.total_listings, 0);
+        const avgListings = (Number(periodTotals?.new_listings ?? 0) / days).toFixed(1);
+        const listingsStatsHeaderHtml = `
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+              <div style="background: #f0fdf4; border-radius: 6px; padding: 12px 16px; text-align: center; border: 1px solid #dcfce7; min-width: 140px;">
+                <div style="font-size: 20px; font-weight: bold; color: #16a34a;">${periodTotals?.new_listings ?? 0}</div>
+                <div style="font-size: 11px; color: #15803d; margin-top: 4px;">Publicados en periodo</div>
+              </div>
+              <div style="background: #f0fdf4; border-radius: 6px; padding: 12px 16px; text-align: center; border: 1px solid #dcfce7; min-width: 140px;">
+                <div style="font-size: 20px; font-weight: bold; color: #16a34a;">${avgListings}</div>
+                <div style="font-size: 11px; color: #15803d; margin-top: 4px;">Promedio diario</div>
+              </div>
+            </div>
+        `;
+
         if (totalListings === 0) {
-            listingsHtml = SUPPORTED_COUNTRIES.map(country => `
+            listingsHtml = listingsStatsHeaderHtml + SUPPORTED_COUNTRIES.map(country => `
               <div style="margin-bottom: 12px;">
                 <h3 style="font-size: 15px; color: #374151; margin: 0 0 4px 0;">
                   ${country.flag} ${country.name} — <span style="color: #9ca3af;">0 anuncios</span>
@@ -559,8 +620,8 @@ Deno.serve(async (req) => {
         } else {
             const listingsMap = new Map(listingsByCountry.map(c => [c.country_code, c]));
 
-            listingsHtml = `
-              <p style="color: #4b5563; margin-bottom: 16px;">
+            listingsHtml = listingsStatsHeaderHtml + `
+              <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
                 Se han publicado <strong>${totalListings}</strong> ${totalListings === 1 ? 'nuevo anuncio' : 'nuevos anuncios'} en ${periodLabel}:
               </p>
             `;
@@ -637,6 +698,34 @@ Deno.serve(async (req) => {
             <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">Resumen de Actividad</p>
           </div>
           <div style="background: #ffffff; padding: 30px 20px; border: 1px solid #e5e7eb; border-top: none;">
+            <!-- Estado General de la Plataforma -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 16px; font-weight: 700;">
+              📊 Estado General de la Plataforma
+            </h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+              <div style="flex: 1; min-width: 130px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #d97706;">${(overview?.total_registered ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Registrados totales</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #0284c7;">${(overview?.mau ?? 0).toLocaleString()} / ${(overview?.wau ?? 0).toLocaleString()} / ${(overview?.dau ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">MAU / WAU / DAU</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #16a34a;">${(overview?.active_listings ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Anuncios activos</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 18px; font-weight: bold; color: #7c3aed;">
+                  ${overview?.retention_30d !== null ? `${overview.retention_30d}%` : '—'} / ${overview?.retention_90d !== null ? `${overview.retention_90d}%` : '—'}
+                </div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Retención 30d / 90d</div>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
             <!-- Users Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
               👥 Nuevos Usuarios (${periodLabel})
