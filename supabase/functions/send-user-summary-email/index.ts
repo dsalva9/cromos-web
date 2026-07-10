@@ -115,6 +115,39 @@ interface PeriodTotals {
     exchanges_completed: number;
 }
 
+interface MarketplaceHealth {
+    active_listings: number;
+    archived_listings: number;
+    historical_listings: number;
+    total_listings_ever: number;
+    reactivated_listings: number;
+    listings_with_conversations: number;
+    completed_exchanges: number;
+    listing_exchange_rate: number;
+}
+
+interface ActivationFunnel {
+    total_registered: number;
+    users_with_listing: number;
+    users_with_message: number;
+    users_with_match: number;
+    users_with_exchange: number;
+    reg_to_listing_pct: number;
+    reg_to_message_pct: number;
+    reg_to_match_pct: number;
+    reg_to_exchange_pct: number;
+    reactivated_users: number;
+}
+
+interface EngagementStats {
+    conversations_started: number;
+    active_chats: number;
+    messages_in_period: number;
+    active_users_in_period: number;
+    messages_per_active_user: number;
+    exchanges_in_period: number;
+}
+
 interface Recipient {
     id: number;
     email: string;
@@ -262,7 +295,10 @@ Deno.serve(async (req) => {
             messagingByCountryResult,
             listingsByCountryResult,
             overviewResult,
-            periodTotalsResult
+            periodTotalsResult,
+            marketplaceHealthResult,
+            activationFunnelResult,
+            engagementResult
         ] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
@@ -271,6 +307,9 @@ Deno.serve(async (req) => {
             supabase.rpc('admin_get_new_listings_by_country', { p_days: days }),
             supabase.rpc('admin_stats_overview', { p_country_code: null }),
             supabase.rpc('admin_stats_period_totals', { p_days: days, p_country_code: null }),
+            supabase.rpc('admin_stats_marketplace_health', { p_country_code: null }),
+            supabase.rpc('admin_stats_activation_funnel', { p_country_code: null }),
+            supabase.rpc('admin_stats_engagement', { p_days: days, p_country_code: null }),
         ]);
 
         if (usersResult.error) {
@@ -308,6 +347,21 @@ Deno.serve(async (req) => {
 
         if (periodTotalsResult.error) {
             console.error('[send-user-summary-email] Error fetching period totals:', periodTotalsResult.error);
+            // Non-fatal
+        }
+
+        if (marketplaceHealthResult.error) {
+            console.error('[send-user-summary-email] Error fetching marketplace health:', marketplaceHealthResult.error);
+            // Non-fatal
+        }
+
+        if (activationFunnelResult.error) {
+            console.error('[send-user-summary-email] Error fetching activation funnel:', activationFunnelResult.error);
+            // Non-fatal
+        }
+
+        if (engagementResult.error) {
+            console.error('[send-user-summary-email] Error fetching engagement stats:', engagementResult.error);
             // Non-fatal
         }
 
@@ -355,6 +409,9 @@ Deno.serve(async (req) => {
         const listingsByCountry = (listingsByCountryResult.data as ListingsByCountry[]) || [];
         const overview = (overviewResult.data as PlatformOverview[])?.[0] || null;
         const periodTotals = (periodTotalsResult.data as PeriodTotals[])?.[0] || null;
+        const mh = (marketplaceHealthResult.data as MarketplaceHealth[])?.[0] || null;
+        const af = (activationFunnelResult.data as ActivationFunnel[])?.[0] || null;
+        const eng = (engagementResult.data as EngagementStats[])?.[0] || null;
 
         let usersHtml: string;
         const avgUsers = (Number(periodTotals?.new_users ?? 0) / days).toFixed(1);
@@ -486,7 +543,7 @@ Deno.serve(async (req) => {
       `;
         }
 
-        // ── Section 3: Messaging Activity ──
+        // ── Section 3: Messaging Activity & Engagement ──
         let messagingHtml: string;
         if (!messagingData || messagingData.total_messages === 0) {
             messagingHtml = `
@@ -500,30 +557,30 @@ Deno.serve(async (req) => {
                 ? `${String(messagingData.busiest_hour).padStart(2, '0')}:00 UTC`
                 : 'N/A';
 
-            const avgMessages = (Number(periodTotals?.total_messages ?? 0) / days).toFixed(1);
+            const msgsPerUser = eng ? Number(eng.messages_per_active_user).toFixed(1) : '—';
 
             messagingHtml = `
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
           <div style="flex: 1; min-width: 100px; background: #f0f9ff; border-radius: 8px; padding: 16px; text-align: center;">
             <div style="font-size: 24px; font-weight: bold; color: #1d4ed8;">${periodTotals?.total_messages ?? 0}</div>
-            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Mensajes</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Mensajes enviados</div>
           </div>
           <div style="flex: 1; min-width: 100px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${messagingData.unique_senders}</div>
-            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Remitentes</div>
+            <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${eng?.conversations_started ?? messagingData.unique_conversations}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Nuevos chats</div>
           </div>
           <div style="flex: 1; min-width: 100px; background: #fffbeb; border-radius: 8px; padding: 16px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: #d97706;">${messagingData.unique_conversations}</div>
-            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Conversaciones</div>
+            <div style="font-size: 24px; font-weight: bold; color: #d97706;">${eng?.active_chats ?? 0}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Chats Activos (7d)</div>
           </div>
           <div style="flex: 1; min-width: 100px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center;">
-            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${avgMessages}</div>
-            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Media/día</div>
+            <div style="font-size: 24px; font-weight: bold; color: #db2777;">${msgsPerUser}</div>
+            <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Msgs / Activo</div>
           </div>
         </div>
 
         <!-- Matches & Exchanges specific statistics section -->
-        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Matches e Intercambios:</h3>
+        <h3 style="font-size: 14px; color: #374151; margin: 24px 0 12px 0; font-weight: 600;">💞 Matches e Intercambios del periodo:</h3>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
           <div style="flex: 1; min-width: 150px; background: #fdf2f8; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fbcfe8;">
             <div style="font-size: 24px; font-weight: bold; color: #db2777;">${periodTotals?.matches_generated ?? 0}</div>
@@ -536,7 +593,7 @@ Deno.serve(async (req) => {
         </div>
 
         <p style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">
-          Hora más activa: <strong>${busiestHourStr}</strong> · Receptores únicos: <strong>${messagingData.unique_receivers}</strong>
+          Hora más activa: <strong>${busiestHourStr}</strong> · Remitentes únicos: <strong>${messagingData.unique_senders}</strong> · Receptores únicos: <strong>${messagingData.unique_receivers}</strong> · Activos en periodo: <strong>${eng?.active_users_in_period ?? 0}</strong>
         </p>
         ${topSenders.length > 0 ? `
         <p style="color: #4b5563; font-size: 13px; font-weight: 600; margin-bottom: 8px;">Top remitentes:</p>
@@ -682,6 +739,66 @@ Deno.serve(async (req) => {
             }
         }
 
+        let marketplaceHealthHtml = '';
+        if (mh) {
+            const exchangeRate = Number(mh.listing_exchange_rate).toFixed(1);
+            marketplaceHealthHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+              <div style="flex: 1; min-width: 130px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #d97706;">${exchangeRate}%</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Eficiencia (Anuncio→Troca)</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #0284c7;">${(mh.active_listings ?? 0).toLocaleString()} / ${(mh.archived_listings ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Activos / Archivados</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #16a34a;">${(mh.listings_with_conversations ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Anuncios con Mensajes</div>
+              </div>
+              <div style="flex: 1; min-width: 130px; background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 8px; padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: bold; color: #7c3aed;">${(mh.reactivated_listings ?? 0).toLocaleString()}</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Anuncios Reativados</div>
+              </div>
+            </div>
+            `;
+        }
+
+        let activationFunnelHtml = '';
+        if (af) {
+            activationFunnelHtml = `
+            <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tbody>
+                  ${[
+                    { label: 'Registrados', count: af.total_registered, pct: 100, color: '#3b82f6' },
+                    { label: 'Publicó un anuncio', count: af.users_with_listing, pct: af.reg_to_listing_pct, color: '#10b981' },
+                    { label: 'Envió un mensaje', count: af.users_with_message, pct: af.reg_to_message_pct, color: '#14b8a6' },
+                    { label: 'Obtuvo un match', count: af.users_with_match, pct: af.reg_to_match_pct, color: '#8b5cf6' },
+                    { label: 'Completó un intercambio', count: af.users_with_exchange, pct: af.reg_to_exchange_pct, color: '#f59e0b' },
+                  ].map(row => `
+                    <tr>
+                      <td style="padding: 6px 0; font-size: 13px; color: #4b5563; width: 40%; font-weight: 500;">${row.label}</td>
+                      <td style="padding: 6px 0; text-align: right; font-size: 13px; font-weight: bold; color: #1f2937; width: 25%;">
+                        ${Number(row.count).toLocaleString()}
+                        <span style="font-size: 11px; color: #6b7280; font-weight: normal; margin-left: 4px;">(${Number(row.pct).toFixed(1)}%)</span>
+                      </td>
+                      <td style="padding: 6px 0 6px 12px; width: 35%;">
+                        <div style="width: 100%; background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                          <div style="background: ${row.color}; width: ${Math.min(100, Number(row.pct))}%; height: 8px; border-radius: 4px;"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #4b5563;">
+                Re-engagement: <strong>${(af.reactivated_users ?? 0).toLocaleString()}</strong> usuarios reactivados (registrados >60d con actividad en los últimos 30d).
+              </div>
+            </div>
+            `;
+        }
+
         const frequencyLabel = frequency === 'daily' ? 'Diario' : frequency === 'weekly' ? 'Semanal' : 'Manual';
         const subject = `[CambioCromos] Resumen de actividad - ${frequencyLabel}`;
 
@@ -744,21 +861,39 @@ Deno.serve(async (req) => {
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
 
-            <!-- Reports Section -->
+            <!-- Marketplace Health Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
-              📋 Reportes${pendingReports.length > 0 ? ` <span style="background: #dc2626; color: white; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-left: 8px;">${pendingReports.length} pendientes</span>` : ''}
+              🏥 Salud del Marketplace (Histórico)
             </h2>
-            ${reportsHtml}
+            ${marketplaceHealthHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Activation Funnel Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              🎯 Embudo de Activación de Usuarios
+            </h2>
+            ${activationFunnelHtml}
 
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
 
             <!-- Messaging Activity Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
-              💬 Actividad de Mensajes (${periodLabel})
+              💬 Actividad de Mensajes & Engagement (${periodLabel})
             </h2>
             ${messagingHtml}
             ${messagingCountryHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Reports Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              📋 Reportes de Moderación${pendingReports.length > 0 ? ` <span style="background: #dc2626; color: white; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-left: 8px;">${pendingReports.length} pendientes</span>` : ''}
+            </h2>
+            ${reportsHtml}
           </div>
           <div style="background: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
             <p style="margin: 0;">Este es un email automático del sistema de CambioCromos</p>
