@@ -794,8 +794,8 @@ Deno.serve(async (req) => {
                     <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">👤 Regs</th>
                     <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">📦 Anunc</th>
                     <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">💬 Msgs</th>
-                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">💬 Chats</th>
-                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">🤝 Trocas</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">💬 Nuevos Chats</th>
+                    <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">🤝 Intercambios</th>
                     <th style="padding: 6px 8px; text-align: center; font-weight: bold; color: #4b5563;">👥 Activos</th>
                   </tr>
                 </thead>
