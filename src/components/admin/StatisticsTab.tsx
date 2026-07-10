@@ -21,6 +21,10 @@ import {
   Heart,
   ShieldCheck,
   Handshake,
+  Archive,
+  Activity,
+  ArrowRight,
+  BarChart2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -221,6 +225,26 @@ export default function StatisticsTab() {
 
   const ov = data.overview;
   const pt = data.periodTotals;
+  const mh = data.marketplaceHealth;
+  const af = data.activationFunnel;
+  const eng = data.engagement;
+
+  /* ── Cohort retention: pivot to row-per-cohort format ───────────── */
+  const cohortOffsets = useMemo(() => {
+    const maxOffset = Math.max(0, ...data.cohortRetention.map(r => r.months_after));
+    return Array.from({ length: maxOffset + 1 }, (_, i) => i);
+  }, [data.cohortRetention]);
+
+  const cohortData = useMemo(() => {
+    const byMonth = new Map<string, { cohort_month: string; cohort_size: number; cells: Record<number, { retention_pct: number | null }> }>();
+    for (const row of data.cohortRetention) {
+      if (!byMonth.has(row.cohort_month)) {
+        byMonth.set(row.cohort_month, { cohort_month: row.cohort_month, cohort_size: row.cohort_size, cells: {} });
+      }
+      byMonth.get(row.cohort_month)!.cells[row.months_after] = { retention_pct: row.retention_pct };
+    }
+    return Array.from(byMonth.values()).sort((a, b) => a.cohort_month.localeCompare(b.cohort_month));
+  }, [data.cohortRetention]);
 
   const daysInPeriod = useMemo(() => {
     if (period === 'today' || period === '24h') return 1;
@@ -620,7 +644,247 @@ export default function StatisticsTab() {
           </section>
 
           {/* ═══════════════════════════════════════════════════════ */}
-          {/* § 6 — Spain CCAA (only when country = ES)              */}
+          {/* § 6 — Marketplace Health                              */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<Activity className="h-5 w-5 text-emerald-400" />}
+              label={t('marketplaceHealthSection')}
+            />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <StatCard
+                icon={<LayoutGrid className="h-4 w-4" />}
+                label={t('mh_activeListings')}
+                hint={t('mh_activeListings_hint')}
+                value={(mh?.active_listings ?? 0).toLocaleString()}
+                color="green"
+              />
+              <StatCard
+                icon={<Archive className="h-4 w-4" />}
+                label={t('mh_archivedListings')}
+                hint={t('mh_archivedListings_hint')}
+                value={(mh?.archived_listings ?? 0).toLocaleString()}
+                color="red"
+              />
+              <StatCard
+                icon={<LayoutGrid className="h-4 w-4" />}
+                label={t('mh_historicalListings')}
+                hint={t('mh_historicalListings_hint')}
+                value={(mh?.historical_listings ?? 0).toLocaleString()}
+                color="teal"
+              />
+              <StatCard
+                icon={<LayoutGrid className="h-4 w-4" />}
+                label={t('mh_totalListingsEver')}
+                hint={t('mh_totalListingsEver_hint')}
+                value={(mh?.total_listings_ever ?? 0).toLocaleString()}
+                color="gold"
+              />
+              <StatCard
+                icon={<TrendingUp className="h-4 w-4" />}
+                label={t('mh_reactivatedListings')}
+                hint={t('mh_reactivatedListings_hint')}
+                value={(mh?.reactivated_listings ?? 0).toLocaleString()}
+                color="blue"
+              />
+              <StatCard
+                icon={<MessageSquare className="h-4 w-4" />}
+                label={t('mh_listingsWithConversations')}
+                hint={t('mh_listingsWithConversations_hint')}
+                value={(mh?.listings_with_conversations ?? 0).toLocaleString()}
+                color="purple"
+              />
+              <StatCard
+                icon={<Handshake className="h-4 w-4" />}
+                label={t('mh_completedExchanges')}
+                hint={t('mh_completedExchanges_hint')}
+                value={(mh?.completed_exchanges ?? 0).toLocaleString()}
+                color="green"
+              />
+              <div className={`rounded-xl border-2 border-amber-500/30 bg-amber-500/5 p-4 flex flex-col gap-1`}>
+                <div className="flex items-center gap-1.5 text-gray-400 text-sm">
+                  <BarChart2 className="h-4 w-4" />
+                  <span>{t('mh_exchangeRate')}</span>
+                  <HintIcon text={t('mh_exchangeRate_hint')} />
+                </div>
+                <p className="text-2xl font-black text-amber-400">
+                  {mh ? `${Number(mh.listing_exchange_rate).toFixed(1)}%` : '—'}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 7 — Activation Funnel                               */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<ArrowRight className="h-5 w-5 text-sky-400" />}
+              label={t('activationFunnelSection')}
+            />
+            <div className="bg-[#1a2236] rounded-xl border-2 border-gray-800 p-6">
+              {af ? (
+                <div className="space-y-3">
+                  {[
+                    { label: t('af_registered'),  count: af.total_registered,    pct: 100,                 color: 'bg-blue-500' },
+                    { label: t('af_listed'),       count: af.users_with_listing,  pct: af.reg_to_listing_pct,  color: 'bg-emerald-500' },
+                    { label: t('af_messaged'),     count: af.users_with_message,  pct: af.reg_to_message_pct,  color: 'bg-teal-500' },
+                    { label: t('af_matched'),      count: af.users_with_match,    pct: af.reg_to_match_pct,    color: 'bg-purple-500' },
+                    { label: t('af_exchanged'),    count: af.users_with_exchange, pct: af.reg_to_exchange_pct, color: 'bg-amber-500' },
+                  ].map(row => (
+                    <div key={row.label}>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-sm text-gray-300">{row.label}</span>
+                        <span className="text-sm font-bold text-white">
+                          {Number(row.count).toLocaleString()}
+                          <span className="text-gray-500 font-normal ml-2">({Number(row.pct).toFixed(1)}%)</span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-800 rounded-full h-2">
+                        <div
+                          className={`${row.color} h-2 rounded-full transition-all duration-500`}
+                          style={{ width: `${Math.min(100, Number(row.pct))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="pt-2 border-t border-gray-800">
+                    <StatCard
+                      icon={<TrendingUp className="h-4 w-4" />}
+                      label={t('af_reactivated')}
+                      hint={t('af_reactivated_hint')}
+                      value={Number(af.reactivated_users).toLocaleString()}
+                      color="teal"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-8 text-sm">{t('noData')}</p>
+              )}
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 8 — Engagement                                      */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<MessageSquare className="h-5 w-5 text-violet-400" />}
+              label={t('engagementSection')}
+            />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <StatCard
+                icon={<MessageSquare className="h-4 w-4" />}
+                label={t('eng_conversationsStarted')}
+                hint={t('eng_conversationsStarted_hint')}
+                value={(eng?.conversations_started ?? 0).toLocaleString()}
+                color="blue"
+              />
+              <StatCard
+                icon={<MessageSquare className="h-4 w-4" />}
+                label={t('eng_activeChats')}
+                hint={t('eng_activeChats_hint')}
+                value={(eng?.active_chats ?? 0).toLocaleString()}
+                color="teal"
+              />
+              <StatCard
+                icon={<MessageSquare className="h-4 w-4" />}
+                label={t('eng_messagesInPeriod')}
+                hint={t('eng_messagesInPeriod_hint')}
+                value={(eng?.messages_in_period ?? 0).toLocaleString()}
+                color="purple"
+              />
+              <StatCard
+                icon={<Users className="h-4 w-4" />}
+                label={t('eng_activeUsers')}
+                hint={t('eng_activeUsers_hint')}
+                value={(eng?.active_users_in_period ?? 0).toLocaleString()}
+                color="gold"
+              />
+              <div className={`rounded-xl border-2 border-violet-500/30 bg-violet-500/5 p-4 flex flex-col gap-1`}>
+                <div className="flex items-center gap-1.5 text-gray-400 text-sm">
+                  <BarChart2 className="h-4 w-4" />
+                  <span>{t('eng_msgsPerUser')}</span>
+                  <HintIcon text={t('eng_msgsPerUser_hint')} />
+                </div>
+                <p className="text-2xl font-black text-violet-400">
+                  {eng ? Number(eng.messages_per_active_user).toFixed(1) : '—'}
+                </p>
+              </div>
+              <StatCard
+                icon={<Handshake className="h-4 w-4" />}
+                label={t('eng_exchanges')}
+                hint={t('eng_exchanges_hint')}
+                value={(eng?.exchanges_in_period ?? 0).toLocaleString()}
+                color="green"
+              />
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 9 — Monthly Cohort Retention                        */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<ShieldCheck className="h-5 w-5 text-indigo-400" />}
+              label={t('cohortRetentionSection')}
+              hint={t('cohortRetention_hint')}
+            />
+            {cohortData.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="text-xs text-white border-separate border-spacing-0">
+                  <thead>
+                    <tr>
+                      <th className="text-left px-3 py-2 text-gray-400 font-medium sticky left-0 bg-[#0f172a] z-10 min-w-[80px]">
+                        {t('cohortMonth')}
+                      </th>
+                      <th className="text-right px-2 py-2 text-gray-400 font-medium min-w-[48px]">
+                        {t('cohortSize')}
+                      </th>
+                      {cohortOffsets.map(m => (
+                        <th key={m} className="text-center px-2 py-2 text-gray-500 font-medium min-w-[40px]">
+                          M+{m}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cohortData.map(row => (
+                      <tr key={row.cohort_month} className="hover:bg-white/5">
+                        <td className="px-3 py-1.5 text-gray-300 font-medium sticky left-0 bg-[#0f172a] z-10">
+                          {new Date(row.cohort_month + 'T12:00:00Z').toLocaleDateString('es-ES', { year: '2-digit', month: 'short' })}
+                        </td>
+                        <td className="px-2 py-1.5 text-right text-gray-400">
+                          {row.cohort_size.toLocaleString()}
+                        </td>
+                        {cohortOffsets.map(m => {
+                          const cell = row.cells[m];
+                          if (cell === undefined) return <td key={m} className="px-2 py-1.5" />;
+                          const pct = cell.retention_pct ?? 0;
+                          const bg =
+                            m === 0 ? 'bg-gray-700 text-gray-300' :
+                            pct >= 50 ? 'bg-green-800/70 text-green-300' :
+                            pct >= 25 ? 'bg-yellow-800/70 text-yellow-300' :
+                            pct >= 10 ? 'bg-orange-800/70 text-orange-300' :
+                            'bg-red-900/60 text-red-400';
+                          return (
+                            <td key={m} className={`px-2 py-1.5 text-center rounded ${bg}`}>
+                              {m === 0 ? '100%' : `${Number(pct).toFixed(0)}%`}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 py-8 text-sm">{t('noData')}</p>
+            )}
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 10 — Spain CCAA (only when country = ES)             */}
           {/* ═══════════════════════════════════════════════════════ */}
           {country === 'ES' && (
             <section>

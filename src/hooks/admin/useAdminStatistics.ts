@@ -43,6 +43,48 @@ export type OverviewStats = {
   retention_90d: number | null;
 };
 
+export type MarketplaceHealth = {
+  active_listings: number;
+  archived_listings: number;
+  historical_listings: number;
+  total_listings_ever: number;
+  reactivated_listings: number;
+  listings_with_conversations: number;
+  completed_exchanges: number;
+  listing_exchange_rate: number;
+};
+
+export type ActivationFunnel = {
+  total_registered: number;
+  users_with_listing: number;
+  users_with_message: number;
+  users_with_match: number;
+  users_with_exchange: number;
+  reg_to_listing_pct: number;
+  reg_to_message_pct: number;
+  reg_to_match_pct: number;
+  reg_to_exchange_pct: number;
+  reactivated_users: number;
+};
+
+export type EngagementStats = {
+  conversations_started: number;
+  active_chats: number;
+  messages_in_period: number;
+  active_users_in_period: number;
+  messages_per_active_user: number;
+  exchanges_in_period: number;
+};
+
+export type CohortRetentionRow = {
+  cohort_month: string;
+  months_after: number;
+  cohort_size: number;
+  retained_count: number;
+  retention_pct: number | null;
+  computed_at: string;
+};
+
 export type DayCount = {
   day: string; // ISO date string e.g. "2026-07-10"
   user_count?: number;
@@ -76,6 +118,10 @@ export type ProvinceCount = {
 
 export type AdminStatisticsData = {
   overview: OverviewStats | null;
+  marketplaceHealth: MarketplaceHealth | null;
+  activationFunnel: ActivationFunnel | null;
+  engagement: EngagementStats | null;
+  cohortRetention: CohortRetentionRow[];
   newUsersDaily: DayCount[];
   newUsersWeekly: WeekCount[];
   dailyListings: DayCount[];
@@ -92,6 +138,10 @@ export function useAdminStatistics(
   const supabase = useSupabaseClient();
   const [data, setData] = useState<AdminStatisticsData>({
     overview: null,
+    marketplaceHealth: null,
+    activationFunnel: null,
+    engagement: null,
+    cohortRetention: [],
     newUsersDaily: [],
     newUsersWeekly: [],
     dailyListings: [],
@@ -123,9 +173,13 @@ export function useAdminStatistics(
 
       const countryParam = countryCode ?? undefined;
 
-      // All 7 RPCs in parallel (spain CCAA only when ES selected)
+      // All RPCs in parallel
       const [
         overviewRes,
+        marketplaceHealthRes,
+        activationFunnelRes,
+        engagementRes,
+        cohortRetentionRes,
         dailyUsersRes,
         weeklyUsersRes,
         dailyListingsRes,
@@ -136,6 +190,18 @@ export function useAdminStatistics(
         db.rpc('admin_stats_overview', {
           p_country_code: countryParam ?? null,
         }),
+        db.rpc('admin_stats_marketplace_health', {
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_activation_funnel', {
+          p_country_code: countryParam ?? null,
+        }),
+        db.rpc('admin_stats_engagement', {
+          ...timeParams,
+          p_country_code: countryParam ?? null,
+        }),
+        // Cohort retention is global (no country/period filter)
+        db.rpc('admin_stats_cohort_retention'),
         db.rpc('admin_stats_new_users_daily', {
           ...timeParams,
           p_country_code: countryParam ?? null,
@@ -166,6 +232,10 @@ export function useAdminStatistics(
       // Check for errors
       const results = [
         overviewRes,
+        marketplaceHealthRes,
+        activationFunnelRes,
+        engagementRes,
+        cohortRetentionRes,
         dailyUsersRes,
         weeklyUsersRes,
         dailyListingsRes,
@@ -182,12 +252,28 @@ export function useAdminStatistics(
         ? (overviewRes.data[0] as OverviewStats | undefined) ?? null
         : null;
 
+      const marketplaceHealthRow = Array.isArray(marketplaceHealthRes.data)
+        ? (marketplaceHealthRes.data[0] as MarketplaceHealth | undefined) ?? null
+        : null;
+
+      const activationFunnelRow = Array.isArray(activationFunnelRes.data)
+        ? (activationFunnelRes.data[0] as ActivationFunnel | undefined) ?? null
+        : null;
+
+      const engagementRow = Array.isArray(engagementRes.data)
+        ? (engagementRes.data[0] as EngagementStats | undefined) ?? null
+        : null;
+
       const periodRow = Array.isArray(periodTotalsRes.data)
         ? (periodTotalsRes.data[0] as PeriodTotals | undefined) ?? null
         : null;
 
       setData({
         overview: overviewRow,
+        marketplaceHealth: marketplaceHealthRow,
+        activationFunnel: activationFunnelRow,
+        engagement: engagementRow,
+        cohortRetention: (cohortRetentionRes.data as CohortRetentionRow[]) ?? [],
         newUsersDaily: (dailyUsersRes.data as DayCount[]) ?? [],
         newUsersWeekly: (weeklyUsersRes.data as WeekCount[]) ?? [],
         dailyListings: (dailyListingsRes.data as DayCount[]) ?? [],
