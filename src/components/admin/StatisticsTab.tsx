@@ -222,6 +222,44 @@ export default function StatisticsTab() {
   const ov = data.overview;
   const pt = data.periodTotals;
 
+  const daysInPeriod = useMemo(() => {
+    if (period === 'today' || period === '24h') return 1;
+    if (period === '3d') return 3;
+    if (period === '1w') return 7;
+    if (period === '1m') return 30;
+
+    const dates = [
+      ...data.newUsersDaily.map(d => d.day),
+      ...data.dailyListings.map(d => d.day),
+      ...data.dailyMessages.map(d => d.day),
+    ].filter(Boolean) as string[];
+
+    if (dates.length > 0) {
+      const timestamps = dates.map(d => new Date(d).getTime());
+      const minTimestamp = Math.min(...timestamps);
+      const diffTime = Math.abs(Date.now() - minTimestamp);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return Math.max(1, diffDays);
+    }
+    return 1;
+  }, [period, data.newUsersDaily, data.dailyListings, data.dailyMessages]);
+
+  const avgNewUsers = useMemo(() => {
+    const val = Number(pt?.new_users ?? 0) / daysInPeriod;
+    return val.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }, [pt?.new_users, daysInPeriod]);
+
+  const avgListings = useMemo(() => {
+    const val = Number(pt?.new_listings ?? 0) / daysInPeriod;
+    return val.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }, [pt?.new_listings, daysInPeriod]);
+
+  const avgMessages = useMemo(() => {
+    const val = Number(pt?.total_messages ?? 0) / daysInPeriod;
+    return val.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }, [pt?.total_messages, daysInPeriod]);
+
+
   return (
     <div className="space-y-8">
       {/* ── Controls ────────────────────────────────────────────── */}
@@ -368,6 +406,13 @@ export default function StatisticsTab() {
                 value={(pt?.new_users ?? 0).toLocaleString()}
                 color="gold"
               />
+              <StatCard
+                icon={<TrendingUp className="h-4 w-4" />}
+                label={t('dailyAverageNewUsers')}
+                hint={t('dailyAverageNewUsers_hint')}
+                value={avgNewUsers}
+                color="gold"
+              />
             </div>
 
             {/* Daily bar chart */}
@@ -446,6 +491,13 @@ export default function StatisticsTab() {
                 value={(pt?.new_listings ?? 0).toLocaleString()}
                 color="teal"
               />
+              <StatCard
+                icon={<TrendingUp className="h-4 w-4" />}
+                label={t('dailyAverageListings')}
+                hint={t('dailyAverageListings_hint')}
+                value={avgListings}
+                color="teal"
+              />
             </div>
 
             {/* Daily listings bar chart */}
@@ -485,6 +537,13 @@ export default function StatisticsTab() {
                 label={t('totalMessagesInPeriod')}
                 hint={t('totalMessagesInPeriod_hint')}
                 value={(pt?.total_messages ?? 0).toLocaleString()}
+                color="blue"
+              />
+              <StatCard
+                icon={<TrendingUp className="h-4 w-4" />}
+                label={t('dailyAverageMessages')}
+                hint={t('dailyAverageMessages_hint')}
+                value={avgMessages}
                 color="blue"
               />
             </div>
