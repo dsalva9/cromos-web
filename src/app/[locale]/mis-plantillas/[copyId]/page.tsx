@@ -109,6 +109,7 @@ function TemplateProgressContent() {
       isGroup: 'true',
       groupCount: spares.length.toString(),
       templateId: copy.template_id.toString(),
+      copyId: copyId.toString(),
       from: `/mis-plantillas/${copyId}`, // Add back navigation
     });
 

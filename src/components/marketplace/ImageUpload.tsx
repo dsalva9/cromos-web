@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { Upload, X, Image as ImageIcon, Camera } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Camera, QrCode } from 'lucide-react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { logger } from '@/lib/logger';
 import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal';
 import { processImageBeforeUpload, generateThumbnail, isQRCodeError } from '@/lib/images/processImageBeforeUpload';
+import type { QRGenerationData } from '@/components/marketplace/SimplifiedListingForm';
+import QRCode from 'qrcode';
+import { siteConfig } from '@/config/site';
+import { useTranslations } from 'next-intl';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -20,17 +24,21 @@ interface ImageUploadProps {
    *                       or null if the thumbnail upload failed (non-fatal)
    */
   onChange: (imageUrl: string | null, thumbnailUrl?: string | null) => void;
+  /** When provided, shows a "Generate QR" button to use a trade QR as the listing image */
+  qrData?: QRGenerationData;
 }
 
-export function ImageUpload({ value, onChange }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
   const supabase = useSupabaseClient();
   const [uploading, setUploading] = useState(false);
+  const [generatingQR, setGeneratingQR] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [supportsCamera] = useState(() =>
     typeof navigator !== 'undefined' &&
     'mediaDevices' in navigator &&
     'getUserMedia' in navigator.mediaDevices
   );
+  const tCreate = useTranslations('createListing');
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -130,9 +138,51 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     await uploadImage(blob, fileName);
   };
 
+  /**
+   * Generate a trade-match QR code on a canvas, convert to PNG blob, and upload it
+   * as the listing image. Since the QR encodes a cambiocromos.com/match/ URL,
+   * it passes through the QR blocker allowlist.
+   */
+  const handleGenerateQR = useCallback(async () => {
+    if (!qrData) return;
+    setGeneratingQR(true);
+    try {
+      const qrUrl = `${siteConfig.url}/match/${qrData.userId}/${qrData.copyId}?name=${encodeURIComponent(qrData.nickname)}&album=${encodeURIComponent(qrData.copyTitle)}`;
+
+      // Generate QR on an offscreen canvas
+      const canvas = document.createElement('canvas');
+      await QRCode.toCanvas(canvas, qrUrl, {
+        width: 512,
+        margin: 3,
+        color: { dark: '#0f172a', light: '#ffffff' },
+        errorCorrectionLevel: 'M',
+      });
+
+      // Convert canvas to PNG blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (b) => (b ? resolve(b) : reject(new Error('Failed to create QR blob'))),
+          'image/png',
+          1
+        );
+      });
+
+      // Create a File from the blob and upload using the normal upload flow
+      const fileName = `qr-${Date.now()}-${Math.random().toString(36).substring(2)}`;
+      await uploadImage(blob, fileName);
+    } catch (err) {
+      logger.error('QR generation failed:', err);
+      toast.error(tCreate('qrGenerateError'));
+    } finally {
+      setGeneratingQR(false);
+    }
+  }, [qrData, uploadImage, tCreate]);
+
   const handleRemove = () => {
     onChange(null, null);
   };
+
+  const isDisabled = uploading || generatingQR;
 
   return (
     <>
@@ -155,7 +205,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                     className="absolute top-2 right-2"
                     onClick={handleRemove}
                     aria-label="Eliminar imagen"
-                    disabled={uploading}
+                    disabled={isDisabled}
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </Button>
@@ -175,19 +225,19 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                   <p className="text-gray-600 text-sm mb-4">
                     Sube una foto de tu cromo para mayor visibilidad
                   </p>
-                  <div className="flex gap-2 justify-center">
+                  <div className="flex gap-2 justify-center flex-wrap">
                     <div className="relative">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileSelect}
-                        disabled={uploading}
+                        disabled={isDisabled}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
                       />
                       <Button
                         type="button"
                         aria-label={uploading ? 'Subiendo imagen' : 'Elegir imagen'}
-                        disabled={uploading}
+                        disabled={isDisabled}
                         className="bg-gold text-black hover:bg-gold-light font-bold"
                       >
                         {uploading ? (
@@ -207,7 +257,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                       <Button
                         type="button"
                         onClick={() => setCameraOpen(true)}
-                        disabled={uploading}
+                        disabled={isDisabled}
                         variant="outline"
                         className="border-2 border-gold text-gold hover:bg-gold hover:text-black"
                       >
@@ -215,9 +265,32 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                         Cámara
                       </Button>
                     )}
+                    {qrData && (
+                      <Button
+                        type="button"
+                        onClick={handleGenerateQR}
+                        disabled={isDisabled}
+                        variant="outline"
+                        className="border-2 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white"
+                      >
+                        {generatingQR ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-r-transparent rounded-full mr-2" />
+                            {tCreate('qrGenerating')}
+                          </>
+                        ) : (
+                          <>
+                            <QrCode className="h-4 w-4 mr-2" />
+                            QR
+                          </>
+                        )}
+                      </Button>
+                    )}
                   </div>
                   <p className="text-gray-500 text-xs mt-2">
-                    JPG, PNG o WebP (máx. 5MB)
+                    {qrData
+                      ? tCreate('imageHintWithQR')
+                      : 'JPG, PNG o WebP (máx. 5MB)'}
                   </p>
                 </div>
               </div>

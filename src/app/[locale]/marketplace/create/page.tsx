@@ -12,6 +12,7 @@ import { logger } from '@/lib/logger';
 import { ArrowLeft } from 'lucide-react';
 import { useMemo } from 'react';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useUser } from '@/components/providers/SupabaseProvider';
 import { useTranslations } from 'next-intl';
 import { getCurrencySymbol } from '@/constants/countries';
 
@@ -20,6 +21,7 @@ function CreateListingContent() {
   const searchParams = useSearchParams();
   const { createListing, loading } = useCreateListing();
   const { profile } = useProfileCompletion();
+  const { user } = useUser();
   const currencySymbol = getCurrencySymbol(profile?.country_code);
   const t = useTranslations('createListing');
 
@@ -45,6 +47,19 @@ function CreateListingContent() {
   // Get back URL and template ID from query parameters
   const backUrl = searchParams.get('from') || '/marketplace';
   const templateId = searchParams.get('templateId');
+  const copyId = searchParams.get('copyId');
+
+  // Build QR data for the "Generate QR" button in ImageUpload
+  // Only available when publishing a pack from an album (has copyId + isGroup)
+  const qrData = useMemo(() => {
+    if (!copyId || !user || !initialData?.is_group) return undefined;
+    return {
+      userId: user.id,
+      copyId: parseInt(copyId),
+      copyTitle: initialData.collection_name || initialData.title || '',
+      nickname: user.user_metadata?.nickname ?? user.email ?? 'yo',
+    };
+  }, [copyId, user, initialData]);
 
   const handleSubmit = async (data: CreateListingForm) => {
     try {
@@ -101,6 +116,7 @@ function CreateListingContent() {
           initialData={initialData}
           disablePackOption={initialData?.is_group}
           currencySymbol={currencySymbol}
+          qrData={qrData}
         />
       </div>
     </div>

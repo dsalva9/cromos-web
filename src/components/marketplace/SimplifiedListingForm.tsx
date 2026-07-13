@@ -61,12 +61,21 @@ const getSimplifiedListingSchema = (t: (key: string) => string) => z.object({
   }
 });
 
+export interface QRGenerationData {
+  userId: string;
+  copyId: number;
+  copyTitle: string;
+  nickname: string;
+}
+
 interface SimplifiedListingFormProps {
   initialData?: Partial<CreateListingForm>;
   onSubmit: (data: CreateListingForm) => Promise<void>;
   loading?: boolean;
   disablePackOption?: boolean;
   currencySymbol?: string;
+  /** When provided, shows a "Generate QR" button in the image upload area */
+  qrData?: QRGenerationData;
 }
 
 export function SimplifiedListingForm({
@@ -75,6 +84,7 @@ export function SimplifiedListingForm({
   loading,
   disablePackOption = false,
   currencySymbol = '€',
+  qrData,
 }: SimplifiedListingFormProps) {
   const supabase = useSupabaseClient();
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
@@ -295,6 +305,7 @@ export function SimplifiedListingForm({
                 setValue('image_url', url || '', { shouldValidate: true });
                 setThumbnailUrl(thumbUrl ?? null);
               }}
+              qrData={qrData}
             />
             {errors.image_url && (
               <p className="text-sm text-red-500">{errors.image_url.message}</p>
