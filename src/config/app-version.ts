@@ -9,9 +9,10 @@
  * that cannot be hot-patched via Vercel.
  *
  * Current history:
- *   10604  — 1.6.3  (AdMob native plugin — first version requiring this check)
+ *   10603  — 1.6.2  (current minimum — all existing users have this)
+ *   10604  — 1.6.3  (AdMob release — raise to this once published on Play Store)
  */
-export const MIN_ANDROID_VERSION_CODE = 10604;
+export const MIN_ANDROID_VERSION_CODE = 10603;
 
 /** Google Play Store deep-link for the app. Used in the force-update screen. */
 export const PLAY_STORE_URL =
