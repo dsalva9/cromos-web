@@ -118,17 +118,35 @@ export async function processImageBeforeUpload(
         // Exception: CambioCromos own trade-match QR codes are allowed.
         try {
           const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
-          const qrCode = jsQR(
+
+          // Scan at full resolution with both normal and inverted attempts
+          let qrCode = jsQR(
             imageData.data,
             imageData.width,
             imageData.height,
-            { inversionAttempts: 'dontInvert' }
+            { inversionAttempts: 'attemptBoth' }
           );
 
+          // If not found at full res, try a center crop (QR might be small within a photo)
+          if (!qrCode && targetWidth > 200 && targetHeight > 200) {
+            const cropX = Math.floor(targetWidth * 0.15);
+            const cropY = Math.floor(targetHeight * 0.15);
+            const cropW = targetWidth - cropX * 2;
+            const cropH = targetHeight - cropY * 2;
+            const cropData = ctx.getImageData(cropX, cropY, cropW, cropH);
+            qrCode = jsQR(
+              cropData.data,
+              cropData.width,
+              cropData.height,
+              { inversionAttempts: 'attemptBoth' }
+            );
+          }
+
           if (qrCode) {
+            const data = qrCode.data;
             const isOwnQR =
-              qrCode.data.includes('cambiocromos.com/match/') ||
-              qrCode.data.includes('localhost') && qrCode.data.includes('/match/');
+              data.includes('cambiocromos.com/match/') ||
+              (data.includes('localhost') && data.includes('/match/'));
 
             if (!isOwnQR) {
               cleanup();
