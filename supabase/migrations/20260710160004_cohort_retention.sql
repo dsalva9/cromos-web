@@ -149,7 +149,7 @@ BEGIN
     PERFORM cron.schedule(
       'weekly-cohort-retention',
       '0 5 * * 1',  -- Every Monday at 05:00 UTC
-      $$SELECT public.compute_cohort_retention()$$
+      $sql$SELECT public.compute_cohort_retention()$sql$
     );
 
     RAISE NOTICE 'pg_cron job weekly-cohort-retention scheduled for Mondays at 05:00 UTC.';

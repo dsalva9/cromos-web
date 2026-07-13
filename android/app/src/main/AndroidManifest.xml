@@ -12,6 +12,11 @@
 
         <meta-data android:name="onesignal_app_id" android:value="3b9eb764-f440-404d-949a-1468356afc18" />
 
+        <!-- Google AdMob: required by the Mobile Ads SDK. App will crash without this. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8347713301854118~2363560569"/>
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"

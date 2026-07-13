@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Megaphone } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAdMob } from '@/hooks/useAdMob';
+import { isNative } from '@/lib/platform';
 
 /** Strip the locale prefix from a pathname. */
 function stripLocale(path: string): string {
@@ -26,6 +28,10 @@ export function AdBanner() {
   const pathname = stripLocale(rawPathname);
   const t = useTranslations('adBanner');
 
+  // Initialise Google AdMob SDK and show native banner on Android.
+  // This is a no-op on web/PWA — Adsterra handles those platforms below.
+  useAdMob();
+
   const mobileAdRef = useRef<HTMLDivElement>(null);
   const desktopAdRef = useRef<HTMLDivElement>(null);
 
@@ -33,11 +39,13 @@ export function AdBanner() {
   const [hasMounted, setHasMounted] = useState(false);
   const [showAdBlockerModal, setShowAdBlockerModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isNativeApp, setIsNativeApp] = useState(false);
 
   const isHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
 
   useEffect(() => {
     setHasMounted(true);
+    setIsNativeApp(isNative());
     if (typeof window !== 'undefined') {
       const checkViewport = () => {
         setIsMobile(window.innerWidth < 768);
@@ -120,9 +128,10 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden]);
 
-  // Inject mobile ad script inside a sandboxed iframe using a local same-domain src
+  // Inject mobile ad script inside a sandboxed iframe using a local same-domain src.
+  // Skipped on native Android — AdMob renders a native overlay banner instead.
   useEffect(() => {
-    if (!hasMounted || isHidden || !isMobile) return;
+    if (!hasMounted || isHidden || !isMobile || isNativeApp) return;
 
     const container = mobileAdRef.current;
     if (!container) return;
@@ -150,7 +159,7 @@ export function AdBanner() {
     return () => {
       container.innerHTML = '';
     };
-  }, [hasMounted, isHidden, isMobile, pathname]);
+  }, [hasMounted, isHidden, isMobile, isNativeApp, pathname]);
 
   // Inject desktop ad script inside a sandboxed iframe (same approach as mobile)
   useEffect(() => {
@@ -184,7 +193,9 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden, isMobile, pathname]);
 
-  if (!hasMounted || isHidden) return null;
+  // On native Android, AdMob renders the banner as a native overlay view.
+  // We must not render an empty Adsterra bar — that would waste space under the nav.
+  if (!hasMounted || isHidden || isNativeApp) return null;
 
 
   return (

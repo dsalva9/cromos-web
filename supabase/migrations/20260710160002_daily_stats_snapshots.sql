@@ -222,7 +222,7 @@ BEGIN
     PERFORM cron.schedule(
       'daily-stats-snapshot',
       '0 4 * * *',
-      $$SELECT public.capture_daily_stats_snapshot(NULL)$$
+      $sql$SELECT public.capture_daily_stats_snapshot(NULL)$sql$
     );
 
     RAISE NOTICE 'pg_cron job daily-stats-snapshot scheduled at 04:00 UTC daily.';

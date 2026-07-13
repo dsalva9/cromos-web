@@ -3,6 +3,9 @@
 -- Path: supabase/migrations/20260710160006_analytics_hourly_activity_v2.sql
 -- ─────────────────────────────────────────────────────────────
 
+-- Drop first because return type changed (3 columns → 7 columns)
+DROP FUNCTION IF EXISTS public.admin_stats_hourly_activity(INT);
+
 CREATE OR REPLACE FUNCTION public.admin_stats_hourly_activity(
   p_days INT DEFAULT 1
 )
