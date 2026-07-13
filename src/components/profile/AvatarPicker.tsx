@@ -83,7 +83,6 @@ export function AvatarPicker({
 
       toast.success('Imagen procesada correctamente');
     } catch (error) {
-      logger.error('Error processing image:', error);
       if (isQRCodeError(error)) {
         toast.error(
           error instanceof Error
@@ -91,6 +90,7 @@ export function AvatarPicker({
             : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
         );
       } else {
+        logger.error('Error processing image:', error);
         toast.error(
           error instanceof Error ? error.message : 'Error al procesar la imagen'
         );

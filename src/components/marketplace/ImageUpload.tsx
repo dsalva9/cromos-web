@@ -109,7 +109,6 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       onChange(imageUrl, thumbnailUrl);
       toast.success('Imagen subida con éxito');
     } catch (error) {
-      logger.error('Upload error:', error);
       if (isQRCodeError(error)) {
         toast.error(
           error instanceof Error
@@ -117,6 +116,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
             : 'Subida bloqueada: No se permiten códigos QR en las imágenes.'
         );
       } else {
+        logger.error('Upload error:', error);
         const message =
           error instanceof Error ? error.message : 'Error al subir la imagen';
         toast.error(message);

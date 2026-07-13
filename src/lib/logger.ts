@@ -98,6 +98,12 @@ export const logger = {
       'code challenge does not match',
       'pkce_code_verifier_not_found',
       'user relationship blocked',
+      'no puede exceder',
+      'cannot exceed',
+      'subida bloqueada',
+      'upload blocked',
+      'no se permiten códigos qr',
+      'qr codes are not allowed',
     ];
     const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {

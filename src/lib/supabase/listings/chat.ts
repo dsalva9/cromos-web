@@ -108,11 +108,11 @@ export async function sendListingMessage(
       : message;
 
     if (!finalMessage.trim()) {
-      throw new Error('El mensaje no puede estar vacío');
+      return { messageId: null, error: new Error('El mensaje no puede estar vacío') };
     }
 
     if (finalMessage.length > 500) {
-      throw new Error('El mensaje no puede exceder 500 caracteres');
+      return { messageId: null, error: new Error('El mensaje no puede exceder 500 caracteres') };
     }
 
     const { data, error } = await supabase.rpc('send_listing_message', {

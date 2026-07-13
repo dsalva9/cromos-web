@@ -139,10 +139,10 @@ export async function sendMatchMessage(
       : message;
 
     if (!finalMessage.trim()) {
-      throw new Error('El mensaje no puede estar vacío');
+      return { messageId: null, error: new Error('El mensaje no puede estar vacío') };
     }
     if (finalMessage.length > 2000) {
-      throw new Error('El mensaje no puede exceder 2000 caracteres');
+      return { messageId: null, error: new Error('El mensaje no puede exceder 2000 caracteres') };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

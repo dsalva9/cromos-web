@@ -322,29 +322,50 @@ export function TradeBuilder({
     const offerSectionHeader = t('iOfferYou');
     const requestSectionHeader = t('youGiveMe');
 
-    const offerLines = selectedIOfferStickers
-      .map((s) => formatStickerLine(s))
-      .join('\n');
-    const requestLines = selectedTheyOfferStickers
-      .map((s) => formatStickerLine(s))
-      .join('\n');
+    const offerLinesList = selectedIOfferStickers.map((s) => formatStickerLine(s));
+    const requestLinesList = selectedTheyOfferStickers.map((s) => formatStickerLine(s));
 
+    const offerLines = offerLinesList.join('\n');
+    const requestLines = requestLinesList.join('\n');
     const fullText = `${header}\n\n${offerSectionHeader}\n${offerLines}\n\n${requestSectionHeader}\n${requestLines}`;
 
-    let msgs: string[] = [];
-    if (fullText.length <= 2000) {
-      msgs = [fullText];
+    const msgs: string[] = [];
+    let currentChunk = `${header}\n\n${offerSectionHeader}\n`;
+
+    for (const line of offerLinesList) {
+      if ((currentChunk + line + '\n').length > 1900) {
+        msgs.push(currentChunk.trim());
+        currentChunk = `${line}\n`;
+      } else {
+        currentChunk += `${line}\n`;
+      }
+    }
+
+    const requestStart = `\n${requestSectionHeader}\n`;
+    if ((currentChunk + requestStart).length > 1900) {
+      msgs.push(currentChunk.trim());
+      currentChunk = `${requestSectionHeader}\n`;
     } else {
-      // Split into 2 messages
-      const msg1 = `${header}\n\n${offerSectionHeader}\n${offerLines}`;
-      const msg2 = `${requestSectionHeader}\n${requestLines}`;
-      msgs = [msg1, msg2];
+      currentChunk += requestStart;
+    }
+
+    for (const line of requestLinesList) {
+      if ((currentChunk + line + '\n').length > 1900) {
+        msgs.push(currentChunk.trim());
+        currentChunk = `${line}\n`;
+      } else {
+        currentChunk += `${line}\n`;
+      }
+    }
+
+    if (currentChunk.trim()) {
+      msgs.push(currentChunk.trim());
     }
 
     return { messages: msgs, fullMessageText: fullText };
   }, [theyOffer, iOffer, selectedTheyOffer, selectedIOffer, t]);
 
-  const willSplit = fullMessageText.length > 2000;
+  const willSplit = messages.length > 1;
   const isSubmitDisabled =
     selectedTheyOffer.size === 0 || selectedIOffer.size === 0 || submitting;
 

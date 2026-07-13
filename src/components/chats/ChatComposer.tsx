@@ -156,7 +156,7 @@ export function ChatComposer({
           onKeyDown={handleKeyDown}
           placeholder={t('placeholder')}
           rows={1}
-          maxLength={500}
+          maxLength={2000}
           disabled={isBusy || disabled}
           className="flex-1 resize-none bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold disabled:opacity-50"
           style={{ minHeight: '36px', maxHeight: '120px' }}
