@@ -128,7 +128,17 @@ export function AdBanner() {
     };
   }, [hasMounted, isHidden]);
 
-  // Inject mobile ad script inside a sandboxed iframe using a local same-domain src.
+  // Inject mobile Adsterra ad directly into a scaled wrapper div.
+  //
+  // We do NOT use an outer sandbox iframe because Adsterra's invoke.js creates its own
+  // inner iframe, and the sandbox restrictions on our outer frame prevent that inner frame
+  // from loading correctly (double-iframe + sandbox incompatibility).
+  //
+  // Security: Adsterra's ad iframe is cross-origin (highperformanceformat.com) and
+  // the browser's own cross-origin policy prevents it from navigating the top frame —
+  // no explicit sandbox is needed to stop redirect hijacking.
+  //
+  // The 320×50 ad is scaled to 160×25 via CSS transform so the strip stays compact.
   // Skipped on native Android — AdMob renders a native overlay banner instead.
   useEffect(() => {
     if (!hasMounted || isHidden || !isMobile || isNativeApp) return;
@@ -138,30 +148,37 @@ export function AdBanner() {
 
     container.innerHTML = '';
 
-    const iframe = document.createElement('iframe');
-    iframe.src = '/ad-frame.html';
-    iframe.width = '320';
-    iframe.height = '50';
-    iframe.style.width = '320px';
-    iframe.style.height = '50px';
-    iframe.style.border = 'none';
-    iframe.style.overflow = 'hidden';
-    iframe.style.transform = 'scale(0.5)';
-    iframe.style.transformOrigin = 'top left';
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-    // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
+    // Scaled wrapper: renders 320×50 ad as 160×25 visual
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '0';
+    wrapper.style.left = '0';
+    wrapper.style.width = '320px';
+    wrapper.style.height = '50px';
+    wrapper.style.transform = 'scale(0.5)';
+    wrapper.style.transformOrigin = 'top left';
 
-    container.appendChild(iframe);
+    // Adsterra config — must be defined before invoke.js
+    const configScript = document.createElement('script');
+    configScript.type = 'text/javascript';
+    configScript.text = `atOptions = { 'key': '207f77c777a93d9b339e6e77660a9707', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };`;
+
+    // Adsterra invoke — creates the ad iframe inside the wrapper
+    const invokeScript = document.createElement('script');
+    invokeScript.type = 'text/javascript';
+    invokeScript.src = 'https://www.highperformanceformat.com/207f77c777a93d9b339e6e77660a9707/invoke.js';
+
+    wrapper.appendChild(configScript);
+    wrapper.appendChild(invokeScript);
+    container.appendChild(wrapper);
 
     return () => {
       container.innerHTML = '';
     };
   }, [hasMounted, isHidden, isMobile, isNativeApp, pathname]);
 
-  // Inject desktop ad script inside a sandboxed iframe (same approach as mobile)
+  // Inject desktop Adsterra ad directly into a scaled wrapper div (same rationale as mobile).
+  // 728×90 leaderboard is scaled to 364×45 visual via CSS transform.
   useEffect(() => {
     if (!hasMounted || isHidden || isMobile) return;
 
@@ -170,23 +187,29 @@ export function AdBanner() {
 
     container.innerHTML = '';
 
-    const iframe = document.createElement('iframe');
-    iframe.src = '/ad-frame-desktop.html';
-    iframe.width = '728';
-    iframe.height = '90';
-    iframe.style.width = '728px';
-    iframe.style.height = '90px';
-    iframe.style.border = 'none';
-    iframe.style.overflow = 'hidden';
-    iframe.style.transform = 'scale(0.5)';
-    iframe.style.transformOrigin = 'top left';
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-    // Allow scripts, same-origin, popups (so clicks open sponsors in new tab), but omit top-navigation to block main window hijacking redirects.
-    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
+    // Scaled wrapper: renders 728×90 ad as 364×45 visual
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '0';
+    wrapper.style.left = '0';
+    wrapper.style.width = '728px';
+    wrapper.style.height = '90px';
+    wrapper.style.transform = 'scale(0.5)';
+    wrapper.style.transformOrigin = 'top left';
 
-    container.appendChild(iframe);
+    // Adsterra config — must be defined before invoke.js
+    const configScript = document.createElement('script');
+    configScript.type = 'text/javascript';
+    configScript.text = `atOptions = { 'key': 'cda4bca11f2cef504a11b56506742be3', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };`;
+
+    // Adsterra invoke — creates the ad iframe inside the wrapper
+    const invokeScript = document.createElement('script');
+    invokeScript.type = 'text/javascript';
+    invokeScript.src = 'https://www.highperformanceformat.com/cda4bca11f2cef504a11b56506742be3/invoke.js';
+
+    wrapper.appendChild(configScript);
+    wrapper.appendChild(invokeScript);
+    container.appendChild(wrapper);
 
     return () => {
       container.innerHTML = '';
