@@ -11,6 +11,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
+import { isNative } from '@/lib/platform';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 import { QRScannerModal } from '@/components/qr/QRScannerModal';
 
@@ -38,7 +39,11 @@ export function MobileBottomNav() {
 
   // Defer client-only checks to avoid SSR hydration mismatch (React #418)
   const [hasMounted, setHasMounted] = useState(false);
-  useEffect(() => { setHasMounted(true); }, []);
+  const [isNativeApp, setIsNativeApp] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+    setIsNativeApp(isNative());
+  }, []);
 
   // Hide on desktop
   // We'll use a CSS class to hide it on md+ screens
@@ -87,10 +92,13 @@ export function MobileBottomNav() {
       <nav
         className="md:hidden fixed left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]"
         style={{
-          bottom: isBannerHidden
+          // Native: sit flush at bottom, paddingBottom covers the safe area with the
+          // nav's own background — prevents the transparent safe-area strip.
+          // Web/PWA: offset up by the Adsterra bar height (unless banner is hidden).
+          bottom: isNativeApp || isBannerHidden
             ? '0px'
             : 'calc(var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
-          paddingBottom: isBannerHidden
+          paddingBottom: isNativeApp || isBannerHidden
             ? 'env(safe-area-inset-bottom, 0px)'
             : undefined,
         }}
