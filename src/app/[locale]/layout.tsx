@@ -24,6 +24,7 @@ import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner';
 import { NotificationPromptBanner } from '@/components/notifications/NotificationPromptBanner';
 import PWAInstallQueryHandler from '@/components/pwa/PWAInstallQueryHandler';
+import { ForceUpdateScreen } from '@/components/native/ForceUpdateScreen';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -66,41 +67,43 @@ export default async function LocaleLayout({ children, params }: Props) {
     <NextIntlClientProvider locale={locale}>
       <Providers>
         <PWASplashScreen>
-          <Analytics />
-          <SpeedInsights />
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-gold focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white"
-          >
-            {t('skipToContent')}
-          </a>
-          <header role="banner">
-            <SiteHeader />
-          </header>
-          <AccountDeletionBanner />
-          <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
-            <PasswordRecoveryGuard>
-              <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
-            </PasswordRecoveryGuard>
-          </main>
-          <MobileBottomNav />
-          <AdSpaceAdjuster />
-          <AdBanner />
-          <FloatingActionBtn />
-          <SiteFooter />
-          <CookieConsentBanner />
-          <NotificationPromptBanner />
-          <PWAInstallQueryHandler />
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            expand={false}
-            duration={3000}
-            toastOptions={{
-              className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
-            }}
-          />
+          <ForceUpdateScreen>
+            <Analytics />
+            <SpeedInsights />
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-gold focus:text-black focus:rounded-md focus:font-bold focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-white"
+            >
+              {t('skipToContent')}
+            </a>
+            <header role="banner">
+              <SiteHeader />
+            </header>
+            <AccountDeletionBanner />
+            <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+              <PasswordRecoveryGuard>
+                <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
+              </PasswordRecoveryGuard>
+            </main>
+            <MobileBottomNav />
+            <AdSpaceAdjuster />
+            <AdBanner />
+            <FloatingActionBtn />
+            <SiteFooter />
+            <CookieConsentBanner />
+            <NotificationPromptBanner />
+            <PWAInstallQueryHandler />
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              expand={false}
+              duration={3000}
+              toastOptions={{
+                className: 'border border-gray-200 dark:border-gray-700 shadow-lg',
+              }}
+            />
+          </ForceUpdateScreen>
         </PWASplashScreen>
       </Providers>
     </NextIntlClientProvider>
