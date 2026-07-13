@@ -89,7 +89,7 @@ export function MobileBottomNav() {
         style={{
           bottom: isBannerHidden
             ? '0px'
-            : `calc(${AD_BANNER_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
+            : 'calc(var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
           paddingBottom: isBannerHidden
             ? 'env(safe-area-inset-bottom, 0px)'
             : undefined,

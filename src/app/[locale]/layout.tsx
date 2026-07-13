@@ -14,6 +14,7 @@ import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
 import { AdBanner, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
+import { AdSpaceAdjuster } from '@/components/ads/AdSpaceAdjuster';
 import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
 import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
 import { AccountDeletionBanner } from '@/components/deletion';
@@ -77,12 +78,13 @@ export default async function LocaleLayout({ children, params }: Props) {
             <SiteHeader />
           </header>
           <AccountDeletionBanner />
-          <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: `calc(4rem + ${AD_BANNER_HEIGHT}px + env(safe-area-inset-bottom, 0px) + 1rem)` }}>
+          <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
             <PasswordRecoveryGuard>
               <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
             </PasswordRecoveryGuard>
           </main>
           <MobileBottomNav />
+          <AdSpaceAdjuster />
           <AdBanner />
           <FloatingActionBtn />
           <SiteFooter />
