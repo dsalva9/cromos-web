@@ -13,9 +13,16 @@ const ADMOB_BANNER_TEST_ID = 'ca-app-pub-3940256099942544/6300978111';
 // Set to true during development/testing, false for production
 const IS_TESTING = false;
 
+// Provisional height applied immediately before the banner loads so the nav
+// moves up before the actual SizeChanged event fires (avoids overlap flash).
+const PROVISIONAL_BANNER_HEIGHT_PX = 60;
+
 /**
  * Initialises the Google Mobile Ads SDK and shows a banner ad at the bottom
  * of the screen. Only runs on native Android (Capacitor).
+ *
+ * Updates the CSS variable --ad-band-height to the actual rendered banner
+ * height so MobileBottomNav, FloatingActionBtn and <main> all float above it.
  *
  * On web and PWA, this hook does nothing — Adsterra continues to handle ads there.
  *
@@ -34,11 +41,13 @@ export function useAdMob() {
         initialised.current = true;
 
         let isMounted = true;
+        let removeListener: (() => void) | undefined;
 
         async function initAndShowBanner() {
             try {
                 // Dynamically import to avoid bundling on web/SSR
-                const { AdMob, BannerAdSize, BannerAdPosition } = await import('@capacitor-community/admob');
+                const { AdMob, BannerAdSize, BannerAdPosition, BannerAdPluginEvents } =
+                    await import('@capacitor-community/admob');
 
                 // Initialise the SDK — must be called before any ad requests
                 // requestTrackingAuthorization() is a separate iOS-only call;
@@ -49,6 +58,13 @@ export function useAdMob() {
 
                 if (!isMounted) return;
 
+                // Reserve space immediately so the nav moves before the banner paints,
+                // avoiding any overlap flash while SizeChanged hasn't fired yet.
+                document.documentElement.style.setProperty(
+                    '--ad-band-height',
+                    `${PROVISIONAL_BANNER_HEIGHT_PX}px`
+                );
+
                 const options = {
                     adId: IS_TESTING ? ADMOB_BANNER_TEST_ID : ADMOB_BANNER_ID,
                     adSize: BannerAdSize.ADAPTIVE_BANNER,
@@ -58,9 +74,27 @@ export function useAdMob() {
                 };
 
                 await AdMob.showBanner(options);
+
+                // Update to the exact rendered height once the SDK reports it.
+                // This replaces the provisional value and keeps layout pixel-perfect.
+                const listener = await AdMob.addListener(
+                    BannerAdPluginEvents.SizeChanged,
+                    (size: { width: number; height: number }) => {
+                        if (size?.height) {
+                            document.documentElement.style.setProperty(
+                                '--ad-band-height',
+                                `${Math.round(size.height)}px`
+                            );
+                        }
+                    }
+                );
+
+                removeListener = () => listener.remove();
             } catch (err) {
-                // Non-fatal: ads failing to load must never crash the app
+                // Non-fatal: ads failing to load must never crash the app.
+                // Reset height so the nav returns to the bottom.
                 console.warn('[AdMob] Failed to initialise or show banner:', err);
+                document.documentElement.style.setProperty('--ad-band-height', '0px');
             }
         }
 
@@ -68,6 +102,7 @@ export function useAdMob() {
 
         return () => {
             isMounted = false;
+            removeListener?.();
             // Do NOT destroy/hide the banner on unmount — this hook lives in the root
             // layout and the banner should persist for the whole session
         };

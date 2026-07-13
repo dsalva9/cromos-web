@@ -92,13 +92,16 @@ export function MobileBottomNav() {
       <nav
         className="md:hidden fixed left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-[var(--z-nav)]"
         style={{
-          // Native: sit flush at bottom, paddingBottom covers the safe area with the
-          // nav's own background — prevents the transparent safe-area strip.
-          // Web/PWA: offset up by the Adsterra bar height (unless banner is hidden).
-          bottom: isNativeApp || isBannerHidden
+          // Native: float above the AdMob overlay using --ad-band-height (set by useAdMob).
+          //         paddingBottom fills the safe-area zone with the nav background.
+          // Web/PWA: offset above the Adsterra bar (also uses --ad-band-height).
+          // Hidden pages: sit flush at bottom:0 with safe-area padding.
+          bottom: isBannerHidden
             ? '0px'
-            : 'calc(var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
-          paddingBottom: isNativeApp || isBannerHidden
+            : isNativeApp
+              ? 'var(--ad-band-height, 0px)'
+              : 'calc(var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: (isNativeApp || isBannerHidden)
             ? 'env(safe-area-inset-bottom, 0px)'
             : undefined,
         }}
