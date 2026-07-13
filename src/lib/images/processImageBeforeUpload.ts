@@ -144,9 +144,7 @@ export async function processImageBeforeUpload(
 
           if (qrCode) {
             const data = qrCode.data;
-            const isOwnQR =
-              data.includes('cambiocromos.com/match/') ||
-              (data.includes('localhost') && data.includes('/match/'));
+            const isOwnQR = data.includes('cambiocromos.com/match/');
 
             if (!isOwnQR) {
               cleanup();
