@@ -161,7 +161,9 @@ export function AdBanner() {
     // Adsterra config — must be defined before invoke.js
     const configScript = document.createElement('script');
     configScript.type = 'text/javascript';
-    configScript.text = `atOptions = { 'key': '207f77c777a93d9b339e6e77660a9707', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };`;
+    // 'var' is required — Next.js modules run in strict mode where bare assignment
+    // to an undeclared variable throws ReferenceError. 'var' creates a window-scoped global.
+    configScript.text = `var atOptions = { 'key': '207f77c777a93d9b339e6e77660a9707', 'format': 'iframe', 'height': 50, 'width': 320, 'params': {} };`;
 
     // Adsterra invoke — creates the ad iframe inside the wrapper
     const invokeScript = document.createElement('script');
@@ -200,7 +202,9 @@ export function AdBanner() {
     // Adsterra config — must be defined before invoke.js
     const configScript = document.createElement('script');
     configScript.type = 'text/javascript';
-    configScript.text = `atOptions = { 'key': 'cda4bca11f2cef504a11b56506742be3', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };`;
+    // 'var' is required — Next.js modules run in strict mode where bare assignment
+    // to an undeclared variable throws ReferenceError. 'var' creates a window-scoped global.
+    configScript.text = `var atOptions = { 'key': 'cda4bca11f2cef504a11b56506742be3', 'format': 'iframe', 'height': 90, 'width': 728, 'params': {} };`;
 
     // Adsterra invoke — creates the ad iframe inside the wrapper
     const invokeScript = document.createElement('script');
@@ -248,32 +252,32 @@ export function AdBanner() {
           </div>
         </div>
       )}
-      {/* ═══════ MOBILE STACK (below bottom nav) ═══════ */}
+      {/* ═══════ MOBILE STRIP (below bottom nav) ═══════ */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex items-center justify-center"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900 border-t-2 border-gray-200 dark:border-gray-700 flex items-center justify-center"
         style={{
           height: 'calc(25px + env(safe-area-inset-bottom, 0px))',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
-        {/* Third-party ad (320×50 scaled to 160×25) */}
+        {/* Adsterra 320×50 → scaled to 160×25 via wrapper div */}
         <div
           ref={mobileAdRef}
-          className="relative mx-auto bg-gray-50 dark:bg-gray-800"
-          style={{ width: '160px', height: '25px', overflow: 'hidden' }}
+          className="relative mx-auto overflow-hidden"
+          style={{ width: '160px', height: '25px' }}
         />
       </div>
 
-      {/* ═══════ DESKTOP STACK (sticky bottom strip) ═══════ */}
+      {/* ═══════ DESKTOP STRIP (sticky bottom strip) ═══════ */}
       <div
-        className="hidden md:flex fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white/80 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200/80 dark:border-gold/20 items-center justify-center"
+        className="hidden md:flex fixed bottom-0 left-0 right-0 z-[calc(var(--z-nav)-1)] bg-white dark:bg-gray-900 border-t-2 border-gray-200 dark:border-gray-700 items-center justify-center"
         style={{ height: '45px' }}
       >
-        {/* Third-party ad (728×90 scaled to 364×45) */}
+        {/* Adsterra 728×90 → scaled to 364×45 via wrapper div */}
         <div
           ref={desktopAdRef}
-          className="relative mx-auto bg-gray-50 dark:bg-gray-800"
-          style={{ width: '364px', height: '45px', overflow: 'hidden' }}
+          className="relative mx-auto overflow-hidden"
+          style={{ width: '364px', height: '45px' }}
         />
       </div>
     </>
