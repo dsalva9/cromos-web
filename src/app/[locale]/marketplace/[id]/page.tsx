@@ -476,6 +476,16 @@ export default function ListingDetailPage() {
                   </ModernCard>
                 )}
 
+              {/* Destacar button — owner only, active, not yet highlighted */}
+              {isOwner && listing.status === 'active' && !listing.is_highlighted && (
+                <button
+                  onClick={() => setShowDestacaModal(true)}
+                  className="w-full mb-6 py-3 px-4 rounded-lg border-2 border-yellow-400 bg-yellow-400/10 text-yellow-700 dark:text-yellow-300 font-bold text-sm hover:bg-yellow-400/20 transition-colors flex items-center justify-center gap-2"
+                >
+                  ⭐ Destacar este anuncio
+                </button>
+              )}
+
               {/* Description */}
               {listing.description && (
                 <ModernCard className="mb-6">
@@ -719,16 +729,6 @@ export default function ListingDetailPage() {
                       </Button>
                     )}
                   </div>
-
-                  {/* Destacar button — only for owner of active non-highlighted listing */}
-                  {listing.status === 'active' && !listing.is_highlighted && (
-                    <button
-                      onClick={() => setShowDestacaModal(true)}
-                      className="w-full mt-2 py-2 px-4 rounded-lg border-2 border-yellow-400 bg-yellow-400/10 text-yellow-700 dark:text-yellow-300 font-bold text-sm hover:bg-yellow-400/20 transition-colors flex items-center justify-center gap-2"
-                    >
-                      ⭐ Destacar este anuncio
-                    </button>
-                  )}
                 </div>
               )}
 
