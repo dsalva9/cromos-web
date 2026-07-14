@@ -10,6 +10,10 @@ import { cn } from '@/lib/utils';
 const LS_STORE_ID = process.env.NEXT_PUBLIC_LS_STORE_ID ?? '410950';
 const LS_VARIANT_48H = process.env.NEXT_PUBLIC_LS_VARIANT_48H ?? '1903433';
 const LS_VARIANT_7D = process.env.NEXT_PUBLIC_LS_VARIANT_7D ?? '1903426';
+// Product UUID — from the Share link in your LS dashboard (not the numeric product ID)
+const LS_PRODUCT_UUID = process.env.NEXT_PUBLIC_LS_PRODUCT_UUID ?? '18a4fdb1-8773-4975-ab4b-a2a453b00736';
+// Store slug: the subdomain of your LS store URL
+const LS_STORE_SLUG = process.env.NEXT_PUBLIC_LS_STORE_SLUG ?? 'cambiocromos';
 
 export type HighlightDuration = '48_hours' | '7_days';
 
@@ -27,11 +31,13 @@ function buildCheckoutUrl(
   duration: HighlightDuration,
 ): string {
   const params = new URLSearchParams({
+    // Pre-select the specific variant (48h or 7d) in the LS checkout
+    'enabled[]': variantId,
     'checkout[custom][user_id]': userId,
     'checkout[custom][listing_id]': String(listingId),
     'checkout[custom][duration]': duration,
   });
-  return `https://cambiocromos.lemonsqueezy.com/buy/${variantId}?${params.toString()}`;
+  return `https://${LS_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${LS_PRODUCT_UUID}?${params.toString()}`;
 }
 
 export function DestacaAnuncioModal({

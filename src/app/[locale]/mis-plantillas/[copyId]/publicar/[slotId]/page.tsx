@@ -3,8 +3,9 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
 import { useEffect, useState, useCallback } from 'react';
-import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
+import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
 import { usePublishDuplicate } from '@/hooks/integration/usePublishDuplicate';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
@@ -50,7 +51,12 @@ function PublishDuplicateContent() {
   const [loading, setLoading] = useState(true);
   const { publishDuplicate, loading: publishing } = usePublishDuplicate();
   const { profile } = useProfileCompletion();
+  const { user } = useUser();
   const currencySymbol = getCurrencySymbol(profile?.country_code);
+
+  // Modal state — shown after successful publish
+  const [highlightModalOpen, setHighlightModalOpen] = useState(false);
+  const [newListingId, setNewListingId] = useState<number | null>(null);
 
   const fetchSlotData = useCallback(async () => {
     try {
@@ -159,9 +165,18 @@ function PublishDuplicateContent() {
       );
 
       toast.success('¡Anuncio publicado correctamente!');
-      router.push(`/marketplace/${listingId}`);
+      // Show highlight upsell modal instead of navigating immediately
+      setNewListingId(Number(listingId));
+      setHighlightModalOpen(true);
     } catch {
       toast.error('Error al publicar el anuncio');
+    }
+  };
+
+  const handleHighlightModalClose = () => {
+    setHighlightModalOpen(false);
+    if (newListingId) {
+      router.push(`/marketplace/${newListingId}`);
     }
   };
 
@@ -239,6 +254,16 @@ function PublishDuplicateContent() {
           currencySymbol={currencySymbol}
         />
       </div>
+
+      {/* Post-publish highlight upsell modal */}
+      {highlightModalOpen && newListingId && user && (
+        <DestacaAnuncioModal
+          open={highlightModalOpen}
+          listingId={newListingId}
+          userId={user.id}
+          onClose={handleHighlightModalClose}
+        />
+      )}
     </div>
   );
 }
