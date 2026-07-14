@@ -91,6 +91,24 @@ function stripLocalePrefix(pathname: string): string {
 export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
 
+    // --- Redirect Vercel production domain to custom domain ---
+    const host = request.headers.get('host');
+    if (host === 'cromos-web.vercel.app') {
+        const isAuthOrApi = pathname.startsWith('/auth/')
+            || pathname.startsWith('/api/')
+            || pathname === '/robots.txt'
+            || pathname === '/sitemap.xml'
+            || pathname === '/manifest.json'
+            || pathname === '/icon.png'
+            || pathname === '/ad-frame.html'
+            || pathname === '/ad-frame-desktop.html';
+
+        if (!isAuthOrApi) {
+            const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://cambiocromos.com');
+            return NextResponse.redirect(redirectUrl, { status: 308 });
+        }
+    }
+
     // --- 1. Skip next-intl for auth callbacks, API routes, and static SEO/PWA files ---
     // These routes don't need locale handling.
     const isAuthOrApi = pathname.startsWith('/auth/')
