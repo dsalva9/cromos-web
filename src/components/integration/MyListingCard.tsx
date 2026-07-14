@@ -18,6 +18,8 @@ import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { DeletionCountdown } from '@/components/deletion';
 import { logger } from '@/lib/logger';
+import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
+import { useUser } from '@/components/providers/SupabaseProvider';
 
 interface MyListing {
   listing_id: number;
@@ -46,6 +48,8 @@ interface MyListing {
   // Expiration metadata
   expiry_scheduled_at?: string | null;
   expiry_warning_sent_at?: string | null;
+  // Highlight
+  is_highlighted?: boolean | null;
 }
 
 interface MyListingCardProps {
@@ -62,6 +66,8 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
   const [showSoftDeleteModal, setShowSoftDeleteModal] = useState(false);
   const [showHardDeleteModal, setShowHardDeleteModal] = useState(false);
   const [reactivating, setReactivating] = useState(false);
+  const [showDestacaModal, setShowDestacaModal] = useState(false);
+  const { user } = useUser();
 
   const handleSoftDelete = async () => {
     try {
@@ -181,18 +187,25 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 )}
               </div>
 
-              {getStatusLabel(listing.status) && (
-                <Badge className={`
-                  ${listing.status === 'active' && listing.is_group ? 'bg-blue-500' : ''}
-                  ${listing.status === 'sold' ? 'bg-gray-500' : ''}
-                  ${listing.status === 'removed' ? 'bg-red-500' : ''}
-                  ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
-                  ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
-                  text-white uppercase flex-shrink-0
-                `}>
-                  {getStatusLabel(listing.status)}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {listing.is_highlighted && (
+                  <Badge className="bg-yellow-400 text-black border border-black font-black uppercase text-xs">
+                    ⭐ Destacado
+                  </Badge>
+                )}
+                {getStatusLabel(listing.status) && (
+                  <Badge className={`
+                    ${listing.status === 'active' && listing.is_group ? 'bg-blue-500' : ''}
+                    ${listing.status === 'sold' ? 'bg-gray-500' : ''}
+                    ${listing.status === 'removed' ? 'bg-red-500' : ''}
+                    ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
+                    ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
+                    text-white uppercase flex-shrink-0
+                  `}>
+                    {getStatusLabel(listing.status)}
+                  </Badge>
+                )}
+              </div>
             </div>
 
             {/* Alert if needs attention */}
@@ -303,6 +316,16 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                     </Button>
                   </Link>
 
+                  {!listing.is_highlighted && user && (
+                    <Button
+                      size="sm"
+                      onClick={() => setShowDestacaModal(true)}
+                      className="bg-yellow-400 text-black hover:bg-yellow-300 border border-black font-bold"
+                    >
+                      ⭐ Destacar
+                    </Button>
+                  )}
+
                   <Button
                     size="sm"
                     variant="outline"
@@ -381,6 +404,16 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
           </div>
         </div>
       </ModernCardContent>
+
+      {/* Destacar Modal */}
+      {user && (
+        <DestacaAnuncioModal
+          isOpen={showDestacaModal}
+          onClose={() => setShowDestacaModal(false)}
+          listingId={listing.listing_id}
+          userId={user.id}
+        />
+      )}
     </ModernCard>
   );
 }

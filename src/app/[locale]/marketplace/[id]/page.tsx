@@ -42,6 +42,7 @@ import { ImageModal } from '@/components/ui/ImageModal';
 import { getCurrencySymbol } from '@/constants/countries';
 import { getSupportMailtoUrl, cn } from '@/lib/utils';
 import { ShareButton } from '@/components/marketplace/ShareButton';
+import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
 
 export default function ListingDetailPage() {
   const params = useParams();
@@ -64,6 +65,7 @@ export default function ListingDetailPage() {
   const viewIncrementedRef = useRef<string | null>(null);
   const [ignoringListing, setIgnoringListing] = useState(false);
   const [showIgnoreConfirm, setShowIgnoreConfirm] = useState(false);
+  const [showDestacaModal, setShowDestacaModal] = useState(false);
 
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
@@ -347,6 +349,13 @@ export default function ListingDetailPage() {
                   {(listing.listing_type === 'venta' || listing.listing_type === 'ambos') && (
                     <Badge className="bg-green-600 text-white border-2 border-black">
                       💰 {t('sale')}
+                    </Badge>
+                  )}
+
+                  {/* Destacado Badge */}
+                  {listing.is_highlighted && (
+                    <Badge className="bg-yellow-400 text-black border-2 border-black font-black uppercase flex items-center gap-1">
+                      ⭐ Destacado
                     </Badge>
                   )}
 
@@ -710,6 +719,16 @@ export default function ListingDetailPage() {
                       </Button>
                     )}
                   </div>
+
+                  {/* Destacar button — only for owner of active non-highlighted listing */}
+                  {listing.status === 'active' && !listing.is_highlighted && (
+                    <button
+                      onClick={() => setShowDestacaModal(true)}
+                      className="w-full mt-2 py-2 px-4 rounded-lg border-2 border-yellow-400 bg-yellow-400/10 text-yellow-700 dark:text-yellow-300 font-bold text-sm hover:bg-yellow-400/20 transition-colors flex items-center justify-center gap-2"
+                    >
+                      ⭐ Destacar este anuncio
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -733,6 +752,16 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Destacar Modal (for owners) */}
+      {user && isOwner && (
+        <DestacaAnuncioModal
+          isOpen={showDestacaModal}
+          onClose={() => setShowDestacaModal(false)}
+          listingId={listing.id}
+          userId={user.id}
+        />
+      )}
 
       {/* Soft Delete Modal (for owners) */}
       <DeleteListingModal

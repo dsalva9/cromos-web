@@ -93,7 +93,17 @@ export function useListing(listingId: string) {
           price: (data as any).price,
           author_completed_trades: Number(data.author.completed_trades ?? 0),
           author_is_patron: data.author.is_patron,
+          is_highlighted: false, // will be set below
         });
+
+        // Check active highlight separately
+        const { data: hlData } = await supabase
+          .from('listing_highlights')
+          .select('id')
+          .eq('listing_id', parseInt(listingId))
+          .gt('expires_at', new Date().toISOString())
+          .maybeSingle();
+        setListing(prev => prev ? { ...prev, is_highlighted: !!hlData } : null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');

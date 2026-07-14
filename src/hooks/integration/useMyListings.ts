@@ -32,6 +32,8 @@ interface MyListing {
   // Expiration metadata
   expiry_scheduled_at?: string | null;
   expiry_warning_sent_at?: string | null;
+  // Highlight
+  is_highlighted?: boolean | null;
 }
 
 export interface MyListingWithAttention extends MyListing {
