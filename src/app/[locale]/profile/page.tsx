@@ -363,9 +363,6 @@ function ProfileContent() {
                 <div>
                   <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
                     {t('credits.title')}
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-400 text-black uppercase tracking-wider">
-                      ⭐ PRO
-                    </span>
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-xl">
                     {t('credits.subtitle')}

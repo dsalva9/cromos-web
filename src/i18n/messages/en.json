@@ -132,11 +132,11 @@
         "error": "Error updating nickname"
       },
       "credits": {
-        "title": "Highlight Credits",
-        "subtitle": "Highlight your listings in the marketplace so they appear first.",
+        "title": "Credits",
+        "subtitle": "Use your credits to highlight your listings in the marketplace so they appear first.",
         "balance": "You have {count} credits",
         "watchAd": "Watch Ad (+{amount} credits)",
-        "howToEarn": "Earn free credits by watching ads in the Android app, or highlight directly when publishing on the web.",
+        "howToEarn": "Earn free credits by watching ads in the Android app.",
         "successReward": "+{amount} credits earned!",
         "adError": "Could not load ad",
         "adLoading": "Showing ad...",

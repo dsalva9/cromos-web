@@ -132,11 +132,11 @@
         "error": "Erro ao atualizar nickname"
       },
       "credits": {
-        "title": "Créditos de Destaque",
-        "subtitle": "Destaque os seus anúncios no marketplace para que apareçam em primeiro lugar.",
+        "title": "Créditos",
+        "subtitle": "Use os seus créditos para destacar os seus anúncios no marketplace para que apareçam em primeiro lugar.",
         "balance": "Tem {count} créditos",
         "watchAd": "Ver Anúncio (+{amount} créditos)",
-        "howToEarn": "Consiga créditos grátis a ver anúncios na app Android, ou destaque diretamente ao publicar na web.",
+        "howToEarn": "Consiga créditos grátis a ver anúncios na app Android.",
         "successReward": "+{amount} créditos ganhos!",
         "adError": "Não foi possível carregar o anúncio",
         "adLoading": "A mostrar anúncio...",

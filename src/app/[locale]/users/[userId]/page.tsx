@@ -909,9 +909,6 @@ export default function UserProfilePage() {
                           <div>
                             <h4 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-1.5">
                               {tp('index.credits.title')}
-                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-black uppercase tracking-wider">
-                                ⭐ PRO
-                              </span>
                             </h4>
                             <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 max-w-md leading-relaxed">
                               {tp('index.credits.subtitle')}
