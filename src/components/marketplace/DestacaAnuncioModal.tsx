@@ -8,11 +8,12 @@ import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 const LS_STORE_ID = process.env.NEXT_PUBLIC_LS_STORE_ID ?? '410950';
-const LS_VARIANT_48H = process.env.NEXT_PUBLIC_LS_VARIANT_48H ?? '1903433';
-const LS_VARIANT_7D = process.env.NEXT_PUBLIC_LS_VARIANT_7D ?? '1903426';
-// Product UUID — from the Share link in your LS dashboard (not the numeric product ID)
-const LS_PRODUCT_UUID = process.env.NEXT_PUBLIC_LS_PRODUCT_UUID ?? '18a4fdb1-8773-4975-ab4b-a2a453b00736';
-// Store slug: the subdomain of your LS store URL
+const LS_VARIANT_48H_ID = process.env.NEXT_PUBLIC_LS_VARIANT_48H ?? '1903433';
+const LS_VARIANT_7D_ID = process.env.NEXT_PUBLIC_LS_VARIANT_7D ?? '1903426';
+// Per-variant checkout UUIDs (from the Share link on each variant in LS dashboard)
+const LS_VARIANT_48H_UUID = process.env.NEXT_PUBLIC_LS_VARIANT_48H_UUID ?? 'df84bb68-f7ac-49a4-acd1-72690b3d583c';
+const LS_VARIANT_7D_UUID = process.env.NEXT_PUBLIC_LS_VARIANT_7D_UUID ?? '18a4fdb1-8773-4975-ab4b-a2a453b00736';
+// Store slug
 const LS_STORE_SLUG = process.env.NEXT_PUBLIC_LS_STORE_SLUG ?? 'cambiocromos';
 
 export type HighlightDuration = '48_hours' | '7_days';
@@ -25,17 +26,19 @@ interface DestacaAnuncioModalProps {
 }
 
 function buildCheckoutUrl(
-  variantId: string,
+  duration: HighlightDuration,
   listingId: number,
   userId: string,
-  duration: HighlightDuration,
 ): string {
+  const variantUuid = duration === '48_hours' ? LS_VARIANT_48H_UUID : LS_VARIANT_7D_UUID;
+  const variantNumericId = duration === '48_hours' ? LS_VARIANT_48H_ID : LS_VARIANT_7D_ID;
   const params = new URLSearchParams({
+    enabled: variantNumericId,
     'checkout[custom][user_id]': userId,
     'checkout[custom][listing_id]': String(listingId),
     'checkout[custom][duration]': duration,
   });
-  return `https://${LS_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${LS_PRODUCT_UUID}?${params.toString()}`;
+  return `https://${LS_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${variantUuid}?${params.toString()}`;
 }
 
 export function DestacaAnuncioModal({
@@ -48,9 +51,7 @@ export function DestacaAnuncioModal({
   const [selected, setSelected] = useState<HighlightDuration | null>(null);
 
   const handlePay = (duration: HighlightDuration) => {
-    const variantId = duration === '48_hours' ? LS_VARIANT_48H : LS_VARIANT_7D;
-    const url = buildCheckoutUrl(variantId, listingId, userId, duration);
-    // Open LS checkout in same tab — LS returns user to their listing after payment
+    const url = buildCheckoutUrl(duration, listingId, userId);
     window.location.href = url;
   };
 
