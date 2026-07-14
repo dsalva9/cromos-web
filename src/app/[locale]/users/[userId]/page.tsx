@@ -39,7 +39,11 @@ import {
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight } from 'lucide-react';
+import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles } from 'lucide-react';
+import { isNative } from '@/lib/platform';
+import { useHighlightCredits, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
+
 import {
   AvatarPicker,
   AvatarSelection,
@@ -252,6 +256,45 @@ export default function UserProfilePage() {
   }, [listings]);
 
   const isOwnProfile = currentUser?.id === userId;
+
+  // Highlight credits and rewarded ad hooks for own profile
+  const { balance, loading: creditsLoading, earnCredits } = useHighlightCredits();
+  const { loadAd, showRewardedAd, isLoading: adLoading, isLoaded: adLoaded } = useRewardedAd();
+  const [watchingAd, setWatchingAd] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+
+  useEffect(() => {
+    setIsAndroid(isNative());
+  }, []);
+
+  // Preload ad when on Android and viewing own profile
+  useEffect(() => {
+    if (isAndroid && isOwnProfile && !adLoaded && !adLoading) {
+      loadAd();
+    }
+  }, [isAndroid, isOwnProfile, adLoaded, adLoading, loadAd]);
+
+  const handleWatchAd = async () => {
+    if (watchingAd) return;
+    setWatchingAd(true);
+    try {
+      if (!adLoaded) {
+        await loadAd();
+      }
+      const rewarded = await showRewardedAd();
+      if (rewarded) {
+        await earnCredits();
+        toast.success(tp('index.credits.successReward', { amount: CREDITS_PER_AD }));
+        // Preload next ad
+        loadAd();
+      }
+    } catch (err) {
+      toast.error(tp('index.credits.adError'));
+    } finally {
+      setWatchingAd(false);
+    }
+  };
+
   const availableStatuses = useMemo<ListingFilter[]>(
     () => (isOwnProfile ? ['active', 'reserved', 'sold', 'removed'] : ['active']),
     [isOwnProfile]
@@ -852,6 +895,73 @@ export default function UserProfilePage() {
 
                     <MatchStatCard userId={userId} renderStatCard={renderStatCard} />
                   </div>
+
+                  {/* HIGHLIGHT CREDITS CARD */}
+                  {isOwnProfile && (
+                    <div className="mt-6 bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 dark:from-amber-500/5 dark:to-orange-500/5 border-2 border-black dark:border-gray-700 rounded-2xl p-5 shadow-sm relative overflow-hidden">
+                      <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-amber-400/10 rounded-full blur-lg pointer-events-none" />
+                      
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 bg-amber-100 dark:bg-amber-950/40 rounded-xl text-amber-600 dark:text-amber-400 shrink-0 border border-amber-200 dark:border-amber-900/50">
+                            <Coins className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h4 className="text-base font-black text-gray-900 dark:text-white flex items-center gap-1.5">
+                              {tp('index.credits.title')}
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-black uppercase tracking-wider">
+                                ⭐ PRO
+                              </span>
+                            </h4>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 max-w-md leading-relaxed">
+                              {tp('index.credits.subtitle')}
+                            </p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-500 mt-1 italic">
+                              {tp('index.credits.howToEarn')}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end gap-2 self-stretch sm:self-auto shrink-0">
+                          <div className="text-right">
+                            <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold">
+                              {tp('index.credits.title')}
+                            </span>
+                            <div className="text-3xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1.5 justify-end">
+                              {creditsLoading ? (
+                                <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+                              ) : (
+                                <>
+                                  <span>{balance}</span>
+                                  <Sparkles className="w-5 h-5 shrink-0 fill-amber-400 text-amber-400" />
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          {isAndroid && (
+                            <Button
+                              onClick={handleWatchAd}
+                              disabled={watchingAd}
+                              size="sm"
+                              className="w-full sm:w-auto bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white font-black uppercase shadow-md px-4 py-1.5 h-9 rounded-lg text-xs"
+                            >
+                              {watchingAd ? (
+                                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                              ) : (
+                                <Tv2 className="w-3.5 h-3.5 mr-1.5" />
+                              )}
+                              {watchingAd
+                                ? tp('index.credits.adLoading')
+                                : adLoading
+                                  ? tp('index.credits.adPreparing')
+                                  : tp('index.credits.watchAd', { amount: CREDITS_PER_AD })}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Patron CTA Card for own profile */}
                   {isOwnProfile && !profile.is_patron && (
