@@ -291,6 +291,7 @@ export default function ListingDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Image */}
           <div className={cn(
+            "self-start lg:sticky lg:top-24",
             listing.is_highlighted
               ? "rounded-xl ring-4 ring-amber-400/60 shadow-[0_0_32px_rgba(245,158,11,0.35)] dark:shadow-[0_0_32px_rgba(245,158,11,0.2)]"
               : ""
