@@ -2080,7 +2080,19 @@
     "close": "Close",
     "onesignalMessage": "Subscribe to our notifications to get messages and trade offers. You can disable anytime.",
     "onesignalAccept": "Subscribe",
-    "onesignalCancel": "Later"
+    "onesignalCancel": "Later",
+    "fullscreen": {
+      "title": "Install the CambioCromos App!",
+      "subtitle": "The best way to trade your cards and collectibles from your Android device",
+      "benefitSpeedTitle": "Faster Loading",
+      "benefitSpeedDesc": "Instant listing and chat loading with zero delay.",
+      "benefitNotifyTitle": "Push Notifications",
+      "benefitNotifyDesc": "Get notified instantly when someone wants to trade a card with you.",
+      "benefitDirectTitle": "Direct Access",
+      "benefitDirectDesc": "Open the app with a single tap from your home screen.",
+      "buttonInstall": "Install from Google Play",
+      "buttonDismiss": "Continue in web browser"
+    }
   },
   "legal": {
     "cookiesBanner": {

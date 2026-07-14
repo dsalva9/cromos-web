@@ -20,6 +20,7 @@ import { AnimatedList } from '@/components/ui/AnimatedList';
 import { SponsoredCard } from '@/components/marketplace/SponsoredCard';
 import { SPONSORED_PRODUCT_CUBE, SPONSORED_PRODUCT_ALBUM } from '@/lib/marketplace/sponsored-product';
 import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
+import { AndroidInstallFullscreenModal } from '@/components/pwa/AndroidInstallFullscreenModal';
 import { useTranslations } from 'next-intl';
 
 interface MarketplaceContentProps {
@@ -312,6 +313,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     return (
         <div className="text-gray-900 dark:text-white">
+            <AndroidInstallFullscreenModal />
             {/* Hero Section */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div className="container mx-auto px-4 pt-3 pb-1 md:pt-4 md:pb-2 md:py-8">

@@ -15,6 +15,7 @@ import Link from '@/components/ui/link';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Listing } from '@/types/v1.6.0';
+import { AndroidInstallFullscreenModal } from '@/components/pwa/AndroidInstallFullscreenModal';
 
 interface PublicMarketplaceContentProps {
     initialListings: Listing[];
@@ -90,6 +91,7 @@ export function PublicMarketplaceContent({ initialListings }: PublicMarketplaceC
 
     return (
         <div className="text-gray-900 dark:text-white">
+            <AndroidInstallFullscreenModal />
             {/* Hero Section */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div className="container mx-auto px-4 pt-3 pb-1 md:pt-4 md:pb-2 md:py-8">

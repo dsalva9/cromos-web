@@ -2080,7 +2080,19 @@
     "close": "Fechar aviso de notificações",
     "onesignalMessage": "Inscreva-se nas nossas notificações para as últimas notícias e atualizações!",
     "onesignalAccept": "Permitir",
-    "onesignalCancel": "Agora não"
+    "onesignalCancel": "Agora não",
+    "fullscreen": {
+      "title": "Instale o App do CambioCromos!",
+      "subtitle": "A melhor forma de trocar seus cromos e colecionáveis do seu Android",
+      "benefitSpeedTitle": "Mais Rápido",
+      "benefitSpeedDesc": "Carregamento instantâneo de anúncios e chats sem esperas.",
+      "benefitNotifyTitle": "Notificações Push",
+      "benefitNotifyDesc": "Fique sabendo instantaneamente quando alguém quiser trocar um cromo com você.",
+      "benefitDirectTitle": "Acesso Direto",
+      "benefitDirectDesc": "Abra o aplicativo com um único toque na sua tela inicial.",
+      "buttonInstall": "Instalar da Google Play",
+      "buttonDismiss": "Continuar no navegador web"
+    }
   },
   "legal": {
     "cookiesBanner": {
