@@ -156,6 +156,17 @@
         "cancel": "Cancelar",
         "success": "Nickname actualizado correctamente",
         "error": "Error al actualizar el nickname"
+      },
+      "credits": {
+        "title": "Créditos de Destacado",
+        "subtitle": "Destaca tus anuncios en el marketplace para que aparezcan en primer lugar.",
+        "balance": "Tienes {count} créditos",
+        "watchAd": "Ver Anuncio (+{amount} créditos)",
+        "howToEarn": "Consigue créditos gratis viendo anuncios en la app de Android, o destaca directamente al publicar en la web.",
+        "successReward": "¡+{amount} créditos ganados!",
+        "adError": "No se pudo cargar el anuncio",
+        "adLoading": "Mostrando anuncio...",
+        "adPreparing": "Preparando anuncio..."
       }
     },
     "completar": {
@@ -1934,7 +1945,20 @@
     "bestValue": "Mejor opción",
     "ctaButton": "Destacar ahora",
     "skip": "No, publicar sin destacar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "credits": "créditos",
+    "creditsBalance": "{count} créditos",
+    "creditsGranted": "+{amount} créditos ganados",
+    "watchAd": "Ver anuncio (+{amount} créditos)",
+    "watchAdLoading": "Mostrando anuncio...",
+    "watchAdPreparing": "Preparando anuncio...",
+    "needMoreCredits": "Necesitas {needed} créditos más · ver {ads} anuncio(s)",
+    "activating": "Destacando...",
+    "activateSuccess": "¡Anuncio destacado con éxito!",
+    "activateError": "Error al destacar el anuncio",
+    "alreadyHighlighted": "Este anuncio ya está destacado",
+    "listingNotActive": "El anuncio no está activo",
+    "adError": "No se pudo cargar el anuncio"
   },
   "createListing": {
     "successToast": "¡Anuncio publicado con éxito!",

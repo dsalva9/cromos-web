@@ -19,14 +19,59 @@ import {
   CheckCircle,
   XCircle,
   EyeOff,
+  Coins,
+  Tv2,
+  Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { isNative } from '@/lib/platform';
+import { useHighlightCredits, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 
 function ProfileContent() {
   const { user, loading: userLoading } = useUser();
   const supabase = useSupabaseClient();
   const router = useRouter();
   const t = useTranslations('profile.index');
+
+  // Highlight credits and rewarded ad hooks
+  const { balance, loading: creditsLoading, earnCredits } = useHighlightCredits();
+  const { loadAd, showRewardedAd, isLoading: adLoading, isLoaded: adLoaded } = useRewardedAd();
+  const [watchingAd, setWatchingAd] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+
+  useEffect(() => {
+    setIsAndroid(isNative());
+  }, []);
+
+  // Preload ad when on Android
+  useEffect(() => {
+    if (isAndroid && !adLoaded && !adLoading) {
+      loadAd();
+    }
+  }, [isAndroid, adLoaded, adLoading, loadAd]);
+
+  const handleWatchAd = async () => {
+    if (watchingAd) return;
+    setWatchingAd(true);
+    try {
+      if (!adLoaded) {
+        await loadAd();
+      }
+      const rewarded = await showRewardedAd();
+      if (rewarded) {
+        await earnCredits();
+        toast.success(t('credits.successReward', { amount: CREDITS_PER_AD }));
+        // Preload next ad
+        loadAd();
+      }
+    } catch (err) {
+      toast.error(t('credits.adError'));
+    } finally {
+      setWatchingAd(false);
+    }
+  };
 
   // Profile data
   const {
@@ -299,6 +344,73 @@ function ProfileContent() {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          </ModernCard>
+        </div>
+
+        {/* HIGHLIGHT CREDITS CARD */}
+        <div className="mb-12">
+          <ModernCard className="bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 dark:from-amber-500/5 dark:to-orange-500/5 border-2 border-black dark:border-gray-700 rounded-md shadow-xl p-6 relative overflow-hidden">
+            {/* Background shimmer effect */}
+            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-amber-400/10 rounded-full blur-xl pointer-events-none" />
+            
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-amber-100 dark:bg-amber-950/40 rounded-xl text-amber-600 dark:text-amber-400 shrink-0 border border-amber-200 dark:border-amber-900/50">
+                  <Coins className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                    {t('credits.title')}
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black bg-amber-400 text-black uppercase tracking-wider">
+                      ⭐ PRO
+                    </span>
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 max-w-xl">
+                    {t('credits.subtitle')}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
+                    {t('credits.howToEarn')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-3 self-stretch md:self-auto shrink-0">
+                <div className="text-right">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-bold">
+                    {t('credits.title')}
+                  </span>
+                  <div className="text-4xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-2 mt-0.5 justify-end">
+                    {creditsLoading ? (
+                      <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+                    ) : (
+                      <>
+                        <span>{balance}</span>
+                        <Sparkles className="w-6 h-6 shrink-0 fill-amber-400 text-amber-400 animate-pulse" />
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {isAndroid && (
+                  <Button
+                    onClick={handleWatchAd}
+                    disabled={watchingAd}
+                    className="w-full md:w-auto bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white font-black uppercase border-2 border-black/10 shadow-lg px-6 py-2 h-11 rounded-lg"
+                  >
+                    {watchingAd ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Tv2 className="w-4 h-4 mr-2" />
+                    )}
+                    {watchingAd
+                      ? t('credits.adLoading')
+                      : adLoading
+                        ? t('credits.adPreparing')
+                        : t('credits.watchAd', { amount: CREDITS_PER_AD })}
+                  </Button>
+                )}
               </div>
             </div>
           </ModernCard>

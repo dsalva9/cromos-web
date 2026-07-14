@@ -130,6 +130,17 @@
         "cancel": "Cancel",
         "success": "Nickname updated successfully",
         "error": "Error updating nickname"
+      },
+      "credits": {
+        "title": "Highlight Credits",
+        "subtitle": "Highlight your listings in the marketplace so they appear first.",
+        "balance": "You have {count} credits",
+        "watchAd": "Watch Ad (+{amount} credits)",
+        "howToEarn": "Earn free credits by watching ads in the Android app, or highlight directly when publishing on the web.",
+        "successReward": "+{amount} credits earned!",
+        "adError": "Could not load ad",
+        "adLoading": "Showing ad...",
+        "adPreparing": "Preparing ad..."
       }
     },
     "completar": {
@@ -1934,7 +1945,20 @@
     "bestValue": "Best value",
     "ctaButton": "Highlight now",
     "skip": "No thanks, publish without highlighting",
-    "close": "Close"
+    "close": "Close",
+    "credits": "credits",
+    "creditsBalance": "{count} credits",
+    "creditsGranted": "+{amount} credits earned",
+    "watchAd": "Watch ad (+{amount} credits)",
+    "watchAdLoading": "Showing ad...",
+    "watchAdPreparing": "Preparing ad...",
+    "needMoreCredits": "You need {needed} more credits · watch {ads} ad(s)",
+    "activating": "Highlighting...",
+    "activateSuccess": "Listing highlighted successfully!",
+    "activateError": "Error highlighting listing",
+    "alreadyHighlighted": "This listing is already highlighted",
+    "listingNotActive": "Listing is not active",
+    "adError": "Could not load ad"
   },
   "createListing": {
     "successToast": "Listing published successfully!",
