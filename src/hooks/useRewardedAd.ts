@@ -35,13 +35,19 @@ const IS_TESTING = false;
 export function useRewardedAd() {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
+    const isLoadedRef = useRef(false);
     const admobRef = useRef<any>(null);
     const loadPromiseRef = useRef<Promise<boolean> | null>(null);
+
+    const setIsLoadedState = (val: boolean) => {
+        isLoadedRef.current = val;
+        setIsLoaded(val);
+    };
 
     /** Pre-load a rewarded ad so it's ready immediately when the user taps. */
     const loadAd = useCallback(async (): Promise<boolean> => {
         if (!isNative()) return false;
-        if (isLoaded) return true;
+        if (isLoadedRef.current) return true;
         if (loadPromiseRef.current) return loadPromiseRef.current;
 
         const promise = (async () => {
@@ -60,11 +66,11 @@ export function useRewardedAd() {
                     adId: IS_TESTING ? ADMOB_REWARDED_TEST_ID : ADMOB_REWARDED_ID,
                     isTesting: IS_TESTING,
                 });
-                setIsLoaded(true);
+                setIsLoadedState(true);
                 return true;
             } catch (err) {
                 console.warn('[AdMob Rewarded] Failed to load:', err);
-                setIsLoaded(false);
+                setIsLoadedState(false);
                 return false;
             } finally {
                 setIsLoading(false);
@@ -74,7 +80,7 @@ export function useRewardedAd() {
 
         loadPromiseRef.current = promise;
         return promise;
-    }, [isLoaded]);
+    }, []);
 
     /**
      * Show the preloaded rewarded ad.
@@ -85,7 +91,7 @@ export function useRewardedAd() {
         if (!isNative()) return false;
 
         // Ensure it is loaded (await the active load promise, or start loading if not loaded)
-        if (!isLoaded) {
+        if (!isLoadedRef.current) {
             const success = await loadAd();
             if (!success) return false;
         }
@@ -97,30 +103,36 @@ export function useRewardedAd() {
                 const { AdMob, RewardAdPluginEvents } = admobRef.current;
 
                 let rewarded = false;
+                let rewardListener: any;
+                let dismissedListener: any;
+                let failedListener: any;
 
-                const rewardListener = await AdMob.addListener(
+                const cleanup = () => {
+                    if (rewardListener) rewardListener.remove();
+                    if (dismissedListener) dismissedListener.remove();
+                    if (failedListener) failedListener.remove();
+                };
+
+                rewardListener = await AdMob.addListener(
                     RewardAdPluginEvents.Rewarded,
                     () => { rewarded = true; }
                 );
 
-                const dismissedListener = await AdMob.addListener(
+                dismissedListener = await AdMob.addListener(
                     RewardAdPluginEvents.Dismissed,
                     () => {
-                        rewardListener.remove();
-                        dismissedListener.remove();
-                        setIsLoaded(false); // ad consumed — need to load another
+                        cleanup();
+                        setIsLoadedState(false); // ad consumed — need to load another
                         resolve(rewarded);
                     }
                 );
 
                 // Also handle failed-to-show
-                const failedListener = await AdMob.addListener(
+                failedListener = await AdMob.addListener(
                     RewardAdPluginEvents.FailedToShow,
                     () => {
-                        rewardListener.remove();
-                        dismissedListener.remove();
-                        failedListener.remove();
-                        setIsLoaded(false);
+                        cleanup();
+                        setIsLoadedState(false);
                         resolve(false);
                     }
                 );
@@ -128,11 +140,11 @@ export function useRewardedAd() {
                 await AdMob.showRewardVideoAd();
             } catch (err) {
                 console.warn('[AdMob Rewarded] Failed to show:', err);
-                setIsLoaded(false);
+                setIsLoadedState(false);
                 resolve(false);
             }
         });
-    }, [isLoaded, loadAd]);
+    }, [loadAd]);
 
     return { loadAd, showRewardedAd, isLoading, isLoaded };
 }
