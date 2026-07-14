@@ -97,7 +97,8 @@ export function useListing(listingId: string) {
         });
 
         // Check active highlight separately
-        const { data: hlData } = await supabase
+        // Check active highlight separately (cast needed: table added after type generation)
+        const { data: hlData } = await (supabase as any)
           .from('listing_highlights')
           .select('id')
           .eq('listing_id', parseInt(listingId))
