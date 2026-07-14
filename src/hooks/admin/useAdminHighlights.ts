@@ -8,6 +8,7 @@ export interface AdminHighlight {
   highlight_id: number;
   listing_id: number;
   listing_title: string;
+  listing_status: string;
   user_id: string;
   nickname: string;
   duration: string;

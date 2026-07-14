@@ -398,9 +398,21 @@ function MarketplaceContent() {
                             <h3 className="text-lg font-black text-white">
                               {h.listing_title}
                             </h3>
-                            <Badge className={h.is_active ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-400'}>
-                              {h.is_active ? 'Activo' : 'Expirado'}
-                            </Badge>
+                            {h.is_active ? (
+                              h.listing_status === 'active' ? (
+                                <Badge className="bg-green-500/20 text-green-500 border border-green-500/30">
+                                  Activo
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30">
+                                  Inactivo (Anuncio {h.listing_status})
+                                </Badge>
+                              )
+                            ) : (
+                              <Badge className="bg-gray-500/20 text-gray-400 border border-gray-700">
+                                Expirado
+                              </Badge>
+                            )}
                             <Badge className="bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center gap-1 font-bold">
                               <Coins className="h-3.5 w-3.5" />
                               {h.credit_source === 'rewarded_ad'
