@@ -756,7 +756,7 @@ export default function ListingDetailPage() {
       {/* Destacar Modal (for owners) */}
       {user && isOwner && (
         <DestacaAnuncioModal
-          isOpen={showDestacaModal}
+          open={showDestacaModal}
           onClose={() => setShowDestacaModal(false)}
           listingId={listing.id}
           userId={user.id}

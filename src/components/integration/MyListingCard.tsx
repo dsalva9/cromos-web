@@ -408,7 +408,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       {/* Destacar Modal */}
       {user && (
         <DestacaAnuncioModal
-          isOpen={showDestacaModal}
+          open={showDestacaModal}
           onClose={() => setShowDestacaModal(false)}
           listingId={listing.listing_id}
           userId={user.id}
