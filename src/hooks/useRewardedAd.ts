@@ -36,35 +36,45 @@ export function useRewardedAd() {
     const [isLoading, setIsLoading] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const admobRef = useRef<any>(null);
+    const loadPromiseRef = useRef<Promise<boolean> | null>(null);
 
     /** Pre-load a rewarded ad so it's ready immediately when the user taps. */
-    const loadAd = useCallback(async () => {
-        if (!isNative()) return;
-        if (isLoading || isLoaded) return;
+    const loadAd = useCallback(async (): Promise<boolean> => {
+        if (!isNative()) return false;
+        if (isLoaded) return true;
+        if (loadPromiseRef.current) return loadPromiseRef.current;
 
-        setIsLoading(true);
-        try {
-            // Lazy import — never bundled on web/SSR
-            if (!admobRef.current) {
-                const admob = await import('@capacitor-community/admob');
-                admobRef.current = admob;
-                // initialize() is idempotent — safe to call even if banner already did it
-                await admob.AdMob.initialize({ initializeForTesting: IS_TESTING });
+        const promise = (async () => {
+            setIsLoading(true);
+            try {
+                // Lazy import — never bundled on web/SSR
+                if (!admobRef.current) {
+                    const admob = await import('@capacitor-community/admob');
+                    admobRef.current = admob;
+                    // initialize() is idempotent — safe to call even if banner already did it
+                    await admob.AdMob.initialize({ initializeForTesting: IS_TESTING });
+                }
+
+                const { AdMob } = admobRef.current;
+                await AdMob.prepareRewardVideoAd({
+                    adId: IS_TESTING ? ADMOB_REWARDED_TEST_ID : ADMOB_REWARDED_ID,
+                    isTesting: IS_TESTING,
+                });
+                setIsLoaded(true);
+                return true;
+            } catch (err) {
+                console.warn('[AdMob Rewarded] Failed to load:', err);
+                setIsLoaded(false);
+                return false;
+            } finally {
+                setIsLoading(false);
+                loadPromiseRef.current = null;
             }
+        })();
 
-            const { AdMob } = admobRef.current;
-            await AdMob.prepareRewardVideoAd({
-                adId: IS_TESTING ? ADMOB_REWARDED_TEST_ID : ADMOB_REWARDED_ID,
-                isTesting: IS_TESTING,
-            });
-            setIsLoaded(true);
-        } catch (err) {
-            console.warn('[AdMob Rewarded] Failed to load:', err);
-            setIsLoaded(false);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [isLoading, isLoaded]);
+        loadPromiseRef.current = promise;
+        return promise;
+    }, [isLoaded]);
 
     /**
      * Show the preloaded rewarded ad.
@@ -72,7 +82,15 @@ export function useRewardedAd() {
      * Resolves false if the user dismissed early or an error occurred.
      */
     const showRewardedAd = useCallback(async (): Promise<boolean> => {
-        if (!isNative() || !isLoaded || !admobRef.current) return false;
+        if (!isNative()) return false;
+
+        // Ensure it is loaded (await the active load promise, or start loading if not loaded)
+        if (!isLoaded) {
+            const success = await loadAd();
+            if (!success) return false;
+        }
+
+        if (!admobRef.current) return false;
 
         return new Promise(async (resolve) => {
             try {
@@ -114,7 +132,7 @@ export function useRewardedAd() {
                 resolve(false);
             }
         });
-    }, [isLoaded]);
+    }, [isLoaded, loadAd]);
 
     return { loadAd, showRewardedAd, isLoading, isLoaded };
 }
