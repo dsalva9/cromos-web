@@ -231,7 +231,8 @@
       "viewDetails": "Ver Detalhes",
       "ignore": "Ignorar anúncio",
       "ignoreSuccess": "Anúncio ignorado. Pode restaurá-lo nas Definições.",
-      "ignoreError": "Erro ao ignorar o anúncio"
+      "ignoreError": "Erro ao ignorar o anúncio",
+      "highlighted": "Destaque"
     },
     "sponsored": {
       "bookTitle": "Coleções Panini Football da Copa do Mundo 1970-2026",
@@ -1922,6 +1923,18 @@
     "logoutError": "Erro ao sair da sessão",
     "favorites": "Favoritos",
     "incompleteProfile": "Você precisa completar seu perfil para começar a trocar figurinhas!"
+  },
+  "destacaModal": {
+    "title": "Destaque o Seu Anúncio!",
+    "subtitle": "Apareça primeiro no marketplace e nos resultados de pesquisa",
+    "option48hTitle": "Destaque por 48 horas",
+    "option48hDesc": "O seu anúncio aparece primeiro durante 2 dias",
+    "option7dTitle": "Destaque por 7 dias",
+    "option7dDesc": "O seu anúncio aparece primeiro durante uma semana inteira",
+    "bestValue": "Melhor opção",
+    "ctaButton": "Destacar agora",
+    "skip": "Não, publicar sem destaque",
+    "close": "Fechar"
   },
   "createListing": {
     "successToast": "Anúncio publicado com sucesso!",

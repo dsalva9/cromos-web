@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { MapPin, Ban, Trash2, Flame, EyeOff } from 'lucide-react';
+import { MapPin, Ban, Trash2, Flame, EyeOff, Sparkles } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 import '@/styles/highlight-animation.css';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -126,11 +126,13 @@ export function ListingCard({ listing }: ListingCardProps) {
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
         "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border shadow-sm dark:shadow-md transition-colors duration-300",
-        listing.author_is_patron
-          ? "border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
-          : isNew
-            ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
-            : "border-gray-200/60 dark:border-gray-700/50"
+        listing.is_highlighted
+          ? "border-amber-400 dark:border-amber-500 shadow-[0_0_16px_rgba(245,158,11,0.25)] dark:shadow-[0_0_16px_rgba(245,158,11,0.15)] ring-1 ring-amber-300/60 dark:ring-amber-600/40"
+          : listing.author_is_patron
+            ? "border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
+            : isNew
+              ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
+              : "border-gray-200/60 dark:border-gray-700/50"
       )}
     >
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
@@ -160,6 +162,12 @@ export function ListingCard({ listing }: ListingCardProps) {
 
         {/* Status / New Badge / Patron Badge */}
         <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+          {listing.is_highlighted && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-400/95 text-white border border-amber-500/60 backdrop-blur-sm shadow-md">
+              <Sparkles className="h-2.5 w-2.5" />
+              {t('highlighted')}
+            </span>
+          )}
           {listing.author_is_patron && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-100/90 text-amber-800 border border-amber-300/60 backdrop-blur-sm shadow-sm dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/40">
               ☕ {t('patron')}

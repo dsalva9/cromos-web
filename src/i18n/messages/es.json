@@ -257,7 +257,8 @@
       "viewDetails": "Ver Detalles",
       "ignore": "Ignorar anuncio",
       "ignoreSuccess": "Anuncio ignorado. Puedes restaurarlo desde Ajustes.",
-      "ignoreError": "Error al ignorar el anuncio"
+      "ignoreError": "Error al ignorar el anuncio",
+      "highlighted": "Destacado"
     },
     "sponsored": {
       "bookTitle": "Panini Copa Mundial Colecciones 1970-2026",
@@ -1922,6 +1923,18 @@
     "logoutError": "Error al cerrar sesión",
     "favorites": "Favoritos",
     "incompleteProfile": "¡Necesitas completar tu perfil para empezar a cambiar cromos!"
+  },
+  "destacaModal": {
+    "title": "¡Destaca tu Anuncio!",
+    "subtitle": "Aparece el primero en el marketplace y en los resultados de búsqueda",
+    "option48hTitle": "Destacar 48 horas",
+    "option48hDesc": "Tu anuncio aparece primero durante 2 días",
+    "option7dTitle": "Destacar 7 días",
+    "option7dDesc": "Tu anuncio aparece primero durante toda una semana",
+    "bestValue": "Mejor opción",
+    "ctaButton": "Destacar ahora",
+    "skip": "No, publicar sin destacar",
+    "close": "Cerrar"
   },
   "createListing": {
     "successToast": "¡Anuncio publicado con éxito!",

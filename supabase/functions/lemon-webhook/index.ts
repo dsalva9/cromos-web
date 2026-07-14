@@ -104,10 +104,10 @@ Deno.serve(async (req) => {
   }
 
   // ---------------------------------------------------------------------------
-  // Only handle order_completed
+  // Only handle order_created (LS fires this when payment succeeds)
   // ---------------------------------------------------------------------------
   const eventName: string = payload?.meta?.event_name;
-  if (eventName !== "order_completed") {
+  if (eventName !== "order_created") {
     // Acknowledge but do nothing
     return new Response(JSON.stringify({ received: true, skipped: true }), {
       status: 200,

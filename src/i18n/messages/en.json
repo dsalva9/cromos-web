@@ -231,7 +231,8 @@
       "viewDetails": "View Details",
       "ignore": "Ignore listing",
       "ignoreSuccess": "Listing ignored. You can restore it from Settings.",
-      "ignoreError": "Error ignoring listing"
+      "ignoreError": "Error ignoring listing",
+      "highlighted": "Featured"
     },
     "sponsored": {
       "bookTitle": "World Cup Panini Football Collections 1970-2026",
@@ -1922,6 +1923,18 @@
     "logoutError": "Error logging out",
     "favorites": "Favorites",
     "incompleteProfile": "You need to complete your profile to start trading stickers!"
+  },
+  "destacaModal": {
+    "title": "Boost Your Listing!",
+    "subtitle": "Appear first in the marketplace and search results",
+    "option48hTitle": "Highlight for 48 hours",
+    "option48hDesc": "Your listing appears first for 2 days",
+    "option7dTitle": "Highlight for 7 days",
+    "option7dDesc": "Your listing appears first for a full week",
+    "bestValue": "Best value",
+    "ctaButton": "Highlight now",
+    "skip": "No thanks, publish without highlighting",
+    "close": "Close"
   },
   "createListing": {
     "successToast": "Listing published successfully!",

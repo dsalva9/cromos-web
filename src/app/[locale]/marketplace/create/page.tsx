@@ -4,13 +4,14 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/hooks/use-router';
 import Link from '@/components/ui/link';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
+import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
 import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
 import { CreateListingForm, PackItem } from '@/types/v1.6.0';
 import { logger } from '@/lib/logger';
 import { ArrowLeft } from 'lucide-react';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useTranslations } from 'next-intl';
@@ -24,6 +25,10 @@ function CreateListingContent() {
   const { user } = useUser();
   const currencySymbol = getCurrencySymbol(profile?.country_code);
   const t = useTranslations('createListing');
+
+  // Modal state — shown after successful publish
+  const [highlightModalOpen, setHighlightModalOpen] = useState(false);
+  const [newListingId, setNewListingId] = useState<number | null>(null);
 
   // Get initial data from query parameters
   const initialData = useMemo(() => {
@@ -81,12 +86,21 @@ function CreateListingContent() {
         pack_items: packItems,
       });
       toast.success(t('successToast'));
-      router.push(`/marketplace/${listingId}`);
+      // Show highlight upsell modal instead of navigating immediately
+      setNewListingId(Number(listingId));
+      setHighlightModalOpen(true);
     } catch (error) {
       logger.error('Create listing error:', error);
       toast.error(
         error instanceof Error ? error.message : t('errorToast')
       );
+    }
+  };
+
+  const handleHighlightModalClose = () => {
+    setHighlightModalOpen(false);
+    if (newListingId) {
+      router.push(`/marketplace/${newListingId}`);
     }
   };
 
@@ -119,6 +133,16 @@ function CreateListingContent() {
           qrData={qrData}
         />
       </div>
+
+      {/* Post-publish highlight upsell modal */}
+      {highlightModalOpen && newListingId && user && (
+        <DestacaAnuncioModal
+          open={highlightModalOpen}
+          listingId={newListingId}
+          userId={user.id}
+          onClose={handleHighlightModalClose}
+        />
+      )}
     </div>
   );
 }

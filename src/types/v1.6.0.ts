@@ -58,6 +58,7 @@ export interface Listing {
   price?: number | null;
   author_completed_trades?: number | null;
   author_is_patron?: boolean;
+  is_highlighted?: boolean | null;  // Whether listing is currently highlighted (paid feature)
 }
 
 
