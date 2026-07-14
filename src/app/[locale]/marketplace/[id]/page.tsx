@@ -44,6 +44,20 @@ import { getSupportMailtoUrl, cn } from '@/lib/utils';
 import { ShareButton } from '@/components/marketplace/ShareButton';
 import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
 
+/** Returns a short Spanish string for how long a highlight has left, or null if expired/missing */
+function getHighlightTimeLeft(expiresAt: string | null | undefined): string | null {
+  if (!expiresAt) return null;
+  const diff = new Date(expiresAt).getTime() - Date.now();
+  if (diff <= 0) return null;
+  const totalHours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  if (days > 0) return `${days}d ${hours}h restantes`;
+  if (totalHours > 0) return `${totalHours}h restantes`;
+  const mins = Math.floor(diff / (1000 * 60));
+  return `${mins}min restantes`;
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -372,9 +386,16 @@ export default function ListingDetailPage() {
 
                   {/* Destacado Badge */}
                   {listing.is_highlighted && (
-                    <Badge className="bg-yellow-400 text-black border-2 border-black font-black uppercase flex items-center gap-1">
-                      ⭐ Destacado
-                    </Badge>
+                    <div className="flex flex-col gap-0.5">
+                      <Badge className="bg-amber-400 text-black border-2 border-amber-600 font-black uppercase flex items-center gap-1">
+                        ⭐ Destacado
+                      </Badge>
+                      {isOwner && getHighlightTimeLeft(listing.highlight_expires_at) && (
+                        <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium pl-0.5">
+                          {getHighlightTimeLeft(listing.highlight_expires_at)}
+                        </span>
+                      )}
+                    </div>
                   )}
 
                   {/* Suspension Badge - Only visible to admins, hidden if author deleted or listing removed */}

@@ -34,6 +34,7 @@ interface MyListing {
   expiry_warning_sent_at?: string | null;
   // Highlight
   is_highlighted?: boolean | null;
+  highlight_expires_at?: string | null;
 }
 
 export interface MyListingWithAttention extends MyListing {

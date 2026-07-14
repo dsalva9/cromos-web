@@ -59,6 +59,7 @@ export interface Listing {
   author_completed_trades?: number | null;
   author_is_patron?: boolean;
   is_highlighted?: boolean | null;  // Whether listing is currently highlighted (paid feature)
+  highlight_expires_at?: string | null;  // ISO timestamp when the highlight expires
 }
 
 

@@ -100,11 +100,15 @@ export function useListing(listingId: string) {
         // Check active highlight separately (cast needed: table added after type generation)
         const { data: hlData } = await (supabase as any)
           .from('listing_highlights')
-          .select('id')
+          .select('id, expires_at')
           .eq('listing_id', parseInt(listingId))
           .gt('expires_at', new Date().toISOString())
           .maybeSingle();
-        setListing(prev => prev ? { ...prev, is_highlighted: !!hlData } : null);
+        setListing(prev => prev ? {
+          ...prev,
+          is_highlighted: !!hlData,
+          highlight_expires_at: hlData?.expires_at ?? null,
+        } : null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');

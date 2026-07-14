@@ -51,6 +51,7 @@ interface MyListing {
   expiry_warning_sent_at?: string | null;
   // Highlight
   is_highlighted?: boolean | null;
+  highlight_expires_at?: string | null;
 }
 
 interface MyListingCardProps {
@@ -58,6 +59,21 @@ interface MyListingCardProps {
   onUpdate: () => void;
   onTabChange?: (status: 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO') => void;
 }
+
+/** Returns a short Spanish string for how long a highlight has left, or null if expired/missing */
+function getHighlightTimeLeft(expiresAt: string | null | undefined): string | null {
+  if (!expiresAt) return null;
+  const diff = new Date(expiresAt).getTime() - Date.now();
+  if (diff <= 0) return null;
+  const totalHours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  if (days > 0) return `${days}d ${hours}h restantes`;
+  if (totalHours > 0) return `${totalHours}h restantes`;
+  const mins = Math.floor(diff / (1000 * 60));
+  return `${mins}min restantes`;
+}
+
 
 export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardProps) {
   const supabase = useSupabaseClient();
@@ -204,9 +220,16 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
 
               <div className="flex items-center gap-2 flex-shrink-0">
                 {listing.is_highlighted && (
-                  <Badge className="bg-yellow-400 text-black border border-black font-black uppercase text-xs">
-                    ⭐ Destacado
-                  </Badge>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <Badge className="bg-amber-400 text-black border border-amber-600 font-black uppercase text-xs">
+                      ⭐ Destacado
+                    </Badge>
+                    {getHighlightTimeLeft(listing.highlight_expires_at) && (
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                        {getHighlightTimeLeft(listing.highlight_expires_at)}
+                      </span>
+                    )}
+                  </div>
                 )}
                 {getStatusLabel(listing.status) && (
                   <Badge className={`
