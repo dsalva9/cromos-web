@@ -32,11 +32,13 @@ function buildCheckoutUrl(
 ): string {
   const variantUuid = duration === '48_hours' ? LS_VARIANT_48H_UUID : LS_VARIANT_7D_UUID;
   const variantNumericId = duration === '48_hours' ? LS_VARIANT_48H_ID : LS_VARIANT_7D_ID;
+  const successUrl = `https://cambiocromos.com/es/marketplace/${listingId}?highlight=success`;
   const params = new URLSearchParams({
     enabled: variantNumericId,
     'checkout[custom][user_id]': userId,
     'checkout[custom][listing_id]': String(listingId),
     'checkout[custom][duration]': duration,
+    'checkout[success_url]': successUrl,
   });
   return `https://${LS_STORE_SLUG}.lemonsqueezy.com/checkout/buy/${variantUuid}?${params.toString()}`;
 }

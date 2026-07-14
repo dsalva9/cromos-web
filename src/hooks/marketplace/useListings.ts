@@ -33,6 +33,7 @@ interface RpcListingResponse {
   group_count?: number;
   author_completed_trades?: number;
   author_is_patron?: boolean;
+  is_highlighted?: boolean | null;
 }
 
 interface UseListingsParams {
@@ -72,6 +73,7 @@ function transformRow(item: RpcListingResponse): Listing {
     group_count: item.group_count,
     author_completed_trades: item.author_completed_trades,
     author_is_patron: item.author_is_patron,
+    is_highlighted: item.is_highlighted,
   };
 }
 
