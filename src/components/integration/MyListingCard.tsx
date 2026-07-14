@@ -20,6 +20,7 @@ import { DeletionCountdown } from '@/components/deletion';
 import { logger } from '@/lib/logger';
 import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
 import { useUser } from '@/components/providers/SupabaseProvider';
+import { cn } from '@/lib/utils';
 
 interface MyListing {
   listing_id: number;
