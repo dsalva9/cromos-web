@@ -151,11 +151,25 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
   };
 
   return (
-    <ModernCard>
+    <ModernCard className={cn(
+      "transition-all duration-300 overflow-hidden",
+      listing.is_highlighted
+        ? "border-2 border-amber-400 dark:border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.3)] dark:shadow-[0_0_20px_rgba(245,158,11,0.15)] ring-1 ring-amber-300/40"
+        : ""
+    )}>
       <ModernCardContent className="p-0">
+        {/* Golden top strip for highlighted listings */}
+        {listing.is_highlighted && (
+          <div className="h-[3px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 w-full" />
+        )}
         <div className="flex flex-col md:flex-row gap-4 p-4">
           {/* Image */}
-          <div className="relative w-full md:w-32 h-32 bg-white rounded-md flex-shrink-0">
+          <div className={cn(
+            "relative w-full md:w-32 h-32 rounded-md flex-shrink-0",
+            listing.is_highlighted
+              ? "bg-gradient-to-br from-amber-100 to-yellow-50 dark:from-amber-950/40 dark:to-gray-800 ring-2 ring-amber-300/50"
+              : "bg-white dark:bg-gray-800"
+          )}>
             {listing.image_url ? (
               <Image
                 src={listing.image_url}

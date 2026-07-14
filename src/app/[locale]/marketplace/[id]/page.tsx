@@ -276,11 +276,24 @@ export default function ListingDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Image */}
-          <div>
+          <div className={cn(
+            listing.is_highlighted
+              ? "rounded-xl ring-4 ring-amber-400/60 shadow-[0_0_32px_rgba(245,158,11,0.35)] dark:shadow-[0_0_32px_rgba(245,158,11,0.2)]"
+              : ""
+          )}>
             <ModernCard>
               <ModernCardContent className="p-0">
+                {/* Golden top strip for highlighted listings */}
+                {listing.is_highlighted && (
+                  <div className="h-[3px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 w-full" />
+                )}
                 <div
-                  className="relative min-h-[400px] bg-white dark:bg-gray-800 flex items-center justify-center rounded-lg overflow-hidden cursor-zoom-in"
+                  className={cn(
+                    "relative min-h-[400px] flex items-center justify-center rounded-lg overflow-hidden cursor-zoom-in",
+                    listing.is_highlighted
+                      ? "bg-gradient-to-br from-amber-50 via-yellow-50/60 to-white dark:from-amber-950/30 dark:via-gray-900 dark:to-gray-800"
+                      : "bg-white dark:bg-gray-800"
+                  )}
                   onClick={() => listing.image_url && setImageModalOpen(true)}
                 >
                   {listing.image_url ? (
@@ -314,7 +327,12 @@ export default function ListingDetailPage() {
           </div>
 
           {/* Details */}
-          <div className="space-y-6">
+          <div className={cn(
+            "space-y-6",
+            listing.is_highlighted
+              ? "rounded-xl p-1 bg-gradient-to-br from-amber-50/60 via-yellow-50/20 to-transparent dark:from-amber-950/20 dark:via-transparent dark:to-transparent"
+              : ""
+          )}>
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex flex-wrap gap-2">

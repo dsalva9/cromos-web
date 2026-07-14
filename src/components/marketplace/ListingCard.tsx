@@ -125,20 +125,29 @@ export function ListingCard({ listing }: ListingCardProps) {
       whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
-        "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border shadow-sm dark:shadow-md transition-colors duration-300",
+        "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-md transition-all duration-300",
         listing.is_highlighted
-          ? "border-amber-400 dark:border-amber-500 shadow-[0_0_16px_rgba(245,158,11,0.25)] dark:shadow-[0_0_16px_rgba(245,158,11,0.15)] ring-1 ring-amber-300/60 dark:ring-amber-600/40"
+          ? "border-2 border-amber-400 dark:border-amber-500 shadow-[0_0_24px_rgba(245,158,11,0.45)] dark:shadow-[0_0_24px_rgba(245,158,11,0.25)] ring-2 ring-amber-300/50 dark:ring-amber-600/40"
           : listing.author_is_patron
-            ? "border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
+            ? "border border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
             : isNew
-              ? "border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
-              : "border-gray-200/60 dark:border-gray-700/50"
+              ? "border border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
+              : "border border-gray-200/60 dark:border-gray-700/50"
       )}
     >
+      {/* Golden shimmer top strip for highlighted listings */}
+      {listing.is_highlighted && (
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 z-30 animate-pulse" />
+      )}
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
-      <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center">
+      <div className={cn(
+        "relative aspect-square overflow-hidden flex items-center justify-center",
+        listing.is_highlighted
+          ? "bg-gradient-to-br from-amber-100 via-yellow-50 to-amber-50 dark:from-amber-950/40 dark:via-gray-900 dark:to-gray-900"
+          : "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900"
+      )}>
         {(listing.thumbnail_url || listing.image_url) ? (
           <Image
             src={listing.thumbnail_url ?? listing.image_url!}
