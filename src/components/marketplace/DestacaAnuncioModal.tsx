@@ -31,8 +31,6 @@ function buildCheckoutUrl(
   duration: HighlightDuration,
 ): string {
   const params = new URLSearchParams({
-    // Pre-select the specific variant (48h or 7d) in the LS checkout
-    'enabled[]': variantId,
     'checkout[custom][user_id]': userId,
     'checkout[custom][listing_id]': String(listingId),
     'checkout[custom][duration]': duration,
