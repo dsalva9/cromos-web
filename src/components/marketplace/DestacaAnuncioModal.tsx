@@ -207,7 +207,7 @@ export function DestacaAnuncioModal({
                     <span className="text-xs font-medium block">{t('credits')}</span>
                   </p>
                 ) : (
-                  <p className="text-xl font-black text-amber-600 dark:text-amber-400">0,99€</p>
+                  <p className="text-xl font-black text-amber-600 dark:text-amber-400">1,20€</p>
                 )}
               </div>
             </div>
@@ -247,7 +247,7 @@ export function DestacaAnuncioModal({
                     <span className="text-xs font-medium block">{t('credits')}</span>
                   </p>
                 ) : (
-                  <p className="text-xl font-black text-amber-600 dark:text-amber-400">2,99€</p>
+                  <p className="text-xl font-black text-amber-600 dark:text-amber-400">3,50€</p>
                 )}
               </div>
             </div>
