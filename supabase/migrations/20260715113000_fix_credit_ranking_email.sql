@@ -23,8 +23,8 @@ BEGIN
   RETURN QUERY
   SELECT 
     p.id as user_id,
-    COALESCE(p.nickname, 'Unknown') as nickname,
-    COALESCE(u.email, 'Unknown') as email,
+    COALESCE(p.nickname, 'Unknown')::TEXT as nickname,
+    COALESCE(u.email, 'Unknown')::TEXT as email,
     COALESCE(SUM(hct.amount) FILTER (WHERE hct.credit_source = 'ls_purchase' AND hct.amount > 0), 0)::BIGINT as purchase_credits,
     COALESCE(SUM(hct.amount) FILTER (WHERE hct.credit_source = 'rewarded_ad' AND hct.amount > 0), 0)::BIGINT as reward_credits,
     COALESCE(SUM(hct.amount) FILTER (WHERE hct.credit_source IN ('ls_purchase', 'rewarded_ad') AND hct.amount > 0), 0)::BIGINT as total_credits
