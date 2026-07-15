@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useAdminPendingDeletionUsers } from '@/hooks/admin/useAdminPendingDeletionUsers';
@@ -24,8 +24,11 @@ import {
 import { Loader2, User, AlertTriangle, Trash2, Shield } from 'lucide-react';
 import Link from '@/components/ui/link';
 import { LegalHoldControls } from './LegalHoldControls';
+import { createClient } from '@/lib/supabase/client';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 export function PendingDeletionUsersTable() {
+  const supabase = createClient();
   const { users, loading, error, refetch } = useAdminPendingDeletionUsers();
   const { permanentlyDeleteUser, loading: deleteLoading } = useAdminPermanentDelete();
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -122,9 +125,9 @@ export function PendingDeletionUsersTable() {
                 <TableRow key={user.user_id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {user.avatar_url ? (
+                      {resolveAvatarUrl(user.avatar_url, supabase) ? (
                         <img
-                          src={user.avatar_url}
+                          src={resolveAvatarUrl(user.avatar_url, supabase)!}
                           alt={user.nickname}
                           className="h-8 w-8 rounded-full"
                         />

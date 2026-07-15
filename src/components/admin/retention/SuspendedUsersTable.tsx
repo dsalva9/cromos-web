@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useAdminSuspendedUsers } from '@/hooks/admin/useAdminSuspendedUsers';
 import {
@@ -13,8 +13,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, User, AlertTriangle, Clock } from 'lucide-react';
 import Link from '@/components/ui/link';
+import { createClient } from '@/lib/supabase/client';
+import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 
 export function SuspendedUsersTable() {
+  const supabase = createClient();
   const { users, loading, error } = useAdminSuspendedUsers();
 
   if (loading) {
@@ -72,9 +75,9 @@ export function SuspendedUsersTable() {
             <TableRow key={user.user_id}>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  {user.avatar_url ? (
+                  {resolveAvatarUrl(user.avatar_url, supabase) ? (
                     <img
-                      src={user.avatar_url}
+                      src={resolveAvatarUrl(user.avatar_url, supabase)!}
                       alt={user.nickname}
                       className="h-8 w-8 rounded-full"
                     />

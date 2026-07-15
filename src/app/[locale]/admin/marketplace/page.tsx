@@ -87,13 +87,13 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm text-left text-white">
           <thead>
-            <tr className="text-gray-500 border-b border-gray-800 text-[10px] uppercase tracking-wider">
-              <th className="py-2.5 font-bold">Pos</th>
-              <th className="py-2.5 font-bold">Usuario</th>
-              <th className="py-2.5 font-bold text-right">Comprados</th>
-              <th className="py-2.5 font-bold text-right">Recomp.</th>
-              <th className="py-2.5 font-bold text-right text-gold">Total</th>
-              <th className="py-2.5 font-bold text-center">Acción</th>
+            <tr className="text-gray-500 border-b border-gray-800 text-[10px] uppercase tracking-wider bg-gray-800/20">
+              <th className="px-4 py-3 font-bold text-left">Pos</th>
+              <th className="px-4 py-3 font-bold text-left">Usuario</th>
+              <th className="px-4 py-3 font-bold text-right">Comprados</th>
+              <th className="px-4 py-3 font-bold text-right">Recomp.</th>
+              <th className="px-4 py-3 font-bold text-right text-gold">Total</th>
+              <th className="px-4 py-3 font-bold text-center">Acción</th>
             </tr>
           </thead>
           <tbody>
@@ -107,25 +107,25 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
 
               return (
                 <tr key={row.user_id} className="border-b border-gray-800/50 hover:bg-gray-800/10">
-                  <td className="py-3">
+                  <td className="px-4 py-3 text-left">
                     <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-black text-[10px] ${rankBadge}`}>
                       {rank}
                     </span>
                   </td>
-                  <td className="py-3">
+                  <td className="px-4 py-3 text-left">
                     <p className="font-bold text-white leading-none text-xs">{row.nickname}</p>
                     <p className="text-[10px] text-gray-500 mt-0.5 max-w-[120px] sm:max-w-none truncate">{row.email}</p>
                   </td>
-                  <td className="py-3 text-right font-semibold text-gray-300 text-xs">
+                  <td className="px-4 py-3 text-right font-semibold text-gray-300 text-xs">
                     {Number(row.purchase_credits).toLocaleString()}
                   </td>
-                  <td className="py-3 text-right font-semibold text-gray-300 text-xs">
+                  <td className="px-4 py-3 text-right font-semibold text-gray-300 text-xs">
                     {Number(row.reward_credits).toLocaleString()}
                   </td>
-                  <td className="py-3 text-right font-black text-gold text-xs">
+                  <td className="px-4 py-3 text-right font-black text-gold text-xs">
                     {Number(row.total_credits).toLocaleString()}
                   </td>
-                  <td className="py-3 text-center">
+                  <td className="px-4 py-3 text-center">
                     <Button
                       size="sm"
                       onClick={() => onSelectUser(row)}
@@ -140,7 +140,7 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
 
             {ranking.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center text-gray-500 py-8 text-xs">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500 text-xs">
                   No hay transacciones registradas de obtención de créditos
                 </td>
               </tr>
@@ -667,7 +667,7 @@ function MarketplaceContent() {
               </div>
 
               {/* Middle Column: Current Balance & Adjustment Form */}
-              <div className="space-y-4 lg:col-span-2">
+              <div className="space-y-4 lg:col-span-2 min-w-0">
                 {selectedUser ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Wallet card */}
