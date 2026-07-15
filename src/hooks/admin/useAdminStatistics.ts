@@ -116,6 +116,20 @@ export type ProvinceCount = {
   user_count: number;
 };
 
+export type GooglePlayClickStats = {
+  source: string;
+  click_count: number;
+};
+
+export type CreditsObtainedStats = {
+  purchase_users: number;
+  purchase_credits: number;
+  reward_users: number;
+  reward_credits: number;
+  admin_grant_users: number;
+  admin_grant_credits: number;
+};
+
 export type AdminStatisticsData = {
   overview: OverviewStats | null;
   marketplaceHealth: MarketplaceHealth | null;
@@ -128,6 +142,8 @@ export type AdminStatisticsData = {
   dailyMessages: DayMessages[];
   periodTotals: PeriodTotals | null;
   spainCCAA: ProvinceCount[];
+  googlePlayClicks: GooglePlayClickStats[];
+  creditsObtained: CreditsObtainedStats | null;
 };
 
 // ── Hook ──────────────────────────────────────────────────────────────
@@ -148,6 +164,8 @@ export function useAdminStatistics(
     dailyMessages: [],
     periodTotals: null,
     spainCCAA: [],
+    googlePlayClicks: [],
+    creditsObtained: null,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,6 +204,8 @@ export function useAdminStatistics(
         dailyMessagesRes,
         periodTotalsRes,
         spainCCAARes,
+        playStoreClicksRes,
+        creditsObtainedRes,
       ] = await Promise.all([
         db.rpc('admin_stats_overview', {
           p_country_code: countryParam ?? null,
@@ -227,6 +247,14 @@ export function useAdminStatistics(
         countryCode === 'ES'
           ? db.rpc('admin_stats_spain_ccaa')
           : Promise.resolve({ data: [], error: null }),
+        // New analytics click tracking RPC
+        db.rpc('admin_stats_google_play_clicks', {
+          ...timeParams,
+        }),
+        // New credit stats RPC
+        db.rpc('admin_stats_credits_obtained', {
+          ...timeParams,
+        }),
       ]);
 
       // Check for errors
@@ -242,6 +270,8 @@ export function useAdminStatistics(
         dailyMessagesRes,
         periodTotalsRes,
         spainCCAARes,
+        playStoreClicksRes,
+        creditsObtainedRes,
       ];
       const firstError = results.find(r => r.error);
       if (firstError?.error) {
@@ -268,6 +298,10 @@ export function useAdminStatistics(
         ? (periodTotalsRes.data[0] as PeriodTotals | undefined) ?? null
         : null;
 
+      const creditsObtainedRow = Array.isArray(creditsObtainedRes.data)
+        ? (creditsObtainedRes.data[0] as CreditsObtainedStats | undefined) ?? null
+        : null;
+
       setData({
         overview: overviewRow,
         marketplaceHealth: marketplaceHealthRow,
@@ -280,6 +314,8 @@ export function useAdminStatistics(
         dailyMessages: (dailyMessagesRes.data as DayMessages[]) ?? [],
         periodTotals: periodRow,
         spainCCAA: (spainCCAARes.data as ProvinceCount[]) ?? [],
+        googlePlayClicks: (playStoreClicksRes.data as GooglePlayClickStats[]) ?? [],
+        creditsObtained: creditsObtainedRow,
       });
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load statistics';

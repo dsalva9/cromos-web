@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, Share, Zap, Bell, Smartphone } from 'lucide-react';
 import { isWeb } from '@/lib/platform';
 import Image from 'next/image';
-
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cambiocromos.app';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 interface InstallAppModalProps {
     open: boolean;
@@ -99,10 +98,8 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
                     </p>
 
                     {isAndroid && (
-                        <a
-                            href={PLAY_STORE_URL}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <GooglePlayLink
+                            source="post_onboarding_modal"
                             className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors"
                         >
                             {/* Google Play icon — exact same as landing page */}
@@ -114,7 +111,7 @@ export function InstallAppModal({ open, onClose }: InstallAppModalProps) {
                                 <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
                             </svg>
                             <span className="text-sm font-semibold">Google Play</span>
-                        </a>
+                        </GooglePlayLink>
                     )}
 
                     {isIOS && (

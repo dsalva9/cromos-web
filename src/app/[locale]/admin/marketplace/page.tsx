@@ -46,8 +46,111 @@ import { useRestoreListing } from '@/hooks/marketplace/useRestoreListing';
 import { useAdminHighlights } from '@/hooks/admin/useAdminHighlights';
 import { useAdminCredits } from '@/hooks/admin/useAdminCredits';
 import { useUserSearch } from '@/hooks/admin/useUserSearch';
+import { useCreditRanking } from '@/hooks/admin/useCreditRanking';
+import { Trophy } from 'lucide-react';
 
 type AdminTab = 'listings' | 'highlights' | 'credits';
+
+function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void }) {
+  const { ranking, loading, error, refetch } = useCreditRanking(50);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-12 bg-[#111827] border border-gray-800 rounded-2xl p-6">
+        <Loader2 className="h-8 w-8 animate-spin text-gold" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4 text-red-400 text-sm">
+        {error.message || 'Error al cargar ranking'}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 bg-[#111827] border border-gray-800 rounded-2xl p-5">
+      <div className="flex items-center justify-between pb-3 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-gold" />
+          <h4 className="font-black text-white text-sm uppercase tracking-wider">
+            Ranking de Obtención de Créditos
+          </h4>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="border-gray-800 text-xs h-7 text-gray-400 hover:text-white">
+          Actualizar
+        </Button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm text-left text-white">
+          <thead>
+            <tr className="text-gray-500 border-b border-gray-800 text-[10px] uppercase tracking-wider">
+              <th className="py-2.5 font-bold">Pos</th>
+              <th className="py-2.5 font-bold">Usuario</th>
+              <th className="py-2.5 font-bold text-right">Comprados</th>
+              <th className="py-2.5 font-bold text-right">Recomp.</th>
+              <th className="py-2.5 font-bold text-right text-gold">Total</th>
+              <th className="py-2.5 font-bold text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ranking.map((row, index) => {
+              const rank = index + 1;
+              const rankBadge =
+                rank === 1 ? 'bg-yellow-500 text-black' :
+                rank === 2 ? 'bg-slate-400 text-black' :
+                rank === 3 ? 'bg-amber-700 text-white' :
+                'bg-gray-800 text-gray-400';
+
+              return (
+                <tr key={row.user_id} className="border-b border-gray-800/50 hover:bg-gray-800/10">
+                  <td className="py-3">
+                    <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-black text-[10px] ${rankBadge}`}>
+                      {rank}
+                    </span>
+                  </td>
+                  <td className="py-3">
+                    <p className="font-bold text-white leading-none text-xs">{row.nickname}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5 max-w-[120px] sm:max-w-none truncate">{row.email}</p>
+                  </td>
+                  <td className="py-3 text-right font-semibold text-gray-300 text-xs">
+                    {Number(row.purchase_credits).toLocaleString()}
+                  </td>
+                  <td className="py-3 text-right font-semibold text-gray-300 text-xs">
+                    {Number(row.reward_credits).toLocaleString()}
+                  </td>
+                  <td className="py-3 text-right font-black text-gold text-xs">
+                    {Number(row.total_credits).toLocaleString()}
+                  </td>
+                  <td className="py-3 text-center">
+                    <Button
+                      size="sm"
+                      onClick={() => onSelectUser(row)}
+                      className="bg-gold hover:bg-yellow-400 text-black text-[10px] px-2 py-0.5 h-6 font-black rounded-lg transition-all"
+                    >
+                      Gestionar
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+
+            {ranking.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-center text-gray-500 py-8 text-xs">
+                  No hay transacciones registradas de obtención de créditos
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function MarketplaceContent() {
   const [activeTab, setActiveTab] = useState<AdminTab>('listings');
@@ -568,7 +671,15 @@ function MarketplaceContent() {
                 {selectedUser ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Wallet card */}
-                    <div className="md:col-span-1 bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 border border-amber-500/20 rounded-2xl p-5 flex flex-col justify-between min-h-[160px]">
+                    <div className="md:col-span-1 bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-orange-500/10 border border-amber-500/20 rounded-2xl p-5 flex flex-col justify-between min-h-[160px] relative">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedUser(null)}
+                        className="absolute top-3 right-3 text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors"
+                        title="Cerrar y volver al ranking"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                       <div>
                         <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Saldo del Usuario</span>
                         <h4 className="text-lg font-black text-white mt-1 leading-snug truncate">{selectedUser.nickname}</h4>
@@ -683,10 +794,7 @@ function MarketplaceContent() {
 
                   </div>
                 ) : (
-                  <div className="h-full min-h-[300px] border border-dashed border-gray-800 rounded-2xl flex flex-col items-center justify-center p-6 text-center text-gray-500">
-                    <Coins className="h-10 w-10 text-gray-700 mb-3" />
-                    <p className="font-bold">Selecciona un usuario de la lista de búsqueda para gestionar su saldo de créditos</p>
-                  </div>
+                  <CreditRankingList onSelectUser={setSelectedUser} />
                 )}
               </div>
             </div>

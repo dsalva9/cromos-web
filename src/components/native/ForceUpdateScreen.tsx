@@ -1,7 +1,7 @@
 'use client';
 
 import { useForceUpdate } from '@/hooks/useForceUpdate';
-import { PLAY_STORE_URL } from '@/config/app-version';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 import { Download } from 'lucide-react';
 
 /**
@@ -37,15 +37,13 @@ export function ForceUpdateScreen({ children }: { children: React.ReactNode }) {
                 </p>
 
                 {/* CTA */}
-                <a
-                    href={PLAY_STORE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <GooglePlayLink
+                    source="force_update"
                     className="w-full max-w-xs bg-gold text-black font-bold text-base py-4 rounded-2xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-center gap-2"
                 >
                     <Download className="w-5 h-5" />
                     Actualizar en Google Play
-                </a>
+                </GooglePlayLink>
 
                 <p className="mt-6 text-xs text-gray-400 dark:text-gray-600">
                     CambioCromos · v1.6.3+

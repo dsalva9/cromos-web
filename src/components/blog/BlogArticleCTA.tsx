@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import PWAInstallButton from '@/components/pwa/PWAInstallButton';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 export default function BlogArticleCTA() {
     const t = useTranslations('blog.cta');
@@ -47,10 +48,8 @@ export default function BlogArticleCTA() {
                     {t('installApp')}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
-                    <a
-                        href="https://play.google.com/store/apps/details?id=com.cambiocromos.app"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <GooglePlayLink
+                        source="blog_cta"
                         className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-xl px-5 h-11 transition-all hover:scale-105 font-semibold text-sm shadow-md"
                     >
                         {/* Google Play icon */}
@@ -62,7 +61,7 @@ export default function BlogArticleCTA() {
                             <path d="M16.8 9.791l3.2 1.799a1 1 0 0 1 0 1.82L16.8 14.21 14.498 12 16.8 9.79z" fill="#34A853"/>
                         </svg>
                         Google Play
-                    </a>
+                    </GooglePlayLink>
                     <PWAInstallButton />
                 </div>
             </div>

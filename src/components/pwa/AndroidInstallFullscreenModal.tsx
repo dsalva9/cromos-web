@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl';
 import { X, Zap, Bell, Sparkles, Smartphone } from 'lucide-react';
 import { isWeb } from '@/lib/platform';
 import Image from 'next/image';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 const DISMISS_KEY = 'android-install-fullscreen-dismissed';
 const BANNER_DISMISS_KEY = 'install-banner-dismissed'; // sync with InstallAppBanner
 const DISMISS_DAYS = 7;
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cambiocromos.app';
 
 export function AndroidInstallFullscreenModal() {
     const [visible, setVisible] = useState(false);
@@ -106,10 +106,8 @@ export function AndroidInstallFullscreenModal() {
 
                 {/* Google Play CTA Button (Placed right before the benefits list) */}
                 <div className="w-full mb-8">
-                    <a
-                        href={PLAY_STORE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <GooglePlayLink
+                        source="android_fullscreen"
                         onClick={handlePlayStoreClick}
                         className="w-full inline-flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-black font-extrabold rounded-xl py-3 px-6 shadow-[0_4px_20px_rgba(245,158,11,0.3)] transition-all transform active:scale-95 duration-200 cursor-pointer"
                     >
@@ -118,7 +116,7 @@ export function AndroidInstallFullscreenModal() {
                             <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 0 1 0 1.38l-2.302 2.302L15.396 13l2.302-2.492zM5.864 3.458L16.8 9.791l-2.302 2.302-8.635-8.635z" />
                         </svg>
                         <span>{t('buttonInstall')}</span>
-                    </a>
+                    </GooglePlayLink>
                 </div>
 
                 {/* Benefits List */}

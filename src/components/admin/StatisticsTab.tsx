@@ -25,6 +25,9 @@ import {
   Activity,
   ArrowRight,
   BarChart2,
+  MousePointerClick,
+  Coins,
+  Download,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -228,6 +231,27 @@ export default function StatisticsTab() {
   const mh = data.marketplaceHealth;
   const af = data.activationFunnel;
   const eng = data.engagement;
+  const gplay = data.googlePlayClicks || [];
+  const creds = data.creditsObtained;
+
+  const totalGooglePlayClicks = useMemo(() => {
+    return gplay.reduce((sum, item) => sum + Number(item.click_count), 0);
+  }, [gplay]);
+
+  const getPlayStoreSourceLabel = (source: string) => {
+    switch (source) {
+      case 'landing': return t('gplay_source_landing');
+      case 'android_fullscreen': return t('gplay_source_android_fullscreen');
+      case 'android_banner': return t('gplay_source_android_banner');
+      case 'post_onboarding_modal': return t('gplay_source_post_onboarding_modal');
+      case 'blog_cta': return t('gplay_source_blog_cta');
+      case 'legal_about': return t('gplay_source_legal_about');
+      case 'legal_faq': return t('gplay_source_legal_faq');
+      case 'match_qr_guest': return t('gplay_source_match_qr_guest');
+      case 'force_update': return t('gplay_source_force_update');
+      default: return source;
+    }
+  };
 
   /* ── Cohort retention: pivot to row-per-cohort format ───────────── */
   const cohortOffsets = useMemo(() => {
@@ -922,6 +946,107 @@ export default function StatisticsTab() {
               )}
             </section>
           )}
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 11 — Google Play Install Clicks                       */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<MousePointerClick className="h-5 w-5 text-sky-400" />}
+              label={t('googlePlayClicksSection')}
+              hint={t('googlePlayClicks_hint')}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <StatCard
+                icon={<Download className="h-4 w-4" />}
+                label={t('totalClicks')}
+                hint={t('totalClicks_hint')}
+                value={totalGooglePlayClicks.toLocaleString()}
+                color="blue"
+              />
+              <div className="md:col-span-2 bg-[#1a2236] rounded-xl border-2 border-gray-800 p-6 space-y-4">
+                <div className="flex items-center gap-1.5 text-gray-400 text-sm pb-2 border-b border-gray-800">
+                  <span className="font-semibold text-gray-300">{t('clicksBySurface')}</span>
+                </div>
+                {gplay.length > 0 ? (
+                  <div className="space-y-4">
+                    {gplay.map((item) => {
+                      const count = Number(item.click_count);
+                      const pct = totalGooglePlayClicks > 0 ? (count / totalGooglePlayClicks) * 100 : 0;
+                      return (
+                        <div key={item.source} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs font-semibold text-gray-300">
+                            <span>{getPlayStoreSourceLabel(item.source)}</span>
+                            <span>{count.toLocaleString()} ({pct.toFixed(1)}%)</span>
+                          </div>
+                          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-sky-500 transition-all duration-500" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500 py-4 text-sm">{t('noData')}</p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════ */}
+          {/* § 12 — Credit statistics                                */}
+          {/* ═══════════════════════════════════════════════════════ */}
+          <section>
+            <SectionHeader
+              icon={<Coins className="h-5 w-5 text-amber-400" />}
+              label={t('creditsStatsSection')}
+              hint={t('creditsStats_hint')}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('purchaseUsers')}
+                hint={t('purchaseUsers_hint')}
+                value={(creds?.purchase_users ?? 0).toLocaleString()}
+                color="gold"
+              />
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('purchaseCredits')}
+                hint={t('purchaseCredits_hint')}
+                value={(creds?.purchase_credits ?? 0).toLocaleString()}
+                color="gold"
+              />
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('rewardUsers')}
+                hint={t('rewardUsers_hint')}
+                value={(creds?.reward_users ?? 0).toLocaleString()}
+                color="green"
+              />
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('rewardCredits')}
+                hint={t('rewardCredits_hint')}
+                value={(creds?.reward_credits ?? 0).toLocaleString()}
+                color="green"
+              />
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('adminGrantUsers')}
+                hint={t('adminGrantUsers_hint')}
+                value={(creds?.admin_grant_users ?? 0).toLocaleString()}
+                color="blue"
+              />
+              <StatCard
+                icon={<Coins className="h-4 w-4" />}
+                label={t('adminGrantCredits')}
+                hint={t('adminGrantCredits_hint')}
+                value={(creds?.admin_grant_credits ?? 0).toLocaleString()}
+                color="blue"
+              />
+            </div>
+          </section>
         </>
       )}
     </div>

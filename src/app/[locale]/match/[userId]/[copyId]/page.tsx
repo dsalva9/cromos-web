@@ -9,9 +9,7 @@ import { MatchResultView } from '@/components/qr/MatchResultView';
 import { Loader2, QrCode, ArrowLeftRight, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
-
-
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cambiocromos.app&hl=es';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 interface ScannerProfile {
   id: string;
@@ -73,8 +71,8 @@ function SmartRedirectCard({
           </div>
 
           {platform === 'android' && (
-            <a
-              href={PLAY_STORE_URL}
+            <GooglePlayLink
+              source="match_qr_guest"
               className="inline-flex items-center justify-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-xl px-5 h-[52px] transition-colors font-semibold w-full"
             >
               {/* Google Play icon */}
@@ -86,7 +84,7 @@ function SmartRedirectCard({
                 <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
               </svg>
               Descargar en Google Play
-            </a>
+            </GooglePlayLink>
           )}
 
           {platform === 'ios' && (

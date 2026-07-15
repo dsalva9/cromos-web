@@ -3,6 +3,7 @@ import { siteConfig } from '@/config/site';
 import { useTranslations } from 'next-intl';
 import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 import { getTranslations } from 'next-intl/server';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
     const t = await getTranslations({ locale, namespace: 'legal.faq' });
@@ -62,10 +63,8 @@ export default function FAQPage() {
                     {t('downloadTitle')}
                 </p>
                 <div className="flex flex-row flex-wrap items-center gap-4">
-                    <a
-                        href="https://play.google.com/store/apps/details?id=com.cambiocromos.app"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <GooglePlayLink
+                        source="legal_faq"
                         className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors no-underline"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -76,7 +75,7 @@ export default function FAQPage() {
                             <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
                         </svg>
                         <span className="text-sm font-semibold">Google Play</span>
-                    </a>
+                    </GooglePlayLink>
                     <PWAInstallButton />
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import MarketplaceShowcase from './MarketplaceShowcase';
 import AnimatedPhoneMockup from './AnimatedPhoneMockup';
 import PWAInstallButton from '@/components/pwa/PWAInstallButton';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 import { ArrowRight, Check, Search, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
@@ -99,10 +100,8 @@ export default function LandingPage() {
                                     {t('hero.availableOn')}
                                 </p>
                                 <div className="flex flex-row items-center gap-4">
-                                    <a
-                                        href="https://play.google.com/store/apps/details?id=com.cambiocromos.app"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <GooglePlayLink
+                                        source="landing"
                                         className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors"
                                     >
                                         {/* Google Play icon */}
@@ -114,7 +113,7 @@ export default function LandingPage() {
                                             <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
                                         </svg>
                                         <span className="text-sm font-semibold">Google Play</span>
-                                    </a>
+                                    </GooglePlayLink>
                                     <PWAInstallButton />
                                 </div>
                             </div>

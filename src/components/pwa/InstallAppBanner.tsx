@@ -4,10 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { X, Share } from 'lucide-react';
 import { isWeb, isNative, isPWA } from '@/lib/platform';
+import GooglePlayLink from '@/components/pwa/GooglePlayLink';
 
 const DISMISS_KEY = 'install-banner-dismissed';
 const DISMISS_DAYS = 7;
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.cambiocromos.app';
 
 /**
  * Compact install banner for mobile web users.
@@ -75,10 +75,8 @@ export function InstallAppBanner() {
             {/* Store buttons — same design as landing page */}
             <div className="flex flex-row items-center gap-3">
                 {isAndroid && (
-                    <a
-                        href={PLAY_STORE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <GooglePlayLink
+                        source="android_banner"
                         className="inline-flex items-center gap-2.5 bg-black hover:bg-gray-800 text-white rounded-lg px-5 h-[48px] transition-colors"
                     >
                         {/* Google Play icon — exact same as landing page */}
@@ -90,7 +88,7 @@ export function InstallAppBanner() {
                             <path d="M5.864 20.542l8.635-8.635 2.302 2.302L5.864 20.542z" fill="#34A853"/>
                         </svg>
                         <span className="text-sm font-semibold">{t('googlePlay')}</span>
-                    </a>
+                    </GooglePlayLink>
                 )}
 
                 {isIOS && (
