@@ -44,6 +44,53 @@ function base64UrlDecode(input: string): Uint8Array {
   return bytes;
 }
 
+/**
+ * Convert an ASN.1 DER-encoded ECDSA signature to IEEE P1363 format.
+ * Google AdMob sends DER but crypto.subtle.verify expects P1363 (raw r||s).
+ * For P-256: output is exactly 64 bytes (32 for r + 32 for s).
+ */
+function derToP1363(der: Uint8Array, byteLength = 32): Uint8Array {
+  // DER structure: 0x30 [total-len] 0x02 [r-len] [r-bytes] 0x02 [s-len] [s-bytes]
+  let offset = 0;
+  if (der[offset++] !== 0x30) throw new Error("Invalid DER: missing SEQUENCE");
+  // Read sequence length (may be 1 or 2 bytes)
+  let seqLen = der[offset++];
+  if (seqLen & 0x80) {
+    // Long form — skip length bytes (very rare for P-256)
+    const lenBytes = seqLen & 0x7f;
+    offset += lenBytes;
+  }
+
+  function readInteger(): Uint8Array {
+    if (der[offset++] !== 0x02) throw new Error("Invalid DER: missing INTEGER");
+    const len = der[offset++];
+    const value = der.slice(offset, offset + len);
+    offset += len;
+    return value;
+  }
+
+  const r = readInteger();
+  const s = readInteger();
+
+  // Pad or trim r and s to exactly byteLength bytes
+  function padOrTrim(value: Uint8Array): Uint8Array {
+    if (value.length === byteLength) return value;
+    if (value.length > byteLength) {
+      // Leading zero byte from DER (positive integer padding) — trim
+      return value.slice(value.length - byteLength);
+    }
+    // Pad with leading zeros
+    const padded = new Uint8Array(byteLength);
+    padded.set(value, byteLength - value.length);
+    return padded;
+  }
+
+  const result = new Uint8Array(byteLength * 2);
+  result.set(padOrTrim(r), 0);
+  result.set(padOrTrim(s), byteLength);
+  return result;
+}
+
 async function verifySignature(
   url: URL,
 ): Promise<boolean> {
@@ -66,7 +113,9 @@ async function verifySignature(
   }
   const message = qs.substring(0, sigIndex);
   const encodedMessage = new TextEncoder().encode(message);
-  const signatureBytes = base64UrlDecode(signatureParam);
+  const derSignature = base64UrlDecode(signatureParam);
+  // Convert DER → IEEE P1363 (raw r||s) for crypto.subtle
+  const signatureBytes = derToP1363(derSignature);
 
   // Try to verify, refreshing keys once if key_id is unknown
   for (let attempt = 0; attempt < 2; attempt++) {
