@@ -176,6 +176,14 @@ interface ListingsByCountry {
     users: { nickname: string; listings_count: number; title: string; listing_type: string; collection_name: string }[];
 }
 
+interface RewardedAdCredit {
+    user_id: string;
+    nickname: string;
+    email: string;
+    amount: number;
+    created_at: string;
+}
+
 // Country reference data (mirrors src/constants/countries.ts)
 const SUPPORTED_COUNTRIES = [
     { code: 'ES', name: 'España', flag: '🇪🇸' },
@@ -309,7 +317,8 @@ Deno.serve(async (req) => {
             marketplaceHealthResult,
             activationFunnelResult,
             engagementResult,
-            hourlyActivityResult
+            hourlyActivityResult,
+            rewardedAdsResult
         ] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
@@ -322,7 +331,12 @@ Deno.serve(async (req) => {
             supabase.rpc('admin_stats_activation_funnel', { p_country_code: null }),
             supabase.rpc('admin_stats_engagement', { p_days: days, p_country_code: null }),
             supabase.rpc('admin_stats_hourly_activity', { p_days: days }),
+            supabase.rpc('admin_get_rewarded_ad_credits_summary', { p_days: days }),
         ]);
+
+        if (rewardedAdsResult.error) {
+            console.error('[send-user-summary-email] Error fetching rewarded ads summary:', rewardedAdsResult.error);
+        }
 
         if (usersResult.error) {
             console.error('[send-user-summary-email] Error fetching users:', usersResult.error);
@@ -430,6 +444,7 @@ Deno.serve(async (req) => {
         const af = (activationFunnelResult.data as ActivationFunnel[])?.[0] || null;
         const eng = (engagementResult.data as EngagementStats[])?.[0] || null;
         const hourlyActivity = (hourlyActivityResult.data as HourlyActivity[]) || [];
+        const rewardedAdsList = (rewardedAdsResult?.data as RewardedAdCredit[]) || [];
 
         let usersHtml: string;
         const avgUsers = (Number(periodTotals?.new_users ?? 0) / days).toFixed(1);
@@ -485,6 +500,62 @@ Deno.serve(async (req) => {
             }
 
             usersHtml += `</div>`;
+        }
+
+        // Group rewarded ads by user
+        const adCreditsByUser = new Map<string, { nickname: string; email: string; total_amount: number; count: number }>();
+        for (const item of rewardedAdsList) {
+            const userId = item.user_id;
+            const existing = adCreditsByUser.get(userId);
+            if (existing) {
+                existing.total_amount += Number(item.amount);
+                existing.count += 1;
+            } else {
+                adCreditsByUser.set(userId, {
+                    nickname: item.nickname,
+                    email: item.email,
+                    total_amount: Number(item.amount),
+                    count: 1,
+                });
+            }
+        }
+
+        let rewardedAdsHtml: string;
+        const totalAdCredits = rewardedAdsList.reduce((sum, item) => sum + Number(item.amount), 0);
+        const uniqueAdUsers = adCreditsByUser.size;
+
+        if (rewardedAdsList.length === 0) {
+            rewardedAdsHtml = `
+              <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
+                Ningún usuario obtuvo créditos por anuncios premiados en ${periodLabel}.
+              </p>
+            `;
+        } else {
+            rewardedAdsHtml = `
+              <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
+                Un total de <strong>${uniqueAdUsers}</strong> ${uniqueAdUsers === 1 ? 'usuario obtuvo' : 'usuarios obtuvieron'} <strong>${totalAdCredits}</strong> créditos viendo anuncios en ${periodLabel}:
+              </p>
+              <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <thead>
+                  <tr style="background: #f3f4f6;">
+                    <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Usuario</th>
+                    <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Email</th>
+                    <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Créditos Totales</th>
+                    <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios Vistos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${Array.from(adCreditsByUser.values()).map((item, i) => `
+                    <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; font-weight: 500;">${escapeHtml(item.nickname)}</td>
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #4b5563;">${escapeHtml(item.email)}</td>
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; font-weight: bold; color: #16a34a;">+${item.total_amount}</td>
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; color: #4b5563;">${item.count}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
         }
 
         // ── Section 2: Reports ──
@@ -866,6 +937,15 @@ Deno.serve(async (req) => {
               👥 Nuevos Usuarios (${periodLabel})
             </h2>
             ${usersHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- Rewarded Ads Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              🎁 Créditos por Anuncios Premiados (${periodLabel})
+            </h2>
+            ${rewardedAdsHtml}
 
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
