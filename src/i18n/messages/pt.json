@@ -1728,6 +1728,14 @@
         "level_up": {
           "label": "Subida de nível",
           "description": "Quando você sobe de nível"
+        },
+        "marketplace_alert": {
+          "label": "Alertas de busca (instantâneos)",
+          "description": "Avisos imediatos ao publicar figurinhas do seu interesse"
+        },
+        "marketplace_alert_digest": {
+          "label": "Resumo de alertas (diário/semanal)",
+          "description": "Resumo periódico com as novas figurinhas que correspondem aos seus alertas"
         }
       }
     },

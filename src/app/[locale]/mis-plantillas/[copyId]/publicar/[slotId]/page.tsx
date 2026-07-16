@@ -262,6 +262,7 @@ function PublishDuplicateContent() {
           listingId={newListingId}
           userId={user.id}
           onClose={handleHighlightModalClose}
+          isNewListing
         />
       )}
     </div>

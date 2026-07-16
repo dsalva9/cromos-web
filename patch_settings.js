@@ -173,6 +173,14 @@ locales.forEach(locale => {
           "level_up": {
               "label": locale === 'en' ? "Level up" : locale === 'pt' ? "Subida de nível" : "Subida de nivel",
               "description": locale === 'en' ? "When you level up" : locale === 'pt' ? "Quando você sobe de nível" : "Cuando subes de nivel"
+          },
+          "marketplace_alert": {
+              "label": locale === 'en' ? "Search alerts (instant)" : locale === 'pt' ? "Alertas de busca (instantâneos)" : "Alertas de búsqueda (instantáneas)",
+              "description": locale === 'en' ? "Immediate notification when stickers you are looking for are published" : locale === 'pt' ? "Avisos imediatos ao publicar figurinhas do seu interesse" : "Avisos inmediatos al publicarse cromos que te interesan"
+          },
+          "marketplace_alert_digest": {
+              "label": locale === 'en' ? "Alerts digest (daily/weekly)" : locale === 'pt' ? "Resumo de alertas (diário/semanal)" : "Resumen de alertas (diario/semanal)",
+              "description": locale === 'en' ? "Periodic summary of new listings matching your search alerts" : locale === 'pt' ? "Resumo periódico com as novas figurinhas que correspondem aos seus alertas" : "Resumen periódico con los nuevos cromos que coinciden con tus alertas"
           }
       }
   };

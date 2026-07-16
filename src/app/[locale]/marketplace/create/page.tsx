@@ -141,6 +141,7 @@ function CreateListingContent() {
           listingId={newListingId}
           userId={user.id}
           onClose={handleHighlightModalClose}
+          isNewListing
         />
       )}
     </div>

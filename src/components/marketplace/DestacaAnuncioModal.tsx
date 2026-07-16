@@ -25,6 +25,8 @@ interface DestacaAnuncioModalProps {
   listingId: number;
   userId: string;
   onClose: () => void;
+  /** When true, shows "publish without highlighting" skip link (post-create flow) */
+  isNewListing?: boolean;
 }
 
 function buildCheckoutUrl(
@@ -50,6 +52,7 @@ export function DestacaAnuncioModal({
   listingId,
   userId,
   onClose,
+  isNewListing = false,
 }: DestacaAnuncioModalProps) {
   const t = useTranslations('destacaModal');
 
@@ -61,7 +64,7 @@ export function DestacaAnuncioModal({
   const [selected, setSelected] = useState<HighlightDuration | null>(null);
 
   // Android-only state
-  const { balance, loading: creditsLoading, earnCredits, activateHighlight } = useHighlightCredits();
+  const { balance, loading: creditsLoading, refresh: refreshBalance, earnCredits, activateHighlight } = useHighlightCredits();
   const { loadAd, showRewardedAd, isLoading: adLoading, isLoaded: adLoaded } = useRewardedAd();
   const [watchingAd, setWatchingAd] = useState(false);
   const [activating, setActivating] = useState(false);
@@ -79,6 +82,13 @@ export function DestacaAnuncioModal({
     }
   }, [isAndroid, open]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Refresh balance when modal opens (picks up credits granted elsewhere)
+  useEffect(() => {
+    if (open && isAndroid) {
+      refreshBalance();
+    }
+  }, [open, isAndroid]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Android: watch ad ──────────────────────────────────────────────────────
   const handleWatchAd = async () => {
     if (watchingAd) return;
@@ -87,23 +97,29 @@ export function DestacaAnuncioModal({
       if (!adLoaded) await loadAd();
       const rewarded = await showRewardedAd();
       if (rewarded) {
-        await earnCredits();
-        setCreditFlash(true);
-        setTimeout(() => setCreditFlash(false), 2500);
+        try {
+          await earnCredits();
+          setCreditFlash(true);
+          setTimeout(() => setCreditFlash(false), 2500);
+        } catch (err: any) {
+          const msg = err?.message ?? '';
+          if (msg === 'credit_grant_timeout') {
+            // SSV callback slow — refresh balance and show info toast
+            await refreshBalance();
+            toast.info(t('rewardProcessing'));
+          } else if (msg.includes('rate_limited')) {
+            toast.error(t('rateLimited'));
+          } else if (msg.includes('daily_limit_reached')) {
+            toast.error(t('dailyLimitReached'));
+          } else {
+            toast.error(t('adError'));
+          }
+        }
         // Pre-load next ad for a seamless second watch
         loadAd();
       }
-    } catch (err: any) {
-      const msg = err?.message ?? '';
-      if (msg === 'credit_grant_timeout') {
-        toast.info(t('rewardProcessing'));
-      } else if (msg.includes('rate_limited')) {
-        toast.error(t('rateLimited'));
-      } else if (msg.includes('daily_limit_reached')) {
-        toast.error(t('dailyLimitReached'));
-      } else {
-        toast.error(t('adError'));
-      }
+    } catch {
+      toast.error(t('adError'));
     } finally {
       setWatchingAd(false);
     }
@@ -136,7 +152,11 @@ export function DestacaAnuncioModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl"
+        className={cn(
+          'sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl',
+          // On Android, add bottom margin so the modal clears the AdMob banner
+          isAndroid && 'mb-[70px]',
+        )}
         showCloseButton={false}
       >
         {/* ── Golden Header (same for both modes) ─────────────────────────── */}
@@ -328,15 +348,17 @@ export function DestacaAnuncioModal({
             </Button>
           )}
 
-          {/* Skip */}
-          <div className="text-center pt-1 pb-2">
-            <button
-              onClick={onClose}
-              className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors underline underline-offset-2"
-            >
-              {t('skip')}
-            </button>
-          </div>
+          {/* Skip — only show for new listings (post-create flow) */}
+          {isNewListing && (
+            <div className="text-center pt-1 pb-2">
+              <button
+                onClick={onClose}
+                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors underline underline-offset-2"
+              >
+                {t('skip')}
+              </button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

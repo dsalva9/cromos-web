@@ -225,8 +225,8 @@ export function NotificationPreferencesMatrix({
                                     : 'bg-gray-200'
                                 } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                                 aria-label={`${
-                                  localPreferences[channel][config.kind] ? t('notifications.deactivate') : t('notifications.activate')
-                                } ${t(`notifications.types.${config.kind}.label`)} ${t('notifications.for')} ${channel}`}
+                                  localPreferences[channel][config.kind] ? t('notifications.matrix.aria.disable') : t('notifications.matrix.aria.enable')
+                                } ${t(`notifications.types.${config.kind}.label`)} ${t('notifications.matrix.aria.for')} ${channel}`}
                               >
                                 <span
                                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
@@ -304,8 +304,8 @@ export function NotificationPreferencesMatrix({
                                 : 'bg-gray-200'
                             } ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                             aria-label={`${
-                              localPreferences[channel][config.kind] ? t('notifications.deactivate') : t('notifications.activate')
-                            } ${t(`notifications.types.${config.kind}.label`)} ${t('notifications.for')} ${channel}`}
+                              localPreferences[channel][config.kind] ? t('notifications.matrix.aria.disable') : t('notifications.matrix.aria.enable')
+                            } ${t(`notifications.types.${config.kind}.label`)} ${t('notifications.matrix.aria.for')} ${channel}`}
                           >
                             <span
                               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

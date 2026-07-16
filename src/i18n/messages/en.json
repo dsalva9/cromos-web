@@ -1851,6 +1851,14 @@
         "level_up": {
           "label": "Level up",
           "description": "When you level up"
+        },
+        "marketplace_alert": {
+          "label": "Search alerts (instant)",
+          "description": "Immediate notification when stickers you are looking for are published"
+        },
+        "marketplace_alert_digest": {
+          "label": "Alerts digest (daily/weekly)",
+          "description": "Periodic summary of new listings matching your search alerts"
         }
       }
     },

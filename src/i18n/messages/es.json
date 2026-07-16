@@ -1728,6 +1728,14 @@
         "level_up": {
           "label": "Subida de nivel",
           "description": "Cuando subes de nivel"
+        },
+        "marketplace_alert": {
+          "label": "Alertas de búsqueda (instantáneas)",
+          "description": "Avisos inmediatos al publicarse cromos que te interesan"
+        },
+        "marketplace_alert_digest": {
+          "label": "Resumen de alertas (diario/semanal)",
+          "description": "Resumen periódico con los nuevos cromos que coinciden con tus alertas"
         }
       }
     },
