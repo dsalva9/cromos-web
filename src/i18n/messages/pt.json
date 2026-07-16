@@ -140,7 +140,10 @@
         "successReward": "+{amount} créditos ganhos!",
         "adError": "Não foi possível carregar o anúncio",
         "adLoading": "A mostrar anúncio...",
-        "adPreparing": "A preparar anúncio..."
+        "adPreparing": "A preparar anúncio...",
+        "rewardProcessing": "A recompensa está a ser processada, verifique em breve",
+        "rateLimited": "Aguarde antes de ver outro anúncio",
+        "dailyLimitReached": "Atingiu o limite diário de créditos"
       }
     },
     "completar": {
@@ -1986,7 +1989,10 @@
     "activateError": "Erro ao destacar o anúncio",
     "alreadyHighlighted": "Este anúncio já está destacado",
     "listingNotActive": "O anúncio não está ativo",
-    "adError": "Não foi possível carregar o anúncio"
+    "adError": "Não foi possível carregar o anúncio",
+    "rewardProcessing": "A recompensa está a ser processada, verifique em breve",
+    "rateLimited": "Aguarde antes de ver outro anúncio",
+    "dailyLimitReached": "Atingiu o limite diário de créditos"
   },
   "createListing": {
     "successToast": "Anúncio publicado com sucesso!",

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { isNative } from '@/lib/platform';
+import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 // Production rewarded ad unit ID (CambioCromos AdMob account)
 const ADMOB_REWARDED_ID = 'ca-app-pub-8347713301854118/7122569822';
@@ -31,8 +32,15 @@ const IS_TESTING = false;
  * - AdMob SDK is already initialised by useAdMob (banner hook)
  * - Only shows ad after explicit user action — never auto-plays
  * - Reward is granted only on the Rewarded event (user completed ad)
+ *
+ * Security:
+ * - SSV (Server-Side Verification) is enabled: the user's Supabase auth ID
+ *   is passed to AdMob so Google can include it in the cryptographically-signed
+ *   callback to our edge function (admob-ssv-callback). Credits are granted
+ *   server-side only after signature verification.
  */
 export function useRewardedAd() {
+    const supabase = useSupabaseClient();
     const [isLoading, setIsLoading] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const isLoadedRef = useRef(false);
@@ -61,10 +69,21 @@ export function useRewardedAd() {
                     await admob.AdMob.initialize({ initializeForTesting: IS_TESTING });
                 }
 
+                // Get current user ID for SSV (Server-Side Verification)
+                const { data: { user } } = await supabase.auth.getUser();
+                const userId = user?.id;
+
                 const { AdMob } = admobRef.current;
                 await AdMob.prepareRewardVideoAd({
                     adId: IS_TESTING ? ADMOB_REWARDED_TEST_ID : ADMOB_REWARDED_ID,
                     isTesting: IS_TESTING,
+                    // SSV: pass user ID so Google includes it in the signed callback
+                    ...(userId ? {
+                        ssv: {
+                            userId,
+                            customData: userId,
+                        },
+                    } : {}),
                 });
                 setIsLoadedState(true);
                 return true;
@@ -80,7 +99,7 @@ export function useRewardedAd() {
 
         loadPromiseRef.current = promise;
         return promise;
-    }, []);
+    }, [supabase]);
 
     /**
      * Show the preloaded rewarded ad.

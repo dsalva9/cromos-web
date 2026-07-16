@@ -66,8 +66,17 @@ function ProfileContent() {
         // Preload next ad
         loadAd();
       }
-    } catch (err) {
-      toast.error(t('credits.adError'));
+    } catch (err: any) {
+      const msg = err?.message ?? '';
+      if (msg === 'credit_grant_timeout') {
+        toast.info(t('credits.rewardProcessing'));
+      } else if (msg.includes('rate_limited')) {
+        toast.error(t('credits.rateLimited'));
+      } else if (msg.includes('daily_limit_reached')) {
+        toast.error(t('credits.dailyLimitReached'));
+      } else {
+        toast.error(t('credits.adError'));
+      }
     } finally {
       setWatchingAd(false);
     }

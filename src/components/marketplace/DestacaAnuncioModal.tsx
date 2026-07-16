@@ -93,8 +93,17 @@ export function DestacaAnuncioModal({
         // Pre-load next ad for a seamless second watch
         loadAd();
       }
-    } catch {
-      toast.error(t('adError'));
+    } catch (err: any) {
+      const msg = err?.message ?? '';
+      if (msg === 'credit_grant_timeout') {
+        toast.info(t('rewardProcessing'));
+      } else if (msg.includes('rate_limited')) {
+        toast.error(t('rateLimited'));
+      } else if (msg.includes('daily_limit_reached')) {
+        toast.error(t('dailyLimitReached'));
+      } else {
+        toast.error(t('adError'));
+      }
     } finally {
       setWatchingAd(false);
     }

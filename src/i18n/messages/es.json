@@ -166,7 +166,10 @@
         "successReward": "¡+{amount} créditos ganados!",
         "adError": "No se pudo cargar el anuncio",
         "adLoading": "Mostrando anuncio...",
-        "adPreparing": "Preparando anuncio..."
+        "adPreparing": "Preparando anuncio...",
+        "rewardProcessing": "La recompensa se está procesando, vuelve a comprobar en breve",
+        "rateLimited": "Espera un momento antes de ver otro anuncio",
+        "dailyLimitReached": "Has alcanzado el límite diario de créditos"
       }
     },
     "completar": {
@@ -1986,7 +1989,10 @@
     "activateError": "Error al destacar el anuncio",
     "alreadyHighlighted": "Este anuncio ya está destacado",
     "listingNotActive": "El anuncio no está activo",
-    "adError": "No se pudo cargar el anuncio"
+    "adError": "No se pudo cargar el anuncio",
+    "rewardProcessing": "La recompensa se está procesando, vuelve a comprobar en breve",
+    "rateLimited": "Espera un momento antes de ver otro anuncio",
+    "dailyLimitReached": "Has alcanzado el límite diario de créditos"
   },
   "createListing": {
     "successToast": "¡Anuncio publicado con éxito!",

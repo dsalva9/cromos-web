@@ -140,7 +140,10 @@
         "successReward": "+{amount} credits earned!",
         "adError": "Could not load ad",
         "adLoading": "Showing ad...",
-        "adPreparing": "Preparing ad..."
+        "adPreparing": "Preparing ad...",
+        "rewardProcessing": "Reward is being processed, check back shortly",
+        "rateLimited": "Please wait before watching another ad",
+        "dailyLimitReached": "You've reached the daily credit limit"
       }
     },
     "completar": {
@@ -1986,7 +1989,10 @@
     "activateError": "Error highlighting listing",
     "alreadyHighlighted": "This listing is already highlighted",
     "listingNotActive": "Listing is not active",
-    "adError": "Could not load ad"
+    "adError": "Could not load ad",
+    "rewardProcessing": "Reward is being processed, check back shortly",
+    "rateLimited": "Please wait before watching another ad",
+    "dailyLimitReached": "You've reached the daily credit limit"
   },
   "createListing": {
     "successToast": "Listing published successfully!",

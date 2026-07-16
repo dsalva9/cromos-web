@@ -288,8 +288,17 @@ export default function UserProfilePage() {
         // Preload next ad
         loadAd();
       }
-    } catch (err) {
-      toast.error(tp('index.credits.adError'));
+    } catch (err: any) {
+      const msg = err?.message ?? '';
+      if (msg === 'credit_grant_timeout') {
+        toast.info(tp('index.credits.rewardProcessing'));
+      } else if (msg.includes('rate_limited')) {
+        toast.error(tp('index.credits.rateLimited'));
+      } else if (msg.includes('daily_limit_reached')) {
+        toast.error(tp('index.credits.dailyLimitReached'));
+      } else {
+        toast.error(tp('index.credits.adError'));
+      }
     } finally {
       setWatchingAd(false);
     }
