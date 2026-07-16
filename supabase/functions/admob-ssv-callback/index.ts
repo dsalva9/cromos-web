@@ -190,11 +190,9 @@ Deno.serve(async (req) => {
     const transactionId = url.searchParams.get("transaction_id") ?? null;
 
     if (!userId) {
-      console.error("[SSV] Missing user_id / custom_data");
-      return new Response("Missing user_id", {
-        status: 400,
-        headers: corsHeaders,
-      });
+      // AdMob test callbacks don't include user_id — return 200 so the test passes
+      console.warn("[SSV] No user_id / custom_data — likely a test callback");
+      return new Response("OK (no user)", { status: 200, headers: corsHeaders });
     }
 
     console.log(
