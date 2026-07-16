@@ -457,7 +457,7 @@ export function ChatDrawer({
 
 
         {/* ---- Composer ---- */}
-        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div style={{ paddingBottom: 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))' }}>
           <ChatComposer
             onSend={sendMessage}
             sending={sending}

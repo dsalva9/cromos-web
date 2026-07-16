@@ -189,6 +189,17 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(marketplaceUrl);
     }
 
+    // Redirect authenticated users from /explorar/[id] to /marketplace/[id]
+    // so they see the full authenticated listing detail instead of the public CTA page.
+    const explorarMatch = pathWithoutLocale.match(/^\/explorar\/(\d+)$/);
+    if (explorarMatch && user) {
+        const localeMatch = pathname.match(/^\/(es|en|pt)/);
+        const locale = localeMatch ? localeMatch[1] : 'es';
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = `/${locale}/marketplace/${explorarMatch[1]}`;
+        return NextResponse.redirect(redirectUrl);
+    }
+
     return response;
 }
 
