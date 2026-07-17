@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 /** Credits awarded per completed rewarded ad. Must match DB grant logic. */
-export const CREDITS_PER_AD = 20;
+export const CREDITS_PER_AD = 10;
 
 /** Credit costs per highlight duration. Must match activate_highlight RPC. */
 export const HIGHLIGHT_COSTS: Record<'48_hours' | '7_days', number> = {
