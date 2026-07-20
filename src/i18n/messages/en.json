@@ -1689,6 +1689,10 @@
         "title": "Cookie Policy",
         "description": "Use of cookies and similar technologies"
       },
+      "adPrivacy": {
+        "title": "Ad Privacy Preferences",
+        "description": "Manage your personalised advertising consent"
+      },
       "version": "Version"
     },
     "ignored": {

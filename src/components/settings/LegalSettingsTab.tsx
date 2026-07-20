@@ -1,12 +1,29 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import Link from '@/components/ui/link';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { Shield, FileText, Cookie, ChevronRight, ExternalLink } from 'lucide-react';
+import { Shield, FileText, Cookie, ChevronRight, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { isNative } from '@/lib/platform';
 
 export function LegalSettingsTab() {
     const t = useTranslations('settings');
+    const [consentLoading, setConsentLoading] = useState(false);
+
+    const handleConsentSettings = useCallback(async () => {
+        if (consentLoading) return;
+        setConsentLoading(true);
+        try {
+            const { AdMob } = await import('@capacitor-community/admob');
+            await AdMob.showConsentForm();
+        } catch (err) {
+            console.warn('[AdMob] Failed to show consent form:', err);
+        } finally {
+            setConsentLoading(false);
+        }
+    }, [consentLoading]);
+
     return (
         <div className="space-y-4 md:space-y-6">
             <ModernCard className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -46,6 +63,29 @@ export function LegalSettingsTab() {
                             <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
                         </Link>
 
+                        {/* Ad Privacy Preferences — native Android only */}
+                        {isNative() && (
+                            <button
+                                onClick={handleConsentSettings}
+                                disabled={consentLoading}
+                                className="w-full flex items-center justify-between px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group disabled:opacity-60"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
+                                        {consentLoading
+                                            ? <Loader2 className="w-5 h-5 text-green-500 animate-spin" />
+                                            : <SlidersHorizontal className="w-5 h-5 text-green-500" />
+                                        }
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="font-bold text-gray-900 dark:text-white">{t('legal.adPrivacy.title')}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('legal.adPrivacy.description')}</p>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" />
+                            </button>
+                        )}
+
                         {/* Cookies */}
                         <Link
                             href="/legal/cookies"
@@ -74,3 +114,4 @@ export function LegalSettingsTab() {
         </div>
     );
 }
+

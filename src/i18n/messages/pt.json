@@ -1784,6 +1784,10 @@
         "title": "Política de Cookies",
         "description": "Uso de cookies e tecnologias semelhantes"
       },
+      "adPrivacy": {
+        "title": "Preferências de privacidade de anúncios",
+        "description": "Gerencie seu consentimento de publicidade personalizada"
+      },
       "version": "Versão"
     },
     "ignored": {
