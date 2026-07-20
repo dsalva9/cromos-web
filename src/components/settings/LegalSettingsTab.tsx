@@ -15,8 +15,17 @@ export function LegalSettingsTab() {
         if (consentLoading) return;
         setConsentLoading(true);
         try {
-            const { AdMob } = await import('@capacitor-community/admob');
-            await AdMob.showConsentForm();
+            const { AdMob, AdmobConsentDebugGeography } = await import('@capacitor-community/admob');
+            // Must request consent info first to (re)load the form before showing it
+            const consentInfo = await AdMob.requestConsentInfo({
+                debugGeography: AdmobConsentDebugGeography.DISABLED,
+                testDeviceIdentifiers: [],
+            });
+            if (consentInfo.isConsentFormAvailable) {
+                await AdMob.showConsentForm();
+            } else {
+                console.log('[AdMob] Consent form not available in this region');
+            }
         } catch (err) {
             console.warn('[AdMob] Failed to show consent form:', err);
         } finally {
