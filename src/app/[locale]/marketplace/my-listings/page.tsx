@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type ListingStatus = 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO';
+type ListingStatus = 'active' | 'reserved' | 'completed' | 'removed';
 
 function MyListingsContent() {
   const t = useTranslations('myListings');
@@ -34,7 +34,7 @@ function MyListingsContent() {
   const activeListings = listings.filter(l => l.status === 'active');
   const reservedListings = listings.filter(l => l.status === 'reserved');
   const completedListings = listings.filter(l => l.status === 'completed' || l.status === 'sold');
-  const eliminadoListings = listings.filter(l => l.status === 'ELIMINADO' || l.status === 'removed');
+  const eliminadoListings = listings.filter(l => l.status === 'removed');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -86,7 +86,7 @@ function MyListingsContent() {
                 <SelectItem value="active">{t('active')} ({activeListings.length})</SelectItem>
                 <SelectItem value="reserved">{t('reserved')} ({reservedListings.length})</SelectItem>
                 <SelectItem value="completed">{t('completed')} ({completedListings.length})</SelectItem>
-                <SelectItem value="ELIMINADO">{t('deleted')} ({eliminadoListings.length})</SelectItem>
+                <SelectItem value="removed">{t('deleted')} ({eliminadoListings.length})</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -103,7 +103,7 @@ function MyListingsContent() {
               <TabsTrigger value="completed">
                 {t('completed')} ({completedListings.length})
               </TabsTrigger>
-              <TabsTrigger value="ELIMINADO">
+              <TabsTrigger value="removed">
                 {t('deleted')} ({eliminadoListings.length})
               </TabsTrigger>
             </TabsList>
@@ -179,8 +179,8 @@ function MyListingsContent() {
             </div>
           )}
 
-          {/* ELIMINADO Listings (includes both 'ELIMINADO' and 'removed' statuses) */}
-          {selectedStatus === 'ELIMINADO' && (
+          {/* Removed/Deleted Listings */}
+          {selectedStatus === 'removed' && (
             <div className="space-y-4">
               {eliminadoListings.length === 0 ? (
                 <div className="text-center py-16">

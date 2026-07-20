@@ -57,7 +57,7 @@ interface MyListing {
 interface MyListingCardProps {
   listing: MyListing;
   onUpdate: () => void;
-  onTabChange?: (status: 'active' | 'reserved' | 'completed' | 'removed' | 'ELIMINADO') => void;
+  onTabChange?: (status: 'active' | 'reserved' | 'completed' | 'removed') => void;
 }
 
 /** Returns a short Spanish string for how long a highlight has left, or null if expired/missing */
@@ -92,7 +92,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       onUpdate(); // Refresh listings
       // Navigate to Eliminados tab after successful soft delete
       if (onTabChange) {
-        onTabChange('ELIMINADO');
+        onTabChange('removed');
       }
     } catch (error) {
       // Error handling is done in hook
@@ -157,8 +157,6 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
       case 'sold':
         return 'Completado';
       case 'removed':
-        return 'Eliminado';
-      case 'ELIMINADO':
         return 'Eliminado';
       case 'reserved':
         return 'Reservado';
@@ -236,7 +234,6 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                     ${listing.status === 'active' && listing.is_group ? 'bg-blue-500' : ''}
                     ${listing.status === 'sold' ? 'bg-gray-500' : ''}
                     ${listing.status === 'removed' ? 'bg-red-500' : ''}
-                    ${listing.status === 'ELIMINADO' ? 'bg-red-600' : ''}
                     ${listing.status === 'reserved' ? 'bg-yellow-500' : ''}
                     text-white uppercase flex-shrink-0
                   `}>
@@ -283,7 +280,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
             )}
 
             {/* Deletion Countdown */}
-            {(listing.status === 'ELIMINADO' || listing.status === 'removed') && listing.deleted_at && listing.scheduled_for && (
+            {listing.status === 'removed' && listing.deleted_at && listing.scheduled_for && (
               <Alert className="bg-yellow-900/20 border-yellow-700">
                 <DeletionCountdown
                   deletedAt={listing.deleted_at}
@@ -378,7 +375,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 </>
               )}
 
-              {(listing.status === 'ELIMINADO' || listing.status === 'removed') && (
+              {listing.status === 'removed' && (
                 <>
                   <Button
                     size="sm"
@@ -425,7 +422,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
               loading={softDeleteLoading}
             />
 
-            {/* Hard Delete Confirmation Modal (for ELIMINADO listings) */}
+            {/* Hard Delete Confirmation Modal (for removed listings) */}
             <HardDeleteModal
               isOpen={showHardDeleteModal}
               onClose={() => setShowHardDeleteModal(false)}
@@ -435,7 +432,7 @@ export function MyListingCard({ listing, onUpdate, onTabChange }: MyListingCardP
                 title: listing.title,
                 status: listing.status,
                 hasActiveChats: false, // Could be determined from chat data if needed
-                hasActiveTransactions: false // ELIMINADO listings shouldn't have active transactions
+                hasActiveTransactions: false // Removed listings shouldn't have active transactions
               }}
               loading={hardDeleteLoading}
             />

@@ -99,9 +99,7 @@ export async function proxy(request: NextRequest) {
             || pathname === '/robots.txt'
             || pathname === '/sitemap.xml'
             || pathname === '/manifest.json'
-            || pathname === '/icon.png'
-            || pathname === '/ad-frame.html'
-            || pathname === '/ad-frame-desktop.html';
+            || pathname === '/icon.png';
 
         if (!isAuthOrApi) {
             const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://cambiocromos.com');
@@ -116,9 +114,7 @@ export async function proxy(request: NextRequest) {
         || pathname === '/robots.txt'
         || pathname === '/sitemap.xml'
         || pathname === '/manifest.json'
-        || pathname === '/icon.png'
-        || pathname === '/ad-frame.html'
-        || pathname === '/ad-frame-desktop.html';
+        || pathname === '/icon.png';
 
     let intlHeaders: Headers | null = null;
 

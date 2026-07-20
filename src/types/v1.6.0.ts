@@ -125,7 +125,7 @@ export interface Favorite {
 
 // Common utility types
 export type SortOption = 'recent' | 'rating' | 'popular';
-export type ListingStatus = 'active' | 'sold' | 'removed' | 'ELIMINADO';
+export type ListingStatus = 'active' | 'sold' | 'removed';
 export type SlotStatus = 'missing' | 'owned' | 'duplicate';
 export type ReportReason =
   | 'spam'

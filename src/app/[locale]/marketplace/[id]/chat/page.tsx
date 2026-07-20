@@ -669,7 +669,7 @@ function ListingChatPageContent() {
           ? { position: 'relative', top: 'auto', bottom: 'auto', height: height || undefined }
           : {
             top: 'calc(var(--header-height, 4rem) + var(--sat, 0px))',
-            bottom: 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
+            bottom: 'calc(4rem + var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))',
           }
       }
     >

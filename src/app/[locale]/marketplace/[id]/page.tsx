@@ -156,7 +156,7 @@ export default function ListingDetailPage() {
     try {
       await softDeleteListing(listingId);
       toast.success(t('moveToDeleted'));
-      router.push('/marketplace/my-listings?tab=ELIMINADO');
+      router.push('/marketplace/my-listings?tab=removed');
     } catch (error) {
       logger.error('Delete error:', error);
       // Error already handled by hook
@@ -235,8 +235,8 @@ export default function ListingDetailPage() {
   const isOwner = user?.id === listing.user_id;
   const canContact = user && !isOwner && listing.status === 'active';
 
-  // Hide ELIMINADO/removed listings from non-owners (except admins)
-  if ((listing.status === 'ELIMINADO' || listing.status === 'removed') && !isOwner && !isAdmin) {
+  // Hide removed listings from non-owners (except admins)
+  if (listing.status === 'removed' && !isOwner && !isAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
@@ -726,7 +726,7 @@ export default function ListingDetailPage() {
                   )}
 
                   <div className="flex gap-4 justify-center flex-wrap">
-                    {(listing.status === 'removed' || listing.status === 'ELIMINADO') ? (
+                    {listing.status === 'removed' ? (
                       // Show Restaurar button for soft-deleted listings
                       <Button
                         className="bg-green-600 hover:bg-green-700 text-white"

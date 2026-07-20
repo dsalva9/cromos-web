@@ -57,7 +57,7 @@ export function ListingDetailContent({ listing, error, currencySymbol = '€' }:
   }
 
   // Hide removed/deleted listings from public view
-  if (listing.status === 'ELIMINADO' || listing.status === 'removed') {
+  if (listing.status === 'removed') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">

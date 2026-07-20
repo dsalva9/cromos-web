@@ -24,9 +24,10 @@ const PROVISIONAL_BANNER_HEIGHT_PX = 60;
  * Updates the CSS variable --ad-band-height to the actual rendered banner
  * height so MobileBottomNav, FloatingActionBtn and <main> all float above it.
  *
- * On web and PWA, this hook does nothing — Adsterra continues to handle ads there.
+ * On web and PWA, this hook does nothing — no web ads are served.
  *
  * Policy compliance:
+ * - UMP consent flow is executed before any ad request (GDPR / US state regs)
  * - Banner is shown at BannerAdPosition.BOTTOM_CENTER (non-intrusive)
  * - Adaptive banner size used as recommended by Google
  * - isTesting flag controls test vs. production ads
@@ -46,10 +47,48 @@ export function useAdMob() {
         async function initAndShowBanner() {
             try {
                 // Dynamically import to avoid bundling on web/SSR
-                const { AdMob, BannerAdSize, BannerAdPosition, BannerAdPluginEvents } =
-                    await import('@capacitor-community/admob');
+                const {
+                    AdMob,
+                    BannerAdSize,
+                    BannerAdPosition,
+                    BannerAdPluginEvents,
+                    AdmobConsentDebugGeography,
+                    AdmobConsentStatus,
+                } = await import('@capacitor-community/admob');
 
-                // Initialise the SDK — must be called before any ad requests
+                // ── UMP Consent Flow ──────────────────────────────────
+                // Must run BEFORE AdMob.initialize() to comply with GDPR
+                // and US state privacy regulations.
+                const consentInfo = await AdMob.requestConsentInfo({
+                    debugGeography: IS_TESTING
+                        ? AdmobConsentDebugGeography.EEA
+                        : AdmobConsentDebugGeography.DISABLED,
+                    testDeviceIdentifiers: [],
+                });
+
+                // If consent form is available and required, show it
+                if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+                    const formResult = await AdMob.showConsentForm();
+                    // After form, check again
+                    if (formResult.status !== AdmobConsentStatus.OBTAINED) {
+                        console.log('[AdMob] Consent not obtained after form, skipping ads');
+                        document.documentElement.style.setProperty('--ad-band-height', '0px');
+                        return;
+                    }
+                }
+
+                // Only proceed if consent allows ads
+                if (
+                    consentInfo.status !== AdmobConsentStatus.OBTAINED &&
+                    consentInfo.status !== AdmobConsentStatus.NOT_REQUIRED
+                ) {
+                    console.log('[AdMob] Consent not available, skipping ads');
+                    document.documentElement.style.setProperty('--ad-band-height', '0px');
+                    return;
+                }
+
+                // ── Initialise the SDK ────────────────────────────────
+                // Must be called before any ad requests.
                 // requestTrackingAuthorization() is a separate iOS-only call;
                 // add it here when iOS support is implemented.
                 await AdMob.initialize({

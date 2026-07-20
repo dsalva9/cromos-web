@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -36,7 +36,7 @@ export function LeanListingCard({ listing, href = '/signup' }: LeanListingCardPr
             case 'sold':
                 return 'VENDIDO';
             case 'removed':
-                return 'ELIMINADO';
+                return 'Eliminado';
             default:
                 return status;
         }

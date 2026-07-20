@@ -97,9 +97,9 @@ export function MobileBottomNav() {
           // background covers the whole zone; the AdMob native layer renders on top.
           // Nav icons stay above the padding so they remain fully tappable.
           //
-          // Web/PWA: offset above the Adsterra bar (which handles its own safe area).
+          // Web/PWA: flush at bottom:0 (no web ads served).
           // Hidden pages: flush at bottom:0 with safe-area padding only.
-          bottom: (isNativeApp || isBannerHidden) ? '0px' : 'calc(var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px))',
+          bottom: (isNativeApp || isBannerHidden) ? '0px' : 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))',
           paddingBottom: isNativeApp
             ? 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))'
             : isBannerHidden

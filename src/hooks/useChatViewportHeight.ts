@@ -35,8 +35,8 @@ export function useChatViewportHeight() {
             const headerPx = headerRem * remPx;
             const sat = parseFloat(rootStyles.getPropertyValue('--sat').trim()) || 0;
 
-            // Desktop: header + SAT + footer (~3.5rem) + py-4 (2rem) + ad banner (56px)
-            const subtract = headerPx + sat + 3.5 * remPx + 2 * remPx + 56;
+            // Desktop: header + SAT + footer (~3.5rem) + py-4 (2rem)
+            const subtract = headerPx + sat + 3.5 * remPx + 2 * remPx;
             const available = window.innerHeight - subtract;
             setHeight(`${Math.max(available, 200)}px`);
         };

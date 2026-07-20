@@ -103,29 +103,6 @@ if (SENTRY_DSN) {
                 (v) => v.stacktrace?.frames ?? [],
             ) ?? [];
 
-            // Drop call stack size errors that do not originate from our codebase.
-            // This filters out stack overflows caused by third-party ad networks (e.g. highperformanceformat.com).
-            const isStackOverflow =
-                message.toLowerCase().includes('maximum call stack size exceeded') ||
-                message.toLowerCase().includes('too much recursion') ||
-                message.toLowerCase().includes('stack size') ||
-                type === 'RangeError';
-
-            if (isStackOverflow) {
-                const hasAppFrames = frames.some((f) => {
-                    const file = f.filename || '';
-                    return (
-                        file.includes('_next/static') ||
-                        file.includes('/src/') ||
-                        file.includes('chunks/') ||
-                        file.includes('cambiocromos.com')
-                    );
-                });
-                if (!hasAppFrames) {
-                    return null;
-                }
-            }
-
             // Drop Facebook in-app browser autofill bridge errors —
             // originates from app://autofill_test_android, not our code.
             const hasFbAutofill = frames.some((f) =>

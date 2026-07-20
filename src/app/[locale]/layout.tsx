@@ -80,7 +80,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               <SiteHeader />
             </header>
             <AccountDeletionBanner />
-            <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
+            <main id="main-content" role="main" className="flex-1 md:pb-20" style={{ paddingTop: 'calc(var(--header-height, 4rem) + var(--sat, 0px))', paddingBottom: 'calc(4rem + var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}>
               <PasswordRecoveryGuard>
                 <ProfileCompletionGuard>{children}</ProfileCompletionGuard>
               </PasswordRecoveryGuard>

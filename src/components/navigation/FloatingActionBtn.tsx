@@ -45,7 +45,7 @@ export function FloatingActionBtn() {
   const isBannerHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
   const bottomOffset = isBannerHidden
     ? 'calc(4rem + env(safe-area-inset-bottom, 0px) + 1rem)'
-    : 'calc(4rem + var(--ad-band-height, 25px) + env(safe-area-inset-bottom, 0px) + 1rem)';
+    : 'calc(4rem + var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px) + 1rem)';
 
   // Hide on desktop
   return (
