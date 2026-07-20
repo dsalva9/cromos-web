@@ -59,6 +59,15 @@ export function useAdMob() {
                 // ── UMP Consent Flow ──────────────────────────────────
                 // Must run BEFORE AdMob.initialize() to comply with GDPR
                 // and US state privacy regulations.
+                //
+                // Important: We ALWAYS show ads regardless of consent outcome.
+                // - Consent obtained → personalised ads (higher CPM)
+                // - Consent declined → non-personalised/contextual ads (lower CPM)
+                // - Consent not required (non-EEA) → personalised ads
+                //
+                // The only way to remove ads is via a future "Pro" subscription.
+                // The AdMob SDK handles the personalised vs non-personalised
+                // distinction automatically based on the UMP consent signal.
                 const consentInfo = await AdMob.requestConsentInfo({
                     debugGeography: IS_TESTING
                         ? AdmobConsentDebugGeography.EEA
@@ -68,29 +77,14 @@ export function useAdMob() {
 
                 // If consent form is available and required, show it
                 if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
-                    const formResult = await AdMob.showConsentForm();
-                    // After form, check again
-                    if (formResult.status !== AdmobConsentStatus.OBTAINED) {
-                        console.log('[AdMob] Consent not obtained after form, skipping ads');
-                        document.documentElement.style.setProperty('--ad-band-height', '0px');
-                        return;
-                    }
-                }
-
-                // Only proceed if consent allows ads
-                if (
-                    consentInfo.status !== AdmobConsentStatus.OBTAINED &&
-                    consentInfo.status !== AdmobConsentStatus.NOT_REQUIRED
-                ) {
-                    console.log('[AdMob] Consent not available, skipping ads');
-                    document.documentElement.style.setProperty('--ad-band-height', '0px');
-                    return;
+                    await AdMob.showConsentForm();
+                    // Regardless of outcome, we proceed — the SDK will serve
+                    // non-personalised ads if consent was not obtained.
                 }
 
                 // ── Initialise the SDK ────────────────────────────────
-                // Must be called before any ad requests.
-                // requestTrackingAuthorization() is a separate iOS-only call;
-                // add it here when iOS support is implemented.
+                // Always initialise — the SDK uses the consent signal
+                // to decide whether to serve personalised or contextual ads.
                 await AdMob.initialize({
                     initializeForTesting: IS_TESTING,
                 });
