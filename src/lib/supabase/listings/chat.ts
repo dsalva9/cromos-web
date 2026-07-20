@@ -58,12 +58,17 @@ export async function getListingChats(
       typeof (error as { message: unknown }).message === 'string' &&
       (error as { message: string }).message.includes('Listing not found');
 
-    const isUnauthorized =
+    const errorMessage =
       error &&
       typeof error === 'object' &&
       'message' in error &&
-      typeof (error as { message: unknown }).message === 'string' &&
-      (error as { message: string }).message.includes('You can only view your own conversation');
+      typeof (error as { message: unknown }).message === 'string'
+        ? (error as { message: string }).message
+        : '';
+
+    const isUnauthorized =
+      errorMessage.includes('You can only view your own conversation') ||
+      errorMessage.includes('Access denied');
 
     if (isNotFound) {
       logger.warn('Listing not found for chat access:', { listingId });
