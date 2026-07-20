@@ -16,18 +16,23 @@ export function LegalSettingsTab() {
         setConsentLoading(true);
         try {
             const { AdMob, AdmobConsentDebugGeography } = await import('@capacitor-community/admob');
-            // Must request consent info first to (re)load the form before showing it
+            // requestConsentInfo loads the latest consent state from Google's servers
             const consentInfo = await AdMob.requestConsentInfo({
                 debugGeography: AdmobConsentDebugGeography.DISABLED,
                 testDeviceIdentifiers: [],
             });
-            if (consentInfo.isConsentFormAvailable) {
-                await AdMob.showConsentForm();
+            // showPrivacyOptionsForm is the correct API for settings pages —
+            // it shows the "Manage options" form even when consent is already obtained.
+            // showConsentForm only shows when consent is newly required.
+            // PrivacyOptionsRequirementStatus enum is not exported from package root,
+            // so we compare against the string value directly.
+            if (consentInfo.privacyOptionsRequirementStatus === 'REQUIRED') {
+                await AdMob.showPrivacyOptionsForm();
             } else {
-                console.log('[AdMob] Consent form not available in this region');
+                console.log('[AdMob] Privacy options form not required in this region:', consentInfo.privacyOptionsRequirementStatus);
             }
         } catch (err) {
-            console.warn('[AdMob] Failed to show consent form:', err);
+            console.warn('[AdMob] Failed to show privacy options form:', err);
         } finally {
             setConsentLoading(false);
         }
