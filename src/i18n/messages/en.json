@@ -269,33 +269,33 @@
       "completarAlbum": "Complete my album"
     },
     "public": {
-      "title": "Explorar Cromos",
+      "title": "Explore Cards",
       "stats": {
-        "active": "{count} activos",
-        "community": "Comunidad activa",
-        "communityShort": "Activa",
-        "updated": "Actualizado hoy",
-        "updatedShort": "Hoy"
+        "active": "{count} active",
+        "community": "Active community",
+        "communityShort": "Active",
+        "updated": "Updated today",
+        "updatedShort": "Today"
       },
-      "registerCtaBtn": "Registrarse para Intercambiar",
-      "searchPlaceholder": "Buscar por nombre, colecci�n...",
-      "filterBtn": "Filtros",
-      "filterTypeAll": "Todos",
-      "filterTypeCromo": "Cromo",
+      "registerCtaBtn": "Sign Up to Trade",
+      "searchPlaceholder": "Search by name, collection...",
+      "filterBtn": "Filters",
+      "filterTypeAll": "All",
+      "filterTypeCromo": "Card",
       "filterTypePack": "Pack",
-      "errorTitle": "Error al cargar anuncios",
-      "loadMoreBtn": "Cargar M�s Anuncios",
+      "errorTitle": "Error loading listings",
+      "loadMoreBtn": "Load More Listings",
       "emptyState": {
-        "searchTitle": "No se encontraron anuncios",
-        "searchDesc": "Intenta buscar con otros t�rminos o filtros",
-        "quietTitle": "El mercado est� tranquilo",
-        "quietDesc": "Reg�strate para publicar tus duplicados y comienza a intercambiar",
-        "registerBtn": "Registrarse"
+        "searchTitle": "No listings found",
+        "searchDesc": "Try searching with other terms or filters",
+        "quietTitle": "The market is quiet",
+        "quietDesc": "Sign up to post your duplicates and start trading",
+        "registerBtn": "Sign Up"
       },
       "ctaBanner": {
-        "title": "�Te interesa alg�n cromo?",
-        "desc": "Reg�strate gratis para contactar con los vendedores e intercambiar tus cromos",
-        "registerBtn": "Crear Cuenta Gratis"
+        "title": "Interested in any card?",
+        "desc": "Sign up for free to contact sellers and trade your cards",
+        "registerBtn": "Create Free Account"
       }
     },
     "detail": {

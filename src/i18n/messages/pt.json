@@ -271,31 +271,31 @@
     "public": {
       "title": "Explorar Cromos",
       "stats": {
-        "active": "{count} activos",
-        "community": "Comunidad activa",
-        "communityShort": "Activa",
-        "updated": "Actualizado hoy",
-        "updatedShort": "Hoy"
+        "active": "{count} ativos",
+        "community": "Comunidade ativa",
+        "communityShort": "Ativa",
+        "updated": "Atualizado hoje",
+        "updatedShort": "Hoje"
       },
-      "registerCtaBtn": "Registrarse para Intercambiar",
-      "searchPlaceholder": "Buscar por nombre, colecci�n...",
+      "registerCtaBtn": "Registar para Trocar",
+      "searchPlaceholder": "Pesquisar por nome, coleção...",
       "filterBtn": "Filtros",
       "filterTypeAll": "Todos",
       "filterTypeCromo": "Cromo",
       "filterTypePack": "Pack",
-      "errorTitle": "Error al cargar anuncios",
-      "loadMoreBtn": "Cargar M�s Anuncios",
+      "errorTitle": "Erro ao carregar anúncios",
+      "loadMoreBtn": "Carregar Mais Anúncios",
       "emptyState": {
-        "searchTitle": "No se encontraron anuncios",
-        "searchDesc": "Intenta buscar con otros t�rminos o filtros",
-        "quietTitle": "El mercado est� tranquilo",
-        "quietDesc": "Reg�strate para publicar tus duplicados y comienza a intercambiar",
-        "registerBtn": "Registrarse"
+        "searchTitle": "Nenhum anúncio encontrado",
+        "searchDesc": "Tente pesquisar por outros termos ou filtros",
+        "quietTitle": "O mercado está tranquilo",
+        "quietDesc": "Registe-se para publicar os seus repetidos e comece a trocar",
+        "registerBtn": "Registar-se"
       },
       "ctaBanner": {
-        "title": "�Te interesa alg�n cromo?",
-        "desc": "Reg�strate gratis para contactar con los vendedores e intercambiar tus cromos",
-        "registerBtn": "Crear Cuenta Gratis"
+        "title": "Interessado em algum cromo?",
+        "desc": "Registe-se grátis para contactar vendedores e trocar os seus cromos",
+        "registerBtn": "Criar Conta Grátis"
       }
     },
     "detail": {

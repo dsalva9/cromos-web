@@ -304,23 +304,23 @@
         "updatedShort": "Hoy"
       },
       "registerCtaBtn": "Registrarse para Intercambiar",
-      "searchPlaceholder": "Buscar por nombre, colecci�n...",
+      "searchPlaceholder": "Buscar por nombre, colección...",
       "filterBtn": "Filtros",
       "filterTypeAll": "Todos",
       "filterTypeCromo": "Cromo",
       "filterTypePack": "Pack",
       "errorTitle": "Error al cargar anuncios",
-      "loadMoreBtn": "Cargar M�s Anuncios",
+      "loadMoreBtn": "Cargar Más Anuncios",
       "emptyState": {
         "searchTitle": "No se encontraron anuncios",
-        "searchDesc": "Intenta buscar con otros t�rminos o filtros",
-        "quietTitle": "El mercado est� tranquilo",
-        "quietDesc": "Reg�strate para publicar tus duplicados y comienza a intercambiar",
+        "searchDesc": "Intenta buscar con otros términos o filtros",
+        "quietTitle": "El mercado está tranquilo",
+        "quietDesc": "Regístrate para publicar tus duplicados y comienza a intercambiar",
         "registerBtn": "Registrarse"
       },
       "ctaBanner": {
-        "title": "�Te interesa alg�n cromo?",
-        "desc": "Reg�strate gratis para contactar con los vendedores e intercambiar tus cromos",
+        "title": "¿Te interesa algún cromo?",
+        "desc": "Regístrate gratis para contactar con los vendedores e intercambiar tus cromos",
         "registerBtn": "Crear Cuenta Gratis"
       }
     },

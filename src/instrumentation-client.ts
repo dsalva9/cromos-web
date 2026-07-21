@@ -49,6 +49,8 @@ if (SENTRY_DSN) {
             'Connection to Indexed Database server lost',
             // Chrome extension/port error injected into the page.
             'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
+            // DuckDuckGo / iOS WKWebView internal script injection postMessage timeout error.
+            'WKWebView API client did not respond to this postMessage',
         ],
 
         beforeSend(event, hint) {
