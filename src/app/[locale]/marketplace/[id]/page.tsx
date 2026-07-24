@@ -92,9 +92,13 @@ export default function ListingDetailPage() {
     }
   }, [listing, user?.id, incrementViews]);
 
-  // Check trade overlap when a non-owner views a listing with copy_id
+  // Check trade overlap when a non-owner views an exchange-type listing
   useEffect(() => {
-    if (!listing || !user || user.id === listing.user_id || !listing.copy_id || listing.status !== 'active') {
+    if (!listing || !user || user.id === listing.user_id || listing.status !== 'active') {
+      return;
+    }
+    // Only check for listings that include exchange
+    if (listing.listing_type !== 'intercambio' && listing.listing_type !== 'ambos') {
       return;
     }
 
@@ -570,8 +574,8 @@ export default function ListingDetailPage() {
                 </ModernCard>
               )}
 
-              {/* Match Button — shown to authenticated non-owners when listing has a copy_id */}
-              {user && !isOwner && listing.copy_id && listing.status === 'active' && (
+              {/* Match Button — shown to authenticated non-owners on exchange-type listings */}
+              {user && !isOwner && listing.status === 'active' && (listing.listing_type === 'intercambio' || listing.listing_type === 'ambos') && (
                 <div className="mb-6">
                   {matchLoading ? (
                     <Button
@@ -588,7 +592,7 @@ export default function ListingDetailPage() {
                       className="w-full bg-gradient-to-r from-gold via-yellow-400 to-amber-500 text-black hover:from-yellow-400 hover:via-amber-400 hover:to-orange-400 font-bold shadow-lg transition-all"
                       asChild
                     >
-                      <Link href={`/match/${listing.user_id}/${listing.copy_id}`}>
+                      <Link href={`/match/${listing.user_id}/${listing.copy_id || 0}`}>
                         <ArrowLeftRight className="mr-2 h-5 w-5" />
                         {t('matchFound', { count: matchCount })}
                       </Link>
