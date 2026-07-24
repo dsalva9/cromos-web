@@ -51,6 +51,10 @@ if (SENTRY_DSN) {
             'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
             // DuckDuckGo / iOS WKWebView internal script injection postMessage timeout error.
             'WKWebView API client did not respond to this postMessage',
+            // Supabase Storage upload aborted by iOS Safari (user backgrounded app / network drop).
+            // Already caught and shown to the user as a toast, so this is just noise.
+            'The operation was aborted.',
+            'StorageUnknownError',
         ],
 
         beforeSend(event, hint) {
@@ -111,6 +115,13 @@ if (SENTRY_DSN) {
                 f.filename?.includes('autofill_test_android'),
             );
             if (hasFbAutofill) return null;
+
+            // Drop errors originating from browser extension injected scripts.
+            // These are extension-owned stack frames, not our code.
+            const hasInjectedScript = frames.some((f) =>
+                f.filename?.includes('injectedScript'),
+            );
+            if (hasInjectedScript) return null;
 
             return event;
         },
