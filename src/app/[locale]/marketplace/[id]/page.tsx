@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { IntlLink as Link } from '@/i18n/navigation';
-import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin, EyeOff } from 'lucide-react';
+import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin, EyeOff, ArrowLeftRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   useUser,
@@ -81,12 +81,44 @@ export default function ListingDetailPage() {
   const [showIgnoreConfirm, setShowIgnoreConfirm] = useState(false);
   const [showDestacaModal, setShowDestacaModal] = useState(false);
 
+  // Match overlap check (for listings with copy_id / QR)
+  const [matchCount, setMatchCount] = useState<number | null>(null);
+  const [matchLoading, setMatchLoading] = useState(false);
+
   useEffect(() => {
     if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
       viewIncrementedRef.current = listing.id.toString();
       incrementViews();
     }
   }, [listing, user?.id, incrementViews]);
+
+  // Check trade overlap when a non-owner views a listing with copy_id
+  useEffect(() => {
+    if (!listing || !user || user.id === listing.user_id || !listing.copy_id || listing.status !== 'active') {
+      return;
+    }
+
+    let cancelled = false;
+    setMatchLoading(true);
+
+    supabase.rpc('get_user_trade_overlap', {
+      p_my_user_id: user.id,
+      p_their_user_id: listing.user_id,
+    }).then(({ data, error: rpcError }) => {
+      if (cancelled) return;
+      if (rpcError) {
+        logger.error('Error checking match overlap:', rpcError);
+        setMatchCount(0);
+      } else {
+        const overlaps = (data as Array<{ total_overlap: number }>) ?? [];
+        const total = overlaps.reduce((sum, o) => sum + (o.total_overlap ?? 0), 0);
+        setMatchCount(total);
+      }
+      setMatchLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [listing, user, supabase]);
 
   const [showAdminDeleteDialog, setShowAdminDeleteDialog] = useState(false);
   const [adminDeleteReason, setAdminDeleteReason] = useState('');
@@ -536,6 +568,42 @@ export default function ListingDetailPage() {
                     </p>
                   </ModernCardContent>
                 </ModernCard>
+              )}
+
+              {/* Match Button — shown to authenticated non-owners when listing has a copy_id */}
+              {user && !isOwner && listing.copy_id && listing.status === 'active' && (
+                <div className="mb-6">
+                  {matchLoading ? (
+                    <Button
+                      size="lg"
+                      className="w-full bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-bold cursor-wait"
+                      disabled
+                    >
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      {t('matchChecking')}
+                    </Button>
+                  ) : matchCount && matchCount > 0 ? (
+                    <Button
+                      size="lg"
+                      className="w-full bg-gradient-to-r from-gold via-yellow-400 to-amber-500 text-black hover:from-yellow-400 hover:via-amber-400 hover:to-orange-400 font-bold shadow-lg transition-all"
+                      asChild
+                    >
+                      <Link href={`/match/${listing.user_id}/${listing.copy_id}`}>
+                        <ArrowLeftRight className="mr-2 h-5 w-5" />
+                        {t('matchFound', { count: matchCount })}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      size="lg"
+                      className="w-full bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 font-bold cursor-not-allowed border border-gray-200 dark:border-gray-700"
+                      disabled
+                    >
+                      <ArrowLeftRight className="mr-2 h-5 w-5" />
+                      {t('noMatch')}
+                    </Button>
+                  )}
+                </div>
               )}
 
               {/* Listing Type Info Card */}

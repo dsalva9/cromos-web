@@ -2381,7 +2381,10 @@
       "confirmButton": "Ignorar",
       "cancelButton": "Cancelar"
     },
-    "share": "Compartir"
+    "share": "Compartir",
+    "matchChecking": "Buscando coincidencias…",
+    "matchFound": "🔄 {count} coincidencias — Ver intercambio",
+    "noMatch": "Sin coincidencias para este álbum"
   },
   "marketplaceChat": {
     "backToChats": "Volver a mis chats",
