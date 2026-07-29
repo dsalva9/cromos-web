@@ -137,28 +137,11 @@ export function useListing(listingId: string) {
     }
   }, [supabase, listingId, listing?.views_count]);
 
-  const deleteListing = useCallback(async () => {
-    try {
-      const { error: deleteError } = await supabase.rpc(
-        'update_listing_status',
-        {
-          p_listing_id: parseInt(listingId),
-          p_new_status: 'removed',
-        }
-      );
-
-      if (deleteError) throw deleteError;
-    } catch (err) {
-      throw err;
-    }
-  }, [supabase, listingId]);
-
   return {
     listing,
     loading,
     error,
     incrementViews,
-    deleteListing,
     refetch: fetchListing,
   };
 }

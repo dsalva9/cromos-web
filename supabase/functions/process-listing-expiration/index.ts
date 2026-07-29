@@ -366,6 +366,7 @@ Deno.serve(async (_req) => {
       .update({
         status: 'removed',
         deleted_at: new Date().toISOString(),
+        deletion_type: 'system',
       })
       .eq('status', 'active')
       .is('deleted_at', null)
