@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { isNative } from '@/lib/platform';
 
 // Production Ad Unit IDs
-const ADMOB_BANNER_ID = 'ca-app-pub-8347713301854118/3223436428';
+const ADMOB_BANNER_ID = 'ca-app-pub-4603075992850630/5633559451';
 
 // Google's official test Ad Unit ID for banners (safe to use during development)
 // Never click real ads during testing — use this ID instead

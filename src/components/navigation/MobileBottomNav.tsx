@@ -10,6 +10,7 @@ import { useRouter } from '@/hooks/use-router';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { useInterstitialAd } from '@/components/ads/InterstitialAdProvider';
 import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
 import { isNative } from '@/lib/platform';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
@@ -18,6 +19,13 @@ import { QRScannerModal } from '@/components/qr/QRScannerModal';
 /** Strip the locale prefix from a pathname for active-state matching. */
 function stripLocale(path: string): string {
   return path.replace(/^\/(es|en|pt)/, '') || '/';
+}
+
+/** Extract the top-level section from a path (e.g. '/marketplace/foo' → 'marketplace'). */
+function getSection(path: string): string {
+  const stripped = stripLocale(path);
+  const segment = stripped.split('/').filter(Boolean)[0] || '';
+  return segment;
 }
 
 export function MobileBottomNav() {
@@ -64,10 +72,17 @@ export function MobileBottomNav() {
 
   const { hapticImpact } = useHaptic();
   const { isAdmin, profile } = useProfileCompletion();
+  const { maybeShowInterstitial } = useInterstitialAd();
   const { totalUnread } = useGlobalUnreadBadge();
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = async (href: string) => {
     hapticImpact();
+    // Show interstitial on section change (e.g. marketplace → mis-plantillas)
+    const currentSection = getSection(pathname || '');
+    const targetSection = getSection(href);
+    if (currentSection !== targetSection) {
+      await maybeShowInterstitial('nav');
+    }
     // Hard navigation workaround — Next.js 16 client-side transitions
     // silently hang for authenticated users, so bypass via window.location.href
     window.location.href = lp(href);
@@ -183,10 +198,11 @@ export function MobileBottomNav() {
           <div className="p-4 space-y-2">
             <a
               href="/marketplace/my-listings"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                await maybeShowInterstitial('nav');
                 window.location.href = lp('/marketplace/my-listings');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -197,10 +213,11 @@ export function MobileBottomNav() {
 
             <a
               href="/templates"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                await maybeShowInterstitial('nav');
                 window.location.href = lp('/templates');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -211,10 +228,11 @@ export function MobileBottomNav() {
 
             <a
               href="/alertas"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                await maybeShowInterstitial('nav');
                 window.location.href = lp('/alertas');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -253,10 +271,11 @@ export function MobileBottomNav() {
 
             <a
               href="/favorites"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                await maybeShowInterstitial('nav');
                 window.location.href = lp('/favorites');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -267,10 +286,11 @@ export function MobileBottomNav() {
 
             <a
               href="/ajustes"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 hapticImpact();
                 setIsMenuOpen(false);
+                await maybeShowInterstitial('nav');
                 window.location.href = lp('/ajustes');
               }}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"

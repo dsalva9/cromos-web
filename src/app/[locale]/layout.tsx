@@ -11,6 +11,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { composeProviders } from '@/lib/composeProviders';
 import { OneSignalProvider } from '@/components/providers/OneSignalProvider';
 import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
+import { InterstitialAdProvider } from '@/components/ads/InterstitialAdProvider';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
 import { AdBanner, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
@@ -39,6 +40,7 @@ const Providers = composeProviders([
   [OneSignalProvider],
   [DeepLinkHandler],
   [ProfileCompletionProvider],
+  [InterstitialAdProvider],
   [ErrorBoundary],
 ]);
 

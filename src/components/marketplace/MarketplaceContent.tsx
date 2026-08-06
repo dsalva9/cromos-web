@@ -22,6 +22,7 @@ import { SPONSORED_PRODUCT_CUBE, SPONSORED_PRODUCT_ALBUM } from '@/lib/marketpla
 import { InstallAppBanner } from '@/components/pwa/InstallAppBanner';
 import { AndroidInstallFullscreenModal } from '@/components/pwa/AndroidInstallFullscreenModal';
 import { useTranslations } from 'next-intl';
+import { useInterstitialAd } from '@/components/ads/InterstitialAdProvider';
 
 interface MarketplaceContentProps {
     initialListings: Listing[];
@@ -32,6 +33,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const t = useTranslations('marketplace.index');
     const ts = useTranslations('marketplace.sponsored');
     const { user } = useUser();
+    const { maybeShowInterstitial } = useInterstitialAd();
     const [searchQuery, setSearchQuery] = useState('');
     const [sortByDistance, setSortByDistance] = useState(false);
     const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
@@ -628,7 +630,10 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 {hasMore && !loading && listings.length > 0 && (
                     <div className="flex justify-center mt-12">
                         <Button
-                            onClick={loadMore}
+                            onClick={async () => {
+                                await maybeShowInterstitial('loadMore');
+                                loadMore();
+                            }}
                             variant="outline"
                             className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-6 text-lg h-auto rounded-xl shadow-sm"
                         >

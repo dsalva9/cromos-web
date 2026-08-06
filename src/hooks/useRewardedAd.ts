@@ -5,7 +5,7 @@ import { isNative } from '@/lib/platform';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 
 // Production rewarded ad unit ID (CambioCromos AdMob account)
-const ADMOB_REWARDED_ID = 'ca-app-pub-8347713301854118/7122569822';
+const ADMOB_REWARDED_ID = 'ca-app-pub-4603075992850630/1685027421';
 
 // Google's official test rewarded ad unit ID — safe for development
 const ADMOB_REWARDED_TEST_ID = 'ca-app-pub-3940256099942544/5224354917';
