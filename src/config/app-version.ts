@@ -12,7 +12,7 @@
  *   10604  — 1.6.3  (AdMob release — PUBLISHED 2026-07-13, force update active)
  *   10700  — 1.7.0  (New AdMob account + interstitial ads)
  */
-export const MIN_ANDROID_VERSION_CODE = 10604;
+export const MIN_ANDROID_VERSION_CODE = 10700;
 
 /** Google Play Store deep-link for the app. Used in the force-update screen. */
 export const PLAY_STORE_URL =
