@@ -11,7 +11,7 @@ const ADMOB_REWARDED_ID = 'ca-app-pub-4603075992850630/1685027421';
 const ADMOB_REWARDED_TEST_ID = 'ca-app-pub-3940256099942544/5224354917';
 
 // Match the banner hook: false = production ads
-const IS_TESTING = false;
+const IS_TESTING = true;
 
 /**
  * Manages a single rewarded ad lifecycle for the Android Capacitor app.

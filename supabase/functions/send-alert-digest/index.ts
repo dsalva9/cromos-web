@@ -381,6 +381,15 @@ Deno.serve(async (req) => {
                   <a href="${APP_URL}/alertas" style="display: inline-block; padding: 12px 28px; background: #000000; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.15);">Gestionar mis alertas</a>
                 </div>
               </div>
+              <div style="background: #FFFBEB; border: 1px solid #e5e7eb; border-top: none; padding: 24px 20px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
+                <p style="margin: 0; font-size: 16px; font-weight: bold; color: #92400E;">¿Te gusta CambioCromos?</p>
+                <p style="margin: 6px 0 16px 0; font-size: 13px; color: #B45309;">¡Tu opinión nos ayuda a crecer y mejorar!</p>
+                <a href="https://play.google.com/store/apps/details?id=com.cambiocromos.app&hl=es" style="display: inline-block; padding: 10px 24px; background: #FFC000; color: #000000; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Valóranos en Google Play</a>
+              </div>
+              <div style="background: #FEF3C7; border: 1px solid #e5e7eb; border-top: none; padding: 14px 20px; text-align: center;">
+                <p style="margin: 0; font-size: 13px; color: #92400E;">☕ Ayúdanos a seguir mejorando — <a href="https://buymeacoffee.com/cambiocromos" style="color: #B45309; font-weight: bold; text-decoration: underline;">Invítanos a un café</a></p>
+              </div>
               <div style="padding: 20px; text-align: center; font-size: 12px; color: #9ca3af;">
                 <p style="margin: 0;">Este es un correo automático enviado por CambioCromos.</p>
                 <p style="margin: 6px 0 0 0;">Puedes cambiar la frecuencia o canales de tus alertas en la sección <a href="${APP_URL}/alertas" style="color: #FF8C00; text-decoration: underline;">Alertas</a>.</p>

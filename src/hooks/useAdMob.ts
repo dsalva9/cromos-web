@@ -11,7 +11,7 @@ const ADMOB_BANNER_ID = 'ca-app-pub-4603075992850630/5633559451';
 const ADMOB_BANNER_TEST_ID = 'ca-app-pub-3940256099942544/6300978111';
 
 // Set to true during development/testing, false for production
-const IS_TESTING = false;
+const IS_TESTING = true;
 
 // Provisional height applied immediately before the banner loads so the nav
 // moves up before the actual SizeChanged event fires (avoids overlap flash).
