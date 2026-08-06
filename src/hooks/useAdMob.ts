@@ -46,6 +46,7 @@ export function useAdMob() {
 
         async function initAndShowBanner() {
             try {
+                console.log('[AdMob Banner] Starting init...');
                 // Dynamically import to avoid bundling on web/SSR
                 const {
                     AdMob,
@@ -56,38 +57,26 @@ export function useAdMob() {
                     AdmobConsentStatus,
                 } = await import('@capacitor-community/admob');
 
-                // ── UMP Consent Flow ──────────────────────────────────
-                // Must run BEFORE AdMob.initialize() to comply with GDPR
-                // and US state privacy regulations.
-                //
-                // Important: We ALWAYS show ads regardless of consent outcome.
-                // - Consent obtained → personalised ads (higher CPM)
-                // - Consent declined → non-personalised/contextual ads (lower CPM)
-                // - Consent not required (non-EEA) → personalised ads
-                //
-                // The only way to remove ads is via a future "Pro" subscription.
-                // The AdMob SDK handles the personalised vs non-personalised
-                // distinction automatically based on the UMP consent signal.
+                console.log('[AdMob Banner] Requesting consent info...');
                 const consentInfo = await AdMob.requestConsentInfo({
                     debugGeography: IS_TESTING
                         ? AdmobConsentDebugGeography.EEA
                         : AdmobConsentDebugGeography.DISABLED,
                     testDeviceIdentifiers: [],
                 });
+                console.log('[AdMob Banner] Consent status:', consentInfo.status, 'formAvailable:', consentInfo.isConsentFormAvailable);
 
                 // If consent form is available and required, show it
                 if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+                    console.log('[AdMob Banner] Showing consent form...');
                     await AdMob.showConsentForm();
-                    // Regardless of outcome, we proceed — the SDK will serve
-                    // non-personalised ads if consent was not obtained.
                 }
 
-                // ── Initialise the SDK ────────────────────────────────
-                // Always initialise — the SDK uses the consent signal
-                // to decide whether to serve personalised or contextual ads.
+                console.log('[AdMob Banner] Initializing SDK...');
                 await AdMob.initialize({
                     initializeForTesting: IS_TESTING,
                 });
+                console.log('[AdMob Banner] SDK initialized OK');
 
                 if (!isMounted) return;
 
@@ -98,8 +87,10 @@ export function useAdMob() {
                     `${PROVISIONAL_BANNER_HEIGHT_PX}px`
                 );
 
+                const adId = IS_TESTING ? ADMOB_BANNER_TEST_ID : ADMOB_BANNER_ID;
+                console.log('[AdMob Banner] Showing banner with adId:', adId);
                 const options = {
-                    adId: IS_TESTING ? ADMOB_BANNER_TEST_ID : ADMOB_BANNER_ID,
+                    adId,
                     adSize: BannerAdSize.ADAPTIVE_BANNER,
                     position: BannerAdPosition.BOTTOM_CENTER,
                     margin: 0,
@@ -107,12 +98,14 @@ export function useAdMob() {
                 };
 
                 await AdMob.showBanner(options);
+                console.log('[AdMob Banner] showBanner() resolved OK');
 
                 // Update to the exact rendered height once the SDK reports it.
                 // This replaces the provisional value and keeps layout pixel-perfect.
                 const listener = await AdMob.addListener(
                     BannerAdPluginEvents.SizeChanged,
                     (size: { width: number; height: number }) => {
+                        console.log('[AdMob Banner] SizeChanged:', size);
                         if (size?.height) {
                             document.documentElement.style.setProperty(
                                 '--ad-band-height',
@@ -126,7 +119,7 @@ export function useAdMob() {
             } catch (err) {
                 // Non-fatal: ads failing to load must never crash the app.
                 // Reset height so the nav returns to the bottom.
-                console.warn('[AdMob] Failed to initialise or show banner:', err);
+                console.warn('[AdMob Banner] FAILED:', err);
                 document.documentElement.style.setProperty('--ad-band-height', '0px');
             }
         }
