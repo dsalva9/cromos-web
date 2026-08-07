@@ -9,8 +9,9 @@ const ADMOB_INTERSTITIAL_TEST_ID = 'ca-app-pub-3940256099942544/1033173712';
 const IS_TESTING = false;
 
 // ── Throttle / Cap constants ───────────────────────────────────────────────
-const COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes between interstitials
-const MAX_PER_SESSION = 5;          // hard cap per app session
+const INITIAL_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes before first interstitial
+const COOLDOWN_MS = 4 * 60 * 1000;         // 4 minutes between subsequent ones
+const MAX_PER_SESSION = 5;                 // hard cap per app session
 
 /**
  * Low-level interstitial ad engine.
@@ -41,8 +42,15 @@ export function useInterstitialAdEngine(isPatron: boolean) {
     const getLastShownAt = (): number => {
         try {
             const v = localStorage.getItem('interstitial_last_shown');
-            return v ? parseInt(v, 10) : 0;  // 0 = epoch = cooldown already elapsed on first visit
-        } catch { return 0; }
+            if (!v) {
+                // First visit / fresh install — stamp now so the initial
+                // cooldown starts from this moment, not from epoch 0.
+                const now = Date.now();
+                localStorage.setItem('interstitial_last_shown', String(now));
+                return now;
+            }
+            return parseInt(v, 10);
+        } catch { return Date.now(); }
     };
     const setLastShownAt = (ts: number) => {
         try { localStorage.setItem('interstitial_last_shown', String(ts)); } catch {}
@@ -135,10 +143,12 @@ export function useInterstitialAdEngine(isPatron: boolean) {
             }
 
             // ── Cooldown guard ──
+            // First interstitial: 2 min after login. Subsequent: 4 min.
+            const cooldown = sc === 0 ? INITIAL_COOLDOWN_MS : COOLDOWN_MS;
             const lastShown = getLastShownAt();
             const elapsed = Date.now() - lastShown;
-            if (elapsed < COOLDOWN_MS) {
-                console.log('[Interstitial] Blocked: cooldown', Math.round(elapsed/1000), 's <', COOLDOWN_MS/1000, 's');
+            if (elapsed < cooldown) {
+                console.log('[Interstitial] Blocked: cooldown', Math.round(elapsed/1000), 's <', cooldown/1000, 's');
                 return false;
             }
 
