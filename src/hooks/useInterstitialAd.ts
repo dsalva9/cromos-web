@@ -4,7 +4,7 @@ import { useRef, useCallback } from 'react';
 import { isNative } from '@/lib/platform';
 
 // ── Ad Unit IDs ────────────────────────────────────────────────────────────
-const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-4603075992850630/3307879099';
+const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-4603075992850630/2878917537';
 const ADMOB_INTERSTITIAL_TEST_ID = 'ca-app-pub-3940256099942544/1033173712';
 const IS_TESTING = false;
 
