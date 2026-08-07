@@ -92,6 +92,7 @@ function derToP1363(der: Uint8Array, byteLength = 32): Uint8Array {
 }
 
 async function verifySignature(
+  reqUrl: string,
   url: URL,
 ): Promise<boolean> {
   const keyIdStr = url.searchParams.get("key_id");
@@ -104,18 +105,33 @@ async function verifySignature(
 
   const keyId = Number(keyIdStr);
 
-  // Build the message: query string content before &signature=
-  const qs = url.search.substring(1); // remove leading ?
-  const sigIndex = qs.indexOf("&signature=");
+  // CRITICAL: Use the RAW query string from the request URL, NOT url.search.
+  // The WHATWG URL parser may normalize percent-encoding (e.g., %C3%A9 → %c3%a9)
+  // which would change the message content and invalidate the signature.
+  const qsStart = reqUrl.indexOf("?");
+  if (qsStart === -1) {
+    console.error("[SSV] No query string found in raw URL");
+    return false;
+  }
+  const rawQs = reqUrl.substring(qsStart + 1);
+  const sigIndex = rawQs.indexOf("&signature=");
   if (sigIndex === -1) {
     console.error("[SSV] Could not find &signature= in query string");
     return false;
   }
-  const message = qs.substring(0, sigIndex);
+  const message = rawQs.substring(0, sigIndex);
+  console.log(`[SSV] key_id=${keyId}, message length=${message.length}`);
+
   const encodedMessage = new TextEncoder().encode(message);
   const derSignature = base64UrlDecode(signatureParam);
-  // Convert DER → IEEE P1363 (raw r||s) for crypto.subtle
-  const signatureBytes = derToP1363(derSignature);
+
+  let signatureBytes: Uint8Array;
+  try {
+    signatureBytes = derToP1363(derSignature);
+  } catch (derErr) {
+    console.error(`[SSV] DER conversion failed: ${derErr}`);
+    return false;
+  }
 
   // Try to verify, refreshing keys once if key_id is unknown
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -148,6 +164,7 @@ async function verifySignature(
       encodedMessage
     );
 
+    console.log(`[SSV] Verification result: ${valid} (key_id=${keyId}, attempt=${attempt})`);
     return valid;
   }
 
@@ -172,8 +189,8 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
 
-    // 1. Verify ECDSA signature
-    const valid = await verifySignature(url);
+    // 1. Verify ECDSA signature (pass raw URL to preserve percent-encoding)
+    const valid = await verifySignature(req.url, url);
     if (!valid) {
       console.error("[SSV] Signature verification failed");
       return new Response("Signature verification failed", {
