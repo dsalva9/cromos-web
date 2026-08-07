@@ -61,11 +61,11 @@ export function useHighlightCredits() {
         const { data: currentData } = await (supabase as any).rpc('get_my_highlight_credits');
         const startBalance = currentData?.balance ?? 0;
 
-        // Poll for balance increase (SSV callback grants credits server-side)
-        const maxAttempts = 10;
+        // First, give SSV a short window to process (Google's callback is usually fast)
+        const ssvAttempts = 4;
         const delayMs = 1500; // 1.5 seconds between polls
 
-        for (let i = 0; i < maxAttempts; i++) {
+        for (let i = 0; i < ssvAttempts; i++) {
             await new Promise(resolve => setTimeout(resolve, delayMs));
 
             const { data } = await (supabase as any).rpc('get_my_highlight_credits');
@@ -77,17 +77,24 @@ export function useHighlightCredits() {
             }
         }
 
-        // Final attempt — the SSV callback may have just been processed
-        const { data: finalData } = await (supabase as any).rpc('get_my_highlight_credits');
-        const finalBalance = finalData?.balance ?? 0;
+        // SSV callback hasn't arrived yet — grant credits directly via RPC.
+        // The RPC uses auth.uid() when called without p_user_id, has rate limiting
+        // (60s cooldown, 300/day cap), and SSV idempotency (so if the SSV callback
+        // arrives later it won't double-grant).
+        console.log('[HighlightCredits] SSV not received, granting via direct RPC');
+        const { data: rpcResult, error: rpcError } = await (supabase as any).rpc(
+            'earn_rewarded_ad_credits',
+            { p_transaction_id: null }
+        );
 
-        if (finalBalance > startBalance) {
-            setBalance(finalBalance);
-            return finalBalance;
+        if (rpcError) {
+            const msg = rpcError.message ?? '';
+            throw new Error(msg);
         }
 
-        // SSV callback hasn't been processed within ~15 seconds
-        throw new Error('credit_grant_timeout');
+        const newBalance = rpcResult?.balance ?? startBalance + CREDITS_PER_AD;
+        setBalance(newBalance);
+        return newBalance;
     }, [supabase]);
 
     /**

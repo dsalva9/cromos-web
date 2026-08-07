@@ -32,10 +32,35 @@ export function useInterstitialAdEngine(isPatron: boolean) {
     // ── Mutable refs (persist across renders, never trigger re-render) ──
     const admobRef = useRef<any>(null);
     const isAdReadyRef = useRef(false);
-    const lastShownAtRef = useRef(Date.now()); // cooldown starts at login
-    const sessionCountRef = useRef(0);
-    const loadMoreCountRef = useRef(0);
     const preparePromiseRef = useRef<Promise<boolean> | null>(null);
+
+    // ── localStorage-backed state (survives hard navigation reloads) ──
+    // window.location.href causes full page reloads, which reset all useRef
+    // values. We persist cooldown/session state in localStorage so the
+    // 4-minute cooldown can actually elapse across navigations.
+    const getLastShownAt = (): number => {
+        try {
+            const v = localStorage.getItem('interstitial_last_shown');
+            return v ? parseInt(v, 10) : 0;  // 0 = epoch = cooldown already elapsed on first visit
+        } catch { return 0; }
+    };
+    const setLastShownAt = (ts: number) => {
+        try { localStorage.setItem('interstitial_last_shown', String(ts)); } catch {}
+    };
+    const getSessionCount = (): number => {
+        try {
+            const v = localStorage.getItem('interstitial_session_count');
+            const lastShown = getLastShownAt();
+            // Reset session count if last ad was >30 min ago (new session proxy)
+            if (Date.now() - lastShown > 30 * 60 * 1000) return 0;
+            return v ? parseInt(v, 10) : 0;
+        } catch { return 0; }
+    };
+    const setSessionCount = (n: number) => {
+        try { localStorage.setItem('interstitial_session_count', String(n)); } catch {}
+    };
+    const loadMoreCountRef = useRef(0);
+
 
     /**
      * Pre-load an interstitial so it's available instantly when a trigger fires.
@@ -99,10 +124,10 @@ export function useInterstitialAdEngine(isPatron: boolean) {
             if (isPatron) return false;
 
             // ── Session cap guard ──
-            if (sessionCountRef.current >= MAX_PER_SESSION) return false;
+            if (getSessionCount() >= MAX_PER_SESSION) return false;
 
             // ── Cooldown guard ──
-            if (Date.now() - lastShownAtRef.current < COOLDOWN_MS) return false;
+            if (Date.now() - getLastShownAt() < COOLDOWN_MS) return false;
 
             // ── Load More frequency guard ──
             if (trigger === 'loadMore') {
@@ -134,8 +159,8 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                         () => {
                             cleanup();
                             isAdReadyRef.current = false;
-                            lastShownAtRef.current = Date.now();
-                            sessionCountRef.current += 1;
+                            setLastShownAt(Date.now());
+                            setSessionCount(getSessionCount() + 1);
                             // Pre-load the next ad
                             prepareAd();
                             resolve(true);
