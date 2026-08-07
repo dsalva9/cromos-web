@@ -76,20 +76,21 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                 if (!admobRef.current) {
                     const admob = await import('@capacitor-community/admob');
                     admobRef.current = admob;
-                    // initialize() is idempotent — safe even if banner already called it
                     await admob.AdMob.initialize({ initializeForTesting: IS_TESTING });
                 }
 
                 const { AdMob } = admobRef.current;
+                console.log('[Interstitial] Preparing ad unit:', IS_TESTING ? ADMOB_INTERSTITIAL_TEST_ID : ADMOB_INTERSTITIAL_ID);
                 await AdMob.prepareInterstitial({
                     adId: IS_TESTING ? ADMOB_INTERSTITIAL_TEST_ID : ADMOB_INTERSTITIAL_ID,
                     isTesting: IS_TESTING,
                 });
 
+                console.log('[Interstitial] ✅ Ad loaded and ready');
                 isAdReadyRef.current = true;
                 return true;
             } catch (err) {
-                console.warn('[AdMob Interstitial] Failed to prepare:', err);
+                console.warn('[Interstitial] ❌ Failed to prepare:', err);
                 isAdReadyRef.current = false;
                 return false;
             } finally {
@@ -121,24 +122,45 @@ export function useInterstitialAdEngine(isPatron: boolean) {
             if (!isNative()) return false;
 
             // ── Patron guard ──
-            if (isPatron) return false;
+            if (isPatron) {
+                console.log('[Interstitial] Blocked: user is patron');
+                return false;
+            }
 
             // ── Session cap guard ──
-            if (getSessionCount() >= MAX_PER_SESSION) return false;
+            const sc = getSessionCount();
+            if (sc >= MAX_PER_SESSION) {
+                console.log('[Interstitial] Blocked: session cap', sc, '>=', MAX_PER_SESSION);
+                return false;
+            }
 
             // ── Cooldown guard ──
-            if (Date.now() - getLastShownAt() < COOLDOWN_MS) return false;
+            const lastShown = getLastShownAt();
+            const elapsed = Date.now() - lastShown;
+            if (elapsed < COOLDOWN_MS) {
+                console.log('[Interstitial] Blocked: cooldown', Math.round(elapsed/1000), 's <', COOLDOWN_MS/1000, 's');
+                return false;
+            }
+
+            console.log('[Interstitial] Guards passed! trigger=' + trigger, 'elapsed=' + Math.round(elapsed/1000) + 's', 'sessionCount=' + sc);
 
             // ── Load More frequency guard ──
             if (trigger === 'loadMore') {
                 loadMoreCountRef.current += 1;
-                if (loadMoreCountRef.current < 2) return false;
+                if (loadMoreCountRef.current < 2) {
+                    console.log('[Interstitial] Blocked: loadMore count', loadMoreCountRef.current, '< 2');
+                    return false;
+                }
             }
 
             // ── Ensure an ad is ready ──
             if (!isAdReadyRef.current) {
+                console.log('[Interstitial] Ad not ready, preparing now...');
                 const ready = await prepareAd();
-                if (!ready) return false;
+                if (!ready) {
+                    console.log('[Interstitial] ❌ Ad prepare failed, cannot show');
+                    return false;
+                }
             }
 
             // ── Show the ad ──
