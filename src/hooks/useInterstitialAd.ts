@@ -9,8 +9,8 @@ const ADMOB_INTERSTITIAL_TEST_ID = 'ca-app-pub-3940256099942544/1033173712';
 const IS_TESTING = false;
 
 // ── Throttle / Cap constants ───────────────────────────────────────────────
-const INITIAL_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes before first interstitial
-const COOLDOWN_MS = 4 * 60 * 1000;         // 4 minutes between subsequent ones
+const INITIAL_COOLDOWN_MS = 1 * 60 * 1000; // 1 minute before first interstitial
+const COOLDOWN_MS = 3 * 60 * 1000;         // 3 minutes between subsequent ones
 const MAX_PER_SESSION = 5;                 // hard cap per app session
 
 /**
