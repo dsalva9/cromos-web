@@ -67,7 +67,6 @@ export function useInterstitialAdEngine(isPatron: boolean) {
     const setSessionCount = (n: number) => {
         try { localStorage.setItem('interstitial_session_count', String(n)); } catch {}
     };
-    const loadMoreCountRef = useRef(0);
 
 
     /**
@@ -153,15 +152,6 @@ export function useInterstitialAdEngine(isPatron: boolean) {
             }
 
             console.log('[Interstitial] Guards passed! trigger=' + trigger, 'elapsed=' + Math.round(elapsed/1000) + 's', 'sessionCount=' + sc);
-
-            // ── Load More frequency guard ──
-            if (trigger === 'loadMore') {
-                loadMoreCountRef.current += 1;
-                if (loadMoreCountRef.current < 2) {
-                    console.log('[Interstitial] Blocked: loadMore count', loadMoreCountRef.current, '< 2');
-                    return false;
-                }
-            }
 
             // ── Ensure an ad is ready ──
             if (!isAdReadyRef.current) {
