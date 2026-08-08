@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { isNative } from '@/lib/platform';
 import { Download, Mail, Calendar, Users } from 'lucide-react';
 
 export default function NewsletterPage() {
@@ -65,15 +66,31 @@ export default function NewsletterPage() {
 
       // Generate CSV with only emails
       const csvContent = emails.join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `subscribers_${startDate}_to_${endDate || today}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const fileName = `subscribers_${startDate}_to_${endDate || today}.csv`;
+
+      if (isNative()) {
+        // Capacitor WebView: blob downloads don't work, use Browser plugin
+        try {
+          const { Browser } = await import('@capacitor/browser');
+          const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+          await Browser.open({ url: dataUri });
+        } catch {
+          // Fallback: copy to clipboard
+          await navigator.clipboard.writeText(csvContent);
+          toast('Emails copiados al portapapeles (CSV)', 'success');
+        }
+      } else {
+        // Web: standard blob download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
 
       toast(t('successDownload', { count }), 'success');
     } catch (e: unknown) {
