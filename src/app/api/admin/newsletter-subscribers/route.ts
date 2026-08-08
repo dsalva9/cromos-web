@@ -87,7 +87,8 @@ export async function GET(request: Request) {
       .rpc('get_subscriber_emails', {
         p_start_date: startTimestamp,
         p_end_date: endTimestamp,
-      });
+      })
+      .limit(100000); // Override PostgREST default 1000 row limit
 
     if (rpcError) {
       logger.error('Error fetching subscriber emails:', rpcError);
