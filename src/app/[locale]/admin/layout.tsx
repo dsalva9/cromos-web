@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/templates')) return 'templates';
     if (pathname.includes('/admin/testing-tools')) return 'testing-tools';
     if (pathname.includes('/admin/feature-flags')) return 'feature-flags';
-    if (pathname.includes('/admin/broadcasts')) return 'broadcasts';
+    if (pathname.includes('/admin/newsletter')) return 'newsletter';
     if (pathname.includes('/admin/settings')) return 'settings';
     return 'dashboard';
   };
@@ -154,13 +154,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </TabsTrigger>
                 </Link>
 
-                <Link href="/admin/broadcasts">
+                <Link href="/admin/newsletter">
                   <TabsTrigger
-                    value="broadcasts"
+                    value="newsletter"
                     className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
                   >
                     <Mail className="h-4 w-4 mr-2" />
-                    Broadcasts
+                    Newsletter
                   </TabsTrigger>
                 </Link>
 
