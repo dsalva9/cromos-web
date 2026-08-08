@@ -80,29 +80,44 @@ export async function GET(request: Request) {
 
     // Use database function to query auth.users directly via SQL
     // This avoids GoTrue's listUsers bug with NULL confirmation_token
+    // Paginate with .range() because PostgREST enforces max-rows=1000
     const startTimestamp = startBoundary ? new Date(startBoundary).toISOString() : null;
     const endTimestamp = endBoundary ? new Date(endBoundary).toISOString() : null;
 
-    const { data: rows, error: rpcError } = await adminClient
-      .rpc('get_subscriber_emails', {
-        p_start_date: startTimestamp,
-        p_end_date: endTimestamp,
-      })
-      .limit(100000); // Override PostgREST default 1000 row limit
+    const BATCH_SIZE = 1000;
+    let allEmails: string[] = [];
+    let from = 0;
+    let hasMore = true;
 
-    if (rpcError) {
-      logger.error('Error fetching subscriber emails:', rpcError);
-      return NextResponse.json(
-        { error: 'Error fetching users' },
-        { status: 500 }
-      );
+    while (hasMore) {
+      const { data: rows, error: rpcError } = await adminClient
+        .rpc('get_subscriber_emails', {
+          p_start_date: startTimestamp,
+          p_end_date: endTimestamp,
+        })
+        .range(from, from + BATCH_SIZE - 1);
+
+      if (rpcError) {
+        logger.error('Error fetching subscriber emails:', rpcError);
+        return NextResponse.json(
+          { error: 'Error fetching users' },
+          { status: 500 }
+        );
+      }
+
+      const batch = (rows || []).map((r: { email: string }) => r.email);
+      allEmails = allEmails.concat(batch);
+
+      if (batch.length < BATCH_SIZE) {
+        hasMore = false;
+      } else {
+        from += BATCH_SIZE;
+      }
     }
 
-    const emails = (rows || []).map((r: { email: string }) => r.email);
-
     return NextResponse.json({
-      emails,
-      count: emails.length
+      emails: allEmails,
+      count: allEmails.length
     });
 
   } catch (error) {
