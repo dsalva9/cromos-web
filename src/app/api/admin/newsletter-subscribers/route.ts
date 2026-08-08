@@ -78,54 +78,26 @@ export async function GET(request: Request) {
       endBoundary = endD.getTime();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let allUsers: any[] = [];
-    let page = 1;
-    let hasMore = true;
+    // Use database function to query auth.users directly via SQL
+    // This avoids GoTrue's listUsers bug with NULL confirmation_token
+    const startTimestamp = startBoundary ? new Date(startBoundary).toISOString() : null;
+    const endTimestamp = endBoundary ? new Date(endBoundary).toISOString() : null;
 
-    while (hasMore) {
-      const { data, error: listError } = await adminClient.auth.admin.listUsers({
-        page,
-        perPage: 1000,
+    const { data: rows, error: rpcError } = await adminClient
+      .rpc('get_subscriber_emails', {
+        p_start_date: startTimestamp,
+        p_end_date: endTimestamp,
       });
 
-      if (listError) {
-        logger.error('Error fetching users:', listError);
-        return NextResponse.json(
-          { error: 'Error fetching users' },
-          { status: 500 }
-        );
-      }
-
-      const users = data.users;
-      if (!users || users.length === 0) {
-        hasMore = false;
-        break;
-      }
-
-      allUsers = allUsers.concat(users);
-
-      // If we got fewer than perPage, we're done
-      if (users.length < 1000) {
-        hasMore = false;
-      } else {
-        page++;
-      }
+    if (rpcError) {
+      logger.error('Error fetching subscriber emails:', rpcError);
+      return NextResponse.json(
+        { error: 'Error fetching users' },
+        { status: 500 }
+      );
     }
 
-    // Filter users by confirmed email and date range
-    const filteredUsers = allUsers.filter(u => {
-      if (!u.email_confirmed_at || !u.email) return false;
-
-      const createdTime = new Date(u.created_at).getTime();
-
-      if (startBoundary !== null && createdTime < startBoundary) return false;
-      if (endBoundary !== null && createdTime > endBoundary) return false;
-
-      return true;
-    });
-
-    const emails = filteredUsers.map(u => u.email as string);
+    const emails = (rows || []).map((r: { email: string }) => r.email);
 
     return NextResponse.json({
       emails,
