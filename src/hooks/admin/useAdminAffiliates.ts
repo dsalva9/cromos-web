@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
-import type { AffiliateLink } from '@/types/affiliates';
+import type { AffiliateLink, ImageConfig } from '@/types/affiliates';
+import { DEFAULT_IMAGE_CONFIG } from '@/types/affiliates';
 
 const supabase = createClient();
 
@@ -20,7 +21,7 @@ interface UseAdminAffiliatesReturn {
     rating: number;
     destination_url: string;
     is_active?: boolean;
-    image_scale?: number;
+    image_config?: ImageConfig;
   }) => Promise<string>;
   deleteAffiliate: (id: string) => Promise<void>;
   uploadImage: (file: File) => Promise<string>;
@@ -57,7 +58,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
     rating: number;
     destination_url: string;
     is_active?: boolean;
-    image_scale?: number;
+    image_config?: ImageConfig;
   }): Promise<string> => {
     setSaving(true);
     setError(null);
@@ -72,7 +73,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
         p_rating: data.rating,
         p_destination_url: data.destination_url,
         p_is_active: data.is_active ?? true,
-        p_image_scale: data.image_scale ?? 1.0,
+        p_image_config: data.image_config ?? DEFAULT_IMAGE_CONFIG,
       });
       if (rpcError) throw rpcError;
       await fetchAffiliates();

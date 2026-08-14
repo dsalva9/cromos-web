@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Star, ChevronRight, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import type { ImageConfig } from '@/types/affiliates';
 
 interface SponsoredCardProps {
   affiliate: {
@@ -12,7 +13,7 @@ interface SponsoredCardProps {
     subtitle: string;
     rating: number;
     destination_url: string;
-    image_scale?: number;
+    image_config?: ImageConfig;
   };
 }
 
@@ -34,15 +35,30 @@ export function SponsoredCard({ affiliate }: SponsoredCardProps) {
       {/* Image Container: aspect-square matches the aspect ratio of regular card listing images */}
       <div className="relative aspect-square bg-gradient-to-br from-amber-50/10 to-orange-50/10 dark:from-gray-800/20 dark:to-gray-900/20 overflow-hidden flex items-center justify-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="relative w-full h-full bg-white dark:bg-white rounded-xl flex items-center justify-center p-1">
-          <Image
-            src={affiliate.image_url}
-            alt={affiliate.title}
-            fill
-            className="object-contain transition-transform duration-500 group-hover:scale-105 p-1"
-            style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale})` } : undefined}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            priority
-          />
+          {/* Mobile View Transform */}
+          <div className="relative w-full h-full block md:hidden">
+            <Image
+              src={affiliate.image_url}
+              alt={affiliate.title}
+              fill
+              className="object-contain transition-transform duration-500 group-hover:scale-105 p-1"
+              style={affiliate.image_config ? { transform: `translate(${affiliate.image_config.mobile?.x || 0}px, ${affiliate.image_config.mobile?.y || 0}px) scale(${affiliate.image_config.mobile?.scale || 1})` } : undefined}
+              sizes="(max-width: 640px) 50vw"
+              priority
+            />
+          </div>
+          {/* Desktop View Transform */}
+          <div className="relative w-full h-full hidden md:block">
+            <Image
+              src={affiliate.image_url}
+              alt={affiliate.title}
+              fill
+              className="object-contain transition-transform duration-500 group-hover:scale-105 p-1"
+              style={affiliate.image_config ? { transform: `translate(${affiliate.image_config.desktop?.x || 0}px, ${affiliate.image_config.desktop?.y || 0}px) scale(${affiliate.image_config.desktop?.scale || 1})` } : undefined}
+              sizes="(max-width: 1024px) 33vw, 25vw"
+              priority
+            />
+          </div>
         </div>
 
         {/* Recomendado Badge Overlay */}

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Star, ChevronRight, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
+import type { ImageConfig } from '@/types/affiliates';
 
 interface SponsoredBannerProps {
   affiliate?: {
@@ -12,7 +13,7 @@ interface SponsoredBannerProps {
     subtitle: string;
     rating: number;
     destination_url: string;
-    image_scale?: number;
+    image_config?: ImageConfig;
   } | null;
 }
 
@@ -83,7 +84,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
                 alt={affiliate.title}
                 fill
                 className="object-contain transform rotate-3"
-                style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale}) rotate(3deg)` } : undefined}
+                style={affiliate.image_config ? { transform: `translate(${affiliate.image_config.mobile?.x || 0}px, ${affiliate.image_config.mobile?.y || 0}px) scale(${affiliate.image_config.mobile?.scale || 1}) rotate(3deg)` } : undefined}
                 sizes="80px"
                 priority
               />
@@ -142,7 +143,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
               alt={affiliate.title}
               fill
               className="object-contain transform rotate-3 group-hover:rotate-6 transition-transform duration-300"
-              style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale}) rotate(3deg)` } : undefined}
+              style={affiliate.image_config ? { transform: `translate(${affiliate.image_config.desktop?.x || 0}px, ${affiliate.image_config.desktop?.y || 0}px) scale(${affiliate.image_config.desktop?.scale || 1}) rotate(3deg)` } : undefined}
               sizes="100px"
               priority
             />
