@@ -47,6 +47,7 @@ import { useAdminHighlights } from '@/hooks/admin/useAdminHighlights';
 import { useAdminCredits } from '@/hooks/admin/useAdminCredits';
 import { useUserSearch } from '@/hooks/admin/useUserSearch';
 import { useCreditRanking } from '@/hooks/admin/useCreditRanking';
+import { useGlobalCreditTransactions } from '@/hooks/admin/useGlobalCreditTransactions';
 import { Trophy } from 'lucide-react';
 
 type AdminTab = 'listings' | 'highlights' | 'credits';
@@ -88,12 +89,13 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
         <table className="min-w-full text-sm text-left text-white">
           <thead>
             <tr className="text-gray-500 border-b border-gray-800 text-[10px] uppercase tracking-wider bg-gray-800/20">
-              <th className="px-4 py-3 font-bold text-left">Pos</th>
-              <th className="px-4 py-3 font-bold text-left">Usuario</th>
-              <th className="px-4 py-3 font-bold text-right">Comprados</th>
-              <th className="px-4 py-3 font-bold text-right">Recomp.</th>
-              <th className="px-4 py-3 font-bold text-right text-gold">Total</th>
-              <th className="px-4 py-3 font-bold text-center">Acción</th>
+              <th className="px-3 py-3 font-bold text-left">Pos</th>
+              <th className="px-3 py-3 font-bold text-left">Usuario</th>
+              <th className="px-3 py-3 font-bold text-right">Comprados</th>
+              <th className="px-3 py-3 font-bold text-right">Recomp.</th>
+              <th className="px-3 py-3 font-bold text-right text-blue-400">Admin</th>
+              <th className="px-3 py-3 font-bold text-right text-gold">Total</th>
+              <th className="px-3 py-3 font-bold text-center">Acción</th>
             </tr>
           </thead>
           <tbody>
@@ -107,25 +109,28 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
 
               return (
                 <tr key={row.user_id} className="border-b border-gray-800/50 hover:bg-gray-800/10">
-                  <td className="px-4 py-3 text-left">
+                  <td className="px-3 py-3 text-left">
                     <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full font-black text-[10px] ${rankBadge}`}>
                       {rank}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-left">
+                  <td className="px-3 py-3 text-left">
                     <p className="font-bold text-white leading-none text-xs">{row.nickname}</p>
                     <p className="text-[10px] text-gray-500 mt-0.5 max-w-[120px] sm:max-w-none truncate">{row.email}</p>
                   </td>
-                  <td className="px-4 py-3 text-right font-semibold text-gray-300 text-xs">
-                    {Number(row.purchase_credits).toLocaleString()}
+                  <td className="px-3 py-3 text-right font-semibold text-gray-300 text-xs">
+                    {Number(row.purchase_credits || 0).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 text-right font-semibold text-gray-300 text-xs">
-                    {Number(row.reward_credits).toLocaleString()}
+                  <td className="px-3 py-3 text-right font-semibold text-gray-300 text-xs">
+                    {Number(row.reward_credits || 0).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 text-right font-black text-gold text-xs">
-                    {Number(row.total_credits).toLocaleString()}
+                  <td className="px-3 py-3 text-right font-semibold text-blue-400 text-xs">
+                    {Number(row.admin_credits || 0).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-3 py-3 text-right font-black text-gold text-xs">
+                    {Number(row.total_credits || 0).toLocaleString()}
+                  </td>
+                  <td className="px-3 py-3 text-center">
                     <Button
                       size="sm"
                       onClick={() => onSelectUser(row)}
@@ -140,7 +145,7 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
 
             {ranking.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500 text-xs">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500 text-xs">
                   No hay transacciones registradas de obtención de créditos
                 </td>
               </tr>
@@ -148,6 +153,170 @@ function CreditRankingList({ onSelectUser }: { onSelectUser: (user: any) => void
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+function GlobalCreditTransactionsList({ onSelectUser }: { onSelectUser: (user: any) => void }) {
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const { transactions, loading, error, refetch } = useGlobalCreditTransactions(50, sourceFilter);
+
+  return (
+    <div className="space-y-4 bg-[#111827] border border-gray-800 rounded-2xl p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+        <div className="flex items-center gap-2">
+          <History className="h-5 w-5 text-gold" />
+          <h4 className="font-black text-white text-sm uppercase tracking-wider">
+            Últimas Transacciones Globales
+          </h4>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800">
+            <button
+              type="button"
+              onClick={() => setSourceFilter('all')}
+              className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                sourceFilter === 'all'
+                  ? 'bg-gold text-black'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Todas
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('admin_grant')}
+              className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                sourceFilter === 'admin_grant'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('rewarded_ad')}
+              className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                sourceFilter === 'rewarded_ad'
+                  ? 'bg-amber-500 text-black'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Ads
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter('ls_purchase')}
+              className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                sourceFilter === 'ls_purchase'
+                  ? 'bg-emerald-500 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Compras/Uso
+            </button>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => refetch()} className="border-gray-800 text-xs h-7 text-gray-400 hover:text-white">
+            Actualizar
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-gold" />
+        </div>
+      ) : error ? (
+        <div className="bg-red-900/20 border-2 border-red-600 rounded-xl p-4 text-red-400 text-sm">
+          {error.message || 'Error al cargar transacciones'}
+        </div>
+      ) : (
+        <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
+          {transactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="p-3 bg-gray-900 border border-gray-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm hover:border-gray-700 transition-colors"
+            >
+              <div className="flex items-start sm:items-center gap-3 min-w-0">
+                <div
+                  className={`p-2 rounded-lg shrink-0 ${
+                    tx.amount > 0
+                      ? 'bg-green-500/10 text-green-400'
+                      : 'bg-red-500/10 text-red-400'
+                  }`}
+                >
+                  {tx.amount > 0 ? (
+                    <ArrowUpRight className="h-5 w-5" />
+                  ) : (
+                    <ArrowDownLeft className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="space-y-0.5 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-white text-xs truncate max-w-[140px] sm:max-w-[200px]">
+                      {tx.nickname}
+                    </span>
+                    <Badge
+                      className={
+                        tx.credit_source === 'admin_grant'
+                          ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 text-[10px]'
+                          : tx.credit_source === 'rewarded_ad'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 text-[10px]'
+                          : tx.credit_source === 'ls_purchase'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]'
+                          : 'bg-gray-800 text-gray-400 text-[10px]'
+                      }
+                    >
+                      {tx.credit_source === 'admin_grant'
+                        ? 'Admin'
+                        : tx.credit_source === 'rewarded_ad'
+                        ? 'Rewarded Ad'
+                        : tx.credit_source === 'ls_purchase'
+                        ? 'LemonSqueezy'
+                        : tx.credit_source}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-300 truncate">
+                    {tx.description || (tx.credit_source === 'admin_grant' ? 'Concesión de créditos por admin' : 'Transacción de créditos')}
+                  </p>
+                  <p className="text-[10px] text-gray-500">
+                    {format(new Date(tx.created_at), 'PPPp', { locale: dateLocaleEs })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-800">
+                <div className="text-left sm:text-right">
+                  <span
+                    className={`font-black text-sm block ${
+                      tx.amount > 0 ? 'text-green-400' : 'text-red-400'
+                    }`}
+                  >
+                    {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
+                  </span>
+                  <span className="text-[10px] text-gray-500 block">
+                    Saldo: {tx.balance_after}
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => onSelectUser({ user_id: tx.user_id, nickname: tx.nickname, email: tx.email })}
+                  className="bg-gold hover:bg-yellow-400 text-black text-[10px] px-2.5 py-0.5 h-6 font-black rounded-lg transition-all"
+                >
+                  Gestionar
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          {transactions.length === 0 && (
+            <p className="text-center text-sm text-gray-500 py-8">
+              No hay transacciones registradas con el filtro seleccionado
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -188,6 +357,8 @@ function MarketplaceContent() {
   const [creditAmount, setCreditAmount] = useState<string>('');
   const [creditReason, setCreditReason] = useState('');
   const [adjustingCredits, setAdjustingCredits] = useState(false);
+  const [creditViewMode, setCreditViewMode] = useState<'ranking' | 'transactions'>('ranking');
+  const [userTxFilter, setUserTxFilter] = useState<'all' | 'admin_grant' | 'rewarded_ad' | 'ls_purchase'>('all');
 
   const {
     balance,
@@ -741,10 +912,63 @@ function MarketplaceContent() {
 
                     {/* Transaction history section below */}
                     <div className="md:col-span-3 space-y-3">
-                      <h3 className="text-lg font-bold text-white flex items-center gap-2 pt-2 border-t border-gray-800">
-                        <History className="h-5 w-5 text-gold" />
-                        Historial de Transacciones
-                      </h3>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-gray-800">
+                        <div className="flex items-center gap-2">
+                          <History className="h-5 w-5 text-gold" />
+                          <h3 className="text-lg font-bold text-white">
+                            Historial de Transacciones
+                          </h3>
+                        </div>
+
+                        <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800 self-start sm:self-auto flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => setUserTxFilter('all')}
+                            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                              userTxFilter === 'all'
+                                ? 'bg-gold text-black'
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Todas ({transactions.length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setUserTxFilter('admin_grant')}
+                            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                              userTxFilter === 'admin_grant'
+                                ? 'bg-blue-500 text-white'
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Admin ({transactions.filter((t) => t.credit_source === 'admin_grant').length})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setUserTxFilter('rewarded_ad')}
+                            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                              userTxFilter === 'rewarded_ad'
+                                ? 'bg-amber-500 text-black'
+                                : 'text-gray-400 hover:text-white'
+                            }`}
+                          >
+                            Ads ({transactions.filter((t) => t.credit_source === 'rewarded_ad').length})
+                          </button>
+                          {transactions.some((t) => t.credit_source === 'ls_purchase') && (
+                            <button
+                              type="button"
+                              onClick={() => setUserTxFilter('ls_purchase')}
+                              className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                                userTxFilter === 'ls_purchase'
+                                  ? 'bg-emerald-500 text-white'
+                                  : 'text-gray-400 hover:text-white'
+                              }`}
+                            >
+                              Compras/Uso ({transactions.filter((t) => t.credit_source === 'ls_purchase').length})
+                            </button>
+                          )}
+                        </div>
+                      </div>
 
                       {txLoading ? (
                         <div className="flex justify-center py-8">
@@ -752,9 +976,11 @@ function MarketplaceContent() {
                         </div>
                       ) : (
                         <div className="space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
-                          {transactions.map((tx) => (
+                          {transactions
+                            .filter((tx) => userTxFilter === 'all' || tx.credit_source === userTxFilter)
+                            .map((tx) => (
                             <div key={tx.id} className="p-3 bg-gray-900 border border-gray-800/80 rounded-xl flex items-center justify-between text-sm gap-4">
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 min-w-0">
                                 <div className={`p-2 rounded-lg shrink-0 ${
                                   tx.amount > 0 
                                     ? 'bg-green-500/10 text-green-400' 
@@ -766,9 +992,30 @@ function MarketplaceContent() {
                                     <ArrowDownLeft className="h-5 w-5" />
                                   )}
                                 </div>
-                                <div className="space-y-0.5">
-                                  <p className="font-bold text-white">{tx.description || 'Ajuste de créditos'}</p>
-                                  <p className="text-xs text-gray-500">
+                                <div className="space-y-0.5 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="font-bold text-white text-xs truncate">
+                                      {tx.description || (tx.credit_source === 'admin_grant' ? 'Concesión manual de administrador' : 'Ajuste de créditos')}
+                                    </p>
+                                    <Badge className={
+                                      tx.credit_source === 'admin_grant'
+                                        ? 'bg-blue-500/20 text-blue-400 border-blue-500/30 text-[10px]'
+                                        : tx.credit_source === 'rewarded_ad'
+                                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 text-[10px]'
+                                        : tx.credit_source === 'ls_purchase'
+                                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]'
+                                        : 'bg-gray-800 text-gray-400 text-[10px]'
+                                    }>
+                                      {tx.credit_source === 'admin_grant'
+                                        ? 'Admin'
+                                        : tx.credit_source === 'rewarded_ad'
+                                        ? 'Rewarded Ad'
+                                        : tx.credit_source === 'ls_purchase'
+                                        ? 'LemonSqueezy'
+                                        : tx.credit_source}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-[10px] text-gray-500">
                                     {format(new Date(tx.created_at), 'PPPp', { locale: dateLocaleEs })}
                                   </p>
                                 </div>
@@ -785,8 +1032,8 @@ function MarketplaceContent() {
                             </div>
                           ))}
 
-                          {transactions.length === 0 && (
-                            <p className="text-center text-sm text-gray-500 py-8">El usuario no tiene transacciones en su historial</p>
+                          {transactions.filter((tx) => userTxFilter === 'all' || tx.credit_source === userTxFilter).length === 0 && (
+                            <p className="text-center text-sm text-gray-500 py-8">No hay transacciones registradas con el filtro seleccionado</p>
                           )}
                         </div>
                       )}
@@ -794,7 +1041,40 @@ function MarketplaceContent() {
 
                   </div>
                 ) : (
-                  <CreditRankingList onSelectUser={setSelectedUser} />
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 border-b border-gray-800 pb-2">
+                      <button
+                        type="button"
+                        onClick={() => setCreditViewMode('ranking')}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                          creditViewMode === 'ranking'
+                            ? 'bg-gold text-black'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800/40'
+                        }`}
+                      >
+                        <Trophy className="h-3.5 w-3.5" />
+                        Ranking de Obtención
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCreditViewMode('transactions')}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                          creditViewMode === 'transactions'
+                            ? 'bg-gold text-black'
+                            : 'text-gray-400 hover:text-white hover:bg-gray-800/40'
+                        }`}
+                      >
+                        <History className="h-3.5 w-3.5" />
+                        Historial Global
+                      </button>
+                    </div>
+
+                    {creditViewMode === 'ranking' ? (
+                      <CreditRankingList onSelectUser={setSelectedUser} />
+                    ) : (
+                      <GlobalCreditTransactionsList onSelectUser={setSelectedUser} />
+                    )}
+                  </div>
                 )}
               </div>
             </div>

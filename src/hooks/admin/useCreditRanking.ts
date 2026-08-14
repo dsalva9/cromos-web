@@ -10,6 +10,7 @@ export interface CreditRankingUser {
   email: string;
   purchase_credits: number;
   reward_credits: number;
+  admin_credits: number;
   total_credits: number;
 }
 
