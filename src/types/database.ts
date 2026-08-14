@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -3307,6 +3307,7 @@ export type Database = {
       admin_list_templates: {
         Args: {
           p_country_code?: string
+          p_is_featured?: boolean
           p_page?: number
           p_page_size?: number
           p_query?: string
@@ -3468,6 +3469,10 @@ export type Database = {
       }
       admin_suspend_user_v2: {
         Args: { p_is_suspended: boolean; p_reason?: string; p_user_id: string }
+        Returns: undefined
+      }
+      admin_reorder_featured_templates: {
+        Args: { p_template_ids: number[] }
         Returns: undefined
       }
       admin_toggle_featured_template: {
