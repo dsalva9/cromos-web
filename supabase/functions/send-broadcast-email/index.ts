@@ -63,7 +63,7 @@ interface BroadcastPayload {
  * For broadcasts, uses Resend personalization variables.
  * For tests, uses the admin's nickname directly.
  */
-function buildBroadcastHtml(subject: string, body: string, mode: 'broadcast' | 'test', adminNickname?: string): string {
+function buildBroadcastHtml(subject: string, body: string, mode: 'broadcast' | 'test', adminNickname?: string, affiliateHtml: string = ''): string {
   // Greeting: use Resend personalization for broadcasts, admin name for tests
   const greeting = mode === 'broadcast'
     ? 'Hola {{{contact.first_name|there}}} 👋'
@@ -89,6 +89,7 @@ function buildBroadcastHtml(subject: string, body: string, mode: 'broadcast' | '
       <h2 style="color: #1f2937; font-size: 20px;">${escapeHtml(subject)}</h2>
       <p style="color: #4b5563; margin: 16px 0; white-space: pre-wrap;">${escapeHtml(body)}</p>
     </div>
+    ${affiliateHtml}
     <div style="background: #FFFBEB; border: 1px solid #e5e7eb; border-top: none; padding: 24px 20px; text-align: center;">
       <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
       <p style="margin: 0; font-size: 16px; font-weight: bold; color: #92400E;">¿Te gusta CambioCromos?</p>
@@ -131,6 +132,29 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch a random active email affiliate for the footer
+    let emailAffiliate: { image_url: string; title: string; subtitle: string; rating: number; destination_url: string } | null = null;
+    try {
+      const { data: affData } = await supabase.rpc('get_random_email_affiliate');
+      if (affData && affData.length > 0) {
+        emailAffiliate = affData[0];
+      }
+    } catch (e) {
+      console.log('[send-broadcast-email] Could not fetch email affiliate:', e);
+    }
+
+    const affiliateHtml = emailAffiliate ? `
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 20px; text-align: center;">
+        <a href="${emailAffiliate.destination_url}" target="_blank" rel="noopener sponsored nofollow" style="text-decoration: none; color: inherit; display: inline-block;">
+          <img src="${emailAffiliate.image_url}" alt="${escapeHtml(emailAffiliate.title)}" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; border-radius: 8px;" />
+          <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1f2937;">${escapeHtml(emailAffiliate.title)}</p>
+          <p style="margin: 4px 0 10px 0; font-size: 12px; color: #6b7280;">${escapeHtml(emailAffiliate.subtitle)}</p>
+          <div style="color: #f59e0b; font-size: 16px; letter-spacing: 2px; margin-bottom: 10px;">${'★'.repeat(Math.floor(emailAffiliate.rating))}${'☆'.repeat(5 - Math.floor(emailAffiliate.rating))} (${emailAffiliate.rating})</div>
+          <span style="display: inline-block; padding: 10px 24px; background: #533FC6; color: white; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase;">Ver en Amazon</span>
+        </a>
+      </div>
+    ` : '';
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -186,7 +210,7 @@ Deno.serve(async (req) => {
     // ─── TEST MODE ─────────────────────────────────────────────
     if (mode === 'test') {
       const recipients = test_emails?.length ? test_emails : [user.email!];
-      const htmlContent = buildBroadcastHtml(subject.trim(), body.trim(), 'test', adminProfile.nickname);
+      const htmlContent = buildBroadcastHtml(subject.trim(), body.trim(), 'test', adminProfile.nickname, affiliateHtml);
 
       const results: { email: string; success: boolean; error?: string }[] = [];
 
@@ -238,7 +262,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const htmlContent = buildBroadcastHtml(subject.trim(), body.trim(), 'broadcast');
+    const htmlContent = buildBroadcastHtml(subject.trim(), body.trim(), 'broadcast', undefined, affiliateHtml);
 
     // Create and send broadcast via Resend Broadcasts API
     const broadcastResponse = await fetch('https://api.resend.com/broadcasts', {

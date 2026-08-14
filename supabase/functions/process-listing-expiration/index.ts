@@ -58,7 +58,7 @@ interface UserEmail {
 /**
  * Common email shell used by both warning and removal emails.
  */
-function emailShell(headerColor: string, body: string): string {
+function emailShell(headerColor: string, body: string, affiliateHtml: string = ''): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -155,6 +155,7 @@ function emailShell(headerColor: string, body: string): string {
           <h1>CambioCromos</h1>
         </div>
         ${body}
+        ${affiliateHtml}
         <div style="background: #FFFBEB; border: 1px solid #e5e7eb; border-top: none; padding: 24px 20px; text-align: center;">
           <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
           <p style="margin: 0; font-size: 16px; font-weight: bold; color: #92400E;">¿Te gusta CambioCromos?</p>
@@ -190,7 +191,7 @@ function buildListingRows(listings: StaleListing[]): string {
     .join('');
 }
 
-function buildExpirationEmailHtml(listings: StaleListing[]): string {
+function buildExpirationEmailHtml(listings: StaleListing[], affiliateHtml: string = ''): string {
   const myListingsUrl = `${BASE_URL}/es/marketplace/my-listings`;
   const body = `
     <div class="content">
@@ -215,10 +216,10 @@ function buildExpirationEmailHtml(listings: StaleListing[]): string {
         <a href="${escapeHtml(myListingsUrl)}" class="button">Ir a Mis Anuncios</a>
       </div>
     </div>`;
-  return emailShell('linear-gradient(135deg, #FFC000 0%, #FF8C00 100%)', body);
+  return emailShell('linear-gradient(135deg, #FFC000 0%, #FF8C00 100%)', body, affiliateHtml);
 }
 
-function buildRemovalEmailHtml(listings: StaleListing[]): string {
+function buildRemovalEmailHtml(listings: StaleListing[], affiliateHtml: string = ''): string {
   const myListingsUrl = `${BASE_URL}/es/marketplace/my-listings`;
   const body = `
     <div class="content">
@@ -246,7 +247,7 @@ function buildRemovalEmailHtml(listings: StaleListing[]): string {
         <a href="${escapeHtml(myListingsUrl)}" class="button">Ir a Mis Anuncios</a>
       </div>
     </div>`;
-  return emailShell('linear-gradient(135deg, #DC2626 0%, #991B1B 100%)', body);
+  return emailShell('linear-gradient(135deg, #DC2626 0%, #991B1B 100%)', body, affiliateHtml);
 }
 
 /**
@@ -256,9 +257,10 @@ function buildRemovalEmailHtml(listings: StaleListing[]): string {
 async function sendBatchedEmails(
   supabase: ReturnType<typeof createClient>,
   listingsByUser: Map<string, StaleListing[]>,
-  buildHtml: (listings: StaleListing[]) => string,
+  buildHtml: (listings: StaleListing[], affiliateHtml?: string) => string,
   buildSubject: (count: number) => string,
   notificationKind: string,
+  affiliateHtml: string = ''
 ): Promise<{ sent: number; errors: number }> {
   let sent = 0;
   let errors = 0;
@@ -305,7 +307,7 @@ async function sendBatchedEmails(
       continue;
     }
 
-    const htmlContent = buildHtml(userListings);
+    const htmlContent = buildHtml(userListings, affiliateHtml);
     const subject = buildSubject(userListings.length);
 
     try {
@@ -364,6 +366,29 @@ Deno.serve(async (_req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch a random active email affiliate for the footer
+    let emailAffiliate: { image_url: string; title: string; subtitle: string; rating: number; destination_url: string } | null = null;
+    try {
+      const { data: affData } = await supabase.rpc('get_random_email_affiliate');
+      if (affData && affData.length > 0) {
+        emailAffiliate = affData[0];
+      }
+    } catch (e) {
+      console.log('[process-listing-expiration] Could not fetch email affiliate:', e);
+    }
+
+    const affiliateHtml = emailAffiliate ? `
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 20px; text-align: center;">
+        <a href="${emailAffiliate.destination_url}" target="_blank" rel="noopener sponsored nofollow" style="text-decoration: none; color: inherit; display: inline-block;">
+          <img src="${emailAffiliate.image_url}" alt="${escapeHtml(emailAffiliate.title)}" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; border-radius: 8px;" />
+          <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1f2937;">${escapeHtml(emailAffiliate.title)}</p>
+          <p style="margin: 4px 0 10px 0; font-size: 12px; color: #6b7280;">${escapeHtml(emailAffiliate.subtitle)}</p>
+          <div style="color: #f59e0b; font-size: 16px; letter-spacing: 2px; margin-bottom: 10px;">${'★'.repeat(Math.floor(emailAffiliate.rating))}${'☆'.repeat(5 - Math.floor(emailAffiliate.rating))} (${emailAffiliate.rating})</div>
+          <span style="display: inline-block; padding: 10px 24px; background: #533FC6; color: white; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase;">Ver en Amazon</span>
+        </a>
+      </div>
+    ` : '';
 
     // ================================================================
     // Step 1: Expire listings whose expiry_scheduled_at has passed
@@ -433,6 +458,7 @@ Deno.serve(async (_req) => {
           ? 'Tu anuncio ha sido eliminado por inactividad'
           : `${count} anuncios han sido eliminados por inactividad`,
         'listing_expiration_removed',
+        affiliateHtml
       );
 
       results.expiredEmailsSent = removalResult.sent;
@@ -495,6 +521,7 @@ Deno.serve(async (_req) => {
         ? 'Tu anuncio va a caducar en 5 días'
         : `${count} anuncios van a caducar en 5 días`,
       'listing_expiration_warning',
+      affiliateHtml
     );
 
     results.emailsSent = warningResult.sent;

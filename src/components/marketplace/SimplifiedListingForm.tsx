@@ -18,6 +18,8 @@ import { PackagePlus, FileText, Library, ChevronDown, ChevronRight, X, LinkIcon 
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useTranslations } from 'next-intl';
 import { SponsoredBanner } from '@/components/marketplace/SponsoredBanner';
+import type { AffiliateLink } from '@/types/affiliates';
+import { fetchMarketplaceAffiliates } from '@/lib/marketplace/affiliates';
 import { logger } from '@/lib/logger';
 
 // Simplified listing schema with is_group support (extends base marketplace schema)
@@ -87,6 +89,16 @@ export function SimplifiedListingForm({
   qrData,
 }: SimplifiedListingFormProps) {
   const supabase = useSupabaseClient();
+  const [bannerAffiliate, setBannerAffiliate] = useState<AffiliateLink | null>(null);
+
+  useEffect(() => {
+    const loadAffiliates = async () => {
+      const result = await fetchMarketplaceAffiliates();
+      setBannerAffiliate(result.banner);
+    };
+    loadAffiliates();
+  }, []);
+
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const [templatesDialogOpen, setTemplatesDialogOpen] = useState(false);
   const [templates, setTemplates] = useState<Array<{ copy_id: number; template_id: number; title: string }>>([]);
@@ -251,7 +263,7 @@ export function SimplifiedListingForm({
 
   return (
     <form onSubmit={handleSubmit(submitHandler)} noValidate>
-      <SponsoredBanner />
+      <SponsoredBanner affiliate={bannerAffiliate} />
       <ModernCard>
         <ModernCardContent className="p-6 space-y-6">
           {/* Listing Type Toggle */}

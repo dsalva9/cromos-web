@@ -5,31 +5,51 @@ import { Star, ChevronRight, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslations, useLocale } from 'next-intl';
 
-export function SponsoredBanner() {
+interface SponsoredBannerProps {
+  affiliate?: {
+    image_url: string;
+    title: string;
+    subtitle: string;
+    rating: number;
+    destination_url: string;
+  } | null;
+}
+
+export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
   const t = useTranslations('marketplace.sponsored');
   const locale = useLocale();
+
+  if (!affiliate) {
+    return null;
+  }
 
   // Helper to render rating stars
   const renderStars = (rating: number, sizeClass = "h-3.5 w-3.5") => {
     return (
       <div className="flex items-center gap-0.5 text-amber-400">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: Math.floor(rating) }).map((_, i) => (
           <Star key={`full-${i}`} className={`${sizeClass} fill-current text-amber-400 stroke-amber-400`} />
         ))}
-        {/* 0.4 half star */}
-        <div className="relative w-3.5 h-3.5">
-          <Star className={`absolute inset-0 ${sizeClass} text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600`} />
-          <div className="absolute inset-0 overflow-hidden w-1/2">
-            <Star className={`${sizeClass} fill-current text-amber-400 stroke-amber-400`} />
+        {/* half star if rating is somewhat fractional */}
+        {rating % 1 >= 0.4 && rating % 1 <= 0.8 && (
+          <div className="relative w-3.5 h-3.5" style={{ width: sizeClass === "h-3 w-3" ? "0.75rem" : "0.875rem", height: sizeClass === "h-3 w-3" ? "0.75rem" : "0.875rem" }}>
+            <Star className={`absolute inset-0 ${sizeClass} text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600`} />
+            <div className="absolute inset-0 overflow-hidden w-1/2">
+              <Star className={`${sizeClass} fill-current text-amber-400 stroke-amber-400`} />
+            </div>
           </div>
-        </div>
+        )}
+        {/* Empty stars */}
+        {Array.from({ length: 5 - Math.floor(rating) - (rating % 1 >= 0.4 && rating % 1 <= 0.8 ? 1 : 0) }).map((_, i) => (
+          <Star key={`empty-${i}`} className={`${sizeClass} text-gray-200 dark:text-gray-600 stroke-gray-200 dark:stroke-gray-600`} />
+        ))}
       </div>
     );
   };
 
   return (
     <motion.a
-      href="https://amzn.to/4fll9SB"
+      href={affiliate.destination_url}
       target="_blank"
       rel="noopener sponsored nofollow"
       whileHover={{ y: -1, boxShadow: '0 6px 15px -5px rgba(83, 63, 198, 0.12)' }}
@@ -48,8 +68,8 @@ export function SponsoredBanner() {
               <Shield className="h-2 w-2 fill-[#533FC6]/10" />
               {t('recomendado')}
             </span>
-            <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase leading-tight tracking-tight">
-              {t('teFaltanMuchos')}
+            <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase leading-tight tracking-tight line-clamp-2">
+              {affiliate.title}
             </h2>
           </div>
 
@@ -58,8 +78,8 @@ export function SponsoredBanner() {
             <div className="absolute w-12 h-12 bg-purple-600/10 rounded-full blur-xs top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             <div className="relative w-16 h-16">
               <Image
-                src="/assets/amazon_images/cubo.png"
-                alt={t('cubeTitle')}
+                src={affiliate.image_url}
+                alt={affiliate.title}
                 fill
                 className="object-contain transform rotate-3"
                 sizes="80px"
@@ -72,8 +92,10 @@ export function SponsoredBanner() {
           <div className="col-span-12 flex items-center justify-between pt-2.5 mt-1.5 border-t border-gray-100 dark:border-gray-700/50">
             {/* Rating */}
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-black text-gray-700 dark:text-gray-200">4.4</span>
-              {renderStars(4.4, "h-3 w-3")}
+              <span className="text-[11px] font-black text-gray-700 dark:text-gray-200">
+                {affiliate.rating.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              </span>
+              {renderStars(affiliate.rating, "h-3 w-3")}
             </div>
 
             {/* CTA Div (styled as button) */}
@@ -94,9 +116,9 @@ export function SponsoredBanner() {
             <Shield className="h-2.5 w-2.5 fill-[#533FC6]/10 dark:fill-[#A79AFE]/10" />
             {t('recomendado')}
           </span>
-          <div className="relative mt-0.5">
-            <h2 className="text-base font-black text-gray-900 dark:text-white uppercase leading-tight tracking-tight">
-              {t('teFaltanMuchos')}
+          <div className="relative mt-0.5 max-w-sm">
+            <h2 className="text-base font-black text-gray-900 dark:text-white uppercase leading-tight tracking-tight line-clamp-2">
+              {affiliate.title}
             </h2>
             {/* Underline SVG */}
             <svg className="w-36 h-1.5 text-[#533FC6] dark:text-[#A79AFE] mt-0.5 opacity-80" viewBox="0 0 200 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -114,8 +136,8 @@ export function SponsoredBanner() {
             className="relative w-20 h-20"
           >
             <Image
-              src="/assets/amazon_images/cubo.png"
-              alt={t('cubeTitle')}
+              src={affiliate.image_url}
+              alt={affiliate.title}
               fill
               className="object-contain transform rotate-3 group-hover:rotate-6 transition-transform duration-300"
               sizes="100px"
@@ -128,8 +150,10 @@ export function SponsoredBanner() {
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           {/* Rating */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-black text-gray-700 dark:text-gray-200">4.4</span>
-            {renderStars(4.4, "h-3.5 w-3.5")}
+            <span className="text-xs font-black text-gray-700 dark:text-gray-200">
+              {affiliate.rating.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+            </span>
+            {renderStars(affiliate.rating, "h-3.5 w-3.5")}
           </div>
 
           {/* CTA Div (styled as button) */}

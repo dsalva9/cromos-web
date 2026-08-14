@@ -119,6 +119,29 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Fetch a random active email affiliate for the footer
+    let emailAffiliate: { image_url: string; title: string; subtitle: string; rating: number; destination_url: string } | null = null;
+    try {
+      const { data: affData } = await supabase.rpc('get_random_email_affiliate');
+      if (affData && affData.length > 0) {
+        emailAffiliate = affData[0];
+      }
+    } catch (e) {
+      console.log('[send-email-notification] Could not fetch email affiliate:', e);
+    }
+
+    const affiliateHtml = emailAffiliate ? `
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 20px; text-align: center;">
+        <a href="${emailAffiliate.destination_url}" target="_blank" rel="noopener sponsored nofollow" style="text-decoration: none; color: inherit; display: inline-block;">
+          <img src="${emailAffiliate.image_url}" alt="${escapeHtml(emailAffiliate.title)}" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; border-radius: 8px;" />
+          <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1f2937;">${escapeHtml(emailAffiliate.title)}</p>
+          <p style="margin: 4px 0 10px 0; font-size: 12px; color: #6b7280;">${escapeHtml(emailAffiliate.subtitle)}</p>
+          <div style="color: #f59e0b; font-size: 16px; letter-spacing: 2px; margin-bottom: 10px;">${'★'.repeat(Math.floor(emailAffiliate.rating))}${'☆'.repeat(5 - Math.floor(emailAffiliate.rating))} (${emailAffiliate.rating})</div>
+          <span style="display: inline-block; padding: 10px 24px; background: #533FC6; color: white; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase;">Ver en Amazon</span>
+        </a>
+      </div>
+    ` : '';
+
     // Fetch user's notification settings
     const { data: settings, error: settingsError } = await supabase.rpc(
       'get_user_notification_settings',
@@ -284,6 +307,7 @@ Deno.serve(async (req) => {
             <p>${escapeHtml(body)}</p>
             ${data?.action_url && isSafeUrl(String(data.action_url)) ? `<a href="${escapeHtml(String(data.action_url))}" class="button">Ver ahora</a>` : ''}
           </div>
+          ${affiliateHtml}
           <div style="background: #FFFBEB; border: 1px solid #e5e7eb; border-top: none; padding: 24px 20px; text-align: center;">
             <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
             <p style="margin: 0; font-size: 16px; font-weight: bold; color: #92400E;">¿Te gusta CambioCromos?</p>

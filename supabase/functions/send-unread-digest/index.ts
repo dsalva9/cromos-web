@@ -124,7 +124,7 @@ function buildIntroLine(senderNames: string[]): string {
 }
 
 /** Build the full HTML email content */
-function buildEmailHtml(nickname: string, count: number, senderNames: string[], oldestUnread: string): string {
+function buildEmailHtml(nickname: string, count: number, senderNames: string[], oldestUnread: string, affiliateHtml: string = ''): string {
   const contextLine = buildContextLine(count, senderNames, oldestUnread);
   const introLine = buildIntroLine(senderNames);
 
@@ -147,6 +147,7 @@ function buildEmailHtml(nickname: string, count: number, senderNames: string[], 
         <a href="${CHATS_URL}" style="display: inline-block; padding: 12px 24px; background: #FFC000; color: #000000; text-decoration: none; border-radius: 6px; font-weight: bold;">Ver mis mensajes</a>
       </div>
     </div>
+    ${affiliateHtml}
     <div style="background: #FFFBEB; border: 1px solid #e5e7eb; border-top: none; padding: 24px 20px; text-align: center;">
       <div style="font-size: 24px; margin-bottom: 8px;">⭐</div>
       <p style="margin: 0; font-size: 16px; font-weight: bold; color: #92400E;">¿Te gusta CambioCromos?</p>
@@ -184,6 +185,29 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Fetch a random active email affiliate for the footer
+    let emailAffiliate: { image_url: string; title: string; subtitle: string; rating: number; destination_url: string } | null = null;
+    try {
+      const { data: affData } = await supabase.rpc('get_random_email_affiliate');
+      if (affData && affData.length > 0) {
+        emailAffiliate = affData[0];
+      }
+    } catch (e) {
+      console.log('[send-unread-digest] Could not fetch email affiliate:', e);
+    }
+
+    const affiliateHtml = emailAffiliate ? `
+      <div style="background: #ffffff; border: 1px solid #e5e7eb; border-top: none; padding: 20px; text-align: center;">
+        <a href="${emailAffiliate.destination_url}" target="_blank" rel="noopener sponsored nofollow" style="text-decoration: none; color: inherit; display: inline-block;">
+          <img src="${emailAffiliate.image_url}" alt="${escapeHtml(emailAffiliate.title)}" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; border-radius: 8px;" />
+          <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1f2937;">${escapeHtml(emailAffiliate.title)}</p>
+          <p style="margin: 4px 0 10px 0; font-size: 12px; color: #6b7280;">${escapeHtml(emailAffiliate.subtitle)}</p>
+          <div style="color: #f59e0b; font-size: 16px; letter-spacing: 2px; margin-bottom: 10px;">${'★'.repeat(Math.floor(emailAffiliate.rating))}${'☆'.repeat(5 - Math.floor(emailAffiliate.rating))} (${emailAffiliate.rating})</div>
+          <span style="display: inline-block; padding: 10px 24px; background: #533FC6; color: white; border-radius: 8px; font-weight: bold; font-size: 13px; text-transform: uppercase;">Ver en Amazon</span>
+        </a>
+      </div>
+    ` : '';
 
     // Authentication: hybrid pattern (cron = no header, manual = service role key)
     const authHeader = req.headers.get('Authorization');
@@ -368,7 +392,8 @@ Deno.serve(async (req) => {
         userData.nickname,
         userData.unread_count,
         senderNames,
-        userData.oldest_unread
+        userData.oldest_unread,
+        affiliateHtml
       );
 
       // Send via Resend

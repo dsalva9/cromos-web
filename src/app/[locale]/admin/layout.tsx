@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from '@/components/ui/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Mail, Settings, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Mail, Settings, BarChart3, Megaphone } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -32,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const getActiveTab = () => {
     if (pathname.includes('/admin/statistics')) return 'statistics';
+    if (pathname.includes('/admin/affiliates')) return 'affiliates';
     if (pathname.includes('/admin/reports')) return 'reports';
     if (pathname.includes('/admin/users')) return 'users';
     if (pathname.includes('/admin/audit')) return 'audit';
@@ -63,7 +64,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Navigation Tabs */}
             <Tabs value={getActiveTab()} className="w-full">
-              <TabsList className="flex w-full max-w-6xl overflow-x-auto md:grid md:grid-cols-11 bg-[#1F2937] scrollbar-hide">
+              <TabsList className="flex w-full max-w-6xl overflow-x-auto md:grid md:grid-cols-12 bg-[#1F2937] scrollbar-hide">
                 <Link href="/admin/dashboard">
                   <TabsTrigger
                     value="dashboard"
@@ -81,6 +82,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Statistics
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/affiliates">
+                  <TabsTrigger
+                    value="affiliates"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
+                  >
+                    <Megaphone className="h-4 w-4 mr-2" />
+                    Affiliates
                   </TabsTrigger>
                 </Link>
 
