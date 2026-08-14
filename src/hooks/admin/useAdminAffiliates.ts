@@ -20,6 +20,7 @@ interface UseAdminAffiliatesReturn {
     rating: number;
     destination_url: string;
     is_active?: boolean;
+    image_scale?: number;
   }) => Promise<string>;
   deleteAffiliate: (id: string) => Promise<void>;
   uploadImage: (file: File) => Promise<string>;
@@ -56,6 +57,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
     rating: number;
     destination_url: string;
     is_active?: boolean;
+    image_scale?: number;
   }): Promise<string> => {
     setSaving(true);
     setError(null);
@@ -70,6 +72,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
         p_rating: data.rating,
         p_destination_url: data.destination_url,
         p_is_active: data.is_active ?? true,
+        p_image_scale: data.image_scale ?? 1.0,
       });
       if (rpcError) throw rpcError;
       await fetchAffiliates();

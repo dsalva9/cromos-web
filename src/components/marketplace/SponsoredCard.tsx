@@ -12,6 +12,7 @@ interface SponsoredCardProps {
     subtitle: string;
     rating: number;
     destination_url: string;
+    image_scale?: number;
   };
 }
 
@@ -38,6 +39,7 @@ export function SponsoredCard({ affiliate }: SponsoredCardProps) {
             alt={affiliate.title}
             fill
             className="object-contain transition-transform duration-500 group-hover:scale-105 p-1"
+            style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale})` } : undefined}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             priority
           />

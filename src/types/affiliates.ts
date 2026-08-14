@@ -11,6 +11,7 @@ export interface AffiliateLink {
   rating: number;
   destination_url: string;
   is_active: boolean;
+  image_scale: number;
   created_at: string;
   updated_at: string;
 }

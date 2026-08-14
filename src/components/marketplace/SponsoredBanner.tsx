@@ -12,6 +12,7 @@ interface SponsoredBannerProps {
     subtitle: string;
     rating: number;
     destination_url: string;
+    image_scale?: number;
   } | null;
 }
 
@@ -82,6 +83,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
                 alt={affiliate.title}
                 fill
                 className="object-contain transform rotate-3"
+                style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale}) rotate(3deg)` } : undefined}
                 sizes="80px"
                 priority
               />
@@ -140,6 +142,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
               alt={affiliate.title}
               fill
               className="object-contain transform rotate-3 group-hover:rotate-6 transition-transform duration-300"
+              style={affiliate.image_scale && affiliate.image_scale !== 1 ? { transform: `scale(${affiliate.image_scale}) rotate(3deg)` } : undefined}
               sizes="100px"
               priority
             />
