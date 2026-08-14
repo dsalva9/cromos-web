@@ -70,8 +70,8 @@ export function SponsoredCard({ affiliate }: SponsoredCardProps) {
           </span>
         </div>
 
-        {/* Title & Tagline: Hidden on mobile, visible on desktop */}
-        <div className="hidden md:block min-h-[2.5rem] sm:min-h-[3rem]">
+        {/* Title & Tagline */}
+        <div className="min-h-[2rem] sm:min-h-[3rem]">
           <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-xs sm:text-sm group-hover:text-primary transition-colors">
             {affiliate.title}
           </h3>
