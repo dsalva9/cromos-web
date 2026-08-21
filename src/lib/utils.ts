@@ -81,7 +81,7 @@ export function generateId(): string {
 }
 
 /**
- * Generate a pre-filled mailto URL for support, optionally including error details.
+ * Generate a mailto URL for support, optionally including error details.
  */
 export function getSupportMailtoUrl(error?: Error & { digest?: string }, customSubject?: string): string {
   const isBrowser = typeof window !== 'undefined';
@@ -99,7 +99,9 @@ export function getSupportMailtoUrl(error?: Error & { digest?: string }, customS
     return `mailto:soporte@cambiocromos.com?subject=${subject}&body=${body}`;
   }
 
-  const subject = encodeURIComponent(customSubject || "Soporte CambioCromos");
-  const body = encodeURIComponent("Hola equipo de soporte,\n\n");
-  return `mailto:soporte@cambiocromos.com?subject=${subject}&body=${body}`;
+  if (customSubject) {
+    return `mailto:soporte@cambiocromos.com?subject=${encodeURIComponent(customSubject)}`;
+  }
+
+  return 'mailto:soporte@cambiocromos.com';
 }
