@@ -51,7 +51,15 @@ function isAuthError(error: unknown): boolean {
     // Handle PostgrestError (plain object with message property)
     msg = String((error as { message: string }).message).toLowerCase();
   }
-  return msg.includes('not authenticated') || msg.includes('jwt') || msg.includes('token');
+  return (
+    msg.includes('not authenticated') ||
+    msg.includes('jwt') ||
+    msg.includes('token') ||
+    msg.includes('callback is no longer runnable') ||
+    msg.includes('aborterror') ||
+    msg.includes('signal is aborted') ||
+    msg.includes('failed to fetch')
+  );
 }
 
 export async function getOrCreateMatchConversation(

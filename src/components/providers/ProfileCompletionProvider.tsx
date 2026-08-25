@@ -86,6 +86,27 @@ function writeCompletedLock(value: boolean) {
   }
 }
 
+function isAuthOrTransientError(error: unknown): boolean {
+  let msg = '';
+  if (error instanceof Error) {
+    msg = error.message.toLowerCase();
+  } else if (error && typeof error === 'object' && 'message' in error) {
+    msg = String((error as { message: string }).message).toLowerCase();
+  } else {
+    msg = String(error).toLowerCase();
+  }
+  return (
+    msg.includes('not authenticated') ||
+    msg.includes('jwt') ||
+    msg.includes('token') ||
+    msg.includes('undefined has no properties') ||
+    msg.includes('_getaccesstoken') ||
+    msg.includes('callback is no longer runnable') ||
+    msg.includes('abort') ||
+    msg.includes('failed to fetch')
+  );
+}
+
 /**
  * ProfileCompletionProvider - Optimized unified profile context
  * 
@@ -177,7 +198,11 @@ export function ProfileCompletionProvider({
         unlockComplete();
       }
     } catch (error) {
-      logger.error('Error fetching profile', error);
+      if (isAuthOrTransientError(error)) {
+        logger.warnLocal('Auth/session transient error fetching profile:', error);
+      } else {
+        logger.error('Error fetching profile', error);
+      }
       // Don't clear profile if locked — preserve optimistic state
       if (!completedLock) {
         setProfile(null);
@@ -207,7 +232,11 @@ export function ProfileCompletionProvider({
       try {
         await fetchProfile();
       } catch (error) {
-        logger.error('Error loading profile', error);
+        if (isAuthOrTransientError(error)) {
+          logger.warnLocal('Auth/session transient error loading profile:', error);
+        } else {
+          logger.error('Error loading profile', error);
+        }
       }
     };
 

@@ -51,6 +51,13 @@ if (SENTRY_DSN) {
             'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
             // DuckDuckGo / iOS WKWebView internal script injection postMessage timeout error.
             'WKWebView API client did not respond to this postMessage',
+            // Facebook in-app browser native bridge exception
+            'Error invoking postMessage: Java exception was raised during method invocation',
+            // Chromium / Android WebView Web Locks callback abort on tab backgrounding/navigation
+            'The provided callback is no longer runnable',
+            'The provided callback is no longer runnable.',
+            // Firefox undefined access token reading on transient session expiration
+            'TypeError: undefined has no properties',
             // Supabase Storage upload aborted by iOS Safari (user backgrounded app / network drop).
             // Already caught and shown to the user as a toast, so this is just noise.
             'The operation was aborted.',
@@ -105,16 +112,27 @@ if (SENTRY_DSN) {
                 return null;
             }
 
+            // Drop Facebook in-app browser bridge and navigation logger errors
+            if (
+                message.includes('Error invoking postMessage') ||
+                message.includes('callback is no longer runnable') ||
+                message.includes('navigation_performance_logger')
+            ) {
+                return null;
+            }
+
             const frames = event.exception?.values?.flatMap(
                 (v) => v.stacktrace?.frames ?? [],
             ) ?? [];
 
-            // Drop Facebook in-app browser autofill bridge errors —
-            // originates from app://autofill_test_android, not our code.
-            const hasFbAutofill = frames.some((f) =>
-                f.filename?.includes('autofill_test_android'),
+            // Drop Facebook in-app browser bridge errors —
+            // originates from app://autofill_test_android or app://navigation_performance_logger_android, not our code.
+            const hasFbBridge = frames.some((f) =>
+                f.filename?.includes('autofill_test_android') ||
+                f.filename?.includes('navigation_performance_logger_android') ||
+                f.filename?.includes('navigation_performance_logger')
             );
-            if (hasFbAutofill) return null;
+            if (hasFbBridge) return null;
 
             // Drop errors originating from browser extension injected scripts.
             // These are extension-owned stack frames, not our code.

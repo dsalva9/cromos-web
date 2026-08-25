@@ -15,6 +15,16 @@ function isAuthError(message: string): boolean {
   return lower.includes('not authenticated') || lower.includes('jwt') || lower.includes('token');
 }
 
+function isTransientAbort(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes('callback is no longer runnable') ||
+    lower.includes('aborterror') ||
+    lower.includes('signal is aborted') ||
+    lower.includes('failed to fetch')
+  );
+}
+
 export function useMatchConversations() {
   const supabase = useSupabaseClient();
   const { user } = useUser();
@@ -58,6 +68,8 @@ export function useMatchConversations() {
       if (isAuthError(convResult.error.message)) {
         logger.warnLocal('Auth error in useMatchConversations, attempting refresh:', convResult.error.message);
         void handleAuthError();
+      } else if (isTransientAbort(convResult.error.message)) {
+        logger.warnLocal('Transient abort in useMatchConversations:', convResult.error.message);
       } else {
         logger.error('Error fetching match conversations:', convResult.error);
       }

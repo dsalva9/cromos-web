@@ -224,7 +224,14 @@ function ListingChatPageContent() {
   // Fetch transaction if listing is reserved or completed
   useEffect(() => {
     async function fetchTransaction() {
-      if (!listing || !user || (listing.status !== 'reserved' && listing.status !== 'completed')) return;
+      if (!listing || !user || (listing.status !== 'reserved' && listing.status !== 'completed')) {
+        setTransactionId(null);
+        setTransactionStatus(null);
+        setTransaction(null);
+        setIsBuyer(false);
+        setIsReservedBuyer(false);
+        return;
+      }
 
       const { data } = await supabase
         .rpc('get_listing_transaction', { p_listing_id: listingId });
@@ -474,6 +481,8 @@ function ListingChatPageContent() {
       toast.success(`Anuncio reservado para ${selectedParticipantData.nickname}`);
       // Update local state
       setListing({ ...listing, status: 'reserved' });
+      setTransactionStatus('reserved');
+      setTransaction({ buyer_id: selectedParticipant });
 
       // Refresh to show system messages
       setTimeout(() => {
@@ -513,6 +522,11 @@ function ListingChatPageContent() {
       toast.success('Reserva liberada. El anuncio está disponible nuevamente.');
       // Update local state
       setListing({ ...listing, status: 'active' });
+      setTransaction(null);
+      setTransactionId(null);
+      setTransactionStatus(null);
+      setIsBuyer(false);
+      setIsReservedBuyer(false);
 
       // Refresh to show system messages
       setTimeout(() => {
