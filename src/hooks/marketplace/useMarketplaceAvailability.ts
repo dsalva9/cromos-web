@@ -30,7 +30,7 @@ export interface MarketplaceAvailabilitySlot {
  * Each entry tells you how many of the user's missing stickers have active listings
  * in the marketplace. Used by dashboard and album card CTAs.
  *
- * Data is cached for 5 minutes since real-time updates aren't critical.
+ * Data is cached for 2 minutes since real-time updates aren't critical.
  */
 export function useMarketplaceAvailabilityCounts() {
     const supabase = useSupabaseClient();
@@ -59,7 +59,7 @@ export function useMarketplaceAvailabilityCounts() {
             return parsed;
         },
         enabled: !!user,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 2 * 60 * 1000, // 2 minutes
     });
 
     return {
@@ -106,7 +106,7 @@ export function useMarketplaceAvailabilitySlots(copyId: number | undefined) {
             return parsed;
         },
         enabled: !!user && !!copyId,
-        staleTime: 5 * 60 * 1000,
+        staleTime: 2 * 60 * 1000, // 2 minutes
     });
 
     return {

@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { useIgnore } from '@/hooks/social/useIgnore';
-import { useReport } from '@/hooks/social/useReport';
+import { ReportModal } from '@/components/social/ReportModal';
 import { toast } from '@/lib/toast';
 import {
   Dialog,
@@ -58,7 +58,7 @@ export function ChatDrawer({
   const [showMenu, setShowMenu] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { ignoreUser, loading: ignoreLoading } = useIgnore();
-  const { submitReport, loading: reportLoading } = useReport();
+  const [showReportModal, setShowReportModal] = useState(false);
   const matchObj = useMemo(() => {
     if (!otherUserId) return null;
     return {
@@ -231,16 +231,9 @@ export function ChatDrawer({
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
                 <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl min-w-[180px] py-1">
                   <button
-                    disabled={reportLoading}
-                    onClick={async () => {
-                      if (!otherUserId) return;
-                      try {
-                        await submitReport('user', otherUserId, 'inappropriate_behavior', 'Reported from match chat');
-                        toast.success(t('reported'));
-                      } catch {
-                        toast.error('Error al reportar');
-                      }
+                    onClick={() => {
                       setShowMenu(false);
+                      setShowReportModal(true);
                     }}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                   >
@@ -550,6 +543,15 @@ export function ChatDrawer({
           </div>
         </DialogContent>
       </Dialog>
+
+      {otherUserId && (
+        <ReportModal
+          open={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          entityType="user"
+          entityId={otherUserId}
+        />
+      )}
     </>
   );
 }
