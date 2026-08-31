@@ -46,7 +46,7 @@ jobs:
             rm -f backup.sql.gz.gpg
           fi
 
-      - name: Commit backup
+      - name: Commit and push backup
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -56,13 +56,7 @@ jobs:
           # Commit the ENCRYPTED compressed file(s)
           git add -f backup.sql.gz.gpg*
           git commit -m "daily db backup (encrypted & compressed)" || echo "No changes to commit"
-
-      - name: Push to backups branch
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: backups
-          force: true
+          git push origin backups --force
           
       - name: Upload artifact (optional history)
         uses: actions/upload-artifact@v4
