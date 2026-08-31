@@ -24,3 +24,36 @@ export function mapSupabaseError(message: string): string {
   }
   return ''; // Empty = no mapping found, fallback to 'unexpected'
 }
+
+export const KNOWN_AUTH_ERROR_KEYS = new Set([
+  'suspended',
+  'contactSupport',
+  'unexpected',
+  'googleUnexpected',
+  'userAlreadyRegistered',
+  'passwordTooShort',
+  'emailRateLimitExceeded',
+  'rateLimitExceeded',
+  'rateLimitCooldown',
+  'invalidEmail',
+  'signupDisabled',
+  'emailNotConfirmed',
+  'invalidCredentials',
+]);
+
+/**
+ * Safely resolves an auth error translation key against next-intl.
+ * If the key is not in the known set of auth translation keys, returns the raw error
+ * directly without calling t.has() or t(), avoiding deep namespace lookup recursion.
+ */
+export function getTranslatedAuthError(
+  error: string,
+  tErrors: (key: string) => string
+): string {
+  if (!error) return '';
+  if (KNOWN_AUTH_ERROR_KEYS.has(error)) {
+    return tErrors(error);
+  }
+  return error;
+}
+

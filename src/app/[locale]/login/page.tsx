@@ -14,7 +14,7 @@ import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { getSupportMailtoUrl } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
-import { mapSupabaseError } from '@/lib/auth/auth-errors';
+import { mapSupabaseError, getTranslatedAuthError } from '@/lib/auth/auth-errors';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -228,7 +228,7 @@ export default function LoginPage() {
                     </>
                   ) : (
                     <>
-                      {tErrors.has(error) ? tErrors(error) : error}
+                      {getTranslatedAuthError(error, tErrors)}
                       <br />
                       <br />
                       {tErrors('contactSupport')}{' '}

@@ -1,5 +1,5 @@
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { setRequestLocale, getTranslations } from 'next-intl/server';
+import { setRequestLocale, getTranslations, getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import SiteHeader from '@/components/site-header';
@@ -14,7 +14,7 @@ import { DeepLinkHandler } from '@/components/providers/DeepLinkHandler';
 import { InterstitialAdProvider } from '@/components/ads/InterstitialAdProvider';
 import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { FloatingActionBtn } from '@/components/navigation/FloatingActionBtn';
-import { AdBanner, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
+import { AdBanner } from '@/components/ads/AdBanner';
 import { AdSpaceAdjuster } from '@/components/ads/AdSpaceAdjuster';
 import { ProfileCompletionGuard } from '@/components/profile/ProfileCompletionGuard';
 import { PasswordRecoveryGuard } from '@/components/auth/PasswordRecoveryGuard';
@@ -64,9 +64,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   // Enable static rendering
   setRequestLocale(locale);
   const t = await getTranslations('layout');
+  const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={locale}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <Providers>
         <PWASplashScreen>
           <ForceUpdateScreen>

@@ -14,7 +14,7 @@ import { useTranslations } from 'next-intl';
 import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
-import { mapSupabaseError } from '@/lib/auth/auth-errors';
+import { mapSupabaseError, getTranslatedAuthError } from '@/lib/auth/auth-errors';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -228,7 +228,7 @@ export default function SignupPage() {
               {error && !isClientError && (
                 <div className="bg-[#E84D4D] border-2 border-black rounded-md p-3 mt-2">
                   <p className="text-xs text-white font-bold">
-                    {tErrors.has(error) ? tErrors(error) : error}
+                    {getTranslatedAuthError(error, tErrors)}
                   </p>
                 </div>
               )}
@@ -381,7 +381,7 @@ export default function SignupPage() {
             {error && (
               <div className="bg-[#E84D4D] border-2 border-black rounded-md p-4">
                 <p className="text-sm text-white font-bold">
-                  {tErrors.has(error) ? tErrors(error) : error}
+                  {getTranslatedAuthError(error, tErrors)}
                 </p>
                 {!isClientError && (
                   <p className="text-sm text-white font-bold mt-2">

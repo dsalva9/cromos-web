@@ -28,24 +28,34 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" -f backup.sql --clean --if-exists
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" --clean --if-exists | gzip -9 > backup.sql.gz
 
       - name: Encrypt Backup
         env:
           PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
-          # Use GPG to encrypt the file to avoid storing plain text secrets in the repo
-          # and to bypass GitHub Secret Scanning blocking the push.
-          gpg --symmetric --cipher-algo AES256 --batch --yes --passphrase "$PASSPHRASE" -o backup.sql.gpg backup.sql
+          # Use GPG to encrypt the compressed archive
+          # Compressing first with gzip -9 shrinks >100MB plain SQL down to ~10-15MB
+          gpg --symmetric --cipher-algo AES256 --batch --yes --passphrase "$PASSPHRASE" -o backup.sql.gz.gpg backup.sql.gz
+          rm -f backup.sql.gz
+
+          # Safeguard: if the encrypted backup exceeds 50MB, split into chunks under GitHub's 100MB limit
+          FILESIZE=$(stat -c%s "backup.sql.gz.gpg")
+          if [ "$FILESIZE" -gt 50000000 ]; then
+            split -b 50M backup.sql.gz.gpg backup.sql.gz.gpg.part_
+            rm -f backup.sql.gz.gpg
+          fi
 
       - name: Commit backup
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git checkout -B backups
-          # Commit the ENCRYPTED file only
-          git add -f backup.sql.gpg
-          git commit -m "daily db backup (encrypted)" || echo "No changes to commit"
+          # Remove legacy uncompressed backup if present on branch
+          git rm -f backup.sql.gpg 2>/dev/null || true
+          # Commit the ENCRYPTED compressed file(s)
+          git add -f backup.sql.gz.gpg*
+          git commit -m "daily db backup (encrypted & compressed)" || echo "No changes to commit"
 
       - name: Push to backups branch
         uses: ad-m/github-push-action@master
@@ -58,5 +68,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ github.sha }}
-          path: backup.sql.gpg
+          path: backup.sql.gz.gpg*
           retention-days: 7
