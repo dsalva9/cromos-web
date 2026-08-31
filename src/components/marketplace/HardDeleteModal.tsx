@@ -265,8 +265,8 @@ export function HardDeleteModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md max-h-[calc(100dvh-2rem)] flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-6 pb-2 shrink-0">
           <DialogTitle className="text-xl font-bold text-red-700">
             {getStepTitle()}
           </DialogTitle>
@@ -275,12 +275,12 @@ export function HardDeleteModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="overflow-y-auto px-6 py-2 flex-1 min-h-0">
           {renderStepContent()}
         </div>
 
         {getStepActions() && (
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="p-6 pt-3 border-t shrink-0">
             {getStepActions()}
           </div>
         )}
