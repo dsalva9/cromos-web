@@ -207,6 +207,12 @@
         "cromo": "Cromo",
         "pack": "Pacote"
       },
+      "ageFilter": {
+        "all": "Qualquer data",
+        "week": "Última semana",
+        "month": "Último mês",
+        "quarter": "Últimos 3 meses"
+      },
       "tip": {
         "title": "Encontre o que procura",
         "description": "Pesquise cromos por nome ou filtre por coleção. Quando encontrar algo interessante, abra um chat com o vendedor para combinar uma troca."

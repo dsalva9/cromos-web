@@ -207,6 +207,12 @@
         "cromo": "Sticker",
         "pack": "Pack"
       },
+      "ageFilter": {
+        "all": "Any date",
+        "week": "Last week",
+        "month": "Last month",
+        "quarter": "Last 3 months"
+      },
       "tip": {
         "title": "Find what you're looking for",
         "description": "Search stickers by name or filter by collection. When you find something interesting, open a chat with the seller to arrange a trade."

@@ -9,7 +9,7 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb, BellPlus, ChevronRight, Users, Search } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb, BellPlus, ChevronRight, Users, Search, CalendarDays } from 'lucide-react';
 import { SlotTradeDrawer } from '@/components/templates/SlotTradeDrawer';
 import { cn } from '@/lib/utils';
 import Link from '@/components/ui/link';
@@ -62,6 +62,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const [searchBarExpanded, setSearchBarExpanded] = useState(false);
     const controlsBarRef = useRef<HTMLDivElement>(null);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
+    const [maxAgeDays, setMaxAgeDays] = useState<number | null>(null);
     const [isHeaderHidden, setIsHeaderHidden] = useState(false);
     const isFirstUrlSync = useRef(true);
 
@@ -135,6 +136,9 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             const savedTypeFilter = sessionStorage.getItem('marketplace_listingTypeFilter');
             if (savedTypeFilter !== null) setListingTypeFilter(savedTypeFilter as any);
 
+            const savedMaxAge = sessionStorage.getItem('marketplace_maxAgeDays');
+            if (savedMaxAge !== null) setMaxAgeDays(savedMaxAge === 'null' ? null : parseInt(savedMaxAge, 10));
+
             // Restore pagination limit to fetch all loaded items at once
             const savedCount = sessionStorage.getItem('marketplace_loaded_count');
             if (savedCount) {
@@ -150,6 +154,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             sessionStorage.removeItem('marketplace_selectedCollectionIds');
             sessionStorage.removeItem('marketplace_showFilters');
             sessionStorage.removeItem('marketplace_listingTypeFilter');
+            sessionStorage.removeItem('marketplace_maxAgeDays');
             sessionStorage.removeItem('marketplace_scroll_position');
             sessionStorage.removeItem('marketplace_loaded_count');
         }
@@ -166,7 +171,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         sessionStorage.setItem('marketplace_selectedCollectionIds', JSON.stringify(selectedCollectionIds));
         sessionStorage.setItem('marketplace_showFilters', String(showFilters));
         sessionStorage.setItem('marketplace_listingTypeFilter', listingTypeFilter);
-    }, [searchQuery, sortByDistance, selectedCollectionIds, showFilters, listingTypeFilter, hasRestored]);
+        sessionStorage.setItem('marketplace_maxAgeDays', String(maxAgeDays));
+    }, [searchQuery, sortByDistance, selectedCollectionIds, showFilters, listingTypeFilter, maxAgeDays, hasRestored]);
 
     // Auto-apply filters on dynamic URL changes after mount
     useEffect(() => {
@@ -238,6 +244,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         collectionIds: selectedCollectionIds,
         initialData: initialListings,
         listingTypeFilter: listingTypeFilter,
+        maxAgeDays: sortByDistance ? maxAgeDays : null,
     });
 
     // Read slot context from URL — only used for the banner/drawer, NOT for filtering listings
@@ -582,6 +589,23 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                         {t('buttons.near')}
                                     </button>
                                 </div>
+
+                                {/* Age Filter — only visible when sorting by distance */}
+                                {sortByDistance && hasPostcode && (
+                                    <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 h-9 px-2">
+                                        <CalendarDays className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
+                                        <select
+                                            value={maxAgeDays ?? ''}
+                                            onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
+                                            className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 border-none outline-none cursor-pointer appearance-none pr-4 w-full"
+                                        >
+                                            <option value="">{t('ageFilter.all')}</option>
+                                            <option value="7">{t('ageFilter.week')}</option>
+                                            <option value="30">{t('ageFilter.month')}</option>
+                                            <option value="90">{t('ageFilter.quarter')}</option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Desktop Filters */}
@@ -650,6 +674,23 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                         {t('buttons.distance')}
                                     </button>
                                 </div>
+
+                                {/* Age Filter — desktop, only visible when sorting by distance */}
+                                {sortByDistance && hasPostcode && (
+                                    <div className="hidden lg:flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 h-10">
+                                        <CalendarDays className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0 ml-2" />
+                                        <select
+                                            value={maxAgeDays ?? ''}
+                                            onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
+                                            className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-200 border-none outline-none cursor-pointer appearance-none pr-5 pl-1"
+                                        >
+                                            <option value="">{t('ageFilter.all')}</option>
+                                            <option value="7">{t('ageFilter.week')}</option>
+                                            <option value="30">{t('ageFilter.month')}</option>
+                                            <option value="90">{t('ageFilter.quarter')}</option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

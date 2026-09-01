@@ -10,6 +10,7 @@ interface GetMarketplaceDataParams {
     offset?: number;
     sortByDistance?: boolean;
     collectionIds?: number[];
+    maxAgeDays?: number | null;
 }
 
 export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) {
@@ -18,7 +19,8 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
         limit = 20,
         offset = 0,
         sortByDistance = false,
-        collectionIds = []
+        collectionIds = [],
+        maxAgeDays = null,
     } = params;
 
     const cookieStore = await cookies();
@@ -93,6 +95,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             p_sort_by_distance: sortByDistance && !!userPostcode,
             p_collection_ids: collectionIds.length > 0 ? collectionIds : null,
             ...(multiCountryEnabled && userCountryCode ? { p_country_code: userCountryCode } : {}),
+            ...(maxAgeDays ? { p_max_age_days: maxAgeDays } : {}),
         };
 
         const { data, error } = await supabase.rpc(
