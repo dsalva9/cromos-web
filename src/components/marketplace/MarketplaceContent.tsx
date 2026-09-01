@@ -8,7 +8,8 @@ import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
 import { Button } from '@/components/ui/button';
-import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb, BellPlus, ChevronRight } from 'lucide-react';
+import { Plus, List, MapPin, Clock, Filter, Package, Lightbulb, BellPlus, ChevronRight, Users, Search } from 'lucide-react';
+import { SlotTradeDrawer } from '@/components/templates/SlotTradeDrawer';
 import { cn } from '@/lib/utils';
 import Link from '@/components/ui/link';
 import { ContextualTip } from '@/components/ui/ContextualTip';
@@ -35,15 +36,33 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     const ts = useTranslations('marketplace.sponsored');
     const { user } = useUser();
     const { maybeShowInterstitial } = useInterstitialAd();
-    const [searchQuery, setSearchQuery] = useState('');
+    const searchParams = useSearchParams();
+
+    const [searchQuery, setSearchQuery] = useState(() => searchParams.get('search') || '');
     const [sortByDistance, setSortByDistance] = useState(false);
-    const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
-    const [showFilters, setShowFilters] = useState(false);
+    const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>(() => {
+        const cp = searchParams.get('collection');
+        if (cp) {
+            const parsed = parseInt(cp, 10);
+            return !isNaN(parsed) ? [parsed] : [];
+        }
+        return [];
+    });
+    const [selectedSlotId, setSelectedSlotId] = useState<number | null>(() => {
+        const sp = searchParams.get('slot_id');
+        if (sp) {
+            const parsed = parseInt(sp, 10);
+            return !isNaN(parsed) ? parsed : null;
+        }
+        return null;
+    });
+    const [showFilters, setShowFilters] = useState(() => Boolean(searchParams.get('collection')));
+    const [slotTradeDrawerOpen, setSlotTradeDrawerOpen] = useState(false);
     const [searchBarExpanded, setSearchBarExpanded] = useState(false);
     const controlsBarRef = useRef<HTMLDivElement>(null);
     const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'cromo' | 'pack'>('all');
     const [isHeaderHidden, setIsHeaderHidden] = useState(false);
-    const searchParams = useSearchParams();
+    const isFirstUrlSync = useRef(true);
 
     const [bannerAffiliate, setBannerAffiliate] = useState<AffiliateLink | null>(null);
     const [card1Affiliate, setCard1Affiliate] = useState<AffiliateLink | null>(null);
@@ -86,7 +105,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         const isBackForward = navigationEntries.length > 0 && 
             (navigationEntries[0] as PerformanceNavigationTiming).type === 'back_forward';
 
-        if (isComingFromSubpage || isBackForward) {
+        const hasUrlParams = Boolean(
+            searchParams.get('search') ||
+            searchParams.get('collection') ||
+            searchParams.get('slot_id')
+        );
+
+        if ((isComingFromSubpage || isBackForward) && !hasUrlParams) {
             // Restore filters from sessionStorage
             const savedSearch = sessionStorage.getItem('marketplace_searchQuery');
             if (savedSearch !== null) setSearchQuery(savedSearch);
@@ -117,7 +142,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     setRestoredLimit(count);
                 }
             }
-        } else {
+        } else if (!hasUrlParams) {
             // Fresh visit: clear saved state to start clean
             sessionStorage.removeItem('marketplace_searchQuery');
             sessionStorage.removeItem('marketplace_sortByDistance');
@@ -142,12 +167,12 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         sessionStorage.setItem('marketplace_listingTypeFilter', listingTypeFilter);
     }, [searchQuery, sortByDistance, selectedCollectionIds, showFilters, listingTypeFilter, hasRestored]);
 
-
-
-    const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
-
-    // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet&slot_id=456)
+    // Auto-apply filters on dynamic URL changes after mount
     useEffect(() => {
+        if (isFirstUrlSync.current) {
+            isFirstUrlSync.current = false;
+            return;
+        }
         const collectionParam = searchParams.get('collection');
         if (collectionParam) {
             const collectionId = parseInt(collectionParam);
@@ -157,7 +182,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             }
         }
         const searchParam = searchParams.get('search');
-        if (searchParam) {
+        if (searchParam !== null) {
             setSearchQuery(searchParam);
         }
         const slotIdParam = searchParams.get('slot_id');
@@ -166,6 +191,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             if (!isNaN(slotId)) {
                 setSelectedSlotId(slotId);
             }
+        } else {
+            setSelectedSlotId(null);
         }
     }, [searchParams]);
 
@@ -212,6 +239,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         listingTypeFilter: listingTypeFilter,
         slotId: selectedSlotId,
     });
+
+    const targetCopyId = selectedCollectionIds.length === 1
+        ? selectedCollectionIds[0]
+        : (searchParams.get('collection') ? parseInt(searchParams.get('collection')!, 10) : undefined);
+    const targetTemplateId = searchParams.get('template_id')
+        ? parseInt(searchParams.get('template_id')!, 10)
+        : undefined;
 
     // Simple handlers - hook manages state now
     const handleSearchChange = (value: string) => {
@@ -623,6 +657,34 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     className="mb-6"
                 />
 
+                {/* Contextual Sticker Banner when arriving with slot_id */}
+                {selectedSlotId && targetCopyId && user && (
+                    <div className="mb-6 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 shadow-sm">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400">
+                                <Search className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-bold text-blue-900 dark:text-blue-100">
+                                    {t('slotFilter.title')}
+                                </p>
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                    {t('slotFilter.description')}
+                                </p>
+                            </div>
+                        </div>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSlotTradeDrawerOpen(true)}
+                            className="w-full sm:w-auto shrink-0 bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/40 font-semibold"
+                        >
+                            <Users className="w-3.5 h-3.5 mr-1.5" />
+                            {t('slotFilter.usersWithDupe')}
+                        </Button>
+                    </div>
+                )}
+
                 {/* Listings Grid */}
                 {error && (
                     <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 p-6 rounded-xl mb-8 text-center">
@@ -699,6 +761,23 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     </div>
                 )}
             </div>
+
+            {/* Slot Trade Drawer for contextual matching */}
+            {selectedSlotId && targetCopyId && (
+                <SlotTradeDrawer
+                    open={slotTradeDrawerOpen}
+                    onOpenChange={setSlotTradeDrawerOpen}
+                    slot={{
+                        slot_id: selectedSlotId,
+                        label: null,
+                        is_special: false,
+                        status: 'missing',
+                        count: 0,
+                    }}
+                    copyId={String(targetCopyId)}
+                    templateId={targetTemplateId}
+                />
+            )}
         </div>
     );
 }

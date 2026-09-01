@@ -224,6 +224,11 @@
         "publishFirst": "Publish First Listing",
         "login": "Log In"
       },
+      "slotFilter": {
+        "title": "Specific sticker selected",
+        "description": "Showing only listings containing this sticker",
+        "usersWithDupe": "Users with duplicate"
+      },
       "createAlert": "Create alert from this search"
     },
     "card": {
@@ -580,7 +585,9 @@
       "matches": "{count} matches",
       "theyOfferCount": "Offers you {count}",
       "youOfferCount": "You offer {count}",
-      "viewTrade": "View trade"
+      "viewTrade": "View trade",
+      "sortByMatches": "Matches",
+      "sortByDistance": "Distance"
     },
     "listings": {
       "buttonLabel": "Listings",

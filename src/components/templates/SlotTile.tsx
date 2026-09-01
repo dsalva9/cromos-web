@@ -250,7 +250,7 @@ export function SlotTile({
             <div className="space-y-1.5">
               {inMarketplace && (
                 <Link
-                  href={`/marketplace?collection=${copyId}&slot_id=${slot.slot_id}&search=${encodeURIComponent(slot.label || String(slot.slot_number || ''))}`}
+                  href={`/marketplace?collection=${copyId}&slot_id=${slot.slot_id}${templateId ? `&template_id=${templateId}` : ''}`}
                   className="block"
                 >
                   <div className="w-full bg-gold/10 border border-gold/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-gold hover:bg-gold/20 transition-colors cursor-pointer font-bold">

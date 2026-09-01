@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useUsersWithDuplicateSlot, UserWithDuplicateSlot } from '@/hooks/templates/useUsersWithDuplicateSlot';
 import { MatchDetailDrawer, TradeMatch } from '@/components/trades/MatchDetailDrawer';
 import { SlotProgress } from '@/components/templates/SlotTile';
+import { cn } from '@/lib/utils';
 import {
   Drawer,
   DrawerContent,
@@ -75,11 +76,34 @@ export function SlotTradeDrawer({
 }: SlotTradeDrawerProps) {
   const t = useTranslations('templates.slotTradeDrawer');
   const isMobile = useIsMobile();
+  const [sortBy, setSortBy] = useState<'matches' | 'distance'>('matches');
 
   const { users, loading, error } = useUsersWithDuplicateSlot(
     open && slot ? slot.slot_id : null,
     Number(copyId)
   );
+
+  const hasAnyDistance = useMemo(
+    () => users.some((u) => u.distance_km != null),
+    [users]
+  );
+
+  const sortedUsers = useMemo(() => {
+    if (!users || users.length === 0) return [];
+    return [...users].sort((a, b) => {
+      if (sortBy === 'distance') {
+        const aDist = a.distance_km ?? Infinity;
+        const bDist = b.distance_km ?? Infinity;
+        if (aDist !== bDist) return aDist - bDist;
+        return b.total_mutual_overlap - a.total_mutual_overlap;
+      }
+      // Default: sort by total matches
+      if (b.total_mutual_overlap !== a.total_mutual_overlap) {
+        return b.total_mutual_overlap - a.total_mutual_overlap;
+      }
+      return b.overlap_from_them_to_me - a.overlap_from_them_to_me;
+    });
+  }, [users, sortBy]);
 
   // Match detail drawer state for when user clicks "Ver intercambio"
   const [selectedMatch, setSelectedMatch] = useState<TradeMatch | null>(null);
@@ -125,6 +149,41 @@ export function SlotTradeDrawer({
             </p>
           </div>
         </div>
+
+        {/* Sorting Toggle */}
+        {users.length > 1 && (
+          <div className="flex bg-gray-100 dark:bg-gray-800/80 rounded-lg p-0.5 mt-3 border border-gray-200/60 dark:border-gray-700/60">
+            <button
+              type="button"
+              onClick={() => setSortBy('matches')}
+              className={cn(
+                "flex-1 py-1 px-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+                sortBy === 'matches'
+                  ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+              )}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{t('sortByMatches')}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (hasAnyDistance) setSortBy('distance');
+              }}
+              disabled={!hasAnyDistance}
+              className={cn(
+                "flex-1 py-1 px-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1.5",
+                sortBy === 'distance'
+                  ? "bg-white dark:bg-gray-700 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              )}
+            >
+              <MapPin className="w-3.5 h-3.5 text-blue-500" />
+              <span>{t('sortByDistance')}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Body / List */}
@@ -138,7 +197,7 @@ export function SlotTradeDrawer({
           <div className="text-center py-8 text-sm text-red-500">
             {error}
           </div>
-        ) : users.length === 0 ? (
+        ) : sortedUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
             <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 mb-3">
               <Inbox className="w-6 h-6" />
@@ -151,7 +210,7 @@ export function SlotTradeDrawer({
             </p>
           </div>
         ) : (
-          users.map((u) => {
+          sortedUsers.map((u) => {
             const distance = formatDistanceShort(u.distance_km);
             return (
               <div

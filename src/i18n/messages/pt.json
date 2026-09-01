@@ -224,6 +224,11 @@
         "publishFirst": "Publicar Primeiro Anúncio",
         "login": "Entrar"
       },
+      "slotFilter": {
+        "title": "Cromo específico selecionado",
+        "description": "Mostrando apenas anúncios com este cromo",
+        "usersWithDupe": "Utilizadores com repetida"
+      },
       "createAlert": "Criar alerta com esta pesquisa"
     },
     "card": {
@@ -580,7 +585,9 @@
       "matches": "{count} coincidências",
       "theyOfferCount": "Oferece-lhe {count}",
       "youOfferCount": "Você oferece {count}",
-      "viewTrade": "Ver troca"
+      "viewTrade": "Ver troca",
+      "sortByMatches": "Coincidências",
+      "sortByDistance": "Distância"
     },
     "listings": {
       "buttonLabel": "Listagens",
