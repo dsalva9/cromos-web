@@ -237,15 +237,11 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         collectionIds: selectedCollectionIds,
         initialData: initialListings,
         listingTypeFilter: listingTypeFilter,
-        slotId: selectedSlotId,
     });
 
-    const targetCopyId = selectedCollectionIds.length === 1
-        ? selectedCollectionIds[0]
-        : (searchParams.get('collection') ? parseInt(searchParams.get('collection')!, 10) : undefined);
-    const targetTemplateId = searchParams.get('template_id')
-        ? parseInt(searchParams.get('template_id')!, 10)
-        : undefined;
+    // Read slot context from URL — only used for the banner/drawer, NOT for filtering listings
+    const urlCopyId = searchParams.get('copy_id') ? parseInt(searchParams.get('copy_id')!, 10) : undefined;
+    const urlTemplateId = searchParams.get('template_id') ? parseInt(searchParams.get('template_id')!, 10) : undefined;
 
     // Simple handlers - hook manages state now
     const handleSearchChange = (value: string) => {
@@ -658,7 +654,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                 />
 
                 {/* Contextual Sticker Banner when arriving with slot_id */}
-                {selectedSlotId && targetCopyId && user && (
+                {selectedSlotId && urlCopyId && (
                     <div className="mb-6 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 shadow-sm">
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400">
@@ -763,19 +759,19 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             </div>
 
             {/* Slot Trade Drawer for contextual matching */}
-            {selectedSlotId && targetCopyId && (
+            {selectedSlotId && urlCopyId && (
                 <SlotTradeDrawer
                     open={slotTradeDrawerOpen}
                     onOpenChange={setSlotTradeDrawerOpen}
                     slot={{
                         slot_id: selectedSlotId,
-                        label: null,
+                        label: searchQuery || null,
                         is_special: false,
                         status: 'missing',
                         count: 0,
                     }}
-                    copyId={String(targetCopyId)}
-                    templateId={targetTemplateId}
+                    copyId={String(urlCopyId)}
+                    templateId={urlTemplateId}
                 />
             )}
         </div>
