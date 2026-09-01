@@ -123,19 +123,22 @@ export function useListing(listingId: string) {
 
   const incrementViews = useCallback(async () => {
     try {
-      await supabase
-        .from('trade_listings')
-        .update({ views_count: (listing?.views_count || 0) + 1 })
-        .eq('id', parseInt(listingId));
+      const { error: rpcError } = await supabase.rpc('increment_listing_views', {
+        p_listing_id: parseInt(listingId, 10),
+      });
+      if (rpcError) {
+        logger.error('Failed to increment views via RPC:', rpcError);
+        return;
+      }
 
       // Update local state
       setListing(prev =>
-        prev ? { ...prev, views_count: prev.views_count + 1 } : null
+        prev ? { ...prev, views_count: (prev.views_count || 0) + 1 } : null
       );
     } catch (err) {
       logger.error('Failed to increment views:', err);
     }
-  }, [supabase, listingId, listing?.views_count]);
+  }, [supabase, listingId]);
 
   return {
     listing,

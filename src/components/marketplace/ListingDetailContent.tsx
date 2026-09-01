@@ -7,9 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, ArrowRight, ArrowLeft, Trash } from 'lucide-react';
 import { ImageModal } from '@/components/ui/ImageModal';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Listing } from '@/types/v1.6.0';
 import { ShareButton } from '@/components/marketplace/ShareButton';
+import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { logger } from '@/lib/logger';
 
 interface ListingDetailContentProps {
   listing: Listing | null;
@@ -19,7 +21,29 @@ interface ListingDetailContentProps {
 }
 
 export function ListingDetailContent({ listing, error, currencySymbol = '€' }: ListingDetailContentProps) {
+  const { user } = useUser();
+  const supabase = useSupabaseClient();
+  const viewIncrementedRef = useRef<string | null>(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (listing && (!user || user.id !== listing.user_id) && viewIncrementedRef.current !== listing.id.toString()) {
+      viewIncrementedRef.current = listing.id.toString();
+      const trackView = async () => {
+        try {
+          const { error: rpcError } = await supabase.rpc('increment_listing_views', {
+            p_listing_id: listing.id,
+          });
+          if (rpcError) {
+            logger.error('Failed to increment views via RPC on explorar detail:', rpcError);
+          }
+        } catch (err) {
+          logger.error('Error invoking increment_listing_views on explorar detail:', err);
+        }
+      };
+      void trackView();
+    }
+  }, [listing, user, supabase]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

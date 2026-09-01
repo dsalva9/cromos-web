@@ -86,11 +86,11 @@ export default function ListingDetailPage() {
   const [matchLoading, setMatchLoading] = useState(false);
 
   useEffect(() => {
-    if (listing && user?.id && user.id !== listing.user_id && viewIncrementedRef.current !== listing.id.toString()) {
+    if (listing && (!user || user.id !== listing.user_id) && viewIncrementedRef.current !== listing.id.toString()) {
       viewIncrementedRef.current = listing.id.toString();
       incrementViews();
     }
-  }, [listing, user?.id, incrementViews]);
+  }, [listing, user, incrementViews]);
 
   // Check trade overlap when a non-owner views an exchange-type listing
   useEffect(() => {
