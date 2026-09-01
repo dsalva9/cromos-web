@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 interface FinalizationResult {
   status: 'pending' | 'completed' | 'already_requested';
@@ -41,6 +42,7 @@ export const useTradeFinalization = (): UseTradeFinalizationReturn => {
           toast.success('¡Intercambio finalizado!', {
             description: 'Has aceptado la finalización. El intercambio se ha completado.',
           });
+          void triggerInAppReview('trade_finalization_completed');
         } else if (result.status === 'pending') {
           toast.success('Finalización solicitada', {
             description: 'Esperando que la otra persona acepte o rechace.',

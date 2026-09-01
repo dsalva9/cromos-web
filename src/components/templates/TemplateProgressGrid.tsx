@@ -11,6 +11,7 @@ import { useSlotListings } from '@/hooks/templates/useSlotListings';
 import { Check, X, Copy as CopyIcon, CheckCircle2, LayoutGrid } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 interface SlotProgress {
   slot_id: number;
@@ -175,6 +176,7 @@ export function TemplateProgressGrid({
       }
 
       setConfirmDialogOpen(false);
+      void triggerInAppReview('template_page_completed');
     } catch (error) {
       logger.error('Error completing page:', error);
     } finally {

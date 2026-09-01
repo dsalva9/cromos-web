@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 interface RatingModalData {
     userId: string;
@@ -43,6 +44,8 @@ export function GlobalRatingModal() {
             if (error) {
                 throw new Error(error.message);
             }
+
+            void triggerInAppReview('global_rating_submitted');
         },
         [supabase, ratingModalData]
     );

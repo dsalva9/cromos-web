@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { AlbumPageData } from '@/hooks/album';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { MoreVertical } from 'lucide-react';
 import { toast } from '@/lib/toast';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 interface PageHeaderProps {
   page: AlbumPageData;
@@ -49,6 +50,7 @@ export default function PageHeader({
       setShowConfirmDialog(false);
       setShowActionSheet(false);
       toast.success('Equipo completado ✔️');
+      void triggerInAppReview('album_page_completed');
     } catch (error) {
       logger.error('Error completing page:', error);
       // Error toast is handled by the hook

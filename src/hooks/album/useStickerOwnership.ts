@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { triggerInAppReview } from '@/lib/inAppReview';
 import { legacyFrom, legacyRpc } from '@/types/legacy-tables';
 import type { AlbumPageData, PageSlot } from './useAlbumNavigation';
 
@@ -174,6 +175,13 @@ export function useStickerOwnership(
                 });
 
                 if (error) throw error;
+
+                // Check if the page or whole album just reached 100%
+                if (currentPage && currentPage.total_slots > 0 && currentPage.owned_slots + (currentCount === 0 ? 1 : 0) >= currentPage.total_slots) {
+                    void triggerInAppReview('album_page_100_percent');
+                } else if (summary && summary.totalStickers > 0 && summary.ownedUnique + (currentCount === 0 ? 1 : 0) >= summary.totalStickers) {
+                    void triggerInAppReview('album_100_percent');
+                }
 
                 await fetchCollectionStats(collectionId, { keepExisting: true });
             } catch (err) {
@@ -422,6 +430,8 @@ export function useStickerOwnership(
                 logger.debug(
                     `Page complete: ${missingStickerIds.length} stickers marked via bulk slot update`
                 );
+
+                void triggerInAppReview('album_page_completed');
 
                 await fetchCollectionStats(collectionId, { keepExisting: true });
             } catch (err) {

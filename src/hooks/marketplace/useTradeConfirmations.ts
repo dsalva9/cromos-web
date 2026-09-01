@@ -5,6 +5,7 @@ import {
 } from '@/components/providers/SupabaseProvider';
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 interface UseTradeConfirmationsOptions {
   listingId?: number;
@@ -137,6 +138,7 @@ export function useTradeConfirmations({
         }
 
         toast.success('¡Intercambio confirmado! 🎉');
+        void triggerInAppReview('trade_confirmation_success');
         await fetchPendingConfirmation();
         return true;
       } catch (err) {

@@ -9,6 +9,7 @@ import {
   ListingTransaction,
 } from '@/lib/supabase/listings/transactions';
 import { toast } from '@/lib/toast';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 export function useListingWorkflow(listingId: number) {
   const supabase = useSupabaseClient();
@@ -75,6 +76,7 @@ export function useListingWorkflow(listingId: number) {
       toast.error(error.message);
     } else if (success) {
       toast.success('Transacción completada');
+      void triggerInAppReview('listing_workflow_completed');
       await fetchTransaction();
     }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { triggerInAppReview } from '@/lib/inAppReview';
 import type { SlotProgress, ItemFieldDefinition } from '@/types/v1.6.0';
 
 interface TemplateCopy {
@@ -166,6 +167,10 @@ export function useTemplateProgress(copyId: string) {
             s => s.status === 'owned' || s.status === 'duplicate'
           ).length;
 
+          if (prev.total_slots > 0 && completed >= prev.total_slots) {
+            void triggerInAppReview('template_album_100_percent');
+          }
+
           return { ...prev, completed_slots: completed };
         });
       } catch (err) {
@@ -227,6 +232,10 @@ export function useTemplateProgress(copyId: string) {
           const completed = updatedProgress.filter(
             s => s.status === 'owned' || s.status === 'duplicate'
           ).length;
+
+          if (prev.total_slots > 0 && completed >= prev.total_slots) {
+            void triggerInAppReview('template_album_100_percent');
+          }
 
           return { ...prev, completed_slots: completed };
         });

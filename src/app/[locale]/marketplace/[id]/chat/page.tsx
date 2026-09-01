@@ -31,6 +31,7 @@ import { CameraCaptureModal } from '@/components/marketplace/CameraCaptureModal'
 import { containsUrl, containsForbiddenAppText, downloadFile } from '@/lib/validations/chat';
 
 import { BmacChatPrompt } from '@/components/chats/BmacChatPrompt';
+import { triggerInAppReview } from '@/lib/inAppReview';
 
 function ListingChatPageContent() {
   const params = useParams();
@@ -590,6 +591,7 @@ function ListingChatPageContent() {
       if (confirmError) throw confirmError;
 
       toast.success('Transacción confirmada. ¡Ahora puedes valorar al vendedor!');
+      void triggerInAppReview('marketplace_transaction_confirmed');
 
       // Set seller info for rating
       setCounterpartyToRate({
@@ -628,6 +630,7 @@ function ListingChatPageContent() {
 
     // Update local state with new rating
     setMyRating({ rating, comment: comment || null });
+    void triggerInAppReview('marketplace_rating_submitted');
 
     // Refresh the page to show updated ratings and check if both have rated
     setTimeout(() => {
