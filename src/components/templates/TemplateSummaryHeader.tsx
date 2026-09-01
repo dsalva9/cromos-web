@@ -25,19 +25,34 @@ interface SlotProgress {
   count: number;
 }
 
+export type TemplateFilter = 'all' | 'owned' | 'duplicate' | 'missing';
+
 interface TemplateSummaryHeaderProps {
   copy: TemplateCopy;
   progress: SlotProgress[];
   marketplaceCount?: number;
+  activeFilter?: TemplateFilter;
+  onFilterChange?: (filter: TemplateFilter) => void;
 }
 
 export function TemplateSummaryHeader({
   copy,
   progress,
   marketplaceCount = 0,
+  activeFilter = 'all',
+  onFilterChange,
 }: TemplateSummaryHeaderProps) {
   const t = useTranslations('templates.summaryHeader');
   const [imageModalOpen, setImageModalOpen] = useState(false);
+
+  const handleFilterClick = (filter: TemplateFilter) => {
+    if (!onFilterChange) return;
+    if (activeFilter === filter) {
+      onFilterChange('all');
+    } else {
+      onFilterChange(filter);
+    }
+  };
   const stats = useMemo(() => {
     // Count owned (tengo) - slots with status='owned' OR status='duplicate'
     // If you have duplicates, you still HAVE the cromo (it counts as owned)
@@ -166,39 +181,114 @@ export function TemplateSummaryHeader({
             </div>
           </div>
 
-          {/* Right Column: Stats Grid */}
+          {/* Right Column: Stats Grid / Filters */}
           <div className={`grid ${marketplaceCount > 0 ? 'grid-cols-4' : 'grid-cols-3'} gap-2 sm:gap-3 w-full md:w-auto`}>
-            {/* Owned */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-600 transition-colors group">
-              <div className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-950 rounded-lg mb-1 sm:mb-2 group-hover:bg-green-200 dark:group-hover:bg-green-900 transition-colors">
-                <Check className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 dark:text-green-400" />
+            {/* Owned Filter */}
+            <button
+              type="button"
+              onClick={() => handleFilterClick('owned')}
+              aria-pressed={activeFilter === 'owned'}
+              title={activeFilter === 'owned' ? t('filterActiveTooltip') : t('filterTooltip', { filter: t('stats.owned') })}
+              className={`rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center transition-all group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                activeFilter === 'owned'
+                  ? 'bg-green-50 dark:bg-green-950/50 border-2 border-green-500 ring-2 ring-green-500/30 shadow-md scale-[1.02]'
+                  : 'bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-700 hover:scale-[1.02] active:scale-95'
+              }`}
+            >
+              <div className={`p-1.5 sm:p-2 rounded-lg mb-1 sm:mb-2 transition-colors ${
+                activeFilter === 'owned'
+                  ? 'bg-green-600 text-white dark:bg-green-500 dark:text-black'
+                  : 'bg-green-100 dark:bg-green-950 group-hover:bg-green-200 dark:group-hover:bg-green-900'
+              }`}>
+                <Check className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                  activeFilter === 'owned'
+                    ? 'text-white dark:text-black'
+                    : 'text-green-600 dark:text-green-400'
+                }`} />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.owned}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.owned')}</span>
-            </div>
+              <span className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider ${
+                activeFilter === 'owned' ? 'text-green-700 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'
+              }`}>{t('stats.owned')}</span>
+              {activeFilter === 'owned' && (
+                <span className="mt-1 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-green-600 text-white dark:bg-green-500 dark:text-black uppercase tracking-wider">
+                  {t('activeBadge')}
+                </span>
+              )}
+            </button>
 
-            {/* Duplicates */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-gold transition-colors group">
-              <div className="p-1.5 sm:p-2 bg-gold/10 dark:bg-gold/20 rounded-lg mb-1 sm:mb-2 group-hover:bg-gold/20 dark:group-hover:bg-gold/30 transition-colors">
-                <CopyIcon className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-700 dark:text-yellow-500" />
+            {/* Duplicates Filter */}
+            <button
+              type="button"
+              onClick={() => handleFilterClick('duplicate')}
+              aria-pressed={activeFilter === 'duplicate'}
+              title={activeFilter === 'duplicate' ? t('filterActiveTooltip') : t('filterTooltip', { filter: t('stats.duplicates') })}
+              className={`rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center transition-all group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                activeFilter === 'duplicate'
+                  ? 'bg-amber-50 dark:bg-amber-950/50 border-2 border-amber-500 ring-2 ring-amber-500/30 shadow-md scale-[1.02]'
+                  : 'bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 hover:border-gold transition-colors hover:scale-[1.02] active:scale-95'
+              }`}
+            >
+              <div className={`p-1.5 sm:p-2 rounded-lg mb-1 sm:mb-2 transition-colors ${
+                activeFilter === 'duplicate'
+                  ? 'bg-amber-500 text-black dark:bg-gold dark:text-black'
+                  : 'bg-gold/10 dark:bg-gold/20 group-hover:bg-gold/20 dark:group-hover:bg-gold/30'
+              }`}>
+                <CopyIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                  activeFilter === 'duplicate'
+                    ? 'text-black'
+                    : 'text-yellow-700 dark:text-yellow-500'
+                }`} />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.duplicates}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.duplicates')}</span>
-            </div>
+              <span className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider ${
+                activeFilter === 'duplicate' ? 'text-amber-700 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'
+              }`}>{t('stats.duplicates')}</span>
+              {activeFilter === 'duplicate' && (
+                <span className="mt-1 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-500 text-black dark:bg-gold uppercase tracking-wider">
+                  {t('activeBadge')}
+                </span>
+              )}
+            </button>
 
-            {/* Missing */}
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-600 transition-colors group">
-              <div className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-950 rounded-lg mb-1 sm:mb-2 group-hover:bg-red-200 dark:group-hover:bg-red-900 transition-colors">
-                <X className="h-4 w-4 sm:h-5 sm:w-5 text-red-600 dark:text-red-400" />
+            {/* Missing Filter */}
+            <button
+              type="button"
+              onClick={() => handleFilterClick('missing')}
+              aria-pressed={activeFilter === 'missing'}
+              title={activeFilter === 'missing' ? t('filterActiveTooltip') : t('filterTooltip', { filter: t('stats.missing') })}
+              className={`rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center transition-all group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                activeFilter === 'missing'
+                  ? 'bg-red-50 dark:bg-red-950/50 border-2 border-red-500 ring-2 ring-red-500/30 shadow-md scale-[1.02]'
+                  : 'bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-600 hover:scale-[1.02] active:scale-95'
+              }`}
+            >
+              <div className={`p-1.5 sm:p-2 rounded-lg mb-1 sm:mb-2 transition-colors ${
+                activeFilter === 'missing'
+                  ? 'bg-red-600 text-white dark:bg-red-500 dark:text-white'
+                  : 'bg-red-100 dark:bg-red-950 group-hover:bg-red-200 dark:group-hover:bg-red-900'
+              }`}>
+                <X className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                  activeFilter === 'missing'
+                    ? 'text-white'
+                    : 'text-red-600 dark:text-red-400'
+                }`} />
               </div>
               <span className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-0.5 sm:mb-1">{stats.missing}</span>
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">{t('stats.missing')}</span>
-            </div>
+              <span className={`text-[9px] sm:text-[10px] uppercase font-bold tracking-wider ${
+                activeFilter === 'missing' ? 'text-red-700 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
+              }`}>{t('stats.missing')}</span>
+              {activeFilter === 'missing' && (
+                <span className="mt-1 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-red-600 text-white uppercase tracking-wider">
+                  {t('activeBadge')}
+                </span>
+              )}
+            </button>
 
             {/* Marketplace Availability */}
             {marketplaceCount > 0 && (
               <Link href={`/marketplace?collection=${copy.copy_id}`} className="block">
-                <div className="bg-gold/5 dark:bg-gold/10 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gold/30 hover:border-gold transition-colors group h-full cursor-pointer">
+                <div className="bg-gold/5 dark:bg-gold/10 rounded-xl p-2 sm:p-4 flex flex-col items-center justify-center border border-gold/30 hover:border-gold transition-colors group h-full cursor-pointer hover:scale-[1.02] active:scale-95">
                   <div className="p-1.5 sm:p-2 bg-gold/20 dark:bg-gold/30 rounded-lg mb-1 sm:mb-2 group-hover:bg-gold/30 dark:group-hover:bg-gold/40 transition-colors">
                     <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-gold" />
                   </div>

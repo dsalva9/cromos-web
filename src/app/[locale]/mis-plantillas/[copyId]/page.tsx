@@ -28,6 +28,7 @@ import { useHaptic } from '@/hooks/useHaptic';
 import { useTranslations } from 'next-intl';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { TradeQRModal } from '@/components/qr/TradeQRModal';
+import { TemplateFilter } from '@/components/templates/TemplateSummaryHeader';
 
 function TemplateProgressContent() {
   const params = useParams();
@@ -38,6 +39,7 @@ function TemplateProgressContent() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<TemplateFilter>('all');
   const { user } = useUser();
 
   const tListings = useTranslations('templates.listings');
@@ -216,7 +218,13 @@ function TemplateProgressContent() {
         </div>
 
         {/* Summary Header */}
-        <TemplateSummaryHeader copy={copy} progress={progress} marketplaceCount={marketplaceCount} />
+        <TemplateSummaryHeader
+          copy={copy}
+          progress={progress}
+          marketplaceCount={marketplaceCount}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
 
         {/* Contextual Tip */}
         <ContextualTip
@@ -239,6 +247,8 @@ function TemplateProgressContent() {
           templateId={copy?.template_id}
           collectionId={copy?.template_id}
           isAuthenticated={true}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
         />
 
         {/* Mobile Delete Button */}
