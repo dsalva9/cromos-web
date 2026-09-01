@@ -208,6 +208,7 @@
         "pack": "Pack"
       },
       "ageFilter": {
+        "label": "Published",
         "all": "Any date",
         "week": "Last week",
         "month": "Last month",

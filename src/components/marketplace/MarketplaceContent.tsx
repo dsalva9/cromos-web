@@ -386,7 +386,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     // Loading state logic - show skeletons only when we have no data
     const showSkeletons = !hasRestored || (loading && listings.length === 0);
 
-    const showMobileFilters = searchBarExpanded || searchQuery.trim() !== '';
+    const showMobileFilters = searchBarExpanded || searchQuery.trim() !== '' || sortByDistance || showFilters || selectedCollectionIds.length > 0;
 
     return (
         <div className="text-gray-900 dark:text-white">
@@ -533,77 +533,86 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                 )}
                             </div>
 
-                            {/* Mobile Filter Toggle — hidden by default, shown when search bar is tapped or text is active */}
+                            {/* Mobile Filter Controls — animated expansion with dedicated rows for narrow screens */}
                             <div
                                 className={cn(
-                                    "md:hidden flex gap-2 transition-all duration-200 ease-in-out overflow-hidden",
+                                    "md:hidden flex flex-col gap-2 transition-all duration-200 ease-in-out overflow-hidden",
                                     showMobileFilters
-                                        ? "max-h-20 opacity-100 mt-1"
+                                        ? "max-h-48 opacity-100 mt-1"
                                         : "max-h-0 opacity-0"
                                 )}
                             >
-                                <Button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    variant="outline"
-                                    className={cn(
-                                        "flex-1 h-9 text-xs font-semibold",
-                                        showFilters 
-                                            ? "bg-gold/10 text-black dark:text-white border-gold/50" 
-                                            : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600"
-                                    )}
-                                >
-                                    <Filter className="mr-1.5 h-3.5 w-3.5" />
-                                    {t('buttons.filters')}
-                                </Button>
-                                
-                                {/* Recent | Near toggle */}
-                                <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex border border-gray-200 dark:border-gray-600 h-9">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSortByDistance(false)}
+                                {/* Row 1: Filters toggle + Sort toggle */}
+                                <div className="flex gap-2 w-full">
+                                    <Button
+                                        onClick={() => setShowFilters(!showFilters)}
+                                        variant="outline"
                                         className={cn(
-                                            "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
-                                            !sortByDistance
-                                                ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                                            "flex-1 h-9 text-xs font-semibold",
+                                            showFilters 
+                                                ? "bg-gold/10 text-black dark:text-white border-gold/50" 
+                                                : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600"
                                         )}
                                     >
-                                        <Clock className="h-3.5 w-3.5" />
-                                        {t('buttons.recent')}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            if (hasPostcode) setSortByDistance(true);
-                                        }}
-                                        disabled={!hasPostcode}
-                                        className={cn(
-                                            "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
-                                            sortByDistance
-                                                ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                                        )}
-                                        title={!hasPostcode ? t('errors.distanceDisabled') : undefined}
-                                    >
-                                        <MapPin className="h-3.5 w-3.5" />
-                                        {t('buttons.near')}
-                                    </button>
+                                        <Filter className="mr-1.5 h-3.5 w-3.5" />
+                                        {t('buttons.filters')}
+                                    </Button>
+                                    
+                                    {/* Recent | Near toggle */}
+                                    <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 flex border border-gray-200 dark:border-gray-600 h-9">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSortByDistance(false)}
+                                            className={cn(
+                                                "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
+                                                !sortByDistance
+                                                    ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                                            )}
+                                        >
+                                            <Clock className="h-3.5 w-3.5" />
+                                            {t('buttons.recent')}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                if (hasPostcode) setSortByDistance(true);
+                                            }}
+                                            disabled={!hasPostcode}
+                                            className={cn(
+                                                "flex-1 py-1 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1",
+                                                sortByDistance
+                                                    ? "bg-white dark:bg-gray-800 text-black dark:text-white shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                                            )}
+                                            title={!hasPostcode ? t('errors.distanceDisabled') : undefined}
+                                        >
+                                            <MapPin className="h-3.5 w-3.5" />
+                                            {t('buttons.near')}
+                                        </button>
+                                    </div>
                                 </div>
 
-                                {/* Age Filter — only visible when sorting by distance */}
+                                {/* Row 2: Secondary Age Filter — appears cleanly when sorting by distance on mobile */}
                                 {sortByDistance && hasPostcode && (
-                                    <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 h-9 px-2">
-                                        <CalendarDays className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
-                                        <select
-                                            value={maxAgeDays ?? ''}
-                                            onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
-                                            className="bg-transparent text-xs font-semibold text-gray-700 dark:text-gray-200 border-none outline-none cursor-pointer appearance-none pr-4 w-full"
-                                        >
-                                            <option value="">{t('ageFilter.all')}</option>
-                                            <option value="7">{t('ageFilter.week')}</option>
-                                            <option value="30">{t('ageFilter.month')}</option>
-                                            <option value="90">{t('ageFilter.quarter')}</option>
-                                        </select>
+                                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/60 rounded-lg border border-gray-200 dark:border-gray-600 px-2.5 py-1.5 w-full">
+                                        <CalendarDays className="h-4 w-4 text-gold shrink-0" />
+                                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 shrink-0">
+                                            {t('ageFilter.label')}:
+                                        </span>
+                                        <div className="relative flex-1 min-w-0">
+                                            <select
+                                                value={maxAgeDays ?? ''}
+                                                onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
+                                                className="w-full bg-white dark:bg-gray-800 text-xs font-semibold text-gray-900 dark:text-white rounded-md pl-2.5 pr-7 py-1.5 border border-gray-200 dark:border-gray-600 shadow-sm focus:border-gold focus:ring-1 focus:ring-gold outline-none cursor-pointer appearance-none truncate"
+                                            >
+                                                <option value="">{t('ageFilter.all')}</option>
+                                                <option value="7">{t('ageFilter.week')}</option>
+                                                <option value="30">{t('ageFilter.month')}</option>
+                                                <option value="90">{t('ageFilter.quarter')}</option>
+                                            </select>
+                                            <ChevronRight className="w-3.5 h-3.5 text-gray-400 rotate-90 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -650,7 +659,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     </div>
                                 )}
 
-                                <div className="hidden lg:flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                                <div className="hidden md:flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                                     <button
                                         onClick={() => {
                                             setSortByDistance(false);
@@ -675,20 +684,26 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                     </button>
                                 </div>
 
-                                {/* Age Filter — desktop, only visible when sorting by distance */}
+                                {/* Age Filter — desktop / tablet, only visible when sorting by distance */}
                                 {sortByDistance && hasPostcode && (
-                                    <div className="hidden lg:flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 h-10">
-                                        <CalendarDays className="h-4 w-4 text-gray-500 dark:text-gray-400 shrink-0 ml-2" />
-                                        <select
-                                            value={maxAgeDays ?? ''}
-                                            onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
-                                            className="bg-transparent text-sm font-medium text-gray-700 dark:text-gray-200 border-none outline-none cursor-pointer appearance-none pr-5 pl-1"
-                                        >
-                                            <option value="">{t('ageFilter.all')}</option>
-                                            <option value="7">{t('ageFilter.week')}</option>
-                                            <option value="30">{t('ageFilter.month')}</option>
-                                            <option value="90">{t('ageFilter.quarter')}</option>
-                                        </select>
+                                    <div className="hidden md:flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1 h-10 px-2.5">
+                                        <CalendarDays className="h-4 w-4 text-gold shrink-0" />
+                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 shrink-0">
+                                            {t('ageFilter.label')}:
+                                        </span>
+                                        <div className="relative">
+                                            <select
+                                                value={maxAgeDays ?? ''}
+                                                onChange={(e) => setMaxAgeDays(e.target.value ? parseInt(e.target.value, 10) : null)}
+                                                className="bg-white dark:bg-gray-800 text-xs font-semibold text-gray-900 dark:text-white rounded-md pl-2 pr-6 py-1 border border-gray-200 dark:border-gray-600 shadow-sm focus:border-gold focus:ring-1 focus:ring-gold outline-none cursor-pointer appearance-none"
+                                            >
+                                                <option value="">{t('ageFilter.all')}</option>
+                                                <option value="7">{t('ageFilter.week')}</option>
+                                                <option value="30">{t('ageFilter.month')}</option>
+                                                <option value="90">{t('ageFilter.quarter')}</option>
+                                            </select>
+                                            <ChevronRight className="w-3.5 h-3.5 text-gray-400 rotate-90 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                        </div>
                                     </div>
                                 )}
                             </div>
