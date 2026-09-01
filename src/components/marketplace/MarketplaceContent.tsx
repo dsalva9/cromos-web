@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useListings } from '@/hooks/marketplace/useListings';
+import { useMissingSlotBySearch } from '@/hooks/marketplace/useMissingSlotBySearch';
 import { ListingCard } from '@/components/marketplace/ListingCard';
 import { SearchBar } from '@/components/marketplace/SearchBar';
 import { CollectionFilter } from '@/components/marketplace/CollectionFilter';
@@ -242,6 +243,16 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
     // Read slot context from URL — only used for the banner/drawer, NOT for filtering listings
     const urlCopyId = searchParams.get('copy_id') ? parseInt(searchParams.get('copy_id')!, 10) : undefined;
     const urlTemplateId = searchParams.get('template_id') ? parseInt(searchParams.get('template_id')!, 10) : undefined;
+
+    // For direct marketplace searches: look up if the search text matches a missing slot
+    const { match: searchSlotMatch } = useMissingSlotBySearch(
+        !selectedSlotId && searchQuery ? searchQuery : ''
+    );
+
+    // Effective values for banner/drawer — URL params take priority, fallback to search match
+    const effectiveSlotId = selectedSlotId || searchSlotMatch?.slot_id || null;
+    const effectiveCopyId = urlCopyId || searchSlotMatch?.copy_id || undefined;
+    const effectiveTemplateId = urlTemplateId || searchSlotMatch?.template_id || undefined;
 
     // Simple handlers - hook manages state now
     const handleSearchChange = (value: string) => {
@@ -653,8 +664,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                     className="mb-6"
                 />
 
-                {/* Contextual Sticker Banner when arriving with slot_id */}
-                {selectedSlotId && urlCopyId && (
+                {/* Contextual Sticker Banner when slot match found (URL params or search) */}
+                {effectiveSlotId && effectiveCopyId && (
                     <div className="mb-6 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 rounded-xl p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 shadow-sm">
                         <div className="flex items-center gap-3 min-w-0">
                             <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400">
@@ -759,19 +770,19 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
             </div>
 
             {/* Slot Trade Drawer for contextual matching */}
-            {selectedSlotId && urlCopyId && (
+            {effectiveSlotId && effectiveCopyId && (
                 <SlotTradeDrawer
                     open={slotTradeDrawerOpen}
                     onOpenChange={setSlotTradeDrawerOpen}
                     slot={{
-                        slot_id: selectedSlotId,
-                        label: searchQuery || null,
+                        slot_id: effectiveSlotId,
+                        label: searchQuery || searchSlotMatch?.label || null,
                         is_special: false,
                         status: 'missing',
                         count: 0,
                     }}
-                    copyId={String(urlCopyId)}
-                    templateId={urlTemplateId}
+                    copyId={String(effectiveCopyId)}
+                    templateId={effectiveTemplateId}
                 />
             )}
         </div>

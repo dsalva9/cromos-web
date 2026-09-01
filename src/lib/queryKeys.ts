@@ -54,6 +54,10 @@ export const QUERY_KEYS = {
     usersWithDuplicateSlot: (slotId: number | null, copyId: number) =>
         ['usersWithDuplicateSlot', { slotId, copyId }] as const,
 
+    /* ─── search → missing slot match ─── */
+    missingSlotBySearch: (search: string) =>
+        ['missingSlotBySearch', search] as const,
+
     /* ─── marketplace alerts ─── */
     alerts: () => ['alerts'] as const,
 } as const;
