@@ -1,6 +1,6 @@
 {
   "name": "cambio-cromos",
-  "version": "1.6.2",
+  "version": "1.7.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
