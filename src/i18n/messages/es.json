@@ -588,6 +588,7 @@
       "special": "Especial",
       "sticker": "Cromo #{number}",
       "inMarketplace": "Disponible en marketplace",
+      "usersWithDupe": "Usuarios con repe",
       "updated": "Actualizado",
       "updateError": "Error al actualizar",
       "countError": "Error al actualizar cantidad",
@@ -595,6 +596,17 @@
       "createListing": "Publicar repetido",
       "createListingTitle": "Necesitas al menos 2 copias para publicar",
       "createAlert": "Crear alerta para este cromo"
+    },
+    "slotTradeDrawer": {
+      "title": "Usuarios con repe",
+      "subtitle": "Usuarios que tienen este cromo como repe en su colección",
+      "loading": "Buscando usuarios con repe...",
+      "noUsers": "Ningún usuario tiene este cromo repetido",
+      "noUsersDesc": "Actualmente no hay usuarios registrados con este cromo repetido.",
+      "matches": "{count} coincidencias",
+      "theyOfferCount": "Te ofrece {count}",
+      "youOfferCount": "Le ofreces {count}",
+      "viewTrade": "Ver intercambio"
     },
     "listings": {
       "buttonLabel": "Listados",

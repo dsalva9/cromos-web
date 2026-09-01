@@ -44,6 +44,7 @@ interface UseListingsParams {
   collectionIds?: number[];
   initialData?: Listing[];
   listingTypeFilter?: 'all' | 'cromo' | 'pack';
+  slotId?: number | null;
 }
 
 /** Transform raw RPC row into the app-level Listing type */
@@ -122,6 +123,7 @@ export function useListings({
   collectionIds = [],
   initialData,
   listingTypeFilter = 'all',
+  slotId = null,
 }: UseListingsParams = {}) {
   const supabase = useSupabaseClient();
   const { profile } = useProfileCompletion();
@@ -142,7 +144,7 @@ export function useListings({
 
   // Only use initialData when filters are at their defaults and limit is the default (18).
   // When filters or limit are modified (e.g. during restoration), the server data is unfiltered or the wrong size.
-  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0 && limit === 18 && listingTypeFilter === 'all';
+  const isDefaultQuery = !search && !sortByDistance && collectionIds.length === 0 && limit === 18 && listingTypeFilter === 'all' && !slotId;
   const effectiveInitialData = isDefaultQuery && initialData && initialData.length > 0
     ? { initialData: { pages: [initialData], pageParams: [0] } }
     : {};
@@ -156,7 +158,7 @@ export function useListings({
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter),
+    queryKey: QUERY_KEYS.listings(search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter, slotId),
     queryFn: async ({ pageParam = 0 }) => {
       const currentIds = collectionIdsRef.current;
       const hasCollectionFilter = currentIds && currentIds.length > 0;
@@ -170,6 +172,7 @@ export function useListings({
         p_sort_by_distance: sortByDistance,
         p_collection_ids: hasCollectionFilter ? currentIds : null,
         p_is_group: listingTypeFilter === 'all' ? null : (listingTypeFilter === 'pack'),
+        ...(slotId ? { p_slot_id: slotId } : {}),
         ...(countryCode ? { p_country_code: countryCode } : {}),
       };
 

@@ -562,6 +562,7 @@
       "special": "Especial",
       "sticker": "Figurinha #{number}",
       "inMarketplace": "Disponível no marketplace",
+      "usersWithDupe": "Utilizadores com repetida",
       "updated": "Atualizado",
       "updateError": "Erro ao atualizar",
       "countError": "Erro ao atualizar quantidade",
@@ -569,6 +570,17 @@
       "createListing": "Publicar repetida",
       "createListingTitle": "Você precisa de pelo menos 2 cópias para publicar",
       "createAlert": "Criar alerta para este cromo"
+    },
+    "slotTradeDrawer": {
+      "title": "Utilizadores com repetida",
+      "subtitle": "Utilizadores que têm este cromo como repetido na sua coleção",
+      "loading": "A procurar utilizadores com repetida...",
+      "noUsers": "Nenhum utilizador tem este cromo repetido",
+      "noUsersDesc": "Atualmente não há utilizadores registados com este cromo repetido.",
+      "matches": "{count} coincidências",
+      "theyOfferCount": "Oferece-lhe {count}",
+      "youOfferCount": "Você oferece {count}",
+      "viewTrade": "Ver troca"
     },
     "listings": {
       "buttonLabel": "Listagens",

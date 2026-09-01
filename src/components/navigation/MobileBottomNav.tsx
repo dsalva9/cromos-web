@@ -191,11 +191,11 @@ export function MobileBottomNav() {
 
       {/* More Menu Drawer */}
       <Drawer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <DrawerContent className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-black dark:text-white pb-[env(safe-area-inset-bottom)] z-[var(--z-modal)]">
-          <DrawerHeader className="border-b border-gray-100 dark:border-gray-800 mb-2">
+        <DrawerContent className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 text-black dark:text-white max-h-[85dvh] flex flex-col overflow-hidden z-[var(--z-modal)]">
+          <DrawerHeader className="border-b border-gray-100 dark:border-gray-800 mb-0 shrink-0">
             <DrawerTitle className="text-center font-bold text-lg">{t('menu')}</DrawerTitle>
           </DrawerHeader>
-          <div className="p-4 space-y-2">
+          <div className="p-4 space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)]">
             <a
               href="/marketplace/my-listings"
               onClick={async (e) => {

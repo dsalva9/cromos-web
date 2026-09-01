@@ -20,6 +20,7 @@ export interface MarketplaceAvailabilitySlot {
     label: string | null;
     page_title: string;
     listing_count: number;
+    has_users_with_dupe?: boolean;
 }
 
 // ─── Hooks ───────────────────────────────────────────────────────────────
@@ -73,7 +74,8 @@ export function useMarketplaceAvailabilityCounts() {
  * Returns slot-level marketplace availability for a SPECIFIC album copy.
  *
  * Each entry identifies a missing sticker slot that has active listings from
- * other users. Used by the album detail page to render 🛒 badges on sticker cells.
+ * other users or other users who have it as a duplicate. Used by the album detail page
+ * to render badges on sticker cells.
  *
  * @param copyId - The user_template_copies.id to check
  */
@@ -109,10 +111,13 @@ export function useMarketplaceAvailabilitySlots(copyId: number | undefined) {
         staleTime: 2 * 60 * 1000, // 2 minutes
     });
 
+    const slots = data ?? [];
+
     return {
-        slots: data ?? [],
-        slotIds: new Set((data ?? []).map((s) => s.slot_id)),
-        totalAvailable: data?.length ?? 0,
+        slots,
+        slotIds: new Set(slots.filter((s) => (s.listing_count ?? 0) > 0).map((s) => s.slot_id)),
+        dupeSlotIds: new Set(slots.filter((s) => !!s.has_users_with_dupe).map((s) => s.slot_id)),
+        totalAvailable: slots.filter((s) => (s.listing_count ?? 0) > 0).length,
         loading: isLoading,
         error: error ? (error instanceof Error ? error.message : 'Unknown error') : null,
     };

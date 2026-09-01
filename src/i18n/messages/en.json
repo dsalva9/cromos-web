@@ -562,6 +562,7 @@
       "special": "Special",
       "sticker": "Sticker #{number}",
       "inMarketplace": "Available in marketplace",
+      "usersWithDupe": "Users with duplicate",
       "updated": "Updated",
       "updateError": "Error updating",
       "countError": "Error updating count",
@@ -569,6 +570,17 @@
       "createListing": "List duplicate",
       "createListingTitle": "You need at least 2 copies to list",
       "createAlert": "Create alert for this sticker"
+    },
+    "slotTradeDrawer": {
+      "title": "Users with duplicate",
+      "subtitle": "Users who have this sticker as a duplicate in their collection",
+      "loading": "Looking for users with duplicates...",
+      "noUsers": "No users have this sticker as a duplicate",
+      "noUsersDesc": "There are currently no registered users with this duplicate sticker.",
+      "matches": "{count} matches",
+      "theyOfferCount": "Offers you {count}",
+      "youOfferCount": "You offer {count}",
+      "viewTrade": "View trade"
     },
     "listings": {
       "buttonLabel": "Listings",

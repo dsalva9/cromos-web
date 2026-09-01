@@ -26,9 +26,10 @@ import { getOrCreateMatchConversation } from '@/lib/supabase/matches/chat';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { toast } from '@/lib/toast';
 
-interface TradeMatch {
+export interface TradeMatch {
   match_user_id: string;
   nickname: string | null;
+  avatar_url?: string | null;
   overlap_from_them_to_me: number;
   overlap_from_me_to_them: number;
   total_mutual_overlap: number;

@@ -46,7 +46,7 @@ function TemplateProgressContent() {
     useTemplateProgress(copyId);
   const { hapticImpact } = useHaptic();
 
-  const { slotIds: marketplaceSlotIds, totalAvailable: marketplaceCount } =
+  const { slotIds: marketplaceSlotIds, dupeSlotIds, totalAvailable: marketplaceCount } =
     useMarketplaceAvailabilitySlots(copyId ? Number(copyId) : undefined);
 
   const handleDelete = async () => {
@@ -235,6 +235,7 @@ function TemplateProgressContent() {
           copyId={copyId}
           customFields={customFields}
           marketplaceSlotIds={marketplaceSlotIds}
+          dupeSlotIds={dupeSlotIds}
           templateId={copy?.template_id}
           collectionId={copy?.template_id}
           isAuthenticated={true}

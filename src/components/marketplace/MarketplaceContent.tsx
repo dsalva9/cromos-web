@@ -144,7 +144,9 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
 
 
-    // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet)
+    const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+
+    // Auto-apply filters from URL params (e.g. /marketplace?collection=123&search=Eduardo+Coudet&slot_id=456)
     useEffect(() => {
         const collectionParam = searchParams.get('collection');
         if (collectionParam) {
@@ -157,6 +159,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         const searchParam = searchParams.get('search');
         if (searchParam) {
             setSearchQuery(searchParam);
+        }
+        const slotIdParam = searchParams.get('slot_id');
+        if (slotIdParam) {
+            const slotId = parseInt(slotIdParam);
+            if (!isNaN(slotId)) {
+                setSelectedSlotId(slotId);
+            }
         }
     }, [searchParams]);
 
@@ -201,11 +210,13 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
         collectionIds: selectedCollectionIds,
         initialData: initialListings,
         listingTypeFilter: listingTypeFilter,
+        slotId: selectedSlotId,
     });
 
     // Simple handlers - hook manages state now
     const handleSearchChange = (value: string) => {
         setSearchQuery(value);
+        if (selectedSlotId) setSelectedSlotId(null);
     };
 
     const handleSortChange = () => {
@@ -216,6 +227,7 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
 
     const handleCollectionFilterChange = (ids: number[]) => {
         setSelectedCollectionIds(ids);
+        if (selectedSlotId) setSelectedSlotId(null);
     };
 
     const handleTypeFilterChange = (type: 'all' | 'cromo' | 'pack') => {

@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 
-import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag, BellPlus } from 'lucide-react';
+import { Minus, Plus, Upload, Check, Copy as CopyIcon, ShoppingBag, BellPlus, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from '@/components/ui/link';
 import { useTranslations } from 'next-intl';
 
-interface SlotProgress {
+export interface SlotProgress {
   slot_id: number;
   label: string | null;
   is_special: boolean;
@@ -40,12 +40,27 @@ interface SlotTileProps {
   listingsLoading?: boolean;
   customFields?: CustomField[];
   inMarketplace?: boolean;
+  hasUsersWithDupe?: boolean;
+  onOpenTradeDrawer?: (slot: SlotProgress) => void;
   templateId?: number;
   collectionId?: number;
   isAuthenticated?: boolean;
 }
 
-export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, customFields = [], inMarketplace = false, templateId, collectionId, isAuthenticated = false }: SlotTileProps) {
+export function SlotTile({
+  slot,
+  onUpdate,
+  copyId,
+  listing,
+  listingsLoading,
+  customFields = [],
+  inMarketplace = false,
+  hasUsersWithDupe = false,
+  onOpenTradeDrawer,
+  templateId,
+  collectionId,
+  isAuthenticated = false,
+}: SlotTileProps) {
   const t = useTranslations('templates.slotTile');
   const [updating, setUpdating] = useState(false);
   const [localCount, setLocalCount] = useState(slot.count);
@@ -230,14 +245,31 @@ export function SlotTile({ slot, onUpdate, copyId, listing, listingsLoading, cus
         </div>
 
         <div className="mt-auto space-y-3">
-          {/* Marketplace Indicator for Missing Stickers */}
-          {slot.status === 'missing' && inMarketplace && (
-            <Link href={`/marketplace?collection=${copyId}&search=${encodeURIComponent(slot.label || String(slot.slot_number || ''))}`} className="block">
-              <div className="w-full bg-gold/10 border border-gold/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-gold hover:bg-gold/20 transition-colors cursor-pointer font-bold">
-                <ShoppingBag className="w-3 h-3" />
-                <span>{t('inMarketplace')}</span>
-              </div>
-            </Link>
+          {/* Missing Sticker Actions: Marketplace and/or Duplicate Traders */}
+          {slot.status === 'missing' && (inMarketplace || hasUsersWithDupe) && (
+            <div className="space-y-1.5">
+              {inMarketplace && (
+                <Link
+                  href={`/marketplace?collection=${copyId}&slot_id=${slot.slot_id}&search=${encodeURIComponent(slot.label || String(slot.slot_number || ''))}`}
+                  className="block"
+                >
+                  <div className="w-full bg-gold/10 border border-gold/30 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-gold hover:bg-gold/20 transition-colors cursor-pointer font-bold">
+                    <ShoppingBag className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{t('inMarketplace')}</span>
+                  </div>
+                </Link>
+              )}
+              {hasUsersWithDupe && (
+                <button
+                  type="button"
+                  onClick={() => onOpenTradeDrawer?.(slot)}
+                  className="w-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-lg py-1.5 px-2 flex items-center justify-center gap-1.5 text-[10px] text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors cursor-pointer font-bold"
+                >
+                  <Users className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{t('usersWithDupe')}</span>
+                </button>
+              )}
+            </div>
           )}
           {/* Status Button */}
           <button

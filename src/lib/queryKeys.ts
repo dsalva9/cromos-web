@@ -18,8 +18,9 @@ export const QUERY_KEYS = {
         limit: number = 20,
         countryCode?: string,
         listingTypeFilter?: string,
+        slotId?: number | null,
     ) =>
-        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter }] as const,
+        ['listings', { search, sortByDistance, viewerPostcode, collectionIdsKey, limit, countryCode, listingTypeFilter, slotId }] as const,
 
     listingsAll: () => ['listings'] as const,
 
@@ -48,6 +49,10 @@ export const QUERY_KEYS = {
     marketplaceAvailability: () => ['marketplaceAvailability'] as const,
     marketplaceAvailabilitySlots: (copyId: number) =>
         ['marketplaceAvailability', 'slots', copyId] as const,
+
+    /* ─── duplicate sticker holders (album ↔ trade bridge) ─── */
+    usersWithDuplicateSlot: (slotId: number | null, copyId: number) =>
+        ['usersWithDuplicateSlot', { slotId, copyId }] as const,
 
     /* ─── marketplace alerts ─── */
     alerts: () => ['alerts'] as const,

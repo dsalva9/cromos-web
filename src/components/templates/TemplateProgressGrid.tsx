@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { SlotTile } from '@/components/templates/SlotTile';
+import { SlotTile, SlotProgress as TileSlotProgress } from '@/components/templates/SlotTile';
+import { SlotTradeDrawer } from '@/components/templates/SlotTradeDrawer';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -44,6 +45,7 @@ interface TemplateProgressGridProps {
   copyId: string;
   customFields?: CustomField[];
   marketplaceSlotIds?: Set<number>;
+  dupeSlotIds?: Set<number>;
   templateId?: number;
   collectionId?: number;
   isAuthenticated?: boolean;
@@ -56,6 +58,7 @@ export function TemplateProgressGrid({
   copyId,
   customFields = [],
   marketplaceSlotIds,
+  dupeSlotIds,
   templateId,
   collectionId,
   isAuthenticated,
@@ -64,8 +67,15 @@ export function TemplateProgressGrid({
   const [selectedPage, setSelectedPage] = useState<number>(1);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [isCompletingPage, setIsCompletingPage] = useState(false);
+  const [tradeDrawerSlot, setTradeDrawerSlot] = useState<TileSlotProgress | null>(null);
+  const [tradeDrawerOpen, setTradeDrawerOpen] = useState(false);
   const { slotListings, loading: listingsLoading } = useSlotListings(copyId);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleOpenTradeDrawer = (slot: TileSlotProgress) => {
+    setTradeDrawerSlot(slot);
+    setTradeDrawerOpen(true);
+  };
 
   // Auto-scroll active tab into view
   useEffect(() => {
@@ -232,12 +242,23 @@ export function TemplateProgressGrid({
             listingsLoading={listingsLoading}
             customFields={customFields}
             inMarketplace={marketplaceSlotIds?.has(slot.slot_id) ?? false}
+            hasUsersWithDupe={dupeSlotIds?.has(slot.slot_id) ?? false}
+            onOpenTradeDrawer={handleOpenTradeDrawer}
             templateId={templateId}
             collectionId={collectionId}
             isAuthenticated={isAuthenticated}
           />
         ))}
       </div>
+
+      {/* Slot Trade Drawer */}
+      <SlotTradeDrawer
+        open={tradeDrawerOpen}
+        onOpenChange={setTradeDrawerOpen}
+        slot={tradeDrawerSlot}
+        copyId={copyId}
+        templateId={templateId}
+      />
 
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
