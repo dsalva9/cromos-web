@@ -14,6 +14,7 @@ import type { QRGenerationData } from '@/components/marketplace/SimplifiedListin
 import QRCode from 'qrcode';
 import { siteConfig } from '@/config/site';
 import { useTranslations } from 'next-intl';
+import { createClient } from '@/lib/supabase/client';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -170,6 +171,14 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
       // Create a File from the blob and upload using the normal upload flow
       const fileName = `qr-${Date.now()}-${Math.random().toString(36).substring(2)}`;
       await uploadImage(blob, fileName);
+
+      // Analytics: track QR image generation (fire-and-forget)
+      const supabase = createClient();
+      supabase.from('analytics_events' as any).insert({
+        event_name: 'listing_qr_image_generated',
+        user_id: qrData.userId,
+        metadata: { copy_id: qrData.copyId, copy_title: qrData.copyTitle },
+      }).then(() => {});
     } catch (err) {
       logger.error('QR generation failed:', err);
       toast.error(tCreate('qrGenerateError'));

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Clock, X, Tv2, Loader2, CheckCircle2 } from 'lucide-react';
@@ -10,6 +10,7 @@ import { isNative } from '@/lib/platform';
 import { useHighlightCredits, HIGHLIGHT_COSTS, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { toast } from '@/lib/toast';
+import { createClient } from '@/lib/supabase/client';
 
 // ─── LemonSqueezy config (web only) ──────────────────────────────────────────
 const LS_VARIANT_48H_ID = process.env.NEXT_PUBLIC_LS_VARIANT_48H ?? '1903433';
@@ -55,6 +56,21 @@ export function DestacaAnuncioModal({
   isNewListing = false,
 }: DestacaAnuncioModalProps) {
   const t = useTranslations('destacaModal');
+
+  // ── Analytics: track modal open (fire-and-forget) ──────────────────────────
+  const trackedRef = useRef(false);
+  useEffect(() => {
+    if (open && !trackedRef.current) {
+      trackedRef.current = true;
+      const supabase = createClient();
+      supabase.from('analytics_events' as any).insert({
+        event_name: 'destacar_modal_opened',
+        user_id: userId,
+        metadata: { listing_id: listingId, is_new_listing: isNewListing },
+      }).then(() => {});
+    }
+    if (!open) trackedRef.current = false;
+  }, [open, listingId, userId, isNewListing]);
 
   // Detect native after hydration to avoid SSR mismatch
   const [isAndroid, setIsAndroid] = useState(false);

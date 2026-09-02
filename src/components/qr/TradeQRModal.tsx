@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { siteConfig } from '@/config/site';
 import { toast } from '@/lib/toast';
+import { createClient } from '@/lib/supabase/client';
 
 interface TradeQRModalProps {
   open: boolean;
@@ -36,6 +37,21 @@ export function TradeQRModal({
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   const qrUrl = `${siteConfig.url}/match/${userId}/${copyId}?name=${encodeURIComponent(nickname)}&album=${encodeURIComponent(copyTitle)}`;
+
+  // ── Analytics: track QR modal open (fire-and-forget) ───────────────────────
+  const trackedRef = useRef(false);
+  useEffect(() => {
+    if (open && !trackedRef.current) {
+      trackedRef.current = true;
+      const supabase = createClient();
+      supabase.from('analytics_events' as any).insert({
+        event_name: 'trade_qr_generated',
+        user_id: userId,
+        metadata: { copy_id: copyId, copy_title: copyTitle },
+      }).then(() => {});
+    }
+    if (!open) trackedRef.current = false;
+  }, [open, userId, copyId, copyTitle]);
 
   const generateQR = useCallback(async () => {
     if (!canvasRef.current) return;
