@@ -1,5 +1,6 @@
 import { isNative } from '@/lib/platform';
 import { logger } from '@/lib/logger';
+import { track } from '@vercel/analytics';
 
 // ── Cooldown Configuration ──────────────────────────────────────────────────
 // Minimum time between in-app review requests (7 days)
@@ -85,6 +86,21 @@ export async function triggerInAppReview(
   // 4. Request native review dialog
   try {
     logger.info(`[InAppReview] Triggering review dialog. Reason: ${reason}`);
+    
+    // Analytics tracking (GA4 + Vercel Analytics)
+    try {
+      track('in_app_review_triggered', { reason, platform: 'capacitor' });
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'in_app_review_triggered', {
+          event_category: 'engagement',
+          reason,
+          platform: 'capacitor',
+        });
+      }
+    } catch {
+      // Analytics failure should never block review flow
+    }
+
     const { InAppReview } = await import('@capacitor-community/in-app-review');
     await InAppReview.requestReview();
     
