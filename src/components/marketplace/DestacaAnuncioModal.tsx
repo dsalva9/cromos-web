@@ -11,6 +11,7 @@ import { useHighlightCredits, HIGHLIGHT_COSTS, CREDITS_PER_AD } from '@/hooks/ma
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { toast } from '@/lib/toast';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics/react';
 
 // ─── LemonSqueezy config (web only) ──────────────────────────────────────────
 const LS_VARIANT_48H_ID = process.env.NEXT_PUBLIC_LS_VARIANT_48H ?? '1903433';
@@ -62,6 +63,7 @@ export function DestacaAnuncioModal({
   useEffect(() => {
     if (open && !trackedRef.current) {
       trackedRef.current = true;
+      track('destacar_modal_opened', { listing_id: String(listingId), is_new_listing: isNewListing ? 'true' : 'false' });
       const supabase = createClient();
       supabase.from('analytics_events' as any).insert({
         event_name: 'destacar_modal_opened',

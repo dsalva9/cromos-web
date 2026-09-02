@@ -14,6 +14,7 @@ import {
 import { siteConfig } from '@/config/site';
 import { toast } from '@/lib/toast';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics/react';
 
 interface TradeQRModalProps {
   open: boolean;
@@ -43,6 +44,7 @@ export function TradeQRModal({
   useEffect(() => {
     if (open && !trackedRef.current) {
       trackedRef.current = true;
+      track('trade_qr_generated', { copy_id: String(copyId), copy_title: copyTitle });
       const supabase = createClient();
       supabase.from('analytics_events' as any).insert({
         event_name: 'trade_qr_generated',

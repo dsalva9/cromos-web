@@ -15,6 +15,7 @@ import QRCode from 'qrcode';
 import { siteConfig } from '@/config/site';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { track } from '@vercel/analytics/react';
 
 interface ImageUploadProps {
   value?: string | null;
@@ -173,6 +174,7 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
       await uploadImage(blob, fileName);
 
       // Analytics: track QR image generation (fire-and-forget)
+      track('listing_qr_image_generated', { copy_id: String(qrData.copyId), copy_title: qrData.copyTitle });
       const supabase = createClient();
       supabase.from('analytics_events' as any).insert({
         event_name: 'listing_qr_image_generated',
