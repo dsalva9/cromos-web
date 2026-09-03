@@ -128,74 +128,91 @@ export function useInAppPurchase() {
     }
 
     try {
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('Timeout: Google Play no respondió en 60s'));
-        }, 60000);
-      });
+      const doPurchase = async (retry = false): Promise<PurchaseResult> => {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('Timeout: Google Play no respondió en 60s'));
+          }, 60000);
+        });
 
-      const purchasePromise = NP.purchaseProduct({
-        productIdentifier: productId,
-        productType: 'inapp',
-        quantity: 1,
-        isConsumable: true,
-      });
+        let transaction: any;
+        try {
+          const purchasePromise = NP.purchaseProduct({
+            productIdentifier: productId,
+            productType: 'inapp',
+            quantity: 1,
+            isConsumable: true,
+          });
+          transaction = await Promise.race([purchasePromise, timeoutPromise]);
+        } catch (purchaseErr: any) {
+          const errMsg = purchaseErr?.message ?? '';
+          // If "already own", consume the old purchase and retry once
+          if (!retry && (errMsg.includes('already') || errMsg.includes('ITEM_ALREADY_OWNED'))) {
+            console.log('[IAP] Already owned — consuming old purchase and retrying...');
+            try {
+              const { purchases } = await NP.restorePurchases();
+              for (const p of (purchases || [])) {
+                const tok = p.purchaseToken || p.transactionId;
+                if (tok) {
+                  try { await NP.consumePurchase({ purchaseToken: tok }); } catch {}
+                }
+              }
+            } catch {}
+            return doPurchase(true);
+          }
+          throw purchaseErr;
+        }
 
-      const transaction = await Promise.race([purchasePromise, timeoutPromise]);
+        const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
+        const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
 
-      const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
-      const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
+        if (!purchaseToken) {
+          return { success: false, error: 'cancelled' };
+        }
 
-      if (!purchaseToken) {
-        return { success: false, error: 'cancelled' };
-      }
+        console.log('[IAP] Purchase OK, token:', purchaseToken?.substring(0, 20) + '...');
 
-      console.log('[IAP] Purchase OK, token:', purchaseToken?.substring(0, 20) + '...');
+        // Verify server-side
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) {
+          return { success: false, error: 'Not authenticated' };
+        }
 
-      // Verify server-side
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) {
-        console.error('[IAP] Not authenticated');
-        return { success: false, error: 'Not authenticated' };
-      }
-
-      console.log('[IAP] Verifying with edge function...');
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/verify-play-purchase',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token,
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/verify-play-purchase',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token,
+            },
+            body: JSON.stringify({
+              platform: 'google_play',
+              productId,
+              purchaseToken,
+              transactionId: orderId,
+            }),
           },
-          body: JSON.stringify({
-            platform: 'google_play',
-            productId,
-            purchaseToken,
-            transactionId: orderId,
-          }),
-        },
-      );
+        );
 
-      const result = await response.json();
-      console.log('[IAP] Verify result:', JSON.stringify(result));
+        const result = await response.json();
 
-      if (!response.ok || !result.ok) {
-        return { success: false, error: result.error || 'Error al verificar' };
-      }
+        if (!response.ok || !result.ok) {
+          return { success: false, error: result.error || 'Error al verificar' };
+        }
 
-      // Consume
-      try {
-        console.log('[IAP] Consuming purchase...');
-        await NP.consumePurchase({ purchaseToken });
-        console.log('[IAP] Consumed OK');
-      } catch (consumeErr: any) {
-        console.warn('[IAP] Consume failed (non-fatal):', consumeErr?.message);
-      }
+        // Consume so the item can be purchased again
+        try {
+          await NP.consumePurchase({ purchaseToken });
+        } catch (consumeErr: any) {
+          console.warn('[IAP] Consume failed (non-fatal):', consumeErr?.message);
+        }
 
-      console.log('[IAP] === PURCHASE COMPLETE ===');
-      return { success: true, transactionId: orderId };
+        return { success: true, transactionId: orderId };
+      };
+
+      return await doPurchase();
     } catch (err: any) {
       const msg = err?.message ?? String(err);
       console.error('[IAP] PURCHASE ERROR:', msg);
