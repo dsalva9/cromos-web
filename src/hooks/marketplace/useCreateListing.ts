@@ -4,14 +4,27 @@ import { CreateListingForm } from '@/types/v1.6.0';
 import { QUERY_KEYS } from '@/lib/queryKeys';
 import { logger } from '@/lib/logger';
 
+/** Custom error class for daily listing limit. */
+export class DailyLimitReachedError extends Error {
+  constructor() {
+    super('daily_listing_limit_reached');
+    this.name = 'DailyLimitReachedError';
+  }
+}
+
 /**
  * Hook for creating marketplace listings, powered by React Query `useMutation`.
  *
  * On success, automatically:
  * - Invalidates listings cache so new listing appears in the marketplace
  * - Invalidates marketplace availability cache (counts change)
+ * - Invalidates listing quota cache (used count increased)
  * - If it's a pack listing with structured `pack_items`, inserts them
  *   into the `listing_pack_items` table for searchability.
+ *
+ * On error, if the backend returns `daily_listing_limit_reached`,
+ * throws a `DailyLimitReachedError` so the UI can show the
+ * `ListingLimitModal` instead of a generic error toast.
  */
 export function useCreateListing() {
   const supabase = useSupabaseClient();
@@ -42,7 +55,13 @@ export function useCreateListing() {
         } as any
       );
 
-      if (error) throw error;
+      if (error) {
+        // Detect daily listing limit error from the RPC
+        if (error.message?.includes('daily_listing_limit_reached')) {
+          throw new DailyLimitReachedError();
+        }
+        throw error;
+      }
       if (!result) throw new Error('No listing ID returned');
 
       const listingId = result.toString();
@@ -75,6 +94,7 @@ export function useCreateListing() {
       // Invalidate caches so UI reflects the new listing
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.listingsAll() });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.marketplaceAvailability() });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.listingQuota() });
     },
 
     onError: (error) => {
@@ -87,3 +107,4 @@ export function useCreateListing() {
     loading: mutation.isPending,
   };
 }
+

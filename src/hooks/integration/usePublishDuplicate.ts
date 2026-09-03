@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
+import { DailyLimitReachedError } from '@/hooks/marketplace/useCreateListing';
 
 export function usePublishDuplicate() {
   const supabase = useSupabaseClient();
@@ -32,7 +33,13 @@ export function usePublishDuplicate() {
         p_price: customData?.price || undefined,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Detect daily listing limit error from the RPC
+        if (error.message?.includes('daily_listing_limit_reached')) {
+          throw new DailyLimitReachedError();
+        }
+        throw error;
+      }
       if (!data) throw new Error('No se devolvió ID del anuncio');
 
       const listingId = data.toString();

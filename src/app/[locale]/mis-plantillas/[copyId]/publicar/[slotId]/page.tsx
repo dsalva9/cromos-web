@@ -6,7 +6,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
+import { ListingLimitModal } from '@/components/marketplace/ListingLimitModal';
 import { usePublishDuplicate } from '@/hooks/integration/usePublishDuplicate';
+import { DailyLimitReachedError } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -57,6 +59,9 @@ function PublishDuplicateContent() {
   // Modal state — shown after successful publish
   const [highlightModalOpen, setHighlightModalOpen] = useState(false);
   const [newListingId, setNewListingId] = useState<number | null>(null);
+
+  // Listing limit modal state — shown when daily limit is reached
+  const [limitModalOpen, setLimitModalOpen] = useState(false);
 
   const fetchSlotData = useCallback(async () => {
     try {
@@ -168,8 +173,12 @@ function PublishDuplicateContent() {
       // Show highlight upsell modal instead of navigating immediately
       setNewListingId(Number(listingId));
       setHighlightModalOpen(true);
-    } catch {
-      toast.error('Error al publicar el anuncio');
+    } catch (err) {
+      if (err instanceof DailyLimitReachedError) {
+        setLimitModalOpen(true);
+      } else {
+        toast.error('Error al publicar el anuncio');
+      }
     }
   };
 
@@ -263,6 +272,16 @@ function PublishDuplicateContent() {
           userId={user.id}
           onClose={handleHighlightModalClose}
           isNewListing
+        />
+      )}
+
+      {/* Daily listing limit modal */}
+      {user && (
+        <ListingLimitModal
+          open={limitModalOpen}
+          userId={user.id}
+          onClose={() => setLimitModalOpen(false)}
+          onUnlocked={() => setLimitModalOpen(false)}
         />
       )}
     </div>

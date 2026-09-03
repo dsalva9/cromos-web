@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { isNative } from '@/lib/platform';
 import { useHighlightCredits, HIGHLIGHT_COSTS, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { useInAppPurchase, PRODUCT_IDS } from '@/hooks/useInAppPurchase';
 import { toast } from '@/lib/toast';
 import { createClient } from '@/lib/supabase/client';
 import { track } from '@vercel/analytics/react';
@@ -84,14 +85,20 @@ export function DestacaAnuncioModal({
   // Android-only state
   const { balance, loading: creditsLoading, refresh: refreshBalance, earnCredits, activateHighlight } = useHighlightCredits();
   const { loadAd, showRewardedAd, isLoading: adLoading, isLoaded: adLoaded } = useRewardedAd();
+  const { purchaseProduct, isReady: storeReady } = useInAppPurchase();
   const [watchingAd, setWatchingAd] = useState(false);
   const [activating, setActivating] = useState(false);
   const [creditFlash, setCreditFlash] = useState(false);
+  const [purchasingGP, setPurchasingGP] = useState(false);
 
   const creditCost = selected ? HIGHLIGHT_COSTS[selected] : 0;
   const hasEnoughCredits = selected ? balance >= creditCost : false;
   const shortfall = selected ? Math.max(0, creditCost - balance) : 0;
   const adsNeeded = Math.ceil(shortfall / CREDITS_PER_AD);
+
+  // Map highlight duration → Google Play product ID
+  const gpProductForDuration = (d: HighlightDuration) =>
+    d === '48_hours' ? PRODUCT_IDS.HIGHLIGHT_48H : PRODUCT_IDS.HIGHLIGHT_7D;
 
   // Preload rewarded ad when modal opens on Android
   useEffect(() => {
@@ -161,6 +168,25 @@ export function DestacaAnuncioModal({
     }
   };
 
+  // ── Android: Google Play purchase for highlight ────────────────────────────
+  const handlePayGooglePlay = async (duration: HighlightDuration) => {
+    if (purchasingGP) return;
+    setPurchasingGP(true);
+    try {
+      const result = await purchaseProduct(gpProductForDuration(duration));
+      if (result.success) {
+        toast.success(t('activateSuccess'));
+        onClose();
+      } else if (result.error !== 'cancelled') {
+        toast.error(result.error || 'Error');
+      }
+    } catch {
+      toast.error(t('activateError'));
+    } finally {
+      setPurchasingGP(false);
+    }
+  };
+
   // ── Web: open LS checkout ─────────────────────────────────────────────────
   const handlePayWeb = (duration: HighlightDuration) => {
     const url = buildCheckoutUrl(duration, listingId, userId);
@@ -170,11 +196,7 @@ export function DestacaAnuncioModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className={cn(
-          'sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl',
-          // On Android, add bottom margin so the modal clears the AdMob banner
-          isAndroid && 'mb-[70px]',
-        )}
+        className="sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl"
         showCloseButton={false}
       >
         {/* ── Golden Header (same for both modes) ─────────────────────────── */}
@@ -348,6 +370,23 @@ export function DestacaAnuncioModal({
                     : t('watchAd', { amount: CREDITS_PER_AD })
                 }
               </Button>
+
+              {/* Google Play direct purchase */}
+              {selected && (
+                <Button
+                  variant="outline"
+                  onClick={() => handlePayGooglePlay(selected)}
+                  disabled={purchasingGP || !storeReady}
+                  className="w-full h-11 rounded-xl border-2 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 font-bold"
+                >
+                  {purchasingGP ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  {t(selected === '48_hours' ? 'buyDirect48h' : 'buyDirect7d')}
+                </Button>
+              )}
             </>
           ) : (
             /* ── Web mode CTA ──────────────────────────────────────────── */

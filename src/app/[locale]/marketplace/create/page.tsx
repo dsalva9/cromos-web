@@ -5,7 +5,8 @@ import { useRouter } from '@/hooks/use-router';
 import Link from '@/components/ui/link';
 import { SimplifiedListingForm } from '@/components/marketplace/SimplifiedListingForm';
 import { DestacaAnuncioModal } from '@/components/marketplace/DestacaAnuncioModal';
-import { useCreateListing } from '@/hooks/marketplace/useCreateListing';
+import { ListingLimitModal } from '@/components/marketplace/ListingLimitModal';
+import { useCreateListing, DailyLimitReachedError } from '@/hooks/marketplace/useCreateListing';
 import AuthGuard from '@/components/AuthGuard';
 import { toast } from 'sonner';
 import { CreateListingForm, PackItem } from '@/types/v1.6.0';
@@ -29,6 +30,9 @@ function CreateListingContent() {
   // Modal state — shown after successful publish
   const [highlightModalOpen, setHighlightModalOpen] = useState(false);
   const [newListingId, setNewListingId] = useState<number | null>(null);
+
+  // Listing limit modal state — shown when daily limit is reached
+  const [limitModalOpen, setLimitModalOpen] = useState(false);
 
   // Get initial data from query parameters
   const initialData = useMemo(() => {
@@ -90,10 +94,14 @@ function CreateListingContent() {
       setNewListingId(Number(listingId));
       setHighlightModalOpen(true);
     } catch (error) {
-      logger.error('Create listing error:', error);
-      toast.error(
-        error instanceof Error ? error.message : t('errorToast')
-      );
+      if (error instanceof DailyLimitReachedError) {
+        setLimitModalOpen(true);
+      } else {
+        logger.error('Create listing error:', error);
+        toast.error(
+          error instanceof Error ? error.message : t('errorToast')
+        );
+      }
     }
   };
 
@@ -142,6 +150,16 @@ function CreateListingContent() {
           userId={user.id}
           onClose={handleHighlightModalClose}
           isNewListing
+        />
+      )}
+
+      {/* Daily listing limit modal */}
+      {user && (
+        <ListingLimitModal
+          open={limitModalOpen}
+          userId={user.id}
+          onClose={() => setLimitModalOpen(false)}
+          onUnlocked={() => setLimitModalOpen(false)}
         />
       )}
     </div>

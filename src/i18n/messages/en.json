@@ -2023,7 +2023,28 @@
     "adError": "Could not load ad",
     "rewardProcessing": "Reward is being processed, check back shortly",
     "rateLimited": "Please wait before watching another ad",
-    "dailyLimitReached": "You've reached the daily credit limit"
+    "dailyLimitReached": "You've reached the daily credit limit",
+    "buyDirect48h": "Buy 48h · €1.20",
+    "buyDirect7d": "Buy 7 days · €3.50"
+  },
+  "listingLimitModal": {
+    "title": "Daily limit reached!",
+    "subtitle": "You have reached the free limit of {limit} stickers uploaded today.",
+    "optionAdsTitle": "Watch rewarded ads",
+    "optionAdsDescription": "Watch {required} ads to unlock 1 extra upload",
+    "optionAdsButton": "Watch ad (+1)",
+    "optionAdsProgress": "{watched} of {required}",
+    "optionAdsUnlocked": "Extra upload unlocked!",
+    "optionPayTitle": "Quick pay",
+    "optionPayDescription": "Unlock 1 extra upload instantly",
+    "optionPayButton": "Pay {price}",
+    "proBanner": "Unlimited uploads and no ads",
+    "proTrial": "Try 1 month free",
+    "proCta": "Discover PRO",
+    "close": "Close",
+    "quotaPill": "{used}/{limit} uploads today",
+    "quotaPillPro": "PRO · Unlimited",
+    "dailyAdLimitReached": "You have reached the daily ad unlock limit"
   },
   "createListing": {
     "successToast": "Listing published successfully!",

@@ -21,6 +21,8 @@ import { SponsoredBanner } from '@/components/marketplace/SponsoredBanner';
 import type { AffiliateLink } from '@/types/affiliates';
 import { fetchMarketplaceAffiliates } from '@/lib/marketplace/affiliates';
 import { logger } from '@/lib/logger';
+import { useListingQuota } from '@/hooks/marketplace/useListingQuota';
+import { cn } from '@/lib/utils';
 
 // Simplified listing schema with is_group support (extends base marketplace schema)
 const baseSimplifiedListingSchema = z.object({
@@ -78,6 +80,37 @@ interface SimplifiedListingFormProps {
   currencySymbol?: string;
   /** When provided, shows a "Generate QR" button in the image upload area */
   qrData?: QRGenerationData;
+}
+
+/** Small pill showing daily listing quota usage (e.g. "1/2 subidas hoy"). */
+function QuotaPill() {
+  const { quota, loading } = useListingQuota();
+
+  if (loading) return null;
+
+  if (quota.isPro) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 px-2.5 py-1 rounded-full">
+        ⭐ PRO · Ilimitadas
+      </span>
+    );
+  }
+
+  const isNearLimit = quota.used >= quota.limit - 1;
+  const isAtLimit = !quota.canCreate;
+
+  return (
+    <span className={cn(
+      'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full',
+      isAtLimit
+        ? 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20'
+        : isNearLimit
+          ? 'text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20'
+          : 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800',
+    )}>
+      📦 {quota.used}/{quota.limit} subidas hoy
+    </span>
+  );
 }
 
 export function SimplifiedListingForm({
@@ -579,7 +612,10 @@ export function SimplifiedListingForm({
           </div>
 
           {/* Actions */}
-          <div className="pt-2 flex justify-end">
+          <div className="pt-2 flex items-center justify-between gap-3">
+            {/* Quota pill */}
+            <QuotaPill />
+
             <Button
               type="submit"
               disabled={loading || isSubmitting}

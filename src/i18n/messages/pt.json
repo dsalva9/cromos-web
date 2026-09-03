@@ -2023,7 +2023,28 @@
     "adError": "Não foi possível carregar o anúncio",
     "rewardProcessing": "A recompensa está a ser processada, verifique em breve",
     "rateLimited": "Aguarde antes de ver outro anúncio",
-    "dailyLimitReached": "Atingiu o limite diário de créditos"
+    "dailyLimitReached": "Atingiu o limite diário de créditos",
+    "buyDirect48h": "Comprar 48h · 1,20€",
+    "buyDirect7d": "Comprar 7 dias · 3,50€"
+  },
+  "listingLimitModal": {
+    "title": "Limite diário atingido!",
+    "subtitle": "Atingiu o limite gratuito de {limit} cromos publicados hoje.",
+    "optionAdsTitle": "Ver anúncios bonificados",
+    "optionAdsDescription": "Veja {required} anúncios para desbloquear 1 publicação extra",
+    "optionAdsButton": "Ver anúncio (+1)",
+    "optionAdsProgress": "{watched} de {required}",
+    "optionAdsUnlocked": "Publicação extra desbloqueada!",
+    "optionPayTitle": "Pagamento rápido",
+    "optionPayDescription": "Desbloqueie 1 publicação extra instantaneamente",
+    "optionPayButton": "Pagar {price}",
+    "proBanner": "Publicações ilimitadas e sem anúncios",
+    "proTrial": "Experimente 1 mês grátis",
+    "proCta": "Descobrir PRO",
+    "close": "Fechar",
+    "quotaPill": "{used}/{limit} publicações hoje",
+    "quotaPillPro": "PRO · Ilimitadas",
+    "dailyAdLimitReached": "Atingiu o limite de desbloqueios por anúncios hoje"
   },
   "createListing": {
     "successToast": "Anúncio publicado com sucesso!",

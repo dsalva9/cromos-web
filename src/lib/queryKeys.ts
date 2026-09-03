@@ -61,4 +61,7 @@ export const QUERY_KEYS = {
 
     /* ─── marketplace alerts ─── */
     alerts: () => ['alerts'] as const,
+
+    /* ─── listing quota (daily limit) ─── */
+    listingQuota: () => ['listingQuota'] as const,
 } as const;
