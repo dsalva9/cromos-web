@@ -299,15 +299,9 @@ export function ListingLimitModal({
                   {t('optionPayButton', { price: '0,50€' })}
                 </Button>
               ) : (
-                <Button
-                  onClick={handlePayWeb}
-                  variant="default"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={!LS_VARIANT_EXTRA_LISTING}
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  {t('optionPayButton', { price: '0,50€' })}
-                </Button>
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 py-2 italic">
+                  {t('desktopComingSoon')}
+                </p>
               )}
             </div>
           </div>

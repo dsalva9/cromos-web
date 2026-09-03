@@ -109,6 +109,8 @@ export const logger = {
       'upload blocked',
       'no se permiten códigos qr',
       'qr codes are not allowed',
+      'daily_listing_limit_reached',
+      'dailylimitreachederror',
     ];
     const shouldIgnore = args.some((arg) => {
       if (typeof arg === 'string') {

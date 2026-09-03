@@ -62,6 +62,9 @@ if (SENTRY_DSN) {
             // Already caught and shown to the user as a toast, so this is just noise.
             'The operation was aborted.',
             'StorageUnknownError',
+            // Daily listing quota reached (expected business constraint handled in-app via modal)
+            'daily_listing_limit_reached',
+            'DailyLimitReachedError',
         ],
 
         beforeSend(event, hint) {
@@ -117,6 +120,14 @@ if (SENTRY_DSN) {
                 message.includes('Error invoking postMessage') ||
                 message.includes('callback is no longer runnable') ||
                 message.includes('navigation_performance_logger')
+            ) {
+                return null;
+            }
+
+            // Drop expected daily listing limit errors (handled by in-app ListingLimitModal)
+            if (
+                message.includes('daily_listing_limit_reached') ||
+                type === 'DailyLimitReachedError'
             ) {
                 return null;
             }

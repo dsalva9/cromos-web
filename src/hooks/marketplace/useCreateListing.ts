@@ -98,6 +98,11 @@ export function useCreateListing() {
     },
 
     onError: (error) => {
+      // Daily listing limit is an expected business constraint, not an application error
+      if (error instanceof DailyLimitReachedError) {
+        logger.debug('[useCreateListing] Daily limit reached');
+        return;
+      }
       logger.error('[useCreateListing] Mutation error:', error);
     },
   });
