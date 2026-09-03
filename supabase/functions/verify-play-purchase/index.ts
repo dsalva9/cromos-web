@@ -312,15 +312,18 @@ Deno.serve(async (req) => {
         "purchase_highlight_credits" as any,
         {
           p_user_id: user.id,
-          p_credits: creditAmount,
-          p_payment_id: paymentId,
-          p_payment_provider: "google_play",
+          p_amount: creditAmount,
+          p_source: "google_play",
+          p_ls_order_id: paymentId,
         }
       );
 
       if (creditError) {
         console.error("[verify-play-purchase] Credit grant error:", creditError);
-        // Fall back to direct insert if RPC doesn't exist yet
+        return new Response(
+          JSON.stringify({ ok: false, error: "Failed to grant highlight credits" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
     }
 
