@@ -176,7 +176,7 @@ export function useInAppPurchase() {
     if (!storeRef.current) {
       await initStore();
       if (!storeRef.current) {
-        return { success: false, error: 'Store not initialized' };
+        return { success: false, error: 'Actualiza la app para usar pagos in-app' };
       }
     }
 

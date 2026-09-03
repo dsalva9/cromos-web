@@ -182,7 +182,7 @@ export function ListingLimitModal({
           />
         ))}
         <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
-          {t('optionAdsProgress', { watched: adsWatched, required: 5 })}
+          {t('optionAdsProgress', { watched: adsWatched, required: 10 })}
         </span>
       </div>
     );
@@ -191,7 +191,7 @@ export function ListingLimitModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl"
+        className="sm:max-w-md p-0 overflow-y-auto max-h-[90vh] rounded-2xl border-0 shadow-2xl"
         showCloseButton={false}
       >
         {/* ── Warning Header ──────────────────────────────────────────────── */}
@@ -231,7 +231,7 @@ export function ListingLimitModal({
                     {t('optionAdsTitle')}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {t('optionAdsDescription', { required: 5 })}
+                    {t('optionAdsDescription', { required: 10 })}
                   </p>
                   <div className="mt-3">
                     {renderProgressDots()}
@@ -289,7 +289,7 @@ export function ListingLimitModal({
                   onClick={handlePayAndroid}
                   variant="default"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={purchasing || !storeReady}
+                  disabled={purchasing}
                 >
                   {purchasing ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
