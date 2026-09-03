@@ -38,6 +38,16 @@ let NativePurchasesModule: any = null;
 async function getNativePurchases(): Promise<any> {
   if (NativePurchasesModule) return NativePurchasesModule;
   try {
+    // Check if Capacitor bridge has the plugin registered natively.
+    // Without this check, the import resolves but any call throws
+    // "NativePurchases plugin is not implemented on android" as an
+    // unhandled rejection for users on old app versions.
+    const cap = (window as any).Capacitor;
+    if (!cap?.isPluginAvailable?.('NativePurchases')) {
+      logger.warn('[InAppPurchase] NativePurchases plugin not available on this app version');
+      return null;
+    }
+
     const mod = await import('@capgo/native-purchases');
     NativePurchasesModule = mod.NativePurchases;
     return NativePurchasesModule;
