@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { isNative } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
 
 /**
  * Product IDs matching Google Play Console configuration.
@@ -34,20 +35,18 @@ interface PurchaseResult {
 
 // Lazy-loaded reference to the NativePurchases plugin
 let NativePurchasesModule: any = null;
+let pluginLoadError: string | null = null;
 
 async function getNativePurchases(): Promise<any> {
   if (NativePurchasesModule) return NativePurchasesModule;
-  try {
-    const cap = (window as any).Capacitor;
-    if (!cap?.isPluginAvailable?.('NativePurchases')) {
-      logger.warn('[InAppPurchase] NativePurchases plugin not available on this app version');
-      return null;
-    }
+  if (pluginLoadError) return null;
 
+  try {
     const mod = await import('@capgo/native-purchases');
     NativePurchasesModule = mod.NativePurchases;
     return NativePurchasesModule;
-  } catch (err) {
+  } catch (err: any) {
+    pluginLoadError = err?.message ?? 'import failed';
     logger.warn('[InAppPurchase] @capgo/native-purchases not available:', err);
     return null;
   }
@@ -65,17 +64,20 @@ export function useInAppPurchase() {
 
   // Initialize on mount (native only)
   useEffect(() => {
-    if (!isNative()) return;
+    if (!Capacitor.isNativePlatform()) return;
 
     let cancelled = false;
     (async () => {
       try {
         const NP = await getNativePurchases();
-        if (!NP || cancelled) return;
+        if (!NP || cancelled) {
+          logger.warn('[InAppPurchase] Plugin not loaded. Error:', pluginLoadError);
+          return;
+        }
 
         // Check billing support
-        const { isBillingSupported } = await NP.isBillingSupported();
-        if (!isBillingSupported) {
+        const result = await NP.isBillingSupported();
+        if (!result?.isBillingSupported) {
           logger.warn('[InAppPurchase] Billing not supported on this device');
           return;
         }
@@ -87,8 +89,15 @@ export function useInAppPurchase() {
 
         logger.info('[InAppPurchase] Ready with ' + (products?.length ?? 0) + ' products');
         if (!cancelled) setIsReady(true);
-      } catch (err) {
-        logger.error('[InAppPurchase] Init failed:', err);
+      } catch (err: any) {
+        // If plugin is "not implemented", this is an old app version — silently ignore
+        const msg = err?.message ?? '';
+        if (msg.includes('not implemented')) {
+          logger.warn('[InAppPurchase] Plugin not implemented (old app version)');
+          pluginLoadError = 'old app version';
+        } else {
+          logger.error('[InAppPurchase] Init failed:', err);
+        }
       }
     })();
 
@@ -101,21 +110,23 @@ export function useInAppPurchase() {
    * Purchase a consumable product (listing_extra_upload, highlight_48h, highlight_7d).
    */
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
-    if (!isNative()) {
+    if (!Capacitor.isNativePlatform()) {
       return { success: false, error: 'Not available on web' };
     }
 
     const NP = await getNativePurchases();
     if (!NP) {
-      return { success: false, error: 'Actualiza la app para usar pagos in-app' };
+      const errMsg = pluginLoadError || 'Plugin no disponible';
+      return { success: false, error: 'Actualiza la app para usar pagos (' + errMsg + ')' };
     }
 
     try {
-      logger.info('[InAppPurchase] Initiating purchase for:', productId);
+      // DEBUG: show what we're doing
+      toast.info('Iniciando compra: ' + productId);
 
-      // Safety timeout: 35 seconds to avoid infinite spinning
+      // Safety timeout: 60 seconds to avoid infinite spinning
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('La operación tardó demasiado o Google Play no respondió')), 35000);
+        setTimeout(() => reject(new Error('Timeout: Google Play no respondió en 60s')), 60000);
       });
 
       // 1. Start native purchase flow — opens Google Play purchase sheet
@@ -127,6 +138,9 @@ export function useInAppPurchase() {
       });
 
       const transaction = await Promise.race([purchasePromise, timeoutPromise]);
+
+      // DEBUG: show what we got back
+      toast.info('Respuesta GP: ' + JSON.stringify(transaction).substring(0, 200));
 
       const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
       const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
@@ -144,6 +158,8 @@ export function useInAppPurchase() {
       if (!token) {
         return { success: false, error: 'Not authenticated' };
       }
+
+      toast.info('Verificando con servidor...');
 
       const response = await fetch(
         process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/verify-play-purchase',
@@ -186,9 +202,14 @@ export function useInAppPurchase() {
         msg.includes('cancel') ||
         msg.includes('Cancel') ||
         msg.includes('USER_CANCELED') ||
-        msg.includes('Purchase is not purchased')
+        msg.includes('not purchased')
       ) {
         return { success: false, error: 'cancelled' };
+      }
+
+      // Plugin not implemented (old app version)
+      if (msg.includes('not implemented')) {
+        return { success: false, error: 'Actualiza la app desde Google Play para comprar' };
       }
 
       logger.error('[InAppPurchase] Purchase error:', err);
