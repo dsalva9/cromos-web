@@ -94,34 +94,25 @@ export function useInAppPurchase() {
   }, []);
 
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
-    alert('[IAP] purchaseProduct called with: ' + productId);
-    alert('[IAP] isNative: ' + Capacitor.isNativePlatform() + ' platform: ' + Capacitor.getPlatform());
+    console.log('[IAP] purchaseProduct called with:', productId);
 
     if (!Capacitor.isNativePlatform()) {
-      alert('[IAP] Not native, returning error');
       return { success: false, error: 'Not available on web' };
     }
 
-    alert('[IAP] Getting NativePurchases...');
     const NP = getNativePurchases();
-    alert('[IAP] NP is: ' + (NP ? 'loaded' : 'null'));
     if (!NP) {
       const errMsg = pluginLoadError || 'Plugin no disponible';
-      alert('[IAP] Plugin not available: ' + errMsg);
       return { success: false, error: 'Actualiza la app (' + errMsg + ')' };
     }
 
     try {
-      alert('[IAP] === STARTING PURCHASE === productId: ' + productId);
-
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          alert('[IAP] TIMEOUT after 60s');
           reject(new Error('Timeout: Google Play no respondió en 60s'));
         }, 60000);
       });
 
-      alert('[IAP] Calling NP.purchaseProduct...');
       const purchasePromise = NP.purchaseProduct({
         productIdentifier: productId,
         productType: 'inapp',
@@ -129,16 +120,12 @@ export function useInAppPurchase() {
         isConsumable: true,
       });
 
-      alert('[IAP] Waiting for purchase or timeout...');
       const transaction = await Promise.race([purchasePromise, timeoutPromise]);
-
-      alert('[IAP] Transaction received: ' + JSON.stringify(transaction));
 
       const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
       const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
 
       if (!purchaseToken) {
-        console.log('[IAP] No purchaseToken, treating as cancelled');
         return { success: false, error: 'cancelled' };
       }
 
@@ -190,7 +177,7 @@ export function useInAppPurchase() {
       return { success: true, transactionId: orderId };
     } catch (err: any) {
       const msg = err?.message ?? String(err);
-      alert('[IAP] PURCHASE ERROR: ' + msg);
+      console.error('[IAP] PURCHASE ERROR:', msg);
 
       if (
         msg.includes('cancel') ||

@@ -170,22 +170,21 @@ export function DestacaAnuncioModal({
 
   // ── Android: Google Play purchase for highlight ────────────────────────────
   const handlePayGooglePlay = async (duration: HighlightDuration) => {
-    alert('[DEBUG-HL] handlePayGooglePlay clicked! duration=' + duration + ' purchasingGP=' + purchasingGP);
     if (purchasingGP) return;
     setPurchasingGP(true);
     const productId = gpProductForDuration(duration);
-    alert('[DEBUG-HL] calling purchaseProduct with: ' + productId);
     try {
       const result = await purchaseProduct(productId);
-      alert('[DEBUG-HL] result: ' + JSON.stringify(result));
       if (result.success) {
+        // Credits were granted by the edge function, now activate the highlight
+        await activateHighlight(listingId, duration);
         toast.success(t('activateSuccess'));
         onClose();
       } else if (result.error !== 'cancelled') {
         toast.error(result.error || 'Error');
       }
-    } catch {
-      toast.error(t('activateError'));
+    } catch (err: any) {
+      toast.error(err?.message || t('activateError'));
     } finally {
       setPurchasingGP(false);
     }

@@ -149,13 +149,10 @@ export function ListingLimitModal({
 
   // ── Pay handler (Google Play — Android) ──────────────────────────────────
   const handlePayAndroid = async () => {
-    alert('[DEBUG] handlePayAndroid clicked! purchasing=' + purchasing);
     if (purchasing) return;
     setPurchasing(true);
     try {
-      alert('[DEBUG] Calling purchaseProduct...');
       const result = await purchaseProduct(PRODUCT_IDS.LISTING_EXTRA_UPLOAD);
-      alert('[DEBUG] Result: ' + JSON.stringify(result));
       if (result.success) {
         toast.success(t('optionAdsUnlocked'));
         refreshQuota();
