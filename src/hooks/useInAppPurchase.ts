@@ -78,6 +78,27 @@ export function useInAppPurchase() {
         });
         console.log('[IAP] Init: products:', JSON.stringify(products?.map((p: any) => p.identifier)));
 
+        // Consume any pending/unconsumed purchases from previous failed flows
+        try {
+          const { purchases } = await NP.restorePurchases();
+          if (purchases && purchases.length > 0) {
+            console.log('[IAP] Found', purchases.length, 'pending purchases, consuming...');
+            for (const p of purchases) {
+              const token = p.purchaseToken || p.transactionId;
+              if (token) {
+                try {
+                  await NP.consumePurchase({ purchaseToken: token });
+                  console.log('[IAP] Consumed pending purchase:', p.productIdentifier || p.productId);
+                } catch (ce: any) {
+                  console.warn('[IAP] Failed to consume:', ce?.message);
+                }
+              }
+            }
+          }
+        } catch (restoreErr: any) {
+          console.warn('[IAP] restorePurchases failed (non-fatal):', restoreErr?.message);
+        }
+
         if (!cancelled) {
           setIsReady(true);
           console.log('[IAP] Init: READY');
