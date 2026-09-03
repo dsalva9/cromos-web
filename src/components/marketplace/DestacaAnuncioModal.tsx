@@ -170,10 +170,13 @@ export function DestacaAnuncioModal({
 
   // ── Android: Google Play purchase for highlight ────────────────────────────
   const handlePayGooglePlay = async (duration: HighlightDuration) => {
+    console.log('[MODAL-HIGHLIGHT] handlePayGooglePlay clicked! duration:', duration, 'purchasingGP:', purchasingGP);
     if (purchasingGP) return;
     setPurchasingGP(true);
+    console.log('[MODAL-HIGHLIGHT] calling purchaseProduct with:', gpProductForDuration(duration));
     try {
       const result = await purchaseProduct(gpProductForDuration(duration));
+      console.log('[MODAL-HIGHLIGHT] purchaseProduct result:', JSON.stringify(result));
       if (result.success) {
         toast.success(t('activateSuccess'));
         onClose();
