@@ -96,35 +96,34 @@ export function useInAppPurchase() {
   }, []);
 
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
-    console.log('[IAP] purchaseProduct called with:', productId);
-    console.log('[IAP] isNative:', Capacitor.isNativePlatform(), 'platform:', Capacitor.getPlatform());
+    alert('[IAP] purchaseProduct called with: ' + productId);
+    alert('[IAP] isNative: ' + Capacitor.isNativePlatform() + ' platform: ' + Capacitor.getPlatform());
 
     if (!Capacitor.isNativePlatform()) {
-      console.log('[IAP] Not native, returning error');
+      alert('[IAP] Not native, returning error');
       return { success: false, error: 'Not available on web' };
     }
 
-    console.log('[IAP] Getting NativePurchases...');
+    alert('[IAP] Getting NativePurchases...');
     const NP = await getNativePurchases();
-    console.log('[IAP] NP is:', NP ? 'loaded' : 'null');
+    alert('[IAP] NP is: ' + (NP ? 'loaded' : 'null'));
     if (!NP) {
       const errMsg = pluginLoadError || 'Plugin no disponible';
-      console.error('[IAP] Plugin not available:', errMsg);
+      alert('[IAP] Plugin not available: ' + errMsg);
       return { success: false, error: 'Actualiza la app (' + errMsg + ')' };
     }
 
     try {
-      console.log('[IAP] === STARTING PURCHASE ===');
-      console.log('[IAP] productId:', productId);
+      alert('[IAP] === STARTING PURCHASE === productId: ' + productId);
 
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          console.error('[IAP] TIMEOUT after 60s');
+          alert('[IAP] TIMEOUT after 60s');
           reject(new Error('Timeout: Google Play no respondió en 60s'));
         }, 60000);
       });
 
-      console.log('[IAP] Calling NP.purchaseProduct...');
+      alert('[IAP] Calling NP.purchaseProduct...');
       const purchasePromise = NP.purchaseProduct({
         productIdentifier: productId,
         productType: 'inapp',
@@ -132,10 +131,10 @@ export function useInAppPurchase() {
         isConsumable: true,
       });
 
-      console.log('[IAP] Waiting for purchase or timeout...');
+      alert('[IAP] Waiting for purchase or timeout...');
       const transaction = await Promise.race([purchasePromise, timeoutPromise]);
 
-      console.log('[IAP] Transaction received:', JSON.stringify(transaction));
+      alert('[IAP] Transaction received: ' + JSON.stringify(transaction));
 
       const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
       const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
@@ -193,7 +192,7 @@ export function useInAppPurchase() {
       return { success: true, transactionId: orderId };
     } catch (err: any) {
       const msg = err?.message ?? String(err);
-      console.error('[IAP] PURCHASE ERROR:', msg);
+      alert('[IAP] PURCHASE ERROR: ' + msg);
 
       if (
         msg.includes('cancel') ||
