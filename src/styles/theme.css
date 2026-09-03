@@ -2,6 +2,9 @@
 
 /* Light theme (default) */
 :root {
+  /* AdMob banner height on native (0px on web) */
+  --ad-band-height: 0px;
+
   /* Gold Brand Colors */
   --gold: #FFC000;
   --gold-light: #FFD633;

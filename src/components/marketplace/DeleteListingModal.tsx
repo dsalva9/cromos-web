@@ -93,37 +93,37 @@ export function DeleteListingModal({
     switch (currentStep) {
       case 'warning':
         return (
-          <div className="space-y-4">
-            <Alert className="border-blue-500 bg-blue-50">
-              <AlertTriangle className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
+          <div className="space-y-3">
+            <Alert className="border-blue-500 bg-blue-50 py-2.5 px-3">
+              <AlertTriangle className="h-4 w-4 text-blue-600 shrink-0" />
+              <AlertDescription className="text-blue-800 text-xs sm:text-sm">
                 <strong>Eliminación Temporal:</strong> Este anuncio será movido a la sección "Eliminados"
               </AlertDescription>
             </Alert>
 
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700 space-y-3">
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border dark:border-gray-700 space-y-1.5">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
                 Se eliminará temporalmente el anuncio:
               </p>
-              <div className="ml-2 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div className="ml-1 space-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-2">
-                  <Trash2 className="h-4 w-4 text-blue-500" />
-                  <span><strong>"{listing.title}"</strong></span>
+                  <Trash2 className="h-4 w-4 text-blue-500 shrink-0" />
+                  <span className="truncate"><strong>"{listing.title}"</strong></span>
                 </div>
               </div>
             </div>
 
-            <Alert className="border-green-500 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">
+            <Alert className="border-green-500 bg-green-50 py-2.5 px-3">
+              <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
+              <AlertDescription className="text-green-800 text-xs sm:text-sm">
                 <strong>Puedes restaurarlo:</strong> El anuncio permanecerá en la sección "Eliminados" durante 30 días.
                 Durante este tiempo, podrás verlo y restaurarlo cuando quieras. Las conversaciones de chat se mantendrán intactas.
               </AlertDescription>
             </Alert>
 
-            <Alert className="border-yellow-500 bg-yellow-50">
-              <AlertTriangle className="h-4 w-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
+            <Alert className="border-yellow-500 bg-yellow-50 py-2.5 px-3">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 shrink-0" />
+              <AlertDescription className="text-yellow-800 text-xs sm:text-sm">
                 <strong>Eliminación automática:</strong> Pasados 30 días, el anuncio será eliminado permanentemente de forma automática junto con todas sus conversaciones.
               </AlertDescription>
             </Alert>
@@ -193,8 +193,8 @@ export function DeleteListingModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[calc(100dvh-2rem)] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2 shrink-0">
+      <DialogContent className="sm:max-w-md flex flex-col p-0 overflow-hidden">
+        <DialogHeader className="p-4 sm:p-6 pb-2 sm:pb-2 shrink-0">
           <DialogTitle className="text-xl font-bold">
             {getStepTitle()}
           </DialogTitle>
@@ -203,12 +203,12 @@ export function DeleteListingModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="overflow-y-auto px-6 py-2 flex-1 min-h-0">
+        <div className="overflow-y-auto px-4 sm:px-6 py-2 flex-1 min-h-0">
           {renderStepContent()}
         </div>
 
         {getStepActions() && (
-          <div className="p-6 pt-3 border-t shrink-0">
+          <div className="p-4 sm:p-6 pt-3 sm:pt-3 border-t shrink-0 bg-white dark:bg-gray-800">
             {getStepActions()}
           </div>
         )}
