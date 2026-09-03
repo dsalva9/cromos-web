@@ -67,7 +67,7 @@ if (SENTRY_DSN) {
             'DailyLimitReachedError',
         ],
 
-        beforeSend(event, hint) {
+        beforeSend(event) {
             const exception = event.exception?.values?.[0];
             const message = exception?.value || '';
             const type = exception?.type || '';
