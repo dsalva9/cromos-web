@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
 
@@ -27,24 +27,22 @@ interface PurchaseResult {
   error?: string;
 }
 
-let NativePurchasesModule: any = null;
+// Register the native plugin directly via Capacitor bridge.
+// This avoids dynamic import of @capgo/native-purchases which hangs
+// when the app is loaded from a remote server.url (Vercel).
+let NativePurchasesPlugin: any = null;
 let pluginLoadError: string | null = null;
 
-async function getNativePurchases(): Promise<any> {
-  console.log('[IAP] getNativePurchases called, cached:', !!NativePurchasesModule, 'prevError:', pluginLoadError);
-  if (NativePurchasesModule) return NativePurchasesModule;
+function getNativePurchases(): any {
+  if (NativePurchasesPlugin) return NativePurchasesPlugin;
   if (pluginLoadError) return null;
 
   try {
-    console.log('[IAP] Attempting dynamic import of @capgo/native-purchases...');
-    const mod = await import('@capgo/native-purchases');
-    console.log('[IAP] Import succeeded, mod keys:', Object.keys(mod));
-    NativePurchasesModule = mod.NativePurchases;
-    console.log('[IAP] NativePurchases object:', typeof NativePurchasesModule);
-    return NativePurchasesModule;
+    NativePurchasesPlugin = registerPlugin('NativePurchases');
+    return NativePurchasesPlugin;
   } catch (err: any) {
-    pluginLoadError = err?.message ?? 'import failed';
-    console.error('[IAP] Import FAILED:', pluginLoadError);
+    pluginLoadError = err?.message ?? 'registerPlugin failed';
+    alert('[IAP] registerPlugin FAILED: ' + pluginLoadError);
     return null;
   }
 }
@@ -62,7 +60,7 @@ export function useInAppPurchase() {
     (async () => {
       try {
         console.log('[IAP] Init: getting NativePurchases...');
-        const NP = await getNativePurchases();
+        const NP = getNativePurchases();
         console.log('[IAP] Init: NP is', NP ? 'loaded' : 'null');
         if (!NP || cancelled) return;
 
@@ -105,7 +103,7 @@ export function useInAppPurchase() {
     }
 
     alert('[IAP] Getting NativePurchases...');
-    const NP = await getNativePurchases();
+    const NP = getNativePurchases();
     alert('[IAP] NP is: ' + (NP ? 'loaded' : 'null'));
     if (!NP) {
       const errMsg = pluginLoadError || 'Plugin no disponible';
