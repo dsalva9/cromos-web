@@ -65,6 +65,7 @@ DECLARE
   v_base_limit INT := 2;
   v_extra_unlocks INT;
   v_total_limit INT;
+  v_ads_watched INT := 0;
 BEGIN
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'User must be authenticated';
@@ -87,6 +88,14 @@ BEGIN
   WHERE user_id = v_user_id
     AND created_at >= (CURRENT_DATE AT TIME ZONE 'Europe/Madrid');
 
+  -- Get current progress towards next ad unlock
+  SELECT COALESCE(ads_watched, 0) INTO v_ads_watched
+  FROM listing_ad_unlock_progress
+  WHERE user_id = v_user_id
+    AND created_at >= (CURRENT_DATE AT TIME ZONE 'Europe/Madrid')
+  ORDER BY created_at DESC
+  LIMIT 1;
+
   -- Pro users: unlimited
   IF v_is_pro THEN
     RETURN jsonb_build_object(
@@ -94,7 +103,8 @@ BEGIN
       'limit', -1,
       'extra_unlocks', 0,
       'can_create', true,
-      'is_pro', true
+      'is_pro', true,
+      'ads_watched', 0
     );
   END IF;
 
@@ -105,7 +115,8 @@ BEGIN
     'limit', v_total_limit,
     'extra_unlocks', v_extra_unlocks,
     'can_create', v_used < v_total_limit,
-    'is_pro', false
+    'is_pro', false,
+    'ads_watched', COALESCE(v_ads_watched, 0)
   );
 END;
 $$;

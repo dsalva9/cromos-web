@@ -11,6 +11,7 @@ export interface ListingQuota {
   extraUnlocks: number;
   canCreate: boolean;
   isPro: boolean;
+  adsWatched: number;
 }
 
 export interface AdViewResult {
@@ -21,8 +22,6 @@ export interface AdViewResult {
   dailyAdUnlocksMax: number;
 }
 
-
-
 /**
  * Manages daily marketplace listing quota.
  *
@@ -30,7 +29,7 @@ export interface AdViewResult {
  * Pro users: unlimited.
  *
  * Provides recordAdView() to track rewarded ad views toward an unlock
- * (5 ads = 1 extra listing) and recordPurchaseUnlock() for paid unlocks.
+ * (10 ads = 1 extra listing) and recordPurchaseUnlock() for paid unlocks.
  */
 export function useListingQuota() {
   const supabase = useSupabaseClient();
@@ -47,6 +46,7 @@ export function useListingQuota() {
         extraUnlocks: data?.extra_unlocks ?? 0,
         canCreate: data?.can_create ?? true,
         isPro: data?.is_pro ?? false,
+        adsWatched: data?.ads_watched ?? 0,
       };
     },
     staleTime: 30_000, // 30 seconds — quota can change after ads/purchases
@@ -64,10 +64,8 @@ export function useListingQuota() {
     const { data, error } = await (supabase as any).rpc('record_listing_ad_view');
     if (error) throw error;
 
-    // Refresh quota if an unlock was granted
-    if (data?.unlocked) {
-      refresh();
-    }
+    // Always refresh quota so adsWatched updates in cache
+    refresh();
 
     return {
       adsWatched: data?.ads_watched ?? 0,
@@ -90,7 +88,7 @@ export function useListingQuota() {
   }, [supabase, refresh]);
 
   return {
-    quota: quota ?? { used: 0, limit: 2, extraUnlocks: 0, canCreate: true, isPro: false },
+    quota: quota ?? { used: 0, limit: 2, extraUnlocks: 0, canCreate: true, isPro: false, adsWatched: 0 },
     loading: isLoading,
     refresh,
     recordAdView,

@@ -66,27 +66,36 @@ export function ListingLimitModal({
   const { purchaseProduct, isReady: storeReady } = useInAppPurchase();
   const [purchasing, setPurchasing] = useState(false);
 
-  // ── Analytics: track modal open ──────────────────────────────────────────
+  // ── Analytics & State sync: track modal open & sync ad progress ───────────
   const trackedRef = useRef(false);
   useEffect(() => {
-    if (open && !trackedRef.current) {
-      trackedRef.current = true;
-      track('listing_limit_modal_opened', { used: String(quota.used), limit: String(quota.limit) });
-      const supabase = createClient();
-      supabase.from('analytics_events' as any).insert({
-        event_name: 'listing_limit_modal_opened',
-        user_id: userId,
-        metadata: { used: quota.used, limit: quota.limit },
-      }).then(() => {});
-    }
-    if (!open) {
+    if (open) {
+      refreshQuota();
+      setAdsWatched(quota.adsWatched ?? 0);
+      if (!trackedRef.current) {
+        trackedRef.current = true;
+        track('listing_limit_modal_opened', { used: String(quota.used), limit: String(quota.limit) });
+        const supabase = createClient();
+        supabase.from('analytics_events' as any).insert({
+          event_name: 'listing_limit_modal_opened',
+          user_id: userId,
+          metadata: { used: quota.used, limit: quota.limit },
+        }).then(() => {});
+      }
+    } else {
       trackedRef.current = false;
-      setAdsWatched(0);
       setJustUnlocked(false);
       setAdLimitReached(false);
       setPurchasing(false);
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep adsWatched in sync when quota updates
+  useEffect(() => {
+    if (open && quota.adsWatched !== undefined) {
+      setAdsWatched(quota.adsWatched);
+    }
+  }, [open, quota.adsWatched]);
 
   // ── Preload rewarded ad on Android ───────────────────────────────────────
   useEffect(() => {
