@@ -196,7 +196,7 @@ export function DestacaAnuncioModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden rounded-2xl border-0 shadow-2xl"
+        className="sm:max-w-md p-0 overflow-y-auto max-h-[90vh] rounded-2xl border-0 shadow-2xl"
         showCloseButton={false}
       >
         {/* ── Golden Header (same for both modes) ─────────────────────────── */}
@@ -376,7 +376,7 @@ export function DestacaAnuncioModal({
                 <Button
                   variant="outline"
                   onClick={() => handlePayGooglePlay(selected)}
-                  disabled={purchasingGP || !storeReady}
+                  disabled={purchasingGP}
                   className="w-full h-11 rounded-xl border-2 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 font-bold"
                 >
                   {purchasingGP ? (

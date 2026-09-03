@@ -84,6 +84,7 @@ export function ListingLimitModal({
       setAdsWatched(0);
       setJustUnlocked(false);
       setAdLimitReached(false);
+      setPurchasing(false);
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
