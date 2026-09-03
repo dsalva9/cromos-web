@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { logger } from '@/lib/logger';
 
 /**
  * Product IDs matching Google Play Console configuration.
@@ -42,9 +41,28 @@ function getNativePurchases(): any {
     return NativePurchasesPlugin;
   } catch (err: any) {
     pluginLoadError = err?.message ?? 'registerPlugin failed';
-    alert('[IAP] registerPlugin FAILED: ' + pluginLoadError);
     return null;
   }
+}
+
+/**
+ * Consume any unconsumed in-app purchases left over from previous sessions.
+ * Uses restorePurchases (which internally consumes) + getPurchases as fallback.
+ */
+async function consumePendingPurchases(NP: any): Promise<void> {
+  try {
+    await NP.restorePurchases();
+  } catch {}
+  try {
+    const result = await NP.getPurchases();
+    const purchases = result?.purchases || [];
+    for (const p of purchases) {
+      const token = p.purchaseToken || p.transactionId;
+      if (token) {
+        try { await NP.consumePurchase({ purchaseToken: token }); } catch {}
+      }
+    }
+  } catch {}
 }
 
 export function useInAppPurchase() {
@@ -52,65 +70,25 @@ export function useInAppPurchase() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const native = Capacitor.isNativePlatform();
-    console.log('[IAP] useEffect mount. isNative:', native, 'platform:', Capacitor.getPlatform());
-    if (!native) return;
+    if (!Capacitor.isNativePlatform()) return;
 
     let cancelled = false;
     (async () => {
       try {
-        console.log('[IAP] Init: getting NativePurchases...');
         const NP = getNativePurchases();
-        console.log('[IAP] Init: NP is', NP ? 'loaded' : 'null');
         if (!NP || cancelled) return;
 
-        console.log('[IAP] Init: checking isBillingSupported...');
         const result = await NP.isBillingSupported();
-        console.log('[IAP] Init: isBillingSupported result:', JSON.stringify(result));
-        if (!result?.isBillingSupported) {
-          console.warn('[IAP] Billing not supported');
-          return;
-        }
+        if (!result?.isBillingSupported) return;
 
-        console.log('[IAP] Init: fetching products...');
-        const { products } = await NP.getProducts({
+        await NP.getProducts({
           productIdentifiers: Object.values(PRODUCT_IDS),
         });
-        console.log('[IAP] Init: products:', JSON.stringify(products?.map((p: any) => p.identifier)));
 
-        // Consume any pending/unconsumed purchases from previous failed flows
-        try {
-          // restorePurchases internally processes and consumes pending purchases
-          await NP.restorePurchases();
-        } catch {}
-        // Also manually consume any remaining via getPurchases
-        try {
-          const result = await NP.getPurchases();
-          const purchases = result?.purchases || [];
-          if (purchases.length > 0) {
-            console.log('[IAP] Found', purchases.length, 'unconsumed purchases, consuming...');
-            for (const p of purchases) {
-              const token = p.purchaseToken || p.transactionId;
-              if (token) {
-                try {
-                  await NP.consumePurchase({ purchaseToken: token });
-                  console.log('[IAP] Consumed:', p.productIdentifier || p.productId);
-                } catch (ce: any) {
-                  console.warn('[IAP] Failed to consume:', ce?.message);
-                }
-              }
-            }
-          }
-        } catch (err: any) {
-          console.warn('[IAP] getPurchases failed (non-fatal):', err?.message);
-        }
+        await consumePendingPurchases(NP);
 
-        if (!cancelled) {
-          setIsReady(true);
-          console.log('[IAP] Init: READY');
-        }
+        if (!cancelled) setIsReady(true);
       } catch (err: any) {
-        console.error('[IAP] Init FAILED:', err?.message ?? err);
         if (err?.message?.includes('not implemented')) {
           pluginLoadError = 'old app version';
         }
@@ -121,8 +99,6 @@ export function useInAppPurchase() {
   }, []);
 
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
-    console.log('[IAP] purchaseProduct called with:', productId);
-
     if (!Capacitor.isNativePlatform()) {
       return { success: false, error: 'Not available on web' };
     }
@@ -152,24 +128,8 @@ export function useInAppPurchase() {
           transaction = await Promise.race([purchasePromise, timeoutPromise]);
         } catch (purchaseErr: any) {
           const errMsg = purchaseErr?.message ?? '';
-          // If "already own", consume the old purchase and retry once
           if (!retry && (errMsg.includes('already') || errMsg.includes('ITEM_ALREADY_OWNED'))) {
-            console.log('[IAP] Already owned — calling restorePurchases to consume, then retry...');
-            try {
-              // restorePurchases internally calls processUnfinishedPurchases which consumes pending items
-              await NP.restorePurchases();
-            } catch {}
-            // Also try getPurchases + manual consume as fallback
-            try {
-              const result = await NP.getPurchases();
-              const purchases = result?.purchases || [];
-              for (const p of purchases) {
-                const tok = p.purchaseToken || p.transactionId;
-                if (tok) {
-                  try { await NP.consumePurchase({ purchaseToken: tok }); } catch {}
-                }
-              }
-            } catch {}
+            await consumePendingPurchases(NP);
             return doPurchase(true);
           }
           throw purchaseErr;
@@ -181,8 +141,6 @@ export function useInAppPurchase() {
         if (!purchaseToken) {
           return { success: false, error: 'cancelled' };
         }
-
-        console.log('[IAP] Purchase OK, token:', purchaseToken?.substring(0, 20) + '...');
 
         // Verify server-side
         const { data: { session } } = await supabase.auth.getSession();
@@ -217,9 +175,7 @@ export function useInAppPurchase() {
         // Consume so the item can be purchased again
         try {
           await NP.consumePurchase({ purchaseToken });
-        } catch (consumeErr: any) {
-          console.warn('[IAP] Consume failed (non-fatal):', consumeErr?.message);
-        }
+        } catch {}
 
         return { success: true, transactionId: orderId };
       };
@@ -227,7 +183,6 @@ export function useInAppPurchase() {
       return await doPurchase();
     } catch (err: any) {
       const msg = err?.message ?? String(err);
-      console.error('[IAP] PURCHASE ERROR:', msg);
 
       if (
         msg.includes('cancel') ||
