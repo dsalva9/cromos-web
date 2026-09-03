@@ -4,11 +4,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
-import { toast } from 'sonner';
 
 /**
  * Product IDs matching Google Play Console configuration.
- * Must be created in Monetizar con Play - Productos integrados.
  */
 export const PRODUCT_IDS = {
   LISTING_EXTRA_UPLOAD: 'listing_extra_upload',
@@ -16,10 +14,6 @@ export const PRODUCT_IDS = {
   HIGHLIGHT_7D: 'highlight_7d',
 } as const;
 
-/**
- * Subscription IDs matching Google Play Console configuration.
- * Must be created in Monetizar con Play - Suscripciones.
- */
 export const SUBSCRIPTION_IDS = {
   PRO_MONTHLY: 'pro_monthly',
   PRO_YEARLY: 'pro_yearly',
@@ -33,103 +27,104 @@ interface PurchaseResult {
   error?: string;
 }
 
-// Lazy-loaded reference to the NativePurchases plugin
 let NativePurchasesModule: any = null;
 let pluginLoadError: string | null = null;
 
 async function getNativePurchases(): Promise<any> {
+  console.log('[IAP] getNativePurchases called, cached:', !!NativePurchasesModule, 'prevError:', pluginLoadError);
   if (NativePurchasesModule) return NativePurchasesModule;
   if (pluginLoadError) return null;
 
   try {
+    console.log('[IAP] Attempting dynamic import of @capgo/native-purchases...');
     const mod = await import('@capgo/native-purchases');
+    console.log('[IAP] Import succeeded, mod keys:', Object.keys(mod));
     NativePurchasesModule = mod.NativePurchases;
+    console.log('[IAP] NativePurchases object:', typeof NativePurchasesModule);
     return NativePurchasesModule;
   } catch (err: any) {
     pluginLoadError = err?.message ?? 'import failed';
-    logger.warn('[InAppPurchase] @capgo/native-purchases not available:', err);
+    console.error('[IAP] Import FAILED:', pluginLoadError);
     return null;
   }
 }
 
-/**
- * Manages in-app purchases via @capgo/native-purchases (Capacitor native bridge).
- *
- * This plugin uses the Capacitor bridge (not Cordova), so it works even when
- * the app loads content from a remote server.url like cambiocromos.com.
- */
 export function useInAppPurchase() {
   const supabase = useSupabaseClient();
   const [isReady, setIsReady] = useState(false);
 
-  // Initialize on mount (native only)
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    const native = Capacitor.isNativePlatform();
+    console.log('[IAP] useEffect mount. isNative:', native, 'platform:', Capacitor.getPlatform());
+    if (!native) return;
 
     let cancelled = false;
     (async () => {
       try {
+        console.log('[IAP] Init: getting NativePurchases...');
         const NP = await getNativePurchases();
-        if (!NP || cancelled) {
-          logger.warn('[InAppPurchase] Plugin not loaded. Error:', pluginLoadError);
-          return;
-        }
+        console.log('[IAP] Init: NP is', NP ? 'loaded' : 'null');
+        if (!NP || cancelled) return;
 
-        // Check billing support
+        console.log('[IAP] Init: checking isBillingSupported...');
         const result = await NP.isBillingSupported();
+        console.log('[IAP] Init: isBillingSupported result:', JSON.stringify(result));
         if (!result?.isBillingSupported) {
-          logger.warn('[InAppPurchase] Billing not supported on this device');
+          console.warn('[IAP] Billing not supported');
           return;
         }
 
-        // Pre-fetch products to verify connection
+        console.log('[IAP] Init: fetching products...');
         const { products } = await NP.getProducts({
           productIdentifiers: Object.values(PRODUCT_IDS),
         });
+        console.log('[IAP] Init: products:', JSON.stringify(products?.map((p: any) => p.identifier)));
 
-        logger.info('[InAppPurchase] Ready with ' + (products?.length ?? 0) + ' products');
-        if (!cancelled) setIsReady(true);
+        if (!cancelled) {
+          setIsReady(true);
+          console.log('[IAP] Init: READY');
+        }
       } catch (err: any) {
-        // If plugin is "not implemented", this is an old app version — silently ignore
-        const msg = err?.message ?? '';
-        if (msg.includes('not implemented')) {
-          logger.warn('[InAppPurchase] Plugin not implemented (old app version)');
+        console.error('[IAP] Init FAILED:', err?.message ?? err);
+        if (err?.message?.includes('not implemented')) {
           pluginLoadError = 'old app version';
-        } else {
-          logger.error('[InAppPurchase] Init failed:', err);
         }
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  /**
-   * Purchase a consumable product (listing_extra_upload, highlight_48h, highlight_7d).
-   */
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
+    console.log('[IAP] purchaseProduct called with:', productId);
+    console.log('[IAP] isNative:', Capacitor.isNativePlatform(), 'platform:', Capacitor.getPlatform());
+
     if (!Capacitor.isNativePlatform()) {
+      console.log('[IAP] Not native, returning error');
       return { success: false, error: 'Not available on web' };
     }
 
+    console.log('[IAP] Getting NativePurchases...');
     const NP = await getNativePurchases();
+    console.log('[IAP] NP is:', NP ? 'loaded' : 'null');
     if (!NP) {
       const errMsg = pluginLoadError || 'Plugin no disponible';
-      return { success: false, error: 'Actualiza la app para usar pagos (' + errMsg + ')' };
+      console.error('[IAP] Plugin not available:', errMsg);
+      return { success: false, error: 'Actualiza la app (' + errMsg + ')' };
     }
 
     try {
-      // DEBUG: show what we're doing
-      toast.info('Iniciando compra: ' + productId);
+      console.log('[IAP] === STARTING PURCHASE ===');
+      console.log('[IAP] productId:', productId);
 
-      // Safety timeout: 60 seconds to avoid infinite spinning
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout: Google Play no respondió en 60s')), 60000);
+        setTimeout(() => {
+          console.error('[IAP] TIMEOUT after 60s');
+          reject(new Error('Timeout: Google Play no respondió en 60s'));
+        }, 60000);
       });
 
-      // 1. Start native purchase flow — opens Google Play purchase sheet
+      console.log('[IAP] Calling NP.purchaseProduct...');
       const purchasePromise = NP.purchaseProduct({
         productIdentifier: productId,
         productType: 'inapp',
@@ -137,30 +132,30 @@ export function useInAppPurchase() {
         isConsumable: true,
       });
 
+      console.log('[IAP] Waiting for purchase or timeout...');
       const transaction = await Promise.race([purchasePromise, timeoutPromise]);
 
-      // DEBUG: show what we got back
-      toast.info('Respuesta GP: ' + JSON.stringify(transaction).substring(0, 200));
+      console.log('[IAP] Transaction received:', JSON.stringify(transaction));
 
       const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
       const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
 
       if (!purchaseToken) {
+        console.log('[IAP] No purchaseToken, treating as cancelled');
         return { success: false, error: 'cancelled' };
       }
 
-      logger.info('[InAppPurchase] Purchase completed locally:', orderId);
+      console.log('[IAP] Purchase OK, token:', purchaseToken?.substring(0, 20) + '...');
 
-      // 2. Verify purchase server-side via our Edge Function
+      // Verify server-side
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-
       if (!token) {
+        console.error('[IAP] Not authenticated');
         return { success: false, error: 'Not authenticated' };
       }
 
-      toast.info('Verificando con servidor...');
-
+      console.log('[IAP] Verifying with edge function...');
       const response = await fetch(
         process.env.NEXT_PUBLIC_SUPABASE_URL + '/functions/v1/verify-play-purchase',
         {
@@ -179,25 +174,27 @@ export function useInAppPurchase() {
       );
 
       const result = await response.json();
+      console.log('[IAP] Verify result:', JSON.stringify(result));
 
       if (!response.ok || !result.ok) {
-        logger.error('[InAppPurchase] Verification failed:', result);
-        return { success: false, error: result.error || 'Error al verificar la compra' };
+        return { success: false, error: result.error || 'Error al verificar' };
       }
 
-      // 3. Consume the purchase so it can be bought again (consumable products)
+      // Consume
       try {
+        console.log('[IAP] Consuming purchase...');
         await NP.consumePurchase({ purchaseToken });
-        logger.info('[InAppPurchase] Purchase consumed successfully');
-      } catch (consumeErr) {
-        logger.warn('[InAppPurchase] Consume failed (non-fatal):', consumeErr);
+        console.log('[IAP] Consumed OK');
+      } catch (consumeErr: any) {
+        console.warn('[IAP] Consume failed (non-fatal):', consumeErr?.message);
       }
 
+      console.log('[IAP] === PURCHASE COMPLETE ===');
       return { success: true, transactionId: orderId };
     } catch (err: any) {
       const msg = err?.message ?? String(err);
+      console.error('[IAP] PURCHASE ERROR:', msg);
 
-      // User cancelled the purchase
       if (
         msg.includes('cancel') ||
         msg.includes('Cancel') ||
@@ -207,12 +204,10 @@ export function useInAppPurchase() {
         return { success: false, error: 'cancelled' };
       }
 
-      // Plugin not implemented (old app version)
       if (msg.includes('not implemented')) {
-        return { success: false, error: 'Actualiza la app desde Google Play para comprar' };
+        return { success: false, error: 'Actualiza la app desde Google Play' };
       }
 
-      logger.error('[InAppPurchase] Purchase error:', err);
       return { success: false, error: msg || 'Purchase failed' };
     }
   }, [supabase]);
