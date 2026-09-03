@@ -80,23 +80,29 @@ export function useInAppPurchase() {
 
         // Consume any pending/unconsumed purchases from previous failed flows
         try {
-          const { purchases } = await NP.restorePurchases();
-          if (purchases && purchases.length > 0) {
-            console.log('[IAP] Found', purchases.length, 'pending purchases, consuming...');
+          // restorePurchases internally processes and consumes pending purchases
+          await NP.restorePurchases();
+        } catch {}
+        // Also manually consume any remaining via getPurchases
+        try {
+          const result = await NP.getPurchases();
+          const purchases = result?.purchases || [];
+          if (purchases.length > 0) {
+            console.log('[IAP] Found', purchases.length, 'unconsumed purchases, consuming...');
             for (const p of purchases) {
               const token = p.purchaseToken || p.transactionId;
               if (token) {
                 try {
                   await NP.consumePurchase({ purchaseToken: token });
-                  console.log('[IAP] Consumed pending purchase:', p.productIdentifier || p.productId);
+                  console.log('[IAP] Consumed:', p.productIdentifier || p.productId);
                 } catch (ce: any) {
                   console.warn('[IAP] Failed to consume:', ce?.message);
                 }
               }
             }
           }
-        } catch (restoreErr: any) {
-          console.warn('[IAP] restorePurchases failed (non-fatal):', restoreErr?.message);
+        } catch (err: any) {
+          console.warn('[IAP] getPurchases failed (non-fatal):', err?.message);
         }
 
         if (!cancelled) {
@@ -148,10 +154,16 @@ export function useInAppPurchase() {
           const errMsg = purchaseErr?.message ?? '';
           // If "already own", consume the old purchase and retry once
           if (!retry && (errMsg.includes('already') || errMsg.includes('ITEM_ALREADY_OWNED'))) {
-            console.log('[IAP] Already owned — consuming old purchase and retrying...');
+            console.log('[IAP] Already owned — calling restorePurchases to consume, then retry...');
             try {
-              const { purchases } = await NP.restorePurchases();
-              for (const p of (purchases || [])) {
+              // restorePurchases internally calls processUnfinishedPurchases which consumes pending items
+              await NP.restorePurchases();
+            } catch {}
+            // Also try getPurchases + manual consume as fallback
+            try {
+              const result = await NP.getPurchases();
+              const purchases = result?.purchases || [];
+              for (const p of purchases) {
                 const tok = p.purchaseToken || p.transactionId;
                 if (tok) {
                   try { await NP.consumePurchase({ purchaseToken: tok }); } catch {}
