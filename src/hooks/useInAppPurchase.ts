@@ -38,10 +38,6 @@ let NativePurchasesModule: any = null;
 async function getNativePurchases(): Promise<any> {
   if (NativePurchasesModule) return NativePurchasesModule;
   try {
-    // Check if Capacitor bridge has the plugin registered natively.
-    // Without this check, the import resolves but any call throws
-    // "NativePurchases plugin is not implemented on android" as an
-    // unhandled rejection for users on old app versions.
     const cap = (window as any).Capacitor;
     if (!cap?.isPluginAvailable?.('NativePurchases')) {
       logger.warn('[InAppPurchase] NativePurchases plugin not available on this app version');
@@ -62,21 +58,6 @@ async function getNativePurchases(): Promise<any> {
  *
  * This plugin uses the Capacitor bridge (not Cordova), so it works even when
  * the app loads content from a remote server.url like cambiocromos.com.
- *
- * Usage:
- *   const { purchaseProduct, isReady } = useInAppPurchase();
- *   const result = await purchaseProduct('listing_extra_upload');
- *   if (result.success) { // granted server-side via Edge Function }
- *
- * Only operational on Android native. Returns no-ops on web/SSR.
- *
- * Flow:
- *   1. User taps buy - NativePurchases opens Google Play purchase sheet
- *   2. On purchase success - we get the transaction with purchaseToken
- *   3. We POST to our Edge Function verify-play-purchase
- *   4. Edge Function verifies with Google Play Developer API
- *   5. Edge Function grants the product (unlock/highlight) in DB
- *   6. We consume the purchase so it can be bought again
  */
 export function useInAppPurchase() {
   const supabase = useSupabaseClient();
@@ -86,10 +67,11 @@ export function useInAppPurchase() {
   useEffect(() => {
     if (!isNative()) return;
 
+    let cancelled = false;
     (async () => {
       try {
         const NP = await getNativePurchases();
-        if (!NP) return;
+        if (!NP || cancelled) return;
 
         // Check billing support
         const { isBillingSupported } = await NP.isBillingSupported();
@@ -104,18 +86,19 @@ export function useInAppPurchase() {
         });
 
         logger.info('[InAppPurchase] Ready with ' + (products?.length ?? 0) + ' products');
-        setIsReady(true);
+        if (!cancelled) setIsReady(true);
       } catch (err) {
         logger.error('[InAppPurchase] Init failed:', err);
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   /**
    * Purchase a consumable product (listing_extra_upload, highlight_48h, highlight_7d).
-   *
-   * Returns { success: true, transactionId } on successful purchase + server verification.
-   * Returns { success: false, error } if cancelled, failed, or verification rejected.
    */
   const purchaseProduct = useCallback(async (productId: ProductId): Promise<PurchaseResult> => {
     if (!isNative()) {
@@ -128,17 +111,31 @@ export function useInAppPurchase() {
     }
 
     try {
-      // 1. Start native purchase flow — opens Google Play purchase sheet
-      const transaction = await NP.purchaseProduct({
-        productIdentifier: productId,
-        quantity: 1,
+      logger.info('[InAppPurchase] Initiating purchase for:', productId);
+
+      // Safety timeout: 35 seconds to avoid infinite spinning
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('La operación tardó demasiado o Google Play no respondió')), 35000);
       });
 
-      if (!transaction?.transactionId) {
+      // 1. Start native purchase flow — opens Google Play purchase sheet
+      const purchasePromise = NP.purchaseProduct({
+        productIdentifier: productId,
+        productType: 'inapp',
+        quantity: 1,
+        isConsumable: true,
+      });
+
+      const transaction = await Promise.race([purchasePromise, timeoutPromise]);
+
+      const purchaseToken = transaction?.purchaseToken || transaction?.transactionId;
+      const orderId = transaction?.orderId || transaction?.transactionId || purchaseToken;
+
+      if (!purchaseToken) {
         return { success: false, error: 'cancelled' };
       }
 
-      logger.info('[InAppPurchase] Purchase completed:', transaction.transactionId);
+      logger.info('[InAppPurchase] Purchase completed locally:', orderId);
 
       // 2. Verify purchase server-side via our Edge Function
       const { data: { session } } = await supabase.auth.getSession();
@@ -159,8 +156,8 @@ export function useInAppPurchase() {
           body: JSON.stringify({
             platform: 'google_play',
             productId,
-            purchaseToken: transaction.transactionId,
-            transactionId: transaction.transactionId,
+            purchaseToken,
+            transactionId: orderId,
           }),
         },
       );
@@ -169,26 +166,28 @@ export function useInAppPurchase() {
 
       if (!response.ok || !result.ok) {
         logger.error('[InAppPurchase] Verification failed:', result);
-        return { success: false, error: result.error || 'Verification failed' };
+        return { success: false, error: result.error || 'Error al verificar la compra' };
       }
 
       // 3. Consume the purchase so it can be bought again (consumable products)
       try {
-        await NP.consumePurchase({
-          purchaseToken: transaction.transactionId,
-        });
-        logger.info('[InAppPurchase] Purchase consumed');
+        await NP.consumePurchase({ purchaseToken });
+        logger.info('[InAppPurchase] Purchase consumed successfully');
       } catch (consumeErr) {
-        // Non-fatal — the purchase was already verified and granted
         logger.warn('[InAppPurchase] Consume failed (non-fatal):', consumeErr);
       }
 
-      return { success: true, transactionId: transaction.transactionId };
+      return { success: true, transactionId: orderId };
     } catch (err: any) {
       const msg = err?.message ?? String(err);
 
       // User cancelled the purchase
-      if (msg.includes('cancel') || msg.includes('Cancel') || msg.includes('USER_CANCELED')) {
+      if (
+        msg.includes('cancel') ||
+        msg.includes('Cancel') ||
+        msg.includes('USER_CANCELED') ||
+        msg.includes('Purchase is not purchased')
+      ) {
         return { success: false, error: 'cancelled' };
       }
 
