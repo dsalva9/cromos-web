@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from '@/components/ui/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Mail, Settings, BarChart3, Megaphone } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Mail, Settings, BarChart3, Megaphone, Crown } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname.includes('/admin/testing-tools')) return 'testing-tools';
     if (pathname.includes('/admin/feature-flags')) return 'feature-flags';
     if (pathname.includes('/admin/newsletter')) return 'newsletter';
+    if (pathname.includes('/admin/pro')) return 'pro';
     if (pathname.includes('/admin/settings')) return 'settings';
     return 'dashboard';
   };
@@ -112,6 +113,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Users
+                  </TabsTrigger>
+                </Link>
+
+                <Link href="/admin/pro">
+                  <TabsTrigger
+                    value="pro"
+                    className="w-full shrink-0 data-[state=active]:bg-gold data-[state=active]:text-black"
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    PRO
                   </TabsTrigger>
                 </Link>
 
