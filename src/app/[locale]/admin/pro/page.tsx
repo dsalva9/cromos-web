@@ -26,7 +26,7 @@ function ProSubscribersTab() {
   const fetchSubscribers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('admin_get_pro_subscribers', {
+      const { data, error } = await (supabase.rpc as any)('admin_get_pro_subscribers', {
         p_status: statusFilter === 'all' ? null : statusFilter,
         p_limit: 50,
         p_offset: (page - 1) * 50
@@ -50,7 +50,7 @@ function ProSubscribersTab() {
     if (!days || isNaN(Number(days))) return;
 
     try {
-      const { error } = await supabase.rpc('admin_extend_pro', {
+      const { error } = await (supabase.rpc as any)('admin_extend_pro', {
         p_user_id: userId,
         p_days: Number(days)
       });
@@ -65,7 +65,7 @@ function ProSubscribersTab() {
   const handleRevoke = async (userId: string, nickname: string) => {
     if (!confirm(`Are you sure you want to revoke PRO from ${nickname}?`)) return;
     try {
-      const { error } = await supabase.rpc('admin_revoke_pro', {
+      const { error } = await (supabase.rpc as any)('admin_revoke_pro', {
         p_user_id: userId
       });
       if (error) throw error;
@@ -201,7 +201,7 @@ function GrantManualTab() {
     if (!selectedUser) return;
     setIsGranting(true);
     try {
-      const { error } = await supabase.rpc('admin_grant_pro', {
+      const { error } = await (supabase.rpc as any)('admin_grant_pro', {
         p_user_id: selectedUser.user_id,
         p_duration_days: Number(duration),
         p_reason: reason
@@ -356,7 +356,7 @@ function ConfigTab() {
 
   const handleSave = async (key: string, value: string) => {
     try {
-      const { error } = await supabase.rpc('admin_update_pro_config', {
+      const { error } = await (supabase.rpc as any)('admin_update_pro_config', {
         p_key: key,
         p_value: value
       });
@@ -419,7 +419,7 @@ function StatsTab() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data, error } = await supabase.rpc('admin_get_pro_stats');
+        const { data, error } = await (supabase.rpc as any)('admin_get_pro_stats');
         if (error) {
           console.error(error);
           return;
