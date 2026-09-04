@@ -52,7 +52,7 @@ function ProSubscribersTab() {
     try {
       const { error } = await (supabase.rpc as any)('admin_extend_pro', {
         p_user_id: userId,
-        p_days: Number(days)
+        p_extra_days: Number(days)
       });
       if (error) throw error;
       toast.success(`Extended PRO for ${days} days`);
@@ -66,7 +66,8 @@ function ProSubscribersTab() {
     if (!confirm(`Are you sure you want to revoke PRO from ${nickname}?`)) return;
     try {
       const { error } = await (supabase.rpc as any)('admin_revoke_pro', {
-        p_user_id: userId
+        p_user_id: userId,
+        p_reason: 'Revoked by admin'
       });
       if (error) throw error;
       toast.success('Revoked PRO successfully');
@@ -189,7 +190,7 @@ function GrantManualTab() {
     const searchUsers = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('user_id, nickname, avatar_url')
+        .select('id, nickname, avatar_url')
         .ilike('nickname', `%${debouncedQuery}%`)
         .limit(10);
       if (data) setUsers(data);
@@ -202,7 +203,7 @@ function GrantManualTab() {
     setIsGranting(true);
     try {
       const { error } = await (supabase.rpc as any)('admin_grant_pro', {
-        p_user_id: selectedUser.user_id,
+        p_user_id: selectedUser.id,
         p_duration_days: Number(duration),
         p_reason: reason
       });
@@ -238,7 +239,7 @@ function GrantManualTab() {
               <div className="mt-2 bg-[#111827] border border-gray-700 rounded-md overflow-hidden">
                 {users.map(u => (
                   <div 
-                    key={u.user_id} 
+                    key={u.id} 
                     className="p-3 hover:bg-[#374151] cursor-pointer flex items-center gap-3 border-b border-gray-700 last:border-0"
                     onClick={() => setSelectedUser(u)}
                   >
@@ -356,22 +357,47 @@ function ConfigTab() {
 
   const handleSave = async (key: string, value: string) => {
     try {
+      // Reconstruct the JSONB value with the updated number
+      const configItem = config.find(c => c.key === key);
+      let jsonValue: any;
+      if (configItem?.value && typeof configItem.value === 'object') {
+        const firstKey = Object.keys(configItem.value)[0];
+        jsonValue = { ...configItem.value, [firstKey]: Number(value) };
+      } else {
+        jsonValue = { value: Number(value) };
+      }
       const { error } = await (supabase.rpc as any)('admin_update_pro_config', {
         p_key: key,
-        p_value: value
+        p_value: jsonValue
       });
-      if (error) {
-        // Fallback to direct update if rpc doesn't exist
-        const { error: updateError } = await supabase.from('pro_config').update({ value }).eq('key', key);
-        if (updateError) throw updateError;
-      }
-      toast.success('Configuration saved');
+      if (error) throw error;
+      toast.success('Configuración guardada');
+      fetchConfig();
     } catch (err: any) {
       toast.error(err.message || 'Error saving configuration');
     }
   };
 
-  if (loading) return <div className="text-white">Loading...</div>;
+  const getDisplayValue = (value: any): string => {
+    if (typeof value === 'object' && value !== null) {
+      const vals = Object.values(value);
+      return String(vals[0] ?? '');
+    }
+    return String(value ?? '');
+  };
+
+  const getDisplayLabel = (key: string): string => {
+    const labels: Record<string, string> = {
+      highlight_credits_monthly: 'Créditos destacados mensuales',
+      trial_duration_days: 'Días de prueba (default)',
+      daily_listing_limit_free: 'Límite diario subidas (gratis)',
+      extra_listing_rewarded_ads: 'Anuncios para subida extra',
+      extra_listing_price_cents: 'Precio subida extra (céntimos)',
+    };
+    return labels[key] || key;
+  };
+
+  if (loading) return <div className="text-white">Cargando...</div>;
 
   return (
     <div className="space-y-4">
@@ -379,13 +405,18 @@ function ConfigTab() {
         <ModernCard key={item.key}>
           <ModernCardContent className="p-6 flex items-center justify-between">
             <div>
-              <h3 className="text-white font-bold">{item.key}</h3>
-              <p className="text-gray-400 text-sm">{item.description}</p>
+              <h3 className="text-white font-bold">{getDisplayLabel(item.key)}</h3>
+              <p className="text-gray-400 text-sm font-mono">{item.key}</p>
+              {typeof item.value === 'object' && Object.keys(item.value).length > 1 && (
+                <p className="text-gray-500 text-xs mt-1">
+                  {JSON.stringify(item.value)}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
-                defaultValue={item.value}
+                defaultValue={getDisplayValue(item.value)}
                 id={`config-${item.key}`}
                 className="w-24 bg-[#374151] border-2 border-black text-white"
               />
@@ -396,7 +427,7 @@ function ConfigTab() {
                 }}
                 className="bg-[#F59E0B] hover:bg-[#D97706] text-black"
               >
-                Save
+                Guardar
               </Button>
             </div>
           </ModernCardContent>
