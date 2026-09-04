@@ -331,7 +331,7 @@ function ConfigTab() {
   const fetchConfig = async () => {
     try {
       // Fetching everything from pro_config, fallback to hardcoded if table doesn't exist
-      const { data, error } = await supabase.from('pro_config').select('*');
+      const { data, error } = await (supabase.from as any)('pro_config').select('*');
       if (error) {
         console.error(error);
         // Fallback for UI if table doesn't exist yet

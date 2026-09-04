@@ -161,8 +161,7 @@ export function ProfileCompletionProvider({
 
     try {
       // Single query for ALL profile data - eliminates redundant queries
-      const { data, error } = await supabase
-        .from('profiles')
+      const { data, error } = await (supabase.from as any)('profiles')
         .select('nickname, postcode, avatar_url, is_admin, suspended_at, deleted_at, country_code, is_patron, is_pro, pro_expires_at')
         .eq('id', user.id)
         .maybeSingle();
