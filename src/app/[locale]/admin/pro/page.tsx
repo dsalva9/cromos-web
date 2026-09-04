@@ -28,8 +28,8 @@ function ProSubscribersTab() {
     try {
       const { data, error } = await (supabase.rpc as any)('admin_get_pro_subscribers', {
         p_status: statusFilter === 'all' ? null : statusFilter,
-        p_limit: 50,
-        p_offset: (page - 1) * 50
+        p_page: page,
+        p_limit: 50
       });
 
       if (error) throw error;
