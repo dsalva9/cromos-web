@@ -33,7 +33,8 @@ function ProSubscribersTab() {
       });
 
       if (error) throw error;
-      setSubscribers(data || []);
+      const result = data || {};
+      setSubscribers(result.data || []);
     } catch (err: any) {
       toast.error(err.message || 'Error fetching subscribers');
     } finally {
@@ -459,7 +460,7 @@ function StatsTab() {
           setStats({
             active_subscribers: data.active_subscribers || 0,
             active_trials: data.active_trials || 0,
-            trials_expiring_week: data.trials_expiring_week || 0,
+            trials_expiring_week: data.expiring_this_week || 0,
             conversion_rate: data.conversion_rate || 0
           });
         }
