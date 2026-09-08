@@ -28,6 +28,7 @@ export interface TemplateCardData {
   copies_count: number;
   pages_count: number;
   total_slots?: number;
+  slug?: string;
   created_at: string;
   is_public?: boolean;
   is_featured?: boolean;
@@ -39,18 +40,26 @@ interface TemplateCardProps {
   template: TemplateCardData;
   showVisibility?: boolean;
   showEditButton?: boolean;
+  linkPrefix?: string;
+  publicMode?: boolean;
 }
 
 export function TemplateCard({
   template,
   showVisibility = false,
   showEditButton = false,
+  linkPrefix = '/templates',
+  publicMode = false,
 }: TemplateCardProps) {
   const { user } = useUser();
   const router = useRouter();
   const { copyTemplate, loading } = useCopyTemplate();
   const [copied, setCopied] = useState(false);
   const t = useTranslations('templates');
+
+  const templateHref = template.slug && linkPrefix !== '/templates'
+    ? `${linkPrefix}/${template.slug}`
+    : `${linkPrefix}/${template.id}`;
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -86,7 +95,7 @@ export function TemplateCard({
       <ModernCardContent className="p-0 flex flex-col h-full">
         {/* Image */}
         <Link
-          href={`/templates/${template.id}`}
+          href={templateHref}
           aria-label={t('card.viewCollection', { title: template.title })}
           className="block"
         >
@@ -151,7 +160,7 @@ export function TemplateCard({
         <div className="p-4 flex flex-col h-full">
           <div className="flex-grow space-y-3">
             <Link
-              href={`/templates/${template.id}`}
+              href={templateHref}
               className="block hover:text-gold transition-colors"
             >
               <h3 className="font-bold text-gray-900 dark:text-white text-lg line-clamp-2">
@@ -218,7 +227,17 @@ export function TemplateCard({
             </div>
           </div>
 
-          {showEditButton ? (
+          {publicMode ? (
+            <Link href={templateHref} className="w-full mt-3 block">
+              <Button
+                className="w-full bg-gold text-black hover:bg-gold-light font-medium relative overflow-hidden transition-all duration-300"
+                size="sm"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                {t('card.viewAlbum')}
+              </Button>
+            </Link>
+          ) : showEditButton ? (
             <Link
               href={`/templates/${template.id}/edit`}
               className="w-full mt-3 block"

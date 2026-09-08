@@ -15,6 +15,12 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {siteConfig.name}
           </span>
           <div className="flex flex-wrap items-center gap-4 md:gap-6">
+            <Link href="/albumes" className="hover:text-gold transition-colors">
+              {t('albums')}
+            </Link>
+            <Link href="/explorar" className="hover:text-gold transition-colors">
+              {t('marketplace')}
+            </Link>
             <Link href="/legal/terms" className="hover:text-gold transition-colors">
               {t('terms')}
             </Link>

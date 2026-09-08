@@ -528,7 +528,8 @@
       "copied": "Copiado!",
       "success": "Modelo copiado! Redirecionando...",
       "error": "Erro ao copiar o modelo",
-      "edit": "Editar"
+      "edit": "Editar",
+      "viewAlbum": "Ver Álbum"
     },
     "myTemplates": {
       "title": "Meus Álbuns",
@@ -900,6 +901,57 @@
       "deleteWarningDesc": "O campo <strong>{name}</strong> tem dados nas figurinhas existentes. <danger>Eliminar este campo apagará esses dados permanentemente.</danger>",
       "deleteWarningNotice": "<strong>Importante:</strong> Esta ação não pode ser desfeita.",
       "deleteConfirm": "Sim, eliminar campo"
+    }
+  },
+  "albumes": {
+    "meta": {
+      "title": "Álbuns e Coleções de Cromos | CambioCromos",
+      "description": "Explore álbuns de cromos e coleções: futebol, Panini, LaLiga, cartas Pokémon, basquete e mais. Checklist completo de cada álbum com todos os cromos.",
+      "jsonLdName": "Álbuns e Coleções de Cromos"
+    },
+    "detail": {
+      "meta": {
+        "titleSuffix": "Álbum e Checklist de Cromos | CambioCromos",
+        "descriptionTemplate": "Álbum {title} por {author} — {pages} páginas, {slots} cromos. Consulte o checklist completo e copie a coleção para organizar suas faltas e repetidos.",
+        "notFoundTitle": "Álbum não encontrado",
+        "notFoundDesc": "O álbum que procura não existe ou não está disponível."
+      },
+      "backLink": "← Voltar aos Álbuns",
+      "by": "por",
+      "pages": "páginas",
+      "stickers": "cromos",
+      "collectors": "colecionadores",
+      "copyTitle": "Copiar Coleção para Meu Perfil",
+      "copyDesc": "Organize seus cromos faltantes e repetidos, e encontre outros utilizadores para trocar automaticamente.",
+      "copyButton": "Copiar Coleção",
+      "signInLink": "Já tem conta? Faça login",
+      "signUpButton": "Criar Conta Grátis",
+      "checklist": "Checklist Completo",
+      "page": "Página",
+      "special": "ESPECIAL",
+      "ratingsTitle": "Avaliações",
+      "noRatings": "Ainda não há avaliações.",
+      "ratingsSuffix": "avaliações",
+      "shareTitle": "Partilhar",
+      "shareWhatsApp": "Partilhar no WhatsApp",
+      "shareTwitter": "Partilhar no X",
+      "copyLink": "Copiar link",
+      "linkCopied": "Link copiado!"
+    },
+    "filters": {
+      "searchPlaceholder": "Procurar álbuns...",
+      "sortRecent": "Recentes",
+      "sortPopular": "Populares",
+      "sortRating": "Mais bem avaliados"
+    },
+    "empty": {
+      "title": "Nenhum álbum encontrado",
+      "desc": "Tente outros termos de busca."
+    },
+    "cta": {
+      "title": "Coleciona cromos ou cartas?",
+      "desc": "Crie sua conta grátis para controlar suas faltas e repetidos.",
+      "button": "Criar Conta Grátis"
     }
   },
   "validations": {
@@ -1376,6 +1428,7 @@
     }
   },
   "header": {
+    "albums": "Álbuns",
     "marketplace": "Marketplace",
     "myAlbums": "Meus Álbuns",
     "chats": "Chats",
@@ -1396,7 +1449,9 @@
     "contact": "Contato",
     "about": "Sobre Nós",
     "blog": "Blog",
-    "advertise": "Anuncie"
+    "advertise": "Anuncie",
+    "albums": "Álbuns",
+    "marketplace": "Marketplace"
   },
   "language": {
     "change": "Mudar idioma"
@@ -1470,6 +1525,15 @@
     "social": {
       "title": "Siga-nos nas redes sociais",
       "subtitle": "Junte-se à nossa comunidade no Instagram e TikTok para novidades, sorteios e muito mais."
+    },
+    "albumsShowcase": {
+      "badge": "📚 COLEÇÕES E ÁLBUNS",
+      "title": "ORGANIZE E COMPLETE SEUS ÁLBUNS FAVORITOS",
+      "desc": "Explore coleções de futebol, basquete, Pokémon, anime e mais. Copie qualquer álbum para controlar suas faltas e repetidos.",
+      "goToAlbums": "Explorar Todos os Álbuns",
+      "error": "Erro ao carregar álbuns: {error}",
+      "emptyTitle": "Nenhum álbum disponível",
+      "emptyDesc": "Volte em breve para descobrir novas coleções."
     }
   },
   "explorar": {

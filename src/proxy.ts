@@ -196,6 +196,16 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(redirectUrl);
     }
 
+    // Redirect authenticated users from /albumes to /templates
+    // so they use the full authenticated experience.
+    if (pathWithoutLocale === '/albumes' && user) {
+        const localeMatch = pathname.match(/^\/(es|en|pt)/);
+        const locale = localeMatch ? localeMatch[1] : 'es';
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = `/${locale}/templates`;
+        return NextResponse.redirect(redirectUrl);
+    }
+
     return response;
 }
 

@@ -191,6 +191,8 @@ export default function SiteHeader() {
   ];
 
   const unauthenticatedLinks: NavigationLink[] = [
+    { href: '/albumes', label: t('albums') },
+    { href: '/explorar', label: t('marketplace') },
     { href: '/login', label: t('login') },
     { href: '/signup', label: t('signup') },
     { href: '/blog', label: t('blog') },

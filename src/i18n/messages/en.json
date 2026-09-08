@@ -528,7 +528,8 @@
       "copied": "Copied!",
       "success": "Template copied! Redirecting...",
       "error": "Error copying template",
-      "edit": "Edit"
+      "edit": "Edit",
+      "viewAlbum": "View Album"
     },
     "myTemplates": {
       "title": "My Albums",
@@ -900,6 +901,57 @@
       "deleteWarningDesc": "The field <strong>{name}</strong> has data in existing stickers. <danger>Deleting this field will permanently remove that data.</danger>",
       "deleteWarningNotice": "<strong>Important:</strong> This action cannot be undone.",
       "deleteConfirm": "Yes, delete field"
+    }
+  },
+  "albumes": {
+    "meta": {
+      "title": "Sticker Albums & Collections | CambioCromos",
+      "description": "Browse sticker albums and collections: football, Panini, LaLiga, Pokémon cards, basketball and more. Complete checklist for every album.",
+      "jsonLdName": "Sticker Albums & Collections"
+    },
+    "detail": {
+      "meta": {
+        "titleSuffix": "Album & Sticker Checklist | CambioCromos",
+        "descriptionTemplate": "Album {title} by {author} — {pages} pages, {slots} stickers. Check the complete checklist and copy the collection to track your missing and duplicate stickers.",
+        "notFoundTitle": "Album not found",
+        "notFoundDesc": "The album you are looking for does not exist or is not available."
+      },
+      "backLink": "← Back to Albums",
+      "by": "by",
+      "pages": "pages",
+      "stickers": "stickers",
+      "collectors": "collectors",
+      "copyTitle": "Copy Collection to My Profile",
+      "copyDesc": "Track your missing and duplicate stickers, and automatically find other users to trade with.",
+      "copyButton": "Copy Collection",
+      "signInLink": "Already have an account? Sign in",
+      "signUpButton": "Create Free Account",
+      "checklist": "Complete Checklist",
+      "page": "Page",
+      "special": "SPECIAL",
+      "ratingsTitle": "Ratings",
+      "noRatings": "No ratings yet.",
+      "ratingsSuffix": "ratings",
+      "shareTitle": "Share",
+      "shareWhatsApp": "Share on WhatsApp",
+      "shareTwitter": "Share on X",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied!"
+    },
+    "filters": {
+      "searchPlaceholder": "Search albums...",
+      "sortRecent": "Recent",
+      "sortPopular": "Popular",
+      "sortRating": "Top rated"
+    },
+    "empty": {
+      "title": "No albums found",
+      "desc": "Try different search terms."
+    },
+    "cta": {
+      "title": "Collecting stickers or trading cards?",
+      "desc": "Create a free account to track your missing and duplicate stickers.",
+      "button": "Create Free Account"
     }
   },
   "validations": {
@@ -1376,6 +1428,7 @@
     }
   },
   "header": {
+    "albums": "Albums",
     "marketplace": "Marketplace",
     "myAlbums": "My Albums",
     "chats": "Chats",
@@ -1396,7 +1449,9 @@
     "contact": "Contact",
     "about": "About Us",
     "blog": "Blog",
-    "advertise": "Advertise"
+    "advertise": "Advertise",
+    "albums": "Albums",
+    "marketplace": "Marketplace"
   },
   "language": {
     "change": "Change language"
@@ -1470,6 +1525,15 @@
     "social": {
       "title": "Follow us on social media",
       "subtitle": "Join our community on Instagram and TikTok for updates, giveaways, and much more."
+    },
+    "albumsShowcase": {
+      "badge": "📚 COLLECTIONS & ALBUMS",
+      "title": "ORGANIZE AND COMPLETE YOUR FAVORITE ALBUMS",
+      "desc": "Explore football, basketball, Pokémon, anime and more collections. Copy any album to track your missing and duplicate stickers.",
+      "goToAlbums": "Explore All Albums",
+      "error": "Error loading albums: {error}",
+      "emptyTitle": "No albums available",
+      "emptyDesc": "Check back soon to discover new collections."
     }
   },
   "explorar": {

@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import MarketplaceShowcase from './MarketplaceShowcase';
+import AlbumsShowcase from '@/components/home/AlbumsShowcase';
 import AnimatedPhoneMockup from './AnimatedPhoneMockup';
 import PWAInstallButton from '@/components/pwa/PWAInstallButton';
 import GooglePlayLink from '@/components/pwa/GooglePlayLink';
@@ -208,6 +209,12 @@ export default function LandingPage() {
                 {/* Subtle warm background tint for marketplace section */}
                 <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-yellow-100/30 to-transparent dark:from-yellow-900/10 dark:to-transparent pointer-events-none" />
                 <MarketplaceShowcase />
+            </div>
+
+            {/* Albums Showcase */}
+            <div id="albums" className="relative">
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-amber-100/20 to-transparent dark:from-amber-900/10 dark:to-transparent pointer-events-none" />
+                <AlbumsShowcase />
             </div>
 
             {/* SEO Context Paragraph */}

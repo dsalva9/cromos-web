@@ -6,6 +6,7 @@
     "skipToContent": "Saltar al contenido principal"
   },
   "header": {
+    "albums": "Álbumes",
     "marketplace": "Marketplace",
     "myAlbums": "Mis Álbumes",
     "chats": "Chats",
@@ -26,7 +27,9 @@
     "contact": "Contacto",
     "about": "Sobre Nosotros",
     "blog": "Blog",
-    "advertise": "Anúnciate"
+    "advertise": "Anúnciate",
+    "albums": "Álbumes",
+    "marketplace": "Marketplace"
   },
   "language": {
     "change": "Cambiar idioma"
@@ -554,7 +557,8 @@
       "copied": "¡Copiada!",
       "success": "¡Plantilla copiada! Redirigiendo...",
       "error": "Error al copiar la plantilla",
-      "edit": "Editar"
+      "edit": "Editar",
+      "viewAlbum": "Ver Álbum"
     },
     "myTemplates": {
       "title": "Mis Álbumes",
@@ -926,6 +930,57 @@
       "deleteWarningDesc": "El campo <strong>{name}</strong> tiene datos en los cromos existentes. <danger>Eliminar este campo borrará esos datos permanentemente.</danger>",
       "deleteWarningNotice": "<strong>Importante:</strong> Esta acción no se puede deshacer.",
       "deleteConfirm": "Sí, eliminar campo"
+    }
+  },
+  "albumes": {
+    "meta": {
+      "title": "Álbumes y Colecciones de Cromos | CambioCromos",
+      "description": "Explora álbumes de cromos y colecciones: fútbol, Panini, LaLiga, cartas Pokémon, baloncesto y más. Checklist completo de cada álbum con todos los cromos.",
+      "jsonLdName": "Álbumes y Colecciones de Cromos"
+    },
+    "detail": {
+      "meta": {
+        "titleSuffix": "Álbum y Checklist de Cromos | CambioCromos",
+        "descriptionTemplate": "Álbum {title} por {author} — {pages} páginas, {slots} cromos. Consulta el checklist completo y copia la colección para organizar tus faltas y repetidos.",
+        "notFoundTitle": "Álbum no encontrado",
+        "notFoundDesc": "El álbum que buscas no existe o no está disponible."
+      },
+      "backLink": "← Volver a Álbumes",
+      "by": "por",
+      "pages": "páginas",
+      "stickers": "cromos",
+      "collectors": "coleccionistas",
+      "copyTitle": "Copiar Colección a Mi Perfil",
+      "copyDesc": "Organiza tus cromos faltantes y repetidos, y encuentra otros usuarios con los que intercambiar automáticamente.",
+      "copyButton": "Copiar Colección",
+      "signInLink": "¿Ya tienes cuenta? Inicia sesión",
+      "signUpButton": "Crear Cuenta Gratis",
+      "checklist": "Checklist Completo",
+      "page": "Página",
+      "special": "ESPECIAL",
+      "ratingsTitle": "Valoraciones",
+      "noRatings": "Aún no hay valoraciones.",
+      "ratingsSuffix": "valoraciones",
+      "shareTitle": "Compartir",
+      "shareWhatsApp": "Compartir en WhatsApp",
+      "shareTwitter": "Compartir en X",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "¡Enlace copiado!"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar álbumes...",
+      "sortRecent": "Recientes",
+      "sortPopular": "Populares",
+      "sortRating": "Mejor valorados"
+    },
+    "empty": {
+      "title": "No se encontraron álbumes",
+      "desc": "Prueba con otros términos de búsqueda."
+    },
+    "cta": {
+      "title": "¿Coleccionas cromos o cartas?",
+      "desc": "Crea tu cuenta gratis para llevar el control de tus faltas y repetidos.",
+      "button": "Crear Cuenta Gratis"
     }
   },
   "validations": {
@@ -1470,6 +1525,15 @@
     "social": {
       "title": "Síguenos en redes sociales",
       "subtitle": "Únete a nuestra comunidad en Instagram y TikTok para estar al día de novedades, sorteos y mucho más."
+    },
+    "albumsShowcase": {
+      "badge": "📚 COLECCIONES Y ÁLBUMES",
+      "title": "ORGANIZA Y COMPLETA TUS ÁLBUMES FAVORITOS",
+      "desc": "Explora colecciones de fútbol, baloncesto, Pokémon, anime y más. Copia cualquier álbum para llevar el control de tus faltas y repetidos.",
+      "goToAlbums": "Explorar Todos los Álbumes",
+      "error": "Error al cargar los álbumes: {error}",
+      "emptyTitle": "No hay álbumes disponibles",
+      "emptyDesc": "Vuelve pronto para descubrir nuevas colecciones."
     }
   },
   "explorar": {
