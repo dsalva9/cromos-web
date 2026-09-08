@@ -15,7 +15,6 @@ import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { useIgnore } from '@/hooks/social/useIgnore';
 import { ReportModal } from '@/components/social/ReportModal';
-import { toast } from '@/lib/toast';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +35,7 @@ interface ChatDrawerProps {
   theyHaveCount?: number;
   youHaveCount?: number;
   distanceKm?: number | null;
+  otherUserIsDeleted?: boolean;
 }
 
 export function ChatDrawer({
@@ -50,6 +50,7 @@ export function ChatDrawer({
   theyHaveCount,
   youHaveCount,
   distanceKm,
+  otherUserIsDeleted,
 }: ChatDrawerProps) {
   const t = useTranslations('matchChat');
   const { user } = useUser();
@@ -193,7 +194,7 @@ export function ChatDrawer({
 
           {/* Name + collection — name links to profile */}
           <div className="flex-1 min-w-0">
-            {otherUserId ? (
+            {otherUserId && !otherUserIsDeleted ? (
               <Link href={`/users/${otherUserId}`} className="font-bold text-gray-900 dark:text-white truncate text-sm block hover:text-gold transition-colors">
                 {otherNickname}
               </Link>
@@ -268,6 +269,14 @@ export function ChatDrawer({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {otherUserIsDeleted && (
+          <div className="p-2.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+              {t('userNoLongerAvailable')}
+            </p>
+          </div>
+        )}
 
         {/* ---- Messages area ---- */}
         <div
@@ -451,14 +460,22 @@ export function ChatDrawer({
 
         {/* ---- Composer ---- */}
         <div style={{ paddingBottom: 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))' }}>
-          <ChatComposer
-            onSend={sendMessage}
-            sending={sending}
-            uploading={uploading}
-            disabled={!conversationId}
-            showConfirmButton={messages.length >= 4 && !pendingConfirmation}
-            onManualConfirm={() => setShowManualModal(true)}
-          />
+          {otherUserIsDeleted ? (
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                {t('cannotSendToDeletedUser')}
+              </p>
+            </div>
+          ) : (
+            <ChatComposer
+              onSend={sendMessage}
+              sending={sending}
+              uploading={uploading}
+              disabled={!conversationId}
+              showConfirmButton={messages.length >= 4 && !pendingConfirmation}
+              onManualConfirm={() => setShowManualModal(true)}
+            />
+          )}
         </div>
       </div>
 

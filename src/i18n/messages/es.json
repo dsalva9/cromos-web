@@ -477,10 +477,14 @@
       "confirmDescription": "La conversación desaparecerá de tu lista de chats. Podrás restaurarla desde Ajustes > Chats ocultos.",
       "confirmButton": "Ocultar",
       "cancelButton": "Cancelar"
-    }
+    },
+    "listingUnavailable": "Anuncio no disponible",
+    "userUnavailable": "Usuario no disponible"
   },
   "matchChat": {
     "title": "Chat",
+    "userNoLongerAvailable": "Este usuario ya no está en CambioCromos",
+    "cannotSendToDeletedUser": "No puedes enviar mensajes porque este usuario ya no está disponible",
     "placeholder": "Escribe un mensaje...",
     "send": "Enviar",
     "loadMore": "Cargar anteriores",
@@ -2444,6 +2448,10 @@
     "statusReserved": "Reservado",
     "statusCompleted": "Completado",
     "statusSold": "Completado",
+    "statusUnavailable": "No disponible",
+    "listingNoLongerAvailable": "Este anuncio ya no está disponible",
+    "userNoLongerAvailable": "Este usuario ya no está en CambioCromos",
+    "cannotSendToDeletedUser": "No puedes enviar mensajes porque este usuario ya no está disponible",
     "markReserved": "Marcar Reservado",
     "you": "Tú",
     "send": "Enviar",

@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2, FileText, Download, Coffee } from 'lucide-react';
+import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2, FileText, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
@@ -65,11 +65,10 @@ function ListingChatPageContent() {
   const [myRating, setMyRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const [counterpartyRating, setCounterpartyRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const [bothRated, setBothRated] = useState(false);
-  const [listingAccessDenied, setListingAccessDenied] = useState(false);
+  const [listingUnavailable, setListingUnavailable] = useState(false);
+  const [counterpartyDeleted, setCounterpartyDeleted] = useState(false);
   const [chatTermsDialogOpen, setChatTermsDialogOpen] = useState(false);
   const [listingCardExpanded, setListingCardExpanded] = useState(false);
-  // If a participant was pre-selected from the URL, start with the list hidden
-  const [showConversationList, setShowConversationList] = useState(!participantFromUrl);
 
   // Image attachment state
   const [pendingImage, setPendingImage] = useState<File | Blob | null>(null);
@@ -143,19 +142,29 @@ function ListingChatPageContent() {
         .eq('id', listingId)
         .maybeSingle();
 
-      if (listingError) {
-        logger.error('Error fetching listing:', listingError);
-        setListingAccessDenied(true);
-        // Don't return - we can still show chat even if listing fetch fails
+      if (listingError || !listingData) {
+        logger.warn('Listing not found or unavailable - continuing with chat only');
+        setListingUnavailable(true);
+        setListing({
+          id: listingId,
+          user_id: '',
+          author_nickname: 'Usuario',
+          author_avatar_url: null,
+          title: t('statusUnavailable'),
+          description: '',
+          sticker_number: null,
+          collection_name: '',
+          image_url: null,
+          status: 'removed',
+          views_count: 0,
+          created_at: '',
+          author_completed_trades: 0,
+        });
         return;
       }
 
-      if (!listingData) {
-        logger.warn('Listing not found or access denied - continuing with chat only');
-        setListingAccessDenied(true);
-        // Don't return or show error - user may still have chat access
-        // The chat will work, but listing card won't show
-        return;
+      if (listingData.status === 'archived' || listingData.status === 'removed') {
+        setListingUnavailable(true);
       }
 
       // Get author info including suspension and deletion status
@@ -163,22 +172,12 @@ function ListingChatPageContent() {
         .from('profiles')
         .select('nickname, avatar_url, is_suspended, deleted_at, is_admin, completed_trades')
         .eq('id', listingData.user_id)
-        .single();
+        .maybeSingle();
 
-      // Check if current user is admin
-      const { data: currentUserProfile } = user ? await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single() : { data: null };
-
-      const isCurrentUserAdmin = currentUserProfile?.is_admin || false;
-
-      // Block access if author is suspended or deleted and viewer is not admin
-      if (profileData && !isCurrentUserAdmin) {
-        if (profileData.is_suspended || profileData.deleted_at) {
-          setListingAccessDenied(true);
-          return;
+      // Check if author is deleted or suspended
+      if (!profileData || profileData.is_suspended || profileData.deleted_at) {
+        if (user && user.id !== listingData.user_id) {
+          setCounterpartyDeleted(true);
         }
       }
 
@@ -205,7 +204,32 @@ function ListingChatPageContent() {
     }
 
     void fetchListing();
-  }, [supabase, listingId, user]);
+  }, [supabase, listingId, user, t]);
+
+  // Check if selected participant (buyer) is deleted or suspended when viewer is owner
+  useEffect(() => {
+    async function checkParticipantStatus() {
+      if (!isOwner) return;
+      if (!selectedParticipant) {
+        setCounterpartyDeleted(false);
+        return;
+      }
+
+      const { data: participantProfile } = await supabase
+        .from('profiles')
+        .select('is_suspended, deleted_at')
+        .eq('id', selectedParticipant)
+        .maybeSingle();
+
+      if (!participantProfile || participantProfile.is_suspended || participantProfile.deleted_at) {
+        setCounterpartyDeleted(true);
+      } else {
+        setCounterpartyDeleted(false);
+      }
+    }
+
+    void checkParticipantStatus();
+  }, [isOwner, selectedParticipant, supabase]);
 
   // Fetch participants if owner
   useEffect(() => {
@@ -218,7 +242,6 @@ function ListingChatPageContent() {
   useEffect(() => {
     if (isOwner && participants.length === 1 && !selectedParticipant) {
       setSelectedParticipant(participants[0].user_id);
-      setShowConversationList(false); // Hide list when auto-selecting on mobile
     }
   }, [isOwner, participants, selectedParticipant]);
 
@@ -429,7 +452,7 @@ function ListingChatPageContent() {
   };
 
   // Handle camera capture
-  const handleCameraCapture = (blob: Blob, _fileName: string) => {
+  const handleCameraCapture = (blob: Blob) => {
     // Revoke old preview URL if exists
     if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
 
@@ -453,7 +476,6 @@ function ListingChatPageContent() {
 
     if (!selectedParticipant) {
       toast.error('Debes seleccionar una conversación para reservar');
-      setShowConversationList(true);
       return;
     }
 
@@ -719,14 +741,20 @@ function ListingChatPageContent() {
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
                   <div className="flex-1 min-w-0">
-                    <Link
-                      href={`/users/${selectedParticipant}`}
-                      className="inline-block hover:text-gold transition-colors"
-                    >
-                      <p className="font-bold text-sm text-gray-900 dark:text-white truncate hover:underline">
+                    {counterpartyDeleted ? (
+                      <p className="font-bold text-sm text-gray-500 dark:text-gray-400 truncate">
                         {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
                       </p>
-                    </Link>
+                    ) : (
+                      <Link
+                        href={`/users/${selectedParticipant}`}
+                        className="inline-block hover:text-gold transition-colors"
+                      >
+                        <p className="font-bold text-sm text-gray-900 dark:text-white truncate hover:underline">
+                          {participants.find(p => p.user_id === selectedParticipant)?.nickname || 'Usuario'}
+                        </p>
+                      </Link>
+                    )}
                     {listing && (
                       <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                         {listing.title}
@@ -756,12 +784,18 @@ function ListingChatPageContent() {
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                       {t('seller')}{' '}
-                      <Link
-                        href={`/users/${listing.user_id}`}
-                        className="hover:text-gold hover:underline transition-colors font-bold"
-                      >
-                        {listing.author_nickname}
-                      </Link>
+                      {counterpartyDeleted ? (
+                        <span className="font-bold text-gray-500 dark:text-gray-400">
+                          {listing.author_nickname}
+                        </span>
+                      ) : (
+                        <Link
+                          href={`/users/${listing.user_id}`}
+                          className="hover:text-gold hover:underline transition-colors font-bold"
+                        >
+                          {listing.author_nickname}
+                        </Link>
+                      )}
                     </p>
                   </div>
                   <button
@@ -774,7 +808,7 @@ function ListingChatPageContent() {
               ) : null}
             </div>
             {/* Mobile action buttons */}
-            {listing && (
+            {listing && !listingUnavailable && (
               <div className="flex gap-2 mt-2">
                 {isOwner && listing.status === 'active' && !transactionStatus && (
                   <Button
@@ -841,7 +875,10 @@ function ListingChatPageContent() {
                         src={listing.image_url}
                         alt={listing.title}
                         fill
-                        className="object-cover rounded border border-gray-700"
+                        className={cn(
+                          "object-cover rounded border border-gray-700",
+                          listingUnavailable && "opacity-50 grayscale"
+                        )}
                       />
                     </div>
                   )}
@@ -852,15 +889,20 @@ function ListingChatPageContent() {
                   </div>
                   <span className={cn(
                     'px-1.5 py-0.5 rounded text-xs font-bold uppercase flex-shrink-0',
-                    listing.status === 'active' && 'bg-green-100 text-green-700',
-                    listing.status === 'reserved' && 'bg-yellow-100 text-yellow-700',
-                    listing.status === 'completed' && 'bg-blue-100 text-blue-700',
-                    listing.status === 'sold' && 'bg-gray-200 text-gray-700'
+                    (listing.status === 'archived' || listing.status === 'removed' || listingUnavailable) && 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+                    listing.status === 'active' && !listingUnavailable && 'bg-green-100 text-green-700',
+                    listing.status === 'reserved' && !listingUnavailable && 'bg-yellow-100 text-yellow-700',
+                    listing.status === 'completed' && !listingUnavailable && 'bg-blue-100 text-blue-700',
+                    listing.status === 'sold' && !listingUnavailable && 'bg-gray-200 text-gray-700'
                   )}>
-                    {listing.status === 'active' && t('statusActive')}
-                    {listing.status === 'reserved' && t('statusReserved')}
-                    {listing.status === 'completed' && t('statusCompleted')}
-                    {listing.status === 'sold' && t('statusSold')}
+                    {(listing.status === 'archived' || listing.status === 'removed' || listingUnavailable) ? t('statusUnavailable') : (
+                      <>
+                        {listing.status === 'active' && t('statusActive')}
+                        {listing.status === 'reserved' && t('statusReserved')}
+                        {listing.status === 'completed' && t('statusCompleted')}
+                        {listing.status === 'sold' && t('statusSold')}
+                      </>
+                    )}
                   </span>
                   <ChevronDown
                     className={cn(
@@ -889,38 +931,52 @@ function ListingChatPageContent() {
                           src={listing.image_url}
                           alt={listing.title}
                           fill
-                          className="object-cover rounded-md border-2 border-gray-200"
+                          className={cn(
+                            "object-cover rounded-md border-2 border-gray-200",
+                            listingUnavailable && "opacity-50 grayscale"
+                          )}
                         />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <Link href={`/marketplace/${listingId}`}>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">
+                      {!listingUnavailable ? (
+                        <Link href={`/marketplace/${listingId}`}>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white hover:text-gold transition-colors">
+                            {listing.title}
+                          </h3>
+                        </Link>
+                      ) : (
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                           {listing.title}
                         </h3>
-                      </Link>
+                      )}
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {listing.collection_name} {listing.sticker_number && `- #${listing.sticker_number}`}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className={cn(
                           'px-2 py-1 rounded text-xs font-bold uppercase',
-                          listing.status === 'active' && 'bg-green-100 text-green-700',
-                          listing.status === 'reserved' && 'bg-yellow-100 text-yellow-700',
-                          listing.status === 'completed' && 'bg-blue-100 text-blue-700',
-                          listing.status === 'sold' && 'bg-gray-200 text-gray-700'
+                          (listing.status === 'archived' || listing.status === 'removed' || listingUnavailable) && 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+                          listing.status === 'active' && !listingUnavailable && 'bg-green-100 text-green-700',
+                          listing.status === 'reserved' && !listingUnavailable && 'bg-yellow-100 text-yellow-700',
+                          listing.status === 'completed' && !listingUnavailable && 'bg-blue-100 text-blue-700',
+                          listing.status === 'sold' && !listingUnavailable && 'bg-gray-200 text-gray-700'
                         )}>
-                          {listing.status === 'active' && t('statusAvailable')}
-                          {listing.status === 'reserved' && t('statusReserved')}
-                          {listing.status === 'completed' && t('statusCompleted')}
-                          {listing.status === 'sold' && t('statusSold')}
+                          {(listing.status === 'archived' || listing.status === 'removed' || listingUnavailable) ? t('statusUnavailable') : (
+                            <>
+                              {listing.status === 'active' && t('statusAvailable')}
+                              {listing.status === 'reserved' && t('statusReserved')}
+                              {listing.status === 'completed' && t('statusCompleted')}
+                              {listing.status === 'sold' && t('statusSold')}
+                            </>
+                          )}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     {/* Desktop action buttons */}
-                    {isOwner && listing.status === 'active' && !transactionStatus && (
+                    {!listingUnavailable && isOwner && listing.status === 'active' && !transactionStatus && (
                       <Button
                         onClick={handleReserve}
                         disabled={reserving || !selectedParticipant}
@@ -1047,7 +1103,6 @@ function ListingChatPageContent() {
                               key={participant.user_id}
                               onClick={() => {
                                 setSelectedParticipant(participant.user_id);
-                                setShowConversationList(false);
                               }}
                               className={cn(
                                 'w-full text-left p-3 rounded-md transition-colors',
@@ -1157,6 +1212,20 @@ function ListingChatPageContent() {
           )}>
             <ModernCard className="flex flex-col flex-1 min-h-0 overflow-hidden border-0 md:border-2">
               <ModernCardContent className="p-0 flex flex-col flex-1 min-h-0 overflow-hidden">
+                {/* Status Banners */}
+                {listingUnavailable && (
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800 px-4 py-2.5 flex items-center gap-2 text-xs text-amber-800 dark:text-amber-200 flex-none">
+                    <Info className="h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>{t('listingNoLongerAvailable')}</span>
+                  </div>
+                )}
+                {counterpartyDeleted && (
+                  <div className="bg-red-50 dark:bg-red-950/40 border-b border-red-200 dark:border-red-800 px-4 py-2.5 flex items-center gap-2 text-xs text-red-800 dark:text-red-200 flex-none">
+                    <Info className="h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+                    <span>{t('userNoLongerAvailable')}</span>
+                  </div>
+                )}
+
                 {/* Messages */}
                 <div
                   ref={chatContainerRef}
@@ -1340,7 +1409,7 @@ function ListingChatPageContent() {
                       )}
 
                       {/* Top Confirmation Banner (when pendingForMe is true) */}
-                      {pendingConfirmation && pendingForMe && (
+                      {pendingConfirmation && pendingForMe && !listingUnavailable && !counterpartyDeleted && (
                         <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
                           <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
                             <span className="text-xl">📬</span>
@@ -1380,14 +1449,14 @@ function ListingChatPageContent() {
                       )}
                       
                       {/* Banner when I requested it and it is still pending */}
-                      {pendingConfirmation && pendingByMe && (
+                      {pendingConfirmation && pendingByMe && !listingUnavailable && !counterpartyDeleted && (
                         <div className="bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-4 text-xs text-center text-gray-500 dark:text-gray-400">
                           📬 Solicitud de confirmación de intercambio pendiente de aprobación por el otro usuario.
                         </div>
                       )}
 
                       {/* Nudge card */}
-                      {shouldShowNudge && !nudgeDismissed && (
+                      {shouldShowNudge && !nudgeDismissed && !listingUnavailable && !counterpartyDeleted && (
                         <div className="flex justify-center my-4 w-full">
                           <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[95%] sm:max-w-[85%] text-center space-y-3">
                             <p className="font-bold text-gray-900 dark:text-white">
@@ -1423,19 +1492,18 @@ function ListingChatPageContent() {
                 <div className="border-t-2 border-gray-200 dark:border-gray-700 p-4 flex-none">
                   {/* Logic for chat disabling */}
                   {(() => {
+                    if (counterpartyDeleted) {
+                      return (
+                        <div className="p-3 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg text-center border border-gray-200 dark:border-gray-700">
+                          <p className="text-sm font-medium">{t('cannotSendToDeletedUser')}</p>
+                        </div>
+                      );
+                    }
+
                     const isReserved = listing?.status === 'reserved';
                     const isCompleted = listing?.status === 'completed';
                     const isReservedParticipant = isReserved && transaction?.buyer_id === selectedParticipant;
 
-                    // Access denied (RLS or blocked)
-                    if (listingAccessDenied && !isOwner) {
-                      return (
-                        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-center border border-red-200 dark:border-red-800">
-                          <h4 className="font-bold">{t('accessDenied')}</h4>
-                          <p className="text-sm mt-1">{t('accessDeniedDesc')}</p>
-                        </div>
-                      );
-                    }
 
                     // Completed listing
                     if (isCompleted) {

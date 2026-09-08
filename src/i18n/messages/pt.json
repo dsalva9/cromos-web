@@ -451,10 +451,14 @@
       "confirmDescription": "A conversa desaparecerá da sua lista de chats. Poderá restaurá-la em Configurações > Chats ocultos.",
       "confirmButton": "Ocultar",
       "cancelButton": "Cancelar"
-    }
+    },
+    "listingUnavailable": "Anúncio indisponível",
+    "userUnavailable": "Utilizador indisponível"
   },
   "matchChat": {
     "title": "Chat",
+    "userNoLongerAvailable": "Este utilizador já não está no CambioCromos",
+    "cannotSendToDeletedUser": "Não podes enviar mensagens porque este utilizador já não está disponível",
     "placeholder": "Escreva uma mensagem...",
     "send": "Enviar",
     "loadMore": "Carregar anteriores",
@@ -2444,6 +2448,10 @@
     "statusReserved": "Reservado",
     "statusCompleted": "Concluído",
     "statusSold": "Concluído",
+    "statusUnavailable": "Indisponível",
+    "listingNoLongerAvailable": "Este anúncio já não está disponível",
+    "userNoLongerAvailable": "Este utilizador já não está no CambioCromos",
+    "cannotSendToDeletedUser": "Não podes enviar mensagens porque este utilizador já não está disponível",
     "markReserved": "Marcar como Reservado",
     "you": "Você",
     "send": "Enviar",

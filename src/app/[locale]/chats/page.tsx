@@ -12,6 +12,7 @@ import { ContextualTip } from '@/components/ui/ContextualTip';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
+import { MatchConversation } from '@/lib/supabase/matches/chat';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -42,6 +43,8 @@ interface Conversation {
   unread_count: number;
   is_seller: boolean;
   counterparty_is_patron?: boolean;
+  counterparty_is_deleted?: boolean;
+  listing_is_unavailable?: boolean;
 }
 
 // ------------------------------------------------------------------
@@ -74,6 +77,7 @@ function ChatsPageContent() {
     collectionTitle: string | null;
     templateId: number | null;
     otherUserId: string;
+    otherUserIsDeleted?: boolean;
   } | null>(null);
 
   // Fetch marketplace conversations
@@ -126,7 +130,7 @@ function ChatsPageContent() {
   }, [hideConfirmConv, supabase, t]);
 
   // Open match chat drawer
-  const openMatchChat = useCallback((conv: typeof matchConvs.conversations[0]) => {
+  const openMatchChat = useCallback((conv: MatchConversation) => {
     setActiveMatchConv({
       id: conv.id,
       otherNickname: conv.other_nickname,
@@ -134,6 +138,7 @@ function ChatsPageContent() {
       collectionTitle: conv.template_title,
       templateId: conv.template_id,
       otherUserId: conv.other_user_id,
+      otherUserIsDeleted: conv.other_user_is_deleted,
     });
     setDrawerOpen(true);
   }, []);
@@ -225,7 +230,10 @@ function ChatsPageContent() {
                     key={`${conv.listing_id}-${conv.counterparty_id}`}
                     href={`/marketplace/${conv.listing_id}/chat${conv.is_seller ? `?participant=${conv.counterparty_id}` : ''}`}
                   >
-                    <ModernCard className="hover:border-gold transition-colors cursor-pointer relative group">
+                    <ModernCard className={cn(
+                      "hover:border-gold transition-colors cursor-pointer relative group",
+                      conv.listing_is_unavailable && "opacity-90"
+                    )}>
                       <ModernCardContent className="p-4">
                         {/* Hide conversation button */}
                         <button
@@ -248,7 +256,10 @@ function ChatsPageContent() {
                                 src={conv.listing_image_url}
                                 alt={conv.listing_title}
                                 fill
-                                className="object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                                className={cn(
+                                  "object-cover rounded-md border border-gray-200 dark:border-gray-700",
+                                  conv.listing_is_unavailable && "grayscale opacity-80"
+                                )}
                               />
                             </div>
                           )}
@@ -258,16 +269,26 @@ function ChatsPageContent() {
                               <h3 className="font-bold text-gray-900 dark:text-white truncate">
                                 {conv.listing_title}
                               </h3>
+                              {conv.listing_is_unavailable && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                                  {t('listingUnavailable')}
+                                </span>
+                              )}
                             </div>
 
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1.5">
                               {conv.is_seller ? (
-                                <>{t('roles.buyer')} {conv.counterparty_nickname}</>
+                                <>{t('roles.buyer')} {conv.counterparty_is_deleted ? <span className="text-gray-400 italic">{t('userUnavailable')}</span> : conv.counterparty_nickname}</>
                               ) : (
-                                <>{t('roles.seller')} {conv.counterparty_nickname}</>
+                                <>{t('roles.seller')} {conv.counterparty_is_deleted ? <span className="text-gray-400 italic">{t('userUnavailable')}</span> : conv.counterparty_nickname}</>
                               )}
-                              {conv.counterparty_is_patron && (
+                              {conv.counterparty_is_patron && !conv.counterparty_is_deleted && (
                                 <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
+                              )}
+                              {conv.counterparty_is_deleted && (
+                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                                  {t('userUnavailable')}
+                                </span>
                               )}
                             </p>
 
@@ -334,16 +355,22 @@ function ChatsPageContent() {
                     onClick={() => openMatchChat(conv)}
                     className="w-full text-left"
                   >
-                    <ModernCard className="hover:border-gold transition-colors cursor-pointer">
+                    <ModernCard className={cn(
+                      "hover:border-gold transition-colors cursor-pointer",
+                      conv.other_user_is_deleted && "opacity-85"
+                    )}>
                       <ModernCardContent className="p-4">
                         <div className="flex gap-3">
                           {/* Avatar */}
-                          <div className="w-12 h-12 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div className={cn(
+                            "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
+                            conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70" : "bg-gold/20 border-gold"
+                          )}>
                             {conv.other_avatar_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
                               <img src={conv.other_avatar_url} alt={conv.other_nickname} className="w-full h-full object-cover" />
                             ) : (
-                              <span className="text-lg font-bold text-gold">
+                              <span className={cn("text-lg font-bold", conv.other_user_is_deleted ? "text-gray-400" : "text-gold")}>
                                 {conv.other_nickname.charAt(0).toUpperCase()}
                               </span>
                             )}
@@ -351,10 +378,19 @@ function ChatsPageContent() {
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-0.5">
-                              <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1">
-                                {conv.other_nickname}
-                                {conv.other_is_patron && (
+                              <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
+                                {conv.other_user_is_deleted ? (
+                                  <span className="text-gray-500 italic">{t('userUnavailable')}</span>
+                                ) : (
+                                  <span>{conv.other_nickname}</span>
+                                )}
+                                {conv.other_is_patron && !conv.other_user_is_deleted && (
                                   <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
+                                )}
+                                {conv.other_user_is_deleted && (
+                                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                                    {t('userUnavailable')}
+                                  </span>
                                 )}
                               </h3>
                               {conv.unread_count > 0 && (
@@ -408,6 +444,7 @@ function ChatsPageContent() {
         collectionTitle={activeMatchConv?.collectionTitle}
         templateId={activeMatchConv?.templateId}
         otherUserId={activeMatchConv?.otherUserId}
+        otherUserIsDeleted={activeMatchConv?.otherUserIsDeleted}
       />
 
       {/* Hide conversation confirmation dialog */}

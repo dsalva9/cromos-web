@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -941,6 +941,27 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_ad_unlock_progress: {
+        Row: {
+          ads_watched: number
+          created_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          ads_watched?: number
+          created_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          ads_watched?: number
+          created_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       listing_highlights: {
         Row: {
           created_at: string
@@ -1148,6 +1169,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      listing_unlock_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          payment_id: string | null
+          unlock_source: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_id?: string | null
+          unlock_source: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_id?: string | null
+          unlock_source?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       marketplace_alert_matches: {
         Row: {
@@ -1611,6 +1659,96 @@ export type Database = {
         }
         Relationships: []
       }
+      pro_config: {
+        Row: {
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      pro_subscriptions: {
+        Row: {
+          created_at: string | null
+          device_id: string | null
+          expires_at: string
+          grant_reason: string | null
+          granted_by: string | null
+          id: string
+          payment_id: string | null
+          payment_provider: string | null
+          plan: string
+          started_at: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_id?: string | null
+          expires_at: string
+          grant_reason?: string | null
+          granted_by?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_provider?: string | null
+          plan: string
+          started_at?: string
+          status: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_id?: string | null
+          expires_at?: string
+          grant_reason?: string | null
+          granted_by?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_provider?: string | null
+          plan?: string
+          started_at?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pro_trial_claims: {
+        Row: {
+          claimed_at: string | null
+          device_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          device_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          device_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1622,6 +1760,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_patron: boolean
+          is_pro: boolean | null
           is_suspended: boolean | null
           last_activity_at: string | null
           last_login_date: string | null
@@ -1634,6 +1773,7 @@ export type Database = {
           onesignal_player_id: string[] | null
           patron_since: string | null
           postcode: string | null
+          pro_expires_at: string | null
           rating_avg: number | null
           rating_count: number | null
           suspended_at: string | null
@@ -1654,6 +1794,7 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           is_patron?: boolean
+          is_pro?: boolean | null
           is_suspended?: boolean | null
           last_activity_at?: string | null
           last_login_date?: string | null
@@ -1666,6 +1807,7 @@ export type Database = {
           onesignal_player_id?: string[] | null
           patron_since?: string | null
           postcode?: string | null
+          pro_expires_at?: string | null
           rating_avg?: number | null
           rating_count?: number | null
           suspended_at?: string | null
@@ -1686,6 +1828,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_patron?: boolean
+          is_pro?: boolean | null
           is_suspended?: boolean | null
           last_activity_at?: string | null
           last_login_date?: string | null
@@ -1698,6 +1841,7 @@ export type Database = {
           onesignal_player_id?: string[] | null
           patron_since?: string | null
           postcode?: string | null
+          pro_expires_at?: string | null
           rating_avg?: number | null
           rating_count?: number | null
           suspended_at?: string | null
@@ -3317,6 +3461,7 @@ export type Database = {
         }
         Returns: Json
       }
+      activate_pro_trial: { Args: { p_device_id: string }; Returns: Json }
       add_listing_status_messages: {
         Args: {
           p_listing_id: number
@@ -3401,6 +3546,10 @@ export type Database = {
       admin_expire_highlight: {
         Args: { p_highlight_id: number }
         Returns: boolean
+      }
+      admin_extend_pro: {
+        Args: { p_extra_days: number; p_user_id: string }
+        Returns: Json
       }
       admin_get_all_highlights: {
         Args: { p_status?: string }
@@ -3607,6 +3756,11 @@ export type Database = {
           target_type: string
         }[]
       }
+      admin_get_pro_stats: { Args: never; Returns: Json }
+      admin_get_pro_subscribers: {
+        Args: { p_limit?: number; p_page?: number; p_status?: string }
+        Returns: Json
+      }
       admin_get_retention_stats: { Args: never; Returns: Json }
       admin_get_rewarded_ad_credits_summary: {
         Args: { p_days: number }
@@ -3678,6 +3832,10 @@ export type Database = {
           listing_title: string
           ls_order_id: string
         }[]
+      }
+      admin_grant_pro: {
+        Args: { p_duration_days: number; p_reason: string; p_user_id: string }
+        Returns: Json
       }
       admin_list_affiliate_links: {
         Args: never
@@ -3834,6 +3992,10 @@ export type Database = {
       admin_reset_user_for_testing: {
         Args: { p_user_id: string }
         Returns: Json
+      }
+      admin_revoke_pro: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
       }
       admin_stats_activation_funnel: {
         Args: { p_country_code?: string }
@@ -4041,6 +4203,10 @@ export type Database = {
         Args: { p_is_patron: boolean; p_user_id: string }
         Returns: undefined
       }
+      admin_update_pro_config: {
+        Args: { p_key: string; p_value: Json }
+        Returns: undefined
+      }
       admin_update_summary_frequency: {
         Args: { p_frequency: string; p_id: number }
         Returns: boolean
@@ -4135,6 +4301,7 @@ export type Database = {
         Args: { p_category: string; p_user_id: string }
         Returns: undefined
       }
+      check_daily_listing_quota: { Args: never; Returns: undefined }
       check_entity_reported: {
         Args: { p_target_id: string; p_target_type: string }
         Returns: boolean
@@ -4188,27 +4355,48 @@ export type Database = {
         Args: { p_comment?: string; p_rating: number; p_template_id: number }
         Returns: number
       }
-      create_trade_listing: {
-        Args: {
-          p_collection_name: string
-          p_copy_id: number
-          p_description: string
-          p_global_number?: number
-          p_group_count?: number
-          p_image_url: string
-          p_is_group?: boolean
-          p_listing_type?: string
-          p_page_number?: number
-          p_page_title?: string
-          p_price?: number
-          p_slot_id: number
-          p_slot_variant?: string
-          p_sticker_number: string
-          p_thumbnail_url?: string
-          p_title: string
-        }
-        Returns: number
-      }
+      create_trade_listing:
+        | {
+            Args: {
+              p_collection_name: string
+              p_copy_id: number
+              p_description: string
+              p_global_number?: number
+              p_group_count?: number
+              p_image_url: string
+              p_is_group?: boolean
+              p_listing_type?: string
+              p_page_number?: number
+              p_page_title?: string
+              p_price?: number
+              p_slot_id: number
+              p_slot_variant?: string
+              p_sticker_number: string
+              p_title: string
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              p_collection_name: string
+              p_copy_id: number
+              p_description: string
+              p_global_number?: number
+              p_group_count?: number
+              p_image_url: string
+              p_is_group?: boolean
+              p_listing_type?: string
+              p_page_number?: number
+              p_page_title?: string
+              p_price?: number
+              p_slot_id: number
+              p_slot_variant?: string
+              p_sticker_number: string
+              p_thumbnail_url?: string
+              p_title: string
+            }
+            Returns: number
+          }
       create_trade_proposal: {
         Args: {
           p_collection_id: number
@@ -4542,6 +4730,7 @@ export type Database = {
           other_is_patron: boolean
           other_nickname: string
           other_user_id: string
+          other_user_is_deleted: boolean
           template_id: number
           template_title: string
           unread_count: number
@@ -4614,6 +4803,7 @@ export type Database = {
           team_name: string
         }[]
       }
+      get_my_daily_listing_quota: { Args: never; Returns: Json }
       get_my_highlight_credits: { Args: never; Returns: Json }
       get_my_listings_with_progress: {
         Args: { p_status?: string }
@@ -4912,12 +5102,14 @@ export type Database = {
         Returns: {
           counterparty_avatar_url: string
           counterparty_id: string
+          counterparty_is_deleted: boolean
           counterparty_nickname: string
           is_seller: boolean
           last_message: string
           last_message_at: string
           listing_id: number
           listing_image_url: string
+          listing_is_unavailable: boolean
           listing_status: string
           listing_title: string
           unread_count: number
@@ -5059,6 +5251,7 @@ export type Database = {
         Args: { p_target_user_id: string; p_user_id: string }
         Returns: boolean
       }
+      is_user_pro: { Args: { p_user_id: string }; Returns: boolean }
       is_user_suspended: { Args: { user_uuid: string }; Returns: boolean }
       list_all_reports: {
         Args: {
@@ -5360,6 +5553,11 @@ export type Database = {
         Returns: number
       }
       reactivate_listing: { Args: { p_listing_id: number }; Returns: undefined }
+      record_listing_ad_view: { Args: never; Returns: Json }
+      record_listing_purchase_unlock: {
+        Args: { p_payment_id: string }
+        Returns: undefined
+      }
       record_user_login: { Args: never; Returns: undefined }
       refresh_leaderboard: { Args: never; Returns: undefined }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
@@ -5624,12 +5822,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -5653,11 +5851,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -5678,11 +5876,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -5703,11 +5901,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -5720,11 +5918,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

@@ -16,6 +16,7 @@ export interface MatchConversation {
   last_message_at: string | null;
   unread_count: number;
   other_is_patron?: boolean;
+  other_user_is_deleted?: boolean;
 }
 
 export interface MatchChatMessage {

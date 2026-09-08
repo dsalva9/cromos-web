@@ -451,10 +451,14 @@
       "confirmDescription": "The conversation will disappear from your chat list. You can restore it from Settings > Hidden chats.",
       "confirmButton": "Hide",
       "cancelButton": "Cancel"
-    }
+    },
+    "listingUnavailable": "Listing unavailable",
+    "userUnavailable": "User unavailable"
   },
   "matchChat": {
     "title": "Chat",
+    "userNoLongerAvailable": "This user is no longer on CambioCromos",
+    "cannotSendToDeletedUser": "You cannot send messages because this user is no longer available",
     "placeholder": "Type a message...",
     "send": "Send",
     "loadMore": "Load older",
@@ -2444,6 +2448,10 @@
     "statusReserved": "Reserved",
     "statusCompleted": "Completed",
     "statusSold": "Completed",
+    "statusUnavailable": "Unavailable",
+    "listingNoLongerAvailable": "This listing is no longer available",
+    "userNoLongerAvailable": "This user is no longer on CambioCromos",
+    "cannotSendToDeletedUser": "You cannot send messages because this user is no longer available",
     "markReserved": "Mark as Reserved",
     "you": "You",
     "send": "Send",
