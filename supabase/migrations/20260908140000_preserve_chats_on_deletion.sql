@@ -918,8 +918,27 @@ END;
 $$;
 
 -- =========================================================================
--- 9. Update RLS Policies
+-- 9. Update RLS Policies (non-recursive via SECURITY DEFINER helpers)
 -- =========================================================================
+
+-- Helper function to check if user is a chat participant for a listing
+-- SECURITY DEFINER bypasses RLS on trade_chats and avoids recursive RLS evaluation
+CREATE OR REPLACE FUNCTION public.is_chat_participant_for_listing(p_listing_id bigint, p_user_id uuid)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public, pg_temp
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM trade_chats
+    WHERE listing_id = p_listing_id
+      AND (sender_id = p_user_id OR receiver_id = p_user_id)
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.is_chat_participant_for_listing(bigint, uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_chat_participant_for_listing(bigint, uuid) TO anon;
 
 -- A. Allow chat participants to view listing metadata (title, image, status)
 DROP POLICY IF EXISTS "Chat participants can view listing metadata" ON public.trade_listings;
@@ -927,12 +946,17 @@ CREATE POLICY "Chat participants can view listing metadata"
     ON public.trade_listings FOR SELECT TO authenticated
     USING (
         user_id = (SELECT auth.uid())
-        OR EXISTS (
-            SELECT 1 FROM trade_chats tc
-            WHERE tc.listing_id = trade_listings.id
-            AND (tc.sender_id = (SELECT auth.uid()) OR tc.receiver_id = (SELECT auth.uid()))
-        )
+        OR is_chat_participant_for_listing(id, (SELECT auth.uid()))
     );
+
+-- Ensure admin policies on trade_listings and trade_chats use is_admin() instead of direct table queries
+DROP POLICY IF EXISTS "Admins can view all listings including deleted" ON public.trade_listings;
+CREATE POLICY "Admins can view all listings including deleted"
+    ON public.trade_listings FOR SELECT USING (is_admin());
+
+DROP POLICY IF EXISTS "Admins have full access" ON public.trade_listings;
+CREATE POLICY "Admins have full access"
+    ON public.trade_listings FOR ALL USING (is_admin());
 
 -- B. Ensure users can always view their own chats even if counterparty is suspended/deleted
 DROP POLICY IF EXISTS "Users can view chats with active participants" ON public.trade_chats;
@@ -943,19 +967,9 @@ CREATE POLICY "Users can view their own chats" ON public.trade_chats
     (sender_id = (SELECT auth.uid())) OR (receiver_id = (SELECT auth.uid()))
   );
 
--- C. Allow chat counterparties to view profile status (deleted_at, is_suspended, nickname)
+DROP POLICY IF EXISTS "Admins can view all chats including deleted users" ON public.trade_chats;
+CREATE POLICY "Admins can view all chats including deleted users"
+    ON public.trade_chats FOR SELECT USING (is_admin());
+
+-- C. Drop recursive policy on profiles if it exists
 DROP POLICY IF EXISTS "Chat counterparties can view profile status" ON public.profiles;
-CREATE POLICY "Chat counterparties can view profile status"
-  ON public.profiles FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM trade_chats tc
-      WHERE (tc.sender_id = profiles.id AND tc.receiver_id = (SELECT auth.uid()))
-         OR (tc.receiver_id = profiles.id AND tc.sender_id = (SELECT auth.uid()))
-    )
-    OR EXISTS (
-      SELECT 1 FROM match_conversations mc
-      WHERE (mc.user_a_id = profiles.id AND mc.user_b_id = (SELECT auth.uid()))
-         OR (mc.user_b_id = profiles.id AND mc.user_a_id = (SELECT auth.uid()))
-    )
-  );
