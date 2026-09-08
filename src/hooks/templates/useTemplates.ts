@@ -82,7 +82,7 @@ export function useTemplates({
           p_offset: pageParam,
           p_search: deferredSearch || undefined,
           p_sort_by: sortBy,
-          ...(countryCode ? { p_country_code: countryCode } : {}),
+          p_country_code: countryCode ?? undefined,
         }
       );
 

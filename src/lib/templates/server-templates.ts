@@ -99,7 +99,7 @@ export async function getPublicTemplates(params: GetTemplatesParams = {}) {
                 p_offset: offset,
                 p_search: search || null,
                 p_sort_by: sortBy,
-                ...(userCountryCode ? { p_country_code: userCountryCode } : {}),
+                p_country_code: userCountryCode ?? null,
             }
         );
 
