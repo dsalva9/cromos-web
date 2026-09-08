@@ -74,6 +74,7 @@ export default function AlbumsShowcase() {
                 <AlbumShowcaseCard
                   key={template.id}
                   template={template}
+                  compact
                 />
               ))}
             </AnimatedList>

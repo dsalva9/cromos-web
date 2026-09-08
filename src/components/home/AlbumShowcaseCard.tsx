@@ -19,9 +19,10 @@ interface AlbumShowcaseCardData {
 
 interface AlbumShowcaseCardProps {
   template: AlbumShowcaseCardData;
+  compact?: boolean;
 }
 
-export function AlbumShowcaseCard({ template }: AlbumShowcaseCardProps) {
+export function AlbumShowcaseCard({ template, compact = false }: AlbumShowcaseCardProps) {
   const t = useTranslations('templates');
   const href = template.slug
     ? `/albumes/${template.slug}`
@@ -60,7 +61,7 @@ export function AlbumShowcaseCard({ template }: AlbumShowcaseCardProps) {
               </p>
             )}
 
-            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-auto mb-3">
+            <div className={`flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-auto ${compact ? '' : 'mb-3'}`}>
               <span className="flex items-center gap-1">
                 <FileText className="h-3.5 w-3.5" />
                 {template.pages_count} pág.
@@ -73,13 +74,15 @@ export function AlbumShowcaseCard({ template }: AlbumShowcaseCardProps) {
               )}
             </div>
 
-            <Button
-              className="w-full bg-gold text-black hover:bg-gold-light font-medium transition-all duration-300"
-              size="sm"
-            >
-              <Eye className="mr-2 h-4 w-4" />
-              {t('card.viewAlbum')}
-            </Button>
+            {!compact && (
+              <Button
+                className="w-full bg-gold text-black hover:bg-gold-light font-medium transition-all duration-300"
+                size="sm"
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                {t('card.viewAlbum')}
+              </Button>
+            )}
           </div>
         </ModernCardContent>
       </ModernCard>
