@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { TemplateCard } from '@/components/templates/TemplateCard';
+import { AlbumShowcaseCard } from '@/components/home/AlbumShowcaseCard';
 import { useTemplates } from '@/hooks/templates/useTemplates';
 import { Template } from '@/lib/templates/server-templates';
 import { Search, ArrowRight, Loader2 } from 'lucide-react';
@@ -80,11 +80,9 @@ export function PublicAlbumsContent({ initialTemplates }: PublicAlbumsContentPro
         {templates.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {templates.map((template) => (
-              <TemplateCard
+              <AlbumShowcaseCard
                 key={template.id}
                 template={template}
-                linkPrefix="/albumes"
-                publicMode
               />
             ))}
           </div>
