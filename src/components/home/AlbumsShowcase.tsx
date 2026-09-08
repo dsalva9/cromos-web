@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
-import { TemplateCard } from '@/components/templates/TemplateCard';
+import { AlbumShowcaseCard } from '@/components/home/AlbumShowcaseCard';
 import { ListingCardSkeleton } from '@/components/skeletons/ListingCardSkeleton';
 import { useTemplates } from '@/hooks/templates/useTemplates';
 import { AlertCircle } from 'lucide-react';
@@ -71,11 +71,9 @@ export default function AlbumsShowcase() {
           ) : hasTemplates ? (
             <AnimatedList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayTemplates.slice(0, 6).map(template => (
-                <TemplateCard
+                <AlbumShowcaseCard
                   key={template.id}
                   template={template}
-                  linkPrefix="/albumes"
-                  publicMode
                 />
               ))}
             </AnimatedList>

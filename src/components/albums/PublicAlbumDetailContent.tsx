@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import type { TemplateDetailsResponse } from '@/lib/templates/server-templates';
-import { Star, Copy, FileText, Users, ArrowLeft, Share2, Check, Layout } from 'lucide-react';
+import { Star, UserPlus, FileText, Users, ArrowLeft, Share2, Check, Layout } from 'lucide-react';
 
 interface PublicAlbumDetailContentProps {
   data: TemplateDetailsResponse;
@@ -101,7 +101,7 @@ export function PublicAlbumDetailContent({ data, templateId }: PublicAlbumDetail
                   <span>{pages.length} {t('pages')}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Copy className="h-4 w-4" />
+                  <Layout className="h-4 w-4" />
                   <span>{totalSlots} {t('stickers')}</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -126,27 +126,29 @@ export function PublicAlbumDetailContent({ data, templateId }: PublicAlbumDetail
                           ({page.slots_count} {t('stickers')})
                         </span>
                       </h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                         {page.slots.map((slot) => (
                           <div
                             key={slot.id}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                            className={`px-3 py-2 rounded-lg text-sm ${
                               slot.is_special
                                 ? 'bg-gold/10 border border-gold/30 text-gold-dark dark:text-gold'
                                 : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
                             }`}
                           >
-                            <span className="font-mono font-bold text-xs min-w-[2rem]">
-                              #{slot.slot_number}{slot.slot_variant || ''}
-                            </span>
-                            <span className="truncate">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono font-bold text-xs shrink-0">
+                                #{slot.slot_number}{slot.slot_variant || ''}
+                              </span>
+                              {slot.is_special && (
+                                <span className="text-[10px] font-bold uppercase bg-gold/20 px-1.5 py-0.5 rounded shrink-0">
+                                  {t('special')}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs mt-0.5 block break-words">
                               {slot.label || `Cromo ${slot.slot_number}`}
                             </span>
-                            {slot.is_special && (
-                              <span className="ml-auto text-[10px] font-bold uppercase bg-gold/20 px-1.5 py-0.5 rounded">
-                                {t('special')}
-                              </span>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -173,7 +175,7 @@ export function PublicAlbumDetailContent({ data, templateId }: PublicAlbumDetail
                     className="w-full bg-gold hover:bg-yellow-400 text-black font-bold border-2 border-black shadow-lg text-base h-12"
                   >
                     <Link href={`/signup?redirect=/templates/${templateId}`}>
-                      <Copy className="mr-2 h-5 w-5" />
+                      <UserPlus className="mr-2 h-5 w-5" />
                       {t('copyButton')}
                     </Link>
                   </Button>
