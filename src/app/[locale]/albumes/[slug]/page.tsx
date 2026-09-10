@@ -98,7 +98,8 @@ export default async function AlbumDetailPage({ params }: Props) {
     '@type': 'CreativeWork',
     name: template.title,
     description: template.description,
-    image: template.image_url,
+    ...(template.image_url ? { image: template.image_url } : {}),
+    url: `${siteConfig.url}/${locale}/albumes/${slug}`,
     dateCreated: template.created_at,
     author: {
       '@type': 'Person',
@@ -111,16 +112,6 @@ export default async function AlbumDetailPage({ params }: Props) {
       url: siteConfig.url,
     },
   };
-
-  if (template.rating_count > 0) {
-    jsonLd.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: template.rating_avg,
-      ratingCount: template.rating_count,
-      bestRating: 5,
-      worstRating: 1,
-    };
-  }
 
   return (
     <>
