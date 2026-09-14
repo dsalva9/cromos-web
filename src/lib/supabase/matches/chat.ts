@@ -63,6 +63,17 @@ function isAuthError(error: unknown): boolean {
   );
 }
 
+/** Expected business error: user tried to message a deleted/suspended user. */
+function isUserUnavailableError(error: unknown): boolean {
+  let msg = '';
+  if (error instanceof Error) {
+    msg = error.message.toLowerCase();
+  } else if (error && typeof error === 'object' && 'message' in error) {
+    msg = String((error as { message: string }).message).toLowerCase();
+  }
+  return msg.includes('user is no longer available');
+}
+
 export async function getOrCreateMatchConversation(
   supabase: SupabaseClient,
   otherUserId: string,
@@ -167,6 +178,8 @@ export async function sendMatchMessage(
   } catch (error) {
     if (isAuthError(error)) {
       logger.warnLocal('Unauthenticated request to sendMatchMessage:', error);
+    } else if (isUserUnavailableError(error)) {
+      logger.warnLocal('Match message blocked (user unavailable):', error);
     } else {
       logger.error('Error sending match message:', error);
     }

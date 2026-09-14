@@ -132,7 +132,16 @@ export async function sendListingMessage(
 
     return { messageId: data as number, error: null };
   } catch (error) {
-    logger.error('Error sending listing message:', error);
+    const msg = error instanceof Error
+      ? error.message.toLowerCase()
+      : (error && typeof error === 'object' && 'message' in error)
+        ? String((error as { message: string }).message).toLowerCase()
+        : '';
+    if (msg.includes('user is no longer available')) {
+      logger.warnLocal('Listing message blocked (user unavailable):', error);
+    } else {
+      logger.error('Error sending listing message:', error);
+    }
     return {
       messageId: null,
       error:
