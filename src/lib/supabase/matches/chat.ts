@@ -64,7 +64,7 @@ function isAuthError(error: unknown): boolean {
 }
 
 /** Expected business error: user tried to message a deleted/suspended user. */
-function isUserUnavailableError(error: unknown): boolean {
+export function isUserUnavailableError(error: unknown): boolean {
   let msg = '';
   if (error instanceof Error) {
     msg = error.message.toLowerCase();
@@ -91,12 +91,20 @@ export async function getOrCreateMatchConversation(
   } catch (error) {
     if (isAuthError(error)) {
       logger.warnLocal('Unauthenticated request to getOrCreateMatchConversation:', error);
+    } else if (isUserUnavailableError(error)) {
+      logger.warnLocal('Match conversation blocked (user unavailable):', error);
     } else {
       logger.error('Error creating match conversation:', error);
     }
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Failed to create conversation'),
+      error: error instanceof Error
+        ? error
+        : new Error(
+            error && typeof error === 'object' && 'message' in error
+              ? String((error as { message: string }).message)
+              : 'Failed to create conversation'
+          ),
     };
   }
 }
@@ -185,7 +193,13 @@ export async function sendMatchMessage(
     }
     return {
       messageId: null,
-      error: error instanceof Error ? error : new Error('No se pudo enviar el mensaje'),
+      error: error instanceof Error
+        ? error
+        : new Error(
+            error && typeof error === 'object' && 'message' in error
+              ? String((error as { message: string }).message)
+              : 'No se pudo enviar el mensaje'
+          ),
     };
   }
 }

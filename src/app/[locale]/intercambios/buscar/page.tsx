@@ -3,7 +3,11 @@
 import { useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
-import { getOrCreateMatchConversation, sendMatchMessage } from '@/lib/supabase/matches/chat';
+import {
+  getOrCreateMatchConversation,
+  sendMatchMessage,
+  isUserUnavailableError,
+} from '@/lib/supabase/matches/chat';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { toast } from '@/lib/toast';
 import {
@@ -162,6 +166,10 @@ function MatchFinderContent() {
     );
 
     if (error || !data) {
+      if (isUserUnavailableError(error)) {
+        toast.warning(t('userUnavailable'));
+        return;
+      }
       toast.error('Error al abrir chat');
       return;
     }
@@ -170,7 +178,11 @@ function MatchFinderContent() {
     if (data.is_new) {
       const collTitle = selectedCollection?.title ?? 'una colección';
       const systemMsg = `⚡ ¡Match en ${collTitle}! ${result.nickname} quiere intercambiar cromos`;
-      await sendMatchMessage(supabase, data.id, systemMsg);
+      const { error: sendError } = await sendMatchMessage(supabase, data.id, systemMsg);
+      if (sendError && isUserUnavailableError(sendError)) {
+        toast.warning(t('userUnavailable'));
+        return;
+      }
     }
 
     setChatDrawerData({
@@ -183,7 +195,7 @@ function MatchFinderContent() {
       avatarUrl: result.avatarUrl,
     });
     setChatDrawerOpen(true);
-  }, [swiper, supabase, selectedCollection]);
+  }, [swiper, supabase, selectedCollection, t]);
 
   const handleCollectionChange = useCallback(() => {
     setIsCollDropdownOpen(true);

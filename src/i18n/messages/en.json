@@ -2715,6 +2715,7 @@
       "noCollections": "No collections",
       "noCollectionsDesc": "Add a collection first to find matches with other collectors.",
       "addCollectionCta": "Explore collections",
+      "userUnavailable": "This user is no longer available",
       "noDuplicates": "You have no duplicate stickers in this collection. Complete more stickers to find trades!",
       "geoOptIn": "📍 Use my exact location",
       "geoOptInDesc": "Improve the displayed distance using your current location",
