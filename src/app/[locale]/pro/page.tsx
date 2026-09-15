@@ -136,7 +136,7 @@ export default function ProPage() {
             <Button
               onClick={activateTrial}
               disabled={isActivating}
-              className="w-full bg-gradient-to-r from-[#FFC000] to-[#F59E0B] hover:from-[#E6AD00] hover:to-[#D97706] text-black font-bold text-lg py-6"
+              className="w-full bg-gradient-to-r from-[#FFC000] to-[#F59E0B] hover:from-[#E6AD00] hover:to-[#D97706] text-black font-bold text-sm sm:text-lg py-5 sm:py-6"
             >
               {isActivating ? 'Activando...' : '🎁 Activar prueba gratuita'}
             </Button>
@@ -181,7 +181,7 @@ export default function ProPage() {
 
         <Button
           onClick={() => subscribePro(selectedPlan)}
-          className="w-full bg-[#FFC000] hover:bg-[#E6AD00] text-black font-bold text-lg py-6"
+          className="w-full bg-[#FFC000] hover:bg-[#E6AD00] text-black font-bold text-sm sm:text-lg py-5 sm:py-6"
         >
           <Zap size={20} className="mr-2" />
           Suscribirse {selectedPlan === 'monthly' ? 'mensual' : 'anual'}
