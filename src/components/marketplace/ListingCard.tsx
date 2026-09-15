@@ -121,7 +121,17 @@ export function ListingCard({ listing }: ListingCardProps) {
     return t('time.hours', { count: hours });
   };
 
+  const proStyle = listing.author_is_pro && !listing.is_highlighted;
+
   return (
+    <div
+      className={proStyle ? 'rounded-2xl' : undefined}
+      style={proStyle ? {
+        border: '2.5px solid #FFC000',
+        boxShadow: '0 0 16px rgba(255,192,0,0.35)',
+        borderRadius: '1rem',
+      } : undefined}
+    >
     <motion.div
       whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)' }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -129,18 +139,14 @@ export function ListingCard({ listing }: ListingCardProps) {
         "group relative h-full flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm dark:shadow-md transition-all duration-300",
         listing.is_highlighted
           ? "border-2 border-amber-400 dark:border-amber-500 shadow-[0_0_24px_rgba(245,158,11,0.45)] dark:shadow-[0_0_24px_rgba(245,158,11,0.25)] ring-2 ring-amber-300/50 dark:ring-amber-600/40"
-          : listing.author_is_pro
-            ? "border-2"
-            : listing.author_is_patron
-              ? "border border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
-              : isNew
-                ? "border border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
-                : "border border-gray-200/60 dark:border-gray-700/50"
+          : listing.author_is_patron && !listing.author_is_pro
+            ? "border border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
+            : isNew && !proStyle
+              ? "border border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
+              : !proStyle
+                ? "border border-gray-200/60 dark:border-gray-700/50"
+                : ""
       )}
-      style={listing.author_is_pro && !listing.is_highlighted ? {
-        borderColor: '#FFC000',
-        boxShadow: '0 0 16px rgba(255,192,0,0.3)',
-      } : undefined}
     >
       {/* Golden shimmer top strip for highlighted listings */}
       {listing.is_highlighted && (
@@ -331,6 +337,6 @@ export function ListingCard({ listing }: ListingCardProps) {
         </div>
       </div>
     </motion.div>
-
+    </div>
   );
 }
