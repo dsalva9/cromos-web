@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { UserLink } from '@/components/ui/user-link';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
-import { MapPin, Ban, Trash2, Flame, EyeOff, Sparkles } from 'lucide-react';
+import { MapPin, Ban, Trash2, Flame, EyeOff, Sparkles, Crown } from 'lucide-react';
 import { Listing } from '@/types/v1.6.0';
 import '@/styles/highlight-animation.css';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -152,6 +152,12 @@ export function ListingCard({ listing }: ListingCardProps) {
       {listing.is_highlighted && (
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 via-yellow-300 to-amber-500 z-30 animate-pulse" />
       )}
+      {/* PRO golden shimmer strip */}
+      {proStyle && (
+        <div className="absolute top-0 left-0 right-0 h-[3px] z-30 overflow-hidden">
+          <div className="h-full w-[200%] bg-gradient-to-r from-transparent via-[#FFC000] to-transparent animate-[shimmer_2s_ease-in-out_infinite]" style={{ animation: 'shimmer 2s ease-in-out infinite' }} />
+        </div>
+      )}
       <Link href={`/marketplace/${listing.id}`} className="absolute inset-0 z-10" aria-label={`Ver anuncio: ${listing.title}`} />
 
       {/* Image Container */}
@@ -182,15 +188,21 @@ export function ListingCard({ listing }: ListingCardProps) {
           <ListingFavoriteButton listingId={listing.id} variant="icon" />
         </div>
 
-        {/* Status / New Badge / Patron Badge */}
+        {/* Status / New Badge / PRO Crown / Patron Badge */}
         <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+          {proStyle && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-[#FFC000] to-amber-400 text-white border border-amber-500/60 backdrop-blur-sm shadow-md">
+              <Crown className="h-2.5 w-2.5" />
+              PRO
+            </span>
+          )}
           {listing.is_highlighted && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-400/95 text-white border border-amber-500/60 backdrop-blur-sm shadow-md">
               <Sparkles className="h-2.5 w-2.5" />
               {t('highlighted')}
             </span>
           )}
-          {listing.author_is_patron && (
+          {listing.author_is_patron && !listing.author_is_pro && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-100/90 text-amber-800 border border-amber-300/60 backdrop-blur-sm shadow-sm dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/40">
               ☕ {t('patron')}
             </span>
@@ -229,7 +241,10 @@ export function ListingCard({ listing }: ListingCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-3 flex flex-col flex-1 gap-2">
+      <div className={cn(
+        "p-3 flex flex-col flex-1 gap-2",
+        proStyle && "bg-gradient-to-b from-amber-50/80 via-yellow-50/50 to-white dark:from-amber-950/30 dark:via-amber-900/10 dark:to-gray-800"
+      )}>
         {/* Title & Collection */}
         <div className="min-h-[3rem]">
           <h3 className="font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 text-sm group-hover:text-primary transition-colors">
