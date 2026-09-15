@@ -318,7 +318,8 @@ Deno.serve(async (req) => {
             activationFunnelResult,
             engagementResult,
             hourlyActivityResult,
-            rewardedAdsResult
+            rewardedAdsResult,
+            proStatsResult
         ] = await Promise.all([
             supabase.rpc('admin_get_new_users_summary', { p_days: days }),
             supabase.rpc('admin_get_pending_reports_summary', { p_days: days }),
@@ -332,6 +333,50 @@ Deno.serve(async (req) => {
             supabase.rpc('admin_stats_engagement', { p_days: days, p_country_code: null }),
             supabase.rpc('admin_stats_hourly_activity', { p_days: days }),
             supabase.rpc('admin_get_rewarded_ad_credits_summary', { p_days: days }),
+            // PRO subscription stats — direct query
+            (async () => {
+                const since = new Date(Date.now() - days * 86400000).toISOString();
+                const [newTrials, newPaid, expiredTrials, cancelledSubs, totalActive, totalPro] = await Promise.all([
+                    supabase.from('pro_subscriptions').select('id, user_id', { count: 'exact' }).eq('status', 'trial').gte('created_at', since),
+                    supabase.from('pro_subscriptions').select('id, user_id, plan, payment_provider', { count: 'exact' }).eq('status', 'active').in('plan', ['monthly', 'yearly']).gte('created_at', since),
+                    supabase.from('pro_subscriptions').select('id, user_id', { count: 'exact' }).eq('status', 'expired').in('plan', ['trial_7d', 'trial_1m']).gte('updated_at', since),
+                    supabase.from('pro_subscriptions').select('id, user_id', { count: 'exact' }).eq('status', 'cancelled').gte('updated_at', since),
+                    supabase.from('pro_subscriptions').select('id', { count: 'exact' }).in('status', ['trial', 'active']).gt('expires_at', new Date().toISOString()),
+                    supabase.from('profiles').select('id', { count: 'exact' }).eq('is_pro', true),
+                ]);
+
+                // Get nicknames for new trials and paid subs
+                const trialUserIds = (newTrials.data || []).map((r: any) => r.user_id);
+                const paidUsers = (newPaid.data || []).map((r: any) => ({ user_id: r.user_id, plan: r.plan, provider: r.payment_provider }));
+                const paidUserIds = paidUsers.map((u: any) => u.user_id);
+                const allUserIds = [...new Set([...trialUserIds, ...paidUserIds])];
+
+                let userNicknames: Record<string, string> = {};
+                if (allUserIds.length > 0) {
+                    const { data: profiles } = await supabase.from('profiles').select('id, nickname').in('id', allUserIds);
+                    for (const p of profiles || []) {
+                        userNicknames[p.id] = p.nickname || p.id.substring(0, 8);
+                    }
+                }
+
+                return {
+                    data: {
+                        new_trials: newTrials.count || 0,
+                        new_paid: newPaid.count || 0,
+                        expired_trials: expiredTrials.count || 0,
+                        cancelled: cancelledSubs.count || 0,
+                        total_active: totalActive.count || 0,
+                        total_pro_profiles: totalPro.count || 0,
+                        trial_users: trialUserIds.map((id: string) => userNicknames[id] || id.substring(0, 8)),
+                        paid_users: paidUsers.map((u: any) => ({
+                            nickname: userNicknames[u.user_id] || u.user_id.substring(0, 8),
+                            plan: u.plan,
+                            provider: u.provider,
+                        })),
+                    },
+                    error: null,
+                };
+            })(),
         ]);
 
         if (rewardedAdsResult.error) {
@@ -555,6 +600,66 @@ Deno.serve(async (req) => {
                   `).join('')}
                 </tbody>
               </table>
+            `;
+        }
+
+        // ── Section: PRO Subscriptions ──
+        const proStats = proStatsResult?.data || {};
+        let proStatsHtml: string;
+
+        if (proStats.new_trials === 0 && proStats.new_paid === 0 && proStats.expired_trials === 0 && proStats.cancelled === 0) {
+            proStatsHtml = `
+              <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
+                Sin actividad PRO en ${periodLabel}.
+              </p>
+              <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <div style="flex: 1; background: #fffbeb; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #fef3c7;">
+                  <div style="font-size: 20px; font-weight: bold; color: #d97706;">${proStats.total_pro_profiles || 0}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Usuarios PRO activos</div>
+                </div>
+                <div style="flex: 1; background: #f0f9ff; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #e0f2fe;">
+                  <div style="font-size: 20px; font-weight: bold; color: #0284c7;">${proStats.total_active || 0}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Suscripciones activas</div>
+                </div>
+              </div>
+            `;
+        } else {
+            const trialUsersList = (proStats.trial_users || []).length > 0
+                ? `<p style="font-size: 13px; color: #4b5563; margin: 8px 0;">Usuarios: ${(proStats.trial_users as string[]).map((n: string) => `<strong>${escapeHtml(n)}</strong>`).join(', ')}</p>`
+                : '';
+            const paidUsersList = (proStats.paid_users || []).length > 0
+                ? `<p style="font-size: 13px; color: #4b5563; margin: 8px 0;">Usuarios: ${(proStats.paid_users as any[]).map((u: any) => {
+                    const planLabel = u.plan === 'yearly' ? 'Anual' : 'Mensual';
+                    const provLabel = u.provider === 'google_play' ? 'GP' : u.provider === 'lemonsqueezy' ? 'LS' : '?';
+                    return `<strong>${escapeHtml(u.nickname)}</strong> <span style="font-size:11px;color:#9ca3af;">(${planLabel} · ${provLabel})</span>`;
+                  }).join(', ')}</p>`
+                : '';
+
+            proStatsHtml = `
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+                <div style="flex: 1; min-width: 100px; background: #fffbeb; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fef3c7;">
+                  <div style="font-size: 24px; font-weight: bold; color: #d97706;">${proStats.total_pro_profiles || 0}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">PRO activos total</div>
+                </div>
+                <div style="flex: 1; min-width: 100px; background: #f0fdf4; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #dcfce7;">
+                  <div style="font-size: 24px; font-weight: bold; color: #16a34a;">${proStats.new_trials}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Nuevos trials</div>
+                </div>
+                <div style="flex: 1; min-width: 100px; background: #f0f9ff; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #e0f2fe;">
+                  <div style="font-size: 24px; font-weight: bold; color: #0284c7;">${proStats.new_paid}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Nuevas suscripciones</div>
+                </div>
+                <div style="flex: 1; min-width: 100px; background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
+                  <div style="font-size: 24px; font-weight: bold; color: #dc2626;">${proStats.expired_trials}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Trials expirados</div>
+                </div>
+                <div style="flex: 1; min-width: 100px; background: #faf5ff; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #f3e8ff;">
+                  <div style="font-size: 24px; font-weight: bold; color: #7c3aed;">${proStats.cancelled}</div>
+                  <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Cancelaciones</div>
+                </div>
+              </div>
+              ${trialUsersList ? `<div style="background: #f0fdf4; border: 1px solid #dcfce7; border-radius: 8px; padding: 12px; margin-bottom: 12px;"><p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #15803d;">🎁 Nuevos trials:</p>${trialUsersList}</div>` : ''}
+              ${paidUsersList ? `<div style="background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 8px; padding: 12px; margin-bottom: 12px;"><p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #0369a1;">💳 Nuevas suscripciones de pago:</p>${paidUsersList}</div>` : ''}
             `;
         }
 
@@ -946,6 +1051,15 @@ Deno.serve(async (req) => {
               🎁 Créditos por Anuncios Premiados (${periodLabel})
             </h2>
             ${rewardedAdsHtml}
+
+            <!-- Divider -->
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+            <!-- PRO Subscriptions Section -->
+            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
+              👑 Suscripciones PRO (${periodLabel})
+            </h2>
+            ${proStatsHtml}
 
             <!-- Divider -->
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
