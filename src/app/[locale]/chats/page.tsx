@@ -359,8 +359,8 @@ function ChatsPageContent() {
                     <ModernCard className={cn(
                       "hover:border-gold transition-colors cursor-pointer",
                       conv.other_user_is_deleted && "opacity-85",
-                      conv.other_is_pro && !conv.other_user_is_deleted && "border-[#FFC000]/60 shadow-[0_0_8px_rgba(255,192,0,0.15)]",
-                      conv.other_is_pro && !conv.other_user_is_deleted && conv.unread_count > 0 && "border-[#FFC000] shadow-[0_0_12px_rgba(255,192,0,0.25)] bg-gradient-to-r from-[#FFC000]/5 to-transparent"
+                      conv.other_is_pro && !conv.other_user_is_deleted && "!border-2 !border-[#FFC000] shadow-[0_0_12px_rgba(255,192,0,0.25)]",
+                      conv.other_is_pro && !conv.other_user_is_deleted && conv.unread_count > 0 && "!border-[#FFC000] shadow-[0_0_20px_rgba(255,192,0,0.35)] bg-gradient-to-r from-[#FFC000]/10 to-transparent"
                     )}>
                       <ModernCardContent className="p-4">
                         <div className="flex gap-3">

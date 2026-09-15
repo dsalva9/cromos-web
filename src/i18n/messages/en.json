@@ -2093,7 +2093,8 @@
     "rateLimited": "Please wait before watching another ad",
     "dailyLimitReached": "You've reached the daily credit limit",
     "buyDirect48h": "Buy 48h · €1.20",
-    "buyDirect7d": "Buy 7 days · €3.50"
+    "buyDirect7d": "Buy 7 days · €3.50",
+    "payInstead": "Pay instead"
   },
   "listingLimitModal": {
     "title": "Daily limit reached!",

@@ -109,10 +109,10 @@ export function DestacaAnuncioModal({
 
   // Refresh balance when modal opens (picks up credits granted elsewhere)
   useEffect(() => {
-    if (open && isAndroid) {
+    if (open) {
       refreshBalance();
     }
-  }, [open, isAndroid]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Android: watch ad ──────────────────────────────────────────────────────
   const handleWatchAd = async () => {
@@ -223,8 +223,8 @@ export function DestacaAnuncioModal({
             {t('subtitle')}
           </p>
 
-          {/* Credit balance pill — Android only */}
-          {isAndroid && (
+          {/* Credit balance pill — shown when user has credits (any platform) */}
+          {(isAndroid || balance > 0) && (
             <div className={cn(
               'mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full transition-all duration-500',
               creditFlash
@@ -273,10 +273,11 @@ export function DestacaAnuncioModal({
                 </div>
               </div>
               <div className="text-right shrink-0 ml-3">
-                {isAndroid ? (
+                {isAndroid || balance > 0 ? (
                   <p className="font-black text-amber-600 dark:text-amber-400 text-sm leading-tight">
                     {HIGHLIGHT_COSTS['48_hours']}
                     <span className="text-xs font-medium block">{t('credits')}</span>
+                    {!isAndroid && <span className="text-[10px] text-gray-400 block">o 1,20€</span>}
                   </p>
                 ) : (
                   <p className="text-xl font-black text-amber-600 dark:text-amber-400">1,20€</p>
@@ -313,10 +314,11 @@ export function DestacaAnuncioModal({
                 </div>
               </div>
               <div className="text-right shrink-0 ml-3">
-                {isAndroid ? (
+                {isAndroid || balance > 0 ? (
                   <p className="font-black text-amber-600 dark:text-amber-400 text-sm leading-tight">
                     {HIGHLIGHT_COSTS['7_days']}
                     <span className="text-xs font-medium block">{t('credits')}</span>
+                    {!isAndroid && <span className="text-[10px] text-gray-400 block">o 3,50€</span>}
                   </p>
                 ) : (
                   <p className="text-xl font-black text-amber-600 dark:text-amber-400">3,50€</p>
@@ -393,19 +395,51 @@ export function DestacaAnuncioModal({
             </>
           ) : (
             /* ── Web mode CTA ──────────────────────────────────────────── */
-            <Button
-              disabled={!selected}
-              onClick={() => selected && handlePayWeb(selected)}
-              className={cn(
-                'w-full h-12 text-base font-black rounded-xl transition-all duration-200',
-                selected
-                  ? 'bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-200/50 dark:shadow-amber-900/30'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed',
+            <>
+              {/* Shortfall info (web, when user has some credits but not enough) */}
+              {selected && balance > 0 && !hasEnoughCredits && (
+                <p className="text-xs text-center text-amber-600 dark:text-amber-400 font-medium pb-1">
+                  {t('needMoreCredits', { needed: shortfall, ads: adsNeeded })}
+                </p>
               )}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {t('ctaButton')}
-            </Button>
+
+              {/* Activate with credits (web) — only if user has enough */}
+              {selected && hasEnoughCredits && (
+                <Button
+                  disabled={activating}
+                  onClick={handleActivate}
+                  className={cn(
+                    'w-full h-12 text-base font-black rounded-xl transition-all duration-200',
+                    'bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-200/50 dark:shadow-amber-900/30',
+                  )}
+                >
+                  {activating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  {activating ? t('activating') : `${t('ctaButton')} (${creditCost} ${t('credits')})`}
+                </Button>
+              )}
+
+              {/* Pay via LemonSqueezy (web) — primary when no credits, secondary when has credits */}
+              <Button
+                disabled={!selected}
+                onClick={() => selected && handlePayWeb(selected)}
+                variant={hasEnoughCredits ? 'outline' : 'default'}
+                className={cn(
+                  'w-full h-12 text-base font-black rounded-xl transition-all duration-200',
+                  hasEnoughCredits
+                    ? 'border-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400'
+                    : selected
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white shadow-lg shadow-amber-200/50 dark:shadow-amber-900/30'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed',
+                )}
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                {hasEnoughCredits ? t('payInstead') : t('ctaButton')}
+              </Button>
+            </>
           )}
 
           {/* Skip — only show for new listings (post-create flow) */}

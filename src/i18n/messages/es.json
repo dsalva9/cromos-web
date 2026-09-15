@@ -2093,7 +2093,8 @@
     "rateLimited": "Espera un momento antes de ver otro anuncio",
     "dailyLimitReached": "Has alcanzado el límite diario de créditos",
     "buyDirect48h": "Comprar 48h · 1,20€",
-    "buyDirect7d": "Comprar 7 días · 3,50€"
+    "buyDirect7d": "Comprar 7 días · 3,50€",
+    "payInstead": "Pagar en su lugar"
   },
   "listingLimitModal": {
     "title": "¡Límite diario alcanzado!",
