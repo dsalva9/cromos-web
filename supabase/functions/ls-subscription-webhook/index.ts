@@ -163,6 +163,32 @@ Deno.serve(async (req) => {
         await supabase.from("pro_subscriptions")
           .update({ status: "cancelled", updated_at: new Date().toISOString() })
           .eq("ls_subscription_id", lsSubscriptionId);
+
+        // Send cancellation email
+        try {
+          const { data: subDetails } = await supabase
+            .from("pro_subscriptions")
+            .select("expires_at, plan")
+            .eq("ls_subscription_id", lsSubscriptionId)
+            .maybeSingle();
+          const { data: profile } = await supabase.from("profiles").select("nickname").eq("id", userId).single();
+          const { data: auth } = await supabase.auth.admin.getUserById(userId);
+          if (auth?.user?.email) {
+            await fetch(`${SUPABASE_URL}/functions/v1/send-pro-email`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+              body: JSON.stringify({
+                type: "subscription_cancelled",
+                user_id: userId,
+                email: auth.user.email,
+                nickname: profile?.nickname || "",
+                plan: subDetails?.plan,
+                expires_at: subDetails?.expires_at,
+              }),
+            });
+          }
+        } catch (e) { console.error("[ls-webhook] Cancellation email error:", e); }
+
         // User keeps PRO until expiry date
         console.log(`[ls-webhook] Cancelled sub ${lsSubscriptionId} (active until expiry)`);
         break;

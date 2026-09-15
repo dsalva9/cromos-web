@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { AlertTriangle, LogOut, Trash2, Loader2, Lightbulb } from 'lucide-react';
+import { AlertTriangle, Crown, LogOut, Trash2, Loader2, Lightbulb } from 'lucide-react';
 import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvider';
+import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useRouter } from '@/hooks/use-router';
 import { toast } from 'sonner';
 import { DeleteAccountDialog } from '@/components/deletion';
@@ -17,6 +19,8 @@ export function SystemSettingsTab() {
   const supabase = useSupabaseClient();
   const router = useRouter();
   const { user } = useUser();
+  const { profile } = useProfileCompletion();
+  const isPro = profile?.is_pro ?? false;
   const [signingOut, setSigningOut] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -58,6 +62,36 @@ export function SystemSettingsTab() {
 
   return (
     <div className="space-y-4 md:space-y-6">
+      {/* Suscripción PRO */}
+      <ModernCard className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <ModernCardContent className="p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/30 border-2 border-[#FFC000] flex items-center justify-center">
+              <Crown className="h-6 w-6 text-[#FFC000]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Suscripción PRO
+              </h3>
+              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
+                {isPro
+                  ? 'Gestiona tu suscripción, consulta beneficios y fecha de renovación.'
+                  : 'Hazte PRO para disfrutar de subidas ilimitadas, sin anuncios y más.'}
+              </p>
+              <Button
+                asChild
+                className="bg-[#FFC000] hover:bg-[#e6ad00] text-gray-900 w-full sm:w-auto text-sm md:text-base"
+              >
+                <Link href="/pro">
+                  <Crown className="h-4 w-4 mr-2" />
+                  {isPro ? 'Gestionar PRO' : 'Ver planes PRO'}
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
+
       {/* Theme Settings */}
       <ThemeSettingsSection />
 

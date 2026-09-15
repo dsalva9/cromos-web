@@ -76,15 +76,16 @@ function buildEmail(type: EmailType, data: EmailData): { subject: string; html: 
       const subject = "🎉 ¡Bienvenido a CambioCromos PRO!";
       const body = `
         <p style="color:#374151;">¡Hola ${name}!</p>
-        <p style="color:#374151;">Tu periodo de prueba PRO de <strong>${data.trialDays || 30} días</strong> ya está activo. Esto es lo que incluye:</p>
+        <p style="color:#374151;">Tu periodo de prueba PRO de <strong>${data.trialDays || 7} días</strong> ya está activo. Esto es lo que incluye:</p>
         <ul style="color:#374151;line-height:1.8;">
           <li>📦 <strong>Subidas ilimitadas</strong> al marketplace</li>
-          <li>⭐ <strong>800 créditos de destacados</strong> al mes</li>
+          <li>⭐ <strong>200 créditos de destacados</strong></li>
           <li>🚫 <strong>Sin anuncios</strong> en toda la app</li>
+          <li>💬 <strong>Chats prioritarios</strong></li>
           <li>🏷️ <strong>Badge PRO</strong> en tu perfil</li>
         </ul>
         <p style="color:#374151;">Tu prueba expira el <strong>${expiresFormatted}</strong>.</p>
-        <p style="color:#6B7280;font-size:14px;">Después podrás suscribirte por solo 4,99€/mes.</p>`;
+        <p style="color:#6B7280;font-size:14px;">Después podrás suscribirte por solo 4,99€/mes para seguir disfrutando de todas las ventajas.</p>`;
       const html = baseTemplate(subject, body, "Ir a CambioCromos", APP_URL);
       return { subject, html };
     }
@@ -101,8 +102,12 @@ function buildEmail(type: EmailType, data: EmailData): { subject: string; html: 
           <li>⭐ 800 créditos de destacados al mes</li>
           <li>🚫 Sin anuncios</li>
           <li>🏷️ Badge PRO exclusivo</li>
+          <li>💬 Chats prioritarios</li>
         </ul>
-        <p style="color:#374151;">Próxima renovación: <strong>${expiresFormatted}</strong></p>`;
+        <p style="color:#374151;">Próxima renovación: <strong>${expiresFormatted}</strong></p>
+        <div style="background:#F3F4F6;border-radius:8px;padding:16px;margin:16px 0;">
+          <p style="margin:0;color:#374151;font-size:14px;">💡 <strong>Gestiona tu suscripción</strong> pulsando tu badge PRO en tu perfil o desde Ajustes → Suscripción PRO.</p>
+        </div>`;
       const html = baseTemplate(subject, body, "Ir a CambioCromos", APP_URL);
       return { subject, html };
     }
@@ -150,11 +155,18 @@ function buildEmail(type: EmailType, data: EmailData): { subject: string; html: 
     }
 
     case "subscription_cancelled": {
-      const subject = "Tu suscripción PRO ha terminado";
+      const subject = "Tu suscripción PRO ha sido cancelada";
       const body = `
         <p style="color:#374151;">Hola ${name},</p>
-        <p style="color:#374151;">Tu suscripción PRO ha finalizado. Lamentamos verte partir.</p>
-        <p style="color:#374151;">Has vuelto al plan gratuito. Si cambias de opinión, puedes volver a suscribirte en cualquier momento.</p>`;
+        <p style="color:#374151;">Tu suscripción PRO ha sido cancelada correctamente.</p>
+        ${expiresFormatted
+          ? `<div style="background:#FFFBEB;border:1px solid #FFC000;border-radius:8px;padding:16px;margin:16px 0;">
+              <p style="margin:0;color:#92400E;font-weight:bold;">📅 Seguirás disfrutando de PRO hasta el ${expiresFormatted}</p>
+            </div>
+            <p style="color:#374151;">Hasta esa fecha, todos tus beneficios PRO siguen activos: subidas ilimitadas, sin anuncios, créditos de destacados y badge PRO.</p>`
+          : `<p style="color:#374151;">Has vuelto al plan gratuito.</p>`
+        }
+        <p style="color:#374151;">Muchas gracias por haber sido parte de CambioCromos PRO. Si cambias de opinión, puedes volver a suscribirte en cualquier momento.</p>`;
       const html = baseTemplate(subject, body, "Volver a PRO", `${APP_URL}/pro`);
       return { subject, html };
     }

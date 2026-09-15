@@ -102,6 +102,31 @@ Deno.serve(async (req) => {
         .update({ status: "cancelled", updated_at: new Date().toISOString() })
         .eq("ls_subscription_id", ls_subscription_id);
 
+      // Send cancellation email (non-blocking)
+      try {
+        const { data: subDetails } = await supabase
+          .from("pro_subscriptions")
+          .select("expires_at, plan")
+          .eq("ls_subscription_id", ls_subscription_id)
+          .maybeSingle();
+        const { data: profile } = await supabase.from("profiles").select("nickname").eq("id", user.id).single();
+
+        await fetch(`${SUPABASE_URL}/functions/v1/send-pro-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+          body: JSON.stringify({
+            type: "subscription_cancelled",
+            user_id: user.id,
+            email: user.email,
+            nickname: profile?.nickname || "",
+            plan: subDetails?.plan,
+            expires_at: subDetails?.expires_at,
+          }),
+        });
+      } catch (emailErr) {
+        console.error("[cancel-ls] Email error (non-fatal):", emailErr);
+      }
+
       console.log(`[cancel-ls] Cancelled LS subscription ${ls_subscription_id} for user ${user.id}`);
 
       return new Response(JSON.stringify({ ok: true }), {

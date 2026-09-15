@@ -242,6 +242,31 @@ export function useProSubscription(): UseProSubscriptionReturn {
 
       toast.success(`¡PRO activado! ${data?.trial_days ?? 7} días gratis + ${data?.highlight_credits ?? 200} créditos de destacados.`);
       await refresh();
+
+      // Send welcome trial email (non-blocking)
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-pro-email`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`,
+            },
+            body: JSON.stringify({
+              type: 'welcome_trial',
+              user_id: authUser?.id,
+              email: authUser?.email,
+              nickname: profile?.nickname || '',
+              expires_at: data?.expires_at,
+              trial_days: data?.trial_days,
+            }),
+          }
+        );
+      } catch {}
+
       return true;
     } catch (err) {
       toast.error('Error activando la prueba.');
@@ -249,7 +274,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
     } finally {
       setIsActivating(false);
     }
-  }, [supabase, deviceId, refresh]);
+  }, [supabase, deviceId, refresh, profile]);
 
   const subscribePro = useCallback(async (plan: ProPlan) => {
     const isNative = Capacitor.isNativePlatform();
