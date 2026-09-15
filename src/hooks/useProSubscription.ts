@@ -92,24 +92,41 @@ export function useProSubscription(): UseProSubscriptionReturn {
           productType: 'subs',
         });
 
-        if (result?.transactionId) {
+        const purchaseToken = result?.purchaseToken || result?.transactionId;
+        const transactionId = result?.transactionId || purchaseToken;
+
+        if (purchaseToken) {
           // Verify with backend
+          const { data: { session } } = await supabase.auth.getSession();
+          const token = session?.access_token;
+          if (!token) {
+            toast.error('No autenticado. Por favor inicia sesión.');
+            return;
+          }
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-play-purchase`,
             {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
               body: JSON.stringify({
-                purchase_token: result.transactionId,
-                product_id: productId,
-                package_name: 'com.cambiocromos.app',
+                productId,
+                purchaseToken,
+                transactionId,
               }),
             }
           );
 
-          if (response.ok) {
-            toast.success('¡Suscripción PRO activada!');
+          const resData = await response.json().catch(() => null);
+
+          if (response.ok && resData?.ok) {
+            toast.success('¡Suscripción PRO activada con éxito!');
             await refresh();
+          } else {
+            toast.error(resData?.error || 'Error al verificar la suscripción.');
           }
         }
       } catch (err: any) {

@@ -6,6 +6,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
  * Validates the purchase token with Google Play Developer API, then:
  *   - For `listing_extra_upload`: grants 1 extra listing unlock
  *   - For `highlight_48h`/`highlight_7d`: purchases highlight credits + activates
+ *   - For `pro_monthly`/`pro_yearly_cc`: activates PRO subscription + grants 800 highlight credits
  *   - Acknowledges the purchase with Google Play
  *
  * Requires:
@@ -24,11 +25,13 @@ const corsHeaders = {
 // Product → action mapping
 const PRODUCT_ACTIONS: Record<
   string,
-  { type: "listing_unlock" | "highlight"; duration?: string }
+  { type: "listing_unlock" | "highlight" | "subscription"; duration?: string; plan?: "monthly" | "yearly" }
 > = {
   listing_extra_upload: { type: "listing_unlock" },
   highlight_48h: { type: "highlight", duration: "48_hours" },
   highlight_7d: { type: "highlight", duration: "7_days" },
+  pro_monthly: { type: "subscription", plan: "monthly" },
+  pro_yearly_cc: { type: "subscription", plan: "yearly" },
 };
 
 // ---------------------------------------------------------------------------
@@ -170,9 +173,70 @@ async function acknowledgePurchase(
       headers: { Authorization: `Bearer ${accessToken}` },
     });
   } catch (err) {
-    // Non-fatal: Google auto-refunds after 3 days if not acknowledged,
-    // but our DB already granted the product. Log and continue.
     console.error("[verify-play-purchase] Acknowledge error:", err);
+  }
+}
+
+async function verifySubscription(
+  subscriptionId: string,
+  purchaseToken: string
+): Promise<{ valid: boolean; orderId?: string; expiryTimeMillis?: string; error?: string }> {
+  try {
+    const accessToken = await getGoogleAccessToken();
+    const packageName = "com.cambiocromos.app";
+
+    const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/purchases/subscriptions/${subscriptionId}/tokens/${purchaseToken}`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(`[verify-play-purchase] Google Subscription API error: ${errBody}`);
+      return { valid: false, error: `Google Subscription API: ${res.status}` };
+    }
+
+    const data = await res.json();
+    const expiry = Number(data.expiryTimeMillis || 0);
+    const now = Date.now();
+
+    // paymentState: 1 = Payment received, 2 = Free trial
+    if (expiry > 0 && expiry < now && data.paymentState !== 1 && data.paymentState !== 2) {
+      return { valid: false, error: "Subscription is not active" };
+    }
+
+    return {
+      valid: true,
+      orderId: data.orderId || purchaseToken,
+      expiryTimeMillis: data.expiryTimeMillis,
+    };
+  } catch (err: any) {
+    console.error("[verify-play-purchase] Subscription verification error:", err);
+    return { valid: false, error: err.message };
+  }
+}
+
+async function acknowledgeSubscription(
+  subscriptionId: string,
+  purchaseToken: string
+): Promise<void> {
+  try {
+    const accessToken = await getGoogleAccessToken();
+    const packageName = "com.cambiocromos.app";
+
+    const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/purchases/subscriptions/${subscriptionId}/tokens/${purchaseToken}:acknowledge`;
+
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    });
+  } catch (err) {
+    console.error("[verify-play-purchase] Acknowledge subscription error:", err);
   }
 }
 
@@ -224,9 +288,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Parse request body
+    // Parse request body — support both camelCase and snake_case
     const body = await req.json();
-    const { productId, purchaseToken, transactionId } = body;
+    const productId = body.productId || body.product_id;
+    const purchaseToken = body.purchaseToken || body.purchase_token;
+    const transactionId = body.transactionId || body.transaction_id;
 
     if (!productId || !purchaseToken) {
       return new Response(
@@ -243,6 +309,103 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ── Subscription handler ────────────────────────────────────────────────
+    if (action.type === "subscription") {
+      const { data: existingSub } = await supabaseAdmin
+        .from("pro_subscriptions")
+        .select("id")
+        .eq("google_purchase_token", purchaseToken)
+        .limit(1);
+
+      if (existingSub && existingSub.length > 0) {
+        return new Response(
+          JSON.stringify({ ok: true, message: "Already processed" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const subVerification = await verifySubscription(productId, purchaseToken);
+      if (!subVerification.valid) {
+        return new Response(
+          JSON.stringify({ ok: false, error: subVerification.error }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const plan = action.plan || "monthly";
+      const defaultDurationDays = plan === "yearly" ? 365 : 30;
+      const expiryMs = Number(subVerification.expiryTimeMillis) || (Date.now() + defaultDurationDays * 86400000);
+      const expiresAt = new Date(expiryMs).toISOString();
+      const paymentId = transactionId || subVerification.orderId || purchaseToken;
+
+      // Upsert pro_subscriptions
+      const { error: subError } = await supabaseAdmin
+        .from("pro_subscriptions")
+        .upsert({
+          user_id: user.id,
+          plan: plan,
+          status: "active",
+          google_purchase_token: purchaseToken,
+          expires_at: expiresAt,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "google_purchase_token" });
+
+      if (subError) {
+        console.error("[verify-play-purchase] Sub insert error:", subError);
+        return new Response(
+          JSON.stringify({ ok: false, error: "Failed to record subscription" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Update profiles.is_pro
+      await supabaseAdmin.from("profiles").update({
+        is_pro: true,
+        pro_expires_at: expiresAt,
+      }).eq("id", user.id);
+
+      // Grant monthly 800 highlight credits
+      await supabaseAdmin.rpc("purchase_highlight_credits" as any, {
+        p_user_id: user.id,
+        p_amount: 800,
+        p_source: "admin_grant",
+        p_ls_order_id: `gplay_sub_${paymentId}`,
+      });
+
+      // Acknowledge subscription with Google Play
+      await acknowledgeSubscription(productId, purchaseToken);
+
+      // Send confirmation email (non-blocking)
+      try {
+        const { data: profile } = await supabaseAdmin.from("profiles").select("nickname").eq("id", user.id).single();
+        await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-pro-email`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({
+            type: "welcome_pro",
+            user_id: user.id,
+            email: user.email,
+            nickname: profile?.nickname || "",
+            plan,
+          }),
+        });
+      } catch (emailErr) {
+        console.warn("[verify-play-purchase] Email error (non-fatal):", emailErr);
+      }
+
+      console.info(`[verify-play-purchase] ✓ PRO subscription ${plan} for user ${user.id} (${paymentId})`);
+
+      return new Response(
+        JSON.stringify({ ok: true, paymentId, expiresAt }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── In-App Consumable products handler ───────────────────────────────────
+
     // Idempotency check: has this transaction already been processed?
     const { data: existing } = await supabaseAdmin
       .from("listing_unlock_transactions")
@@ -251,7 +414,6 @@ Deno.serve(async (req) => {
       .limit(1);
 
     if (existing && existing.length > 0) {
-      // Already processed — return success (idempotent)
       return new Response(
         JSON.stringify({ ok: true, message: "Already processed" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }

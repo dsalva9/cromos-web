@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, Tv2, CreditCard, Crown, Loader2, CheckCircle2, X } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { isNative } from '@/lib/platform';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
@@ -49,6 +49,7 @@ export function ListingLimitModal({
   onUnlocked,
 }: ListingLimitModalProps) {
   const t = useTranslations('listingLimitModal');
+  const locale = useLocale();
   const { quota, recordAdView, refresh: refreshQuota } = useListingQuota();
 
   // ── Platform detection (post-hydration) ──────────────────────────────────
@@ -297,7 +298,7 @@ export function ListingLimitModal({
                 variant="ghost"
                 size="sm"
                 className="text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 font-semibold text-xs shrink-0"
-                onClick={() => { window.location.href = '/es/pro'; }}
+                onClick={() => { onClose(); window.location.href = `/${locale}/pro`; }}
               >
                 {t('proCta')}
               </Button>
