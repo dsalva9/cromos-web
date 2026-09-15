@@ -26,7 +26,7 @@ import { Capacitor } from '@capacitor/core';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Bell } from 'lucide-react';
+import { Bell, Crown } from 'lucide-react';
 
 type NavigationLink = {
   href: string;
@@ -94,7 +94,7 @@ export default function SiteHeader() {
   const supabase = useSupabaseClient();
   const { user, loading, wasAuthed } = useUser();
   // isAdmin now comes from ProfileCompletionProvider - eliminates separate query
-  const { isComplete, isAdmin, loading: profileLoading } = useProfileCompletion();
+  const { isComplete, isAdmin, profile, loading: profileLoading } = useProfileCompletion();
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('header');
@@ -316,6 +316,19 @@ export default function SiteHeader() {
               </ul>
               {!loading && user ? (
                 <div className="ml-4 flex items-center gap-2">
+                  {!profile?.is_pro && (
+                    <Link
+                      href="/pro"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider text-white transition-all hover:scale-105 hover:shadow-lg"
+                      style={{
+                        background: 'linear-gradient(135deg, #FFC000, #F59E0B)',
+                        boxShadow: '0 2px 8px rgba(255,192,0,0.3)',
+                      }}
+                    >
+                      <Crown className="h-3.5 w-3.5" />
+                      PRO
+                    </Link>
+                  )}
                   <NotificationDropdown onOpenRatingModal={handleOpenRatingModal} />
                   {i18nEnabled && <LanguageSelector />}
                   <UserAvatarDropdown isAdmin={isAdmin} />
@@ -336,6 +349,18 @@ export default function SiteHeader() {
               ) : (
                 user ? (
                   <>
+                    {!profile?.is_pro && (
+                      <Link
+                        href="/pro"
+                        className="p-1.5 rounded-full transition-all hover:scale-110 shrink-0"
+                        style={{
+                          background: 'linear-gradient(135deg, #FFC000, #F59E0B)',
+                          boxShadow: '0 1px 4px rgba(255,192,0,0.4)',
+                        }}
+                      >
+                        <Crown className="h-4 w-4 text-white" />
+                      </Link>
+                    )}
                     <MobileNotificationIcon />
                     <MobileUserAvatar userId={user.id} />
                   </>

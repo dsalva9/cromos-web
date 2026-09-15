@@ -39,8 +39,9 @@ import {
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles } from 'lucide-react';
+import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles, Crown } from 'lucide-react';
 import { isNative } from '@/lib/platform';
+import { ProBadge } from '@/components/ui/ProBadge';
 import { useHighlightCredits, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 
@@ -576,10 +577,17 @@ export default function UserProfilePage() {
           <div 
             className={cn(
               "mb-8 rounded-2xl border shadow-sm transition-all duration-300",
-              profile.is_patron 
-                ? "border-amber-300 dark:border-amber-800 bg-gradient-to-br from-amber-50/40 via-white to-orange-50/30 dark:from-amber-950/20 dark:via-gray-800 dark:to-orange-950/15" 
-                : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+              profile.is_pro
+                ? "border-2 bg-white dark:bg-gray-800"
+                : profile.is_patron 
+                  ? "border-amber-300 dark:border-amber-800 bg-gradient-to-br from-amber-50/40 via-white to-orange-50/30 dark:from-amber-950/20 dark:via-gray-800 dark:to-orange-950/15" 
+                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
             )}
+            style={profile.is_pro ? {
+              borderColor: '#FFC000',
+              boxShadow: '0 0 20px rgba(255,192,0,0.25)',
+              background: 'linear-gradient(135deg, rgba(255,192,0,0.06), transparent 60%)',
+            } : undefined}
           >
             <div className="p-6">
               <div className="flex flex-col md:flex-row gap-6">
@@ -593,21 +601,27 @@ export default function UserProfilePage() {
                       height={120}
                       className={cn(
                         "rounded-full object-cover shadow-sm bg-gray-50 dark:bg-gray-800",
-                        profile.is_patron 
-                          ? "border-4 border-amber-400 dark:border-amber-500" 
-                          : "border border-gray-200 dark:border-gray-700"
+                        profile.is_pro
+                          ? "border-4"
+                          : profile.is_patron 
+                            ? "border-4 border-amber-400 dark:border-amber-500" 
+                            : "border border-gray-200 dark:border-gray-700"
                       )}
+                      style={profile.is_pro ? { borderColor: '#FFC000', boxShadow: '0 0 12px rgba(255,192,0,0.3)' } : undefined}
                     />
                   ) : (
                     <div 
                       className={cn(
                         "w-[120px] h-[120px] rounded-full flex items-center justify-center",
-                        profile.is_patron 
-                          ? "border-4 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/20" 
-                          : "border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
+                        profile.is_pro
+                          ? "border-4 bg-amber-50 dark:bg-amber-950/20"
+                          : profile.is_patron 
+                            ? "border-4 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/20" 
+                            : "border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
                       )}
+                      style={profile.is_pro ? { borderColor: '#FFC000', boxShadow: '0 0 12px rgba(255,192,0,0.3)' } : undefined}
                     >
-                      <User className={cn("h-16 w-16", profile.is_patron ? "text-amber-500 dark:text-amber-400" : "text-gray-400")} />
+                      <User className={cn("h-16 w-16", profile.is_pro ? "text-amber-500 dark:text-amber-400" : profile.is_patron ? "text-amber-500 dark:text-amber-400" : "text-gray-400")} />
                     </div>
                   )}
                 </div>
@@ -616,8 +630,9 @@ export default function UserProfilePage() {
                 <div className="flex-1">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
                     <div>
-                      <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
+                      <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                         {profile.nickname}
+                        {profile.is_pro && <ProBadge size="md" />}
                       </h1>
 
                       {/* Email & Location */}
@@ -665,8 +680,25 @@ export default function UserProfilePage() {
                         </a>
                       </div>
 
+                      {/* PRO badge */}
+                      {profile.is_pro && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <span
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider text-white border-2 shadow-md"
+                            style={{
+                              background: 'linear-gradient(135deg, #FFC000, #F59E0B)',
+                              borderColor: '#FFC000',
+                              boxShadow: '2px 2px 0px 0px #B8860B, 0 0 12px rgba(255,192,0,0.3)',
+                            }}
+                          >
+                            <Crown className="h-3.5 w-3.5" />
+                            <span>CambioCromos PRO</span>
+                          </span>
+                        </div>
+                      )}
+
                       {/* Patron badge */}
-                      {profile.is_patron && (
+                      {profile.is_patron && !profile.is_pro && (
                         <div className="flex items-center gap-2 mt-2">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border-2 border-amber-400 dark:border-amber-800 shadow-[2px_2px_0px_0px_rgba(245,158,11,1)]">
                             <span>☕</span>
