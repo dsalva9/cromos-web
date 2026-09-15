@@ -12,6 +12,7 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
+import { ProBadge } from '@/components/ui/ProBadge';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -236,7 +237,9 @@ export function ListingCard({ listing }: ListingCardProps) {
               <div 
                 className={cn(
                   "relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700",
-                  listing.author_is_patron 
+                  listing.author_is_pro
+                    ? "ring-2 ring-[#FFC000]"
+                    : listing.author_is_patron 
                     ? "ring-2 ring-amber-400 dark:ring-amber-500" 
                     : "ring-1 ring-gray-100 dark:ring-gray-700"
                 )}
@@ -272,7 +275,10 @@ export function ListingCard({ listing }: ListingCardProps) {
                 className="text-xs font-medium text-gray-900 dark:text-white hover:text-primary truncate block max-w-[100px] !text-gray-900 dark:!text-white transition-colors"
                 forceSpan={false}
               />
-              {listing.author_is_patron && (
+              {listing.author_is_pro && (
+                  <ProBadge size="sm" />
+                )}
+              {listing.author_is_patron && !listing.author_is_pro && (
                 <span
                   className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm whitespace-nowrap shrink-0"
                   title="Patrón de CambioCromos"

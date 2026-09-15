@@ -334,8 +334,7 @@ export function ListingLimitModal({
                 variant="ghost"
                 size="sm"
                 className="text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/30 font-semibold text-xs shrink-0"
-                // TODO Phase 3: Link to /pro page
-                disabled
+                onClick={() => { window.location.href = '/es/pro'; }}
               >
                 {t('proCta')}
               </Button>
