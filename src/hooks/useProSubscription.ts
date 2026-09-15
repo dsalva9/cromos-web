@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useDeviceId } from '@/hooks/useDeviceId';
@@ -15,6 +15,22 @@ interface UseProSubscriptionReturn {
   activateTrial: () => Promise<boolean>;
   subscribePro: (plan: ProPlan) => Promise<void>;
   isActivating: boolean;
+}
+
+let NativePurchasesPlugin: any = null;
+let pluginLoadError: string | null = null;
+
+function getNativePurchases(): any {
+  if (NativePurchasesPlugin) return NativePurchasesPlugin;
+  if (pluginLoadError) return null;
+
+  try {
+    NativePurchasesPlugin = registerPlugin('NativePurchases');
+    return NativePurchasesPlugin;
+  } catch (err: any) {
+    pluginLoadError = err?.message ?? 'registerPlugin failed';
+    return null;
+  }
 }
 
 /**
@@ -81,16 +97,51 @@ export function useProSubscription(): UseProSubscriptionReturn {
     const isNative = Capacitor.isNativePlatform();
 
     if (isNative) {
-      // Google Play subscription — use NativePurchases plugin
-      try {
-        const { registerPlugin } = await import('@capacitor/core');
-        const NativePurchases = registerPlugin('NativePurchases') as any;
+      const NP = getNativePurchases();
+      if (!NP) {
+        toast.error('Plugin de compras no disponible. Actualiza la app.');
+        return;
+      }
 
-        const productId = plan === 'monthly' ? 'pro_monthly' : 'pro_yearly_cc';
-        const result = await NativePurchases.purchaseProduct({
+      const productId = plan === 'monthly' ? 'pro_monthly' : 'pro_yearly_cc';
+
+      try {
+        // Query product details from Google Play to obtain basePlanId and offerToken
+        let planIdentifier = productId;
+        let offerToken: string | undefined = undefined;
+
+        try {
+          const productsResult = await NP.getProducts({
+            productIdentifiers: [productId],
+            productType: 'subs',
+          });
+          const products = productsResult?.products || [];
+          if (products.length > 0) {
+            // In @capgo/native-purchases on Android:
+            // product.identifier is the basePlanId from Play Console
+            if (products[0].identifier) {
+              planIdentifier = products[0].identifier;
+            }
+            if (products[0].offerToken) {
+              offerToken = products[0].offerToken;
+            }
+          }
+        } catch (queryErr) {
+          console.warn('[useProSubscription] Could not pre-query subscription products:', queryErr);
+        }
+
+        const purchaseOptions: any = {
           productIdentifier: productId,
+          planIdentifier,
           productType: 'subs',
-        });
+          quantity: 1,
+        };
+
+        if (offerToken) {
+          purchaseOptions.offerToken = offerToken;
+        }
+
+        const result = await NP.purchaseProduct(purchaseOptions);
 
         const purchaseToken = result?.purchaseToken || result?.transactionId;
         const transactionId = result?.transactionId || purchaseToken;
@@ -104,6 +155,8 @@ export function useProSubscription(): UseProSubscriptionReturn {
             return;
           }
 
+          toast.loading('Verificando suscripción con Google Play...', { id: 'verify-sub' });
+
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-play-purchase`,
             {
@@ -113,6 +166,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
                 'Authorization': `Bearer ${token}`,
               },
               body: JSON.stringify({
+                platform: 'google_play',
                 productId,
                 purchaseToken,
                 transactionId,
@@ -120,6 +174,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
             }
           );
 
+          toast.dismiss('verify-sub');
           const resData = await response.json().catch(() => null);
 
           if (response.ok && resData?.ok) {
@@ -130,26 +185,57 @@ export function useProSubscription(): UseProSubscriptionReturn {
           }
         }
       } catch (err: any) {
-        if (!err?.message?.includes('cancelled')) {
-          toast.error('Error al procesar la compra.');
+        const msg = err?.message ?? String(err);
+        if (
+          msg.includes('cancel') ||
+          msg.includes('Cancel') ||
+          msg.includes('USER_CANCELED') ||
+          msg.includes('not purchased')
+        ) {
+          return;
         }
+        console.error('[useProSubscription] Purchase error:', err);
+        toast.error(err?.message || 'Error al procesar la compra.');
       }
     } else {
       // Web — redirect to LemonSqueezy checkout
-      const variantId = plan === 'monthly'
+      let variantId = plan === 'monthly'
         ? process.env.NEXT_PUBLIC_LS_VARIANT_PRO_MONTHLY
         : process.env.NEXT_PUBLIC_LS_VARIANT_PRO_YEARLY;
 
-      const storeSlug = process.env.NEXT_PUBLIC_LS_STORE_SLUG || 'cambiocromos';
+      let storeSlug = process.env.NEXT_PUBLIC_LS_STORE_SLUG || 'cambiocromos';
+
+      // Fallback: check pro_config in Supabase
+      if (!variantId) {
+        try {
+          const { data: configRow } = await supabase
+            .from('pro_config')
+            .select('value')
+            .eq('key', 'lemonsqueezy_variants')
+            .maybeSingle();
+
+          if (configRow?.value) {
+            const configVal = configRow.value as any;
+            if (configVal?.store_slug) storeSlug = configVal.store_slug;
+            variantId = plan === 'monthly'
+              ? configVal?.monthly_variant_id || configVal?.monthly
+              : configVal?.yearly_variant_id || configVal?.yearly;
+          }
+        } catch (fetchErr) {
+          console.error('[useProSubscription] Error fetching LS config from DB:', fetchErr);
+        }
+      }
 
       if (!variantId) {
-        toast.error('Suscripción web no disponible todavía.');
+        toast.error('Suscripción web no disponible todavía (Variant ID no configurado).');
         return;
       }
 
       // Open LemonSqueezy checkout with prefilled user info
       const { data: { user } } = await supabase.auth.getUser();
-      const checkoutUrl = `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${variantId}?checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}`;
+      const checkoutUrl = variantId.startsWith('http')
+        ? (variantId.includes('?') ? `${variantId}&checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}` : `${variantId}?checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}`)
+        : `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${variantId}?checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}`;
 
       window.open(checkoutUrl, '_blank');
     }

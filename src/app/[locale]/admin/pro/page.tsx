@@ -394,46 +394,123 @@ function ConfigTab() {
       daily_listing_limit_free: 'Límite diario subidas (gratis)',
       extra_listing_rewarded_ads: 'Anuncios para subida extra',
       extra_listing_price_cents: 'Precio subida extra (céntimos)',
+      highlight_credits_trial: 'Créditos destacados en prueba',
+      lemonsqueezy_variants: 'LemonSqueezy Suscripciones Web',
     };
     return labels[key] || key;
+  };
+
+  const handleSaveLsVariants = async (item: any) => {
+    try {
+      const storeSlug = (document.getElementById('ls-store-slug') as HTMLInputElement)?.value || 'cambiocromos';
+      const monthlyId = (document.getElementById('ls-monthly-id') as HTMLInputElement)?.value || '';
+      const yearlyId = (document.getElementById('ls-yearly-id') as HTMLInputElement)?.value || '';
+
+      const { error } = await (supabase.rpc as any)('admin_update_pro_config', {
+        p_key: 'lemonsqueezy_variants',
+        p_value: {
+          store_slug: storeSlug,
+          monthly_variant_id: monthlyId,
+          yearly_variant_id: yearlyId,
+        }
+      });
+      if (error) throw error;
+      toast.success('Configuración de LemonSqueezy guardada');
+      fetchConfig();
+    } catch (err: any) {
+      toast.error(err.message || 'Error al guardar configuración LS');
+    }
   };
 
   if (loading) return <div className="text-white">Cargando...</div>;
 
   return (
     <div className="space-y-4">
-      {config.map((item) => (
-        <ModernCard key={item.key}>
-          <ModernCardContent className="p-6 flex items-center justify-between">
-            <div>
-              <h3 className="text-white font-bold">{getDisplayLabel(item.key)}</h3>
-              <p className="text-gray-400 text-sm font-mono">{item.key}</p>
-              {typeof item.value === 'object' && Object.keys(item.value).length > 1 && (
-                <p className="text-gray-500 text-xs mt-1">
-                  {JSON.stringify(item.value)}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
-              <Input
-                type="number"
-                defaultValue={getDisplayValue(item.value)}
-                id={`config-${item.key}`}
-                className="w-24 bg-[#374151] border-2 border-black text-white"
-              />
-              <Button 
-                onClick={() => {
-                  const val = (document.getElementById(`config-${item.key}`) as HTMLInputElement).value;
-                  handleSave(item.key, val);
-                }}
-                className="bg-[#F59E0B] hover:bg-[#D97706] text-black"
-              >
-                Guardar
-              </Button>
-            </div>
-          </ModernCardContent>
-        </ModernCard>
-      ))}
+      {config.map((item) => {
+        if (item.key === 'lemonsqueezy_variants') {
+          const val = item.value || {};
+          return (
+            <ModernCard key={item.key}>
+              <ModernCardContent className="p-6 space-y-4">
+                <div>
+                  <h3 className="text-white font-bold">{getDisplayLabel(item.key)}</h3>
+                  <p className="text-gray-400 text-sm font-mono">lemonsqueezy_variants (checkout web)</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs text-gray-300">Store Slug</Label>
+                    <Input
+                      id="ls-store-slug"
+                      defaultValue={val.store_slug || 'cambiocromos'}
+                      placeholder="cambiocromos"
+                      className="bg-[#374151] border-2 border-black text-white mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-300">Variant ID Mensual</Label>
+                    <Input
+                      id="ls-monthly-id"
+                      defaultValue={val.monthly_variant_id || val.monthly || ''}
+                      placeholder="Ej: 1903433"
+                      className="bg-[#374151] border-2 border-black text-white mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-300">Variant ID Anual</Label>
+                    <Input
+                      id="ls-yearly-id"
+                      defaultValue={val.yearly_variant_id || val.yearly || ''}
+                      placeholder="Ej: 1903426"
+                      className="bg-[#374151] border-2 border-black text-white mt-1"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => handleSaveLsVariants(item)}
+                    className="bg-[#F59E0B] hover:bg-[#D97706] text-black font-bold"
+                  >
+                    Guardar LemonSqueezy
+                  </Button>
+                </div>
+              </ModernCardContent>
+            </ModernCard>
+          );
+        }
+
+        return (
+          <ModernCard key={item.key}>
+            <ModernCardContent className="p-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-white font-bold">{getDisplayLabel(item.key)}</h3>
+                <p className="text-gray-400 text-sm font-mono">{item.key}</p>
+                {typeof item.value === 'object' && Object.keys(item.value).length > 1 && (
+                  <p className="text-gray-500 text-xs mt-1">
+                    {JSON.stringify(item.value)}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  defaultValue={getDisplayValue(item.value)}
+                  id={`config-${item.key}`}
+                  className="w-24 bg-[#374151] border-2 border-black text-white"
+                />
+                <Button 
+                  onClick={() => {
+                    const val = (document.getElementById(`config-${item.key}`) as HTMLInputElement).value;
+                    handleSave(item.key, val);
+                  }}
+                  className="bg-[#F59E0B] hover:bg-[#D97706] text-black"
+                >
+                  Guardar
+                </Button>
+              </div>
+            </ModernCardContent>
+          </ModernCard>
+        );
+      })}
     </div>
   );
 }
