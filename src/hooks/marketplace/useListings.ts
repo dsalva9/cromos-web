@@ -181,7 +181,7 @@ export function useListings({
         ...(maxAgeDays ? { p_max_age_days: maxAgeDays } : {}),
       };
 
-      const { data, error } = await supabase.rpc(
+      const { data, error } = await (supabase.rpc as any)(
         'list_trade_listings_with_collection_filter',
         rpcParams
       );
