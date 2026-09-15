@@ -77,7 +77,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
         const { registerPlugin } = await import('@capacitor/core');
         const NativePurchases = registerPlugin('NativePurchases') as any;
 
-        const productId = plan === 'monthly' ? 'pro_monthly' : 'pro_yearly';
+        const productId = plan === 'monthly' ? 'pro_monthly' : 'pro_yearly_cc';
         const result = await NativePurchases.purchaseProduct({
           productIdentifier: productId,
           productType: 'subs',

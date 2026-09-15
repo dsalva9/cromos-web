@@ -15,7 +15,7 @@ export const PRODUCT_IDS = {
 
 export const SUBSCRIPTION_IDS = {
   PRO_MONTHLY: 'pro_monthly',
-  PRO_YEARLY: 'pro_yearly',
+  PRO_YEARLY: 'pro_yearly_cc',
 } as const;
 
 type ProductId = (typeof PRODUCT_IDS)[keyof typeof PRODUCT_IDS];

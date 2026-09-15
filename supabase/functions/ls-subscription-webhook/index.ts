@@ -4,7 +4,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const LS_WEBHOOK_SECRET = Deno.env.get("LS_WEBHOOK_SECRET")!;
+const LS_WEBHOOK_SECRET = Deno.env.get("LS_WEBHOOK_SECRET_SUBSCRIPTION")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

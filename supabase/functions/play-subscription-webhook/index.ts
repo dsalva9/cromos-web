@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     }
 
     const userId = existingSub.user_id;
-    const plan = subscriptionId === "pro_yearly" ? "yearly" : "monthly";
+    const plan = subscriptionId === "pro_yearly_cc" ? "yearly" : "monthly";
 
     switch (notificationType) {
       case 1: // RECOVERED — subscription recovered from account hold
