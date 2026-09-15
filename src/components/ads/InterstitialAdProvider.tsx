@@ -34,18 +34,20 @@ const InterstitialAdContext = createContext<InterstitialAdContextValue>({
  */
 export function InterstitialAdProvider({ children }: { children: ReactNode }) {
     const { profile } = useProfileCompletion();
+    const isPro = profile?.is_pro ?? (typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true');
     const isPatron = profile?.is_patron ?? false;
+    const isAdFree = Boolean(isPro || isPatron);
 
-    const { maybeShowInterstitial, prepareAd } = useInterstitialAdEngine(isPatron);
+    const { maybeShowInterstitial, prepareAd } = useInterstitialAdEngine(isAdFree);
 
     // Pre-load the first interstitial on mount (native only)
     useEffect(() => {
         if (!isNative()) return;
-        if (isPatron) return;
+        if (isAdFree) return;
         // Small delay so we don't compete with the banner ad for the first request
         const timer = setTimeout(() => { prepareAd(); }, 3000);
         return () => clearTimeout(timer);
-    }, [isPatron, prepareAd]);
+    }, [isAdFree, prepareAd]);
 
     return (
         <InterstitialAdContext.Provider value={{ maybeShowInterstitial }}>

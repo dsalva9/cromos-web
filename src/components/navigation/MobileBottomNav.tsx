@@ -96,6 +96,8 @@ export function MobileBottomNav() {
   // Check if the ad banner is hidden on this page
   const isBannerHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
 
+  const isPro = Boolean(profile?.is_pro || (typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true'));
+
   // If user is not logged in (and wasn't previously authed), do not show the bottom nav
   // Before mount, always return null to match SSR output and avoid hydration mismatch
   if (!hasMounted || (!user && !wasAuthed)) {
@@ -112,12 +114,12 @@ export function MobileBottomNav() {
           // background covers the whole zone; the AdMob native layer renders on top.
           // Nav icons stay above the padding so they remain fully tappable.
           //
-          // Web/PWA: flush at bottom:0 (no web ads served).
+          // PRO users & Web/PWA: flush at bottom:0 with safe-area padding only (no ads).
           // Hidden pages: flush at bottom:0 with safe-area padding only.
-          bottom: (isNativeApp || isBannerHidden) ? '0px' : 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))',
-          paddingBottom: isNativeApp
+          bottom: (isNativeApp || isBannerHidden || isPro) ? '0px' : 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: (isNativeApp && !isPro)
             ? 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))'
-            : isBannerHidden
+            : (isBannerHidden || isPro || isNativeApp)
               ? 'env(safe-area-inset-bottom, 0px)'
               : undefined,
         }}

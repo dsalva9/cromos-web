@@ -125,7 +125,26 @@ export function ProfileCompletionProvider({
 }) {
   const { user, loading: authLoading } = useUser();
   const supabase = useSupabaseClient();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      if (localStorage.getItem('cc_is_pro') === 'true') {
+        return {
+          nickname: null,
+          postcode: null,
+          avatar_url: null,
+          is_admin: false,
+          is_patron: false,
+          is_pro: true,
+          pro_expires_at: null,
+          suspended_at: null,
+          deleted_at: null,
+          country_code: 'ES',
+        };
+      }
+    } catch {}
+    return null;
+  });
   const [loading, setLoading] = useState(true);
   // Once true, isComplete stays true for the rest of this session.
   // This prevents transient false readings during re-fetch after profile save.
@@ -150,6 +169,7 @@ export function ProfileCompletionProvider({
     if (!user) {
       setProfile(null);
       setLoading(false);
+      try { localStorage.removeItem('cc_is_pro'); } catch {}
       return;
     }
 
@@ -184,6 +204,13 @@ export function ProfileCompletionProvider({
         : { nickname: null, postcode: null, avatar_url: null, is_admin: false, is_patron: false, is_pro: false, pro_expires_at: null, suspended_at: null, deleted_at: null, country_code: 'ES' };
 
       setProfile(profileData);
+      try {
+        if (profileData.is_pro) {
+          localStorage.setItem('cc_is_pro', 'true');
+        } else {
+          localStorage.removeItem('cc_is_pro');
+        }
+      } catch {}
 
       // Check suspension/deletion status (merged from SupabaseProvider)
       if (data?.suspended_at || data?.deleted_at) {
