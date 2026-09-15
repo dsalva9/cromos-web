@@ -10,6 +10,9 @@ export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
+const isHttpUrl = (url?: string | null): url is string =>
+  !!url && (url.startsWith('http://') || url.startsWith('https://'));
+
 async function resolveTemplate(slug: string, locale: string) {
   // If slug is purely numeric, redirect to the actual slug URL
   if (/^\d+$/.test(slug)) {
@@ -54,7 +57,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     slots: totalSlots.toString(),
   });
 
-  const ogImage = template.image_url || `${siteConfig.url}/assets/LogoBlanco.png`;
+  const ogImage = isHttpUrl(template.image_url)
+    ? template.image_url
+    : `${siteConfig.url}/assets/LogoBlanco.png`;
 
   return {
     title,
@@ -70,6 +75,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: siteConfig.name,
       type: 'website',
       images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
     },
   };
 }
@@ -91,21 +102,25 @@ export default async function AlbumDetailPage({ params }: Props) {
 
   const { data, templateId } = result;
   const { template } = data;
-  const totalSlots = data.pages.reduce((sum, p) => sum + p.slots_count, 0);
+
+  const hasValidImageUrl = isHttpUrl(template.image_url);
 
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     name: template.title,
-    description: template.description,
-    ...(template.image_url ? { image: template.image_url } : {}),
+    ...(template.description ? { description: template.description } : {}),
+    image: hasValidImageUrl ? template.image_url : `${siteConfig.url}/assets/LogoBlanco.png`,
     url: `${siteConfig.url}/${locale}/albumes/${slug}`,
     dateCreated: template.created_at,
-    author: {
-      '@type': 'Person',
-      name: template.author_nickname,
-    },
-    numberOfItems: totalSlots,
+    ...(template.author_nickname
+      ? {
+          author: {
+            '@type': 'Person',
+            name: template.author_nickname,
+          },
+        }
+      : {}),
     isPartOf: {
       '@type': 'WebSite',
       name: siteConfig.name,

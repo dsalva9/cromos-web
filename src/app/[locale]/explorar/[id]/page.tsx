@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { notFound } from 'next/navigation';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { siteConfig } from '@/config/site';
@@ -76,8 +75,8 @@ async function getListingById(id: string): Promise<Listing | null> {
     global_number: data.global_number,
     is_group: data.is_group,
     group_count: data.group_count,
-    listing_type: (data as any).listing_type || 'intercambio',
-    price: (data as any).price,
+    listing_type: ((data as Record<string, unknown>).listing_type as Listing['listing_type']) || 'intercambio',
+    price: (data as Record<string, unknown>).price as number | undefined,
   };
 }
 
@@ -134,7 +133,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: `${baseUrl}/explorar/${id}`,
       siteName: siteConfig.name,
       type: 'website',
-      ...(listing.image_url ? { images: [{ url: listing.image_url }] } : {}),
+      ...(listing.image_url && (listing.image_url.startsWith('http://') || listing.image_url.startsWith('https://'))
+        ? { images: [{ url: listing.image_url }] }
+        : {}),
     },
   };
 }
@@ -149,6 +150,9 @@ export default async function PublicListingDetailPage({ params }: PageProps) {
   }
 
   const baseUrl = siteConfig.url;
+  const hasValidImageUrl =
+    !!listing.image_url &&
+    (listing.image_url.startsWith('http://') || listing.image_url.startsWith('https://'));
 
   // Build Product JSON-LD for rich results
   const productJsonLd: Record<string, unknown> = {
@@ -157,7 +161,7 @@ export default async function PublicListingDetailPage({ params }: PageProps) {
     name: listing.title,
     url: `${baseUrl}/explorar/${id}`,
     description: listing.description || `${t('meta.jsonLdDescFallbackSticker')} ${listing.title}${listing.collection_name ? ` ${t('meta.jsonLdDescFallbackFrom')} ${listing.collection_name}` : ''}`,
-    ...(listing.image_url ? { image: listing.image_url } : {}),
+    image: hasValidImageUrl ? listing.image_url : `${baseUrl}/assets/LogoBlanco.png`,
     ...(listing.collection_name ? { category: listing.collection_name } : {}),
     ...(listing.sticker_number ? { sku: `${listing.sticker_number}${listing.slot_variant || ''}` } : {}),
   };

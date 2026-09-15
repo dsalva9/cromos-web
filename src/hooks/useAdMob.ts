@@ -33,11 +33,16 @@ const PROVISIONAL_BANNER_HEIGHT_PX = 60;
  * - isTesting flag controls test vs. production ads
  * - AdMob.initialize() is called once per app lifecycle
  */
-export function useAdMob() {
+export function useAdMob(isPro = false) {
     const initialised = useRef(false);
 
     useEffect(() => {
         if (!isNative()) return;
+        if (isPro) {
+            // PRO users: ensure no banner is shown and reset height
+            document.documentElement.style.setProperty('--ad-band-height', '0px');
+            return;
+        }
         if (initialised.current) return;
         initialised.current = true;
 
@@ -146,5 +151,5 @@ export function useAdMob() {
             // Do NOT destroy/hide the banner on unmount — this hook lives in the root
             // layout and the banner should persist for the whole session
         };
-    }, []);
+    }, [isPro]);
 }

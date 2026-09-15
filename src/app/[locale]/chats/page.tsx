@@ -13,6 +13,7 @@ import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
 import { MatchConversation } from '@/lib/supabase/matches/chat';
+import { ProBadge } from '@/components/ui/ProBadge';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -364,7 +365,9 @@ function ChatsPageContent() {
                           {/* Avatar */}
                           <div className={cn(
                             "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
-                            conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70" : "bg-gold/20 border-gold"
+                            conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                              : conv.other_is_pro ? "bg-gold/20 border-[#FFC000] ring-2 ring-[#FFC000]/50"
+                              : "bg-gold/20 border-gold"
                           )}>
                             {conv.other_avatar_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
@@ -384,7 +387,10 @@ function ChatsPageContent() {
                                 ) : (
                                   <span>{conv.other_nickname}</span>
                                 )}
-                                {conv.other_is_patron && !conv.other_user_is_deleted && (
+                                {conv.other_is_pro && !conv.other_user_is_deleted && (
+                                  <ProBadge size="sm" />
+                                )}
+                                {conv.other_is_patron && !conv.other_user_is_deleted && !conv.other_is_pro && (
                                   <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
                                 )}
                                 {conv.other_user_is_deleted && (
