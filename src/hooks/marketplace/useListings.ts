@@ -51,6 +51,10 @@ interface UseListingsParams {
 
 /** Transform raw RPC row into the app-level Listing type */
 function transformRow(item: RpcListingResponse): Listing {
+  // TEMP DEBUG: log raw PRO fields for Davor_Cromos listing
+  if (item.id === 6295 || item.author_nickname === 'Davor_Cromos') {
+    console.warn('[PRO-DEBUG] Raw item:', item.id, item.author_nickname, 'is_pro:', item.author_is_pro, 'is_patron:', item.author_is_patron, 'all keys:', Object.keys(item));
+  }
   return {
     id: item.id,
     user_id: item.user_id,
