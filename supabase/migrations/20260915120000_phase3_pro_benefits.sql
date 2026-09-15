@@ -159,3 +159,7 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.get_match_conversations() TO authenticated;
 
+-- Allow 'trial_7d' in pro_subscriptions plan check constraint
+ALTER TABLE public.pro_subscriptions DROP CONSTRAINT IF EXISTS pro_subscriptions_plan_check;
+ALTER TABLE public.pro_subscriptions ADD CONSTRAINT pro_subscriptions_plan_check 
+  CHECK (plan IN ('trial_1m', 'trial_7d', 'monthly', 'yearly', 'admin_grant'));
