@@ -139,6 +139,7 @@ export async function getMarketplaceData(params: GetMarketplaceDataParams = {}) 
             group_count: item.group_count,
             author_completed_trades: item.author_completed_trades,
             author_is_patron: item.author_is_patron,
+            author_is_pro: item.author_is_pro,
             is_highlighted: item.is_highlighted,
         }));
 
