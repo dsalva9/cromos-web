@@ -27,7 +27,8 @@ export function useListing(listingId: string) {
             postcode,
             country_code,
             completed_trades,
-            is_patron
+            is_patron,
+            is_pro
           )
         `
         )
@@ -93,6 +94,7 @@ export function useListing(listingId: string) {
           price: (data as any).price,
           author_completed_trades: Number(data.author.completed_trades ?? 0),
           author_is_patron: data.author.is_patron,
+          author_is_pro: (data.author as any).is_pro ?? false,
           is_highlighted: false, // will be set below
         });
 

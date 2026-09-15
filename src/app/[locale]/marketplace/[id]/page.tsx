@@ -7,6 +7,7 @@ import { useListing } from '@/hooks/marketplace/useListing';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ProBadge } from '@/components/ui/ProBadge';
 import Image from 'next/image';
 import { IntlLink as Link } from '@/i18n/navigation';
 import { MessageCircle, Eye, Calendar, Edit, Trash, Ban, Trash2, MapPin, EyeOff, ArrowLeftRight } from 'lucide-react';
@@ -643,7 +644,10 @@ export default function ListingDetailPage() {
               </ModernCard>
 
               {/* Seller */}
-              <ModernCard className={cn("mb-6", listing.author_is_patron && "border-amber-300 dark:border-amber-900/50 shadow-[0_0_12px_rgba(245,158,11,0.08)] bg-gradient-to-r from-amber-50/10 to-transparent dark:from-amber-950/5")}>
+              <ModernCard className={cn("mb-6",
+                listing.author_is_pro && "border-[#FFC000] shadow-[0_0_12px_rgba(255,192,0,0.15)] bg-gradient-to-r from-[#FFC000]/5 to-transparent",
+                !listing.author_is_pro && listing.author_is_patron && "border-amber-300 dark:border-amber-900/50 shadow-[0_0_12px_rgba(245,158,11,0.08)] bg-gradient-to-r from-amber-50/10 to-transparent dark:from-amber-950/5"
+              )}>
                 <ModernCardContent className="p-4">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('seller')}</h3>
                   <Link href={`/users/${listing.user_id}`}>
@@ -665,7 +669,9 @@ export default function ListingDetailPage() {
                             height={48}
                             className={cn(
                               "rounded-full border-2",
-                              listing.author_is_patron
+                              listing.author_is_pro
+                                ? "border-[#FFC000] ring-2 ring-[#FFC000]/50"
+                                : listing.author_is_patron
                                 ? "border-amber-400 ring-2 ring-amber-400/50"
                                 : "border-black"
                             )}
@@ -674,7 +680,9 @@ export default function ListingDetailPage() {
                           <div
                             className={cn(
                               "w-12 h-12 rounded-full border-2 flex items-center justify-center text-black font-black text-lg",
-                              listing.author_is_patron
+                              listing.author_is_pro
+                                ? "border-[#FFC000] ring-2 ring-[#FFC000]/50"
+                                : listing.author_is_patron
                                 ? "border-amber-400 ring-2 ring-amber-400/50"
                                 : "border-black",
                               fallback.gradientClass
@@ -689,7 +697,10 @@ export default function ListingDetailPage() {
                           <p className="font-bold text-gray-900 dark:text-white">
                             {listing.author_nickname}
                           </p>
-                          {listing.author_is_patron && (
+                          {listing.author_is_pro && (
+                            <ProBadge size="sm" />
+                          )}
+                          {listing.author_is_patron && !listing.author_is_pro && (
                             <span
                               className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800 shadow-sm whitespace-nowrap shrink-0"
                               title="Patrón de CambioCromos"

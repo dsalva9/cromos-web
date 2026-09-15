@@ -13,14 +13,14 @@ interface ProBadgeProps {
  */
 export function ProBadge({ size = 'sm', className = '' }: ProBadgeProps) {
   const sizeClasses = size === 'sm'
-    ? 'text-[10px] px-1.5 py-0.5 gap-0.5'
-    : 'text-xs px-2 py-0.5 gap-1';
+    ? 'text-[9px] px-1.5 py-0.5 gap-0.5'
+    : 'text-xs px-2 py-1 gap-1';
 
-  const iconSize = size === 'sm' ? 10 : 12;
+  const iconSize = size === 'sm' ? 10 : 14;
 
   return (
     <span
-      className={`inline-flex items-center font-bold rounded-full bg-gradient-to-r from-[#FFC000] to-[#F59E0B] text-black ${sizeClasses} ${className}`}
+      className={`inline-flex items-center font-black tracking-wide rounded-full bg-gradient-to-r from-[#FFC000] to-[#F59E0B] text-black shadow-sm shadow-[#FFC000]/40 shrink-0 whitespace-nowrap ${sizeClasses} ${className}`}
     >
       <Crown size={iconSize} className="fill-current" />
       PRO

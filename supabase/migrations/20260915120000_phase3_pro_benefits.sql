@@ -100,7 +100,7 @@ RETURNS TABLE (
   other_user_id UUID,
   other_nickname TEXT,
   other_avatar_url TEXT,
-  template_id BIGINT,
+  template_id INTEGER,
   template_title TEXT,
   last_message TEXT,
   last_message_at TIMESTAMPTZ,
@@ -110,6 +110,7 @@ RETURNS TABLE (
   other_is_pro BOOLEAN
 )
 LANGUAGE plpgsql SECURITY DEFINER
+SET search_path TO 'public'
 AS $$
 DECLARE
   v_me uuid := auth.uid();
@@ -155,3 +156,6 @@ BEGIN
     mc.created_at DESC;
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.get_match_conversations() TO authenticated;
+
