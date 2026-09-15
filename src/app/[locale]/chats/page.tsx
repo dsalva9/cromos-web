@@ -44,6 +44,7 @@ interface Conversation {
   unread_count: number;
   is_seller: boolean;
   counterparty_is_patron?: boolean;
+  counterparty_is_pro?: boolean;
   counterparty_is_deleted?: boolean;
   listing_is_unavailable?: boolean;
 }
@@ -231,10 +232,22 @@ function ChatsPageContent() {
                     key={`${conv.listing_id}-${conv.counterparty_id}`}
                     href={`/marketplace/${conv.listing_id}/chat${conv.is_seller ? `?participant=${conv.counterparty_id}` : ''}`}
                   >
-                    <ModernCard className={cn(
-                      "hover:border-gold transition-colors cursor-pointer relative group",
-                      conv.listing_is_unavailable && "opacity-90"
-                    )}>
+                    <ModernCard
+                      className={cn(
+                        "hover:border-gold transition-colors cursor-pointer relative group",
+                        conv.listing_is_unavailable && "opacity-90"
+                      )}
+                      style={conv.counterparty_is_pro && !conv.counterparty_is_deleted ? {
+                        borderWidth: '2px',
+                        borderColor: '#FFC000',
+                        boxShadow: conv.unread_count > 0
+                          ? '0 0 20px rgba(255,192,0,0.35)'
+                          : '0 0 12px rgba(255,192,0,0.25)',
+                        background: conv.unread_count > 0
+                          ? 'linear-gradient(to right, rgba(255,192,0,0.08), transparent)'
+                          : undefined,
+                      } : undefined}
+                    >
                       <ModernCardContent className="p-4">
                         {/* Hide conversation button */}
                         <button
@@ -283,7 +296,10 @@ function ChatsPageContent() {
                               ) : (
                                 <>{t('roles.seller')} {conv.counterparty_is_deleted ? <span className="text-gray-400 italic">{t('userUnavailable')}</span> : conv.counterparty_nickname}</>
                               )}
-                              {conv.counterparty_is_patron && !conv.counterparty_is_deleted && (
+                              {conv.counterparty_is_pro && !conv.counterparty_is_deleted && (
+                                <ProBadge size="sm" />
+                              )}
+                              {conv.counterparty_is_patron && !conv.counterparty_is_deleted && !conv.counterparty_is_pro && (
                                 <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
                               )}
                               {conv.counterparty_is_deleted && (
@@ -356,12 +372,22 @@ function ChatsPageContent() {
                     onClick={() => openMatchChat(conv)}
                     className="w-full text-left"
                   >
-                    <ModernCard className={cn(
-                      "hover:border-gold transition-colors cursor-pointer",
-                      conv.other_user_is_deleted && "opacity-85",
-                      conv.other_is_pro && !conv.other_user_is_deleted && "!border-2 !border-[#FFC000] shadow-[0_0_12px_rgba(255,192,0,0.25)]",
-                      conv.other_is_pro && !conv.other_user_is_deleted && conv.unread_count > 0 && "!border-[#FFC000] shadow-[0_0_20px_rgba(255,192,0,0.35)] bg-gradient-to-r from-[#FFC000]/10 to-transparent"
-                    )}>
+                    <ModernCard
+                      className={cn(
+                        "hover:border-gold transition-colors cursor-pointer",
+                        conv.other_user_is_deleted && "opacity-85"
+                      )}
+                      style={conv.other_is_pro && !conv.other_user_is_deleted ? {
+                        borderWidth: '2px',
+                        borderColor: '#FFC000',
+                        boxShadow: conv.unread_count > 0
+                          ? '0 0 20px rgba(255,192,0,0.35)'
+                          : '0 0 12px rgba(255,192,0,0.25)',
+                        background: conv.unread_count > 0
+                          ? 'linear-gradient(to right, rgba(255,192,0,0.08), transparent)'
+                          : undefined,
+                      } : undefined}
+                    >
                       <ModernCardContent className="p-4">
                         <div className="flex gap-3">
                           {/* Avatar */}

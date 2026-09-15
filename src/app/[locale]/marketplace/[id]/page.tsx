@@ -644,10 +644,17 @@ export default function ListingDetailPage() {
               </ModernCard>
 
               {/* Seller */}
-              <ModernCard className={cn("mb-6",
-                listing.author_is_pro && "border-[#FFC000] shadow-[0_0_12px_rgba(255,192,0,0.15)] bg-gradient-to-r from-[#FFC000]/5 to-transparent",
-                !listing.author_is_pro && listing.author_is_patron && "border-amber-300 dark:border-amber-900/50 shadow-[0_0_12px_rgba(245,158,11,0.08)] bg-gradient-to-r from-amber-50/10 to-transparent dark:from-amber-950/5"
-              )}>
+              <ModernCard
+                className={cn("mb-6",
+                  !listing.author_is_pro && listing.author_is_patron && "border-amber-300 dark:border-amber-900/50 shadow-[0_0_12px_rgba(245,158,11,0.08)] bg-gradient-to-r from-amber-50/10 to-transparent dark:from-amber-950/5"
+                )}
+                style={listing.author_is_pro ? {
+                  borderWidth: '2px',
+                  borderColor: '#FFC000',
+                  boxShadow: '0 0 12px rgba(255,192,0,0.2)',
+                  background: 'linear-gradient(to right, rgba(255,192,0,0.05), transparent)',
+                } : undefined}
+              >
                 <ModernCardContent className="p-4">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('seller')}</h3>
                   <Link href={`/users/${listing.user_id}`}>

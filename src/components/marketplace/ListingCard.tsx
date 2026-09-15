@@ -130,13 +130,17 @@ export function ListingCard({ listing }: ListingCardProps) {
         listing.is_highlighted
           ? "border-2 border-amber-400 dark:border-amber-500 shadow-[0_0_24px_rgba(245,158,11,0.45)] dark:shadow-[0_0_24px_rgba(245,158,11,0.25)] ring-2 ring-amber-300/50 dark:ring-amber-600/40"
           : listing.author_is_pro
-            ? "border-2 border-[#FFC000] shadow-[0_0_16px_rgba(255,192,0,0.3)] dark:shadow-[0_0_16px_rgba(255,192,0,0.2)]"
+            ? "border-2"
             : listing.author_is_patron
               ? "border border-amber-400/90 dark:border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.12)] bg-gradient-to-b from-amber-50/5 to-transparent dark:from-amber-950/5"
               : isNew
                 ? "border border-orange-300/70 dark:border-orange-500/40 animate-flame-pulse"
                 : "border border-gray-200/60 dark:border-gray-700/50"
       )}
+      style={listing.author_is_pro && !listing.is_highlighted ? {
+        borderColor: '#FFC000',
+        boxShadow: '0 0 16px rgba(255,192,0,0.3)',
+      } : undefined}
     >
       {/* Golden shimmer top strip for highlighted listings */}
       {listing.is_highlighted && (

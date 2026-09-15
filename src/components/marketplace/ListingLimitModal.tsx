@@ -278,43 +278,6 @@ export function ListingLimitModal({
             </div>
           )}
 
-          {/* ── Option 2: Pay 0.50€ ──────────────────────────────────────── */}
-          <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg shrink-0">
-                <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">
-                  {t('optionPayTitle')}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {t('optionPayDescription')}
-                </p>
-              </div>
-            </div>
-            <div className="mt-3">
-              {isAndroid ? (
-                <Button
-                  onClick={handlePayAndroid}
-                  variant="default"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={purchasing}
-                >
-                  {purchasing ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <CreditCard className="h-4 w-4 mr-2" />
-                  )}
-                  {t('optionPayButton', { price: '0,50€' })}
-                </Button>
-              ) : (
-                <p className="text-center text-xs text-gray-500 dark:text-gray-400 py-2 italic">
-                  {t('desktopComingSoon')}
-                </p>
-              )}
-            </div>
-          </div>
 
           {/* ── Option 3: PRO banner ─────────────────────────────────────── */}
           <div className="rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border border-amber-200 dark:border-amber-700/50 p-4">
