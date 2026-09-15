@@ -359,6 +359,7 @@ Deno.serve(async (req) => {
           user_id: user.id,
           plan: plan,
           status: "active",
+          payment_provider: "google_play",
           google_purchase_token: purchaseToken,
           expires_at: expiresAt,
           updated_at: new Date().toISOString(),
@@ -371,6 +372,7 @@ Deno.serve(async (req) => {
           user_id: user.id,
           plan: plan,
           status: "active",
+          payment_provider: "google_play",
           google_purchase_token: purchaseToken,
           expires_at: expiresAt,
         });
