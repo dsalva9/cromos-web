@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
@@ -9,12 +9,26 @@ import { toast } from 'sonner';
 
 export type ProPlan = 'monthly' | 'yearly';
 
+export interface SubscriptionDetails {
+  id: string;
+  status: string; // trial | active | cancelled | expired
+  plan: string; // trial_1m | monthly | yearly | admin_grant
+  payment_provider: string | null; // google_play | lemonsqueezy | admin_grant
+  started_at: string;
+  expires_at: string;
+  ls_subscription_id: string | null;
+  google_purchase_token: string | null;
+}
+
 interface UseProSubscriptionReturn {
   isPro: boolean;
   expiresAt: string | null;
+  subscriptionDetails: SubscriptionDetails | null;
+  loadingDetails: boolean;
   activateTrial: () => Promise<boolean>;
   subscribePro: (plan: ProPlan) => Promise<void>;
   restorePurchases: (silent?: boolean) => Promise<boolean>;
+  cancelSubscription: () => Promise<boolean>;
   isActivating: boolean;
 }
 
@@ -45,9 +59,44 @@ export function useProSubscription(): UseProSubscriptionReturn {
   const { profile, refresh } = useProfileCompletion();
   const { deviceId } = useDeviceId();
   const [isActivating, setIsActivating] = useState(false);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   const isPro = profile?.is_pro ?? false;
   const expiresAt = profile?.pro_expires_at ?? null;
+
+  // Fetch subscription details when user is PRO
+  useEffect(() => {
+    if (!isPro) {
+      setSubscriptionDetails(null);
+      return;
+    }
+
+    let cancelled = false;
+    async function fetchDetails() {
+      setLoadingDetails(true);
+      try {
+        const { data, error } = await supabase
+          .from('pro_subscriptions')
+          .select('id, status, plan, payment_provider, started_at, expires_at, ls_subscription_id, google_purchase_token')
+          .in('status', ['trial', 'active', 'cancelled'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle() as { data: any; error: any };
+
+        if (!cancelled && data && !error) {
+          setSubscriptionDetails(data as SubscriptionDetails);
+        }
+      } catch (e) {
+        console.error('[useProSubscription] Error fetching subscription details:', e);
+      } finally {
+        if (!cancelled) setLoadingDetails(false);
+      }
+    }
+
+    fetchDetails();
+    return () => { cancelled = true; };
+  }, [isPro, supabase]);
 
   const verifyWithBackend = useCallback(async (
     productId: string,
@@ -321,12 +370,80 @@ export function useProSubscription(): UseProSubscriptionReturn {
     }
   }, [supabase, refresh, verifyWithBackend, restorePurchases]);
 
+  const cancelSubscription = useCallback(async (): Promise<boolean> => {
+    if (!subscriptionDetails) {
+      toast.error('No se encontró información de la suscripción.');
+      return false;
+    }
+
+    const { payment_provider, google_purchase_token, ls_subscription_id, plan } = subscriptionDetails;
+
+    // Trial or admin_grant — no payment to cancel, just inform
+    if (plan === 'trial_1m' || plan === 'admin_grant') {
+      toast.info('Las pruebas gratuitas y PRO de cortesía no requieren cancelación. Expiran automáticamente.');
+      return false;
+    }
+
+    if (payment_provider === 'google_play') {
+      // Open Google Play subscription management page
+      const productId = plan === 'yearly' ? 'pro_yearly_cc' : 'pro_monthly';
+      const playUrl = `https://play.google.com/store/account/subscriptions?sku=${productId}&package=com.cambiocromos.app`;
+      window.open(playUrl, '_blank');
+      toast.info('Se ha abierto Google Play para gestionar tu suscripción.');
+      return true;
+    }
+
+    if (payment_provider === 'lemonsqueezy' && ls_subscription_id) {
+      // Call edge function to cancel via LemonSqueezy API
+      try {
+        toast.loading('Cancelando suscripción...', { id: 'cancel-sub' });
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/cancel-ls-subscription`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ ls_subscription_id }),
+          }
+        );
+
+        toast.dismiss('cancel-sub');
+        const resData = await response.json().catch(() => null);
+
+        if (response.ok && resData?.ok) {
+          toast.success('Suscripción cancelada. Mantendrás PRO hasta la fecha de expiración.');
+          setSubscriptionDetails(prev => prev ? { ...prev, status: 'cancelled' } : null);
+          return true;
+        } else {
+          toast.error(resData?.error || 'Error al cancelar la suscripción.');
+          return false;
+        }
+      } catch (e) {
+        toast.dismiss('cancel-sub');
+        toast.error('Error de red al cancelar la suscripción.');
+        return false;
+      }
+    }
+
+    // Fallback — shouldn't normally reach here
+    toast.info('Contacta con soporte para cancelar tu suscripción.');
+    return false;
+  }, [subscriptionDetails, supabase]);
+
   return {
     isPro,
     expiresAt,
+    subscriptionDetails,
+    loadingDetails,
     activateTrial,
     subscribePro,
     restorePurchases,
+    cancelSubscription,
     isActivating,
   };
 }

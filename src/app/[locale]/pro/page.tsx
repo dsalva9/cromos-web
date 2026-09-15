@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Crown, Zap, MessageCircle, Upload, Star, Ban, Gift, Check } from 'lucide-react';
+import { Crown, Zap, MessageCircle, Upload, Star, Ban, Gift, Check, ExternalLink, XCircle, Loader2, CalendarClock, CreditCard, Shield, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { ProBadge } from '@/components/ui/ProBadge';
@@ -37,11 +37,47 @@ const benefits = [
   },
 ];
 
+function getPlanLabel(plan: string): string {
+  switch (plan) {
+    case 'monthly': return 'Mensual (4,99€/mes)';
+    case 'yearly': return 'Anual (49,99€/año)';
+    case 'trial_1m': return 'Prueba gratuita';
+    case 'admin_grant': return 'Cortesía';
+    default: return plan;
+  }
+}
+
+function getProviderLabel(provider: string | null): string {
+  switch (provider) {
+    case 'google_play': return 'Google Play';
+    case 'lemonsqueezy': return 'Web (LemonSqueezy)';
+    case 'admin_grant': return 'Administrador';
+    default: return provider || 'Desconocido';
+  }
+}
+
+function getStatusLabel(status: string): { label: string; color: string } {
+  switch (status) {
+    case 'active': return { label: 'Activa', color: 'text-green-600 dark:text-green-400' };
+    case 'trial': return { label: 'Prueba gratuita', color: 'text-blue-600 dark:text-blue-400' };
+    case 'cancelled': return { label: 'Cancelada (activa hasta expiración)', color: 'text-amber-600 dark:text-amber-400' };
+    case 'expired': return { label: 'Expirada', color: 'text-red-600 dark:text-red-400' };
+    default: return { label: status, color: 'text-gray-600 dark:text-gray-400' };
+  }
+}
+
 export default function ProPage() {
   const { user } = useUser();
-  const { isPro, expiresAt, activateTrial, subscribePro, restorePurchases, isActivating } = useProSubscription();
+  const { isPro, expiresAt, subscriptionDetails, loadingDetails, activateTrial, subscribePro, restorePurchases, cancelSubscription, isActivating } = useProSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
+  const [isCancelling, setIsCancelling] = useState(false);
   const router = useRouter();
+
+  const handleCancel = async () => {
+    setIsCancelling(true);
+    await cancelSubscription();
+    setIsCancelling(false);
+  };
 
   if (!user) {
     return (
@@ -64,25 +100,97 @@ export default function ProPage() {
   }
 
   if (isPro) {
+    const sub = subscriptionDetails;
+    const statusInfo = sub ? getStatusLabel(sub.status) : null;
+    const canCancel = sub && sub.status === 'active' && sub.plan !== 'trial_1m' && sub.plan !== 'admin_grant';
+    const isTrial = sub?.plan === 'trial_1m' || sub?.status === 'trial';
+    const isAdminGrant = sub?.plan === 'admin_grant';
+
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#111827] p-4 pt-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#111827] p-4 pt-8 pb-24">
         <div className="max-w-lg mx-auto">
+          {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FFC000] to-[#F59E0B] mb-4">
               <Crown size={40} className="text-black" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">¡Eres PRO!</h1>
             <ProBadge size="md" className="mx-auto" />
-            {expiresAt && (
-              <p className="text-gray-500 dark:text-gray-400 mt-3">
-                Activo hasta: <span className="text-gray-900 dark:text-white font-medium">{new Date(expiresAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-              </p>
-            )}
           </div>
 
-          <ModernCard>
+          {/* Subscription Info Card */}
+          <ModernCard className="mb-4">
             <ModernCardContent className="p-6">
-              <h3 className="text-gray-900 dark:text-white font-bold mb-4">Tus beneficios activos</h3>
+              <h3 className="text-gray-900 dark:text-white font-bold mb-4 flex items-center gap-2">
+                <CreditCard size={18} className="text-[#FFC000]" />
+                Tu suscripción
+              </h3>
+
+              {loadingDetails ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 size={20} className="animate-spin text-gray-400" />
+                  <span className="ml-2 text-gray-400 text-sm">Cargando...</span>
+                </div>
+              ) : sub ? (
+                <div className="space-y-3">
+                  {/* Plan */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">Plan</span>
+                    <span className="text-gray-900 dark:text-white font-medium text-sm">{getPlanLabel(sub.plan)}</span>
+                  </div>
+
+                  {/* Provider */}
+                  {!isTrial && !isAdminGrant && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 dark:text-gray-400 text-sm">Plataforma</span>
+                      <span className="text-gray-900 dark:text-white font-medium text-sm">{getProviderLabel(sub.payment_provider)}</span>
+                    </div>
+                  )}
+
+                  {/* Status */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">Estado</span>
+                    <span className={`font-medium text-sm ${statusInfo?.color}`}>{statusInfo?.label}</span>
+                  </div>
+
+                  {/* Expiry */}
+                  {expiresAt && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1.5">
+                        <CalendarClock size={14} />
+                        {sub.status === 'cancelled' ? 'Activo hasta' : 'Se renueva el'}
+                      </span>
+                      <span className="text-gray-900 dark:text-white font-medium text-sm">
+                        {new Date(expiresAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Cancelled warning */}
+                  {sub.status === 'cancelled' && (
+                    <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                      <p className="text-amber-700 dark:text-amber-300 text-xs flex items-start gap-2">
+                        <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                        Tu suscripción está cancelada pero seguirás disfrutando de PRO hasta la fecha de expiración.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  No se encontraron detalles de suscripción.
+                </p>
+              )}
+            </ModernCardContent>
+          </ModernCard>
+
+          {/* Active Benefits */}
+          <ModernCard className="mb-4">
+            <ModernCardContent className="p-6">
+              <h3 className="text-gray-900 dark:text-white font-bold mb-4 flex items-center gap-2">
+                <Shield size={18} className="text-[#FFC000]" />
+                Tus beneficios activos
+              </h3>
               <div className="space-y-3">
                 {benefits.map((b) => (
                   <div key={b.title} className="flex items-center gap-3">
@@ -93,6 +201,49 @@ export default function ProPage() {
               </div>
             </ModernCardContent>
           </ModernCard>
+
+          {/* Cancel / Manage Subscription */}
+          {sub && sub.status !== 'cancelled' && (
+            <ModernCard className="border-gray-200 dark:border-gray-700">
+              <ModernCardContent className="p-6">
+                <h3 className="text-gray-900 dark:text-white font-bold mb-3 flex items-center gap-2">
+                  Gestionar suscripción
+                </h3>
+                {canCancel ? (
+                  <>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
+                      {sub.payment_provider === 'google_play'
+                        ? 'Se abrirá Google Play para gestionar tu suscripción. Desde allí puedes cancelar o cambiar tu plan.'
+                        : 'Al cancelar, mantendrás PRO hasta el final del periodo pagado.'}
+                    </p>
+                    <Button
+                      onClick={handleCancel}
+                      disabled={isCancelling}
+                      variant="outline"
+                      className="w-full border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      {isCancelling ? (
+                        <Loader2 size={16} className="mr-2 animate-spin" />
+                      ) : sub.payment_provider === 'google_play' ? (
+                        <ExternalLink size={16} className="mr-2" />
+                      ) : (
+                        <XCircle size={16} className="mr-2" />
+                      )}
+                      {sub.payment_provider === 'google_play' ? 'Gestionar en Google Play' : 'Cancelar suscripción'}
+                    </Button>
+                  </>
+                ) : isTrial ? (
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                    Tu prueba gratuita expirará automáticamente. No necesitas hacer nada para cancelar.
+                  </p>
+                ) : isAdminGrant ? (
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                    Este PRO fue otorgado por un administrador. Contacta con soporte para cualquier cambio.
+                  </p>
+                ) : null}
+              </ModernCardContent>
+            </ModernCard>
+          )}
         </div>
       </div>
     );

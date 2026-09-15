@@ -632,7 +632,15 @@ export default function UserProfilePage() {
                     <div>
                       <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                         {profile.nickname}
-                        {profile.is_pro && <ProBadge size="md" />}
+                        {profile.is_pro && (
+                          currentUser?.id === userId ? (
+                            <Link href={`/${params.locale}/pro`} className="hover:opacity-80 transition-opacity">
+                              <ProBadge size="md" />
+                            </Link>
+                          ) : (
+                            <ProBadge size="md" />
+                          )
+                        )}
                       </h1>
 
                       {/* Email & Location */}
