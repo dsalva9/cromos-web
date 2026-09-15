@@ -39,7 +39,7 @@ const benefits = [
 
 export default function ProPage() {
   const { user } = useUser();
-  const { isPro, expiresAt, activateTrial, subscribePro, isActivating } = useProSubscription();
+  const { isPro, expiresAt, activateTrial, subscribePro, restorePurchases, isActivating } = useProSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const router = useRouter();
 
@@ -186,6 +186,16 @@ export default function ProPage() {
           <Zap size={20} className="mr-2" />
           Suscribirse {selectedPlan === 'monthly' ? 'mensual' : 'anual'}
         </Button>
+
+        <div className="text-center mt-3">
+          <button
+            type="button"
+            onClick={() => restorePurchases(false)}
+            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline transition-colors"
+          >
+            ¿Ya te has suscrito? Restaurar compras
+          </button>
+        </div>
 
         {/* FAQ */}
         <div className="mt-10 space-y-4">

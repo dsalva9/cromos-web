@@ -227,14 +227,21 @@ async function acknowledgeSubscription(
 
     const url = `https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${packageName}/purchases/subscriptions/${subscriptionId}/tokens/${purchaseToken}:acknowledge`;
 
-    await fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ developerPayload: "acknowledged_by_cambiocromos" }),
     });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(`[verify-play-purchase] Google Subscription Acknowledge failed (${res.status}): ${errBody}`);
+    } else {
+      console.log(`[verify-play-purchase] Google Subscription acknowledged successfully (${subscriptionId})`);
+    }
   } catch (err) {
     console.error("[verify-play-purchase] Acknowledge subscription error:", err);
   }
@@ -313,11 +320,18 @@ Deno.serve(async (req) => {
     if (action.type === "subscription") {
       const { data: existingSub } = await supabaseAdmin
         .from("pro_subscriptions")
-        .select("id")
+        .select("id, expires_at")
         .eq("google_purchase_token", purchaseToken)
         .limit(1);
 
       if (existingSub && existingSub.length > 0) {
+        await supabaseAdmin.from("profiles").update({
+          is_pro: true,
+          pro_expires_at: existingSub[0].expires_at,
+        }).eq("id", user.id);
+
+        await acknowledgeSubscription(productId, purchaseToken);
+
         return new Response(
           JSON.stringify({ ok: true, message: "Already processed" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -352,10 +366,14 @@ Deno.serve(async (req) => {
 
       if (subError) {
         console.error("[verify-play-purchase] Sub insert error:", subError);
-        return new Response(
-          JSON.stringify({ ok: false, error: "Failed to record subscription" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        // Fallback: try inserting without onConflict
+        await supabaseAdmin.from("pro_subscriptions").insert({
+          user_id: user.id,
+          plan: plan,
+          status: "active",
+          google_purchase_token: purchaseToken,
+          expires_at: expiresAt,
+        });
       }
 
       // Update profiles.is_pro

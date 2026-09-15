@@ -14,6 +14,7 @@ interface UseProSubscriptionReturn {
   expiresAt: string | null;
   activateTrial: () => Promise<boolean>;
   subscribePro: (plan: ProPlan) => Promise<void>;
+  restorePurchases: (silent?: boolean) => Promise<boolean>;
   isActivating: boolean;
 }
 
@@ -37,6 +38,7 @@ function getNativePurchases(): any {
  * Centralizes PRO subscription actions:
  * - activateTrial() → calls activate_pro_trial RPC (7 days free, no card)
  * - subscribePro() → Google Play (native) or LemonSqueezy (web)
+ * - restorePurchases() → queries Google Play for existing subscription and verifies
  */
 export function useProSubscription(): UseProSubscriptionReturn {
   const supabase = useSupabaseClient();
@@ -46,6 +48,113 @@ export function useProSubscription(): UseProSubscriptionReturn {
 
   const isPro = profile?.is_pro ?? false;
   const expiresAt = profile?.pro_expires_at ?? null;
+
+  const verifyWithBackend = useCallback(async (
+    productId: string,
+    purchaseToken: string,
+    transactionId?: string,
+    silent = false
+  ): Promise<boolean> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) {
+      if (!silent) toast.error('No autenticado. Por favor inicia sesión.');
+      return false;
+    }
+
+    if (!silent) {
+      toast.loading('Verificando suscripción con Google Play...', { id: 'verify-sub' });
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-play-purchase`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            platform: 'google_play',
+            productId,
+            purchaseToken,
+            transactionId: transactionId || purchaseToken,
+          }),
+        }
+      );
+
+      if (!silent) toast.dismiss('verify-sub');
+      const resData = await response.json().catch(() => null);
+
+      if (response.ok && resData?.ok) {
+        toast.success('¡Suscripción PRO activada con éxito!');
+        await refresh();
+        return true;
+      } else {
+        if (!silent) {
+          toast.error(resData?.error || 'Error al verificar la suscripción.');
+        }
+        return false;
+      }
+    } catch (e: any) {
+      if (!silent) {
+        toast.dismiss('verify-sub');
+        toast.error('Error de red al verificar la suscripción.');
+      }
+      return false;
+    }
+  }, [supabase, refresh]);
+
+  const restorePurchases = useCallback(async (silent = false): Promise<boolean> => {
+    if (!Capacitor.isNativePlatform()) return false;
+    const NP = getNativePurchases();
+    if (!NP) return false;
+
+    if (!silent) {
+      toast.loading('Consultando compras en Google Play...', { id: 'restore-sub' });
+    }
+
+    try {
+      const result = await NP.getPurchases({ productType: 'subs' });
+      const purchases = result?.purchases || [];
+
+      const proPurchase = purchases.find((p: any) =>
+        p.productIdentifier === 'pro_monthly' || p.productIdentifier === 'pro_yearly_cc'
+      );
+
+      if (!silent) toast.dismiss('restore-sub');
+
+      if (!proPurchase) {
+        if (!silent) toast.info('No se encontraron suscripciones activas en Google Play.');
+        return false;
+      }
+
+      const purchaseToken = proPurchase.purchaseToken || proPurchase.transactionId;
+      const productId = proPurchase.productIdentifier;
+      const orderId = proPurchase.orderId || proPurchase.transactionId || purchaseToken;
+
+      if (!purchaseToken) {
+        if (!silent) toast.error('Token de compra no disponible.');
+        return false;
+      }
+
+      return await verifyWithBackend(productId, purchaseToken, orderId, silent);
+    } catch (err: any) {
+      if (!silent) {
+        toast.dismiss('restore-sub');
+        toast.error(err?.message || 'Error al restaurar compras.');
+      }
+      return false;
+    }
+  }, [verifyWithBackend]);
+
+  // Silently check for existing subscription on native platform if user is not marked as PRO yet
+  useState(() => {
+    if (typeof window !== 'undefined' && Capacitor.isNativePlatform() && !isPro) {
+      restorePurchases(true);
+    }
+  });
 
   const activateTrial = useCallback(async (): Promise<boolean> => {
     let resolvedDeviceId = deviceId;
@@ -117,8 +226,6 @@ export function useProSubscription(): UseProSubscriptionReturn {
           });
           const products = productsResult?.products || [];
           if (products.length > 0) {
-            // In @capgo/native-purchases on Android:
-            // product.identifier is the basePlanId from Play Console
             if (products[0].identifier) {
               planIdentifier = products[0].identifier;
             }
@@ -147,42 +254,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
         const transactionId = result?.transactionId || purchaseToken;
 
         if (purchaseToken) {
-          // Verify with backend
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token;
-          if (!token) {
-            toast.error('No autenticado. Por favor inicia sesión.');
-            return;
-          }
-
-          toast.loading('Verificando suscripción con Google Play...', { id: 'verify-sub' });
-
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-play-purchase`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                platform: 'google_play',
-                productId,
-                purchaseToken,
-                transactionId,
-              }),
-            }
-          );
-
-          toast.dismiss('verify-sub');
-          const resData = await response.json().catch(() => null);
-
-          if (response.ok && resData?.ok) {
-            toast.success('¡Suscripción PRO activada con éxito!');
-            await refresh();
-          } else {
-            toast.error(resData?.error || 'Error al verificar la suscripción.');
-          }
+          await verifyWithBackend(productId, purchaseToken, transactionId, false);
         }
       } catch (err: any) {
         const msg = err?.message ?? String(err);
@@ -194,6 +266,14 @@ export function useProSubscription(): UseProSubscriptionReturn {
         ) {
           return;
         }
+
+        // If Google Play indicates user already owns the subscription, restore immediately
+        if (msg.includes('already') || msg.includes('ITEM_ALREADY_OWNED') || msg.includes('Owned')) {
+          console.log('[useProSubscription] Already subscribed according to Play Store, restoring...');
+          const restored = await restorePurchases(false);
+          if (restored) return;
+        }
+
         console.error('[useProSubscription] Purchase error:', err);
         toast.error(err?.message || 'Error al procesar la compra.');
       }
@@ -239,13 +319,14 @@ export function useProSubscription(): UseProSubscriptionReturn {
 
       window.open(checkoutUrl, '_blank');
     }
-  }, [supabase, refresh]);
+  }, [supabase, refresh, verifyWithBackend, restorePurchases]);
 
   return {
     isPro,
     expiresAt,
     activateTrial,
     subscribePro,
+    restorePurchases,
     isActivating,
   };
 }
