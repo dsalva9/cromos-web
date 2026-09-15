@@ -32,7 +32,16 @@ export function useProSubscription(): UseProSubscriptionReturn {
   const expiresAt = profile?.pro_expires_at ?? null;
 
   const activateTrial = useCallback(async (): Promise<boolean> => {
-    if (!deviceId) {
+    let resolvedDeviceId = deviceId;
+    if (!resolvedDeviceId && typeof window !== 'undefined') {
+      try { resolvedDeviceId = localStorage.getItem('cc_device_id'); } catch {}
+      if (!resolvedDeviceId) {
+        resolvedDeviceId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'dev_' + Date.now();
+        try { localStorage.setItem('cc_device_id', resolvedDeviceId); } catch {}
+      }
+    }
+
+    if (!resolvedDeviceId) {
       toast.error('Error obteniendo ID del dispositivo. Inténtalo de nuevo.');
       return false;
     }
@@ -40,7 +49,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
     setIsActivating(true);
     try {
       const { data, error } = await (supabase.rpc as any)('activate_pro_trial', {
-        p_device_id: deviceId,
+        p_device_id: resolvedDeviceId,
       });
 
       if (error) {

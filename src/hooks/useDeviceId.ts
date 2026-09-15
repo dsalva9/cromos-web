@@ -3,57 +3,90 @@ import { useState, useEffect } from 'react';
 import { registerPlugin } from '@capacitor/core';
 import { isNative } from '@/lib/platform';
 
-// Register the Device plugin directly via Capacitor bridge to avoid dynamic import hangs.
-let DevicePlugin: any = null;
-
-function getDevicePlugin() {
-  if (DevicePlugin) return DevicePlugin;
+let PreferencesPlugin: any = null;
+function getPreferencesPlugin() {
+  if (PreferencesPlugin) return PreferencesPlugin;
   try {
-    DevicePlugin = registerPlugin('Device');
-    return DevicePlugin;
-  } catch (err) {
+    PreferencesPlugin = registerPlugin('Preferences');
+    return PreferencesPlugin;
+  } catch {
     return null;
   }
 }
 
+function generateFallbackId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'dev_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+}
+
 export function useDeviceId() {
-  const [deviceId, setDeviceId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [deviceId, setDeviceId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return localStorage.getItem('cc_device_id');
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;
 
-    async function loadDeviceId() {
+    async function resolveDeviceId() {
       try {
+        // 1. Try native Preferences (SharedPreferences on Android)
         if (isNative()) {
-          const Device = getDevicePlugin();
-          if (Device) {
-            const info = await Device.getId();
-            if (mounted) {
-              setDeviceId(info.identifier || info.uuid || null);
+          const Prefs = getPreferencesPlugin();
+          if (Prefs) {
+            try {
+              const res = await Prefs.get({ key: 'cc_device_id' });
+              if (res?.value) {
+                if (mounted) setDeviceId(res.value);
+                try { localStorage.setItem('cc_device_id', res.value); } catch {}
+                return;
+              }
+            } catch {
+              // fallback to localStorage
             }
-          } else {
-            if (mounted) setDeviceId(null);
-          }
-        } else {
-          // Web fallback
-          const stored = localStorage.getItem('cc_device_id');
-          if (stored) {
-            if (mounted) setDeviceId(stored);
-          } else {
-            const newId = crypto.randomUUID();
-            localStorage.setItem('cc_device_id', newId);
-            if (mounted) setDeviceId(newId);
           }
         }
-      } catch (err) {
-        if (mounted) setDeviceId(null);
+
+        // 2. Try localStorage
+        let existingId: string | null = null;
+        try {
+          existingId = localStorage.getItem('cc_device_id');
+        } catch {}
+
+        if (existingId) {
+          if (mounted) setDeviceId(existingId);
+          if (isNative()) {
+            const Prefs = getPreferencesPlugin();
+            try { await Prefs?.set({ key: 'cc_device_id', value: existingId }); } catch {}
+          }
+          return;
+        }
+
+        // 3. Generate new stable ID
+        const newId = generateFallbackId();
+        try { localStorage.setItem('cc_device_id', newId); } catch {}
+        if (isNative()) {
+          const Prefs = getPreferencesPlugin();
+          try { await Prefs?.set({ key: 'cc_device_id', value: newId }); } catch {}
+        }
+
+        if (mounted) setDeviceId(newId);
+      } catch {
+        const fallback = generateFallbackId();
+        if (mounted) setDeviceId(fallback);
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
-    loadDeviceId();
+    resolveDeviceId();
 
     return () => {
       mounted = false;
