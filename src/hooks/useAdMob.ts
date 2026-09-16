@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { isNative } from '@/lib/platform';
+import { isAdBannerHidden } from '@/components/ads/AdBanner';
+import { logger } from '@/lib/logger';
 
 // Production Ad Unit IDs
 const ADMOB_BANNER_ID = 'ca-app-pub-4603075992850630/5633559451';
@@ -26,7 +29,8 @@ const PROVISIONAL_BANNER_HEIGHT_PX = 60;
  *
  * On web and PWA, this hook does nothing — no web ads are served.
  *
- * Policy compliance:
+ * Policy compliance & route handling:
+ * - Never shows banners on auth/excluded routes (/login, /signup, /forgot-password, /profile/reset-password, etc.)
  * - UMP consent flow is executed before any ad request (GDPR / US state regs)
  * - Banner is shown at BannerAdPosition.BOTTOM_CENTER (non-intrusive)
  * - Adaptive banner size used as recommended by Google
@@ -34,15 +38,28 @@ const PROVISIONAL_BANNER_HEIGHT_PX = 60;
  * - AdMob.initialize() is called once per app lifecycle
  */
 export function useAdMob(isPro = false, loading = false) {
-    const initialised = useRef(false);
+    const rawPathname = usePathname();
+    const currentPath = rawPathname || (typeof window !== 'undefined' ? window.location.pathname : '');
+    const isHidden = isAdBannerHidden(currentPath);
+
+    // Track state across renders
+    const sdkInitialisedRef = useRef(false);
+    const bannerShowingRef = useRef(false);
+    const listenerAttachedRef = useRef(false);
+
+    // Refs for accessing latest state inside async callbacks
+    const isHiddenRef = useRef(isHidden);
+    isHiddenRef.current = isHidden;
+    const isProRef = useRef(isPro);
+    isProRef.current = isPro;
 
     useEffect(() => {
         if (!isNative()) return;
 
-        if (isPro) {
-            // PRO users: ensure no banner is shown, proactively remove native banner if present, and reset height
+        // If user is PRO or currently on an auth/excluded route (e.g. /login)
+        if (isPro || isHidden) {
             document.documentElement.style.setProperty('--ad-band-height', '0px');
-            initialised.current = false;
+            bannerShowingRef.current = false;
             (async () => {
                 try {
                     const { AdMob } = await import('@capacitor-community/admob');
@@ -57,11 +74,10 @@ export function useAdMob(isPro = false, loading = false) {
         // Wait until profile completion / auth state resolves before requesting ads
         if (loading) return;
 
-        if (initialised.current) return;
-        initialised.current = true;
+        // Banner is already showing and allowed — keep it active without reload/flicker
+        if (bannerShowingRef.current) return;
 
         let isMounted = true;
-        let removeListener: (() => void) | undefined;
 
         async function initAndShowBanner() {
             try {
@@ -75,50 +91,38 @@ export function useAdMob(isPro = false, loading = false) {
                     AdmobConsentStatus,
                 } = await import('@capacitor-community/admob');
 
-                // ── UMP Consent Flow ──────────────────────────────────
-                // Wrapped in its own try/catch so that if the consent form
-                // isn't configured yet in AdMob, we still proceed.
-                // The SDK will serve non-personalised/contextual ads.
-                //
-                // Important: We ALWAYS show ads regardless of consent outcome.
-                // - Consent obtained → personalised ads (higher CPM)
-                // - Consent declined → non-personalised/contextual ads (lower CPM)
-                // - Consent not required (non-EEA) → personalised ads
-                //
-                // The only way to remove ads is via a future "Pro" subscription.
-                // The AdMob SDK handles the personalised vs non-personalised
-                // distinction automatically based on the UMP consent signal.
-                try {
-                    const consentInfo = await AdMob.requestConsentInfo({
-                        debugGeography: IS_TESTING
-                            ? AdmobConsentDebugGeography.EEA
-                            : AdmobConsentDebugGeography.DISABLED,
-                        testDeviceIdentifiers: [],
-                    });
+                // ── UMP Consent Flow & SDK Init (only once per app lifecycle) ──
+                if (!sdkInitialisedRef.current) {
+                    try {
+                        const consentInfo = await AdMob.requestConsentInfo({
+                            debugGeography: IS_TESTING
+                                ? AdmobConsentDebugGeography.EEA
+                                : AdmobConsentDebugGeography.DISABLED,
+                            testDeviceIdentifiers: [],
+                        });
 
-                    // If consent form is available and required, show it
-                    if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
-                        await AdMob.showConsentForm();
-                        // Regardless of outcome, we proceed — the SDK will serve
-                        // non-personalised ads if consent was not obtained.
+                        if (consentInfo.isConsentFormAvailable && consentInfo.status === AdmobConsentStatus.REQUIRED) {
+                            await AdMob.showConsentForm();
+                        }
+                    } catch (consentErr) {
+                        logger.warn('[AdMob] Consent flow failed (non-fatal, proceeding):', consentErr);
                     }
-                } catch (consentErr) {
-                    // Non-fatal: consent form not configured or network error.
-                    // SDK will serve non-personalised/contextual ads.
-                    console.warn('[AdMob] Consent flow failed (non-fatal, proceeding):', consentErr);
+
+                    await AdMob.initialize({
+                        initializeForTesting: IS_TESTING,
+                    });
+                    sdkInitialisedRef.current = true;
                 }
 
-                // ── Initialise the SDK ────────────────────────────────
-                // Always initialise — the SDK uses the consent signal
-                // to decide whether to serve personalised or contextual ads.
-                await AdMob.initialize({
-                    initializeForTesting: IS_TESTING,
-                });
+                // Guard against navigation that happened while initializing
+                if (!isMounted || isHiddenRef.current || isProRef.current) {
+                    document.documentElement.style.setProperty('--ad-band-height', '0px');
+                    bannerShowingRef.current = false;
+                    await AdMob.removeBanner().catch(() => AdMob.hideBanner());
+                    return;
+                }
 
-                if (!isMounted) return;
-
-                // Reserve space immediately so the nav moves before the banner paints,
-                // avoiding any overlap flash while SizeChanged hasn't fired yet.
+                // Reserve space immediately so the nav moves before the banner paints
                 document.documentElement.style.setProperty(
                     '--ad-band-height',
                     `${PROVISIONAL_BANNER_HEIGHT_PX}px`
@@ -133,27 +137,40 @@ export function useAdMob(isPro = false, loading = false) {
                 };
 
                 await AdMob.showBanner(options);
+                bannerShowingRef.current = true;
 
-                // Update to the exact rendered height once the SDK reports it.
-                // This replaces the provisional value and keeps layout pixel-perfect.
-                const listener = await AdMob.addListener(
-                    BannerAdPluginEvents.SizeChanged,
-                    (size: { width: number; height: number }) => {
-                        if (size?.height) {
-                            document.documentElement.style.setProperty(
-                                '--ad-band-height',
-                                `${Math.round(size.height)}px`
-                            );
+                // Double check if user navigated away while showBanner was in flight
+                if (!isMounted || isHiddenRef.current || isProRef.current) {
+                    document.documentElement.style.setProperty('--ad-band-height', '0px');
+                    bannerShowingRef.current = false;
+                    await AdMob.removeBanner().catch(() => AdMob.hideBanner());
+                    return;
+                }
+
+                // Attach SizeChanged listener only once
+                if (!listenerAttachedRef.current) {
+                    listenerAttachedRef.current = true;
+                    await AdMob.addListener(
+                        BannerAdPluginEvents.SizeChanged,
+                        (size: { width: number; height: number }) => {
+                            if (bannerShowingRef.current && !isHiddenRef.current && !isProRef.current) {
+                                if (typeof size?.height === 'number' && size.height > 0) {
+                                    document.documentElement.style.setProperty(
+                                        '--ad-band-height',
+                                        `${Math.round(size.height)}px`
+                                    );
+                                }
+                            } else {
+                                document.documentElement.style.setProperty('--ad-band-height', '0px');
+                            }
                         }
-                    }
-                );
-
-                removeListener = () => listener.remove();
+                    );
+                }
             } catch (err) {
                 // Non-fatal: ads failing to load must never crash the app.
-                // Reset height so the nav returns to the bottom.
-                console.warn('[AdMob] Failed to initialise or show banner:', err);
+                logger.warn('[AdMob] Failed to initialise or show banner:', err);
                 document.documentElement.style.setProperty('--ad-band-height', '0px');
+                bannerShowingRef.current = false;
             }
         }
 
@@ -161,9 +178,6 @@ export function useAdMob(isPro = false, loading = false) {
 
         return () => {
             isMounted = false;
-            removeListener?.();
-            // Do NOT destroy/hide the banner on unmount — this hook lives in the root
-            // layout and the banner should persist for the whole session
         };
-    }, [isPro, loading]);
+    }, [isPro, loading, isHidden]);
 }

@@ -11,7 +11,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/u
 import { useHaptic } from '@/hooks/useHaptic';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useInterstitialAd } from '@/components/ads/InterstitialAdProvider';
-import { AD_BANNER_HIDDEN_PATHS, AD_BANNER_HEIGHT } from '@/components/ads/AdBanner';
+import { isAdBannerHidden } from '@/components/ads/AdBanner';
 import { isNative } from '@/lib/platform';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 import { QRScannerModal } from '@/components/qr/QRScannerModal';
@@ -94,7 +94,7 @@ export function MobileBottomNav() {
   };
 
   // Check if the ad banner is hidden on this page
-  const isBannerHidden = AD_BANNER_HIDDEN_PATHS.some(p => pathname === p || pathname?.startsWith(p + '/'));
+  const isBannerHidden = isAdBannerHidden(rawPathname);
 
   const isPro = Boolean(profile?.is_pro || (typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true'));
 

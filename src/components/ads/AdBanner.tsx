@@ -4,7 +4,26 @@ import { useAdMob } from '@/hooks/useAdMob';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 
 /** Pages where the ad banner should be hidden */
-export const AD_BANNER_HIDDEN_PATHS = ['/login', '/register', '/advertise', '/admin'];
+export const AD_BANNER_HIDDEN_PATHS = [
+  '/login',
+  '/signup',
+  '/register',
+  '/forgot-password',
+  '/profile/reset-password',
+  '/profile/completar',
+  '/advertise',
+  '/admin',
+];
+
+/**
+ * Check if the ad banner should be hidden for the given pathname.
+ * Handles locale prefixes (/es, /en, /pt) and subpaths.
+ */
+export function isAdBannerHidden(pathname?: string | null): boolean {
+  if (!pathname) return false;
+  const clean = pathname.replace(/^\/(es|en|pt)(?=\/|$)/, '') || '/';
+  return AD_BANNER_HIDDEN_PATHS.some(p => clean === p || clean.startsWith(p + '/'));
+}
 
 /**
  * Height of the ad banner content (without safe-area).
