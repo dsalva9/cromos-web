@@ -371,9 +371,10 @@ export function useProSubscription(): UseProSubscriptionReturn {
           if (configRow?.value) {
             const configVal = configRow.value as any;
             if (configVal?.store_slug) storeSlug = configVal.store_slug;
+            // Prefer checkout UUIDs (required for checkout/buy/ URLs)
             variantId = plan === 'monthly'
-              ? configVal?.monthly_variant_id || configVal?.monthly
-              : configVal?.yearly_variant_id || configVal?.yearly;
+              ? configVal?.monthly_checkout_uuid || configVal?.monthly_variant_id || configVal?.monthly
+              : configVal?.yearly_checkout_uuid || configVal?.yearly_variant_id || configVal?.yearly;
           }
         } catch (fetchErr) {
           console.error('[useProSubscription] Error fetching LS config from DB:', fetchErr);
