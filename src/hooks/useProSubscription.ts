@@ -360,6 +360,7 @@ export function useProSubscription(): UseProSubscriptionReturn {
       let storeSlug = process.env.NEXT_PUBLIC_LS_STORE_SLUG || 'cambiocromos';
 
       // Fallback: check pro_config in Supabase
+      let numericVariantId = '';
       if (!variantId) {
         try {
           const { data: configRow } = await supabase
@@ -371,10 +372,14 @@ export function useProSubscription(): UseProSubscriptionReturn {
           if (configRow?.value) {
             const configVal = configRow.value as any;
             if (configVal?.store_slug) storeSlug = configVal.store_slug;
-            // Prefer checkout UUIDs (required for checkout/buy/ URLs)
+            // Checkout UUID for the URL path
             variantId = plan === 'monthly'
-              ? configVal?.monthly_checkout_uuid || configVal?.monthly_variant_id || configVal?.monthly
-              : configVal?.yearly_checkout_uuid || configVal?.yearly_variant_id || configVal?.yearly;
+              ? configVal?.monthly_checkout_uuid || configVal?.monthly_variant_id
+              : configVal?.yearly_checkout_uuid || configVal?.yearly_variant_id;
+            // Numeric variant ID to pre-select the correct plan variant
+            numericVariantId = plan === 'monthly'
+              ? configVal?.monthly_variant_id || ''
+              : configVal?.yearly_variant_id || '';
           }
         } catch (fetchErr) {
           console.error('[useProSubscription] Error fetching LS config from DB:', fetchErr);
@@ -386,11 +391,18 @@ export function useProSubscription(): UseProSubscriptionReturn {
         return;
       }
 
-      // Open LemonSqueezy checkout with prefilled user info
+      // Open LemonSqueezy checkout with prefilled user info and pre-selected variant
       const { data: { user } } = await supabase.auth.getUser();
-      const checkoutUrl = variantId.startsWith('http')
-        ? (variantId.includes('?') ? `${variantId}&checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}` : `${variantId}?checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}`)
-        : `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${variantId}?checkout[email]=${encodeURIComponent(user?.email || '')}&checkout[custom][user_id]=${user?.id || ''}`;
+      const baseUrl = variantId.startsWith('http')
+        ? variantId
+        : `https://${storeSlug}.lemonsqueezy.com/checkout/buy/${variantId}`;
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      const params = [
+        `checkout[email]=${encodeURIComponent(user?.email || '')}`,
+        `checkout[custom][user_id]=${user?.id || ''}`,
+        ...(numericVariantId ? [`variant=${numericVariantId}`] : []),
+      ].join('&');
+      const checkoutUrl = `${baseUrl}${separator}${params}`;
 
       window.open(checkoutUrl, '_blank');
     }
