@@ -63,8 +63,15 @@ Deno.serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const lsSubscriptionId = String(payload?.data?.id || "");
+    // For subscription_payment_success, data is an invoice — subscription_id is in attributes
+    // For subscription_created/updated/cancelled, data IS the subscription
+    const isPaymentEvent = eventName === "subscription_payment_success" || eventName === "subscription_payment_failed";
+    const lsSubscriptionId = isPaymentEvent
+      ? String(attrs?.subscription_id || payload?.data?.id || "")
+      : String(payload?.data?.id || "");
     const variantId = String(attrs?.variant_id || "");
+
+    console.log(`[ls-webhook] Resolved lsSubscriptionId: ${lsSubscriptionId}, isPaymentEvent: ${isPaymentEvent}`);
 
     // Determine plan from variant or product name
     const plan = attrs?.variant_name?.toLowerCase()?.includes("anual") ? "yearly" : "monthly";

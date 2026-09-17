@@ -111,30 +111,7 @@ Deno.serve(async (req) => {
         .update({ status: "cancelled", updated_at: new Date().toISOString() })
         .eq("ls_subscription_id", ls_subscription_id);
 
-      // Send cancellation email (non-blocking)
-      try {
-        const { data: subDetails } = await supabase
-          .from("pro_subscriptions")
-          .select("expires_at, plan")
-          .eq("ls_subscription_id", ls_subscription_id)
-          .maybeSingle();
-        const { data: profile } = await supabase.from("profiles").select("nickname").eq("id", user.id).single();
-
-        await fetch(`${SUPABASE_URL}/functions/v1/send-pro-email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
-          body: JSON.stringify({
-            type: "subscription_cancelled",
-            user_id: user.id,
-            email: user.email,
-            nickname: profile?.nickname || "",
-            plan: subDetails?.plan,
-            expires_at: subDetails?.expires_at,
-          }),
-        });
-      } catch (emailErr) {
-        console.error("[cancel-ls] Email error (non-fatal):", emailErr);
-      }
+      // Note: cancellation email is sent by ls-subscription-webhook when LS fires the event
 
       console.log(`[cancel-ls] Cancelled LS subscription ${ls_subscription_id} for user ${user.id}`);
 
@@ -145,14 +122,18 @@ Deno.serve(async (req) => {
     } else {
       const errorBody = await lsResponse.text();
       console.error(`[cancel-ls] LS API error ${lsResponse.status}:`, errorBody);
-      return new Response(JSON.stringify({ error: "Error al cancelar en LemonSqueezy. Contacta con soporte." }), {
+      console.error(`[cancel-ls] ls_subscription_id: ${ls_subscription_id}, LS_API_KEY length: ${LS_API_KEY.length}`);
+      return new Response(JSON.stringify({ 
+        error: "Error al cancelar en LemonSqueezy. Contacta con soporte.",
+        debug: { status: lsResponse.status, body: errorBody, subId: ls_subscription_id }
+      }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
   } catch (err) {
     console.error("[cancel-ls] Error:", err);
-    return new Response(JSON.stringify({ error: String(err) }), {
+    return new Response(JSON.stringify({ error: `Error interno: ${String(err?.message || err)}` }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
