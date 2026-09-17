@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
             user_id: userId,
             status: "active",
             plan,
-            provider: "lemonsqueezy",
+            payment_provider: "lemonsqueezy",
             ls_subscription_id: lsSubscriptionId,
             expires_at: expiresAt,
           });
