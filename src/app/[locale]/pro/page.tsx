@@ -71,9 +71,23 @@ export default function ProPage() {
   const { isPro, expiresAt, subscriptionDetails, loadingDetails, activateTrial, subscribePro, restorePurchases, cancelSubscription, isActivating } = useProSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const router = useRouter();
 
   const handleCancel = async () => {
+    // For Google Play, just call directly (opens external page)
+    if (subscriptionDetails?.payment_provider === 'google_play') {
+      setIsCancelling(true);
+      await cancelSubscription();
+      setIsCancelling(false);
+      return;
+    }
+    // For LS, show confirmation modal
+    setShowCancelModal(true);
+  };
+
+  const confirmCancel = async () => {
+    setShowCancelModal(false);
     setIsCancelling(true);
     await cancelSubscription();
     setIsCancelling(false);
@@ -245,6 +259,58 @@ export default function ProPage() {
             </ModernCard>
           )}
         </div>
+
+        {/* Cancel Confirmation Modal */}
+        {showCancelModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200">
+              <div className="text-center mb-5">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+                  <AlertTriangle size={28} className="text-red-500" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                  ¿Cancelar suscripción?
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  Al cancelar, perderás acceso a todos los beneficios PRO
+                  {expiresAt && (
+                    <> a partir del <strong className="text-gray-700 dark:text-gray-300">
+                      {new Date(expiresAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </strong></>
+                  )}.
+                </p>
+              </div>
+
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-5">
+                <p className="text-amber-700 dark:text-amber-300 text-xs text-center">
+                  Mantendrás PRO hasta el final del periodo ya pagado.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowCancelModal(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Volver
+                </Button>
+                <Button
+                  onClick={confirmCancel}
+                  disabled={isCancelling}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  {isCancelling ? (
+                    <Loader2 size={16} className="mr-2 animate-spin" />
+                  ) : (
+                    <XCircle size={16} className="mr-2" />
+                  )}
+                  Sí, cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
