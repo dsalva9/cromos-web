@@ -206,6 +206,27 @@ export async function proxy(request: NextRequest) {
         return NextResponse.redirect(redirectUrl);
     }
 
+    // Redirect unauthenticated users (including Googlebot) from /templates to /albumes
+    // so search engines only index the public /albumes canonical URLs.
+    if (pathWithoutLocale === '/templates' && !user) {
+        const localeMatch = pathname.match(/^\/(es|en|pt)/);
+        const locale = localeMatch ? localeMatch[1] : 'es';
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = `/${locale}/albumes`;
+        return NextResponse.redirect(redirectUrl, { status: 308 });
+    }
+
+    // Redirect unauthenticated users from /templates/[id] to /albumes/[id]
+    // (the album page will resolve numeric IDs to slugs with a 308)
+    const templatesIdMatch = pathWithoutLocale.match(/^\/templates\/(\d+)$/);
+    if (templatesIdMatch && !user) {
+        const localeMatch = pathname.match(/^\/(es|en|pt)/);
+        const locale = localeMatch ? localeMatch[1] : 'es';
+        const redirectUrl = request.nextUrl.clone();
+        redirectUrl.pathname = `/${locale}/albumes/${templatesIdMatch[1]}`;
+        return NextResponse.redirect(redirectUrl, { status: 308 });
+    }
+
     return response;
 }
 

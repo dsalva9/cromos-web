@@ -1,6 +1,9 @@
-'use client';
-
+import { Metadata } from 'next';
 import AuthGuard from '@/components/AuthGuard';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default function TemplatesLayout({
   children,
@@ -9,4 +12,3 @@ export default function TemplatesLayout({
 }) {
   return <AuthGuard>{children}</AuthGuard>;
 }
-

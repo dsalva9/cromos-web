@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect, permanentRedirect } from 'next/navigation';
 import { siteConfig } from '@/config/site';
 import { getPublicTemplateBySlug, getSlugByNumericId } from '@/lib/templates/server-templates';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { routing } from '@/i18n/routing';
 import { PublicAlbumDetailContent } from '@/components/albums/PublicAlbumDetailContent';
 
 export const revalidate = 60;
@@ -18,7 +19,7 @@ async function resolveTemplate(slug: string, locale: string) {
   if (/^\d+$/.test(slug)) {
     const actualSlug = await getSlugByNumericId(parseInt(slug));
     if (actualSlug) {
-      redirect(`/${locale}/albumes/${actualSlug}`);
+      permanentRedirect(`/${locale}/albumes/${actualSlug}`);
     }
     return null;
   }
@@ -61,12 +62,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? template.image_url
     : `${siteConfig.url}/assets/LogoBlanco.png`;
 
+  const languages: Record<string, string> = {};
+  for (const l of routing.locales) {
+    languages[l] = `${siteConfig.url}/${l}/albumes/${slug}`;
+  }
+  languages['x-default'] = `${siteConfig.url}/${routing.defaultLocale}/albumes/${slug}`;
+
   return {
     title,
     description,
     robots: { index: true, follow: true },
     alternates: {
       canonical: `${baseUrl}/albumes/${slug}`,
+      languages,
     },
     openGraph: {
       title,

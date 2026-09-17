@@ -911,7 +911,7 @@
     },
     "detail": {
       "meta": {
-        "titleSuffix": "Album & Sticker Checklist | CambioCromos",
+        "titleSuffix": "Album & Sticker Checklist",
         "descriptionTemplate": "Album {title} by {author} — {pages} pages, {slots} stickers. Check the complete checklist and copy the collection to track your missing and duplicate stickers.",
         "notFoundTitle": "Album not found",
         "notFoundDesc": "The album you are looking for does not exist or is not available."

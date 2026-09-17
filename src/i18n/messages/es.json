@@ -940,7 +940,7 @@
     },
     "detail": {
       "meta": {
-        "titleSuffix": "Álbum y Checklist de Cromos | CambioCromos",
+        "titleSuffix": "Álbum y Checklist de Cromos",
         "descriptionTemplate": "Álbum {title} por {author} — {pages} páginas, {slots} cromos. Consulta el checklist completo y copia la colección para organizar tus faltas y repetidos.",
         "notFoundTitle": "Álbum no encontrado",
         "notFoundDesc": "El álbum que buscas no existe o no está disponible."

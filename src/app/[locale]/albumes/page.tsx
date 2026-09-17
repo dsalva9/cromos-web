@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { siteConfig } from '@/config/site';
-import { getPublicTemplates, Template } from '@/lib/templates/server-templates';
+import { routing } from '@/i18n/routing';
+import { getPublicTemplates } from '@/lib/templates/server-templates';
 import { PublicAlbumsContent } from '@/components/albums/PublicAlbumsContent';
 
 export const revalidate = 60;
@@ -13,11 +14,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations('albumes');
   const baseUrl = `${siteConfig.url}/${locale}`;
 
+  const languages: Record<string, string> = {};
+  for (const l of routing.locales) {
+    languages[l] = `${siteConfig.url}/${l}/albumes`;
+  }
+  languages['x-default'] = `${siteConfig.url}/${routing.defaultLocale}/albumes`;
+
   return {
     title: t('meta.title'),
     description: t('meta.description'),
     alternates: {
       canonical: `${baseUrl}/albumes`,
+      languages,
     },
     openGraph: {
       title: t('meta.title'),

@@ -94,6 +94,9 @@ const nextConfig: NextConfig = {
       { source: '/admin', destination: '/es/admin', permanent: true },
       { source: '/dashboard', destination: '/es/dashboard', permanent: true },
       { source: '/marketplace/:path*', destination: '/es/marketplace/:path*', permanent: true },
+      { source: '/albumes', destination: '/es/albumes', permanent: true },
+      { source: '/albumes/:path*', destination: '/es/albumes/:path*', permanent: true },
+      { source: '/templates/:path*', destination: '/es/templates/:path*', permanent: true },
     ];
   },
 };
