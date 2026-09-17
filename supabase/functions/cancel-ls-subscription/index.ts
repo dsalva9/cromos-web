@@ -82,16 +82,25 @@ Deno.serve(async (req) => {
     }
 
     // Call LemonSqueezy API to cancel the subscription
-    // DELETE /v1/subscriptions/{id} cancels (does not delete) the subscription
+    // PATCH /v1/subscriptions/{id} with cancelled: true
     const lsResponse = await fetch(
       `https://api.lemonsqueezy.com/v1/subscriptions/${ls_subscription_id}`,
       {
-        method: "DELETE",
+        method: "PATCH",
         headers: {
           "Accept": "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
           "Authorization": `Bearer ${LS_API_KEY}`,
         },
+        body: JSON.stringify({
+          data: {
+            type: "subscriptions",
+            id: ls_subscription_id,
+            attributes: {
+              cancelled: true,
+            },
+          },
+        }),
       }
     );
 
