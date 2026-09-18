@@ -5,6 +5,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useDeviceId } from '@/hooks/useDeviceId';
+import { safeStorage } from '@/lib/safeStorage';
 import { toast } from 'sonner';
 
 export type ProPlan = 'monthly' | 'yearly';
@@ -207,11 +208,11 @@ export function useProSubscription(): UseProSubscriptionReturn {
 
   const activateTrial = useCallback(async (): Promise<boolean> => {
     let resolvedDeviceId = deviceId;
-    if (!resolvedDeviceId && typeof window !== 'undefined') {
-      try { resolvedDeviceId = localStorage.getItem('cc_device_id'); } catch {}
+    if (!resolvedDeviceId) {
+      resolvedDeviceId = safeStorage.getItem('cc_device_id');
       if (!resolvedDeviceId) {
         resolvedDeviceId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'dev_' + Date.now();
-        try { localStorage.setItem('cc_device_id', resolvedDeviceId); } catch {}
+        safeStorage.setItem('cc_device_id', resolvedDeviceId);
       }
     }
 

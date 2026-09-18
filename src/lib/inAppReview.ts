@@ -1,5 +1,6 @@
 import { isNative } from '@/lib/platform';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 import { track } from '@vercel/analytics';
 
 // ── Cooldown Configuration ──────────────────────────────────────────────────
@@ -18,25 +19,15 @@ export interface TriggerReviewOptions {
  * Returns the timestamp of the last review request from localStorage.
  */
 function getLastReviewRequestTime(): number {
-  if (typeof window === 'undefined') return 0;
-  try {
-    const val = localStorage.getItem(STORAGE_KEY_LAST_REQUEST);
-    return val ? parseInt(val, 10) : 0;
-  } catch {
-    return 0;
-  }
+  const val = safeStorage.getItem(STORAGE_KEY_LAST_REQUEST);
+  return val ? parseInt(val, 10) : 0;
 }
 
 /**
  * Saves the current timestamp as the last review request time.
  */
 function setLastReviewRequestTime(timestamp: number): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY_LAST_REQUEST, String(timestamp));
-  } catch {
-    // Ignore localStorage write errors
-  }
+  safeStorage.setItem(STORAGE_KEY_LAST_REQUEST, String(timestamp));
 }
 
 /**

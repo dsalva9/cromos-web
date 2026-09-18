@@ -13,6 +13,7 @@ import { DeleteAccountDialog } from '@/components/deletion';
 import { ThemeSettingsSection } from './ThemeSettingsSection';
 import { useTranslations } from 'next-intl';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 
 export function SystemSettingsTab() {
   const t = useTranslations('settings');
@@ -26,10 +27,8 @@ export function SystemSettingsTab() {
 
   const handleReactivateTips = () => {
     try {
-      if (typeof window !== 'undefined') {
-        window.localStorage.removeItem('dismissed-tips');
-        toast.success(t('system.reactivateTips.success'));
-      }
+      safeStorage.removeItem('dismissed-tips');
+      toast.success(t('system.reactivateTips.success'));
     } catch (error) {
       logger.error('Error reactivating tips:', error);
       toast.error(t('system.reactivateTips.error'));

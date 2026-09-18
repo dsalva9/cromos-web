@@ -2,6 +2,7 @@
 
 import { useAdMob } from '@/hooks/useAdMob';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
+import { safeStorage } from '@/lib/safeStorage';
 
 /** Pages where the ad banner should be hidden */
 export const AD_BANNER_HIDDEN_PATHS = [
@@ -34,7 +35,7 @@ export const AD_BANNER_HEIGHT = 0; // px — no web ads
 
 export function AdBanner() {
   const { profile, loading } = useProfileCompletion();
-  const cachedPro = typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true';
+  const cachedPro = safeStorage.getItem('cc_is_pro') === 'true';
   const isPro = profile?.is_pro ?? cachedPro;
 
   // Initialise Google AdMob SDK and show native banner on Android.

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { Capacitor } from '@capacitor/core';
 import { requestPushPermission } from '@/components/providers/OneSignalProvider';
+import { safeStorage } from '@/lib/safeStorage';
 
 const DISMISSED_KEY = 'cc-notif-dismissed';
 const PROMPT_DELAY_MS = 45_000; // 45 seconds
@@ -24,7 +25,7 @@ export function NotificationPromptBanner() {
     // Only web — native uses its own OS-level prompt
     if (Capacitor.isNativePlatform()) return false;
     // Already dismissed
-    if (localStorage.getItem(DISMISSED_KEY) === '1') return false;
+    if (safeStorage.getItem(DISMISSED_KEY) === '1') return false;
     // Browser doesn't support notifications
     if (!('Notification' in window)) return false;
     // Already granted — no need to prompt
@@ -43,7 +44,7 @@ export function NotificationPromptBanner() {
 
   const dismiss = useCallback(() => {
     setVisible(false);
-    localStorage.setItem(DISMISSED_KEY, '1');
+    safeStorage.setItem(DISMISSED_KEY, '1');
   }, []);
 
   const activate = useCallback(() => {

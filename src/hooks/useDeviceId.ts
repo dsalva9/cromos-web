@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { registerPlugin } from '@capacitor/core';
 import { isNative } from '@/lib/platform';
+import { safeStorage } from '@/lib/safeStorage';
 
 let PreferencesPlugin: any = null;
 function getPreferencesPlugin() {
@@ -23,12 +24,7 @@ function generateFallbackId(): string {
 
 export function useDeviceId() {
   const [deviceId, setDeviceId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      return localStorage.getItem('cc_device_id');
-    } catch {
-      return null;
-    }
+    return safeStorage.getItem('cc_device_id');
   });
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +41,7 @@ export function useDeviceId() {
               const res = await Prefs.get({ key: 'cc_device_id' });
               if (res?.value) {
                 if (mounted) setDeviceId(res.value);
-                try { localStorage.setItem('cc_device_id', res.value); } catch {}
+                safeStorage.setItem('cc_device_id', res.value);
                 return;
               }
             } catch {
@@ -55,10 +51,7 @@ export function useDeviceId() {
         }
 
         // 2. Try localStorage
-        let existingId: string | null = null;
-        try {
-          existingId = localStorage.getItem('cc_device_id');
-        } catch {}
+        const existingId = safeStorage.getItem('cc_device_id');
 
         if (existingId) {
           if (mounted) setDeviceId(existingId);
@@ -71,7 +64,7 @@ export function useDeviceId() {
 
         // 3. Generate new stable ID
         const newId = generateFallbackId();
-        try { localStorage.setItem('cc_device_id', newId); } catch {}
+        safeStorage.setItem('cc_device_id', newId);
         if (isNative()) {
           const Prefs = getPreferencesPlugin();
           try { await Prefs?.set({ key: 'cc_device_id', value: newId }); } catch {}

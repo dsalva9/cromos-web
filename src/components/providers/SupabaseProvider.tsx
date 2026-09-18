@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import { setPasswordRecoveryFlag, clearPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
+import { safeStorage } from '@/lib/safeStorage';
 
 const AUTH_HINT_KEY = 'cc-was-authed';
 
@@ -32,11 +33,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   // Read localStorage hint synchronously so we know before the first render
   const [wasAuthed] = useState(() => {
-    try {
-      return typeof window !== 'undefined' && localStorage.getItem(AUTH_HINT_KEY) === '1';
-    } catch {
-      return false;
-    }
+    return safeStorage.getItem(AUTH_HINT_KEY) === '1';
   });
 
 
@@ -79,14 +76,12 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Persist auth hint for next hard navigation
-        try {
-          if (currentUser) {
-            localStorage.setItem(AUTH_HINT_KEY, '1');
-          } else {
-            localStorage.removeItem(AUTH_HINT_KEY);
-            clearPasswordRecoveryFlag();
-          }
-        } catch { /* ignore */ }
+        if (currentUser) {
+          safeStorage.setItem(AUTH_HINT_KEY, '1');
+        } else {
+          safeStorage.removeItem(AUTH_HINT_KEY);
+          clearPasswordRecoveryFlag();
+        }
       }
     );
 
@@ -104,13 +99,11 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.setAttribute('data-auth-ready', '1');
 
         // Persist auth hint for next hard navigation
-        try {
-          if (currentUser) {
-            localStorage.setItem(AUTH_HINT_KEY, '1');
-          } else {
-            localStorage.removeItem(AUTH_HINT_KEY);
-          }
-        } catch { /* ignore */ }
+        if (currentUser) {
+          safeStorage.setItem(AUTH_HINT_KEY, '1');
+        } else {
+          safeStorage.removeItem(AUTH_HINT_KEY);
+        }
       })
       .catch((error) => {
         // Handle invalid refresh token on initial load

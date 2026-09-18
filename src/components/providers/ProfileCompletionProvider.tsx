@@ -13,6 +13,7 @@ import {
   useUser,
 } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 
 /**
@@ -68,23 +69,15 @@ function computeIsComplete(profile: UserProfile | null) {
 
 /** Read the persisted completion lock from localStorage. */
 function readCompletedLock(): boolean {
-  try {
-    return localStorage.getItem(COMPLETED_LOCK_KEY) === 'true';
-  } catch {
-    return false;
-  }
+  return safeStorage.getItem(COMPLETED_LOCK_KEY) === 'true';
 }
 
 /** Persist the completion lock to localStorage. */
 function writeCompletedLock(value: boolean) {
-  try {
-    if (value) {
-      localStorage.setItem(COMPLETED_LOCK_KEY, 'true');
-    } else {
-      localStorage.removeItem(COMPLETED_LOCK_KEY);
-    }
-  } catch {
-    // localStorage unavailable (SSR, private mode) — non-critical
+  if (value) {
+    safeStorage.setItem(COMPLETED_LOCK_KEY, 'true');
+  } else {
+    safeStorage.removeItem(COMPLETED_LOCK_KEY);
   }
 }
 
@@ -126,23 +119,20 @@ export function ProfileCompletionProvider({
   const { user, loading: authLoading } = useUser();
   const supabase = useSupabaseClient();
   const [profile, setProfile] = useState<UserProfile | null>(() => {
-    if (typeof window === 'undefined') return null;
-    try {
-      if (localStorage.getItem('cc_is_pro') === 'true') {
-        return {
-          nickname: null,
-          postcode: null,
-          avatar_url: null,
-          is_admin: false,
-          is_patron: false,
-          is_pro: true,
-          pro_expires_at: null,
-          suspended_at: null,
-          deleted_at: null,
-          country_code: 'ES',
-        };
-      }
-    } catch {}
+    if (safeStorage.getItem('cc_is_pro') === 'true') {
+      return {
+        nickname: null,
+        postcode: null,
+        avatar_url: null,
+        is_admin: false,
+        is_patron: false,
+        is_pro: true,
+        pro_expires_at: null,
+        suspended_at: null,
+        deleted_at: null,
+        country_code: 'ES',
+      };
+    }
     return null;
   });
   const [loading, setLoading] = useState(true);
@@ -169,7 +159,7 @@ export function ProfileCompletionProvider({
     if (!user) {
       setProfile(null);
       setLoading(false);
-      try { localStorage.removeItem('cc_is_pro'); } catch {}
+      safeStorage.removeItem('cc_is_pro');
       return;
     }
 
@@ -204,13 +194,11 @@ export function ProfileCompletionProvider({
         : { nickname: null, postcode: null, avatar_url: null, is_admin: false, is_patron: false, is_pro: false, pro_expires_at: null, suspended_at: null, deleted_at: null, country_code: 'ES' };
 
       setProfile(profileData);
-      try {
-        if (profileData.is_pro) {
-          localStorage.setItem('cc_is_pro', 'true');
-        } else {
-          localStorage.removeItem('cc_is_pro');
-        }
-      } catch {}
+      if (profileData.is_pro) {
+        safeStorage.setItem('cc_is_pro', 'true');
+      } else {
+        safeStorage.removeItem('cc_is_pro');
+      }
 
       // Check suspension/deletion status (merged from SupabaseProvider)
       if (data?.suspended_at || data?.deleted_at) {

@@ -5,6 +5,7 @@ import { useFindTraders } from './useFindTraders';
 import { useUserCollections } from '@/hooks/templates/useUserCollections';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 
 // ------------------------------------------------------------------
 // Types
@@ -45,13 +46,13 @@ function getSeenKey(collectionId: number): string {
 }
 
 function loadSeen(collectionId: number): Set<string> {
+  const raw = safeStorage.getItem(getSeenKey(collectionId));
+  if (!raw) return new Set();
   try {
-    const raw = localStorage.getItem(getSeenKey(collectionId));
-    if (!raw) return new Set();
     const data: SeenData = JSON.parse(raw);
     // Expire after 24h
     if (Date.now() - data.timestamp > SEEN_EXPIRY_MS) {
-      localStorage.removeItem(getSeenKey(collectionId));
+      safeStorage.removeItem(getSeenKey(collectionId));
       return new Set();
     }
     return new Set(data.ids);
@@ -61,12 +62,8 @@ function loadSeen(collectionId: number): Set<string> {
 }
 
 function saveSeen(collectionId: number, ids: Set<string>): void {
-  try {
-    const data: SeenData = { ids: Array.from(ids), timestamp: Date.now() };
-    localStorage.setItem(getSeenKey(collectionId), JSON.stringify(data));
-  } catch {
-    // localStorage full or unavailable — silently continue
-  }
+  const data: SeenData = { ids: Array.from(ids), timestamp: Date.now() };
+  safeStorage.setItem(getSeenKey(collectionId), JSON.stringify(data));
 }
 
 // ------------------------------------------------------------------
@@ -164,7 +161,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
 
   // ---- Restore geo from localStorage ----
   useEffect(() => {
-    const stored = localStorage.getItem('matchfinder_geo');
+    const stored = safeStorage.getItem('matchfinder_geo');
     if (stored === 'granted') {
       navigator.geolocation?.getCurrentPosition(
         pos => {
@@ -210,7 +207,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   useEffect(() => {
     if (user && selectedTemplateId && geoChecked && !authLoading && !collectionsLoading) {
       // Check if we should show geo prompt first
-      if (!geoCoords && !geoPromptDismissed && !localStorage.getItem('matchfinder_geo')) {
+      if (!geoCoords && !geoPromptDismissed && !safeStorage.getItem('matchfinder_geo')) {
         setPhase('geo_prompt');
         return;
       }
@@ -309,7 +306,7 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
   const resetSeen = useCallback(() => {
     if (!selectedCopyId) return;
     setSeenIds(new Set());
-    localStorage.removeItem(getSeenKey(selectedCopyId));
+    safeStorage.removeItem(getSeenKey(selectedCopyId));
     setCurrentIndex(0);
     fetchedRef.current = false;
     doFetch();
@@ -333,20 +330,20 @@ export function useMatchSwiper(): UseMatchSwiperReturn {
     navigator.geolocation?.getCurrentPosition(
       pos => {
         setGeoCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-        localStorage.setItem('matchfinder_geo', 'granted');
+        safeStorage.setItem('matchfinder_geo', 'granted');
         setGeoPromptDismissed(true);
       },
       (err) => {
         logger.warn('Geolocation denied:', err);
         setGeoPromptDismissed(true);
-        localStorage.setItem('matchfinder_geo', 'dismissed');
+        safeStorage.setItem('matchfinder_geo', 'dismissed');
       }
     );
   }, []);
 
   const dismissGeoPrompt = useCallback(() => {
     setGeoPromptDismissed(true);
-    localStorage.setItem('matchfinder_geo', 'dismissed');
+    safeStorage.setItem('matchfinder_geo', 'dismissed');
   }, []);
 
   const loadMore = useCallback(() => {

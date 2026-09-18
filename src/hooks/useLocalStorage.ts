@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 
 export function useLocalStorage<T>(
   key: string,
@@ -16,7 +17,7 @@ export function useLocalStorage<T>(
     }
 
     try {
-      const item = window.localStorage.getItem(key);
+      const item = safeStorage.getItem(key);
       return item ? JSON.parse(item) : initialValueRef.current;
     } catch (error) {
       logger.warn(`Error reading localStorage key "${key}":`, error);
@@ -30,9 +31,7 @@ export function useLocalStorage<T>(
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }
+      safeStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       logger.warn(`Error setting localStorage key "${key}":`, error);
     }

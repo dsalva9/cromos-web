@@ -15,6 +15,7 @@ import { isAdBannerHidden } from '@/components/ads/AdBanner';
 import { isNative } from '@/lib/platform';
 import { useGlobalUnreadBadge } from '@/hooks/trades/useGlobalUnreadBadge';
 import { QRScannerModal } from '@/components/qr/QRScannerModal';
+import { safeStorage } from '@/lib/safeStorage';
 
 /** Strip the locale prefix from a pathname for active-state matching. */
 function stripLocale(path: string): string {
@@ -96,7 +97,7 @@ export function MobileBottomNav() {
   // Check if the ad banner is hidden on this page
   const isBannerHidden = isAdBannerHidden(rawPathname);
 
-  const isPro = Boolean(profile?.is_pro || (typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true'));
+  const isPro = Boolean(profile?.is_pro || safeStorage.getItem('cc_is_pro') === 'true');
 
   // If user is not logged in (and wasn't previously authed), do not show the bottom nav
   // Before mount, always return null to match SSR output and avoid hydration mismatch

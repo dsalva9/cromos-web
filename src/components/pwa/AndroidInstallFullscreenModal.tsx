@@ -6,6 +6,7 @@ import { X, Zap, Bell, Sparkles, Smartphone } from 'lucide-react';
 import { isWeb } from '@/lib/platform';
 import Image from 'next/image';
 import GooglePlayLink from '@/components/pwa/GooglePlayLink';
+import { safeStorage } from '@/lib/safeStorage';
 
 const DISMISS_KEY = 'android-install-fullscreen-dismissed';
 const BANNER_DISMISS_KEY = 'install-banner-dismissed'; // sync with InstallAppBanner
@@ -26,7 +27,7 @@ export function AndroidInstallFullscreenModal() {
         if (!isAndroidBrowser) return;
 
         // 2. Check if dismissed recently
-        const dismissedAt = localStorage.getItem(DISMISS_KEY);
+        const dismissedAt = safeStorage.getItem(DISMISS_KEY);
         if (dismissedAt) {
             const dismissDate = new Date(dismissedAt);
             const daysSince = (Date.now() - dismissDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -48,15 +49,15 @@ export function AndroidInstallFullscreenModal() {
 
     const handleDismiss = useCallback(() => {
         const now = new Date().toISOString();
-        localStorage.setItem(DISMISS_KEY, now);
-        localStorage.setItem(BANNER_DISMISS_KEY, now); // suppress inline banner too
+        safeStorage.setItem(DISMISS_KEY, now);
+        safeStorage.setItem(BANNER_DISMISS_KEY, now); // suppress inline banner too
         setVisible(false);
     }, []);
 
     const handlePlayStoreClick = useCallback(() => {
         const now = new Date().toISOString();
-        localStorage.setItem(DISMISS_KEY, now);
-        localStorage.setItem(BANNER_DISMISS_KEY, now); // suppress inline banner too
+        safeStorage.setItem(DISMISS_KEY, now);
+        safeStorage.setItem(BANNER_DISMISS_KEY, now); // suppress inline banner too
     }, []);
 
     if (!visible) return null;

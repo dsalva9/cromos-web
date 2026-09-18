@@ -67,6 +67,11 @@ if (SENTRY_DSN) {
             'DailyLimitReachedError',
             // Third-party / in-app WebView injected scripts syntax errors (e.g. ChatGPT Android WebView evaluateJavascript)
             "Unexpected token 'else'",
+            // Safari Private Browsing / restricted storage: localStorage is null.
+            // Our safeStorage wrapper prevents this, but suppress residual events from cached bundles.
+            "null is not an object (evaluating 'localStorage.getItem')",
+            "null is not an object (evaluating 'localStorage.setItem')",
+            "null is not an object (evaluating 'localStorage.removeItem')",
         ],
 
         beforeSend(event) {
@@ -92,6 +97,12 @@ if (SENTRY_DSN) {
                 return null;
             }
 
+            // Drop Safari Private Browsing localStorage-is-null TypeErrors
+            if (
+                message.includes("null is not an object (evaluating 'localStorage")
+            ) {
+                return null;
+            }
             // Drop standard aborted-fetch errors
             if (
                 message.includes('Failed to fetch') ||

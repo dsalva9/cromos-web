@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
+import { safeStorage } from '@/lib/safeStorage';
 
 const GA_MEASUREMENT_ID = 'G-27DY11PMLQ';
 
@@ -10,12 +11,12 @@ export default function GoogleAnalytics() {
 
     useEffect(() => {
         // Check local storage for consent
-        const savedConsent = localStorage.getItem('cookie-consent');
+        const savedConsent = safeStorage.getItem('cookie-consent');
         setConsent(savedConsent);
 
         // Listen for custom event when consent is updated
         const handleConsentChange = () => {
-            setConsent(localStorage.getItem('cookie-consent'));
+            setConsent(safeStorage.getItem('cookie-consent'));
         };
 
         window.addEventListener('cookie-consent-updated', handleConsentChange);

@@ -6,6 +6,7 @@ import Link from '@/components/ui/link';
 import { Button } from '@/components/ui/button';
 import { Cookie, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { safeStorage } from '@/lib/safeStorage';
 
 export function CookieConsentBanner() {
     const [isVisible, setIsVisible] = useState(false);
@@ -13,7 +14,7 @@ export function CookieConsentBanner() {
 
     useEffect(() => {
         // Show banner if no consent choice has been made
-        const consent = localStorage.getItem('cookie-consent');
+        const consent = safeStorage.getItem('cookie-consent');
         if (!consent) {
             // Small delay to make it feel less intrusive on reload
             const timer = setTimeout(() => setIsVisible(true), 1500);
@@ -22,14 +23,14 @@ export function CookieConsentBanner() {
     }, []);
 
     const handleAccept = () => {
-        localStorage.setItem('cookie-consent', 'accepted');
+        safeStorage.setItem('cookie-consent', 'accepted');
         setIsVisible(false);
         // Trigger custom event to notify GoogleAnalytics component
         window.dispatchEvent(new Event('cookie-consent-updated'));
     };
 
     const handleDecline = () => {
-        localStorage.setItem('cookie-consent', 'rejected');
+        safeStorage.setItem('cookie-consent', 'rejected');
         setIsVisible(false);
         window.dispatchEvent(new Event('cookie-consent-updated'));
     };

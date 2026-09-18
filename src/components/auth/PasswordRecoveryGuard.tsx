@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 import { isTransientNetworkError } from '@/lib/supabase/notifications';
 
 /**
@@ -31,34 +32,26 @@ const RECOVERY_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
 
 /** Mark that the current session requires a password reset. */
 export function setPasswordRecoveryFlag() {
-  try {
-    localStorage.setItem(RECOVERY_FLAG_KEY, String(Date.now()));
-  } catch { /* storage unavailable */ }
+  safeStorage.setItem(RECOVERY_FLAG_KEY, String(Date.now()));
 }
 
 /** Check whether the recovery flag is set and still valid (< 1 hour old). */
 export function isPasswordRecoveryRequired(): boolean {
-  try {
-    const raw = localStorage.getItem(RECOVERY_FLAG_KEY);
-    if (!raw) return false;
-    const ts = parseInt(raw, 10);
-    if (isNaN(ts)) return false;
-    if (Date.now() - ts > RECOVERY_MAX_AGE_MS) {
-      // Expired — clean up silently
-      localStorage.removeItem(RECOVERY_FLAG_KEY);
-      return false;
-    }
-    return true;
-  } catch {
+  const raw = safeStorage.getItem(RECOVERY_FLAG_KEY);
+  if (!raw) return false;
+  const ts = parseInt(raw, 10);
+  if (isNaN(ts)) return false;
+  if (Date.now() - ts > RECOVERY_MAX_AGE_MS) {
+    // Expired — clean up silently
+    safeStorage.removeItem(RECOVERY_FLAG_KEY);
     return false;
   }
+  return true;
 }
 
 /** Clear the recovery flag (call after successful password reset or sign-out). */
 export function clearPasswordRecoveryFlag() {
-  try {
-    localStorage.removeItem(RECOVERY_FLAG_KEY);
-  } catch { /* storage unavailable */ }
+  safeStorage.removeItem(RECOVERY_FLAG_KEY);
   logger.info('Password recovery flag cleared');
 }
 

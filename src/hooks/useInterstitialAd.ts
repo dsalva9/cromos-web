@@ -2,6 +2,7 @@
 
 import { useRef, useCallback } from 'react';
 import { isNative } from '@/lib/platform';
+import { safeStorage } from '@/lib/safeStorage';
 
 // ── Ad Unit IDs ────────────────────────────────────────────────────────────
 const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-4603075992850630/2878917537';
@@ -40,32 +41,28 @@ export function useInterstitialAdEngine(isPatron: boolean) {
     // values. We persist cooldown/session state in localStorage so the
     // 4-minute cooldown can actually elapse across navigations.
     const getLastShownAt = (): number => {
-        try {
-            const v = localStorage.getItem('interstitial_last_shown');
-            if (!v) {
-                // First visit / fresh install — stamp now so the initial
-                // cooldown starts from this moment, not from epoch 0.
-                const now = Date.now();
-                localStorage.setItem('interstitial_last_shown', String(now));
-                return now;
-            }
-            return parseInt(v, 10);
-        } catch { return Date.now(); }
+        const v = safeStorage.getItem('interstitial_last_shown');
+        if (!v) {
+            // First visit / fresh install — stamp now so the initial
+            // cooldown starts from this moment, not from epoch 0.
+            const now = Date.now();
+            safeStorage.setItem('interstitial_last_shown', String(now));
+            return now;
+        }
+        return parseInt(v, 10);
     };
     const setLastShownAt = (ts: number) => {
-        try { localStorage.setItem('interstitial_last_shown', String(ts)); } catch {}
+        safeStorage.setItem('interstitial_last_shown', String(ts));
     };
     const getSessionCount = (): number => {
-        try {
-            const v = localStorage.getItem('interstitial_session_count');
-            const lastShown = getLastShownAt();
-            // Reset session count if last ad was >30 min ago (new session proxy)
-            if (Date.now() - lastShown > 30 * 60 * 1000) return 0;
-            return v ? parseInt(v, 10) : 0;
-        } catch { return 0; }
+        const v = safeStorage.getItem('interstitial_session_count');
+        const lastShown = getLastShownAt();
+        // Reset session count if last ad was >30 min ago (new session proxy)
+        if (Date.now() - lastShown > 30 * 60 * 1000) return 0;
+        return v ? parseInt(v, 10) : 0;
     };
     const setSessionCount = (n: number) => {
-        try { localStorage.setItem('interstitial_session_count', String(n)); } catch {}
+        safeStorage.setItem('interstitial_session_count', String(n));
     };
 
 

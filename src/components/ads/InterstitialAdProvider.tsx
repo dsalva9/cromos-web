@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useInterstitialAdEngine } from '@/hooks/useInterstitialAd';
 import { isNative } from '@/lib/platform';
+import { safeStorage } from '@/lib/safeStorage';
 
 // ── Context ────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ const InterstitialAdContext = createContext<InterstitialAdContextValue>({
  */
 export function InterstitialAdProvider({ children }: { children: ReactNode }) {
     const { profile } = useProfileCompletion();
-    const isPro = profile?.is_pro ?? (typeof window !== 'undefined' && localStorage.getItem('cc_is_pro') === 'true');
+    const isPro = profile?.is_pro ?? (safeStorage.getItem('cc_is_pro') === 'true');
     const isPatron = profile?.is_patron ?? false;
     const isAdFree = Boolean(isPro || isPatron);
 

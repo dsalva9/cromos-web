@@ -6,6 +6,7 @@ import Link from '@/components/ui/link';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LayoutDashboard, AlertTriangle, Users, FileText, ShoppingCart, BookTemplate, FlaskConical, Flag, Mail, Settings, BarChart3, Megaphone, Crown } from 'lucide-react';
 import AdminGuard from '@/components/AdminGuard';
+import { safeStorage } from '@/lib/safeStorage';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -18,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // Cleanup: restore user preference when leaving admin
     return () => {
       // Re-apply user's theme preference
-      const userTheme = localStorage.getItem('theme') || 'light';
+      const userTheme = safeStorage.getItem('theme') || 'light';
       if (userTheme === 'light') {
         root.classList.remove('dark');
       } else if (userTheme === 'system') {

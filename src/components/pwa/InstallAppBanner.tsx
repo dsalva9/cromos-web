@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { X, Share } from 'lucide-react';
 import { isWeb, isNative, isPWA } from '@/lib/platform';
 import GooglePlayLink from '@/components/pwa/GooglePlayLink';
+import { safeStorage } from '@/lib/safeStorage';
 
 const DISMISS_KEY = 'install-banner-dismissed';
 const DISMISS_DAYS = 7;
@@ -26,7 +27,7 @@ export function InstallAppBanner() {
         if (isNative() || isPWA()) return;
         if (!isWeb()) return;
 
-        const dismissedAt = localStorage.getItem(DISMISS_KEY);
+        const dismissedAt = safeStorage.getItem(DISMISS_KEY);
         if (dismissedAt) {
             const dismissDate = new Date(dismissedAt);
             const daysSince = (Date.now() - dismissDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -46,7 +47,7 @@ export function InstallAppBanner() {
 
     const handleDismiss = useCallback(() => {
         setVisible(false);
-        localStorage.setItem(DISMISS_KEY, new Date().toISOString());
+        safeStorage.setItem(DISMISS_KEY, new Date().toISOString());
     }, []);
 
     const handleIOSClick = useCallback(() => {

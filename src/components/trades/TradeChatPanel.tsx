@@ -9,6 +9,7 @@ import { UserLink } from '@/components/ui/user-link';
 import { Send, ChevronDown, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { safeStorage } from '@/lib/safeStorage';
 
 interface TradeChatPanelProps {
   tradeId: number | null;
@@ -49,14 +50,14 @@ export function TradeChatPanel({
 
   // Check if user has seen the chat disclaimer
   useEffect(() => {
-    const hasSeenDisclaimer = localStorage.getItem('chat_disclaimer_seen');
+    const hasSeenDisclaimer = safeStorage.getItem('chat_disclaimer_seen');
     if (!hasSeenDisclaimer && tradeId) {
       setShowChatDisclaimer(true);
     }
   }, [tradeId]);
 
   const handleDismissDisclaimer = () => {
-    localStorage.setItem('chat_disclaimer_seen', 'true');
+    safeStorage.setItem('chat_disclaimer_seen', 'true');
     setShowChatDisclaimer(false);
   };
 

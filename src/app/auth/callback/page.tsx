@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
 import { setPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
 import { getCallbackMessage, CallbackMessageKey } from '../callback-messages';
+import { safeStorage } from '@/lib/safeStorage';
 
 const PROFILE_COMPLETION_ROUTE = '/profile/completar';
 const DEFAULT_LOCALE = 'es';
@@ -14,7 +15,7 @@ const DEFAULT_LOCALE = 'es';
 /** Read stored locale preference, with fallback to 'es'. */
 function getStoredLocale(): string {
   if (typeof window === 'undefined') return DEFAULT_LOCALE;
-  return localStorage.getItem('locale') || DEFAULT_LOCALE;
+  return safeStorage.getItem('locale') || DEFAULT_LOCALE;
 }
 
 /** Prefix a path with a locale segment. */

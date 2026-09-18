@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { routing, type Locale } from '@/i18n/routing';
+import { safeStorage } from '@/lib/safeStorage';
 
 const LOCALE_LABELS: Record<Locale, { flag: string; label: string }> = {
   es: { flag: '🇪🇸', label: 'Español' },
@@ -43,9 +44,7 @@ export function LanguageSelector() {
     const newPath = `/${newLocale}${pathWithoutLocale}`;
 
     // Persist preference
-    try {
-      localStorage.setItem('locale', newLocale);
-    } catch { /* ignore */ }
+    safeStorage.setItem('locale', newLocale);
 
     setOpen(false);
     // Hard navigation to ensure full re-render with new locale
