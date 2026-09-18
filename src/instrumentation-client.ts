@@ -65,6 +65,8 @@ if (SENTRY_DSN) {
             // Daily listing quota reached (expected business constraint handled in-app via modal)
             'daily_listing_limit_reached',
             'DailyLimitReachedError',
+            // Third-party / in-app WebView injected scripts syntax errors (e.g. ChatGPT Android WebView evaluateJavascript)
+            "Unexpected token 'else'",
         ],
 
         beforeSend(event) {
@@ -151,6 +153,18 @@ if (SENTRY_DSN) {
                 f.filename?.includes('injectedScript'),
             );
             if (hasInjectedScript) return null;
+
+            // Drop third-party / in-app browser injected script syntax errors (e.g. ChatGPT Android WebView evaluateJavascript)
+            if (
+                message.includes("Unexpected token 'else'") ||
+                (type === 'SyntaxError' &&
+                    frames.length <= 1 &&
+                    (frames[0]?.function === 'None' || !frames[0]?.function || frames[0]?.function === '?') &&
+                    frames[0]?.lineno === 1 &&
+                    !frames[0]?.filename?.includes('/_next/static/'))
+            ) {
+                return null;
+            }
 
             return event;
         },
