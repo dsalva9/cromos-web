@@ -12,7 +12,7 @@ import { useProfileCompletion } from '@/components/providers/ProfileCompletionPr
 import { ListingFavoriteButton } from '@/components/marketplace/ListingFavoriteButton';
 import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatarUrl';
 import { cn } from '@/lib/utils';
-import { ProBadge } from '@/components/ui/ProBadge';
+import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
@@ -261,14 +261,15 @@ export function ListingCard({ listing }: ListingCardProps) {
         <div className="flex items-center gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
           <div className="z-20 relative block shrink-0">
             <Link href={`/users/${listing.user_id}`} className="block">
+              <ProAvatarRing isPro={!!listing.author_is_pro} size="xs">
               <div 
                 className={cn(
                   "relative w-6 h-6 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700",
-                  listing.author_is_pro
-                    ? "ring-2 ring-[#FFC000]"
-                    : listing.author_is_patron 
+                  !listing.author_is_pro && listing.author_is_patron 
                     ? "ring-2 ring-amber-400 dark:ring-amber-500" 
-                    : "ring-1 ring-gray-100 dark:ring-gray-700"
+                    : !listing.author_is_pro
+                      ? "ring-1 ring-gray-100 dark:ring-gray-700"
+                      : ""
                 )}
               >
                 {avatarUrl ? (
@@ -290,6 +291,7 @@ export function ListingCard({ listing }: ListingCardProps) {
                   </div>
                 )}
               </div>
+              </ProAvatarRing>
             </Link>
           </div>
 

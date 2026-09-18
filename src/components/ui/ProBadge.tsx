@@ -29,23 +29,51 @@ export function ProBadge({ size = 'sm', className = '' }: ProBadgeProps) {
 }
 
 /**
- * Wraps an avatar with a golden ring border for PRO users.
+ * Wraps an avatar with a golden ring border and a small crown badge for PRO users.
  * Usage: <ProAvatarRing isPro={true}><Avatar ... /></ProAvatarRing>
+ *
+ * @param size - Controls the crown badge size to match the avatar:
+ *   'xs' → 24px avatars (listing cards)
+ *   'sm' → 32-40px avatars (header, chat list)
+ *   'md' → 48px avatars (profile cards)
+ *   'lg' → 64px+ avatars (profile page hero)
  */
 export function ProAvatarRing({
   isPro,
   children,
   className = '',
+  size = 'sm',
 }: {
   isPro: boolean;
   children: React.ReactNode;
   className?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }) {
   if (!isPro) return <>{children}</>;
 
+  const badgeSizeClasses = {
+    xs: 'w-3 h-3 -bottom-0 -right-0',
+    sm: 'w-4 h-4 -bottom-0.5 -right-0.5',
+    md: 'w-5 h-5 -bottom-0.5 -right-0.5',
+    lg: 'w-6 h-6 -bottom-0.5 -right-0.5',
+  };
+
+  const crownSize = {
+    xs: 8,
+    sm: 10,
+    md: 12,
+    lg: 14,
+  };
+
   return (
-    <div className={`relative rounded-full ring-2 ring-[#FFC000] ${className}`}>
+    <div className={`relative inline-flex rounded-full ring-2 ring-[#FFC000] ${className}`}>
       {children}
+      {/* PRO crown badge */}
+      <span
+        className={`absolute ${badgeSizeClasses[size]} flex items-center justify-center rounded-full bg-gradient-to-br from-[#FFC000] to-[#F59E0B] shadow-sm shadow-[#FFC000]/50 border border-white dark:border-gray-900 z-10`}
+      >
+        <Crown size={crownSize[size]} className="text-white fill-white" />
+      </span>
     </div>
   );
 }

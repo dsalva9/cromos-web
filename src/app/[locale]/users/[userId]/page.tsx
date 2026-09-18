@@ -41,7 +41,7 @@ import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles, Crown } from 'lucide-react';
 import { isNative } from '@/lib/platform';
-import { ProBadge } from '@/components/ui/ProBadge';
+import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { useHighlightCredits, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 
@@ -593,6 +593,7 @@ export default function UserProfilePage() {
               <div className="flex flex-col md:flex-row gap-6">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
+                  <ProAvatarRing isPro={!!profile.is_pro} size="lg">
                   {displayAvatarUrl ? (
                     <Image
                       src={displayAvatarUrl}
@@ -601,11 +602,11 @@ export default function UserProfilePage() {
                       height={120}
                       className={cn(
                         "rounded-full object-cover shadow-sm bg-gray-50 dark:bg-gray-800",
-                        profile.is_pro
-                          ? "border-4"
-                          : profile.is_patron 
-                            ? "border-4 border-amber-400 dark:border-amber-500" 
-                            : "border border-gray-200 dark:border-gray-700"
+                        !profile.is_pro && profile.is_patron 
+                          ? "border-4 border-amber-400 dark:border-amber-500" 
+                          : !profile.is_pro
+                            ? "border border-gray-200 dark:border-gray-700"
+                            : "border-4"
                       )}
                       style={profile.is_pro ? { borderColor: '#FFC000', boxShadow: '0 0 12px rgba(255,192,0,0.3)' } : undefined}
                     />
@@ -613,17 +614,18 @@ export default function UserProfilePage() {
                     <div 
                       className={cn(
                         "w-[120px] h-[120px] rounded-full flex items-center justify-center",
-                        profile.is_pro
-                          ? "border-4 bg-amber-50 dark:bg-amber-950/20"
-                          : profile.is_patron 
-                            ? "border-4 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/20" 
-                            : "border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
+                        !profile.is_pro && profile.is_patron 
+                          ? "border-4 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-950/20" 
+                          : !profile.is_pro
+                            ? "border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800"
+                            : "border-4 bg-amber-50 dark:bg-amber-950/20"
                       )}
                       style={profile.is_pro ? { borderColor: '#FFC000', boxShadow: '0 0 12px rgba(255,192,0,0.3)' } : undefined}
                     >
                       <User className={cn("h-16 w-16", profile.is_pro ? "text-amber-500 dark:text-amber-400" : profile.is_patron ? "text-amber-500 dark:text-amber-400" : "text-gray-400")} />
                     </div>
                   )}
+                  </ProAvatarRing>
                 </div>
 
                 {/* Info */}

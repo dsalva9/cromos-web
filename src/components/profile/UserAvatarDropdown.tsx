@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { toast } from '@/lib/toast';
 import { useLocale, useTranslations } from 'next-intl';
+import { ProAvatarRing } from '@/components/ui/ProBadge';
 
 interface UserAvatarDropdownProps {
   isAdmin?: boolean;
@@ -91,6 +92,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
         aria-expanded={isOpen}
         aria-label="Menú de perfil"
       >
+        <ProAvatarRing isPro={!!profile?.is_pro} size="sm">
         <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black">
           {avatarUrl ? (
             <Image
@@ -111,6 +113,7 @@ export function UserAvatarDropdown({ isAdmin = false, open: controlledOpen, onOp
             </div>
           )}
         </div>
+        </ProAvatarRing>
         <ChevronDown
           className={cn(
             'h-4 w-4 text-gray-900 dark:text-white transition-transform mr-1',

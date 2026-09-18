@@ -27,6 +27,7 @@ import { resolveAvatarUrl, getAvatarFallback } from '@/lib/profile/resolveAvatar
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Crown } from 'lucide-react';
+import { ProAvatarRing } from '@/components/ui/ProBadge';
 
 type NavigationLink = {
   href: string;
@@ -44,6 +45,7 @@ function MobileUserAvatar({ userId }: { userId: string }) {
 
   return (
     <Link href={`/users/${userId}`} className="block shrink-0">
+      <ProAvatarRing isPro={!!profile?.is_pro} size="sm">
       <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-black dark:border-white hover:border-gold dark:hover:border-gold transition-colors">
         {avatarUrl ? (
           <Image
@@ -64,6 +66,7 @@ function MobileUserAvatar({ userId }: { userId: string }) {
           </div>
         )}
       </div>
+      </ProAvatarRing>
     </Link>
   );
 }

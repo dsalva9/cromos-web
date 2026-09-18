@@ -13,7 +13,7 @@ import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
 import { MatchConversation } from '@/lib/supabase/matches/chat';
-import { ProBadge } from '@/components/ui/ProBadge';
+import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -391,10 +391,10 @@ function ChatsPageContent() {
                       <ModernCardContent className="p-4">
                         <div className="flex gap-3">
                           {/* Avatar */}
+                          <ProAvatarRing isPro={!!conv.other_is_pro && !conv.other_user_is_deleted} size="md">
                           <div className={cn(
                             "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
                             conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
-                              : conv.other_is_pro ? "bg-gold/20 border-[#FFC000] ring-2 ring-[#FFC000]/50"
                               : "bg-gold/20 border-gold"
                           )}>
                             {conv.other_avatar_url ? (
@@ -406,6 +406,7 @@ function ChatsPageContent() {
                               </span>
                             )}
                           </div>
+                          </ProAvatarRing>
 
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-0.5">
