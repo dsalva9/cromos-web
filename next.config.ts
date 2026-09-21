@@ -19,6 +19,14 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  // Prevent Next.js from streaming metadata into the body.
+  // By forcing blocking metadata for all requests (/.*/), all <title>,
+  // <meta>, <link rel="canonical"> and hreflang tags are guaranteed to be
+  // placed inside the <head> before the HTML shell is sent. This prevents
+  // Googlebot from ignoring canonical tags that would otherwise be streamed
+  // into the <body>, which caused "Duplicate without user-selected canonical"
+  // errors in Google Search Console.
+  htmlLimitedBots: /.*/,
   images: {
     // Disable Vercel Image Optimization to stay within free tier.
     // All Supabase images are already pre-optimized (WebP, sized thumbnails).

@@ -20,6 +20,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   applicationName: siteConfig.name,
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/icons/icon-192x192.png',
+  },
   title: {
     default: `${siteConfig.name} — Intercambia cromos deportivos`,
     template: `%s | ${siteConfig.name}`,
@@ -90,8 +94,6 @@ export default async function RootLayout({
   return (
     <html lang={locale} data-theme="light" suppressHydrationWarning>
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

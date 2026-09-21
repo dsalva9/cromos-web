@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
@@ -170,7 +171,7 @@ export interface TemplateDetailsResponse {
  * Fetches a public template's full details (metadata + pages + slots) by slug.
  * Returns null if not found, not public, or deleted.
  */
-export async function getPublicTemplateBySlug(slug: string): Promise<{ data: TemplateDetailsResponse; templateId: number } | null> {
+export const getPublicTemplateBySlug = cache(async (slug: string): Promise<{ data: TemplateDetailsResponse; templateId: number } | null> => {
     const cookieStore = await cookies();
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -210,13 +211,13 @@ export async function getPublicTemplateBySlug(slug: string): Promise<{ data: Tem
         logger.error('Error fetching public template by slug:', error);
         return null;
     }
-}
+});
 
 /**
  * Lightweight lookup: resolves a numeric template ID to its slug.
  * Used for redirecting /albumes/47 → /albumes/panini-world-cup-2026.
  */
-export async function getSlugByNumericId(id: number): Promise<string | null> {
+export const getSlugByNumericId = cache(async (id: number): Promise<string | null> => {
     const cookieStore = await cookies();
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -242,13 +243,13 @@ export async function getSlugByNumericId(id: number): Promise<string | null> {
         logger.error('Error resolving template ID to slug:', error);
         return null;
     }
-}
+});
 
 /**
  * Resolves a slug to a numeric template ID.
  * Used by proxy middleware for auth redirects.
  */
-export async function getTemplateIdBySlug(slug: string): Promise<number | null> {
+export const getTemplateIdBySlug = cache(async (slug: string): Promise<number | null> => {
     const cookieStore = await cookies();
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -274,4 +275,4 @@ export async function getTemplateIdBySlug(slug: string): Promise<number | null> 
         logger.error('Error resolving slug to template ID:', error);
         return null;
     }
-}
+});
