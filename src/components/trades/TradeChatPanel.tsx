@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Fragment } from 'react';
 import { useTradeChat } from '@/hooks/trades/useTradeChat';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,9 @@ import { Send, ChevronDown, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { safeStorage } from '@/lib/safeStorage';
+import { useLocale } from 'next-intl';
+import { ChatDateSeparator } from '@/components/chats/ChatDateSeparator';
+import { isSameDay, formatMessageTime, formatFullDateTime } from '@/lib/chatDate';
 
 interface TradeChatPanelProps {
   tradeId: number | null;
@@ -25,6 +28,7 @@ export function TradeChatPanel({
   isProposalActive,
 }: TradeChatPanelProps) {
   const { user } = useUser();
+  const locale = useLocale();
   const {
     messages,
     loading,
@@ -233,47 +237,53 @@ export function TradeChatPanel({
         )}
 
         {/* Messages */}
-        {messages.map(message => {
+        {messages.map((message, index) => {
           const isMine = message.sender_id === user?.id;
+          const showDateSep =
+            index === 0 ||
+            !isSameDay(message.created_at, messages[index - 1].created_at);
+
           return (
-            <div
-              key={message.id}
-              className={cn('flex', isMine ? 'justify-end' : 'justify-start')}
-            >
+            <Fragment key={message.id}>
+              {showDateSep && (
+                <ChatDateSeparator date={message.created_at} locale={locale} />
+              )}
               <div
-                className={cn(
-                  'max-w-[70%] rounded-lg p-3 border-2 border-black shadow-md',
-                  isMine
-                    ? 'bg-gold text-gray-900'
-                    : 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
-                )}
+                className={cn('flex', isMine ? 'justify-end' : 'justify-start')}
               >
-                {!isMine && (
-                  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">
-                    <UserLink
-                      userId={message.sender_id ?? ''}
-                      nickname={message.sender_nickname ?? ''}
-                      variant="subtle"
-                      disabled={!message.sender_id}
-                    />
-                  </p>
-                )}
-                <p className="text-sm font-medium whitespace-pre-wrap break-words">
-                  {message.message}
-                </p>
-                <p
+                <div
                   className={cn(
-                    'text-xs mt-1',
-                    isMine ? 'text-gray-700' : 'text-gray-500'
+                    'max-w-[70%] rounded-lg p-3 border-2 border-black shadow-md',
+                    isMine
+                      ? 'bg-gold text-gray-900'
+                      : 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
                   )}
                 >
-                  {new Date(message.created_at).toLocaleTimeString('es-ES', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
+                  {!isMine && (
+                    <p className="text-xs font-bold text-gray-600 dark:text-gray-400 mb-1">
+                      <UserLink
+                        userId={message.sender_id ?? ''}
+                        nickname={message.sender_nickname ?? ''}
+                        variant="subtle"
+                        disabled={!message.sender_id}
+                      />
+                    </p>
+                  )}
+                  <p className="text-sm font-medium whitespace-pre-wrap break-words">
+                    {message.message}
+                  </p>
+                  <p
+                    className={cn(
+                      'text-[11px] mt-1 text-right whitespace-nowrap',
+                      isMine ? 'text-gray-700 font-medium' : 'text-gray-500 dark:text-gray-400'
+                    )}
+                    title={formatFullDateTime(message.created_at, locale)}
+                  >
+                    {formatMessageTime(message.created_at, locale)}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Fragment>
           );
         })}
 

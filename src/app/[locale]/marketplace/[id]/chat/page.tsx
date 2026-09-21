@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Fragment } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -10,7 +10,9 @@ import { useTradeConfirmations } from '@/hooks/marketplace/useTradeConfirmations
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import { ChatDateSeparator } from '@/components/chats/ChatDateSeparator';
+import { isSameDay, formatMessageTime, formatFullDateTime } from '@/lib/chatDate';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +39,7 @@ function ListingChatPageContent() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations('marketplaceChat');
+  const locale = useLocale();
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const listingId = parseInt(params.id as string, 10);
@@ -1249,7 +1252,11 @@ function ListingChatPageContent() {
                   ) : (
                     <>
 
-                      {messages.map(message => {
+                      {messages.map((message, index) => {
+                        const showDateSep =
+                          index === 0 ||
+                          !isSameDay(message.created_at, messages[index - 1].created_at);
+
                         // System messages render differently
                         if (message.is_system) {
                           let isBmacPrompt = false;
@@ -1262,110 +1269,118 @@ function ListingChatPageContent() {
 
                           if (isBmacPrompt) {
                             return (
-                              <div
-                                key={message.id}
-                                className="flex justify-center my-4 w-full"
-                              >
-                                <BmacChatPrompt />
-                              </div>
+                              <Fragment key={message.id}>
+                                {showDateSep && (
+                                  <ChatDateSeparator date={message.created_at} locale={locale} />
+                                )}
+                                <div className="flex justify-center my-4 w-full">
+                                  <BmacChatPrompt />
+                                </div>
+                              </Fragment>
                             );
                           }
 
                           return (
-                            <div
-                              key={message.id}
-                              className="flex justify-center my-4"
-                            >
-                              <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
-                                <p className="italic">{message.message}</p>
-                                <p className="text-xs mt-1 opacity-60">
-                                  {new Date(message.created_at).toLocaleTimeString('es-ES', {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                  })}
-                                </p>
+                            <Fragment key={message.id}>
+                              {showDateSep && (
+                                <ChatDateSeparator date={message.created_at} locale={locale} />
+                              )}
+                              <div className="flex justify-center my-4">
+                                <div className="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 text-sm text-center max-w-[80%] border border-gold">
+                                  <p className="italic">{message.message}</p>
+                                  <p
+                                    className="text-[10px] mt-1 opacity-70"
+                                    title={formatFullDateTime(message.created_at, locale)}
+                                  >
+                                    {formatMessageTime(message.created_at, locale)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
+                            </Fragment>
                           );
                         }
 
                         // Regular user messages
                         const isOwnMessage = message.sender_id === user?.id;
                         return (
-                          <div
-                            key={message.id}
-                            className={cn(
-                              'flex',
-                              isOwnMessage ? 'justify-end' : 'justify-start'
+                          <Fragment key={message.id}>
+                            {showDateSep && (
+                              <ChatDateSeparator date={message.created_at} locale={locale} />
                             )}
-                          >
                             <div
                               className={cn(
-                                'max-w-[70%] rounded-lg p-3 border-2 border-black',
-                                isOwnMessage
-                                  ? 'bg-gold text-black'
-                                  : 'bg-gray-800 text-white'
+                                'flex',
+                                isOwnMessage ? 'justify-end' : 'justify-start'
                               )}
                             >
-                              {!isOwnMessage && message.sender_nickname && (
-                                <p className="text-xs font-bold mb-1 opacity-70">
-                                  {message.sender_id ? (
-                                    <Link
-                                      href={`/users/${message.sender_id}`}
-                                      className="hover:text-gold hover:underline transition-colors"
-                                    >
-                                      {message.sender_nickname}
-                                    </Link>
-                                  ) : (
-                                    message.sender_nickname
-                                  )}
-                                </p>
-                              )}
-                              {/* File attachment */}
-                              {message.image_url?.endsWith('.pdf') && (
-                                <button
-                                  onClick={() => void downloadFile(message.image_url!, 'documento.pdf')}
-                                  type="button"
-                                  className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors text-left w-full text-current"
+                              <div
+                                className={cn(
+                                  'max-w-[70%] rounded-lg p-3 border-2 border-black',
+                                  isOwnMessage
+                                    ? 'bg-gold text-black'
+                                    : 'bg-gray-800 text-white'
+                                )}
+                              >
+                                {!isOwnMessage && message.sender_nickname && (
+                                  <p className="text-xs font-bold mb-1 opacity-70">
+                                    {message.sender_id ? (
+                                      <Link
+                                        href={`/users/${message.sender_id}`}
+                                        className="hover:text-gold hover:underline transition-colors"
+                                      >
+                                        {message.sender_nickname}
+                                      </Link>
+                                    ) : (
+                                      message.sender_nickname
+                                    )}
+                                  </p>
+                                )}
+                                {/* File attachment */}
+                                {message.image_url?.endsWith('.pdf') && (
+                                  <button
+                                    onClick={() => void downloadFile(message.image_url!, 'documento.pdf')}
+                                    type="button"
+                                    className="flex items-center gap-3 p-3 mb-1 rounded-lg bg-white/20 dark:bg-black/20 border border-black/10 dark:border-white/10 hover:bg-white/30 dark:hover:bg-black/30 transition-colors text-left w-full text-current"
+                                  >
+                                    <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium truncate">Documento PDF</p>
+                                      <p className="text-xs opacity-60">Toca para descargar</p>
+                                    </div>
+                                    <Download className="w-4 h-4 opacity-60 flex-shrink-0" />
+                                  </button>
+                                )}
+                                {/* Image attachment */}
+                                {message.thumbnail_url && !message.image_url?.endsWith('.pdf') && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setLightboxUrl(message.image_url || message.thumbnail_url || null)}
+                                    className="block mb-1 rounded-md overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                                    aria-label={t('viewFullImage')}
+                                  >
+                                    <img
+                                      src={message.thumbnail_url}
+                                      alt={t('imageMessage')}
+                                      loading="lazy"
+                                      className="max-w-[240px] max-h-[240px] rounded-md"
+                                    />
+                                  </button>
+                                )}
+                                {/* Message text (hide placeholder for image/PDF-only messages) */}
+                                {!(message.thumbnail_url && message.message === '📷 Imagen') && !(message.image_url?.endsWith('.pdf') && message.message === '📄 PDF') && (
+                                  <p className="whitespace-pre-wrap break-words">
+                                    {message.message}
+                                  </p>
+                                )}
+                                <p
+                                  className="text-[11px] mt-1 text-right opacity-70 whitespace-nowrap"
+                                  title={formatFullDateTime(message.created_at, locale)}
                                 >
-                                  <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate">Documento PDF</p>
-                                    <p className="text-xs opacity-60">Toca para descargar</p>
-                                  </div>
-                                  <Download className="w-4 h-4 opacity-60 flex-shrink-0" />
-                                </button>
-                              )}
-                              {/* Image attachment */}
-                              {message.thumbnail_url && !message.image_url?.endsWith('.pdf') && (
-                                <button
-                                  type="button"
-                                  onClick={() => setLightboxUrl(message.image_url || message.thumbnail_url || null)}
-                                  className="block mb-1 rounded-md overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
-                                  aria-label={t('viewFullImage')}
-                                >
-                                  <img
-                                    src={message.thumbnail_url}
-                                    alt={t('imageMessage')}
-                                    loading="lazy"
-                                    className="max-w-[240px] max-h-[240px] rounded-md"
-                                  />
-                                </button>
-                              )}
-                              {/* Message text (hide placeholder for image/PDF-only messages) */}
-                              {!(message.thumbnail_url && message.message === '📷 Imagen') && !(message.image_url?.endsWith('.pdf') && message.message === '📄 PDF') && (
-                                <p className="whitespace-pre-wrap break-words">
-                                  {message.message}
+                                  {formatMessageTime(message.created_at, locale)}
                                 </p>
-                              )}
-                              <p className="text-xs mt-1 opacity-60">
-                                {new Date(message.created_at).toLocaleTimeString('es-ES', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </p>
+                              </div>
                             </div>
-                          </div>
+                          </Fragment>
                         );
                       })}
 

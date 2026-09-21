@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, Fragment } from 'react';
 import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -8,10 +8,12 @@ import { useMatchChat } from '@/hooks/chats/useMatchChat';
 import { useTradeConfirmations } from '@/hooks/marketplace/useTradeConfirmations';
 import { MessageBubble } from './MessageBubble';
 import { ChatComposer } from './ChatComposer';
+import { ChatDateSeparator } from './ChatDateSeparator';
 import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 import { sendMatchMessage } from '@/lib/supabase/matches/chat';
 import { cn } from '@/lib/utils';
-import { useTranslations } from 'next-intl';
+import { isSameDay } from '@/lib/chatDate';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from '@/components/ui/link';
 import { useIgnore } from '@/hooks/social/useIgnore';
 import { ReportModal } from '@/components/social/ReportModal';
@@ -53,6 +55,7 @@ export function ChatDrawer({
   otherUserIsDeleted,
 }: ChatDrawerProps) {
   const t = useTranslations('matchChat');
+  const locale = useLocale();
   const { user } = useUser();
   const supabase = useSupabaseClient();
   const [showInfo, setShowInfo] = useState(false);
@@ -309,13 +312,23 @@ export function ChatDrawer({
               )}
 
               {/* Message bubbles */}
-              {messages.map(msg => (
-                <MessageBubble
-                  key={msg.id}
-                  message={msg}
-                  isOwn={msg.sender_id === user?.id}
-                />
-              ))}
+              {messages.map((msg, index) => {
+                const showDateSep =
+                  index === 0 ||
+                  !isSameDay(msg.created_at, messages[index - 1].created_at);
+
+                return (
+                  <Fragment key={msg.id}>
+                    {showDateSep && (
+                      <ChatDateSeparator date={msg.created_at} locale={locale} />
+                    )}
+                    <MessageBubble
+                      message={msg}
+                      isOwn={msg.sender_id === user?.id}
+                    />
+                  </Fragment>
+                );
+              })}
 
               {/* Top Confirmation Banner (when pendingForMe is true) */}
               {pendingConfirmation && pendingForMe && (

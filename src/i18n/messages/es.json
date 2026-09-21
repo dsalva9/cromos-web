@@ -445,6 +445,8 @@
   "chats": {
     "title": "Mis Chats",
     "subtitle": "Todas tus conversaciones",
+    "today": "Hoy",
+    "yesterday": "Ayer",
     "tabs": {
       "marketplace": "Marketplace",
       "match": "Match"

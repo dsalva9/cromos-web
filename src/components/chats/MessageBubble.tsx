@@ -7,7 +7,8 @@ import { ImageModal } from '@/components/ui/ImageModal';
 import type { MatchChatMessage } from '@/lib/supabase/matches/chat';
 import { FileText, Download, Coffee } from 'lucide-react';
 import { downloadFile } from '@/lib/validations/chat';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatMessageTime, formatFullDateTime } from '@/lib/chatDate';
 
 import { BmacChatPrompt } from './BmacChatPrompt';
 
@@ -17,7 +18,11 @@ interface MessageBubbleProps {
 }
 
 export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
+  const locale = useLocale();
   const [showImageModal, setShowImageModal] = useState(false);
+
+  const time = formatMessageTime(message.created_at, locale);
+  const fullDateTime = formatFullDateTime(message.created_at, locale);
 
   // System messages
   if (message.is_system) {
@@ -38,18 +43,19 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
     }
 
     return (
-      <div className="flex justify-center my-3">
+      <div className="flex flex-col items-center my-3">
         <span className="text-xs text-gray-500 dark:text-gray-400 italic bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full max-w-[80%] text-center">
           {message.message}
+        </span>
+        <span
+          className="text-[10px] text-gray-400 dark:text-gray-500 mt-1"
+          title={fullDateTime}
+        >
+          {time}
         </span>
       </div>
     );
   }
-
-  const time = new Date(message.created_at).toLocaleTimeString('es-ES', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 
   const hasImage = !!message.image_url;
   const isPdf = !!message.image_url?.endsWith('.pdf');
@@ -111,9 +117,10 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
           {/* Timestamp */}
           <p
             className={cn(
-              'text-[10px] mt-1 text-right',
-              isOwn ? 'text-black/50' : 'text-gray-400 dark:text-gray-500'
+              'text-[10px] mt-1 text-right whitespace-nowrap',
+              isOwn ? 'text-black/60 font-medium' : 'text-gray-400 dark:text-gray-500'
             )}
+            title={fullDateTime}
           >
             {time}
           </p>

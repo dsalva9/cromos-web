@@ -416,6 +416,8 @@
   "chats": {
     "title": "Meus Chats",
     "subtitle": "Todas as suas conversas",
+    "today": "Hoje",
+    "yesterday": "Ontem",
     "tabs": {
       "marketplace": "Marketplace",
       "match": "Match"
