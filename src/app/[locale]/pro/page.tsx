@@ -42,6 +42,7 @@ function getPlanLabel(plan: string): string {
     case 'monthly': return 'Mensual (4,99€/mes)';
     case 'yearly': return 'Anual (49,99€/año)';
     case 'trial_1m': return 'Prueba gratuita';
+    case 'trial_7d': return 'Prueba gratuita';
     case 'admin_grant': return 'Cortesía';
     default: return plan;
   }
@@ -117,7 +118,7 @@ export default function ProPage() {
     const sub = subscriptionDetails;
     const statusInfo = sub ? getStatusLabel(sub.status) : null;
     const canCancel = sub && sub.status === 'active' && sub.plan !== 'trial_1m' && sub.plan !== 'admin_grant';
-    const isTrial = sub?.plan === 'trial_1m' || sub?.status === 'trial';
+    const isTrial = sub?.plan === 'trial_1m' || sub?.plan === 'trial_7d' || sub?.status === 'trial';
     const isAdminGrant = sub?.plan === 'admin_grant';
 
     return (
@@ -247,9 +248,51 @@ export default function ProPage() {
                     </Button>
                   </>
                 ) : isTrial ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    Tu prueba gratuita expirará automáticamente. No necesitas hacer nada para cancelar.
-                  </p>
+                  <>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
+                      Tu prueba gratuita expirará automáticamente. ¡Suscríbete para no perder tus beneficios!
+                    </p>
+
+                    {/* Plan selection */}
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      <button
+                        onClick={() => setSelectedPlan('monthly')}
+                        className={`rounded-xl border-2 p-3 text-left transition-all ${
+                          selectedPlan === 'monthly'
+                            ? 'border-[#FFC000] bg-[#FFC000]/10'
+                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1F2937]'
+                        }`}
+                      >
+                        <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">Mensual</p>
+                        <p className="text-gray-900 dark:text-white font-bold text-lg">4,99€</p>
+                        <p className="text-gray-400 dark:text-gray-500 text-xs">/mes</p>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedPlan('yearly')}
+                        className={`rounded-xl border-2 p-3 text-left transition-all relative ${
+                          selectedPlan === 'yearly'
+                            ? 'border-[#FFC000] bg-[#FFC000]/10'
+                            : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1F2937]'
+                        }`}
+                      >
+                        <span className="absolute -top-2.5 right-2 bg-[#FFC000] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          -17%
+                        </span>
+                        <p className="text-gray-500 dark:text-gray-400 text-xs mb-0.5">Anual</p>
+                        <p className="text-gray-900 dark:text-white font-bold text-lg">49,99€</p>
+                        <p className="text-gray-400 dark:text-gray-500 text-xs">/año</p>
+                      </button>
+                    </div>
+
+                    <Button
+                      onClick={() => subscribePro(selectedPlan)}
+                      className="w-full bg-gradient-to-r from-[#FFC000] to-[#F59E0B] hover:from-[#E6AD00] hover:to-[#D97706] text-black font-bold"
+                    >
+                      <Crown size={18} className="mr-2" />
+                      Mantener beneficios PRO
+                    </Button>
+                  </>
                 ) : isAdminGrant ? (
                   <p className="text-gray-500 dark:text-gray-400 text-xs">
                     Este PRO fue otorgado por un administrador. Contacta con soporte para cualquier cambio.

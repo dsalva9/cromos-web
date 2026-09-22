@@ -122,7 +122,7 @@ function buildEmail(type: EmailType, data: EmailData): { subject: string; html: 
         <div style="background:#FFFBEB;border:1px solid #FFC000;border-radius:8px;padding:16px;margin:16px 0;">
           <p style="margin:0;color:#92400E;font-weight:bold;">💰 Desde solo 4,99€/mes</p>
         </div>`;
-      const html = baseTemplate(subject, body, "Suscribirme ahora", `${APP_URL}/pro`);
+      const html = baseTemplate(subject, body, "Mantener mis beneficios PRO", `${APP_URL}/pro`);
       return { subject, html };
     }
 
@@ -135,7 +135,7 @@ function buildEmail(type: EmailType, data: EmailData): { subject: string; html: 
         <div style="background:#FEF2F2;border:1px solid #EF4444;border-radius:8px;padding:16px;margin:16px 0;">
           <p style="margin:0;color:#991B1B;font-weight:bold;">⚠️ Mañana perderás: subidas ilimitadas, sin anuncios, créditos de destacados</p>
         </div>`;
-      const html = baseTemplate(subject, body, "Suscribirme ahora", `${APP_URL}/pro`);
+      const html = baseTemplate(subject, body, "Mantener mis beneficios PRO", `${APP_URL}/pro`);
       return { subject, html };
     }
 
