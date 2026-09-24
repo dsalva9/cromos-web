@@ -155,14 +155,16 @@ BEGIN
   WHERE profiles.id = p_rated_id;
 
   IF NOT v_is_update THEN
-    INSERT INTO notifications (user_id, kind, actor_id, created_at, payload)
+    INSERT INTO notifications (user_id, kind, actor_id, rating_id, created_at, payload)
     VALUES (
       p_rated_id,
       'user_rated',
       v_rater_id,
+      v_rating_id,
       now(),
       jsonb_build_object('rating', p_rating)
-    );
+    )
+    ON CONFLICT DO NOTHING;
   END IF;
 
   PERFORM trigger_top_rated_badge_check(p_rated_id);

@@ -66,7 +66,7 @@ BEGIN
         p.is_patron,
         (SELECT COUNT(*)::BIGINT FROM trade_chats tc WHERE tc.sender_id = p.id) AS messages_sent,
         (SELECT COUNT(*)::BIGINT FROM trade_chats tc2 WHERE tc2.listing_id IN (SELECT tl2.id FROM trade_listings tl2 WHERE tl2.user_id = p.id) AND tc2.sender_id != p.id) AS messages_received,
-        (SELECT COUNT(*)::BIGINT FROM user_collection_copies ucc WHERE ucc.user_id = p.id) AS albums_count,
+        (SELECT COUNT(*)::BIGINT FROM user_template_copies ucc WHERE ucc.user_id = p.id) AS albums_count,
         COALESCE(p.country_code, '')::TEXT AS country_code,
         COALESCE(p.is_flagged, false) AS is_flagged,
         p.flagged_at,
@@ -113,7 +113,7 @@ BEGIN
     WHERE id = p_user_id;
 
     INSERT INTO audit_log (action, entity, user_id, admin_id, admin_nickname, occurred_at)
-    VALUES ('approve_flagged_profile', 'profiles', p_user_id, auth.uid(),
+    VALUES ('moderation', 'user', p_user_id, auth.uid(),
             (SELECT nickname FROM profiles WHERE id = auth.uid()), now());
 END;
 $function$;
