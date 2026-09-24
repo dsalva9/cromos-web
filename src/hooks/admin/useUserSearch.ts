@@ -20,9 +20,13 @@ interface AdminUser {
   albums_count: number;
   country_code: string;
   is_patron: boolean;
+  is_flagged: boolean;
+  flagged_at: string | null;
+  flagged_reason: string | null;
+  flagged_source_profile_id: string | null;
 }
 
-export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended' | 'pending_deletion') {
+export function useUserSearch(query: string, status: 'all' | 'active' | 'suspended' | 'pending_deletion' | 'flagged') {
   const supabase = useSupabaseClient();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);

@@ -474,6 +474,8 @@
     "reportUser": "Reportar usuário",
     "blockUser": "Bloquear usuário",
     "reported": "Usuário reportado com sucesso",
+    "rateUser": "Avaliar usuário",
+    "updateRating": "Atualizar avaliação",
     "info": {
       "title": "Info do match",
       "collection": "Coleção",

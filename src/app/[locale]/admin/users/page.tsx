@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import Image from 'next/image';
 import Link from '@/components/ui/link';
-import { User, Search, Ban, CheckCircle, AlertTriangle, Mail, Trash2 } from 'lucide-react';
+import { User, Search, Ban, CheckCircle, AlertTriangle, Mail, Trash2, Shield } from 'lucide-react';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
 import AdminGuard from '@/components/AdminGuard';
@@ -21,7 +21,7 @@ import { SendEmailModal } from '@/components/admin/SendEmailModal';
 
 function UserSearchContent() {
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<'all' | 'active' | 'suspended' | 'pending_deletion'>('all');
+  const [status, setStatus] = useState<'all' | 'active' | 'suspended' | 'pending_deletion' | 'flagged'>('all');
   const debouncedQuery = useDebounce(query, 500);
   const supabase = useSupabaseClient();
 
@@ -115,6 +115,23 @@ function UserSearchContent() {
     }
   };
 
+  const handleApproveFlagged = async (userId: string, nickname: string) => {
+    if (!confirm(`Approve ${nickname}'s profile and remove the flag?`)) return;
+
+    try {
+      const { error } = await supabase.rpc('admin_approve_flagged_profile', {
+        p_user_id: userId
+      });
+
+      if (error) throw error;
+
+      toast.success('Profile approved — flag removed');
+      refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to approve profile');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1F2937]">
       <div className="container mx-auto px-4 py-8">
@@ -149,7 +166,7 @@ function UserSearchContent() {
             {/* Status Filter */}
             <div className="space-y-2">
               <Label className="text-white">Status</Label>
-              <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended' | 'pending_deletion') => setStatus(v)}>
+              <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended' | 'pending_deletion' | 'flagged') => setStatus(v)}>
                 <SelectTrigger className="bg-[#374151] border-2 border-black text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -158,6 +175,7 @@ function UserSearchContent() {
                   <SelectItem value="active">Active Only</SelectItem>
                   <SelectItem value="suspended">Suspended Only</SelectItem>
                   <SelectItem value="pending_deletion">Pending Deletion</SelectItem>
+                  <SelectItem value="flagged">⚠️ Flagged Profiles</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -235,6 +253,9 @@ function UserSearchContent() {
                             <Badge className="bg-orange-600 text-white">Pending Deletion</Badge>
                           ) : user.is_suspended && (
                             <Badge className="bg-gray-600 text-white">Suspended</Badge>
+                          )}
+                          {user.is_flagged && (
+                            <Badge className="bg-amber-600 text-white">⚠️ Flagged</Badge>
                           )}
                         </div>
                         <p className="text-gray-400 text-sm">{user.email}</p>
@@ -360,6 +381,51 @@ function UserSearchContent() {
                       <div className="flex items-center gap-2 text-sm text-orange-400 pt-2">
                         <AlertTriangle className="h-4 w-4" />
                         <span>This user has received {user.reports_received_count} report(s)</span>
+                      </div>
+                    )}
+
+                    {/* Flagged profile info */}
+                    {user.is_flagged && (
+                      <div className="mt-3 p-3 bg-amber-900/30 border border-amber-700 rounded-lg space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-amber-400 font-semibold">
+                          <Shield className="h-4 w-4" />
+                          <span>Flagged Profile — Device match detected</span>
+                        </div>
+                        {user.flagged_reason && (
+                          <p className="text-xs text-amber-300/80">{user.flagged_reason}</p>
+                        )}
+                        {user.flagged_at && (
+                          <p className="text-xs text-gray-400">Flagged at: {new Date(user.flagged_at).toLocaleString()}</p>
+                        )}
+                        {user.flagged_source_profile_id && (
+                          <p className="text-xs text-gray-400">
+                            Source profile:{' '}
+                            <Link href={`/users/${user.flagged_source_profile_id}`} className="text-gold hover:underline">
+                              {user.flagged_source_profile_id.slice(0, 8)}…
+                            </Link>
+                          </p>
+                        )}
+                        <div className="flex gap-2 pt-1">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApproveFlagged(user.user_id, user.nickname)}
+                            className="bg-green-700 hover:bg-green-600"
+                          >
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            Approve Profile
+                          </Button>
+                          {!user.is_suspended && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleSuspend(user.user_id, user.nickname)}
+                              disabled={actionLoading}
+                              className="bg-red-700 hover:bg-red-600"
+                            >
+                              <Ban className="mr-2 h-4 w-4" />
+                              Suspend
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

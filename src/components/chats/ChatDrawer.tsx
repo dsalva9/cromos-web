@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useMemo, Fragment } from 'react';
-import { X, Info, ArrowLeft, MoreVertical, Flag, Ban } from 'lucide-react';
+import { X, Info, ArrowLeft, MoreVertical, Flag, Ban, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
@@ -10,6 +10,7 @@ import { MessageBubble } from './MessageBubble';
 import { ChatComposer } from './ChatComposer';
 import { ChatDateSeparator } from './ChatDateSeparator';
 import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
+import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { sendMatchMessage } from '@/lib/supabase/matches/chat';
 import { cn } from '@/lib/utils';
 import { isSameDay } from '@/lib/chatDate';
@@ -63,6 +64,9 @@ export function ChatDrawer({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { ignoreUser, loading: ignoreLoading } = useIgnore();
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [canRate, setCanRate] = useState(false);
+  const [existingRating, setExistingRating] = useState<{ rating: number; comment: string | null } | null>(null);
   const matchObj = useMemo(() => {
     if (!otherUserId) return null;
     return {
@@ -90,6 +94,39 @@ export function ChatDrawer({
     conversationId: isOpen ? conversationId : null,
     enableRealtime: isOpen,
   });
+
+  // Check rating eligibility for counterparty
+  useEffect(() => {
+    if (!isOpen || !otherUserId || !user) {
+      setCanRate(false);
+      return;
+    }
+
+    const checkRating = async () => {
+      try {
+        const { data: eligibility } = await supabase.rpc('can_rate_user', {
+          p_target_id: otherUserId
+        });
+        const canRateResult = Array.isArray(eligibility) ? eligibility[0]?.can_rate : false;
+        setCanRate(canRateResult === true);
+
+        if (canRateResult) {
+          const { data: myRating } = await supabase.rpc('get_my_rating_for_user', {
+            p_rated_id: otherUserId
+          });
+          if (myRating && myRating.length > 0) {
+            setExistingRating({ rating: myRating[0].rating, comment: myRating[0].comment });
+          } else {
+            setExistingRating(null);
+          }
+        }
+      } catch {
+        // Non-critical
+      }
+    };
+
+    void checkRating();
+  }, [isOpen, otherUserId, user, supabase]);
 
   // Trade Confirmations state
   const t_tc = useTranslations('tradeConfirmations');
@@ -221,6 +258,22 @@ export function ChatDrawer({
           >
             <Info className="w-5 h-5" />
           </button>
+
+          {/* Rate button */}
+          {canRate && otherUserId && (
+            <button
+              onClick={() => setShowRatingModal(true)}
+              className={cn(
+                'transition-colors p-1',
+                existingRating
+                  ? 'text-gold hover:text-yellow-400'
+                  : 'text-gray-400 hover:text-gold'
+              )}
+              title={existingRating ? t('updateRating') : t('rateUser')}
+            >
+              <Star className={cn('w-5 h-5', existingRating && 'fill-current')} />
+            </button>
+          )}
 
           {/* More menu (block/report) */}
           <div className="relative">
@@ -580,6 +633,24 @@ export function ChatDrawer({
           onClose={() => setShowReportModal(false)}
           entityType="user"
           entityId={otherUserId}
+        />
+      )}
+
+      {otherUserId && (
+        <UserRatingDialog
+          open={showRatingModal}
+          onOpenChange={setShowRatingModal}
+          userToRate={{ id: otherUserId, nickname: otherNickname }}
+          existingRating={existingRating}
+          onSubmit={async (rating, comment) => {
+            const { error } = await supabase.rpc('upsert_user_rating', {
+              p_rated_id: otherUserId,
+              p_rating: rating,
+              p_comment: comment || undefined,
+            });
+            if (error) throw new Error(error.message);
+            setExistingRating({ rating, comment: comment || null });
+          }}
         />
       )}
     </>

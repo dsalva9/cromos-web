@@ -3601,6 +3601,10 @@ export type Database = {
         Args: { p_amount: number; p_description: string; p_user_id: string }
         Returns: number
       }
+      admin_approve_flagged_profile: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       admin_archive_expired_listing: {
         Args: { p_listing_id: number }
         Returns: Json
@@ -5784,14 +5788,22 @@ export type Database = {
         }
         Returns: {
           active_listings_count: number
+          albums_count: number
           avatar_url: string
+          country_code: string
           created_at: string
           deletion_scheduled_for: string
           email: string
+          flagged_at: string
+          flagged_reason: string
+          flagged_source_profile_id: string
           is_admin: boolean
+          is_flagged: boolean
           is_patron: boolean
           is_pending_deletion: boolean
           is_suspended: boolean
+          messages_received: number
+          messages_sent: number
           nickname: string
           rating_avg: number
           rating_count: number

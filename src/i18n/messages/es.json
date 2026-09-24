@@ -503,6 +503,8 @@
     "reportUser": "Reportar usuario",
     "blockUser": "Bloquear usuario",
     "reported": "Usuario reportado correctamente",
+    "rateUser": "Valorar usuario",
+    "updateRating": "Actualizar valoración",
     "info": {
       "title": "Info del match",
       "collection": "Colección",

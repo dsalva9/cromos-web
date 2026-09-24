@@ -474,6 +474,8 @@
     "reportUser": "Report user",
     "blockUser": "Block user",
     "reported": "User reported successfully",
+    "rateUser": "Rate user",
+    "updateRating": "Update rating",
     "info": {
       "title": "Match info",
       "collection": "Collection",
