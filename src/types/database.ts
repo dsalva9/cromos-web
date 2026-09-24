@@ -461,6 +461,92 @@ export type Database = {
         }
         Relationships: []
       }
+      delayed_notifications: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          deliver_after: string
+          id: number
+          kind: string
+          payload: Json | null
+          processed_at: string | null
+          rating_id: number | null
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          deliver_after: string
+          id?: number
+          kind: string
+          payload?: Json | null
+          processed_at?: string | null
+          rating_id?: number | null
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          deliver_after?: string
+          id?: number
+          kind?: string
+          payload?: Json | null
+          processed_at?: string | null
+          rating_id?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delayed_notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "user_ratings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delayed_notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       device_fingerprints: {
         Row: {
           fingerprint_hash: string
@@ -4547,6 +4633,7 @@ export type Database = {
         Args: { p_confirmation_id: number }
         Returns: boolean
       }
+      dispatch_delayed_notifications: { Args: never; Returns: number }
       earn_rewarded_ad_credits: {
         Args: { p_transaction_id?: string; p_user_id?: string }
         Returns: Json
