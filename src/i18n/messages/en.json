@@ -1714,9 +1714,11 @@
       "stars3": "3 estrellas",
       "stars2": "2 estrellas",
       "stars1": "1 estrella",
-      "typeListing": "Anuncio",
-      "typeTrade": "Intercambio",
-      "empty": "Este usuario aún no ha recibido valoraciones"
+      "typeListing": "Listing",
+      "typeTrade": "Trade",
+      "empty": "This user has not received any ratings yet",
+      "rateUser": "Rate {nickname}",
+      "updateRating": "Update rating"
     },
     "listings": {
       "title": "Active listings",

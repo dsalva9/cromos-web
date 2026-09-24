@@ -1,11 +1,13 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useUserProfile } from '@/hooks/social/useUserProfile';
 import { ListingCard } from '@/components/marketplace/ListingCard';
+import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { triggerInAppReview } from '@/lib/inAppReview';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -138,6 +140,12 @@ export default function UserProfilePage() {
   const [loadingRatings, setLoadingRatings] = useState(false);
   const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
 
+  // Profile-level rating interaction state
+  const isOwnProfile = currentUser?.id === userId;
+  const [canRate, setCanRate] = useState(false);
+  const [existingRating, setExistingRating] = useState<{ rating: number; comment: string | null } | null>(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+
   useEffect(() => {
     if (!profile) return;
     setFormNickname(
@@ -183,41 +191,100 @@ export default function UserProfilePage() {
     void checkAdmin();
   }, [currentUser, supabase]);
 
-  // Fetch ratings
+  // Fetch ratings (memoized to allow refetch on submit)
+  const fetchRatings = useCallback(async () => {
+    if (!userId) return;
+
+    setLoadingRatings(true);
+    try {
+      // Fetch rating summary
+      const { data: summaryData, error: summaryError } = await supabase.rpc(
+        'get_user_rating_summary',
+        { p_user_id: userId }
+      );
+
+      if (summaryError) throw summaryError;
+      if (summaryData && summaryData.length > 0) {
+        setRatingSummary(summaryData[0] as unknown as typeof ratingSummary);
+      }
+
+      // Fetch ratings (limit to 50 most recent)
+      const { data: ratingsData, error: ratingsError } = await supabase.rpc(
+        'get_user_ratings_anonymous',
+        { p_user_id: userId, p_limit: 50, p_offset: 0 }
+      );
+
+      if (ratingsError) throw ratingsError;
+      setRatings(ratingsData || []);
+    } catch (err) {
+      logger.error('Error fetching ratings:', err);
+    } finally {
+      setLoadingRatings(false);
+    }
+  }, [userId, supabase]);
+
   useEffect(() => {
-    async function fetchRatings() {
-      if (!userId) return;
+    void fetchRatings();
+  }, [fetchRatings]);
 
-      setLoadingRatings(true);
+  // Check if current viewer can rate this user
+  useEffect(() => {
+    async function checkRatingEligibility() {
+      if (!currentUser || !userId || isOwnProfile) {
+        setCanRate(false);
+        setExistingRating(null);
+        return;
+      }
+
       try {
-        // Fetch rating summary
-        const { data: summaryData, error: summaryError } = await supabase.rpc(
-          'get_user_rating_summary',
-          { p_user_id: userId }
-        );
+        const { data: eligibility } = await supabase.rpc('can_rate_user', {
+          p_target_id: userId
+        });
 
-        if (summaryError) throw summaryError;
-        if (summaryData && summaryData.length > 0) {
-          setRatingSummary(summaryData[0] as unknown as typeof ratingSummary);
+        if (eligibility && eligibility.length > 0 && eligibility[0].can_rate) {
+          setCanRate(true);
+        } else {
+          setCanRate(false);
         }
 
-        // Fetch ratings (limit to 50 most recent)
-        const { data: ratingsData, error: ratingsError } = await supabase.rpc(
-          'get_user_ratings_anonymous',
-          { p_user_id: userId, p_limit: 50, p_offset: 0 }
-        );
+        const { data: myRatingData } = await supabase.rpc('get_my_rating_for_user', {
+          p_rated_id: userId
+        });
 
-        if (ratingsError) throw ratingsError;
-        setRatings(ratingsData || []);
+        if (myRatingData && myRatingData.length > 0) {
+          setExistingRating({ rating: myRatingData[0].rating, comment: myRatingData[0].comment });
+        } else {
+          setExistingRating(null);
+        }
       } catch (err) {
-        logger.error('Error fetching ratings:', err);
-      } finally {
-        setLoadingRatings(false);
+        logger.error('Error checking rating eligibility on profile:', err);
+        setCanRate(false);
       }
     }
 
+    void checkRatingEligibility();
+  }, [currentUser, userId, isOwnProfile, supabase]);
+
+  const handleSubmitRating = async (rating: number, comment?: string) => {
+    if (!userId || !currentUser) return;
+
+    const { error: submitError } = await supabase.rpc('upsert_user_rating', {
+      p_rated_id: userId,
+      p_rating: rating,
+      p_comment: comment || undefined
+    });
+
+    if (submitError) {
+      throw new Error(submitError.message);
+    }
+
+    setExistingRating({ rating, comment: comment || null });
+    void triggerInAppReview('profile_rating_submitted');
+
+    // Refresh ratings summary, list, and user profile aggregates
     void fetchRatings();
-  }, [userId, supabase]);
+    void refetch();
+  };
 
   const displayAvatarUrl = useMemo(
     () => resolveAvatarUrl(profile?.avatar_url ?? null, supabase),
@@ -249,8 +316,6 @@ export default function UserProfilePage() {
     });
     return counts;
   }, [listings]);
-
-  const isOwnProfile = currentUser?.id === userId;
 
   // Highlight credits and rewarded ad hooks for own profile
   const { balance, loading: creditsLoading, earnCredits } = useHighlightCredits();
@@ -774,6 +839,18 @@ export default function UserProfilePage() {
                     <div className="flex items-center gap-3">
                       {!isOwnProfile && currentUser && (
                         <div className="flex items-center gap-3 flex-wrap">
+                          {canRate && (
+                            <Button
+                              onClick={() => setShowRatingModal(true)}
+                              className="bg-gold text-black hover:bg-yellow-400 font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs sm:text-sm"
+                              size="sm"
+                            >
+                              <Star className="w-4 h-4 mr-1.5 fill-black" />
+                              {existingRating
+                                ? t('ratings.updateRating')
+                                : t('ratings.rateUser', { nickname: profile?.nickname || 'usuario' })}
+                            </Button>
+                          )}
                           <FavoriteButton
                             userId={userId}
                             onFavoriteDelta={adjustFavoritesCount}
@@ -1122,7 +1199,21 @@ export default function UserProfilePage() {
 
         {/* Ratings Section */}
         <div id="valoraciones" className="space-y-6 mt-12 scroll-mt-8">
-          <h2 className="text-2xl font-black text-gray-900 dark:text-white">{t('ratings.title')}</h2>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white">{t('ratings.title')}</h2>
+            {canRate && !isOwnProfile && (
+              <Button
+                onClick={() => setShowRatingModal(true)}
+                className="bg-gold text-black hover:bg-yellow-400 font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-xs sm:text-sm"
+                size="sm"
+              >
+                <Star className="w-4 h-4 mr-1.5 fill-black" />
+                {existingRating
+                  ? t('ratings.updateRating')
+                  : t('ratings.rateUser', { nickname: profile?.nickname || 'usuario' })}
+              </Button>
+            )}
+          </div>
 
           {loadingRatings ? (
             <div className="flex items-center justify-center py-12">
@@ -1238,6 +1329,17 @@ export default function UserProfilePage() {
             </div>
           )}
         </div>
+
+        {/* User Rating Dialog */}
+        {canRate && !isOwnProfile && profile && (
+          <UserRatingDialog
+            open={showRatingModal}
+            onOpenChange={setShowRatingModal}
+            userToRate={{ id: userId, nickname: profile.nickname || 'Usuario' }}
+            existingRating={existingRating}
+            onSubmit={handleSubmitRating}
+          />
+        )}
       </div>
     </div>
   );

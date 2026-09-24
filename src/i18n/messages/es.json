@@ -1716,7 +1716,9 @@
       "stars1": "1 estrella",
       "typeListing": "Anuncio",
       "typeTrade": "Intercambio",
-      "empty": "Este usuario aún no ha recibido valoraciones"
+      "empty": "Este usuario aún no ha recibido valoraciones",
+      "rateUser": "Valorar a {nickname}",
+      "updateRating": "Actualizar valoración"
     },
     "listings": {
       "title": "Anuncios activos",
