@@ -1642,6 +1642,7 @@
     }
   },
   "userProfile": {
+    "accountUnderReview": "A tua conta está em revisão. Algumas funções podem estar temporariamente limitadas.",
     "status": {
       "active": "Ativos",
       "reserved": "Reservados",
@@ -2499,6 +2500,8 @@
     "noMatch": "Sem coincidências para este álbum"
   },
   "marketplaceChat": {
+    "rateUser": "Avaliar {nickname}",
+    "updateRating": "Atualizar avaliação de {nickname}",
     "backToChats": "Voltar aos meus chats",
     "loading": "Carregando...",
     "seller": "Vendedor:",

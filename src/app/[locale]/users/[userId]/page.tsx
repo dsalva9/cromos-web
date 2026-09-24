@@ -39,7 +39,7 @@ import {
 import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles, Crown } from 'lucide-react';
+import { User, Star, Heart, Package, MapPin, Pencil, Ban, Trash2, ArrowLeftRight, Coins, Tv2, Loader2, Sparkles, Crown, AlertTriangle } from 'lucide-react';
 import { isNative } from '@/lib/platform';
 import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { useHighlightCredits, CREDITS_PER_AD } from '@/hooks/marketplace/useHighlightCredits';
@@ -61,14 +61,8 @@ import { useMatchStats } from '@/hooks/social/useMatchStats';
 
 type ListingFilter = 'active' | 'reserved' | 'sold' | 'removed';
 interface Rating {
-  id: number;
-  rater_id: string;
-  rater_nickname: string;
-  rater_avatar_url: string | null;
   rating: number;
   comment: string | null;
-  context_type: string;
-  context_id: number;
   created_at: string;
 }
 
@@ -209,7 +203,7 @@ export default function UserProfilePage() {
 
         // Fetch ratings (limit to 50 most recent)
         const { data: ratingsData, error: ratingsError } = await supabase.rpc(
-          'get_user_ratings',
+          'get_user_ratings_anonymous',
           { p_user_id: userId, p_limit: 50, p_offset: 0 }
         );
 
@@ -573,6 +567,16 @@ export default function UserProfilePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
+          {/* Flagged Banner */}
+          {isOwnProfile && profile.is_flagged && (
+            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-start sm:items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5 sm:mt-0" />
+              <p className="text-sm text-amber-800 dark:text-amber-400 font-medium">
+                Tu cuenta está en revisión. Algunas funciones pueden estar limitadas temporalmente.
+              </p>
+            </div>
+          )}
+
           {/* Profile Header */}
           <div 
             className={cn(
@@ -1195,81 +1199,35 @@ export default function UserProfilePage() {
 
               {/* Ratings List */}
               <div className="space-y-4">
-                {ratings.map(rating => {
-                  const avatarUrl = resolveAvatarUrl(
-                    rating.rater_avatar_url,
-                    supabase
-                  );
-                  return (
-                    <div
-                      key={rating.id}
-                      className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-4 transition-all hover:shadow-md"
-                    >
-                      <div className="flex gap-4">
-                        {/* Rater Avatar */}
-                        <Link
-                          href={`/users/${rating.rater_id}`}
-                          className="flex-shrink-0"
-                        >
-                          {avatarUrl ? (
-                            <Image
-                              src={avatarUrl}
-                              alt={rating.rater_nickname}
-                              width={48}
-                              height={48}
-                              className="rounded-full border border-gray-200 dark:border-gray-700 hover:opacity-80 transition-opacity bg-gray-50 dark:bg-gray-800"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:opacity-80 transition-opacity text-gray-400">
-                              <User className="h-6 w-6" />
-                            </div>
-                          )}
-                        </Link>
-
-                        {/* Rating Content */}
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <UserLink
-                                userId={rating.rater_id}
-                                nickname={rating.rater_nickname}
-                                variant="bold"
-                              />
-                              <div className="flex items-center gap-2 mt-1">
-                                {renderStars(rating.rating)}
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800"
-                                >
-                                  {rating.context_type === 'listing'
-                                    ? t('ratings.typeListing')
-                                    : t('ratings.typeTrade')}
-                                </Badge>
-                              </div>
-                            </div>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                              {new Date(rating.created_at).toLocaleDateString(
-                                'es-ES',
-                                {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                }
-                              )}
-                            </span>
-                          </div>
-
-                          {/* Comment */}
-                          {rating.comment && (
-                            <p className="text-gray-700 dark:text-gray-300 text-sm mt-2 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                              {rating.comment}
-                            </p>
-                          )}
-                        </div>
+                {ratings.map((rating, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-4 transition-all hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {renderStars(rating.rating)}
                       </div>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                        {new Date(rating.created_at).toLocaleDateString(
+                          'es-ES',
+                          {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          }
+                        )}
+                      </span>
                     </div>
-                  );
-                })}
+
+                    {/* Comment */}
+                    {rating.comment && (
+                      <p className="text-gray-700 dark:text-gray-300 text-sm mt-2 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        {rating.comment}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             </>
           ) : (

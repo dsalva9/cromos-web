@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import { setPasswordRecoveryFlag, clearPasswordRecoveryFlag } from '@/components/auth/PasswordRecoveryGuard';
 import { safeStorage } from '@/lib/safeStorage';
+import { getDeviceFingerprint } from '@/lib/deviceFingerprint';
 
 const AUTH_HINT_KEY = 'cc-was-authed';
 
@@ -73,6 +74,12 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
         if (currentUser && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
           // Fire-and-forget: PostgrestFilterBuilder is PromiseLike, not Promise
           void Promise.resolve(supabase.rpc('record_user_login')).catch(() => { /* non-critical */ });
+          // Register device fingerprint for anti-fraud (fire-and-forget)
+          void getDeviceFingerprint().then(hash => {
+            if (hash) {
+              void Promise.resolve(supabase.rpc('register_device_fingerprint', { p_fingerprint_hash: hash })).catch(() => { /* non-critical */ });
+            }
+          }).catch(() => { /* non-critical */ });
         }
 
         // Persist auth hint for next hard navigation

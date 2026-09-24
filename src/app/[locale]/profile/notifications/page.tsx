@@ -35,8 +35,6 @@ function NotificationsCenterContent() {
   const [ratingModalData, setRatingModalData] = useState<{
     userId: string;
     nickname: string;
-    listingId: number;
-    listingTitle: string;
   } | null>(null);
 
   // Mark visible notifications as read when switching to "unread" tab
@@ -67,20 +65,18 @@ function NotificationsCenterContent() {
     }
   };
 
-  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
-    setRatingModalData({ userId, nickname, listingId, listingTitle });
+  const handleOpenRatingModal = (userId: string, nickname: string) => {
+    setRatingModalData({ userId, nickname });
     setShowRatingModal(true);
   };
 
   const handleSubmitRating = async (rating: number, comment?: string) => {
     if (!ratingModalData) return;
 
-    const { error } = await supabase.rpc('create_user_rating', {
+    const { error } = await supabase.rpc('upsert_user_rating', {
       p_rated_id: ratingModalData.userId,
       p_rating: rating,
       p_comment: comment || undefined,
-      p_context_type: 'listing',
-      p_context_id: ratingModalData.listingId
     });
 
     if (error) {
@@ -260,8 +256,7 @@ function NotificationsCenterContent() {
               id: ratingModalData.userId,
               nickname: ratingModalData.nickname
             }}
-            listingTitle={ratingModalData.listingTitle}
-            listingId={ratingModalData.listingId}
+            existingRating={null}
             onSubmit={handleSubmitRating}
           />
         )}

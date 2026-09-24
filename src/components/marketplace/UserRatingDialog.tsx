@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { Star, Loader2 } from 'lucide-react';
@@ -21,8 +21,7 @@ interface UserRatingDialogProps {
     id: string;
     nickname: string;
   };
-  listingTitle: string;
-  listingId: number; // For rating context
+  existingRating?: { rating: number; comment: string | null } | null;
   onSubmit: (rating: number, comment?: string) => Promise<void>;
 }
 
@@ -30,8 +29,7 @@ export function UserRatingDialog({
   open,
   onOpenChange,
   userToRate,
-  listingTitle,
-  listingId: _listingId, // eslint-disable-line @typescript-eslint/no-unused-vars -- Used by parent's onSubmit callback
+  existingRating,
   onSubmit
 }: UserRatingDialogProps) {
   const [rating, setRating] = useState<number>(0);
@@ -39,13 +37,18 @@ export function UserRatingDialog({
   const [hoveredStar, setHoveredStar] = useState<number>(0);
   const [loading, setLoading] = useState(false);
 
-  // Reset state when dialog opens
+  // Reset or initialize state when dialog opens
   useEffect(() => {
     if (open) {
-      setRating(0);
-      setComment('');
+      if (existingRating) {
+        setRating(existingRating.rating);
+        setComment(existingRating.comment || '');
+      } else {
+        setRating(0);
+        setComment('');
+      }
     }
-  }, [open]);
+  }, [open, existingRating]);
 
   const handleSubmit = async () => {
     if (rating === 0) {
@@ -61,7 +64,7 @@ export function UserRatingDialog({
     setLoading(true);
     try {
       await onSubmit(rating, comment || undefined);
-      toast.success('Valoración enviada con éxito');
+      toast.success(existingRating ? 'Valoración actualizada con éxito' : 'Valoración enviada con éxito');
       onOpenChange(false);
     } catch (error) {
       toast.error(
@@ -77,9 +80,6 @@ export function UserRatingDialog({
       <DialogContent className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 max-w-md">
         <DialogHeader>
           <DialogTitle>Valorar a {userToRate.nickname}</DialogTitle>
-          <DialogDescription className="text-gray-500 dark:text-gray-400">
-            Transacción: {listingTitle}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -157,7 +157,7 @@ export function UserRatingDialog({
                 Enviando...
               </>
             ) : (
-              'Enviar valoración'
+              existingRating ? 'Actualizar valoración' : 'Enviar valoración'
             )}
           </Button>
         </DialogFooter>

@@ -27,7 +27,7 @@ interface NotificationDropdownProps {
   /** Maximum number of notifications to show in dropdown */
   maxItems?: number;
   /** Callback to open rating modal from notification */
-  onOpenRatingModal?: (userId: string, nickname: string, listingId: number, listingTitle: string) => void;
+  onOpenRatingModal?: (userId: string, nickname: string) => void;
   /** Controlled open state (optional, for coordination with other dropdowns) */
   open?: boolean;
   /** Controlled open change handler (optional, for coordination with other dropdowns) */
@@ -50,9 +50,9 @@ export function NotificationDropdown({ maxItems = 5, onOpenRatingModal, open: co
     markAsRead(id);
   };
 
-  const handleOpenRatingModal = (userId: string, nickname: string, listingId: number, listingTitle: string) => {
+  const handleOpenRatingModal = (userId: string, nickname: string) => {
     setIsOpen(false); // Close dropdown
-    onOpenRatingModal?.(userId, nickname, listingId, listingTitle);
+    onOpenRatingModal?.(userId, nickname);
   };
 
   return (

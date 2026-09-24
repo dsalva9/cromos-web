@@ -8,8 +8,6 @@ import { triggerInAppReview } from '@/lib/inAppReview';
 interface RatingModalData {
     userId: string;
     nickname: string;
-    listingId: number;
-    listingTitle: string;
 }
 
 /**
@@ -22,8 +20,8 @@ export function GlobalRatingModal() {
     const [ratingModalData, setRatingModalData] = useState<RatingModalData | null>(null);
 
     const handleOpenRatingModal = useCallback(
-        (userId: string, nickname: string, listingId: number, listingTitle: string) => {
-            setRatingModalData({ userId, nickname, listingId, listingTitle });
+        (userId: string, nickname: string) => {
+            setRatingModalData({ userId, nickname });
             setShowRatingModal(true);
         },
         []
@@ -33,12 +31,10 @@ export function GlobalRatingModal() {
         async (rating: number, comment?: string) => {
             if (!ratingModalData) return;
 
-            const { error } = await supabase.rpc('create_user_rating', {
+            const { error } = await supabase.rpc('upsert_user_rating', {
                 p_rated_id: ratingModalData.userId,
                 p_rating: rating,
                 p_comment: comment || undefined,
-                p_context_type: 'listing',
-                p_context_id: ratingModalData.listingId,
             });
 
             if (error) {
@@ -60,8 +56,7 @@ export function GlobalRatingModal() {
                     id: ratingModalData.userId,
                     nickname: ratingModalData.nickname,
                 }}
-                listingTitle={ratingModalData.listingTitle}
-                listingId={ratingModalData.listingId}
+                existingRating={null}
                 onSubmit={handleSubmitRating}
             />
         ) : null,

@@ -3,13 +3,10 @@ import { useSupabaseClient, useUser } from '@/components/providers/SupabaseProvi
 import {
   reserveListing,
   unreserveListing,
-  completeListingTransaction,
-  cancelListingTransaction,
   getListingTransaction,
   ListingTransaction,
 } from '@/lib/supabase/listings/transactions';
 import { toast } from '@/lib/toast';
-import { triggerInAppReview } from '@/lib/inAppReview';
 
 export function useListingWorkflow(listingId: number) {
   const supabase = useSupabaseClient();
@@ -60,29 +57,6 @@ export function useListingWorkflow(listingId: number) {
     [supabase, listingId, user, processing, fetchTransaction]
   );
 
-  // Complete transaction
-  const handleComplete = useCallback(async () => {
-    if (!user || !transaction || processing) return;
-
-    if (!confirm('¿Confirmar que la transacción se ha completado?')) return;
-
-    setProcessing(true);
-    const { success, error } = await completeListingTransaction(
-      supabase,
-      transaction.id
-    );
-
-    if (error) {
-      toast.error(error.message);
-    } else if (success) {
-      toast.success('Transacción completada');
-      void triggerInAppReview('listing_workflow_completed');
-      await fetchTransaction();
-    }
-
-    setProcessing(false);
-  }, [supabase, transaction, user, processing, fetchTransaction]);
-
   // Unreserve listing (return to active)
   const handleUnreserve = useCallback(async () => {
     if (!user || processing) return;
@@ -102,30 +76,6 @@ export function useListingWorkflow(listingId: number) {
     setProcessing(false);
   }, [supabase, listingId, user, processing, fetchTransaction]);
 
-  // Cancel reservation (deprecated - use unreserve instead)
-  const handleCancel = useCallback(
-    async (reason: string) => {
-      if (!user || !transaction || processing) return;
-
-      setProcessing(true);
-      const { success, error } = await cancelListingTransaction(
-        supabase,
-        transaction.id,
-        reason
-      );
-
-      if (error) {
-        toast.error(error.message);
-      } else if (success) {
-        toast.success('Reserva cancelada');
-        await fetchTransaction();
-      }
-
-      setProcessing(false);
-    },
-    [supabase, transaction, user, processing, fetchTransaction]
-  );
-
   return {
     transaction,
     loading,
@@ -133,7 +83,5 @@ export function useListingWorkflow(listingId: number) {
     refetch: fetchTransaction,
     reserveListing: handleReserve,
     unreserveListing: handleUnreserve,
-    completeTransaction: handleComplete,
-    cancelReservation: handleCancel,
   };
 }

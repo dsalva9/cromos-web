@@ -19,6 +19,7 @@ interface UserProfile {
   trade_reputation_tier: string;
   is_patron: boolean;
   is_pro: boolean;
+  is_flagged: boolean;
 }
 
 export function useUserProfile(userId: string) {
@@ -91,6 +92,7 @@ export function useUserProfile(userId: string) {
         trade_reputation_tier: profileData.trade_reputation_tier ?? 'novato',
         is_patron: Boolean(profileData.is_patron),
         is_pro: Boolean(profileData.is_pro),
+        is_flagged: Boolean(profileData.is_flagged),
       };
 
       setProfile(normalizedProfile);

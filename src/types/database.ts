@@ -299,6 +299,7 @@ export type Database = {
           item_schema: Json | null
           rating_avg: number | null
           rating_count: number | null
+          slug: string | null
           status: string | null
           suspended_at: string | null
           suspension_reason: string | null
@@ -323,6 +324,7 @@ export type Database = {
           item_schema?: Json | null
           rating_avg?: number | null
           rating_count?: number | null
+          slug?: string | null
           status?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
@@ -347,6 +349,7 @@ export type Database = {
           item_schema?: Json | null
           rating_avg?: number | null
           rating_count?: number | null
+          slug?: string | null
           status?: string | null
           suspended_at?: string | null
           suspension_reason?: string | null
@@ -457,6 +460,55 @@ export type Database = {
           wau?: number
         }
         Relationships: []
+      }
+      device_fingerprints: {
+        Row: {
+          fingerprint_hash: string
+          first_seen_at: string
+          id: number
+          last_seen_at: string
+          platform: string
+          profile_id: string
+        }
+        Insert: {
+          fingerprint_hash: string
+          first_seen_at?: string
+          id?: never
+          last_seen_at?: string
+          platform?: string
+          profile_id: string
+        }
+        Update: {
+          fingerprint_hash?: string
+          first_seen_at?: string
+          id?: never
+          last_seen_at?: string
+          platform?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_fingerprints_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "device_fingerprints_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "device_fingerprints_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_bounces: {
         Row: {
@@ -1685,9 +1737,11 @@ export type Database = {
           created_at: string | null
           device_id: string | null
           expires_at: string
+          google_purchase_token: string | null
           grant_reason: string | null
           granted_by: string | null
           id: string
+          ls_subscription_id: string | null
           payment_id: string | null
           payment_provider: string | null
           plan: string
@@ -1700,9 +1754,11 @@ export type Database = {
           created_at?: string | null
           device_id?: string | null
           expires_at: string
+          google_purchase_token?: string | null
           grant_reason?: string | null
           granted_by?: string | null
           id?: string
+          ls_subscription_id?: string | null
           payment_id?: string | null
           payment_provider?: string | null
           plan: string
@@ -1715,9 +1771,11 @@ export type Database = {
           created_at?: string | null
           device_id?: string | null
           expires_at?: string
+          google_purchase_token?: string | null
           grant_reason?: string | null
           granted_by?: string | null
           id?: string
+          ls_subscription_id?: string | null
           payment_id?: string | null
           payment_provider?: string | null
           plan?: string
@@ -1757,8 +1815,12 @@ export type Database = {
           created_at: string | null
           deleted_at: string | null
           deletion_reason: string | null
+          flagged_at: string | null
+          flagged_reason: string | null
+          flagged_source_profile_id: string | null
           id: string
           is_admin: boolean | null
+          is_flagged: boolean
           is_patron: boolean
           is_pro: boolean | null
           is_suspended: boolean | null
@@ -1775,6 +1837,7 @@ export type Database = {
           postcode: string | null
           pro_expires_at: string | null
           rating_avg: number | null
+          rating_cooldown_until: string | null
           rating_count: number | null
           suspended_at: string | null
           suspended_by: string | null
@@ -1791,8 +1854,12 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           deletion_reason?: string | null
+          flagged_at?: string | null
+          flagged_reason?: string | null
+          flagged_source_profile_id?: string | null
           id: string
           is_admin?: boolean | null
+          is_flagged?: boolean
           is_patron?: boolean
           is_pro?: boolean | null
           is_suspended?: boolean | null
@@ -1809,6 +1876,7 @@ export type Database = {
           postcode?: string | null
           pro_expires_at?: string | null
           rating_avg?: number | null
+          rating_cooldown_until?: string | null
           rating_count?: number | null
           suspended_at?: string | null
           suspended_by?: string | null
@@ -1825,8 +1893,12 @@ export type Database = {
           created_at?: string | null
           deleted_at?: string | null
           deletion_reason?: string | null
+          flagged_at?: string | null
+          flagged_reason?: string | null
+          flagged_source_profile_id?: string | null
           id?: string
           is_admin?: boolean | null
+          is_flagged?: boolean
           is_patron?: boolean
           is_pro?: boolean | null
           is_suspended?: boolean | null
@@ -1843,6 +1915,7 @@ export type Database = {
           postcode?: string | null
           pro_expires_at?: string | null
           rating_avg?: number | null
+          rating_cooldown_until?: string | null
           rating_count?: number | null
           suspended_at?: string | null
           suspended_by?: string | null
@@ -1853,6 +1926,27 @@ export type Database = {
           xp_total?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_flagged_source_profile_id_fkey"
+            columns: ["flagged_source_profile_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard_cache"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "profiles_flagged_source_profile_id_fkey"
+            columns: ["flagged_source_profile_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_eligible_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_flagged_source_profile_id_fkey"
+            columns: ["flagged_source_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_suspended_by_fkey"
             columns: ["suspended_by"]
@@ -3016,33 +3110,36 @@ export type Database = {
       user_ratings: {
         Row: {
           comment: string | null
-          context_id: number
-          context_type: string
+          context_id: number | null
+          context_type: string | null
           created_at: string | null
           id: number
           rated_id: string
           rater_id: string
           rating: number
+          updated_at: string | null
         }
         Insert: {
           comment?: string | null
-          context_id: number
-          context_type: string
+          context_id?: number | null
+          context_type?: string | null
           created_at?: string | null
           id?: number
           rated_id: string
           rater_id: string
           rating: number
+          updated_at?: string | null
         }
         Update: {
           comment?: string | null
-          context_id?: number
-          context_type?: string
+          context_id?: number | null
+          context_type?: string | null
           created_at?: string | null
           id?: number
           rated_id?: string
           rater_id?: string
           rating?: number
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -4287,6 +4384,13 @@ export type Database = {
         }[]
       }
       calculate_level_from_xp: { Args: { total_xp: number }; Returns: number }
+      can_rate_user: {
+        Args: { p_target_id: string }
+        Returns: {
+          can_rate: boolean
+          reason: string
+        }[]
+      }
       cancel_account_deletion: { Args: never; Returns: Json }
       cancel_listing_transaction: {
         Args: { p_reason: string; p_transaction_id: number }
@@ -4499,6 +4603,10 @@ export type Database = {
           postcode: string
           total_mutual_overlap: number
         }[]
+      }
+      generate_template_slug: {
+        Args: { p_id: number; p_title: string }
+        Returns: string
       }
       get_admin_dashboard_stats: {
         Args: never
@@ -4728,6 +4836,7 @@ export type Database = {
           last_message_at: string
           other_avatar_url: string
           other_is_patron: boolean
+          other_is_pro: boolean
           other_nickname: string
           other_user_id: string
           other_user_is_deleted: boolean
@@ -4835,6 +4944,14 @@ export type Database = {
           template_title: string
           title: string
           views_count: number
+        }[]
+      }
+      get_my_rating_for_user: {
+        Args: { p_rated_id: string }
+        Returns: {
+          comment: string
+          rating: number
+          updated_at: string
         }[]
       }
       get_my_template_copies: {
@@ -5103,6 +5220,7 @@ export type Database = {
           counterparty_avatar_url: string
           counterparty_id: string
           counterparty_is_deleted: boolean
+          counterparty_is_pro: boolean
           counterparty_nickname: string
           is_seller: boolean
           last_message: string
@@ -5178,6 +5296,14 @@ export type Database = {
           rating: number
         }[]
       }
+      get_user_ratings_anonymous: {
+        Args: { p_limit?: number; p_offset?: number; p_user_id: string }
+        Returns: {
+          comment: string
+          created_at: string
+          rating: number
+        }[]
+      }
       get_user_report_summary: {
         Args: { p_user_id: string }
         Returns: {
@@ -5243,6 +5369,10 @@ export type Database = {
         | { Args: never; Returns: boolean }
         | { Args: { user_uuid: string }; Returns: boolean }
       is_admin_user: { Args: never; Returns: boolean }
+      is_chat_participant_for_listing: {
+        Args: { p_listing_id: number; p_user_id: string }
+        Returns: boolean
+      }
       is_favourited: {
         Args: { p_target_id: string; p_target_type: string }
         Returns: boolean
@@ -5339,7 +5469,9 @@ export type Database = {
           pages_count: number
           rating_avg: number
           rating_count: number
+          slug: string
           title: string
+          total_slots: number
         }[]
       }
       list_trade_listings_filtered: {
@@ -5414,6 +5546,8 @@ export type Database = {
         Returns: {
           author_avatar_url: string
           author_completed_trades: number
+          author_is_patron: boolean
+          author_is_pro: boolean
           author_nickname: string
           author_postcode: string
           collection_name: string
@@ -5560,6 +5694,10 @@ export type Database = {
       }
       record_user_login: { Args: never; Returns: undefined }
       refresh_leaderboard: { Args: never; Returns: undefined }
+      register_device_fingerprint: {
+        Args: { p_fingerprint_hash: string }
+        Returns: Json
+      }
       reject_trade_finalization: { Args: { p_trade_id: number }; Returns: Json }
       request_account_deletion: { Args: never; Returns: undefined }
       request_match_trade_confirmation: {
@@ -5592,6 +5730,19 @@ export type Database = {
       resolve_report: {
         Args: { p_action: string; p_admin_notes?: string; p_report_id: number }
         Returns: undefined
+      }
+      resolve_template_id: {
+        Args: { p_id: number }
+        Returns: {
+          template_slug: string
+        }[]
+      }
+      resolve_template_slug: {
+        Args: { p_slug: string }
+        Returns: {
+          template_id: number
+          template_slug: string
+        }[]
       }
       respond_to_trade_proposal: {
         Args: { p_action: string; p_proposal_id: number }
@@ -5700,6 +5851,10 @@ export type Database = {
         Args: { p_alert_id: number }
         Returns: boolean
       }
+      trigger_top_rated_badge_check: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       unhide_conversation: {
         Args: { p_counterparty_id: string; p_listing_id: number }
         Returns: undefined
@@ -5800,6 +5955,10 @@ export type Database = {
       update_user_rating: {
         Args: { p_comment?: string; p_rating: number; p_rating_id: number }
         Returns: undefined
+      }
+      upsert_user_rating: {
+        Args: { p_comment?: string; p_rated_id: string; p_rating: number }
+        Returns: number
       }
     }
     Enums: {
@@ -5936,3 +6095,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

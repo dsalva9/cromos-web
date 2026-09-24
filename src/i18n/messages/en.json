@@ -1642,6 +1642,7 @@
     }
   },
   "userProfile": {
+    "accountUnderReview": "Your account is under review. Some features may be temporarily limited.",
     "status": {
       "active": "Active",
       "reserved": "Reserved",
@@ -2499,6 +2500,8 @@
     "noMatch": "No matches for this album"
   },
   "marketplaceChat": {
+    "rateUser": "Rate {nickname}",
+    "updateRating": "Update rating for {nickname}",
     "backToChats": "Back to my chats",
     "loading": "Loading...",
     "seller": "Seller:",
