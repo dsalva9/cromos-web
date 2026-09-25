@@ -68,10 +68,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   languages['x-default'] = `${siteConfig.url}/${routing.defaultLocale}/albumes/${slug}`;
 
+  // Only index albums with sufficient content (>= 10 stickers) to prevent
+  // Google Search Console "Duplicate, Google chose different canonical than user"
+  // and thin-content indexing penalties on incomplete user test templates.
+  const isIndexable = totalSlots >= 10;
+
   return {
     title,
     description,
-    robots: { index: true, follow: true },
+    robots: { index: isIndexable, follow: true },
     alternates: {
       canonical: `${baseUrl}/albumes/${slug}`,
       languages,

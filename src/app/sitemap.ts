@@ -113,16 +113,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             }
         );
 
-        const { data: templates } = await supabase
-            .from('collection_templates')
-            .select('slug, created_at')
-            .eq('is_public', true)
-            .is('deleted_at', null)
-            .not('slug', 'is', null)
-            .order('copies_count', { ascending: false });
+        // Query public templates via RPC to get accurate total_slots count,
+        // and only include albums with at least 10 stickers in sitemap.xml.
+        // This avoids submitting thin/duplicate user test templates to search engines.
+        const { data: templates } = await supabase.rpc('list_public_templates', {
+            p_limit: 200,
+            p_offset: 0,
+            p_sort_by: 'popular',
+        });
 
         if (templates) {
-            albumEntries = templates.flatMap((template) =>
+            const indexableTemplates = (templates as Array<{ slug?: string; total_slots?: number; created_at: string }>).filter(
+                (t) => t.slug && (t.total_slots ?? 0) >= 10
+            );
+
+            albumEntries = indexableTemplates.flatMap((template) =>
                 locales.map((loc) => ({
                     url: `${siteConfig.url}/${loc}/albumes/${template.slug}`,
                     lastModified: new Date(template.created_at),
