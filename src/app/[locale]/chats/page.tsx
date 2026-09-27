@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
+import { MarketplaceChatDrawer } from '@/components/chats/MarketplaceChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
 import { MatchConversation, hideMatchConversation, deleteMatchConversation } from '@/lib/supabase/matches/chat';
 import { deleteMarketplaceConversation, hideMarketplaceConversation } from '@/lib/supabase/listings/chat';
@@ -84,24 +85,45 @@ function ChatsPageContent() {
     otherIsPro?: boolean;
   } | null>(null);
 
+  // ---- Marketplace drawer state ----
+  const [mpDrawerOpen, setMpDrawerOpen] = useState(false);
+  const [activeMpConv, setActiveMpConv] = useState<{
+    listingId: number;
+    participantId: string | null;
+  } | null>(null);
+
   // Fetch marketplace conversations
-  useEffect(() => {
-    async function fetchConversations() {
-      if (!user) return;
+  const fetchMarketplaceConversations = useCallback(async () => {
+    if (!user) return;
 
-      const { data, error } = await supabase.rpc('get_user_conversations');
+    const { data, error } = await supabase.rpc('get_user_conversations');
 
-      if (error) {
-        logger.error('Error fetching conversations:', error);
-      } else if (data) {
-        setMarketplaceConvs(data);
-      }
-
-      setMpLoading(false);
+    if (error) {
+      logger.error('Error fetching conversations:', error);
+    } else if (data) {
+      setMarketplaceConvs(data);
     }
 
-    void fetchConversations();
+    setMpLoading(false);
   }, [user, supabase]);
+
+  useEffect(() => {
+    void fetchMarketplaceConversations();
+  }, [fetchMarketplaceConversations]);
+
+  const openMarketplaceChat = (conv: Conversation) => {
+    setActiveMpConv({
+      listingId: conv.listing_id,
+      participantId: conv.is_seller ? conv.counterparty_id : null,
+    });
+    setMpDrawerOpen(true);
+  };
+
+  const closeMpDrawer = () => {
+    setMpDrawerOpen(false);
+    setActiveMpConv(null);
+    void fetchMarketplaceConversations();
+  };
 
   // State for hide & delete confirmation dialogs (marketplace)
   const [deletingMpId, setDeletingMpId] = useState<string | null>(null);
@@ -298,11 +320,12 @@ function ChatsPageContent() {
             ) : (
               <div className="space-y-3">
                 {marketplaceConvs.map((conv) => (
-                  <Link
+                  <div
                     key={`${conv.listing_id}-${conv.counterparty_id}`}
-                    href={`/marketplace/${conv.listing_id}/chat${conv.is_seller ? `?participant=${conv.counterparty_id}` : ''}`}
+                    className="relative block"
                   >
                     <ModernCard
+                      onClick={() => openMarketplaceChat(conv)}
                       className={cn(
                         "hover:border-gold transition-colors cursor-pointer relative group",
                         conv.listing_is_unavailable && "opacity-90"
@@ -420,7 +443,7 @@ function ChatsPageContent() {
                         </div>
                       </ModernCardContent>
                     </ModernCard>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
@@ -610,6 +633,22 @@ function ChatsPageContent() {
               setDeleteConfirmMatchConv(conv);
             }
           }
+        }}
+      />
+
+      {/* Marketplace Chat Drawer */}
+      <MarketplaceChatDrawer
+        isOpen={mpDrawerOpen}
+        onClose={closeMpDrawer}
+        listingId={activeMpConv?.listingId ?? 0}
+        initialParticipantId={activeMpConv?.participantId}
+        onHide={() => {
+          closeMpDrawer();
+          void fetchMarketplaceConversations();
+        }}
+        onDelete={() => {
+          closeMpDrawer();
+          void fetchMarketplaceConversations();
         }}
       />
 

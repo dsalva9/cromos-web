@@ -5,15 +5,29 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ImageModal } from '@/components/ui/ImageModal';
 import type { MatchChatMessage } from '@/lib/supabase/matches/chat';
-import { FileText, Download, Coffee } from 'lucide-react';
+import type { ListingChatMessage } from '@/lib/supabase/listings/chat';
+import { FileText, Download } from 'lucide-react';
 import { downloadFile } from '@/lib/validations/chat';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { formatMessageTime, formatFullDateTime } from '@/lib/chatDate';
 
 import { BmacChatPrompt } from './BmacChatPrompt';
 
+export interface ChatMessageItem {
+  id: number;
+  sender_id: string | null;
+  receiver_id?: string | null;
+  sender_nickname?: string | null;
+  message: string;
+  is_read?: boolean;
+  is_system?: boolean;
+  created_at: string;
+  image_url?: string | null;
+  thumbnail_url?: string | null;
+}
+
 interface MessageBubbleProps {
-  message: MatchChatMessage;
+  message: MatchChatMessage | ListingChatMessage | ChatMessageItem;
   isOwn: boolean;
 }
 

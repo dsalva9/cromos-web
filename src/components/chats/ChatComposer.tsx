@@ -13,6 +13,7 @@ interface ChatComposerProps {
   disabled?: boolean;
   onManualConfirm?: () => void;
   showConfirmButton?: boolean;
+  placeholder?: string;
 }
 
 export function ChatComposer({
@@ -22,6 +23,7 @@ export function ChatComposer({
   disabled,
   onManualConfirm,
   showConfirmButton,
+  placeholder,
 }: ChatComposerProps) {
   const t = useTranslations('matchChat');
   const t_tc = useTranslations('tradeConfirmations');
@@ -154,7 +156,7 @@ export function ChatComposer({
           value={text}
           onChange={autoGrow}
           onKeyDown={handleKeyDown}
-          placeholder={t('placeholder')}
+          placeholder={placeholder || t('placeholder')}
           rows={1}
           maxLength={2000}
           disabled={isBusy || disabled}
