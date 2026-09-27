@@ -26,6 +26,8 @@ import { ReportModal } from '@/components/social/ReportModal';
 import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { cn } from '@/lib/utils';
 import { isSameDay } from '@/lib/chatDate';
+import { isNative } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
@@ -182,6 +184,44 @@ export function MarketplaceChatDrawer({
   const [showManualModal, setShowManualModal] = useState(false);
   const [manualStickerCount, setManualStickerCount] = useState<string>('');
   const [manualNote, setManualNote] = useState<string>('');
+
+  // Lock body scroll on mobile when drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+      }
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  // On native Capacitor, hide AdMob banner when chat is open so it never blocks the composer
+  useEffect(() => {
+    if (isOpen && isNative()) {
+      import('@capacitor-community/admob')
+        .then(({ AdMob }) => {
+          void AdMob.hideBanner().catch(() => {});
+        })
+        .catch(() => {});
+
+      return () => {
+        import('@capacitor-community/admob')
+          .then(({ AdMob }) => {
+            void AdMob.resumeBanner().catch(() => {});
+          })
+          .catch(() => {});
+      };
+    }
+  }, [isOpen]);
+
+  const isNativeAndroid = typeof window !== 'undefined' && isNative() && Capacitor.getPlatform() === 'android';
+  const safeTopPadding = isNativeAndroid
+    ? 'calc(max(2.25rem, var(--sat, 0px), env(safe-area-inset-top, 0px)) + 0.5rem)'
+    : 'calc(max(0.75rem, var(--sat, 0px), env(safe-area-inset-top, 0px)) + 0.25rem)';
 
   // Fetch listing details
   useEffect(() => {
@@ -532,8 +572,8 @@ export function MarketplaceChatDrawer({
       <div
         className={cn(
           'flex flex-col bg-white dark:bg-gray-900',
-          // Mobile: Always full screen covering navigation and ads
-          'fixed inset-0 z-[110]',
+          // Mobile: Always full screen covering navigation and ads, locked to viewport
+          'fixed inset-0 z-[110] overflow-hidden h-[100dvh] max-h-[100dvh]',
           // Desktop: Modal drawer OR page container
           isPage
             ? 'sm:relative sm:inset-auto sm:z-auto sm:w-full sm:max-w-2xl sm:mx-auto sm:my-6 sm:h-[680px] sm:max-h-[85vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl sm:overflow-hidden'
@@ -548,7 +588,7 @@ export function MarketplaceChatDrawer({
             {/* Header */}
             <div
               className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0"
-              style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+              style={{ paddingTop: safeTopPadding }}
             >
               <button
                 onClick={onClose}
@@ -635,7 +675,7 @@ export function MarketplaceChatDrawer({
             {/* ---- Top Header ---- */}
             <div
               className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0"
-              style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+              style={{ paddingTop: safeTopPadding }}
             >
               {/* Back button */}
               <button
@@ -1028,7 +1068,12 @@ export function MarketplaceChatDrawer({
             )}
 
             {/* ---- Composer ---- */}
-            <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+            <div
+              className="flex-shrink-0 bg-white dark:bg-gray-900"
+              style={{
+                paddingBottom: 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
+              }}
+            >
               <ChatComposer
                 onSend={handleComposerSend}
                 sending={sending}

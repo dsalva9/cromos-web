@@ -15,6 +15,8 @@ import { sendMatchMessage } from '@/lib/supabase/matches/chat';
 import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { cn } from '@/lib/utils';
 import { isSameDay } from '@/lib/chatDate';
+import { isNative } from '@/lib/platform';
+import { Capacitor } from '@capacitor/core';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from '@/components/ui/link';
 import { useIgnore } from '@/hooks/social/useIgnore';
@@ -187,12 +189,40 @@ export function ChatDrawer({
   // Lock body scroll on mobile when drawer is open
   useEffect(() => {
     if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
+      if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+      }
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = prevOverflow;
       };
     }
   }, [isOpen]);
+
+  // On native Capacitor, hide AdMob banner when chat is open so it never blocks the composer
+  useEffect(() => {
+    if (isOpen && isNative()) {
+      import('@capacitor-community/admob')
+        .then(({ AdMob }) => {
+          void AdMob.hideBanner().catch(() => {});
+        })
+        .catch(() => {});
+
+      return () => {
+        import('@capacitor-community/admob')
+          .then(({ AdMob }) => {
+            void AdMob.resumeBanner().catch(() => {});
+          })
+          .catch(() => {});
+      };
+    }
+  }, [isOpen]);
+
+  const isNativeAndroid = typeof window !== 'undefined' && isNative() && Capacitor.getPlatform() === 'android';
+  const safeTopPadding = isNativeAndroid
+    ? 'calc(max(2.25rem, var(--sat, 0px), env(safe-area-inset-top, 0px)) + 0.5rem)'
+    : 'calc(max(0.75rem, var(--sat, 0px), env(safe-area-inset-top, 0px)) + 0.25rem)';
 
   if (!isOpen) return null;
 
@@ -208,17 +238,17 @@ export function ChatDrawer({
       <div
         className={cn(
           'fixed z-[110] flex flex-col bg-white dark:bg-gray-900',
-          // Mobile: full screen
-          'inset-0',
+          // Mobile: full screen locked to viewport
+          'inset-0 overflow-hidden h-[100dvh] max-h-[100dvh]',
           // Desktop: centered modal
           'sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
-          'sm:w-[500px] sm:h-[600px] sm:max-h-[80vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl'
+          'sm:w-[500px] sm:h-[600px] sm:max-h-[80vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl sm:overflow-hidden'
         )}
       >
         {/* ---- Header ---- */}
         <div
           className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0"
-          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0px))' }}
+          style={{ paddingTop: safeTopPadding }}
         >
           {/* Back button (mobile) */}
           <button
@@ -577,7 +607,12 @@ export function ChatDrawer({
 
 
         {/* ---- Composer ---- */}
-        <div style={{ paddingBottom: 'calc(var(--ad-band-height, 0px) + env(safe-area-inset-bottom, 0px))' }}>
+        <div
+          className="flex-shrink-0 bg-white dark:bg-gray-900"
+          style={{
+            paddingBottom: 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
+          }}
+        >
           {otherUserIsDeleted ? (
             <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 text-center">
               <p className="text-xs text-gray-500 dark:text-gray-400 italic">

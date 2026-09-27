@@ -23,6 +23,7 @@ export const AD_BANNER_HIDDEN_PATHS = [
 export function isAdBannerHidden(pathname?: string | null): boolean {
   if (!pathname) return false;
   const clean = pathname.replace(/^\/(es|en|pt)(?=\/|$)/, '') || '/';
+  if (clean.includes('/chat')) return true;
   return AD_BANNER_HIDDEN_PATHS.some(p => clean === p || clean.startsWith(p + '/'));
 }
 
