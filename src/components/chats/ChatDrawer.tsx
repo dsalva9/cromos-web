@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo, Fragment } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback, Fragment } from 'react';
 import { X, Info, ArrowLeft, MoreVertical, Flag, Ban, Star, EyeOff, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
@@ -165,37 +165,110 @@ export function ChatDrawer({
     messages,
   });
 
-  // Auto-scroll to bottom when messages change
+  // Mobile visual viewport and keyboard tracking
+  const [visualHeight, setVisualHeight] = useState<number | null>(null);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
   useEffect(() => {
-    if (messages.length > 0 && chatContainerRef.current) {
-      const el = chatContainerRef.current;
-      // Only auto-scroll if user is near the bottom
-      const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 150;
-      if (isNearBottom) {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!isOpen) {
+      setVisualHeight(null);
+      setIsKeyboardOpen(false);
+      return;
+    }
+
+    const handleViewport = () => {
+      if (typeof window === 'undefined') return;
+
+      if (window.innerWidth < 640) {
+        const vv = window.visualViewport;
+        const currentHeight = vv ? vv.height : window.innerHeight;
+        setVisualHeight(currentHeight);
+
+        const keyboardActive = vv ? (window.innerHeight - vv.height > 150) : false;
+        setIsKeyboardOpen(keyboardActive);
+
+        if (window.scrollY !== 0) {
+          window.scrollTo(0, 0);
+        }
+      } else {
+        setVisualHeight(null);
+        setIsKeyboardOpen(false);
       }
-    }
-  }, [messages, messagesEndRef]);
+    };
 
-  // Force scroll on first open
+    handleViewport();
+
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', handleViewport);
+      vv.addEventListener('scroll', handleViewport);
+    }
+    window.addEventListener('resize', handleViewport);
+    window.addEventListener('scroll', handleViewport);
+
+    return () => {
+      if (vv) {
+        vv.removeEventListener('resize', handleViewport);
+        vv.removeEventListener('scroll', handleViewport);
+      }
+      window.removeEventListener('resize', handleViewport);
+      window.removeEventListener('scroll', handleViewport);
+    };
+  }, [isOpen]);
+
+  const isInitialScrollRef = useRef(true);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
+  }, []);
+
+  // Auto-scroll messages container to bottom without scrolling window/document
   useEffect(() => {
-    if (isOpen && messages.length > 0) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-      }, 100);
-    }
-  }, [isOpen, conversationId, messages.length, messagesEndRef]);
+    if (!isOpen || messages.length === 0 || !chatContainerRef.current) return;
 
-  // Lock body scroll on mobile when drawer is open
+    const container = chatContainerRef.current;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 250;
+
+    if (isInitialScrollRef.current) {
+      container.scrollTop = container.scrollHeight;
+      isInitialScrollRef.current = false;
+    } else if (isNearBottom) {
+      scrollToBottom('smooth');
+    }
+  }, [messages.length, isOpen, scrollToBottom]);
+
+  // Reset initial scroll flag when closed or conversation changes
+  useEffect(() => {
+    if (!isOpen) {
+      isInitialScrollRef.current = true;
+    }
+  }, [isOpen, conversationId]);
+
+  // Lock body & html scroll on mobile when drawer is open and restore position on close
   useEffect(() => {
     if (isOpen) {
-      const prevOverflow = document.body.style.overflow;
+      const prevScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+      const prevBodyOverflow = document.body.style.overflow;
+      const prevHtmlOverflow = document.documentElement.style.overflow;
+
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+
       if (typeof window !== 'undefined') {
         window.scrollTo(0, 0);
       }
+
       return () => {
-        document.body.style.overflow = prevOverflow;
+        document.body.style.overflow = prevBodyOverflow;
+        document.documentElement.style.overflow = prevHtmlOverflow;
+        if (typeof window !== 'undefined' && prevScrollY > 0) {
+          window.scrollTo(0, prevScrollY);
+        }
       };
     }
   }, [isOpen]);
@@ -228,9 +301,9 @@ export function ChatDrawer({
 
   return (
     <>
-      {/* Overlay */}
+      {/* Overlay: desktop modal only */}
       <div
-        className="fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm"
+        className="hidden sm:block fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
 
@@ -239,11 +312,15 @@ export function ChatDrawer({
         className={cn(
           'fixed z-[110] flex flex-col bg-white dark:bg-gray-900',
           // Mobile: full screen locked to viewport
-          'inset-0 overflow-hidden h-[100dvh] max-h-[100dvh]',
+          'inset-0 overflow-hidden',
           // Desktop: centered modal
           'sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2',
           'sm:w-[500px] sm:h-[600px] sm:max-h-[80vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl sm:overflow-hidden'
         )}
+        style={{
+          height: visualHeight ? `${visualHeight}px` : undefined,
+          maxHeight: visualHeight ? `${visualHeight}px` : undefined,
+        }}
       >
         {/* ---- Header ---- */}
         <div
@@ -407,7 +484,7 @@ export function ChatDrawer({
         {/* ---- Messages area ---- */}
         <div
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto px-4 py-3"
+          className="flex-1 overflow-y-auto px-4 py-3 overscroll-contain"
         >
           {loading ? (
             <div className="flex items-center justify-center h-full">
@@ -610,7 +687,9 @@ export function ChatDrawer({
         <div
           className="flex-shrink-0 bg-white dark:bg-gray-900"
           style={{
-            paddingBottom: 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
+            paddingBottom: isKeyboardOpen
+              ? 'max(0.375rem, env(safe-area-inset-bottom, 0px))'
+              : 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
           }}
         >
           {otherUserIsDeleted ? (
@@ -627,6 +706,11 @@ export function ChatDrawer({
               disabled={!conversationId}
               showConfirmButton={messages.length >= 4 && !pendingConfirmation}
               onManualConfirm={() => setShowManualModal(true)}
+              onFocus={() => {
+                setTimeout(() => {
+                  scrollToBottom('smooth');
+                }, 200);
+              }}
             />
           )}
         </div>

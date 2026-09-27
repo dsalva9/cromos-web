@@ -14,6 +14,7 @@ interface ChatComposerProps {
   onManualConfirm?: () => void;
   showConfirmButton?: boolean;
   placeholder?: string;
+  onFocus?: () => void;
 }
 
 export function ChatComposer({
@@ -24,6 +25,7 @@ export function ChatComposer({
   onManualConfirm,
   showConfirmButton,
   placeholder,
+  onFocus,
 }: ChatComposerProps) {
   const t = useTranslations('matchChat');
   const t_tc = useTranslations('tradeConfirmations');
@@ -156,6 +158,7 @@ export function ChatComposer({
           value={text}
           onChange={autoGrow}
           onKeyDown={handleKeyDown}
+          onFocus={onFocus}
           placeholder={placeholder || t('placeholder')}
           rows={1}
           maxLength={2000}

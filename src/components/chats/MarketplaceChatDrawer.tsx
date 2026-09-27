@@ -185,16 +185,80 @@ export function MarketplaceChatDrawer({
   const [manualStickerCount, setManualStickerCount] = useState<string>('');
   const [manualNote, setManualNote] = useState<string>('');
 
-  // Lock body scroll on mobile when drawer is open
+  // Mobile visual viewport and keyboard tracking
+  const [visualHeight, setVisualHeight] = useState<number | null>(null);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setVisualHeight(null);
+      setIsKeyboardOpen(false);
+      return;
+    }
+
+    const handleViewport = () => {
+      if (typeof window === 'undefined') return;
+
+      // On mobile screens (< 640px)
+      if (window.innerWidth < 640) {
+        const vv = window.visualViewport;
+        const currentHeight = vv ? vv.height : window.innerHeight;
+        setVisualHeight(currentHeight);
+
+        // Detect if keyboard is open
+        const keyboardActive = vv ? (window.innerHeight - vv.height > 150) : false;
+        setIsKeyboardOpen(keyboardActive);
+
+        // Keep window scroll locked at 0 so fixed elements don't shift up
+        if (window.scrollY !== 0) {
+          window.scrollTo(0, 0);
+        }
+      } else {
+        setVisualHeight(null);
+        setIsKeyboardOpen(false);
+      }
+    };
+
+    handleViewport();
+
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', handleViewport);
+      vv.addEventListener('scroll', handleViewport);
+    }
+    window.addEventListener('resize', handleViewport);
+    window.addEventListener('scroll', handleViewport);
+
+    return () => {
+      if (vv) {
+        vv.removeEventListener('resize', handleViewport);
+        vv.removeEventListener('scroll', handleViewport);
+      }
+      window.removeEventListener('resize', handleViewport);
+      window.removeEventListener('scroll', handleViewport);
+    };
+  }, [isOpen]);
+
+  // Lock body & html scroll on mobile when drawer is open and restore position on close
   useEffect(() => {
     if (isOpen) {
-      const prevOverflow = document.body.style.overflow;
+      const prevScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+      const prevBodyOverflow = document.body.style.overflow;
+      const prevHtmlOverflow = document.documentElement.style.overflow;
+
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+
       if (typeof window !== 'undefined') {
         window.scrollTo(0, 0);
       }
+
       return () => {
-        document.body.style.overflow = prevOverflow;
+        document.body.style.overflow = prevBodyOverflow;
+        document.documentElement.style.overflow = prevHtmlOverflow;
+        if (typeof window !== 'undefined' && prevScrollY > 0) {
+          window.scrollTo(0, prevScrollY);
+        }
       };
     }
   }, [isOpen]);
@@ -402,12 +466,38 @@ export function MarketplaceChatDrawer({
     }
   }, [isOpen, chatLoading, messages, user, effectiveParticipantId, markAsRead]);
 
-  // Auto scroll messages to bottom
-  useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const isInitialScrollRef = useRef(true);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior,
+      });
     }
-  }, [messages.length, messagesEndRef]);
+  }, []);
+
+  // Auto scroll messages container to bottom without scrolling window/document
+  useEffect(() => {
+    if (!isOpen || messages.length === 0 || !chatContainerRef.current) return;
+
+    const container = chatContainerRef.current;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 250;
+
+    if (isInitialScrollRef.current) {
+      container.scrollTop = container.scrollHeight;
+      isInitialScrollRef.current = false;
+    } else if (isNearBottom) {
+      scrollToBottom('smooth');
+    }
+  }, [messages.length, isOpen, scrollToBottom]);
+
+  // Reset initial scroll flag when closed or conversation changes
+  useEffect(() => {
+    if (!isOpen) {
+      isInitialScrollRef.current = true;
+    }
+  }, [isOpen, selectedParticipant]);
 
   // Send message handler
   const handleComposerSend = useCallback(
@@ -560,10 +650,10 @@ export function MarketplaceChatDrawer({
 
   return (
     <>
-      {/* Overlay: when modal drawer on desktop */}
+      {/* Overlay: desktop modal only */}
       {!isPage && (
         <div
-          className="fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm"
+          className="hidden sm:block fixed inset-0 z-[105] bg-black/40 backdrop-blur-sm"
           onClick={onClose}
         />
       )}
@@ -573,12 +663,16 @@ export function MarketplaceChatDrawer({
         className={cn(
           'flex flex-col bg-white dark:bg-gray-900',
           // Mobile: Always full screen covering navigation and ads, locked to viewport
-          'fixed inset-0 z-[110] overflow-hidden h-[100dvh] max-h-[100dvh]',
+          'fixed inset-0 z-[110] overflow-hidden',
           // Desktop: Modal drawer OR page container
           isPage
             ? 'sm:relative sm:inset-auto sm:z-auto sm:w-full sm:max-w-2xl sm:mx-auto sm:my-6 sm:h-[680px] sm:max-h-[85vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl sm:overflow-hidden'
             : 'sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[500px] sm:h-[600px] sm:max-h-[80vh] sm:rounded-2xl sm:border-2 sm:border-black sm:shadow-2xl'
         )}
+        style={{
+          height: visualHeight ? `${visualHeight}px` : undefined,
+          maxHeight: visualHeight ? `${visualHeight}px` : undefined,
+        }}
       >
         {/* ==================================================================== */}
         {/* PARTICIPANT SELECTOR VIEW (Seller with multiple buyers)               */}
@@ -878,7 +972,7 @@ export function MarketplaceChatDrawer({
             )}
 
             {/* ---- Messages Area ---- */}
-            <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 py-3">
+            <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 py-3 overscroll-contain">
               {chatLoading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin h-8 w-8 border-3 border-gold border-r-transparent rounded-full" />
@@ -1071,7 +1165,9 @@ export function MarketplaceChatDrawer({
             <div
               className="flex-shrink-0 bg-white dark:bg-gray-900"
               style={{
-                paddingBottom: 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
+                paddingBottom: isKeyboardOpen
+                  ? 'max(0.375rem, env(safe-area-inset-bottom, 0px))'
+                  : 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
               }}
             >
               <ChatComposer
@@ -1082,6 +1178,11 @@ export function MarketplaceChatDrawer({
                 placeholder={t('writeMessage')}
                 showConfirmButton={messages.length >= 4 && !pendingConfirmation}
                 onManualConfirm={() => setShowManualModal(true)}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollToBottom('smooth');
+                  }, 200);
+                }}
               />
             </div>
           </>

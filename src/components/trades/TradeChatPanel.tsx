@@ -71,7 +71,12 @@ export function TradeChatPanel({
 
     // If this is the first load or user is at bottom
     if (!isUserScrolledUp || lastMessageCountRef.current === 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: lastMessageCountRef.current === 0 ? 'auto' : 'smooth',
+        });
+      }
       setShowNewMessagesPill(false);
     } else if (messages.length > lastMessageCountRef.current) {
       // New message arrived while user scrolled up
@@ -128,7 +133,12 @@ export function TradeChatPanel({
 
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
     setShowNewMessagesPill(false);
   };
 
@@ -171,7 +181,7 @@ export function TradeChatPanel({
         <div className="bg-gold border-b-2 border-black px-4 py-3 flex-shrink-0">
           <div className="flex items-start justify-between gap-3">
             <p className="text-xs text-gray-900 dark:text-gray-900 leading-relaxed flex-1">
-              El chat es un espacio privado para intercambiar, pero <strong>Cambiocromos.com se reserva el derecho de moderación</strong> ante reportes de abuso. Este servicio es <strong>exclusivamente para mayores de 18 años</strong>. Sé respetuoso. No compartas datos sensibles. El acoso o comportamiento inapropiado resultará en la <strong>suspensión inmediata</strong> de tu cuenta. Usa el botón de "Reportar" si detectas alguna irregularidad.
+              El chat es un espacio privado para intercambiar, pero <strong>Cambiocromos.com se reserva el derecho de moderación</strong> ante reportes de abuso. Este servicio es <strong>exclusivamente para mayores de 18 años</strong>. Sé respetuoso. No compartas datos sensibles. El acoso o comportamiento inapropiado resultará en la <strong>suspensión inmediata</strong> de tu cuenta. Usa el botón de &quot;Reportar&quot; si detectas alguna irregularidad.
             </p>
             <Button
               variant="ghost"
