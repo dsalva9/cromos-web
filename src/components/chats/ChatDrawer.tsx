@@ -91,12 +91,14 @@ export function ChatDrawer({
   const {
     messages,
     loading,
+    error,
     sending,
     uploading,
     hasMore,
     sendMessage,
     loadMore,
     messagesEndRef,
+    refetch,
   } = useMatchChat({
     conversationId: isOpen ? conversationId : null,
     enableRealtime: isOpen,
@@ -380,6 +382,18 @@ export function ChatDrawer({
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin h-8 w-8 border-3 border-gold border-r-transparent rounded-full" />
+            </div>
+          ) : error && messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center text-red-500 dark:text-red-400 px-4 gap-2">
+              <p className="text-sm font-semibold">{t('errorLoading') || 'Error al cargar los mensajes'}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void refetch()}
+                className="text-xs"
+              >
+                {t('retry') || 'Reintentar'}
+              </Button>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 dark:text-gray-500 px-4">

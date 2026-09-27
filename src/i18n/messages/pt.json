@@ -512,7 +512,9 @@
       "uncheckAll": "Desmarcar todos"
     },
     "hideChat": "Ocultar chat",
-    "deleteChat": "Eliminar chat"
+    "deleteChat": "Eliminar chat",
+    "errorLoading": "Erro ao carregar mensagens",
+    "retry": "Tentar novamente"
   },
   "templates": {
     "filters": {

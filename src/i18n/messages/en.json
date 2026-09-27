@@ -512,7 +512,9 @@
       "uncheckAll": "Uncheck all"
     },
     "hideChat": "Hide chat",
-    "deleteChat": "Delete chat"
+    "deleteChat": "Delete chat",
+    "errorLoading": "Error loading messages",
+    "retry": "Retry"
   },
   "templates": {
     "filters": {

@@ -251,11 +251,11 @@ BEGIN
   END IF;
 
   -- Verify user is a participant and get deleted_at
-  SELECT CASE WHEN user_a_id = v_me THEN user_a_deleted_at ELSE user_b_deleted_at END
+  SELECT CASE WHEN mc.user_a_id = v_me THEN mc.user_a_deleted_at ELSE mc.user_b_deleted_at END
   INTO v_deleted_at
-  FROM match_conversations
-  WHERE id = p_conversation_id
-    AND (user_a_id = v_me OR user_b_id = v_me);
+  FROM match_conversations mc
+  WHERE mc.id = p_conversation_id
+    AND (mc.user_a_id = v_me OR mc.user_b_id = v_me);
 
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Conversation not found or access denied';
@@ -283,7 +283,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.get_match_chat_messages TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_match_chat_messages(bigint, timestamptz, integer) TO authenticated;
 
 -- 8. Updated send_match_message() with auto-unhide and reset
 CREATE OR REPLACE FUNCTION public.send_match_message(
