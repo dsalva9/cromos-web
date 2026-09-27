@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useUserSearch } from '@/hooks/admin/useUserSearch';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
 import { Input } from '@/components/ui/input';
@@ -8,9 +9,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Image from 'next/image';
 import Link from '@/components/ui/link';
-import { User, Search, Ban, CheckCircle, AlertTriangle, Mail, Trash2, Shield } from 'lucide-react';
+import {
+  User,
+  Search,
+  Ban,
+  CheckCircle,
+  AlertTriangle,
+  Mail,
+  Shield,
+  Star,
+  Users as UsersIcon,
+} from 'lucide-react';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
 import AdminGuard from '@/components/AdminGuard';
@@ -18,6 +30,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { SendEmailModal } from '@/components/admin/SendEmailModal';
+import UserRatingsTab from '@/components/admin/UserRatingsTab';
 
 function UserSearchContent() {
   const [query, setQuery] = useState('');
@@ -36,6 +49,7 @@ function UserSearchContent() {
 
     setTogglingPatronId(userId);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.rpc as any)('admin_update_patron_status', {
         p_user_id: userId,
         p_is_patron: !currentStatus
@@ -102,7 +116,8 @@ function UserSearchContent() {
     if (!confirm(`Move ${nickname} to deletion queue? The account will be permanently deleted in 90 days. You can still unsuspend to cancel.`)) return;
 
     try {
-      const { error } = await supabase.rpc('admin_move_to_deletion', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('admin_move_to_deletion', {
         p_user_id: userId
       });
 
@@ -119,7 +134,8 @@ function UserSearchContent() {
     if (!confirm(`Approve ${nickname}'s profile and remove the flag?`)) return;
 
     try {
-      const { error } = await supabase.rpc('admin_approve_flagged_profile', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('admin_approve_flagged_profile', {
         p_user_id: userId
       });
 
@@ -133,307 +149,295 @@ function UserSearchContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1F2937]">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black uppercase text-white mb-2">
-            User Management
-          </h1>
-          <p className="text-gray-400">
-            Search and moderate users
+    <>
+      {/* Search and Filters */}
+      <ModernCard className="mb-6 bg-[#111827] border-2 border-black">
+        <ModernCardContent className="p-6 space-y-4">
+          {/* Search */}
+          <div className="space-y-2">
+            <Label className="text-white">Search</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by nickname or email..."
+                className="pl-10 bg-[#374151] border-2 border-black text-white"
+              />
+            </div>
+          </div>
+
+          {/* Status Filter */}
+          <div className="space-y-2">
+            <Label className="text-white">Status</Label>
+            <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended' | 'pending_deletion' | 'flagged') => setStatus(v)}>
+              <SelectTrigger className="bg-[#374151] border-2 border-black text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                <SelectItem value="active">Active Only</SelectItem>
+                <SelectItem value="suspended">Suspended Only</SelectItem>
+                <SelectItem value="pending_deletion">Pending Deletion</SelectItem>
+                <SelectItem value="flagged">⚠️ Flagged Profiles</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </ModernCardContent>
+      </ModernCard>
+
+      {/* Error State */}
+      {error && (
+        <div className="text-red-500 text-center py-8">
+          Error loading users: {error}
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
+        </div>
+      )}
+
+      {/* Results */}
+      {!loading && users.length === 0 && (
+        <div className="text-center py-16">
+          <Search className="h-16 w-16 mx-auto mb-4 text-gray-600" />
+          <p className="text-gray-400 text-lg">
+            No users found
           </p>
         </div>
+      )}
 
-        {/* Search and Filters */}
-        <ModernCard className="mb-6">
-          <ModernCardContent className="p-6 space-y-4">
-            {/* Search */}
-            <div className="space-y-2">
-              <Label className="text-white">Search</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <Input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by nickname or email..."
-                  className="pl-10 bg-[#374151] border-2 border-black text-white"
-                />
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div className="space-y-2">
-              <Label className="text-white">Status</Label>
-              <Select value={status} onValueChange={(v: 'all' | 'active' | 'suspended' | 'pending_deletion' | 'flagged') => setStatus(v)}>
-                <SelectTrigger className="bg-[#374151] border-2 border-black text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Users</SelectItem>
-                  <SelectItem value="active">Active Only</SelectItem>
-                  <SelectItem value="suspended">Suspended Only</SelectItem>
-                  <SelectItem value="pending_deletion">Pending Deletion</SelectItem>
-                  <SelectItem value="flagged">⚠️ Flagged Profiles</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </ModernCardContent>
-        </ModernCard>
-
-        {/* Error State */}
-        {error && (
-          <div className="text-red-500 text-center py-8">
-            Error loading users: {error}
-          </div>
-        )}
-
-        {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
-          </div>
-        )}
-
-        {/* Results */}
-        {!loading && users.length === 0 && (
-          <div className="text-center py-16">
-            <Search className="h-16 w-16 mx-auto mb-4 text-gray-600" />
-            <p className="text-gray-400 text-lg">
-              No users found
-            </p>
-          </div>
-        )}
-
-        {/* Users List */}
-        <div className="space-y-4">
-          {users.map((user) => (
-            <ModernCard key={user.user_id}>
-              <ModernCardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    {(() => {
-                      const avatarUrl = resolveAvatarUrl(user.avatar_url, supabase);
-                      return avatarUrl ? (
-                        <Image
-                          src={avatarUrl}
-                          alt={user.nickname}
-                          width={64}
-                          height={64}
-                          className="rounded-full border-2 border-black"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-gold border-2 border-black flex items-center justify-center">
-                          <User className="h-8 w-8 text-black" />
-                        </div>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 space-y-2">
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Link href={`/users/${user.user_id}`}>
-                            <h3 className="font-bold text-white text-lg hover:text-gold transition-colors">
-                              {user.nickname}
-                            </h3>
-                          </Link>
-                          {user.is_admin && (
-                            <Badge className="bg-red-600 text-white">Admin</Badge>
-                          )}
-                          {user.is_patron && (
-                            <Badge className="bg-amber-500 text-white">☕ Patron</Badge>
-                          )}
-                          {user.is_pending_deletion ? (
-                            <Badge className="bg-orange-600 text-white">Pending Deletion</Badge>
-                          ) : user.is_suspended && (
-                            <Badge className="bg-gray-600 text-white">Suspended</Badge>
-                          )}
-                          {user.is_flagged && (
-                            <Badge className="bg-amber-600 text-white">⚠️ Flagged</Badge>
-                          )}
-                        </div>
-                        <p className="text-gray-400 text-sm">{user.email}</p>
+      {/* Users List */}
+      <div className="space-y-4">
+        {users.map((user) => (
+          <ModernCard key={user.user_id}>
+            <ModernCardContent className="p-6">
+              <div className="flex items-start gap-4">
+                {/* Avatar */}
+                <div className="flex-shrink-0">
+                  {(() => {
+                    const avatarUrl = resolveAvatarUrl(user.avatar_url, supabase);
+                    return avatarUrl ? (
+                      <Image
+                        src={avatarUrl}
+                        alt={user.nickname}
+                        width={64}
+                        height={64}
+                        className="rounded-full border-2 border-black"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gold border-2 border-black flex items-center justify-center">
+                        <User className="h-8 w-8 text-black" />
                       </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
-                      <div>
-                        <p className="text-gray-400">Rating</p>
-                        <p className="text-white font-bold">
-                          {user.rating_avg.toFixed(1)} ⭐ ({user.rating_count})
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Active Listings</p>
-                        <p className="text-white font-bold">{user.active_listings_count}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Msgs Sent</p>
-                        <p className="text-white font-bold">{user.messages_sent}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Msgs Received</p>
-                        <p className="text-white font-bold">{user.messages_received}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Albums</p>
-                        <p className="text-white font-bold">{user.albums_count}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Reports Received</p>
-                        <p className="text-white font-bold">{user.reports_received_count}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Country</p>
-                        <p className="text-white font-bold">{user.country_code}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Joined</p>
-                        <p className="text-white font-bold">
-                          {new Date(user.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      <Link href={`/users/${user.user_id}`}>
-                        <Button size="sm" variant="outline">
-                          View Profile
-                        </Button>
-                      </Link>
-
-                      <Button
-                        size="sm"
-                        onClick={() => handleTogglePatron(user.user_id, user.is_patron, user.nickname)}
-                        disabled={togglingPatronId === user.user_id}
-                        className={user.is_patron ? "bg-[#B45309] hover:bg-[#92400E] text-white" : "bg-[#F59E0B] hover:bg-[#D97706] text-black font-semibold"}
-                      >
-                        ☕ {user.is_patron ? 'Revoke Patron' : 'Grant Patron'}
-                      </Button>
-
-                      {!user.is_admin && (
-                        <>
-                          {user.is_suspended ? (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleUnsuspend(user.user_id, user.nickname)}
-                                disabled={actionLoading}
-                                className="bg-green-700 hover:bg-green-600"
-                              >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Unsuspend
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => handleMoveToDeletion(user.user_id, user.nickname)}
-                                disabled={actionLoading || user.is_pending_deletion}
-                                className="bg-orange-700 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <AlertTriangle className="mr-2 h-4 w-4" />
-                                {user.is_pending_deletion ? 'Already Pending Deletion' : 'Move to Deletion'}
-                              </Button>
-                            </>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSuspend(user.user_id, user.nickname)}
-                              disabled={actionLoading}
-                              className="bg-red-700 hover:bg-red-600"
-                            >
-                              <Ban className="mr-2 h-4 w-4" />
-                              Suspend
-                            </Button>
-                          )}
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleForceReset(user.user_id, user.nickname)}
-                            className="border-blue-600 text-blue-500 hover:bg-blue-600/10"
-                          >
-                            <Mail className="mr-2 h-4 w-4" />
-                            Reset Password
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEmailUser({ user_id: user.user_id, email: user.email, nickname: user.nickname })}
-                            className="border-gold text-gold hover:bg-gold/10"
-                          >
-                            <Mail className="mr-2 h-4 w-4" />
-                            Send Email
-                          </Button>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Warning if reports > 0 */}
-                    {user.reports_received_count > 0 && (
-                      <div className="flex items-center gap-2 text-sm text-orange-400 pt-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span>This user has received {user.reports_received_count} report(s)</span>
-                      </div>
-                    )}
-
-                    {/* Flagged profile info */}
-                    {user.is_flagged && (
-                      <div className="mt-3 p-3 bg-amber-900/30 border border-amber-700 rounded-lg space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-amber-400 font-semibold">
-                          <Shield className="h-4 w-4" />
-                          <span>Flagged Profile — Device match detected</span>
-                        </div>
-                        {user.flagged_reason && (
-                          <p className="text-xs text-amber-300/80">{user.flagged_reason}</p>
-                        )}
-                        {user.flagged_at && (
-                          <p className="text-xs text-gray-400">Flagged at: {new Date(user.flagged_at).toLocaleString()}</p>
-                        )}
-                        {user.flagged_source_profile_id && (
-                          <p className="text-xs text-gray-400">
-                            Source profile:{' '}
-                            <Link href={`/users/${user.flagged_source_profile_id}`} className="text-gold hover:underline">
-                              {user.flagged_source_profile_id.slice(0, 8)}…
-                            </Link>
-                          </p>
-                        )}
-                        <div className="flex gap-2 pt-1">
-                          <Button
-                            size="sm"
-                            onClick={() => handleApproveFlagged(user.user_id, user.nickname)}
-                            className="bg-green-700 hover:bg-green-600"
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Approve Profile
-                          </Button>
-                          {!user.is_suspended && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleSuspend(user.user_id, user.nickname)}
-                              disabled={actionLoading}
-                              className="bg-red-700 hover:bg-red-600"
-                            >
-                              <Ban className="mr-2 h-4 w-4" />
-                              Suspend
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </div>
-              </ModernCardContent>
-            </ModernCard>
-          ))}
-        </div>
+
+                {/* Info */}
+                <div className="flex-1 space-y-2">
+                  {/* Header */}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link href={`/users/${user.user_id}`}>
+                          <h3 className="font-bold text-white text-lg hover:text-gold transition-colors">
+                            {user.nickname}
+                          </h3>
+                        </Link>
+                        {user.is_admin && (
+                          <Badge className="bg-red-600 text-white">Admin</Badge>
+                        )}
+                        {user.is_patron && (
+                          <Badge className="bg-amber-500 text-white">☕ Patron</Badge>
+                        )}
+                        {user.is_pending_deletion ? (
+                          <Badge className="bg-orange-600 text-white">Pending Deletion</Badge>
+                        ) : user.is_suspended && (
+                          <Badge className="bg-gray-600 text-white">Suspended</Badge>
+                        )}
+                        {user.is_flagged && (
+                          <Badge className="bg-amber-600 text-white">⚠️ Flagged</Badge>
+                        )}
+                      </div>
+                      <p className="text-gray-400 text-sm">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4 text-sm">
+                    <div>
+                      <p className="text-gray-400">Rating</p>
+                      <p className="text-white font-bold">
+                        {user.rating_avg.toFixed(1)} ⭐ ({user.rating_count})
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Active Listings</p>
+                      <p className="text-white font-bold">{user.active_listings_count}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Msgs Sent</p>
+                      <p className="text-white font-bold">{user.messages_sent}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Msgs Received</p>
+                      <p className="text-white font-bold">{user.messages_received}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Albums</p>
+                      <p className="text-white font-bold">{user.albums_count}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Reports Received</p>
+                      <p className="text-white font-bold">{user.reports_received_count}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Country</p>
+                      <p className="text-white font-bold">{user.country_code}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Joined</p>
+                      <p className="text-white font-bold">
+                        {new Date(user.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    <Link href={`/users/${user.user_id}`}>
+                      <Button size="sm" variant="outline">
+                        View Profile
+                      </Button>
+                    </Link>
+
+                    <Button
+                      size="sm"
+                      onClick={() => handleTogglePatron(user.user_id, user.is_patron, user.nickname)}
+                      disabled={togglingPatronId === user.user_id}
+                      className={user.is_patron ? "bg-[#B45309] hover:bg-[#92400E] text-white" : "bg-[#F59E0B] hover:bg-[#D97706] text-black font-semibold"}
+                    >
+                      ☕ {user.is_patron ? 'Revoke Patron' : 'Grant Patron'}
+                    </Button>
+
+                    {!user.is_admin && (
+                      <>
+                        {user.is_suspended ? (
+                          <>
+                            <Button
+                              size="sm"
+                              onClick={() => handleUnsuspend(user.user_id, user.nickname)}
+                              disabled={actionLoading}
+                              className="bg-green-700 hover:bg-green-600"
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Unsuspend
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleMoveToDeletion(user.user_id, user.nickname)}
+                              disabled={actionLoading || user.is_pending_deletion}
+                              className="bg-orange-700 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <AlertTriangle className="mr-2 h-4 w-4" />
+                              {user.is_pending_deletion ? 'Already Pending Deletion' : 'Move to Deletion'}
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            size="sm"
+                            onClick={() => handleSuspend(user.user_id, user.nickname)}
+                            disabled={actionLoading}
+                            className="bg-red-700 hover:bg-red-600"
+                          >
+                            <Ban className="mr-2 h-4 w-4" />
+                            Suspend
+                          </Button>
+                        )}
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleForceReset(user.user_id, user.nickname)}
+                          className="border-blue-600 text-blue-500 hover:bg-blue-600/10"
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Reset Password
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEmailUser({ user_id: user.user_id, email: user.email, nickname: user.nickname })}
+                          className="border-gold text-gold hover:bg-gold/10"
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Send Email
+                        </Button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Warning if reports > 0 */}
+                  {user.reports_received_count > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-orange-400 pt-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      <span>This user has received {user.reports_received_count} report(s)</span>
+                    </div>
+                  )}
+
+                  {/* Flagged profile info */}
+                  {user.is_flagged && (
+                    <div className="mt-3 p-3 bg-amber-900/30 border border-amber-700 rounded-lg space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-amber-400 font-semibold">
+                        <Shield className="h-4 w-4" />
+                        <span>Flagged Profile — Device match detected</span>
+                      </div>
+                      {user.flagged_reason && (
+                        <p className="text-xs text-amber-300/80">{user.flagged_reason}</p>
+                      )}
+                      {user.flagged_at && (
+                        <p className="text-xs text-gray-400">Flagged at: {new Date(user.flagged_at).toLocaleString()}</p>
+                      )}
+                      {user.flagged_source_profile_id && (
+                        <p className="text-xs text-gray-400">
+                          Source profile:{' '}
+                          <Link href={`/users/${user.flagged_source_profile_id}`} className="text-gold hover:underline">
+                            {user.flagged_source_profile_id.slice(0, 8)}…
+                          </Link>
+                        </p>
+                      )}
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          size="sm"
+                          onClick={() => handleApproveFlagged(user.user_id, user.nickname)}
+                          className="bg-green-700 hover:bg-green-600"
+                        >
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Approve Profile
+                        </Button>
+                        {!user.is_suspended && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleSuspend(user.user_id, user.nickname)}
+                            disabled={actionLoading}
+                            className="bg-red-700 hover:bg-red-600"
+                          >
+                            <Ban className="mr-2 h-4 w-4" />
+                            Suspend
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ModernCardContent>
+          </ModernCard>
+        ))}
       </div>
 
       <SendEmailModal
@@ -441,6 +445,67 @@ function UserSearchContent() {
         open={!!emailUser}
         onClose={() => setEmailUser(null)}
       />
+    </>
+  );
+}
+
+function AdminUsersContent() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'ratings' ? 'ratings' : 'directory';
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  const handleTabChange = (val: string) => {
+    setActiveTab(val);
+    const url = new URL(window.location.href);
+    if (val === 'ratings') {
+      url.searchParams.set('tab', 'ratings');
+    } else {
+      url.searchParams.delete('tab');
+    }
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  return (
+    <div className="min-h-screen bg-[#1F2937]">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-black uppercase text-white mb-2">
+            User Management
+          </h1>
+          <p className="text-gray-400">
+            Search and moderate users, monitor community ratings, and analyze reputation
+          </p>
+        </div>
+
+        {/* Subtabs */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="bg-[#111827] border-2 border-black mb-6">
+            <TabsTrigger
+              value="directory"
+              className="data-[state=active]:bg-gold data-[state=active]:text-black font-bold flex items-center gap-2 px-4 py-2"
+            >
+              <UsersIcon className="h-4 w-4" />
+              <span>Directory & Moderation</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="ratings"
+              className="data-[state=active]:bg-gold data-[state=active]:text-black font-bold flex items-center gap-2 px-4 py-2"
+            >
+              <Star className="h-4 w-4 fill-current" />
+              <span>User Ratings & Stats</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="directory" className="mt-0">
+            <UserSearchContent />
+          </TabsContent>
+
+          <TabsContent value="ratings" className="mt-0">
+            <UserRatingsTab />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
@@ -448,7 +513,15 @@ function UserSearchContent() {
 export default function AdminUsersPage() {
   return (
     <AdminGuard>
-      <UserSearchContent />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[#1F2937] flex items-center justify-center py-20">
+            <div className="animate-spin h-8 w-8 border-4 border-gold border-r-transparent rounded-full" />
+          </div>
+        }
+      >
+        <AdminUsersContent />
+      </Suspense>
     </AdminGuard>
   );
 }
