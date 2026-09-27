@@ -188,6 +188,33 @@ export function MarketplaceChatDrawer({
   // Mobile visual viewport and keyboard tracking
   const [visualHeight, setVisualHeight] = useState<number | null>(null);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const prevScrollYRef = useRef(0);
+
+  // Lock body & html scroll on mobile when drawer is open and restore position on close
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (typeof window !== 'undefined') {
+      prevScrollYRef.current = window.scrollY;
+    }
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      if (typeof window !== 'undefined' && prevScrollYRef.current > 0) {
+        window.scrollTo(0, prevScrollYRef.current);
+      }
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -237,30 +264,6 @@ export function MarketplaceChatDrawer({
       window.removeEventListener('resize', handleViewport);
       window.removeEventListener('scroll', handleViewport);
     };
-  }, [isOpen]);
-
-  // Lock body & html scroll on mobile when drawer is open and restore position on close
-  useEffect(() => {
-    if (isOpen) {
-      const prevScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-      const prevBodyOverflow = document.body.style.overflow;
-      const prevHtmlOverflow = document.documentElement.style.overflow;
-
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-
-      if (typeof window !== 'undefined') {
-        window.scrollTo(0, 0);
-      }
-
-      return () => {
-        document.body.style.overflow = prevBodyOverflow;
-        document.documentElement.style.overflow = prevHtmlOverflow;
-        if (typeof window !== 'undefined' && prevScrollY > 0) {
-          window.scrollTo(0, prevScrollY);
-        }
-      };
-    }
   }, [isOpen]);
 
   // On native Capacitor, hide AdMob banner when chat is open so it never blocks the composer
