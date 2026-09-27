@@ -13,6 +13,7 @@ import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
 import { MatchConversation, hideMatchConversation, deleteMatchConversation } from '@/lib/supabase/matches/chat';
+import { deleteMarketplaceConversation, hideMarketplaceConversation } from '@/lib/supabase/listings/chat';
 import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
@@ -102,8 +103,10 @@ function ChatsPageContent() {
     void fetchConversations();
   }, [user, supabase]);
 
-  // State for hide confirmation dialog (marketplace)
+  // State for hide & delete confirmation dialogs (marketplace)
+  const [deletingMpId, setDeletingMpId] = useState<string | null>(null);
   const [hideConfirmConv, setHideConfirmConv] = useState<Conversation | null>(null);
+  const [deleteConfirmMpConv, setDeleteConfirmMpConv] = useState<Conversation | null>(null);
 
   // State for hide & delete confirmation dialogs (match)
   const [hidingMatchId, setHidingMatchId] = useState<number | null>(null);
@@ -119,10 +122,7 @@ function ChatsPageContent() {
     setHidingId(key);
     setHideConfirmConv(null);
     try {
-      const { error } = await supabase.rpc('hide_conversation', {
-        p_listing_id: conv.listing_id,
-        p_counterparty_id: conv.counterparty_id,
-      });
+      const { error } = await hideMarketplaceConversation(supabase, conv.listing_id, conv.counterparty_id);
       if (error) throw error;
       setMarketplaceConvs(prev =>
         prev.filter(c =>
@@ -137,6 +137,30 @@ function ChatsPageContent() {
       setHidingId(null);
     }
   }, [hideConfirmConv, supabase, t]);
+
+  // Delete a marketplace conversation (called after confirmation)
+  const confirmDeleteConversation = useCallback(async () => {
+    const conv = deleteConfirmMpConv;
+    if (!conv) return;
+    const key = `${conv.listing_id}-${conv.counterparty_id}`;
+    setDeletingMpId(key);
+    setDeleteConfirmMpConv(null);
+    try {
+      const { error } = await deleteMarketplaceConversation(supabase, conv.listing_id, conv.counterparty_id);
+      if (error) throw error;
+      setMarketplaceConvs(prev =>
+        prev.filter(c =>
+          !(c.listing_id === conv.listing_id && c.counterparty_id === conv.counterparty_id)
+        )
+      );
+      toast.success(t('delete.success'));
+    } catch (err) {
+      logger.error('Error deleting marketplace conversation:', err);
+      toast.error(t('delete.error'));
+    } finally {
+      setDeletingMpId(null);
+    }
+  }, [deleteConfirmMpConv, supabase, t]);
 
   // Hide a match conversation (called after confirmation)
   const confirmHideMatchConversation = useCallback(async () => {
@@ -295,19 +319,33 @@ function ChatsPageContent() {
                       } : undefined}
                     >
                       <ModernCardContent className="p-4">
-                        {/* Hide conversation button */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setHideConfirmConv(conv);
-                          }}
-                          disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}`}
-                          className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
-                          title={t('hide.button')}
-                        >
-                          <EyeOff className="h-4 w-4" />
-                        </button>
+                        {/* Actions: Hide and Delete */}
+                        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setHideConfirmConv(conv);
+                            }}
+                            disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}` || deletingMpId === `${conv.listing_id}-${conv.counterparty_id}`}
+                            className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-all duration-200"
+                            title={t('hide.button')}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeleteConfirmMpConv(conv);
+                            }}
+                            disabled={hidingId === `${conv.listing_id}-${conv.counterparty_id}` || deletingMpId === `${conv.listing_id}-${conv.counterparty_id}`}
+                            className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
+                            title={t('delete.button')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
 
                         <div className="flex gap-4">
                           {conv.listing_image_url && (
@@ -325,7 +363,7 @@ function ChatsPageContent() {
                           )}
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start gap-2 mb-1 pr-8">
+                            <div className="flex items-start gap-2 mb-1 pr-16">
                               <h3 className="font-bold text-gray-900 dark:text-white truncate">
                                 {conv.listing_title}
                               </h3>
@@ -591,6 +629,27 @@ function ChatsPageContent() {
               className="bg-gold hover:bg-gold-light text-black"
             >
               {t('hide.confirmButton')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete marketplace conversation confirmation dialog */}
+      <Dialog open={!!deleteConfirmMpConv} onOpenChange={(open) => !open && setDeleteConfirmMpConv(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('delete.confirmTitle')}</DialogTitle>
+            <DialogDescription>{t('delete.confirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setDeleteConfirmMpConv(null)}>
+              {t('delete.cancelButton')}
+            </Button>
+            <Button
+              onClick={() => void confirmDeleteConversation()}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {t('delete.confirmButton')}
             </Button>
           </DialogFooter>
         </DialogContent>

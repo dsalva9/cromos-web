@@ -850,6 +850,52 @@ export type Database = {
           },
         ]
       }
+      deleted_marketplace_conversations: {
+        Row: {
+          counterparty_id: string
+          deleted_at: string
+          id: number
+          listing_id: number
+          user_id: string
+        }
+        Insert: {
+          counterparty_id: string
+          deleted_at?: string
+          id?: number
+          listing_id: number
+          user_id: string
+        }
+        Update: {
+          counterparty_id?: string
+          deleted_at?: string
+          id?: number
+          listing_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deleted_marketplace_conversations_counterparty_id_fkey"
+            columns: ["counterparty_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deleted_marketplace_conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "trade_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deleted_marketplace_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       highlight_credit_balances: {
         Row: {
           balance: number
@@ -5443,6 +5489,10 @@ export type Database = {
         Returns: number
       }
       hide_conversation: {
+        Args: { p_counterparty_id: string; p_listing_id: number }
+        Returns: undefined
+      }
+      delete_marketplace_conversation: {
         Args: { p_counterparty_id: string; p_listing_id: number }
         Returns: undefined
       }

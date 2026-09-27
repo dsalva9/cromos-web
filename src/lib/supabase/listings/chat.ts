@@ -218,3 +218,97 @@ export async function markListingMessagesRead(
     };
   }
 }
+
+function isAuthError(error: unknown): boolean {
+  let msg = '';
+  if (error instanceof Error) {
+    msg = error.message.toLowerCase();
+  } else if (error && typeof error === 'object' && 'message' in error) {
+    msg = String((error as { message: string }).message).toLowerCase();
+  }
+  return (
+    msg.includes('not authenticated') ||
+    msg.includes('jwt') ||
+    msg.includes('token') ||
+    msg.includes('callback is no longer runnable') ||
+    msg.includes('aborterror') ||
+    msg.includes('signal is aborted') ||
+    msg.includes('failed to fetch')
+  );
+}
+
+/**
+ * Hide a marketplace conversation
+ */
+export async function hideMarketplaceConversation(
+  supabase: SupabaseClient,
+  listingId: number,
+  counterpartyId: string
+): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.rpc('hide_conversation', {
+      p_listing_id: listingId,
+      p_counterparty_id: counterpartyId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to hideMarketplaceConversation:', error);
+    } else {
+      logger.error('Error hiding marketplace conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to hide conversation') };
+  }
+}
+
+/**
+ * Unhide a marketplace conversation
+ */
+export async function unhideMarketplaceConversation(
+  supabase: SupabaseClient,
+  listingId: number,
+  counterpartyId: string
+): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.rpc('unhide_conversation', {
+      p_listing_id: listingId,
+      p_counterparty_id: counterpartyId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to unhideMarketplaceConversation:', error);
+    } else {
+      logger.error('Error unhiding marketplace conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to unhide conversation') };
+  }
+}
+
+/**
+ * Delete a marketplace conversation
+ */
+export async function deleteMarketplaceConversation(
+  supabase: SupabaseClient,
+  listingId: number,
+  counterpartyId: string
+): Promise<{ error: Error | null }> {
+  try {
+    const { error } = await supabase.rpc('delete_marketplace_conversation', {
+      p_listing_id: listingId,
+      p_counterparty_id: counterpartyId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to deleteMarketplaceConversation:', error);
+    } else {
+      logger.error('Error deleting marketplace conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to delete conversation') };
+  }
+}
+

@@ -18,14 +18,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2, FileText, Download } from 'lucide-react';
+import { ArrowLeft, Send, Package, ChevronDown, Info, MessageCircle, Paperclip, Camera, X, Loader2, FileText, Download, MoreVertical, EyeOff, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/lib/toast';
 import { Listing } from '@/types/v1.6.0';
 import Link from '@/components/ui/link';
 import Image from 'next/image';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
+import { deleteMarketplaceConversation, hideMarketplaceConversation } from '@/lib/supabase/listings/chat';
 
 import { logger } from '@/lib/logger';
 import { useChatViewportHeight } from '@/hooks/useChatViewportHeight';
@@ -39,6 +42,7 @@ function ListingChatPageContent() {
   const params = useParams();
   const router = useRouter();
   const t = useTranslations('marketplaceChat');
+  const tChats = useTranslations('chats');
   const locale = useLocale();
   const { user } = useUser();
   const supabase = useSupabaseClient();
@@ -59,7 +63,7 @@ function ListingChatPageContent() {
   const [transactionId, setTransactionId] = useState<number | null>(null);
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
   const [transaction, setTransaction] = useState<{ buyer_id: string } | null>(null);
-  const [isBuyer, setIsBuyer] = useState(false);
+  const [, setIsBuyer] = useState(false);
   const [isReservedBuyer, setIsReservedBuyer] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [existingRating, setExistingRating] = useState<{ rating: number; comment: string | null } | null>(null);
@@ -106,6 +110,57 @@ function ListingChatPageContent() {
   const [manualNote, setManualNote] = useState<string>('');
 
   const effectiveParticipantId = isOwner ? selectedParticipant : listingOwner;
+
+  // Action menu & Hide / Delete states
+  const [showActionMenu, setShowActionMenu] = useState(false);
+  const [showHideModal, setShowHideModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingChat, setDeletingChat] = useState(false);
+  const [hidingChat, setHidingChat] = useState(false);
+
+  const handleConfirmHide = useCallback(async () => {
+    if (!effectiveParticipantId) return;
+    setHidingChat(true);
+    setShowHideModal(false);
+    try {
+      const { error } = await hideMarketplaceConversation(supabase, listingId, effectiveParticipantId);
+      if (error) throw error;
+      toast.success(tChats('hide.success'));
+      if (isOwner && participants.length > 1) {
+        setSelectedParticipant(null);
+        void fetchParticipants();
+      } else {
+        router.push('/chats');
+      }
+    } catch (err) {
+      logger.error('Error hiding marketplace chat:', err);
+      toast.error(tChats('hide.error'));
+    } finally {
+      setHidingChat(false);
+    }
+  }, [effectiveParticipantId, supabase, listingId, tChats, isOwner, participants.length, fetchParticipants, router]);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!effectiveParticipantId) return;
+    setDeletingChat(true);
+    setShowDeleteModal(false);
+    try {
+      const { error } = await deleteMarketplaceConversation(supabase, listingId, effectiveParticipantId);
+      if (error) throw error;
+      toast.success(tChats('delete.success'));
+      if (isOwner && participants.length > 1) {
+        setSelectedParticipant(null);
+        void fetchParticipants();
+      } else {
+        router.push('/chats');
+      }
+    } catch (err) {
+      logger.error('Error deleting marketplace chat:', err);
+      toast.error(tChats('delete.error'));
+    } finally {
+      setDeletingChat(false);
+    }
+  }, [effectiveParticipantId, supabase, listingId, tChats, isOwner, participants.length, fetchParticipants, router]);
 
   const {
     pendingConfirmation,
@@ -609,7 +664,7 @@ function ListingChatPageContent() {
     >
       <div className="container mx-auto px-4 max-w-5xl flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="mb-4 hidden md:flex items-center gap-4 flex-none">
+        <div className="mb-4 hidden md:flex items-center justify-between gap-4 flex-none">
           <Button
             variant="ghost"
             size="sm"
@@ -619,6 +674,47 @@ function ListingChatPageContent() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t('backToChats')}
           </Button>
+
+          {effectiveParticipantId && (
+            <div className="relative">
+              <button
+                onClick={() => setShowActionMenu(!showActionMenu)}
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={tChats('title')}
+              >
+                <MoreVertical className="h-5 w-5" />
+              </button>
+              {showActionMenu && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setShowActionMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-xl min-w-[180px] py-1">
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false);
+                        setShowHideModal(true);
+                      }}
+                      disabled={hidingChat || deletingChat}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                    >
+                      <EyeOff className="w-4 h-4 text-amber-500" />
+                      {tChats('hideChat')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowActionMenu(false);
+                        setShowDeleteModal(true);
+                      }}
+                      disabled={hidingChat || deletingChat}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {tChats('deleteChat')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Mobile sticky header with context */}
@@ -662,6 +758,44 @@ function ListingChatPageContent() {
                   >
                     <Info className="h-5 w-5" />
                   </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowActionMenu(!showActionMenu)}
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white p-1 rounded-full transition-colors"
+                      title={tChats('title')}
+                    >
+                      <MoreVertical className="h-5 w-5" />
+                    </button>
+                    {showActionMenu && (
+                      <>
+                        <div className="fixed inset-0 z-30" onClick={() => setShowActionMenu(false)} />
+                        <div className="absolute right-0 top-full mt-1 z-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-xl min-w-[180px] py-1">
+                          <button
+                            onClick={() => {
+                              setShowActionMenu(false);
+                              setShowHideModal(true);
+                            }}
+                            disabled={hidingChat || deletingChat}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                          >
+                            <EyeOff className="w-4 h-4 text-amber-500" />
+                            {tChats('hideChat')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowActionMenu(false);
+                              setShowDeleteModal(true);
+                            }}
+                            disabled={hidingChat || deletingChat}
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            {tChats('deleteChat')}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </>
               ) : !isOwner && listing ? (
                 <>
@@ -699,6 +833,44 @@ function ListingChatPageContent() {
                   >
                     <Info className="h-5 w-5" />
                   </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowActionMenu(!showActionMenu)}
+                      className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white p-1 rounded-full transition-colors"
+                      title={tChats('title')}
+                    >
+                      <MoreVertical className="h-5 w-5" />
+                    </button>
+                    {showActionMenu && (
+                      <>
+                        <div className="fixed inset-0 z-30" onClick={() => setShowActionMenu(false)} />
+                        <div className="absolute right-0 top-full mt-1 z-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-xl min-w-[180px] py-1">
+                          <button
+                            onClick={() => {
+                              setShowActionMenu(false);
+                              setShowHideModal(true);
+                            }}
+                            disabled={hidingChat || deletingChat}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                          >
+                            <EyeOff className="w-4 h-4 text-amber-500" />
+                            {tChats('hideChat')}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowActionMenu(false);
+                              setShowDeleteModal(true);
+                            }}
+                            disabled={hidingChat || deletingChat}
+                            className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            {tChats('deleteChat')}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </>
               ) : null}
             </div>
@@ -1783,6 +1955,49 @@ function ListingChatPageContent() {
           onCapture={handleCameraCapture}
         />
 
+        {/* Hide conversation confirmation dialog */}
+        <Dialog open={showHideModal} onOpenChange={setShowHideModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{tChats('hide.confirmTitle')}</DialogTitle>
+              <DialogDescription>{tChats('hide.confirmDescription')}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowHideModal(false)}>
+                {tChats('hide.cancelButton')}
+              </Button>
+              <Button
+                onClick={() => void handleConfirmHide()}
+                className="bg-gold hover:bg-gold-light text-black"
+                disabled={hidingChat}
+              >
+                {tChats('hide.confirmButton')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete conversation confirmation dialog */}
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{tChats('delete.confirmTitle')}</DialogTitle>
+              <DialogDescription>{tChats('delete.confirmDescription')}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
+                {tChats('delete.cancelButton')}
+              </Button>
+              <Button
+                onClick={() => void handleConfirmDelete()}
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={deletingChat}
+              >
+                {tChats('delete.confirmButton')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
       </div>
     </div>
