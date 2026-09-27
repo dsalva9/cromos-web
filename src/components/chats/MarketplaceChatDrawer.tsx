@@ -137,6 +137,20 @@ export function MarketplaceChatDrawer({
     enableRealtime: isOpen,
   });
 
+  // Sync initialParticipantId when passed or changed
+  useEffect(() => {
+    if (initialParticipantId) {
+      setSelectedParticipant(initialParticipantId);
+    }
+  }, [initialParticipantId]);
+
+  // Auto-select if there's only 1 participant and none selected
+  useEffect(() => {
+    if (isOwner && !selectedParticipant && participants.length === 1) {
+      setSelectedParticipant(participants[0].user_id);
+    }
+  }, [isOwner, selectedParticipant, participants]);
+
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Determine effective counterparty ID

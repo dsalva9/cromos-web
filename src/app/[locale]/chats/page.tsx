@@ -638,6 +638,7 @@ function ChatsPageContent() {
 
       {/* Marketplace Chat Drawer */}
       <MarketplaceChatDrawer
+        key={`${activeMpConv?.listingId}-${activeMpConv?.participantId}`}
         isOpen={mpDrawerOpen}
         onClose={closeMpDrawer}
         listingId={activeMpConv?.listingId ?? 0}
