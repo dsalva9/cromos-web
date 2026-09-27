@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -5445,6 +5445,30 @@ export type Database = {
       hide_conversation: {
         Args: { p_counterparty_id: string; p_listing_id: number }
         Returns: undefined
+      }
+      hide_match_conversation: {
+        Args: { p_conversation_id: number }
+        Returns: undefined
+      }
+      delete_match_conversation: {
+        Args: { p_conversation_id: number }
+        Returns: undefined
+      }
+      unhide_match_conversation: {
+        Args: { p_conversation_id: number }
+        Returns: undefined
+      }
+      get_hidden_match_conversations: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          hidden_at: string
+          match_conversation_id: number
+          other_avatar_url: string | null
+          other_nickname: string
+          other_user_id: string
+          template_id: number | null
+          template_title: string | null
+        }[]
       }
       ignore_listing: { Args: { p_listing_id: number }; Returns: undefined }
       ignore_user: { Args: { p_ignored_user_id: string }; Returns: boolean }

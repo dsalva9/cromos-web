@@ -455,7 +455,16 @@
       "cancelButton": "Cancel"
     },
     "listingUnavailable": "Listing unavailable",
-    "userUnavailable": "User unavailable"
+    "userUnavailable": "User unavailable",
+    "delete": {
+      "button": "Delete conversation",
+      "success": "Conversation deleted.",
+      "error": "Error deleting conversation",
+      "confirmTitle": "Delete this conversation?",
+      "confirmDescription": "This conversation will be removed from your list. This action cannot be undone.",
+      "confirmButton": "Delete",
+      "cancelButton": "Cancel"
+    }
   },
   "matchChat": {
     "title": "Chat",
@@ -501,7 +510,9 @@
       "theyOfferTitle": "{nickname} can offer you",
       "youOfferTitle": "You can offer",
       "uncheckAll": "Uncheck all"
-    }
+    },
+    "hideChat": "Hide chat",
+    "deleteChat": "Delete chat"
   },
   "templates": {
     "filters": {
@@ -1863,7 +1874,16 @@
         "loading": "Showing...",
         "success": "Chat restored: {title}",
         "error": "Error restoring chat"
-      }
+      },
+      "tabs": {
+        "marketplace": "Marketplace",
+        "match": "Match"
+      },
+      "matchEmpty": {
+        "title": "No hidden match chats",
+        "description": "Match chats you hide will appear here. You can restore them at any time."
+      },
+      "matchDefaultTitle": "Match Chat"
     },
     "notifications": {
       "matrix": {

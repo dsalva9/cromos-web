@@ -66,7 +66,7 @@ export function ProAvatarRing({
   };
 
   return (
-    <div className={`relative inline-flex rounded-full ring-2 ring-[#FFC000] ${className}`}>
+    <div className={`relative inline-flex shrink-0 self-start w-fit h-fit rounded-full ring-2 ring-[#FFC000] ${className}`}>
       {children}
       {/* PRO crown badge */}
       <span

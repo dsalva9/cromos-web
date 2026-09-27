@@ -484,7 +484,16 @@
       "cancelButton": "Cancelar"
     },
     "listingUnavailable": "Anuncio no disponible",
-    "userUnavailable": "Usuario no disponible"
+    "userUnavailable": "Usuario no disponible",
+    "delete": {
+      "button": "Eliminar conversación",
+      "success": "Conversación eliminada.",
+      "error": "Error al eliminar la conversación",
+      "confirmTitle": "¿Eliminar esta conversación?",
+      "confirmDescription": "Esta conversación se eliminará de tu lista. Esta acción no se puede deshacer.",
+      "confirmButton": "Eliminar",
+      "cancelButton": "Cancelar"
+    }
   },
   "matchChat": {
     "title": "Chat",
@@ -530,7 +539,9 @@
       "theyOfferTitle": "{nickname} te puede ofrecer",
       "youOfferTitle": "Tú puedes ofrecer",
       "uncheckAll": "Deseleccionar todo"
-    }
+    },
+    "hideChat": "Ocultar chat",
+    "deleteChat": "Eliminar chat"
   },
   "templates": {
     "filters": {
@@ -1965,7 +1976,16 @@
         "loading": "Mostrando...",
         "success": "Chat restaurado: {title}",
         "error": "Error al restaurar el chat"
-      }
+      },
+      "tabs": {
+        "marketplace": "Marketplace",
+        "match": "Match"
+      },
+      "matchEmpty": {
+        "title": "No tienes chats de match ocultos",
+        "description": "Los chats de match que ocultes aparecerán aquí. Podrás restaurarlos en cualquier momento."
+      },
+      "matchDefaultTitle": "Chat de Match"
     }
   },
   "myCollection": {

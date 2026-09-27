@@ -239,3 +239,94 @@ export async function getMatchUnreadTotal(
     return 0;
   }
 }
+
+export interface HiddenMatchConversation {
+  match_conversation_id: number;
+  template_id: number | null;
+  template_title: string | null;
+  other_user_id: string;
+  other_nickname: string;
+  other_avatar_url: string | null;
+  hidden_at: string;
+}
+
+export async function hideMatchConversation(
+  supabase: SupabaseClient,
+  conversationId: number
+): Promise<{ error: Error | null }> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)('hide_match_conversation', {
+      p_conversation_id: conversationId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to hideMatchConversation:', error);
+    } else {
+      logger.error('Error hiding match conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to hide conversation') };
+  }
+}
+
+export async function unhideMatchConversation(
+  supabase: SupabaseClient,
+  conversationId: number
+): Promise<{ error: Error | null }> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)('unhide_match_conversation', {
+      p_conversation_id: conversationId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to unhideMatchConversation:', error);
+    } else {
+      logger.error('Error unhiding match conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to unhide conversation') };
+  }
+}
+
+export async function deleteMatchConversation(
+  supabase: SupabaseClient,
+  conversationId: number
+): Promise<{ error: Error | null }> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.rpc as any)('delete_match_conversation', {
+      p_conversation_id: conversationId,
+    });
+    if (error) throw error;
+    return { error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to deleteMatchConversation:', error);
+    } else {
+      logger.error('Error deleting match conversation:', error);
+    }
+    return { error: error instanceof Error ? error : new Error('Failed to delete conversation') };
+  }
+}
+
+export async function getHiddenMatchConversations(
+  supabase: SupabaseClient
+): Promise<{ data: HiddenMatchConversation[]; error: Error | null }> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)('get_hidden_match_conversations');
+    if (error) throw error;
+    return { data: (data || []) as HiddenMatchConversation[], error: null };
+  } catch (error) {
+    if (isAuthError(error)) {
+      logger.warnLocal('Unauthenticated request to getHiddenMatchConversations:', error);
+    } else {
+      logger.error('Error fetching hidden match conversations:', error);
+    }
+    return { data: [], error: error instanceof Error ? error : new Error('Failed to fetch hidden match conversations') };
+  }
+}

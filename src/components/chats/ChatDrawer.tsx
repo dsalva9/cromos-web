@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useMemo, Fragment } from 'react';
-import { X, Info, ArrowLeft, MoreVertical, Flag, Ban, Star } from 'lucide-react';
+import { X, Info, ArrowLeft, MoreVertical, Flag, Ban, Star, EyeOff, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { useMatchChat } from '@/hooks/chats/useMatchChat';
@@ -12,6 +12,7 @@ import { ChatDateSeparator } from './ChatDateSeparator';
 import { MatchDetailDrawer } from '@/components/trades/MatchDetailDrawer';
 import { UserRatingDialog } from '@/components/marketplace/UserRatingDialog';
 import { sendMatchMessage } from '@/lib/supabase/matches/chat';
+import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { cn } from '@/lib/utils';
 import { isSameDay } from '@/lib/chatDate';
 import { useTranslations, useLocale } from 'next-intl';
@@ -39,6 +40,9 @@ interface ChatDrawerProps {
   youHaveCount?: number;
   distanceKm?: number | null;
   otherUserIsDeleted?: boolean;
+  otherIsPro?: boolean;
+  onHide?: () => void;
+  onDelete?: () => void;
 }
 
 export function ChatDrawer({
@@ -54,6 +58,9 @@ export function ChatDrawer({
   youHaveCount,
   distanceKm,
   otherUserIsDeleted,
+  otherIsPro,
+  onHide,
+  onDelete,
 }: ChatDrawerProps) {
   const t = useTranslations('matchChat');
   const locale = useLocale();
@@ -221,28 +228,35 @@ export function ChatDrawer({
           </button>
 
           {/* Avatar */}
-          <div className="w-9 h-9 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
-            {otherAvatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={otherAvatarUrl} alt={otherNickname} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-sm font-bold text-gold">
-                {otherNickname.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
+          <ProAvatarRing isPro={!!otherIsPro && !otherUserIsDeleted} size="sm">
+            <div className="w-9 h-9 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {otherAvatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={otherAvatarUrl} alt={otherNickname} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-gold">
+                  {otherNickname.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+          </ProAvatarRing>
 
           {/* Name + collection — name links to profile */}
           <div className="flex-1 min-w-0">
-            {otherUserId && !otherUserIsDeleted ? (
-              <Link href={`/users/${otherUserId}`} className="font-bold text-gray-900 dark:text-white truncate text-sm block hover:text-gold transition-colors">
-                {otherNickname}
-              </Link>
-            ) : (
-              <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
-                {otherNickname}
-              </p>
-            )}
+            <div className="flex items-center gap-1.5">
+              {otherUserId && !otherUserIsDeleted ? (
+                <Link href={`/users/${otherUserId}`} className="font-bold text-gray-900 dark:text-white truncate text-sm hover:text-gold transition-colors">
+                  {otherNickname}
+                </Link>
+              ) : (
+                <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                  {otherNickname}
+                </p>
+              )}
+              {otherIsPro && !otherUserIsDeleted && (
+                <ProBadge size="sm" />
+              )}
+            </div>
             {collectionTitle && (
               <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {collectionTitle}
@@ -275,7 +289,7 @@ export function ChatDrawer({
             </button>
           )}
 
-          {/* More menu (block/report) */}
+          {/* More menu (block/report/hide/delete) */}
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
@@ -287,6 +301,30 @@ export function ChatDrawer({
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
                 <div className="absolute right-0 top-full mt-1 z-20 bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl min-w-[180px] py-1">
+                  {onHide && (
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        onHide();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+                    >
+                      <EyeOff className="w-4 h-4 text-amber-500" />
+                      {t('hideChat')}
+                    </button>
+                  )}
+                  {onDelete && (
+                    <button
+                      onClick={() => {
+                        setShowMenu(false);
+                        onDelete();
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      {t('deleteChat')}
+                    </button>
+                  )}
                   <button
                     onClick={() => {
                       setShowMenu(false);

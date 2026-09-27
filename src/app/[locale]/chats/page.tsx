@@ -6,13 +6,13 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { MessageCircle, Lightbulb, Sparkles, EyeOff } from 'lucide-react';
+import { MessageCircle, Lightbulb, Sparkles, EyeOff, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
 import { ChatDrawer } from '@/components/chats/ChatDrawer';
 import { useMatchConversations } from '@/hooks/chats/useMatchConversations';
-import { MatchConversation } from '@/lib/supabase/matches/chat';
+import { MatchConversation, hideMatchConversation, deleteMatchConversation } from '@/lib/supabase/matches/chat';
 import { ProBadge, ProAvatarRing } from '@/components/ui/ProBadge';
 import { logger } from '@/lib/logger';
 import { useTranslations } from 'next-intl';
@@ -80,6 +80,7 @@ function ChatsPageContent() {
     templateId: number | null;
     otherUserId: string;
     otherUserIsDeleted?: boolean;
+    otherIsPro?: boolean;
   } | null>(null);
 
   // Fetch marketplace conversations
@@ -101,8 +102,14 @@ function ChatsPageContent() {
     void fetchConversations();
   }, [user, supabase]);
 
-  // State for hide confirmation dialog
+  // State for hide confirmation dialog (marketplace)
   const [hideConfirmConv, setHideConfirmConv] = useState<Conversation | null>(null);
+
+  // State for hide & delete confirmation dialogs (match)
+  const [hidingMatchId, setHidingMatchId] = useState<number | null>(null);
+  const [deletingMatchId, setDeletingMatchId] = useState<number | null>(null);
+  const [hideConfirmMatchConv, setHideConfirmMatchConv] = useState<MatchConversation | null>(null);
+  const [deleteConfirmMatchConv, setDeleteConfirmMatchConv] = useState<MatchConversation | null>(null);
 
   // Hide a marketplace conversation (called after confirmation)
   const confirmHideConversation = useCallback(async () => {
@@ -131,6 +138,44 @@ function ChatsPageContent() {
     }
   }, [hideConfirmConv, supabase, t]);
 
+  // Hide a match conversation (called after confirmation)
+  const confirmHideMatchConversation = useCallback(async () => {
+    const conv = hideConfirmMatchConv;
+    if (!conv) return;
+    setHidingMatchId(conv.id);
+    setHideConfirmMatchConv(null);
+    try {
+      const { error } = await hideMatchConversation(supabase, conv.id);
+      if (error) throw error;
+      void matchConvs.refresh({ silent: true });
+      toast.success(t('hide.success'));
+    } catch (err) {
+      logger.error('Error hiding match conversation:', err);
+      toast.error(t('hide.error'));
+    } finally {
+      setHidingMatchId(null);
+    }
+  }, [hideConfirmMatchConv, supabase, matchConvs, t]);
+
+  // Delete a match conversation (called after confirmation)
+  const confirmDeleteMatchConversation = useCallback(async () => {
+    const conv = deleteConfirmMatchConv;
+    if (!conv) return;
+    setDeletingMatchId(conv.id);
+    setDeleteConfirmMatchConv(null);
+    try {
+      const { error } = await deleteMatchConversation(supabase, conv.id);
+      if (error) throw error;
+      void matchConvs.refresh({ silent: true });
+      toast.success(t('delete.success'));
+    } catch (err) {
+      logger.error('Error deleting match conversation:', err);
+      toast.error(t('delete.error'));
+    } finally {
+      setDeletingMatchId(null);
+    }
+  }, [deleteConfirmMatchConv, supabase, matchConvs, t]);
+
   // Open match chat drawer
   const openMatchChat = useCallback((conv: MatchConversation) => {
     setActiveMatchConv({
@@ -141,6 +186,7 @@ function ChatsPageContent() {
       templateId: conv.template_id,
       otherUserId: conv.other_user_id,
       otherUserIsDeleted: conv.other_user_is_deleted,
+      otherIsPro: conv.other_is_pro,
     });
     setDrawerOpen(true);
   }, []);
@@ -367,14 +413,14 @@ function ChatsPageContent() {
             ) : (
               <div className="space-y-3">
                 {matchConvs.conversations.map((conv) => (
-                  <button
+                  <div
                     key={conv.id}
-                    onClick={() => openMatchChat(conv)}
-                    className="w-full text-left"
+                    className="relative block"
                   >
                     <ModernCard
+                      onClick={() => openMatchChat(conv)}
                       className={cn(
-                        "hover:border-gold transition-colors cursor-pointer",
+                        "hover:border-gold transition-colors cursor-pointer relative group",
                         conv.other_user_is_deleted && "opacity-85"
                       )}
                       style={conv.other_is_pro && !conv.other_user_is_deleted ? {
@@ -389,26 +435,54 @@ function ChatsPageContent() {
                       } : undefined}
                     >
                       <ModernCardContent className="p-4">
-                        <div className="flex gap-3">
+                        {/* Actions: Hide and Delete */}
+                        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setHideConfirmMatchConv(conv);
+                            }}
+                            disabled={hidingMatchId === conv.id || deletingMatchId === conv.id}
+                            className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/30 dark:hover:text-amber-400 transition-all duration-200"
+                            title={t('hide.button')}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeleteConfirmMatchConv(conv);
+                            }}
+                            disabled={hidingMatchId === conv.id || deletingMatchId === conv.id}
+                            className="p-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 hover:text-red-500 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all duration-200"
+                            title={t('delete.button')}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-start gap-3">
                           {/* Avatar */}
-                          <ProAvatarRing isPro={!!conv.other_is_pro && !conv.other_user_is_deleted} size="md">
-                          <div className={cn(
-                            "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
-                            conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
-                              : "bg-gold/20 border-gold"
-                          )}>
-                            {conv.other_avatar_url ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={conv.other_avatar_url} alt={conv.other_nickname} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className={cn("text-lg font-bold", conv.other_user_is_deleted ? "text-gray-400" : "text-gold")}>
-                                {conv.other_nickname.charAt(0).toUpperCase()}
-                              </span>
-                            )}
-                          </div>
+                          <ProAvatarRing isPro={!!conv.other_is_pro && !conv.other_user_is_deleted} size="md" className="shrink-0">
+                            <div className={cn(
+                              "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
+                              conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                                : "bg-gold/20 border-gold"
+                            )}>
+                              {conv.other_avatar_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={conv.other_avatar_url} alt={conv.other_nickname} className="w-full h-full object-cover" />
+                              ) : (
+                                <span className={cn("text-lg font-bold", conv.other_user_is_deleted ? "text-gray-400" : "text-gold")}>
+                                  {conv.other_nickname.charAt(0).toUpperCase()}
+                                </span>
+                              )}
+                            </div>
                           </ProAvatarRing>
 
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 pr-16">
                             <div className="flex items-start justify-between gap-2 mb-0.5">
                               <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
                                 {conv.other_user_is_deleted ? (
@@ -461,7 +535,7 @@ function ChatsPageContent() {
                         </div>
                       </ModernCardContent>
                     </ModernCard>
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -480,9 +554,28 @@ function ChatsPageContent() {
         templateId={activeMatchConv?.templateId}
         otherUserId={activeMatchConv?.otherUserId}
         otherUserIsDeleted={activeMatchConv?.otherUserIsDeleted}
+        otherIsPro={activeMatchConv?.otherIsPro}
+        onHide={() => {
+          if (activeMatchConv) {
+            const conv = matchConvs.conversations.find(c => c.id === activeMatchConv.id);
+            if (conv) {
+              setDrawerOpen(false);
+              setHideConfirmMatchConv(conv);
+            }
+          }
+        }}
+        onDelete={() => {
+          if (activeMatchConv) {
+            const conv = matchConvs.conversations.find(c => c.id === activeMatchConv.id);
+            if (conv) {
+              setDrawerOpen(false);
+              setDeleteConfirmMatchConv(conv);
+            }
+          }
+        }}
       />
 
-      {/* Hide conversation confirmation dialog */}
+      {/* Hide marketplace conversation confirmation dialog */}
       <Dialog open={!!hideConfirmConv} onOpenChange={(open) => !open && setHideConfirmConv(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -498,6 +591,48 @@ function ChatsPageContent() {
               className="bg-gold hover:bg-gold-light text-black"
             >
               {t('hide.confirmButton')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Hide match conversation confirmation dialog */}
+      <Dialog open={!!hideConfirmMatchConv} onOpenChange={(open) => !open && setHideConfirmMatchConv(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('hide.confirmTitle')}</DialogTitle>
+            <DialogDescription>{t('hide.confirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setHideConfirmMatchConv(null)}>
+              {t('hide.cancelButton')}
+            </Button>
+            <Button
+              onClick={() => void confirmHideMatchConversation()}
+              className="bg-gold hover:bg-gold-light text-black"
+            >
+              {t('hide.confirmButton')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete match conversation confirmation dialog */}
+      <Dialog open={!!deleteConfirmMatchConv} onOpenChange={(open) => !open && setDeleteConfirmMatchConv(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('delete.confirmTitle')}</DialogTitle>
+            <DialogDescription>{t('delete.confirmDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setDeleteConfirmMatchConv(null)}>
+              {t('delete.cancelButton')}
+            </Button>
+            <Button
+              onClick={() => void confirmDeleteMatchConversation()}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {t('delete.confirmButton')}
             </Button>
           </DialogFooter>
         </DialogContent>
