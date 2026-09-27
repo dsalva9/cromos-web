@@ -750,7 +750,7 @@ export function MarketplaceChatDrawer({
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
                       >
                         <EyeOff className="w-4 h-4 text-amber-500" />
-                        {t_chats('hideChat')}
+                        {t_match('hideChat')}
                       </button>
 
                       {/* Delete conversation */}
@@ -762,7 +762,7 @@ export function MarketplaceChatDrawer({
                         className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
-                        {t_chats('deleteChat')}
+                        {t_match('deleteChat')}
                       </button>
 
                       {/* Report user */}
@@ -1149,10 +1149,10 @@ export function MarketplaceChatDrawer({
             <DialogHeader>
               <DialogTitle className="text-gray-900 dark:text-white flex items-center gap-2">
                 <span className="text-xl">📬</span>
-                {t_tc('manualModalTitle')}
+                {t_tc('manualButton')}
               </DialogTitle>
               <DialogDescription className="text-gray-600 dark:text-gray-400">
-                {t_tc('manualModalDesc', { nickname: counterpartyNickname })}
+                {t_tc('bannerTitle', { nickname: counterpartyNickname })}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
@@ -1213,10 +1213,10 @@ export function MarketplaceChatDrawer({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
               <EyeOff className="w-5 h-5 text-amber-500" />
-              {t_chats('hide.modalTitle')}
+              {t_chats('hide.confirmTitle')}
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-400">
-              {t_chats('hide.modalDescription')}
+              {t_chats('hide.confirmDescription')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:justify-end">
@@ -1225,14 +1225,14 @@ export function MarketplaceChatDrawer({
               onClick={() => setShowHideModal(false)}
               disabled={hidingChat}
             >
-              {t_chats('hide.cancel')}
+              {t_chats('hide.cancelButton')}
             </Button>
             <Button
               className="bg-amber-600 hover:bg-amber-700 text-white"
               onClick={handleConfirmHide}
               disabled={hidingChat}
             >
-              {hidingChat ? t_chats('hide.loading') : t_chats('hide.confirm')}
+              {hidingChat ? t('loading') : t_chats('hide.confirmButton')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1244,10 +1244,10 @@ export function MarketplaceChatDrawer({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
               <Trash2 className="w-5 h-5" />
-              {t_chats('delete.modalTitle')}
+              {t_chats('delete.confirmTitle')}
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-400">
-              {t_chats('delete.modalDescription')}
+              {t_chats('delete.confirmDescription')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:justify-end">
@@ -1256,14 +1256,14 @@ export function MarketplaceChatDrawer({
               onClick={() => setShowDeleteModal(false)}
               disabled={deletingChat}
             >
-              {t_chats('delete.cancel')}
+              {t_chats('delete.cancelButton')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleConfirmDelete}
               disabled={deletingChat}
             >
-              {deletingChat ? t_chats('delete.loading') : t_chats('delete.confirm')}
+              {deletingChat ? t('loading') : t_chats('delete.confirmButton')}
             </Button>
           </DialogFooter>
         </DialogContent>
