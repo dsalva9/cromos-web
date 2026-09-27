@@ -37,11 +37,13 @@ import {
   Ban,
   User as UserIcon,
   Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { UserRatingDetailModal } from './UserRatingDetailModal';
+import { AdminUserDirectoryModal } from './AdminUserDirectoryModal';
 import { SendEmailModal } from './SendEmailModal';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
@@ -80,6 +82,7 @@ export default function UserRatingsTab() {
   // Modals state
   const [inspectUser, setInspectUser] = useState<RatedUser | null>(null);
   const [emailUser, setEmailUser] = useState<{ user_id: string; email: string; nickname: string } | null>(null);
+  const [selectedDirectoryUserId, setSelectedDirectoryUserId] = useState<string | null>(null);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -613,7 +616,12 @@ export default function UserRatingsTab() {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         {/* User Identity */}
                         <div className="flex items-center gap-3 min-w-0">
-                          <Link href={`/users/${u.user_id}`}>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedDirectoryUserId(u.user_id)}
+                            className="focus:outline-none cursor-pointer flex-shrink-0"
+                            title="Click to view full user profile, reports & actions"
+                          >
                             {avatar ? (
                               <Image
                                 src={avatar}
@@ -631,15 +639,18 @@ export default function UserRatingsTab() {
                                 <UserIcon className="h-6 w-6 text-black" />
                               </div>
                             )}
-                          </Link>
+                          </button>
 
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <Link href={`/users/${u.user_id}`}>
-                                <h4 className="font-bold text-white text-base hover:text-gold transition-colors truncate">
-                                  {u.nickname}
-                                </h4>
-                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedDirectoryUserId(u.user_id)}
+                                className="font-bold text-white text-base hover:text-gold transition-colors truncate text-left cursor-pointer"
+                                title="Click to open user directory modal"
+                              >
+                                {u.nickname}
+                              </button>
                               {u.is_admin && (
                                 <Badge className="bg-red-600 text-white text-[10px]">Admin</Badge>
                               )}
@@ -653,6 +664,17 @@ export default function UserRatingsTab() {
                               )}
                               {u.is_suspended && (
                                 <Badge className="bg-gray-600 text-white text-[10px]">Suspended</Badge>
+                              )}
+                              {u.reports_received_count > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedDirectoryUserId(u.user_id)}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/80 text-red-400 border border-red-600 hover:bg-red-900/80 transition-colors cursor-pointer"
+                                  title="Click to view reports, text & cause"
+                                >
+                                  <AlertTriangle className="h-3 w-3" />
+                                  {u.reports_received_count} {u.reports_received_count === 1 ? 'Report' : 'Reports'}
+                                </button>
                               )}
                               {u.country_code && (
                                 <span className="text-xs text-gray-400 font-mono uppercase bg-gray-800 px-1.5 py-0.5 rounded border border-gray-700">
@@ -690,6 +712,19 @@ export default function UserRatingsTab() {
                             <div>
                               <span className="text-gray-400">Given: </span>
                               <span className="text-white font-bold">{u.ratings_given_count}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Reports: </span>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedDirectoryUserId(u.user_id)}
+                                className={`font-bold hover:underline cursor-pointer ${
+                                  u.reports_received_count > 0 ? 'text-red-400' : 'text-white'
+                                }`}
+                                title="Click to view reports, text & cause"
+                              >
+                                {u.reports_received_count}
+                              </button>
                             </div>
                             {u.latest_rating_at && (
                               <div className="text-[10px] text-gray-500">
@@ -878,7 +913,12 @@ export default function UserRatingsTab() {
                       <div className="flex items-center gap-2 flex-wrap">
                         {/* Rater */}
                         <div className="flex items-center gap-2">
-                          <Link href={`/users/${r.rater_id}`} className="flex items-center gap-1.5 font-bold text-white hover:text-gold text-sm">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedDirectoryUserId(r.rater_id)}
+                            className="flex items-center gap-1.5 font-bold text-white hover:text-gold text-sm cursor-pointer"
+                            title="Open user directory modal"
+                          >
                             {raterAvatar ? (
                               <Image src={raterAvatar} alt={r.rater_nickname} width={24} height={24} className="rounded-full border border-black" />
                             ) : (
@@ -887,13 +927,18 @@ export default function UserRatingsTab() {
                               </div>
                             )}
                             <span>{r.rater_nickname}</span>
-                          </Link>
+                          </button>
                           <span className="text-xs text-gray-400">rated</span>
                         </div>
 
                         {/* Rated User */}
                         <div className="flex items-center gap-2">
-                          <Link href={`/users/${r.rated_id}`} className="flex items-center gap-1.5 font-bold text-white hover:text-gold text-sm">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedDirectoryUserId(r.rated_id)}
+                            className="flex items-center gap-1.5 font-bold text-white hover:text-gold text-sm cursor-pointer"
+                            title="Open user directory modal"
+                          >
                             {ratedAvatar ? (
                               <Image src={ratedAvatar} alt={r.rated_nickname} width={24} height={24} className="rounded-full border border-black" />
                             ) : (
@@ -902,7 +947,7 @@ export default function UserRatingsTab() {
                               </div>
                             )}
                             <span>{r.rated_nickname}</span>
-                          </Link>
+                          </button>
                         </div>
                       </div>
 
@@ -965,6 +1010,14 @@ export default function UserRatingsTab() {
         user={emailUser}
         open={!!emailUser}
         onClose={() => setEmailUser(null)}
+      />
+
+      {/* Admin User Directory & Moderation Modal */}
+      <AdminUserDirectoryModal
+        userId={selectedDirectoryUserId}
+        open={!!selectedDirectoryUserId}
+        onClose={() => setSelectedDirectoryUserId(null)}
+        onUserUpdated={() => refetchUsers()}
       />
     </div>
   );

@@ -29,6 +29,7 @@ export interface RatedUser {
   rating_avg: number;
   rating_count: number;
   ratings_given_count: number;
+  reports_received_count: number;
   latest_rating_at: string | null;
   is_patron: boolean;
   is_admin: boolean;
@@ -37,6 +38,44 @@ export interface RatedUser {
   flagged_reason: string | null;
   created_at: string;
   total_filtered_count: number;
+}
+
+export interface UserReportItem {
+  id?: number;
+  report_id?: number;
+  reason: string;
+  description: string | null;
+  status: string;
+  created_at: string;
+  reporter_id: string;
+  reporter_nickname: string;
+}
+
+export interface UserFullInfo {
+  user_id: string;
+  email: string;
+  nickname: string;
+  avatar_url: string | null;
+  country_code: string;
+  created_at: string;
+  is_admin: boolean;
+  is_patron: boolean;
+  is_suspended: boolean;
+  is_pending_deletion: boolean;
+  deletion_scheduled_for: string | null;
+  is_flagged: boolean;
+  flagged_at: string | null;
+  flagged_reason: string | null;
+  flagged_source_profile_id: string | null;
+  rating_avg: number;
+  rating_count: number;
+  ratings_given_count: number;
+  active_listings_count: number;
+  messages_sent: number;
+  messages_received: number;
+  albums_count: number;
+  reports_received_count: number;
+  reports: UserReportItem[];
 }
 
 export interface RecentRating {
@@ -179,6 +218,38 @@ export function useAdminRatings(
     }
   }, [supabase, recentFilter]);
 
+  // Fetch full user info including stats, profile and reports
+  const fetchUserFullInfo = useCallback(async (userId: string) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase.rpc as any)('admin_get_user_full_info', {
+        p_user_id: userId,
+      });
+
+      if (rpcError) throw rpcError;
+      return data as UserFullInfo;
+    } catch (err) {
+      logger.error('Error fetching user full info:', err);
+      throw err;
+    }
+  }, [supabase]);
+
+  // Fetch reports for a specific user
+  const fetchUserReports = useCallback(async (userId: string) => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase.rpc as any)('admin_get_user_reports', {
+        p_user_id: userId,
+      });
+
+      if (rpcError) throw rpcError;
+      return (data as UserReportItem[]) || [];
+    } catch (err) {
+      logger.error('Error fetching user reports:', err);
+      throw err;
+    }
+  }, [supabase]);
+
   // Fetch detailed ratings for a specific user (modal)
   const fetchUserDetails = useCallback(async (userId: string, direction: 'received' | 'given' = 'received') => {
     try {
@@ -246,6 +317,8 @@ export function useAdminRatings(
     refetchUsers: fetchUsers,
     refetchRecent: fetchRecentRatings,
     fetchUserDetails,
+    fetchUserFullInfo,
+    fetchUserReports,
     deleteRating,
   };
 }

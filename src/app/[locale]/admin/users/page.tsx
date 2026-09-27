@@ -22,6 +22,8 @@ import {
   Shield,
   Star,
   Users as UsersIcon,
+  Clock,
+  ExternalLink,
 } from 'lucide-react';
 import { useSuspendUser } from '@/hooks/admin/useSuspendUser';
 import { toast } from 'sonner';
@@ -30,6 +32,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { resolveAvatarUrl } from '@/lib/profile/resolveAvatarUrl';
 import { SendEmailModal } from '@/components/admin/SendEmailModal';
+import { AdminUserDirectoryModal } from '@/components/admin/AdminUserDirectoryModal';
+import { UserReportItem } from '@/hooks/admin/useAdminRatings';
 import UserRatingsTab from '@/components/admin/UserRatingsTab';
 
 function UserSearchContent() {
@@ -42,6 +46,73 @@ function UserSearchContent() {
   const { suspendUser, unsuspendUser, loading: actionLoading } = useSuspendUser();
   const [emailUser, setEmailUser] = useState<{ user_id: string; email: string; nickname: string } | null>(null);
   const [togglingPatronId, setTogglingPatronId] = useState<string | null>(null);
+
+  // User details modal & reports inspector state
+  const [selectedDirectoryUserId, setSelectedDirectoryUserId] = useState<string | null>(null);
+  const [expandedReports, setExpandedReports] = useState<Record<string, boolean>>({});
+  const [userReports, setUserReports] = useState<Record<string, UserReportItem[]>>({});
+  const [loadingReports, setLoadingReports] = useState<Record<string, boolean>>({});
+
+  const handleToggleUserReports = async (userId: string) => {
+    const isCurrentlyExpanded = !!expandedReports[userId];
+    if (isCurrentlyExpanded) {
+      setExpandedReports((prev) => ({ ...prev, [userId]: false }));
+      return;
+    }
+
+    setExpandedReports((prev) => ({ ...prev, [userId]: true }));
+
+    // Fetch if not already fetched
+    if (!userReports[userId]) {
+      setLoadingReports((prev) => ({ ...prev, [userId]: true }));
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error: rpcErr } = await (supabase.rpc as any)('admin_get_user_reports', {
+          p_user_id: userId,
+        });
+        if (rpcErr) throw rpcErr;
+        setUserReports((prev) => ({ ...prev, [userId]: (data as UserReportItem[]) || [] }));
+      } catch {
+        toast.error('Failed to load user reports');
+      } finally {
+        setLoadingReports((prev) => ({ ...prev, [userId]: false }));
+      }
+    }
+  };
+
+  const getReasonLabel = (reason: string) => {
+    switch (reason) {
+      case 'harassment':
+        return 'Harassment / Acoso';
+      case 'offensive_language':
+        return 'Offensive Language / Lenguaje Ofensivo';
+      case 'spam':
+        return 'Spam';
+      case 'misleading_information':
+        return 'Misleading / Engaño';
+      case 'fake_listing':
+        return 'Fake Listing / Anuncio Falso';
+      case 'inappropriate_content':
+        return 'Inappropriate Content';
+      case 'copyright_violation':
+        return 'Copyright Violation';
+      default:
+        return reason.replace(/_/g, ' ');
+    }
+  };
+
+  const getStatusBadge = (reportStatus: string) => {
+    switch (reportStatus) {
+      case 'pending':
+        return <Badge className="bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 text-[10px]">Pending</Badge>;
+      case 'resolved':
+        return <Badge className="bg-green-500/20 text-green-300 border border-green-500/40 text-[10px]">Resolved</Badge>;
+      case 'dismissed':
+        return <Badge className="bg-gray-500/20 text-gray-300 border border-gray-500/40 text-[10px]">Dismissed</Badge>;
+      default:
+        return <Badge variant="outline" className="text-[10px]">{reportStatus}</Badge>;
+    }
+  };
 
   const handleTogglePatron = async (userId: string, currentStatus: boolean, nickname: string) => {
     const actionText = currentStatus ? 'Revoke' : 'Grant';
@@ -222,17 +293,29 @@ function UserSearchContent() {
                   {(() => {
                     const avatarUrl = resolveAvatarUrl(user.avatar_url, supabase);
                     return avatarUrl ? (
-                      <Image
-                        src={avatarUrl}
-                        alt={user.nickname}
-                        width={64}
-                        height={64}
-                        className="rounded-full border-2 border-black"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDirectoryUserId(user.user_id)}
+                        className="focus:outline-none cursor-pointer"
+                        title="Click to view full user modal & reports"
+                      >
+                        <Image
+                          src={avatarUrl}
+                          alt={user.nickname}
+                          width={64}
+                          height={64}
+                          className="rounded-full border-2 border-black"
+                        />
+                      </button>
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-gold border-2 border-black flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDirectoryUserId(user.user_id)}
+                        className="w-16 h-16 rounded-full bg-gold border-2 border-black flex items-center justify-center cursor-pointer"
+                        title="Click to view full user modal & reports"
+                      >
                         <User className="h-8 w-8 text-black" />
-                      </div>
+                      </button>
                     );
                   })()}
                 </div>
@@ -243,10 +326,18 @@ function UserSearchContent() {
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <Link href={`/users/${user.user_id}`}>
-                          <h3 className="font-bold text-white text-lg hover:text-gold transition-colors">
-                            {user.nickname}
-                          </h3>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDirectoryUserId(user.user_id)}
+                          className="font-bold text-white text-lg hover:text-gold transition-colors text-left cursor-pointer"
+                          title="Click to view full user modal & reports"
+                        >
+                          {user.nickname}
+                        </button>
+                        <Link href={`/users/${user.user_id}`} target="_blank" title="View public profile">
+                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-gold hover:text-yellow-400">
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </Button>
                         </Link>
                         {user.is_admin && (
                           <Badge className="bg-red-600 text-white">Admin</Badge>
@@ -293,7 +384,22 @@ function UserSearchContent() {
                     </div>
                     <div>
                       <p className="text-gray-400">Reports Received</p>
-                      <p className="text-white font-bold">{user.reports_received_count}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (user.reports_received_count > 0) {
+                            handleToggleUserReports(user.user_id);
+                          } else {
+                            setSelectedDirectoryUserId(user.user_id);
+                          }
+                        }}
+                        className={`font-bold hover:underline cursor-pointer ${
+                          user.reports_received_count > 0 ? 'text-red-400' : 'text-white'
+                        }`}
+                        title="Click to view reports, text & cause"
+                      >
+                        {user.reports_received_count}
+                      </button>
                     </div>
                     <div>
                       <p className="text-gray-400">Country</p>
@@ -309,6 +415,15 @@ function UserSearchContent() {
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2 pt-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedDirectoryUserId(user.user_id)}
+                      className="border-gray-700 text-gray-200 hover:bg-[#374151]"
+                    >
+                      User Details Modal
+                    </Button>
+
                     <Link href={`/users/${user.user_id}`}>
                       <Button size="sm" variant="outline">
                         View Profile
@@ -381,11 +496,84 @@ function UserSearchContent() {
                     )}
                   </div>
 
-                  {/* Warning if reports > 0 */}
+                  {/* Reports Section with Text and Cause */}
                   {user.reports_received_count > 0 && (
-                    <div className="flex items-center gap-2 text-sm text-orange-400 pt-2">
-                      <AlertTriangle className="h-4 w-4" />
-                      <span>This user has received {user.reports_received_count} report(s)</span>
+                    <div className="pt-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-red-950/30 border border-red-700/80 rounded-lg">
+                        <div className="flex items-center gap-2 text-sm text-red-300 font-semibold">
+                          <AlertTriangle className="h-4 w-4 text-red-400" />
+                          <span>This user has received {user.reports_received_count} report(s)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleToggleUserReports(user.user_id)}
+                            className="h-7 text-xs border-red-600 text-red-300 hover:bg-red-900/40"
+                          >
+                            {expandedReports[user.user_id]
+                              ? 'Hide Report Details'
+                              : `Inspect ${user.reports_received_count} Report(s) (Cause & Text)`}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => setSelectedDirectoryUserId(user.user_id)}
+                            className="h-7 text-xs bg-red-700 hover:bg-red-600 text-white"
+                          >
+                            Open In Modal
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Expanded Report Details */}
+                      {expandedReports[user.user_id] && (
+                        <div className="mt-2 space-y-3 p-4 bg-[#111827] rounded-lg border border-red-800/60">
+                          {loadingReports[user.user_id] ? (
+                            <div className="flex justify-center items-center py-4">
+                              <div className="animate-spin h-5 w-5 border-2 border-gold border-r-transparent rounded-full" />
+                            </div>
+                          ) : !userReports[user.user_id] || userReports[user.user_id].length === 0 ? (
+                            <p className="text-xs text-gray-400 text-center py-2">No detailed report records found.</p>
+                          ) : (
+                            userReports[user.user_id].map((report: UserReportItem, idx: number) => {
+                              const reportId = report.id ?? report.report_id ?? idx;
+                              return (
+                                <div
+                                  key={reportId}
+                                  className="p-3 bg-[#1F2937] rounded-lg border border-gray-700 text-sm space-y-2"
+                                >
+                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                    <div className="flex items-center gap-2">
+                                      <Badge className="bg-red-900/40 text-red-300 border border-red-700 text-xs font-semibold">
+                                        Cause: {getReasonLabel(report.reason)}
+                                      </Badge>
+                                      {getStatusBadge(report.status)}
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                                      <Clock className="h-3 w-3" />
+                                      <span>{new Date(report.created_at).toLocaleString()}</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="p-2.5 bg-[#111827] rounded border border-gray-700 text-sm text-gray-200">
+                                    <p className="text-xs text-gray-400 font-semibold mb-0.5">Report text / description:</p>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-xs">
+                                      {report.description || 'No description provided by reporter.'}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex items-center justify-between text-xs text-gray-400 pt-0.5">
+                                    <span>
+                                      Reporter: <strong className="text-white">{report.reporter_nickname}</strong>
+                                    </span>
+                                    <span className="text-gray-500">Report ID: #{reportId}</span>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -444,6 +632,13 @@ function UserSearchContent() {
         user={emailUser}
         open={!!emailUser}
         onClose={() => setEmailUser(null)}
+      />
+
+      <AdminUserDirectoryModal
+        userId={selectedDirectoryUserId}
+        open={!!selectedDirectoryUserId}
+        onClose={() => setSelectedDirectoryUserId(null)}
+        onUserUpdated={() => refetch()}
       />
     </>
   );
