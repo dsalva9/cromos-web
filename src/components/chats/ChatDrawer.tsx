@@ -42,6 +42,7 @@ interface ChatDrawerProps {
   youHaveCount?: number;
   distanceKm?: number | null;
   otherUserIsDeleted?: boolean;
+  otherUserIsSuspended?: boolean;
   otherIsPro?: boolean;
   onHide?: () => void;
   onDelete?: () => void;
@@ -60,6 +61,7 @@ export function ChatDrawer({
   youHaveCount,
   distanceKm,
   otherUserIsDeleted,
+  otherUserIsSuspended,
   otherIsPro,
   onHide,
   onDelete,
@@ -340,13 +342,21 @@ export function ChatDrawer({
           </button>
 
           {/* Avatar */}
-          <ProAvatarRing isPro={!!otherIsPro && !otherUserIsDeleted} size="sm">
-            <div className="w-9 h-9 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <ProAvatarRing isPro={!!otherIsPro && !otherUserIsDeleted && !otherUserIsSuspended} size="sm">
+            <div className={cn(
+              "w-9 h-9 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
+              otherUserIsDeleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                : otherUserIsSuspended ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
+                : "bg-gold/20 border-gold"
+            )}>
               {otherAvatarUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={otherAvatarUrl} alt={otherNickname} className="w-full h-full object-cover" />
+                <img src={otherAvatarUrl} alt={otherNickname} className={cn("w-full h-full object-cover", otherUserIsSuspended && "opacity-80")} />
               ) : (
-                <span className="text-sm font-bold text-gold">
+                <span className={cn(
+                  "text-sm font-bold",
+                  otherUserIsDeleted ? "text-gray-400" : otherUserIsSuspended ? "text-amber-600 dark:text-amber-400" : "text-gold"
+                )}>
                   {otherNickname.charAt(0).toUpperCase()}
                 </span>
               )}
@@ -355,18 +365,30 @@ export function ChatDrawer({
 
           {/* Name + collection — name links to profile */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              {otherUserId && !otherUserIsDeleted ? (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {otherUserId && !otherUserIsDeleted && !otherUserIsSuspended ? (
                 <Link href={`/users/${otherUserId}`} className="font-bold text-gray-900 dark:text-white truncate text-sm hover:text-gold transition-colors">
                   {otherNickname}
                 </Link>
               ) : (
-                <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                <p className={cn("font-bold text-gray-900 dark:text-white truncate text-sm", (otherUserIsDeleted || otherUserIsSuspended) && "text-gray-500 dark:text-gray-400")}>
                   {otherNickname}
                 </p>
               )}
-              {otherIsPro && !otherUserIsDeleted && (
+              {otherIsPro && !otherUserIsDeleted && !otherUserIsSuspended && (
                 <ProBadge size="sm" />
+              )}
+              {otherUserIsSuspended && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                  <Ban className="h-2.5 w-2.5" />
+                  {t('userSuspended')}
+                </span>
+              )}
+              {otherUserIsDeleted && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                  <Trash2 className="h-2.5 w-2.5" />
+                  {t('userDeleted')}
+                </span>
               )}
             </div>
             {collectionTitle && (
@@ -476,10 +498,20 @@ export function ChatDrawer({
           </button>
         </div>
 
+        {otherUserIsSuspended && (
+          <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/50 flex items-center justify-center gap-1.5 text-center flex-shrink-0">
+            <Ban className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+            <p className="text-xs font-medium text-amber-800 dark:text-amber-300">
+              {t('suspendedBanner')}
+            </p>
+          </div>
+        )}
+
         {otherUserIsDeleted && (
-          <div className="p-2.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
+          <div className="p-2.5 bg-gray-100 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center gap-1.5 text-center flex-shrink-0">
+            <Trash2 className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
             <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
-              {t('userNoLongerAvailable')}
+              {t('deletedBanner')}
             </p>
           </div>
         )}
@@ -593,7 +625,7 @@ export function ChatDrawer({
               )}
 
               {/* Nudge card */}
-              {shouldShowNudge && !nudgeDismissed && !showNudgeForm && (
+              {shouldShowNudge && !nudgeDismissed && !showNudgeForm && !otherUserIsDeleted && !otherUserIsSuspended && (
                 <div className="flex justify-center my-4 w-full">
                   <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[95%] sm:max-w-[85%] text-center space-y-3">
                     <p className="font-bold text-gray-900 dark:text-white">
@@ -695,8 +727,16 @@ export function ChatDrawer({
               : 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
           }}
         >
-          {otherUserIsDeleted ? (
-            <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 text-center">
+          {otherUserIsSuspended ? (
+            <div className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border-t border-amber-200/50 dark:border-amber-800/30 flex items-center justify-center gap-2 text-center">
+              <Ban className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <p className="text-xs text-amber-800 dark:text-amber-300 font-medium">
+                {t('cannotSendToSuspendedUser')}
+              </p>
+            </div>
+          ) : otherUserIsDeleted ? (
+            <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-center">
+              <Trash2 className="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0" />
               <p className="text-xs text-gray-500 dark:text-gray-400 italic">
                 {t('cannotSendToDeletedUser')}
               </p>
@@ -728,7 +768,7 @@ export function ChatDrawer({
           open={showInfo}
           onOpenChange={setShowInfo}
           onSendTradeMessage={async (messages) => {
-            if (!conversationId) return;
+            if (!conversationId || otherUserIsDeleted || otherUserIsSuspended) return;
             for (const text of messages) {
               await sendMatchMessage(supabase, conversationId, text);
             }

@@ -495,9 +495,9 @@ function ChatsPageContent() {
                       onClick={() => openMatchChat(conv)}
                       className={cn(
                         "hover:border-gold transition-colors cursor-pointer relative group",
-                        conv.other_user_is_deleted && "opacity-85"
+                        (conv.other_user_is_deleted || conv.other_user_is_suspended) && "opacity-85"
                       )}
-                      style={conv.other_is_pro && !conv.other_user_is_deleted ? {
+                      style={conv.other_is_pro && !conv.other_user_is_deleted && !conv.other_user_is_suspended ? {
                         borderWidth: '2px',
                         borderColor: '#FFC000',
                         boxShadow: conv.unread_count > 0
@@ -539,17 +539,21 @@ function ChatsPageContent() {
 
                         <div className="flex items-start gap-3">
                           {/* Avatar */}
-                          <ProAvatarRing isPro={!!conv.other_is_pro && !conv.other_user_is_deleted} size="md" className="shrink-0">
+                          <ProAvatarRing isPro={!!conv.other_is_pro && !conv.other_user_is_deleted && !conv.other_user_is_suspended} size="md" className="shrink-0">
                             <div className={cn(
                               "w-12 h-12 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
                               conv.other_user_is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                                : conv.other_user_is_suspended ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
                                 : "bg-gold/20 border-gold"
                             )}>
                               {conv.other_avatar_url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={conv.other_avatar_url} alt={conv.other_nickname} className="w-full h-full object-cover" />
+                                <img src={conv.other_avatar_url} alt={conv.other_nickname} className={cn("w-full h-full object-cover", conv.other_user_is_suspended && "opacity-80")} />
                               ) : (
-                                <span className={cn("text-lg font-bold", conv.other_user_is_deleted ? "text-gray-400" : "text-gold")}>
+                                <span className={cn(
+                                  "text-lg font-bold",
+                                  conv.other_user_is_deleted ? "text-gray-400" : conv.other_user_is_suspended ? "text-amber-600 dark:text-amber-400" : "text-gold"
+                                )}>
                                   {conv.other_nickname.charAt(0).toUpperCase()}
                                 </span>
                               )}
@@ -558,21 +562,28 @@ function ChatsPageContent() {
 
                           <div className="flex-1 min-w-0 pr-16">
                             <div className="flex items-start justify-between gap-2 mb-0.5">
-                              <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5">
-                                {conv.other_user_is_deleted ? (
-                                  <span className="text-gray-500 italic">{t('userUnavailable')}</span>
-                                ) : (
-                                  <span>{conv.other_nickname}</span>
-                                )}
-                                {conv.other_is_pro && !conv.other_user_is_deleted && (
+                              <h3 className="font-bold text-gray-900 dark:text-white truncate flex items-center gap-1.5 flex-wrap">
+                                <span className={cn(
+                                  (conv.other_user_is_deleted || conv.other_user_is_suspended) && "text-gray-500 dark:text-gray-400"
+                                )}>
+                                  {conv.other_nickname}
+                                </span>
+                                {conv.other_is_pro && !conv.other_user_is_deleted && !conv.other_user_is_suspended && (
                                   <ProBadge size="sm" />
                                 )}
-                                {conv.other_is_patron && !conv.other_user_is_deleted && !conv.other_is_pro && (
+                                {conv.other_is_patron && !conv.other_user_is_deleted && !conv.other_user_is_suspended && !conv.other_is_pro && (
                                   <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
                                 )}
+                                {conv.other_user_is_suspended && (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                                    <Ban className="h-2.5 w-2.5" />
+                                    {t('userSuspended')}
+                                  </span>
+                                )}
                                 {conv.other_user_is_deleted && (
-                                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
-                                    {t('userUnavailable')}
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                                    <Trash2 className="h-2.5 w-2.5" />
+                                    {t('userDeleted')}
                                   </span>
                                 )}
                               </h3>
@@ -628,6 +639,7 @@ function ChatsPageContent() {
         templateId={activeMatchConv?.templateId}
         otherUserId={activeMatchConv?.otherUserId}
         otherUserIsDeleted={activeMatchConv?.otherUserIsDeleted}
+        otherUserIsSuspended={activeMatchConv?.otherUserIsSuspended}
         otherIsPro={activeMatchConv?.otherIsPro}
         onHide={() => {
           if (activeMatchConv) {

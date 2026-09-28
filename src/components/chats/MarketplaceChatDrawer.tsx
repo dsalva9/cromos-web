@@ -112,6 +112,7 @@ export function MarketplaceChatDrawer({
   const [counterpartyIsPro, setCounterpartyIsPro] = useState(false);
   const [counterpartyIsPatron, setCounterpartyIsPatron] = useState(false);
   const [counterpartyDeleted, setCounterpartyDeleted] = useState(false);
+  const [counterpartySuspended, setCounterpartySuspended] = useState(false);
 
   // Transactions / reservation state
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
@@ -353,7 +354,10 @@ export function MarketplaceChatDrawer({
         setCounterpartyAvatarUrl(profileData?.avatar_url || null);
         setCounterpartyIsPro(!!profileData?.is_pro);
         setCounterpartyIsPatron(!!profileData?.is_patron);
-        setCounterpartyDeleted(!!(profileData?.is_suspended || profileData?.deleted_at));
+        const isSusp = !!(profileData?.is_suspended && !profileData?.deleted_at);
+        const isDel = !!(profileData?.deleted_at || !profileData);
+        setCounterpartySuspended(isSusp);
+        setCounterpartyDeleted(isDel);
       }
     }
 
@@ -384,6 +388,8 @@ export function MarketplaceChatDrawer({
       if (part) {
         setCounterpartyNickname(part.nickname);
         setCounterpartyAvatarUrl(part.avatar_url);
+        setCounterpartySuspended(!!part.is_suspended);
+        setCounterpartyDeleted(!!part.is_deleted);
       }
 
       const { data: profile } = await supabase
@@ -397,7 +403,12 @@ export function MarketplaceChatDrawer({
         setCounterpartyAvatarUrl(profile.avatar_url || part?.avatar_url || null);
         setCounterpartyIsPro(!!profile.is_pro);
         setCounterpartyIsPatron(!!profile.is_patron);
-        setCounterpartyDeleted(!!(profile.is_suspended || profile.deleted_at));
+        const isSusp = !!(profile.is_suspended && !profile.deleted_at);
+        const isDel = !!profile.deleted_at;
+        setCounterpartySuspended(isSusp);
+        setCounterpartyDeleted(isDel);
+      } else if (!part) {
+        setCounterpartyDeleted(true);
       }
     }
 
@@ -517,6 +528,11 @@ export function MarketplaceChatDrawer({
         return;
       }
 
+      if (counterpartyDeleted || counterpartySuspended) {
+        toast.error(counterpartySuspended ? t('cannotSendToSuspendedUser') : t('cannotSendToDeletedUser'));
+        return;
+      }
+
       if (!isOwner && messages.length === 0 && !tosAccepted) {
         toast.error('Debes aceptar los términos y condiciones antes de enviar un mensaje');
         return;
@@ -526,7 +542,7 @@ export function MarketplaceChatDrawer({
 
       await sendMessage(text, receiverId, file);
     },
-    [sending, uploading, isOwner, messages.length, tosAccepted, selectedParticipant, listingOwner, sendMessage]
+    [sending, uploading, counterpartyDeleted, counterpartySuspended, t, isOwner, messages.length, tosAccepted, selectedParticipant, listingOwner, sendMessage]
   );
 
   // Reserve listing handler
@@ -731,22 +747,47 @@ export function MarketplaceChatDrawer({
                 <button
                   key={participant.user_id}
                   onClick={() => setSelectedParticipant(participant.user_id)}
-                  className="w-full text-left p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gold dark:hover:border-gold hover:bg-gold/5 dark:hover:bg-gold/5 transition-all flex items-center gap-3"
+                  className={cn(
+                    "w-full text-left p-3.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-gold dark:hover:border-gold hover:bg-gold/5 dark:hover:bg-gold/5 transition-all flex items-center gap-3",
+                    (participant.is_suspended || participant.is_deleted) && "opacity-85"
+                  )}
                 >
-                  <div className="w-10 h-10 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
+                    participant.is_deleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                      : participant.is_suspended ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
+                      : "bg-gold/20 border-gold"
+                  )}>
                     {participant.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={participant.avatar_url} alt={participant.nickname} className="w-full h-full object-cover" />
+                      <img src={participant.avatar_url} alt={participant.nickname} className={cn("w-full h-full object-cover", participant.is_suspended && "opacity-80")} />
                     ) : (
-                      <span className="text-sm font-bold text-gold">
+                      <span className={cn(
+                        "text-sm font-bold",
+                        participant.is_deleted ? "text-gray-400" : participant.is_suspended ? "text-amber-600 dark:text-amber-400" : "text-gold"
+                      )}>
                         {participant.nickname.charAt(0).toUpperCase()}
                       </span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-bold text-sm text-gray-900 dark:text-white truncate">
-                        {participant.nickname}
+                      <p className="font-bold text-sm text-gray-900 dark:text-white truncate flex items-center gap-1.5 flex-wrap">
+                        <span className={cn((participant.is_suspended || participant.is_deleted) && "text-gray-500 dark:text-gray-400")}>
+                          {participant.nickname}
+                        </span>
+                        {participant.is_suspended && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                            <Ban className="h-2.5 w-2.5" />
+                            {t_chats('userSuspended')}
+                          </span>
+                        )}
+                        {participant.is_deleted && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                            <Trash2 className="h-2.5 w-2.5" />
+                            {t_chats('userDeleted')}
+                          </span>
+                        )}
                       </p>
                       {participant.unread_count > 0 && (
                         <span className="bg-gold text-black text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
@@ -784,13 +825,21 @@ export function MarketplaceChatDrawer({
               </button>
 
               {/* Avatar */}
-              <ProAvatarRing isPro={counterpartyIsPro && !counterpartyDeleted} size="sm">
-                <div className="w-9 h-9 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <ProAvatarRing isPro={counterpartyIsPro && !counterpartyDeleted && !counterpartySuspended} size="sm">
+                <div className={cn(
+                  "w-9 h-9 rounded-full border-2 flex items-center justify-center flex-shrink-0 overflow-hidden",
+                  counterpartyDeleted ? "bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 opacity-70"
+                    : counterpartySuspended ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700"
+                    : "bg-gold/20 border-gold"
+                )}>
                   {counterpartyAvatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={counterpartyAvatarUrl} alt={counterpartyNickname} className="w-full h-full object-cover" />
+                    <img src={counterpartyAvatarUrl} alt={counterpartyNickname} className={cn("w-full h-full object-cover", counterpartySuspended && "opacity-80")} />
                   ) : (
-                    <span className="text-sm font-bold text-gold">
+                    <span className={cn(
+                      "text-sm font-bold",
+                      counterpartyDeleted ? "text-gray-400" : counterpartySuspended ? "text-amber-600 dark:text-amber-400" : "text-gold"
+                    )}>
                       {counterpartyNickname.charAt(0).toUpperCase()}
                     </span>
                   )}
@@ -799,8 +848,8 @@ export function MarketplaceChatDrawer({
 
               {/* Nickname + Subtitle */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  {effectiveParticipantId && !counterpartyDeleted ? (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {effectiveParticipantId && !counterpartyDeleted && !counterpartySuspended ? (
                     <Link
                       href={`/users/${effectiveParticipantId}`}
                       className="font-bold text-gray-900 dark:text-white truncate text-sm hover:text-gold transition-colors"
@@ -808,14 +857,26 @@ export function MarketplaceChatDrawer({
                       {counterpartyNickname}
                     </Link>
                   ) : (
-                    <p className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                    <p className={cn("font-bold text-gray-900 dark:text-white truncate text-sm", (counterpartyDeleted || counterpartySuspended) && "text-gray-500 dark:text-gray-400")}>
                       {counterpartyNickname}
                     </p>
                   )}
-                  {counterpartyIsPro && !counterpartyDeleted && <ProBadge size="sm" />}
-                  {counterpartyIsPatron && !counterpartyDeleted && !counterpartyIsPro && (
+                  {counterpartyIsPro && !counterpartyDeleted && !counterpartySuspended && <ProBadge size="sm" />}
+                  {counterpartyIsPatron && !counterpartyDeleted && !counterpartySuspended && !counterpartyIsPro && (
                     <span className="inline-flex items-center text-[10px]" title="Patrón">
                       ☕
+                    </span>
+                  )}
+                  {counterpartySuspended && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                      <Ban className="h-2.5 w-2.5" />
+                      {t_chats('userSuspended')}
+                    </span>
+                  )}
+                  {counterpartyDeleted && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                      <Trash2 className="h-2.5 w-2.5" />
+                      {t_chats('userDeleted')}
                     </span>
                   )}
                 </div>
@@ -865,7 +926,7 @@ export function MarketplaceChatDrawer({
                     <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
                     <div className="absolute right-0 top-full mt-1 z-40 bg-white dark:bg-gray-800 border-2 border-black rounded-md shadow-xl min-w-[190px] py-1">
                       {/* Seller reserve / unreserve actions */}
-                      {isOwner && listing?.status === 'active' && !transactionStatus && selectedParticipant && (
+                      {isOwner && listing?.status === 'active' && !transactionStatus && selectedParticipant && !counterpartyDeleted && !counterpartySuspended && (
                         <button
                           onClick={() => {
                             setShowMenu(false);
@@ -959,10 +1020,19 @@ export function MarketplaceChatDrawer({
             </div>
 
             {/* Status Banners */}
+            {counterpartySuspended && (
+              <div className="p-2.5 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/50 flex items-center justify-center gap-1.5 text-center flex-shrink-0">
+                <Ban className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                <p className="text-xs font-medium text-amber-800 dark:text-amber-300">
+                  {t('suspendedBanner')}
+                </p>
+              </div>
+            )}
             {counterpartyDeleted && (
-              <div className="p-2.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center flex-shrink-0">
+              <div className="p-2.5 bg-gray-100 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 flex items-center justify-center gap-1.5 text-center flex-shrink-0">
+                <Trash2 className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 shrink-0" />
                 <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                  {t('userNoLongerAvailable')}
+                  {t('deletedBanner')}
                 </p>
               </div>
             )}
@@ -1000,7 +1070,7 @@ export function MarketplaceChatDrawer({
                   })}
 
                   {/* Confirmation Banner (when pending for current user) */}
-                  {pendingConfirmation && pendingForMe && !listingUnavailable && !counterpartyDeleted && (
+                  {pendingConfirmation && pendingForMe && !listingUnavailable && !counterpartyDeleted && !counterpartySuspended && (
                     <div className="bg-yellow-50 dark:bg-yellow-950/30 border-2 border-gold rounded-lg p-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-yellow-800 dark:text-yellow-200">
                       <div className="flex flex-col sm:flex-row items-center gap-2 flex-1 min-w-0">
                         <span className="text-xl">📬</span>
@@ -1050,7 +1120,7 @@ export function MarketplaceChatDrawer({
                   )}
 
                   {/* Nudge card */}
-                  {shouldShowNudge && !nudgeDismissed && !showNudgeForm && (
+                  {shouldShowNudge && !nudgeDismissed && !showNudgeForm && !listingUnavailable && !counterpartyDeleted && !counterpartySuspended && (
                     <div className="flex justify-center my-4 w-full">
                       <div className="bg-yellow-50/50 dark:bg-yellow-950/20 border-2 border-gold rounded-lg p-4 w-full max-w-[95%] sm:max-w-[85%] text-center space-y-3">
                         <p className="font-bold text-gray-900 dark:text-white">
@@ -1139,7 +1209,7 @@ export function MarketplaceChatDrawer({
             </div>
 
             {/* ---- ToS Acceptance (for buyer before first message) ---- */}
-            {!isOwner && messages.length === 0 && (
+            {!isOwner && messages.length === 0 && !counterpartyDeleted && !counterpartySuspended && (
               <div className="px-4 py-2 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
                 <div className="flex items-center gap-2.5">
                   <Checkbox
@@ -1173,20 +1243,36 @@ export function MarketplaceChatDrawer({
                   : 'calc(var(--ad-band-height, 0px) + max(0.5rem, env(safe-area-inset-bottom, 0px), var(--sab, 0px)))',
               }}
             >
-              <ChatComposer
-                onSend={handleComposerSend}
-                sending={sending}
-                uploading={uploading}
-                disabled={listingUnavailable || counterpartyDeleted}
-                placeholder={t('writeMessage')}
-                showConfirmButton={messages.length >= 4 && !pendingConfirmation}
-                onManualConfirm={() => setShowManualModal(true)}
-                onFocus={() => {
-                  setTimeout(() => {
-                    scrollToBottom('smooth');
-                  }, 200);
-                }}
-              />
+              {counterpartySuspended ? (
+                <div className="p-4 bg-amber-50/50 dark:bg-amber-950/20 border-t border-amber-200/50 dark:border-amber-800/30 flex items-center justify-center gap-2 text-center">
+                  <Ban className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <p className="text-xs text-amber-800 dark:text-amber-300 font-medium">
+                    {t('cannotSendToSuspendedUser')}
+                  </p>
+                </div>
+              ) : counterpartyDeleted ? (
+                <div className="p-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-200 dark:border-gray-700 flex items-center justify-center gap-2 text-center">
+                  <Trash2 className="w-4 h-4 text-gray-500 dark:text-gray-400 shrink-0" />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                    {t('cannotSendToDeletedUser')}
+                  </p>
+                </div>
+              ) : (
+                <ChatComposer
+                  onSend={handleComposerSend}
+                  sending={sending}
+                  uploading={uploading}
+                  disabled={listingUnavailable}
+                  placeholder={t('writeMessage')}
+                  showConfirmButton={messages.length >= 4 && !pendingConfirmation}
+                  onManualConfirm={() => setShowManualModal(true)}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      scrollToBottom('smooth');
+                    }, 200);
+                  }}
+                />
+              )}
             </div>
           </>
         )}
