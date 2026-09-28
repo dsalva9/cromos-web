@@ -4907,7 +4907,9 @@ export type Database = {
         Args: { p_listing_id: number }
         Returns: {
           avatar_url: string
+          is_deleted: boolean
           is_owner: boolean
+          is_suspended: boolean
           last_message: string
           last_message_at: string
           nickname: string
@@ -4977,6 +4979,7 @@ export type Database = {
           other_nickname: string
           other_user_id: string
           other_user_is_deleted: boolean
+          other_user_is_suspended: boolean
           template_id: number
           template_title: string
           unread_count: number
@@ -5358,6 +5361,7 @@ export type Database = {
           counterparty_id: string
           counterparty_is_deleted: boolean
           counterparty_is_pro: boolean
+          counterparty_is_suspended: boolean
           counterparty_nickname: string
           is_seller: boolean
           last_message: string

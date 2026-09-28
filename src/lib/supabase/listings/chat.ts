@@ -25,6 +25,8 @@ const chatParticipantSchema = z.object({
   last_message: z.string().nullable(),
   last_message_at: z.string().nullable(),
   unread_count: z.number(),
+  is_suspended: z.boolean().optional().default(false),
+  is_deleted: z.boolean().optional().default(false),
 });
 
 export type ListingChatMessage = z.infer<typeof listingChatMessageSchema>;

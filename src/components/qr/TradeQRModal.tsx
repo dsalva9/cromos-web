@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import QRCode from 'qrcode';
-import { QrCode, Download, Share2, X } from 'lucide-react';
+import { QrCode, Download, Share2, Copy, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,6 +15,10 @@ import { siteConfig } from '@/config/site';
 import { toast } from '@/lib/toast';
 import { createClient } from '@/lib/supabase/client';
 import { track } from '@vercel/analytics/react';
+import { logger } from '@/lib/logger';
+import { shareContent, getWhatsAppShareUrl, getTelegramShareUrl } from '@/lib/share';
+import { WhatsAppIcon, TelegramIcon } from '@/components/ui/social-icons';
+import { isNative } from '@/lib/platform';
 
 interface TradeQRModalProps {
   open: boolean;
@@ -36,8 +40,19 @@ export function TradeQRModal({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [generating, setGenerating] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [showShareFallback, setShowShareFallback] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const qrUrl = `${siteConfig.url}/match/${userId}/${copyId}?name=${encodeURIComponent(nickname)}&album=${encodeURIComponent(copyTitle)}`;
+
+  // Reset fallback state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setShowShareFallback(false);
+      setCopied(false);
+    }
+  }, [open]);
 
   // ── Analytics: track QR modal open (fire-and-forget) ───────────────────────
   const trackedRef = useRef(false);
@@ -46,6 +61,7 @@ export function TradeQRModal({
       trackedRef.current = true;
       track('trade_qr_generated', { copy_id: String(copyId), copy_title: copyTitle });
       const supabase = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       supabase.from('analytics_events' as any).insert({
         event_name: 'trade_qr_generated',
         user_id: userId,
@@ -68,7 +84,7 @@ export function TradeQRModal({
       });
       setQrDataUrl(canvas.toDataURL('image/png'));
     } catch (err) {
-      console.error('QR generation failed', err);
+      logger.error('QR generation failed', { error: err });
     } finally {
       setGenerating(false);
     }
@@ -92,32 +108,62 @@ export function TradeQRModal({
     link.click();
   }, [qrDataUrl, copyTitle]);
 
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(qrUrl);
+      setCopied(true);
+      toast.success('Enlace copiado al portapapeles');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('No se pudo copiar el enlace');
+    }
+  }, [qrUrl]);
+
   const handleShare = useCallback(async () => {
     if (!qrDataUrl) return;
+    setSharing(true);
     try {
-      if (navigator.share && navigator.canShare) {
-        const res = await fetch(qrDataUrl);
-        const blob = await res.blob();
-        const file = new File([blob], 'qr-intercambio.png', { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: `Intercambio ${copyTitle}`,
-            text: `Escanea este QR para intercambiar cromos de ${copyTitle} conmigo en CambioCromos`,
-          });
-          return;
+      // On web browsers (not native Capacitor), convert dataUrl to File for platforms supporting file sharing
+      let file: File | undefined;
+      if (typeof window !== 'undefined' && !isNative()) {
+        try {
+          const res = await fetch(qrDataUrl);
+          const blob = await res.blob();
+          file = new File([blob], 'qr-intercambio.png', { type: 'image/png' });
+        } catch {
+          // Ignore file conversion errors and proceed with URL sharing
         }
       }
-      // Fallback: copy URL to clipboard
-      await navigator.clipboard.writeText(qrUrl);
-      toast.success('Enlace copiado al portapapeles');
-    } catch (err) {
-      if ((err as Error)?.name !== 'AbortError') {
-        await navigator.clipboard.writeText(qrUrl).catch(() => null);
-        toast.success('Enlace copiado al portapapeles');
+
+      const shareTitle = `Intercambio ${copyTitle}`;
+      const shareMessage = `¡Hola! Mira qué cromos de ${copyTitle} podemos intercambiar en CambioCromos:`;
+
+      const result = await shareContent({
+        title: shareTitle,
+        text: `${shareMessage}\n${qrUrl}`,
+        url: qrUrl,
+        dialogTitle: 'Compartir enlace de intercambio',
+        files: file ? [file] : undefined,
+      });
+
+      // If native sharing succeeded or user intentionally aborted the share sheet, stop here
+      if (result.success || result.method === 'aborted') {
+        return;
       }
+
+      // If native sharing is unsupported (e.g. desktop or older native app build without plugin),
+      // copy the link to clipboard AND show direct WhatsApp / Telegram sharing options
+      setShowShareFallback(true);
+      await navigator.clipboard.writeText(qrUrl).catch(() => null);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast.success('Enlace copiado. Elige dónde compartirlo:');
+    } finally {
+      setSharing(false);
     }
   }, [qrDataUrl, qrUrl, copyTitle]);
+
+  const shareTextForApps = `¡Hola! Mira qué cromos de ${copyTitle} podemos intercambiar en CambioCromos:`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -172,17 +218,69 @@ export function TradeQRModal({
           <Button
             className="flex-1 bg-gold text-black hover:bg-yellow-400 font-bold"
             onClick={handleShare}
-            disabled={!qrDataUrl}
+            disabled={!qrDataUrl || sharing}
           >
             <Share2 className="w-4 h-4 mr-2" />
             Compartir
           </Button>
         </div>
 
-        {/* URL hint for desktop */}
-        <p className="text-center text-[10px] text-gray-300 dark:text-gray-600 truncate px-2 select-all cursor-text">
+        {/* Fallback share channels when native share is unavailable */}
+        {showShareFallback && (
+          <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                Compartir por:
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowShareFallback(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-0.5 rounded transition-colors"
+                aria-label="Cerrar opciones de compartir"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <a
+                href={getWhatsAppShareUrl(qrUrl, shareTextForApps)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-all font-medium text-xs gap-1"
+              >
+                <WhatsAppIcon className="w-5 h-5" />
+                WhatsApp
+              </a>
+              <a
+                href={getTelegramShareUrl(qrUrl, shareTextForApps)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-[#26A5E4]/10 text-[#26A5E4] hover:bg-[#26A5E4]/20 transition-all font-medium text-xs gap-1"
+              >
+                <TelegramIcon className="w-5 h-5" />
+                Telegram
+              </a>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="flex flex-col items-center justify-center p-2 rounded-lg bg-gray-200/70 dark:bg-gray-700/70 text-gray-700 dark:text-gray-200 hover:bg-gray-300/70 dark:hover:bg-gray-600/70 transition-all font-medium text-xs gap-1"
+              >
+                {copied ? <Check className="w-5 h-5 text-green-600" /> : <Copy className="w-5 h-5" />}
+                {copied ? '¡Copiado!' : 'Copiar'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* URL hint with click to copy */}
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          className="text-center text-[10px] text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 truncate px-2 cursor-pointer transition-colors block w-full text-left"
+          title="Haz clic para copiar"
+        >
           {qrUrl}
-        </p>
+        </button>
       </DialogContent>
     </Dialog>
   );

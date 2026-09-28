@@ -410,7 +410,13 @@
       "myRating": "My rating",
       "counterpartyRating": "Received rating",
       "transactionCompleted": "Transaction completed",
-      "youAreSeller": "You are the seller"
+      "youAreSeller": "You are the seller",
+      "userSuspended": "Suspended user",
+      "userDeleted": "Deleted account",
+      "suspendedBanner": "This user is currently suspended. The chat remains accessible in read-only mode.",
+      "deletedBanner": "This account has been deleted. The chat remains accessible in read-only mode.",
+      "cannotSendToSuspendedUser": "You cannot send messages because this user is suspended",
+      "cannotSendToDeletedUser": "You cannot send messages because this account has been deleted"
     }
   },
   "chats": {
@@ -456,6 +462,8 @@
     },
     "listingUnavailable": "Listing unavailable",
     "userUnavailable": "User unavailable",
+    "userSuspended": "Suspended",
+    "userDeleted": "Deleted account",
     "delete": {
       "button": "Delete conversation",
       "success": "Conversation deleted.",
@@ -469,7 +477,12 @@
   "matchChat": {
     "title": "Chat",
     "userNoLongerAvailable": "This user is no longer on CambioCromos",
-    "cannotSendToDeletedUser": "You cannot send messages because this user is no longer available",
+    "userSuspended": "Suspended user",
+    "userDeleted": "Deleted account",
+    "suspendedBanner": "This user is currently suspended. The chat remains accessible in read-only mode.",
+    "deletedBanner": "This account has been deleted. The chat remains accessible in read-only mode.",
+    "cannotSendToSuspendedUser": "You cannot send messages because this user is suspended",
+    "cannotSendToDeletedUser": "You cannot send messages because this account has been deleted",
     "placeholder": "Type a message...",
     "send": "Send",
     "loadMore": "Load older",
