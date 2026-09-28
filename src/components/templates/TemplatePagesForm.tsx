@@ -134,6 +134,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             </div>
           </div>
           <Button
+            type="button"
             onClick={addPage}
             disabled={!newPageTitle.trim()}
             className="bg-gold text-black hover:bg-gold-light"
@@ -159,6 +160,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
               </div>
             </div>
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => deletePage(pageIndex)}
@@ -211,14 +213,15 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
             </div>
 
             {/* Slots */}
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label>{t('pageStickers')}</Label>
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => addSlot(pageIndex)}
-                  className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700"
+                  className="text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   {t('addStickerBtn')}
@@ -239,6 +242,7 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                         </span>
                       </div>
                       <Button
+                        type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => deleteSlot(pageIndex, slotIndex)}
@@ -264,6 +268,24 @@ export function TemplatePagesForm({ data, onChange, itemSchema }: TemplatePagesF
                   </div>
                 ))}
               </div>
+
+              {page.slots.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 self-start sm:self-center">
+                    {t('stickersCount', { count: page.slots.length })}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addSlot(pageIndex)}
+                    className="w-full sm:w-auto text-gray-900 dark:text-white border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('addStickerBtn')}
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
