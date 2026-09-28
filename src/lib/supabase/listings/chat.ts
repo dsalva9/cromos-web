@@ -19,14 +19,14 @@ const listingChatMessageSchema = z.object({
 
 const chatParticipantSchema = z.object({
   user_id: z.string().uuid(),
-  nickname: z.string(),
-  avatar_url: z.string().nullable(),
-  is_owner: z.boolean(),
-  last_message: z.string().nullable(),
-  last_message_at: z.string().nullable(),
-  unread_count: z.number(),
-  is_suspended: z.boolean().optional().default(false),
-  is_deleted: z.boolean().optional().default(false),
+  nickname: z.string().default('Usuario'),
+  avatar_url: z.string().nullable().default(null),
+  is_owner: z.boolean().nullable().transform(val => Boolean(val)),
+  last_message: z.string().nullable().default(null),
+  last_message_at: z.string().nullable().default(null),
+  unread_count: z.number().nullable().transform(val => val ?? 0),
+  is_suspended: z.boolean().nullable().transform(val => Boolean(val)),
+  is_deleted: z.boolean().nullable().transform(val => Boolean(val)),
 });
 
 export type ListingChatMessage = z.infer<typeof listingChatMessageSchema>;
@@ -168,7 +168,23 @@ export async function getListingChatParticipants(
 
     if (error) throw error;
 
-    const validated = z.array(chatParticipantSchema).parse(data || []);
+    const rawList = Array.isArray(data) ? data : [];
+    const validated: ChatParticipant[] = [];
+
+    for (const item of rawList) {
+      if (!item || typeof item !== 'object') continue;
+      // Skip system messages or invalid rows lacking a user_id
+      const record = item as Record<string, unknown>;
+      if (!record.user_id || typeof record.user_id !== 'string') {
+        continue;
+      }
+      const parsed = chatParticipantSchema.safeParse(item);
+      if (parsed.success) {
+        validated.push(parsed.data);
+      } else {
+        logger.warn('Skipping invalid chat participant row:', { error: parsed.error, item });
+      }
+    }
 
     return { data: validated, error: null };
   } catch (error) {
