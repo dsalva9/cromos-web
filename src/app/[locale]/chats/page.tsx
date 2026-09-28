@@ -6,7 +6,7 @@ import Image from 'next/image';
 import AuthGuard from '@/components/AuthGuard';
 import { useUser, useSupabaseClient } from '@/components/providers/SupabaseProvider';
 import { ModernCard, ModernCardContent } from '@/components/ui/modern-card';
-import { MessageCircle, Lightbulb, Sparkles, EyeOff, Trash2 } from 'lucide-react';
+import { MessageCircle, Lightbulb, Sparkles, EyeOff, Trash2, Ban } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ContextualTip } from '@/components/ui/ContextualTip';
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs';
@@ -48,6 +48,7 @@ interface Conversation {
   counterparty_is_patron?: boolean;
   counterparty_is_pro?: boolean;
   counterparty_is_deleted?: boolean;
+  counterparty_is_suspended?: boolean;
   listing_is_unavailable?: boolean;
 }
 
@@ -82,6 +83,7 @@ function ChatsPageContent() {
     templateId: number | null;
     otherUserId: string;
     otherUserIsDeleted?: boolean;
+    otherUserIsSuspended?: boolean;
     otherIsPro?: boolean;
   } | null>(null);
 
@@ -232,6 +234,7 @@ function ChatsPageContent() {
       templateId: conv.template_id,
       otherUserId: conv.other_user_id,
       otherUserIsDeleted: conv.other_user_is_deleted,
+      otherUserIsSuspended: conv.other_user_is_suspended,
       otherIsPro: conv.other_is_pro,
     });
     setDrawerOpen(true);
@@ -328,9 +331,10 @@ function ChatsPageContent() {
                       onClick={() => openMarketplaceChat(conv)}
                       className={cn(
                         "hover:border-gold transition-colors cursor-pointer relative group",
+                        (conv.counterparty_is_deleted || conv.counterparty_is_suspended) && "opacity-85",
                         conv.listing_is_unavailable && "opacity-90"
                       )}
-                      style={conv.counterparty_is_pro && !conv.counterparty_is_deleted ? {
+                      style={conv.counterparty_is_pro && !conv.counterparty_is_deleted && !conv.counterparty_is_suspended ? {
                         borderWidth: '2px',
                         borderColor: '#FFC000',
                         boxShadow: conv.unread_count > 0
@@ -397,21 +401,30 @@ function ChatsPageContent() {
                               )}
                             </div>
 
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1.5">
-                              {conv.is_seller ? (
-                                <>{t('roles.buyer')} {conv.counterparty_is_deleted ? <span className="text-gray-400 italic">{t('userUnavailable')}</span> : conv.counterparty_nickname}</>
-                              ) : (
-                                <>{t('roles.seller')} {conv.counterparty_is_deleted ? <span className="text-gray-400 italic">{t('userUnavailable')}</span> : conv.counterparty_nickname}</>
-                              )}
-                              {conv.counterparty_is_pro && !conv.counterparty_is_deleted && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-1.5 flex-wrap">
+                              <span>{conv.is_seller ? t('roles.buyer') : t('roles.seller')}</span>
+                              <span className={cn(
+                                "font-medium",
+                                (conv.counterparty_is_deleted || conv.counterparty_is_suspended) && "text-gray-500 dark:text-gray-400"
+                              )}>
+                                {conv.counterparty_nickname}
+                              </span>
+                              {conv.counterparty_is_pro && !conv.counterparty_is_deleted && !conv.counterparty_is_suspended && (
                                 <ProBadge size="sm" />
                               )}
-                              {conv.counterparty_is_patron && !conv.counterparty_is_deleted && !conv.counterparty_is_pro && (
+                              {conv.counterparty_is_patron && !conv.counterparty_is_deleted && !conv.counterparty_is_suspended && !conv.counterparty_is_pro && (
                                 <span className="inline-flex items-center text-[10px]" title="Patrón">☕</span>
                               )}
+                              {conv.counterparty_is_suspended && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+                                  <Ban className="h-2.5 w-2.5" />
+                                  {t('userSuspended')}
+                                </span>
+                              )}
                               {conv.counterparty_is_deleted && (
-                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
-                                  {t('userUnavailable')}
+                                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex-shrink-0">
+                                  <Trash2 className="h-2.5 w-2.5" />
+                                  {t('userDeleted')}
                                 </span>
                               )}
                             </p>
