@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from '@/lib/toast';
 
 interface ChatComposerProps {
-  onSend: (text: string, imageFile?: File | Blob | null) => Promise<void>;
+  onSend: (text: string, imageFile?: File | Blob | null) => Promise<boolean | void>;
   sending: boolean;
   uploading: boolean;
   disabled?: boolean;
@@ -37,12 +37,18 @@ export function ChatComposer({
   const handleSend = useCallback(async () => {
     if ((!text.trim() && !pendingFile) || sending || uploading) return;
 
-    await onSend(text, pendingFile);
-    setText('');
-    setPendingFile(null);
+    try {
+      const result = await onSend(text, pendingFile);
+      if (result === false) return;
 
-    // Refocus textarea
-    textareaRef.current?.focus();
+      setText('');
+      setPendingFile(null);
+
+      // Refocus textarea
+      textareaRef.current?.focus();
+    } catch {
+      // Keep input text if sending failed
+    }
   }, [text, pendingFile, onSend, sending, uploading]);
 
   const handleKeyDown = useCallback(

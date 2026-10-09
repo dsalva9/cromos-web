@@ -36,10 +36,13 @@ import { toast } from '@/lib/toast';
 import { logger } from '@/lib/logger';
 import { triggerInAppReview } from '@/lib/inAppReview';
 import { containsUrl, containsForbiddenAppText } from '@/lib/validations/chat';
+import { safeStorage } from '@/lib/safeStorage';
 import {
   deleteMarketplaceConversation,
   hideMarketplaceConversation,
 } from '@/lib/supabase/listings/chat';
+
+const CHAT_TOS_STORAGE_KEY = 'cambiocromos_chat_tos_accepted';
 import {
   Dialog,
   DialogContent,
@@ -84,7 +87,32 @@ export function MarketplaceChatDrawer({
   const [showReportModal, setShowReportModal] = useState(false);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [chatTermsDialogOpen, setChatTermsDialogOpen] = useState(false);
-  const [tosAccepted, setTosAccepted] = useState(false);
+  const [tosAccepted, setTosAccepted] = useState(() => {
+    return safeStorage.getItem(CHAT_TOS_STORAGE_KEY) === 'true';
+  });
+
+  // Restore or pre-populate ToS acceptance
+  useEffect(() => {
+    if (tosAccepted) return;
+    if (safeStorage.getItem(CHAT_TOS_STORAGE_KEY) === 'true') {
+      setTosAccepted(true);
+      return;
+    }
+    // If user has ever sent a message in trade_chats, they have implicitly accepted terms previously
+    if (user?.id) {
+      void supabase
+        .from('trade_chats')
+        .select('id')
+        .eq('sender_id', user.id)
+        .limit(1)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setTosAccepted(true);
+            safeStorage.setItem(CHAT_TOS_STORAGE_KEY, 'true');
+          }
+        });
+    }
+  }, [user?.id, supabase, tosAccepted]);
 
   // Hide & Delete dialog states
   const [showHideModal, setShowHideModal] = useState(false);
@@ -138,6 +166,7 @@ export function MarketplaceChatDrawer({
     listingId,
     participantId: selectedParticipant || undefined,
     enableRealtime: isOpen,
+    isOpen,
   });
 
   // Sync initialParticipantId when passed or changed
@@ -515,32 +544,37 @@ export function MarketplaceChatDrawer({
 
   // Send message handler
   const handleComposerSend = useCallback(
-    async (text: string, file?: File | Blob | null) => {
-      if ((!text.trim() && !file) || sending || uploading) return;
+    async (text: string, file?: File | Blob | null): Promise<boolean> => {
+      if ((!text.trim() && !file) || sending || uploading) return false;
 
       if (text.trim() && containsUrl(text)) {
         toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
-        return;
+        return false;
       }
 
       if (text.trim() && containsForbiddenAppText(text)) {
         toast.error('No se permite publicidad de otras apps.');
-        return;
+        return false;
       }
 
       if (counterpartyDeleted || counterpartySuspended) {
         toast.error(counterpartySuspended ? t('cannotSendToSuspendedUser') : t('cannotSendToDeletedUser'));
-        return;
+        return false;
       }
 
       if (!isOwner && messages.length === 0 && !tosAccepted) {
         toast.error('Debes aceptar los términos y condiciones antes de enviar un mensaje');
-        return;
+        return false;
+      }
+
+      if (tosAccepted) {
+        safeStorage.setItem(CHAT_TOS_STORAGE_KEY, 'true');
       }
 
       const receiverId = isOwner ? selectedParticipant || undefined : listingOwner || undefined;
 
-      await sendMessage(text, receiverId, file);
+      const success = await sendMessage(text, receiverId, file);
+      return success;
     },
     [sending, uploading, counterpartyDeleted, counterpartySuspended, t, isOwner, messages.length, tosAccepted, selectedParticipant, listingOwner, sendMessage]
   );
@@ -1215,21 +1249,32 @@ export function MarketplaceChatDrawer({
                   <Checkbox
                     id="tos-chat-drawer"
                     checked={tosAccepted}
-                    onCheckedChange={(checked) => setTosAccepted(checked === true)}
+                    onCheckedChange={(checked) => {
+                      const val = checked === true;
+                      setTosAccepted(val);
+                      if (val) {
+                        safeStorage.setItem(CHAT_TOS_STORAGE_KEY, 'true');
+                      }
+                    }}
                   />
-                  <label
-                    htmlFor="tos-chat-drawer"
-                    className="text-xs text-gray-600 dark:text-gray-300 cursor-pointer"
-                  >
-                    {t('tosAccept')}
+                  <div className="text-xs text-gray-600 dark:text-gray-300">
+                    <label
+                      htmlFor="tos-chat-drawer"
+                      className="cursor-pointer select-none"
+                    >
+                      {t('tosAccept')}{' '}
+                    </label>
                     <button
                       type="button"
-                      onClick={() => setChatTermsDialogOpen(true)}
-                      className="text-gold hover:underline font-semibold ml-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setChatTermsDialogOpen(true);
+                      }}
+                      className="text-gold hover:underline font-semibold ml-1 cursor-pointer"
                     >
                       {t('termsAndConditions')}
                     </button>
-                  </label>
+                  </div>
                 </div>
               </div>
             )}

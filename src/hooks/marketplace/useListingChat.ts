@@ -22,19 +22,22 @@ interface UseListingChatOptions {
   participantId?: string;
   /** Enable realtime subscriptions */
   enableRealtime?: boolean;
+  /** Whether the chat is open/active. Defaults to true */
+  isOpen?: boolean;
 }
 
 export function useListingChat({
   listingId,
   participantId,
   enableRealtime = true,
+  isOpen = true,
 }: UseListingChatOptions) {
   const supabase = useSupabaseClient();
   const { user } = useUser();
 
   const [messages, setMessages] = useState<ListingChatMessage[]>([]);
   const [participants, setParticipants] = useState<ChatParticipant[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(isOpen && listingId > 0));
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +51,10 @@ export function useListingChat({
 
   // Fetch initial messages
   const fetchMessages = useCallback(async (options?: { silent?: boolean }) => {
-    if (!user) return;
+    if (!user || !listingId || listingId <= 0 || !isOpen) {
+      setLoading(false);
+      return;
+    }
 
     if (!options?.silent && messagesRef.current.length === 0) {
       setLoading(true);
@@ -86,29 +92,30 @@ export function useListingChat({
     }
 
     setLoading(false);
-  }, [supabase, listingId, participantId, user]);
+  }, [supabase, listingId, participantId, user, isOpen]);
 
   // Fetch participants (seller only)
   const fetchParticipants = useCallback(async () => {
+    if (!listingId || listingId <= 0 || !isOpen) return;
     const { data } = await getListingChatParticipants(supabase, listingId);
     setParticipants(data);
-  }, [supabase, listingId]);
+  }, [supabase, listingId, isOpen]);
 
   // Send a message (with optional image)
   const sendMessage = useCallback(
-    async (text: string, receiverId?: string, imageFile?: File | Blob | null) => {
-      if (!user || (!text.trim() && !imageFile)) return;
+    async (text: string, receiverId?: string, imageFile?: File | Blob | null): Promise<boolean> => {
+      if (!user || !listingId || listingId <= 0 || (!text.trim() && !imageFile)) return false;
 
       // Block URLs in message text
       if (text.trim() && containsUrl(text)) {
         toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
-        return;
+        return false;
       }
 
       // Block forbidden app text in message text
       if (text.trim() && containsForbiddenAppText(text)) {
         toast.error('No se permite publicidad de otras apps.');
-        return;
+        return false;
       }
 
       // Determine receiver
@@ -122,7 +129,7 @@ export function useListingChat({
           targetReceiverId = participantId;
         } else {
           toast.error('No se pudo determinar el destinatario');
-          return;
+          return false;
         }
       }
 
@@ -148,7 +155,7 @@ export function useListingChat({
               toast.error('El archivo PDF no puede superar los 2MB');
               setSending(false);
               setUploading(false);
-              return;
+              return false;
             }
 
             const timestamp = Date.now();
@@ -191,7 +198,7 @@ export function useListingChat({
                     contentType: 'image/webp',
                     upsert: true,
                   })
-                : Promise.resolve({ data: null, error: null } as any),
+                : Promise.resolve({ data: null, error: null as unknown }),
             ]);
 
             if (imageUpload.error) throw imageUpload.error;
@@ -227,7 +234,7 @@ export function useListingChat({
           }
           setSending(false);
           setUploading(false);
-          return;
+          return false;
         } finally {
           setUploading(false);
         }
@@ -244,6 +251,8 @@ export function useListingChat({
 
       if (sendError) {
         toast.error(sendError.message);
+        setSending(false);
+        return false;
       } else if (messageId) {
         // Determine display message (placeholder for image/PDF-only)
         const isPdfUrl = imageUrl?.endsWith('.pdf');
@@ -270,31 +279,35 @@ export function useListingChat({
         setTimeout(() => {
           void fetchMessages({ silent: true });
         }, 500);
+
+        setSending(false);
+        return true;
       }
 
       setSending(false);
+      return false;
     },
     [supabase, listingId, user, messages, participantId, fetchMessages]
   );
 
-  // Auto-scroll to bottom on all platforms
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
   // Mark messages from a specific sender as read
   const markAsRead = useCallback(async (senderId: string) => {
+    if (!listingId || listingId <= 0) return;
     await markListingMessagesRead(supabase, listingId, senderId);
   }, [supabase, listingId]);
 
   // Initial fetch
   useEffect(() => {
+    if (!isOpen || !listingId || listingId <= 0) {
+      setLoading(false);
+      return;
+    }
     void fetchMessages();
-  }, [fetchMessages]);
+  }, [fetchMessages, isOpen, listingId]);
 
   // Realtime subscription
   useEffect(() => {
-    if (!enableRealtime || !user) return;
+    if (!enableRealtime || !user || !isOpen || !listingId || listingId <= 0) return;
 
     const channel = supabase
       .channel(`listing-chat-${listingId}`)
@@ -316,7 +329,7 @@ export function useListingChat({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [supabase, listingId, enableRealtime, user, fetchMessages]);
+  }, [supabase, listingId, enableRealtime, user, isOpen, fetchMessages]);
 
   // Note: auto-scroll is handled by the page component which owns the
   // chat container ref. messagesEndRef is still available for manual use.
