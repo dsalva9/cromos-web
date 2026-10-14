@@ -92,19 +92,19 @@ export function useMatchChat({
 
   // ---- Send message ----
   const sendMessage = useCallback(
-    async (text: string, imageFile?: File | Blob | null) => {
-      if (!user || !conversationId || (!text.trim() && !imageFile)) return;
+    async (text: string, imageFile?: File | Blob | null): Promise<boolean> => {
+      if (!user || !conversationId || (!text.trim() && !imageFile)) return false;
 
       // Block URLs in message text
       if (text.trim() && containsUrl(text)) {
         toast.error('No se permiten enlaces o URLs en los mensajes del chat.');
-        return;
+        return false;
       }
 
       // Block forbidden app text in message text
       if (text.trim() && containsForbiddenAppText(text)) {
         toast.error('No se permite publicidad de otras apps.');
-        return;
+        return false;
       }
 
       setSending(true);
@@ -128,7 +128,7 @@ export function useMatchChat({
               toast.error('El archivo PDF no puede superar los 2MB');
               setSending(false);
               setUploading(false);
-              return;
+              return false;
             }
 
             const timestamp = Date.now();
@@ -144,9 +144,9 @@ export function useMatchChat({
             imageUrl = pdfData.publicUrl;
             // No thumbnail for PDFs
           } else {
-            // --- Image path: existing flow (unchanged) ---
+            // --- Image path ---
             const processed = await processImageBeforeUpload(file, {
-              maxSizeMB: 0.5,
+              maxSizeMB: 1,
               maxWidthOrHeight: 1200,
               quality: 0.82,
             });
@@ -158,20 +158,24 @@ export function useMatchChat({
 
             const timestamp = Date.now();
             const basePath = `chat-images/match/${conversationId}/${user.id}/${timestamp}`;
-            const imagePath = `${basePath}.webp`;
-            const thumbPath = `${basePath}-thumb.webp`;
+            const imageContentType = processed.blob.type || 'image/webp';
+            const imageExt = imageContentType === 'image/jpeg' ? 'jpg' : 'webp';
+            const thumbContentType = thumbBlob?.type || 'image/webp';
+            const thumbExt = thumbContentType === 'image/jpeg' ? 'jpg' : 'webp';
+            const imagePath = `${basePath}.${imageExt}`;
+            const thumbPath = `${basePath}-thumb.${thumbExt}`;
 
             const [imageUpload, thumbUpload] = await Promise.all([
               supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
-                contentType: 'image/webp',
+                contentType: imageContentType,
                 upsert: true,
               }),
               thumbBlob
                 ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-                    contentType: 'image/webp',
+                    contentType: thumbContentType,
                     upsert: true,
                   })
-                : Promise.resolve({ data: null, error: null } as any),
+                : Promise.resolve({ data: null, error: null as unknown }),
             ]);
 
             if (imageUpload.error) throw imageUpload.error;
@@ -207,7 +211,7 @@ export function useMatchChat({
           }
           setSending(false);
           setUploading(false);
-          return;
+          return false;
         } finally {
           setUploading(false);
         }
@@ -228,6 +232,8 @@ export function useMatchChat({
 
       if (sendError) {
         toast.error(sendError.message);
+        setSending(false);
+        return false;
       } else if (messageId) {
         // Optimistic add
         const optimisticMsg: MatchChatMessage = {
@@ -248,9 +254,13 @@ export function useMatchChat({
         setTimeout(() => {
           void fetchMessages({ silent: true });
         }, 500);
+
+        setSending(false);
+        return true;
       }
 
       setSending(false);
+      return false;
     },
     [supabase, conversationId, user, fetchMessages]
   );

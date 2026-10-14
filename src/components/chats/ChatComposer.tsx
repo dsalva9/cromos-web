@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Send, Paperclip, Loader2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { toast } from '@/lib/toast';
+import { isPdfFile, MAX_PDF_SIZE_BYTES } from '@/lib/validations/chat';
 
 interface ChatComposerProps {
   onSend: (text: string, imageFile?: File | Blob | null) => Promise<boolean | void>;
@@ -31,8 +32,21 @@ export function ChatComposer({
   const t_tc = useTranslations('tradeConfirmations');
   const [text, setText] = useState('');
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!pendingFile || isPdfFile(pendingFile)) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(pendingFile);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [pendingFile]);
 
   const handleSend = useCallback(async () => {
     if ((!text.trim() && !pendingFile) || sending || uploading) return;
@@ -61,19 +75,39 @@ export function ChatComposer({
     [handleSend]
   );
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate PDF size limit (2MB)
-      if (file.type === 'application/pdf' && file.size > 2 * 1024 * 1024) {
-        toast.error('El archivo PDF no puede superar los 2MB');
-        e.target.value = '';
-        return;
-      }
-      setPendingFile(file);
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const selectedFile = input.files?.[0];
+    if (!selectedFile) {
+      input.value = '';
+      return;
     }
-    // Reset so same file can be re-selected
-    e.target.value = '';
+
+    // Validate PDF size limit (2MB)
+    if (isPdfFile(selectedFile) && selectedFile.size > MAX_PDF_SIZE_BYTES) {
+      toast.error('El archivo PDF no puede superar los 2MB');
+      input.value = '';
+      return;
+    }
+
+    try {
+      // Read bytes into memory before clearing input.value so iOS Safari / WebKit
+      // does not invalidate the temporary camera/gallery file handle before Send is tapped
+      const buffer = await selectedFile.arrayBuffer();
+      const inferredType =
+        selectedFile.type ||
+        (selectedFile.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+      const inMemoryFile = new File([buffer], selectedFile.name || 'chat-attachment', {
+        type: inferredType,
+        lastModified: selectedFile.lastModified || Date.now(),
+      });
+      setPendingFile(inMemoryFile);
+    } catch {
+      setPendingFile(selectedFile);
+    } finally {
+      // Reset so same file can be re-selected
+      input.value = '';
+    }
   }, []);
 
   const autoGrow = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -91,16 +125,16 @@ export function ChatComposer({
       {pendingFile && (
         <div className="flex items-center gap-2 mb-2 px-1">
           <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden relative flex items-center justify-center">
-            {pendingFile.type === 'application/pdf' ? (
+            {isPdfFile(pendingFile) ? (
               <FileText className="w-6 h-6 text-red-500" />
-            ) : (
+            ) : previewUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={URL.createObjectURL(pendingFile)}
+                src={previewUrl}
                 alt="Preview"
                 className="w-full h-full object-cover"
               />
-            )}
+            ) : null}
           </div>
           <span className="text-xs text-gray-500 truncate flex-1">{pendingFile.name}</span>
           <button

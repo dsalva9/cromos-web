@@ -171,9 +171,9 @@ export function useListingChat({
             imageUrl = pdfData.publicUrl;
             // No thumbnail for PDFs
           } else {
-            // --- Image path: existing flow (unchanged) ---
+            // --- Image path ---
             const processed = await processImageBeforeUpload(file, {
-              maxSizeMB: 0.5,
+              maxSizeMB: 1,
               maxWidthOrHeight: 1200,
               quality: 0.82,
             });
@@ -185,17 +185,21 @@ export function useListingChat({
 
             const timestamp = Date.now();
             const basePath = `chat-images/${listingId}/${user.id}/${timestamp}`;
-            const imagePath = `${basePath}.webp`;
-            const thumbPath = `${basePath}-thumb.webp`;
+            const imageContentType = processed.blob.type || 'image/webp';
+            const imageExt = imageContentType === 'image/jpeg' ? 'jpg' : 'webp';
+            const thumbContentType = thumbBlob?.type || 'image/webp';
+            const thumbExt = thumbContentType === 'image/jpeg' ? 'jpg' : 'webp';
+            const imagePath = `${basePath}.${imageExt}`;
+            const thumbPath = `${basePath}-thumb.${thumbExt}`;
 
             const [imageUpload, thumbUpload] = await Promise.all([
               supabase.storage.from('sticker-images').upload(imagePath, processed.blob, {
-                contentType: 'image/webp',
+                contentType: imageContentType,
                 upsert: true,
               }),
               thumbBlob
                 ? supabase.storage.from('sticker-images').upload(thumbPath, thumbBlob, {
-                    contentType: 'image/webp',
+                    contentType: thumbContentType,
                     upsert: true,
                   })
                 : Promise.resolve({ data: null, error: null as unknown }),

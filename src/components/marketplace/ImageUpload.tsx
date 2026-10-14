@@ -42,30 +42,11 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
   );
   const tCreate = useTranslations('createListing');
 
-  const handleFileSelect = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Por favor selecciona un archivo de imagen');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('La imagen debe ser menor a 5MB');
-      return;
-    }
-
-    await uploadImage(file);
-  };
-
-  const uploadImage = async (file: File | Blob, fileName?: string) => {
+  const uploadImage = useCallback(async (file: File | Blob, fileName?: string) => {
     try {
       setUploading(true);
 
-      // Always compress and convert to WebP before upload
+      // Always compress and convert to WebP (or JPEG fallback on iOS) before upload
       const fileToProcess =
         file instanceof File
           ? file
@@ -78,29 +59,31 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
         quality: 0.85,
       });
       const fullBlob = result.blob;
+      const fullExt = fullBlob.type === 'image/jpeg' ? 'jpg' : 'webp';
 
       // Generate base filename (shared between full and thumb)
       const baseName =
-        fileName?.replace(/\.webp$/, '') ||
+        fileName?.replace(/\.(webp|jpe?g|png)$/i, '') ||
         `${Date.now()}-${Math.random().toString(36).substring(2)}`;
-      const fullPath = `marketplace/${baseName}.webp`;
-      const thumbPath = `marketplace/${baseName}-thumb.webp`;
+      const fullPath = `marketplace/${baseName}.${fullExt}`;
 
       // Generate the thumbnail (non-blocking — failure is non-fatal)
       const thumbnailBlob = await generateThumbnail(fullBlob).catch((err) => {
         logger.warn('Thumbnail generation failed (non-fatal):', err);
         return null;
       });
+      const thumbExt = thumbnailBlob?.type === 'image/jpeg' ? 'jpg' : 'webp';
+      const thumbPath = `marketplace/${baseName}-thumb.${thumbExt}`;
 
       // Upload full image and thumbnail in parallel
       const [fullUpload, thumbUpload] = await Promise.all([
         supabase.storage
           .from('sticker-images')
-          .upload(fullPath, fullBlob, { contentType: 'image/webp', upsert: true }),
+          .upload(fullPath, fullBlob, { contentType: fullBlob.type || 'image/webp', upsert: true }),
         thumbnailBlob
           ? supabase.storage
               .from('sticker-images')
-              .upload(thumbPath, thumbnailBlob, { contentType: 'image/webp', upsert: true })
+              .upload(thumbPath, thumbnailBlob, { contentType: thumbnailBlob.type || 'image/webp', upsert: true })
           : Promise.resolve({ error: new Error('Thumbnail skipped') }),
       ]);
 
@@ -134,6 +117,25 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
     } finally {
       setUploading(false);
     }
+  }, [onChange, supabase.storage]);
+
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor selecciona un archivo de imagen');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen debe ser menor a 5MB');
+      return;
+    }
+
+    await uploadImage(file);
   };
 
   const handleCameraCapture = async (blob: Blob, fileName: string) => {
@@ -175,8 +177,9 @@ export function ImageUpload({ value, onChange, qrData }: ImageUploadProps) {
 
       // Analytics: track QR image generation (fire-and-forget)
       track('listing_qr_image_generated', { copy_id: String(qrData.copyId), copy_title: qrData.copyTitle });
-      const supabase = createClient();
-      supabase.from('analytics_events' as any).insert({
+      const supabaseClient = createClient();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      supabaseClient.from('analytics_events' as any).insert({
         event_name: 'listing_qr_image_generated',
         user_id: qrData.userId,
         metadata: { copy_id: qrData.copyId, copy_title: qrData.copyTitle },

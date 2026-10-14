@@ -26,9 +26,11 @@ export function containsForbiddenAppText(text: string): boolean {
 /** Maximum PDF file size in bytes (2MB) */
 export const MAX_PDF_SIZE_BYTES = 2 * 1024 * 1024;
 
-/** Check if a File/Blob is a PDF based on MIME type */
+/** Check if a File/Blob is a PDF based on MIME type or filename extension */
 export function isPdfFile(file: File | Blob): boolean {
-  return file.type === 'application/pdf';
+  if (file.type === 'application/pdf') return true;
+  if (file instanceof File && file.name.toLowerCase().endsWith('.pdf')) return true;
+  return false;
 }
 
 /**
@@ -50,7 +52,7 @@ export async function downloadFile(url: string, defaultFilename: string) {
     
     document.body.removeChild(link);
     URL.revokeObjectURL(blobUrl);
-  } catch (error) {
+  } catch {
     // Fallback: open in new tab if CORS or other issues occur
     window.open(url, '_blank', 'noopener,noreferrer');
   }
