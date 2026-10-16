@@ -3998,10 +3998,12 @@ export type Database = {
       admin_get_rewarded_ad_credits_summary: {
         Args: { p_days: number }
         Returns: {
+          ads_watched: number
           amount: number
           created_at: string
           email: string
           nickname: string
+          reward_type: string
           user_id: string
         }[]
       }

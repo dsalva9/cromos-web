@@ -181,6 +181,8 @@ interface RewardedAdCredit {
     nickname: string;
     email: string;
     amount: number;
+    ads_watched?: number;
+    reward_type?: 'highlight_credits' | 'listing_unlock' | 'listing_unlock_progress' | string;
     created_at: string;
 }
 
@@ -548,56 +550,92 @@ Deno.serve(async (req) => {
         }
 
         // Group rewarded ads by user
-        const adCreditsByUser = new Map<string, { nickname: string; email: string; total_amount: number; count: number }>();
+        const adCreditsByUser = new Map<string, {
+            nickname: string;
+            email: string;
+            highlight_credits: number;
+            extra_listings: number;
+            progress_ads: number;
+            ads_watched: number;
+        }>();
         for (const item of rewardedAdsList) {
             const userId = item.user_id;
-            const existing = adCreditsByUser.get(userId);
-            if (existing) {
-                existing.total_amount += Number(item.amount);
-                existing.count += 1;
+            const rewardType = item.reward_type || 'highlight_credits';
+            const adsCount = Number(item.ads_watched ?? 1);
+            const amount = Number(item.amount ?? 0);
+
+            const existing = adCreditsByUser.get(userId) || {
+                nickname: item.nickname,
+                email: item.email,
+                highlight_credits: 0,
+                extra_listings: 0,
+                progress_ads: 0,
+                ads_watched: 0,
+            };
+
+            if (rewardType === 'listing_unlock') {
+                existing.extra_listings += amount;
+            } else if (rewardType === 'listing_unlock_progress') {
+                existing.progress_ads += adsCount;
             } else {
-                adCreditsByUser.set(userId, {
-                    nickname: item.nickname,
-                    email: item.email,
-                    total_amount: Number(item.amount),
-                    count: 1,
-                });
+                existing.highlight_credits += amount;
             }
+            existing.ads_watched += adsCount;
+            adCreditsByUser.set(userId, existing);
         }
 
         let rewardedAdsHtml: string;
-        const totalAdCredits = rewardedAdsList.reduce((sum, item) => sum + Number(item.amount), 0);
+        const totalAdCredits = Array.from(adCreditsByUser.values()).reduce((sum, u) => sum + u.highlight_credits, 0);
+        const totalExtraListings = Array.from(adCreditsByUser.values()).reduce((sum, u) => sum + u.extra_listings, 0);
+        const totalAdsWatched = Array.from(adCreditsByUser.values()).reduce((sum, u) => sum + u.ads_watched, 0);
         const uniqueAdUsers = adCreditsByUser.size;
 
         if (rewardedAdsList.length === 0) {
             rewardedAdsHtml = `
               <p style="color: #6b7280; font-style: italic; text-align: center; padding: 20px;">
-                Ningún usuario obtuvo créditos por anuncios premiados en ${periodLabel}.
+                Ningún usuario vio anuncios premiados en ${periodLabel}.
               </p>
             `;
         } else {
+            const summaryParts: string[] = [];
+            if (totalAdCredits > 0) summaryParts.push(`<strong>+${totalAdCredits}</strong> créditos`);
+            if (totalExtraListings > 0) summaryParts.push(`<strong>+${totalExtraListings}</strong> ${totalExtraListings === 1 ? 'subida extra' : 'subidas extra'}`);
+            const summaryRewardsText = summaryParts.length > 0 ? ` (${summaryParts.join(' · ')})` : '';
+
             rewardedAdsHtml = `
               <p style="color: #4b5563; margin-bottom: 16px; font-size: 14px;">
-                Un total de <strong>${uniqueAdUsers}</strong> ${uniqueAdUsers === 1 ? 'usuario obtuvo' : 'usuarios obtuvieron'} <strong>${totalAdCredits}</strong> créditos viendo anuncios en ${periodLabel}:
+                Un total de <strong>${uniqueAdUsers}</strong> ${uniqueAdUsers === 1 ? 'usuario vio' : 'usuarios vieron'} <strong>${totalAdsWatched}</strong> ${totalAdsWatched === 1 ? 'anuncio premiado' : 'anuncios premiados'} en ${periodLabel}${summaryRewardsText}:
               </p>
               <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                 <thead>
                   <tr style="background: #f3f4f6;">
                     <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Usuario</th>
                     <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Email</th>
-                    <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Créditos Totales</th>
+                    <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Recompensa</th>
                     <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #e5e7eb; font-size: 12px; color: #6b7280;">Anuncios Vistos</th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${Array.from(adCreditsByUser.values()).map((item, i) => `
+                  ${Array.from(adCreditsByUser.values()).map((item, i) => {
+                    const rewards: string[] = [];
+                    if (item.highlight_credits > 0) {
+                        rewards.push(`<span style="color: #16a34a; font-weight: bold;">+${item.highlight_credits} créditos</span>`);
+                    }
+                    if (item.extra_listings > 0) {
+                        rewards.push(`<span style="color: #d97706; font-weight: bold;">+${item.extra_listings} ${item.extra_listings === 1 ? 'subida extra' : 'subidas extra'}</span>`);
+                    }
+                    if (item.progress_ads > 0) {
+                        rewards.push(`<span style="color: #6b7280; font-size: 12px;">En progreso (${item.progress_ads}/10)</span>`);
+                    }
+                    return `
                     <tr style="background: ${i % 2 === 0 ? '#ffffff' : '#f9fafb'};">
                       <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; font-weight: 500;">${escapeHtml(item.nickname)}</td>
                       <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; color: #4b5563;">${escapeHtml(item.email)}</td>
-                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; font-weight: bold; color: #16a34a;">+${item.total_amount}</td>
-                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; color: #4b5563;">${item.count}</td>
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px;">${rewards.join(' · ') || '—'}</td>
+                      <td style="padding: 8px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; font-size: 13px; color: #4b5563; font-weight: 600;">${item.ads_watched}</td>
                     </tr>
-                  `).join('')}
+                  `;
+                  }).join('')}
                 </tbody>
               </table>
             `;
@@ -1048,7 +1086,7 @@ Deno.serve(async (req) => {
 
             <!-- Rewarded Ads Section -->
             <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 20px;">
-              🎁 Créditos por Anuncios Premiados (${periodLabel})
+              🎁 Anuncios Premiados (${periodLabel})
             </h2>
             ${rewardedAdsHtml}
 
