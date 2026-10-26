@@ -83,6 +83,22 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Ignore bounces caused by forwarded inbound emails (e.g. Gmail rejecting
+    // forwarded spam/phishing content sent to info@ or soporte@).
+    const subject = event.data?.subject ?? "";
+    if (subject.startsWith("[Forwarded]")) {
+      console.log(
+        `[receive-resend-webhook] Ignoring bounce for forwarded inbound email: ${subject}`
+      );
+      return new Response(
+        JSON.stringify({ message: "Ignored bounce for forwarded email" }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // -----------------------------------------------------------------------
     // Process bounce: upsert each recipient into email_bounces
     // -----------------------------------------------------------------------
@@ -90,10 +106,27 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Fetch admin forwarding addresses so they are never suppressed
+    const { data: adminAddresses } = await supabase
+      .from("email_forwarding_addresses")
+      .select("email");
+    const protectedEmails = new Set(
+      (adminAddresses ?? []).map((a: { email: string }) =>
+        a.email.toLowerCase().trim()
+      )
+    );
+
     const recipients = event.data?.to ?? [];
 
     for (const recipientEmail of recipients) {
       const email = recipientEmail.toLowerCase().trim();
+
+      if (protectedEmails.has(email)) {
+        console.log(
+          `[receive-resend-webhook] Skipping bounce suppression for admin forwarding address: ${email}`
+        );
+        continue;
+      }
 
       console.log(
         `[receive-resend-webhook] Processing bounce for: ${email}`
