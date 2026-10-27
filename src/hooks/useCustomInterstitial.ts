@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/components/providers/SupabaseProvider';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
-import { isAdBannerHidden } from '@/components/ads/AdBanner';
 import { fetchInterstitialAffiliate } from '@/lib/marketplace/interstitialAffiliate';
 import { safeStorage } from '@/lib/safeStorage';
 import type { AffiliateLink } from '@/types/affiliates';
@@ -15,15 +14,25 @@ export const CUSTOM_INTERSTITIAL_LAST_SECTION_KEY = 'custom_interstitial_last_se
 
 const SESSION_INACTIVITY_MS = 30 * 60 * 1000; // 30 minutes
 
+const INTERSTITIAL_EXEMPT_PATHS = [
+  '/login',
+  '/signup',
+  '/register',
+  '/forgot-password',
+  '/profile/reset-password',
+  '/profile/completar',
+  '/advertise',
+  '/admin',
+];
+
 /**
  * Helper to check if the current route is exempt from showing any interstitial.
  */
 export function isInterstitialExemptRoute(pathname?: string | null): boolean {
   if (!pathname) return true;
-  if (isAdBannerHidden(pathname)) return true;
   const clean = pathname.replace(/^\/(es|en|pt)(?=\/|$)/, '') || '/';
   if (clean.startsWith('/auth')) return true;
-  return false;
+  return INTERSTITIAL_EXEMPT_PATHS.some(p => clean === p || clean.startsWith(p + '/'));
 }
 
 export function useCustomInterstitial(isAdFree: boolean) {

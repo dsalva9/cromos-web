@@ -195,7 +195,7 @@ export function CustomInterstitialOverlay({
             {/* Hero Image Section (scales responsively on mobile & desktop) */}
             <div className="relative w-full h-[220px] min-[380px]:h-[250px] sm:h-[290px] bg-gradient-to-b from-purple-50/70 via-white to-amber-50/40 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center p-6 pt-14 overflow-hidden border-b border-gray-100 dark:border-gray-800 shrink-0">
               {/* Mobile viewport image transform */}
-              <div className="w-full h-full flex items-center justify-center md:hidden overflow-hidden">
+              <div className="w-full h-full flex items-center justify-center md:hidden">
                 <img
                   src={affiliate.image_url}
                   alt={affiliate.title}
@@ -209,7 +209,7 @@ export function CustomInterstitialOverlay({
               </div>
 
               {/* Desktop viewport image transform */}
-              <div className="w-full h-full hidden md:flex items-center justify-center overflow-hidden">
+              <div className="w-full h-full hidden md:flex items-center justify-center">
                 <img
                   src={affiliate.image_url}
                   alt={affiliate.title}
