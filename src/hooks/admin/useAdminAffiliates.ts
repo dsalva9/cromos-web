@@ -22,6 +22,7 @@ interface UseAdminAffiliatesReturn {
     destination_url: string;
     is_active?: boolean;
     image_config?: ImageConfig;
+    cta_text?: string | null;
   }) => Promise<string>;
   deleteAffiliate: (id: string) => Promise<void>;
   uploadImage: (file: File) => Promise<string>;
@@ -59,6 +60,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
     destination_url: string;
     is_active?: boolean;
     image_config?: ImageConfig;
+    cta_text?: string | null;
   }): Promise<string> => {
     setSaving(true);
     setError(null);
@@ -74,6 +76,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
         p_destination_url: data.destination_url,
         p_is_active: data.is_active ?? true,
         p_image_config: data.image_config ?? DEFAULT_IMAGE_CONFIG,
+        p_cta_text: data.cta_text ?? null,
       });
       if (rpcError) throw rpcError;
       await fetchAffiliates();

@@ -106,6 +106,9 @@ export function AffiliatesTab() {
             <div>
               <h4 className="text-sm font-medium text-white truncate">{affiliate.title}</h4>
               <p className="text-xs text-zinc-400 mt-1 line-clamp-1">{affiliate.subtitle}</p>
+              {affiliate.cta_text && (
+                <p className="text-[11px] text-purple-400 mt-0.5 truncate">CTA: {affiliate.cta_text}</p>
+              )}
             </div>
             <button
               onClick={() => handleEdit(affiliate, placement)}

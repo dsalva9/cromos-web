@@ -17,6 +17,7 @@ export type Database = {
       affiliate_links: {
         Row: {
           created_at: string
+          cta_text: string | null
           destination_url: string
           id: string
           image_config: Json
@@ -30,6 +31,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          cta_text?: string | null
           destination_url: string
           id?: string
           image_config?: Json
@@ -43,6 +45,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          cta_text?: string | null
           destination_url?: string
           id?: string
           image_config?: Json
@@ -4460,6 +4463,7 @@ export type Database = {
       }
       admin_upsert_affiliate_link: {
         Args: {
+          p_cta_text?: string
           p_destination_url?: string
           p_id?: string
           p_image_config?: Json

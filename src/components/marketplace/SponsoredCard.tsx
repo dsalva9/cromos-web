@@ -14,6 +14,7 @@ interface SponsoredCardProps {
     rating: number;
     destination_url: string;
     image_config?: ImageConfig;
+    cta_text?: string | null;
   };
 }
 
@@ -129,7 +130,7 @@ export function SponsoredCard({ affiliate }: SponsoredCardProps) {
           <div className="w-full bg-[#533FC6] group-hover:bg-[#4332A6] text-white font-black text-[10px] sm:text-xs uppercase py-2.5 rounded-xl transition-all duration-200 shadow-sm flex items-center justify-between px-3 sm:px-3.5 gap-1.5 shrink-0">
             <div className="flex items-center gap-1.5">
               <Star className="h-3.5 w-3.5 fill-yellow-400 stroke-yellow-400 text-yellow-400" />
-              <span>{t('ctaTeFaltan')}</span>
+              <span>{affiliate.cta_text || t('ctaTeFaltan')}</span>
             </div>
             <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </div>
@@ -138,5 +139,3 @@ export function SponsoredCard({ affiliate }: SponsoredCardProps) {
     </motion.a>
   );
 }
-
-

@@ -31,6 +31,7 @@ export interface AffiliateLink {
   destination_url: string;
   is_active: boolean;
   image_config: ImageConfig;
+  cta_text?: string | null;
   created_at: string;
   updated_at: string;
 }

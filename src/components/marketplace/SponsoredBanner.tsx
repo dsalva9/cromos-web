@@ -14,6 +14,7 @@ interface SponsoredBannerProps {
     rating: number;
     destination_url: string;
     image_config?: ImageConfig;
+    cta_text?: string | null;
   } | null;
 }
 
@@ -104,7 +105,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
             {/* CTA Div (styled as button) */}
             <div className="bg-[#533FC6] text-white font-black text-[9px] uppercase py-2 px-3 rounded-lg flex items-center gap-1 shadow-sm shrink-0">
               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <span>{t('completarAlbum')}</span>
+              <span>{affiliate.cta_text || t('completarAlbum')}</span>
               <ChevronRight className="h-3 w-3" />
             </div>
           </div>
@@ -163,7 +164,7 @@ export function SponsoredBanner({ affiliate }: SponsoredBannerProps) {
           {/* CTA Div (styled as button) */}
           <div className="bg-[#533FC6] text-white font-black text-[10px] uppercase py-2.5 px-4 rounded-xl flex items-center gap-1.5 transition-all duration-200 shadow-sm group-hover:bg-[#4332A6] shrink-0">
             <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 shrink-0" />
-            <span>{t('completarAlbum')}</span>
+            <span>{affiliate.cta_text || t('completarAlbum')}</span>
             <ChevronRight className="h-3.5 w-3.5 shrink-0" />
           </div>
         </div>

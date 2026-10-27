@@ -449,8 +449,8 @@ export function MarketplaceContent({ initialListings, initialUserPostcode }: Mar
                                             </p>
                                         </div>
                                         <div className="shrink-0 flex items-center justify-center text-[10px] sm:text-xs font-black uppercase text-amber-600 dark:text-amber-400 gap-0.5 bg-amber-100/50 dark:bg-amber-900/30 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-amber-200/40 dark:border-amber-800/40 group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500 transition-all duration-200">
-                                            <span className="hidden sm:inline">{ts('ctaBook')}</span>
-                                            <span className="sm:hidden">Amazon</span>
+                                            <span className="hidden sm:inline">{bannerAffiliate.cta_text || ts('ctaBook')}</span>
+                                            <span className="sm:hidden">{bannerAffiliate.cta_text || 'Amazon'}</span>
                                             <ChevronRight className="w-3.5 h-3.5" />
                                         </div>
                                     </a>

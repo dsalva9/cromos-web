@@ -33,11 +33,19 @@ export function AffiliateEditModal({
   // Form State
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
+  const [ctaText, setCtaText] = useState('');
   const [rating, setRating] = useState(5.0);
   const [url, setUrl] = useState('');
   const [active, setActive] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
   const [imageConfig, setImageConfig] = useState<ImageConfig>(DEFAULT_IMAGE_CONFIG);
+
+  const defaultCtaPlaceholder =
+    placement === 'card_1' || placement === 'card_2'
+      ? '¿Te faltan cromos?'
+      : placement === 'banner'
+        ? 'Completar mi álbum'
+        : 'Ver en Amazon';
 
   // UI State
   const [isUploading, setIsUploading] = useState(false);
@@ -53,6 +61,7 @@ export function AffiliateEditModal({
       if (affiliate) {
         setTitle(affiliate.title || '');
         setSubtitle(affiliate.subtitle || '');
+        setCtaText(affiliate.cta_text || '');
         setRating(affiliate.rating || 5.0);
         setUrl(affiliate.destination_url || '');
         setActive(affiliate.is_active ?? true);
@@ -72,6 +81,7 @@ export function AffiliateEditModal({
       } else {
         setTitle('');
         setSubtitle('');
+        setCtaText('');
         setRating(5.0);
         setUrl('');
         setActive(placement !== 'email' ? true : false);
@@ -214,6 +224,7 @@ export function AffiliateEditModal({
         destination_url: url,
         is_active: placement === 'email' ? active : true,
         image_config: imageConfig,
+        cta_text: ctaText.trim() || null,
       });
       toast.success('Enlace de afiliado guardado');
       onSaved();
@@ -389,7 +400,7 @@ export function AffiliateEditModal({
                 {renderStars(rating)}
               </div>
               <div className="bg-[#533FC6] text-white font-black text-[8px] uppercase py-1.5 px-3 rounded-lg flex items-center gap-1">
-                ⭐ Completar álbum →
+                ⭐ {ctaText.trim() || 'Completar mi álbum'} →
               </div>
             </div>
           </div>
@@ -413,8 +424,9 @@ export function AffiliateEditModal({
             </div>
             <h4 className="font-bold text-gray-900 text-xs leading-tight line-clamp-2 mb-0.5">{title || 'Título principal'}</h4>
             <p className="text-[10px] text-gray-500 line-clamp-1 mb-2">{subtitle || 'Subtítulo'}</p>
-            <div className="w-full h-7 bg-purple-600 text-white text-[10px] font-semibold rounded-full flex items-center justify-center">
-              Ver precio
+            <div className="w-full py-1.5 px-2.5 bg-[#533FC6] text-white text-[9px] font-black uppercase rounded-lg flex items-center justify-between gap-1">
+              <span className="truncate">⭐ {ctaText.trim() || '¿Te faltan cromos?'}</span>
+              <span>›</span>
             </div>
           </div>
         </div>
@@ -437,7 +449,7 @@ export function AffiliateEditModal({
           </div>
           <div className="shrink-0">
             <div className="h-8 px-4 bg-purple-600 text-white text-xs font-semibold rounded-md flex items-center justify-center whitespace-nowrap">
-              Ver en Amazon
+              {ctaText.trim() || 'Ver en Amazon'}
             </div>
           </div>
         </div>
@@ -517,6 +529,22 @@ export function AffiliateEditModal({
             <div>
               <Label htmlFor="subtitle" className="text-gray-700">Subtítulo</Label>
               <Input id="subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} className="bg-white border-gray-300 focus-visible:ring-amber-500 mt-1 text-gray-900" placeholder="Ej: Smartphone 5G, 256GB" disabled={isUploading || isSaving} />
+            </div>
+
+            {/* CTA Button Text */}
+            <div>
+              <Label htmlFor="ctaText" className="text-gray-700">Texto del botón (CTA web)</Label>
+              <Input
+                id="ctaText"
+                value={ctaText}
+                onChange={(e) => setCtaText(e.target.value)}
+                className="bg-white border-gray-300 focus-visible:ring-amber-500 mt-1 text-gray-900"
+                placeholder={`Por defecto: ${defaultCtaPlaceholder}`}
+                disabled={isUploading || isSaving}
+              />
+              <p className="text-[11px] text-gray-400 mt-1">
+                Déjalo vacío para usar el texto por defecto (&ldquo;{defaultCtaPlaceholder}&rdquo;)
+              </p>
             </div>
 
             {/* Rating */}
