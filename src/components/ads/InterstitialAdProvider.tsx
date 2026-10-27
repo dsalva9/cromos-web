@@ -3,6 +3,9 @@
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useProfileCompletion } from '@/components/providers/ProfileCompletionProvider';
 import { useInterstitialAdEngine } from '@/hooks/useInterstitialAd';
+import { useCustomInterstitial } from '@/hooks/useCustomInterstitial';
+import { useRouteChangeInterstitial } from '@/hooks/useRouteChangeInterstitial';
+import { CustomInterstitialOverlay } from '@/components/ads/CustomInterstitialOverlay';
 import { isNative } from '@/lib/platform';
 import { safeStorage } from '@/lib/safeStorage';
 
@@ -11,7 +14,7 @@ import { safeStorage } from '@/lib/safeStorage';
 interface InterstitialAdContextValue {
     /**
      * Attempt to show an interstitial ad if all guards pass
-     * (cooldown elapsed, session cap not reached, user is not patron).
+     * (cooldown elapsed, session cap not reached, user is not patron/pro).
      *
      * @param trigger - `'nav'` for section changes, `'loadMore'` for marketplace.
      * @returns `true` if an ad was shown.
@@ -29,9 +32,13 @@ const InterstitialAdContext = createContext<InterstitialAdContextValue>({
  * Wraps the app tree and provides `maybeShowInterstitial` via React context.
  *
  * Must be placed below `ProfileCompletionProvider` in the component tree
- * so it can read `profile.is_patron`.
+ * so it can read `profile.is_patron` and `profile.is_pro`.
  *
- * On web/SSR the context value is a no-op — no ads are ever loaded or shown.
+ * - On login / new session (Web + Android): displays `CustomInterstitialOverlay`
+ *   if an active `'interstitial'` affiliate link is configured.
+ * - On subsequent navigations / loadMore:
+ *   - Android native: shows AdMob interstitial
+ *   - Web (Desktop / Mobile): shows `CustomInterstitialOverlay`
  */
 export function InterstitialAdProvider({ children }: { children: ReactNode }) {
     const { profile } = useProfileCompletion();
@@ -39,9 +46,22 @@ export function InterstitialAdProvider({ children }: { children: ReactNode }) {
     const isPatron = profile?.is_patron ?? false;
     const isAdFree = Boolean(isPro || isPatron);
 
-    const { maybeShowInterstitial, prepareAd } = useInterstitialAdEngine(isAdFree);
+    const {
+        affiliate,
+        isVisible,
+        showCustomInterstitial,
+        dismissCustomInterstitial,
+    } = useCustomInterstitial(isAdFree);
 
-    // Pre-load the first interstitial on mount (native only)
+    const { maybeShowInterstitial, prepareAd } = useInterstitialAdEngine(
+        isAdFree,
+        showCustomInterstitial
+    );
+
+    // Watch section changes (desktop & mobile web navigation)
+    useRouteChangeInterstitial(maybeShowInterstitial);
+
+    // Pre-load the first AdMob interstitial on mount (native only)
     useEffect(() => {
         if (!isNative()) return;
         if (isAdFree) return;
@@ -53,6 +73,12 @@ export function InterstitialAdProvider({ children }: { children: ReactNode }) {
     return (
         <InterstitialAdContext.Provider value={{ maybeShowInterstitial }}>
             {children}
+            {isVisible && affiliate && !isAdFree && (
+                <CustomInterstitialOverlay
+                    affiliate={affiliate}
+                    onClose={dismissCustomInterstitial}
+                />
+            )}
         </InterstitialAdContext.Provider>
     );
 }

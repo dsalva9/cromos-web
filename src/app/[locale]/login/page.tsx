@@ -12,6 +12,7 @@ import { GoogleIcon } from '@/components/ui/google-icon';
 import { Capacitor } from '@capacitor/core';
 import { logger } from '@/lib/logger';
 import { isProfileComplete } from '@/lib/profile/isProfileComplete';
+import { safeStorage } from '@/lib/safeStorage';
 import { getSupportMailtoUrl } from '@/lib/utils';
 import { useLocale, useTranslations } from 'next-intl';
 import { mapSupabaseError, getTranslatedAuthError } from '@/lib/auth/auth-errors';
@@ -99,6 +100,10 @@ export default function LoginPage() {
           profileData?.avatar_url
         );
 
+        if (profileIsComplete) {
+          safeStorage.setItem('custom_interstitial_pending', 'true');
+          safeStorage.setItem('interstitial_session_count', '0');
+        }
         // Hard redirect — avoids App Router startTransition that gets stuck
         window.location.href = profileIsComplete ? `/${locale}/marketplace` : `/${locale}/profile/completar`;
       }

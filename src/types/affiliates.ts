@@ -23,7 +23,7 @@ export const DEFAULT_IMAGE_CONFIG: ImageConfig = {
  */
 export interface AffiliateLink {
   id: string;
-  placement: 'banner' | 'card_1' | 'card_2' | 'email';
+  placement: 'banner' | 'card_1' | 'card_2' | 'email' | 'interstitial';
   image_url: string;
   title: string;
   subtitle: string;
@@ -37,3 +37,9 @@ export interface AffiliateLink {
 }
 
 export type AffiliatePlacement = AffiliateLink['placement'];
+
+export interface InterstitialStats {
+  impressions: number;
+  clicks: number;
+  dismissals: number;
+}

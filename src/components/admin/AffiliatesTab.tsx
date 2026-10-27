@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAdminAffiliates } from '@/hooks/admin/useAdminAffiliates';
 import type { AffiliateLink } from '@/types/affiliates';
 import { ModernCard } from '@/components/ui/modern-card';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { 
   Megaphone, 
@@ -16,30 +17,69 @@ import {
   Loader2, 
   Mail, 
   ShoppingCart, 
-  LayoutTemplate 
+  LayoutTemplate,
+  Maximize2,
+  MousePointerClick,
+  Eye,
+  XCircle
 } from 'lucide-react';
 import { AffiliateEditModal } from '@/components/admin/AffiliateEditModal';
 
+type EditablePlacement = 'banner' | 'card_1' | 'card_2' | 'email' | 'interstitial';
+
 export function AffiliatesTab() {
-  const { affiliates, loading, fetchAffiliates, deleteAffiliate } = useAdminAffiliates();
+  const {
+    affiliates,
+    interstitialStats,
+    loading,
+    fetchAffiliates,
+    upsertAffiliate,
+    deleteAffiliate,
+  } = useAdminAffiliates();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAffiliate, setEditingAffiliate] = useState<AffiliateLink | null>(null);
-  const [editingPlacement, setEditingPlacement] = useState<'banner' | 'card_1' | 'card_2' | 'email'>('banner');
+  const [editingPlacement, setEditingPlacement] = useState<EditablePlacement>('banner');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [togglingInterstitial, setTogglingInterstitial] = useState(false);
 
   useEffect(() => {
     fetchAffiliates();
   }, [fetchAffiliates]);
 
+  const interstitialAffiliate = affiliates?.find(a => a.placement === 'interstitial');
   const bannerAffiliate = affiliates?.find(a => a.placement === 'banner');
   const card1Affiliate = affiliates?.find(a => a.placement === 'card_1');
   const card2Affiliate = affiliates?.find(a => a.placement === 'card_2');
   const emailAffiliates = affiliates?.filter(a => a.placement === 'email') || [];
 
-  const handleEdit = (affiliate: AffiliateLink | null, placement: 'banner' | 'card_1' | 'card_2' | 'email') => {
+  const handleEdit = (affiliate: AffiliateLink | null, placement: EditablePlacement) => {
     setEditingAffiliate(affiliate);
     setEditingPlacement(placement);
     setModalOpen(true);
+  };
+
+  const handleToggleInterstitialActive = async (checked: boolean) => {
+    if (!interstitialAffiliate) return;
+    try {
+      setTogglingInterstitial(true);
+      await upsertAffiliate({
+        id: interstitialAffiliate.id,
+        placement: 'interstitial',
+        image_url: interstitialAffiliate.image_url,
+        title: interstitialAffiliate.title,
+        subtitle: interstitialAffiliate.subtitle,
+        rating: interstitialAffiliate.rating,
+        destination_url: interstitialAffiliate.destination_url,
+        is_active: checked,
+        image_config: interstitialAffiliate.image_config,
+        cta_text: interstitialAffiliate.cta_text,
+      });
+      toast.success(checked ? 'Intersticial activado' : 'Intersticial desactivado');
+    } catch {
+      toast.error('Error al actualizar el estado del intersticial');
+    } finally {
+      setTogglingInterstitial(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -47,7 +87,7 @@ export function AffiliatesTab() {
       await deleteAffiliate(id);
       toast.success('Affiliate deleted successfully');
       setDeleteConfirmId(null);
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete affiliate');
     }
   };
@@ -62,7 +102,7 @@ export function AffiliatesTab() {
             className={`w-4 h-4 ${star <= Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-600'}`} 
           />
         ))}
-        <span className="text-xs text-zinc-400 ml-2">{rating.toFixed(1)}</span>
+        <span className="text-xs text-zinc-400 ml-2">{Number(rating).toFixed(1)}</span>
       </div>
     );
   };
@@ -75,7 +115,11 @@ export function AffiliatesTab() {
     );
   }
 
-  const renderCompactCard = (affiliate: AffiliateLink | undefined, placement: 'banner' | 'card_1' | 'card_2', label: string) => {
+  const renderCompactCard = (
+    affiliate: AffiliateLink | undefined,
+    placement: 'banner' | 'card_1' | 'card_2' | 'interstitial',
+    label: string
+  ) => {
     if (!affiliate) {
       return (
         <div className="flex flex-col items-center justify-center p-6 border border-dashed border-zinc-700 rounded-lg bg-[#1F2937]/50">
@@ -104,7 +148,20 @@ export function AffiliatesTab() {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start">
             <div>
-              <h4 className="text-sm font-medium text-white truncate">{affiliate.title}</h4>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-medium text-white truncate">{affiliate.title}</h4>
+                {placement === 'interstitial' && (
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${
+                      affiliate.is_active
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-zinc-700 text-zinc-400'
+                    }`}
+                  >
+                    {affiliate.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-zinc-400 mt-1 line-clamp-1">{affiliate.subtitle}</p>
               {affiliate.cta_text && (
                 <p className="text-[11px] text-purple-400 mt-0.5 truncate">CTA: {affiliate.cta_text}</p>
@@ -113,6 +170,7 @@ export function AffiliatesTab() {
             <button
               onClick={() => handleEdit(affiliate, placement)}
               className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-md transition-colors"
+              title={`Edit ${label}`}
             >
               <Pencil className="w-4 h-4" />
             </button>
@@ -134,14 +192,83 @@ export function AffiliatesTab() {
     );
   };
 
+  const ctr =
+    interstitialStats.impressions > 0
+      ? ((interstitialStats.clicks / interstitialStats.impressions) * 100).toFixed(1)
+      : '0.0';
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end">
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight">Affiliate Links</h2>
-          <p className="text-zinc-400 mt-1">Manage sponsored product links for marketplace and email campaigns.</p>
+          <p className="text-zinc-400 mt-1">Manage sponsored product links for marketplace, interstitials and email campaigns.</p>
         </div>
       </div>
+
+      {/* Full-Screen Interstitial Section */}
+      <ModernCard>
+        <div className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center space-x-2">
+              <Maximize2 className="w-5 h-5 text-gold" />
+              <div>
+                <h3 className="text-lg font-medium text-white">📺 Full-Screen Interstitial (Web & Login)</h3>
+                <p className="text-xs text-zinc-400">
+                  Appears on login (Web & Android) with 5s countdown, and on Web navigation with AdMob frequency.
+                </p>
+              </div>
+            </div>
+
+            {interstitialAffiliate && (
+              <div className="flex items-center gap-3 bg-zinc-800/60 px-3 py-1.5 rounded-lg border border-zinc-700/60">
+                <span className="text-xs text-zinc-300 font-medium">
+                  {interstitialAffiliate.is_active ? 'Enabled' : 'Disabled'}
+                </span>
+                <Switch
+                  checked={interstitialAffiliate.is_active}
+                  onCheckedChange={handleToggleInterstitialActive}
+                  disabled={togglingInterstitial}
+                />
+              </div>
+            )}
+          </div>
+
+          {renderCompactCard(interstitialAffiliate, 'interstitial', 'Interstitial')}
+
+          {/* Quick Analytics Bar */}
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3 rounded-lg bg-[#1F2937]/70 border border-zinc-800 flex items-center gap-3">
+              <Eye className="w-4 h-4 text-blue-400 shrink-0" />
+              <div>
+                <div className="text-xs text-zinc-400">Impressions</div>
+                <div className="text-sm font-bold text-white">{interstitialStats.impressions}</div>
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#1F2937]/70 border border-zinc-800 flex items-center gap-3">
+              <MousePointerClick className="w-4 h-4 text-green-400 shrink-0" />
+              <div>
+                <div className="text-xs text-zinc-400">Clicks</div>
+                <div className="text-sm font-bold text-white">{interstitialStats.clicks}</div>
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#1F2937]/70 border border-zinc-800 flex items-center gap-3">
+              <XCircle className="w-4 h-4 text-zinc-400 shrink-0" />
+              <div>
+                <div className="text-xs text-zinc-400">Dismissals (X)</div>
+                <div className="text-sm font-bold text-white">{interstitialStats.dismissals}</div>
+              </div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#1F2937]/70 border border-zinc-800 flex items-center gap-3">
+              <Star className="w-4 h-4 text-amber-400 shrink-0" />
+              <div>
+                <div className="text-xs text-zinc-400">CTR</div>
+                <div className="text-sm font-bold text-amber-400">{ctr}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ModernCard>
 
       {/* Main Banner Section */}
       <ModernCard>

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { useAdminAffiliates } from '@/hooks/admin/useAdminAffiliates';
+import { logger } from '@/lib/logger';
 import type { AffiliateLink, ImageConfig, ImageViewConfig } from '@/types/affiliates';
 import { DEFAULT_IMAGE_CONFIG } from '@/types/affiliates';
 import { toast } from 'sonner';
@@ -16,7 +17,7 @@ interface AffiliateEditModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   affiliate: AffiliateLink | null;
-  placement: 'banner' | 'card_1' | 'card_2' | 'email';
+  placement: 'banner' | 'card_1' | 'card_2' | 'email' | 'interstitial';
   onSaved: () => void;
 }
 
@@ -45,7 +46,9 @@ export function AffiliateEditModal({
       ? '¿Te faltan cromos?'
       : placement === 'banner'
         ? 'Completar mi álbum'
-        : 'Ver en Amazon';
+        : placement === 'interstitial'
+          ? 'Ver oferta en Amazon'
+          : 'Ver en Amazon';
 
   // UI State
   const [isUploading, setIsUploading] = useState(false);
@@ -190,7 +193,7 @@ export function AffiliateEditModal({
         toast.success('Imagen subida con éxito');
       }
     } catch (error) {
-      console.error(error);
+      logger.error('Error uploading affiliate image:', error);
       toast.error('Error al subir la imagen');
     } finally {
       setIsUploading(false);
@@ -222,7 +225,7 @@ export function AffiliateEditModal({
         subtitle,
         rating,
         destination_url: url,
-        is_active: placement === 'email' ? active : true,
+        is_active: placement === 'email' || placement === 'interstitial' ? active : true,
         image_config: imageConfig,
         cta_text: ctaText.trim() || null,
       });
@@ -230,7 +233,7 @@ export function AffiliateEditModal({
       onSaved();
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      logger.error('Error saving affiliate link:', error);
       toast.error('Error al guardar el enlace');
     } finally {
       setIsSaving(false);
@@ -356,6 +359,48 @@ export function AffiliateEditModal({
       );
     }
 
+    if (placement === 'interstitial') {
+      return (
+        <div className="bg-black/90 rounded-2xl p-2.5 border border-gray-800 shadow-inner relative overflow-hidden">
+          <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 flex flex-col">
+            <div className="relative h-36 bg-gradient-to-b from-purple-50 to-amber-50/30 p-3 pt-9 flex items-center justify-center border-b border-gray-100">
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10 pointer-events-none">
+                <span className="px-2 py-0.5 rounded-full text-[8px] font-black uppercase bg-[#E8E6F8] text-[#533FC6]">
+                  🛡️ Recomendado
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-gray-900 text-white">
+                  5s · ✕
+                </span>
+              </div>
+              <DraggableImage
+                view="mobile"
+                className="max-w-full max-h-full object-contain"
+                containerClassName="w-full h-full flex items-center justify-center"
+              />
+            </div>
+            <div className="p-3 flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[8px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700">
+                  ✨ Destacado
+                </span>
+                <div className="flex items-center gap-1">
+                  {renderStars(rating)}
+                  <span className="text-[10px] font-bold text-gray-700">{rating.toFixed(1)}</span>
+                </div>
+              </div>
+              <h4 className="font-black text-gray-900 text-xs uppercase leading-tight line-clamp-2">
+                {title || 'Título principal'}
+              </h4>
+              <p className="text-[10px] text-gray-500 line-clamp-1">{subtitle || 'Subtítulo'}</p>
+              <div className="mt-1 w-full py-2 bg-[#533FC6] text-white text-[10px] font-black uppercase rounded-xl flex items-center justify-center gap-1">
+                <span>⭐ {ctaText.trim() || 'Ver oferta en Amazon'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (placement === 'email') {
       return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
@@ -427,6 +472,51 @@ export function AffiliateEditModal({
             <div className="w-full py-1.5 px-2.5 bg-[#533FC6] text-white text-[9px] font-black uppercase rounded-lg flex items-center justify-between gap-1">
               <span className="truncate">⭐ {ctaText.trim() || '¿Te faltan cromos?'}</span>
               <span>›</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (placement === 'interstitial') {
+      return (
+        <div className="bg-black/85 rounded-2xl px-8 py-4 border border-gray-800 relative overflow-hidden flex items-center justify-center">
+          <span className="absolute top-2 left-2.5 text-[9px] text-white/40 font-mono uppercase pointer-events-none">
+            Zona muerta (clic → afiliado)
+          </span>
+          <div className="w-[230px] bg-white rounded-2xl overflow-hidden shadow-2xl border border-white/20 flex flex-col z-10">
+            <div className="relative h-32 bg-gradient-to-b from-purple-50 to-amber-50/30 p-3 pt-8 flex items-center justify-center border-b border-gray-100">
+              <div className="absolute top-2 left-2 right-2 flex items-center justify-between z-10 pointer-events-none">
+                <span className="px-1.5 py-0.5 rounded-full text-[7px] font-black uppercase bg-[#E8E6F8] text-[#533FC6]">
+                  🛡️ Recomendado
+                </span>
+                <span className="px-1.5 py-0.5 rounded-full text-[8px] font-black bg-gray-900 text-white">
+                  5s · ✕
+                </span>
+              </div>
+              <DraggableImage
+                view="desktop"
+                className="max-w-full max-h-full object-contain"
+                containerClassName="w-full h-full flex items-center justify-center"
+              />
+            </div>
+            <div className="p-3 flex flex-col gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700">
+                  ✨ Destacado
+                </span>
+                <div className="flex items-center gap-1">
+                  {renderStars(rating)}
+                  <span className="text-[9px] font-bold text-gray-700">{rating.toFixed(1)}</span>
+                </div>
+              </div>
+              <h4 className="font-black text-gray-900 text-xs uppercase leading-tight line-clamp-1">
+                {title || 'Título principal'}
+              </h4>
+              <p className="text-[9px] text-gray-500 line-clamp-1">{subtitle || 'Subtítulo'}</p>
+              <div className="mt-1 w-full py-1.5 bg-[#533FC6] text-white text-[9px] font-black uppercase rounded-lg flex items-center justify-center gap-1">
+                <span>⭐ {ctaText.trim() || 'Ver oferta en Amazon'}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -565,12 +655,16 @@ export function AffiliateEditModal({
               <Input id="url" type="url" value={url} onChange={(e) => setUrl(e.target.value)} className="bg-white border-gray-300 focus-visible:ring-amber-500 mt-1 text-gray-900" placeholder="https://amazon.es/dp/..." disabled={isUploading || isSaving} />
             </div>
 
-            {/* Active Toggle (Only Email) */}
-            {placement === 'email' && (
+            {/* Active Toggle (Email & Interstitial) */}
+            {(placement === 'email' || placement === 'interstitial') && (
               <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg mt-2">
                 <div>
                   <p className="font-medium text-sm text-gray-700">Estado del enlace</p>
-                  <p className="text-xs text-gray-400">Mostrar en los próximos emails</p>
+                  <p className="text-xs text-gray-400">
+                    {placement === 'interstitial'
+                      ? 'Mostrar al iniciar sesión y en navegación web'
+                      : 'Mostrar en los próximos emails'}
+                  </p>
                 </div>
                 <Switch checked={active} onCheckedChange={setActive} disabled={isUploading || isSaving} />
               </div>

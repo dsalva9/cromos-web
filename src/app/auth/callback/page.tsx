@@ -206,6 +206,10 @@ export default function AuthCallback() {
             profile?.avatar_url ?? null
           );
 
+          if (complete) {
+            safeStorage.setItem('custom_interstitial_pending', 'true');
+            safeStorage.setItem('interstitial_session_count', '0');
+          }
           logger.info('Redirecting based on profile completion:', { complete });
           const userLocale = profile?.locale || getStoredLocale();
           if (mountedRef.current) router.push(lp(complete ? '/marketplace' : PROFILE_COMPLETION_ROUTE, userLocale));

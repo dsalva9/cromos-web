@@ -3,6 +3,7 @@
 import { useRef, useCallback } from 'react';
 import { isNative } from '@/lib/platform';
 import { safeStorage } from '@/lib/safeStorage';
+import { logger } from '@/lib/logger';
 
 // ── Ad Unit IDs ────────────────────────────────────────────────────────────
 const ADMOB_INTERSTITIAL_ID = 'ca-app-pub-4603075992850630/2878917537';
@@ -14,57 +15,50 @@ const INITIAL_COOLDOWN_MS = 1 * 60 * 1000; // 1 minute before first interstitial
 const COOLDOWN_MS = 3 * 60 * 1000;         // 3 minutes between subsequent ones
 const MAX_PER_SESSION = 5;                 // hard cap per app session
 
+function getLastShownAt(): number {
+    const v = safeStorage.getItem('interstitial_last_shown');
+    if (!v) {
+        const now = Date.now();
+        safeStorage.setItem('interstitial_last_shown', String(now));
+        return now;
+    }
+    return parseInt(v, 10);
+}
+
+function setLastShownAt(ts: number) {
+    safeStorage.setItem('interstitial_last_shown', String(ts));
+}
+
+function getSessionCount(): number {
+    const v = safeStorage.getItem('interstitial_session_count');
+    const lastShown = getLastShownAt();
+    // Reset session count if last ad was >30 min ago (new session proxy)
+    if (Date.now() - lastShown > 30 * 60 * 1000) return 0;
+    return v ? parseInt(v, 10) : 0;
+}
+
+function setSessionCount(n: number) {
+    safeStorage.setItem('interstitial_session_count', String(n));
+}
+
 /**
  * Low-level interstitial ad engine.
  *
  * This hook manages the full lifecycle:
- *   1. Pre-loading an interstitial so it's ready instantly
- *   2. Enforcing a 4-minute cooldown between impressions
+ *   1. Pre-loading an AdMob interstitial on native so it's ready instantly
+ *   2. Enforcing a cooldown between impressions (1m initial / 3m subsequent)
  *   3. Capping at 5 impressions per session
- *   4. Tracking "Load More" presses so we only fire from the 2nd onwards
- *   5. Skipping entirely for patrons (`is_patron`)
- *
- * The hook is consumed by `InterstitialAdProvider` which wraps it in a
- * React context so any component in the tree can call `maybeShowInterstitial`.
- *
- * On web / SSR this is a complete no-op — the Capacitor AdMob plugin is
- * never imported.
+ *   4. Skipping entirely for PRO / patrons (`isAdFree`)
+ *   5. Routing Web (Desktop/Mobile) impressions to `onShowCustomInterstitial`
  */
-export function useInterstitialAdEngine(isPatron: boolean) {
-    // ── Mutable refs (persist across renders, never trigger re-render) ──
+export function useInterstitialAdEngine(
+    isPatron: boolean,
+    onShowCustomInterstitial?: () => Promise<boolean>
+) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admobRef = useRef<any>(null);
     const isAdReadyRef = useRef(false);
     const preparePromiseRef = useRef<Promise<boolean> | null>(null);
-
-    // ── localStorage-backed state (survives hard navigation reloads) ──
-    // window.location.href causes full page reloads, which reset all useRef
-    // values. We persist cooldown/session state in localStorage so the
-    // 4-minute cooldown can actually elapse across navigations.
-    const getLastShownAt = (): number => {
-        const v = safeStorage.getItem('interstitial_last_shown');
-        if (!v) {
-            // First visit / fresh install — stamp now so the initial
-            // cooldown starts from this moment, not from epoch 0.
-            const now = Date.now();
-            safeStorage.setItem('interstitial_last_shown', String(now));
-            return now;
-        }
-        return parseInt(v, 10);
-    };
-    const setLastShownAt = (ts: number) => {
-        safeStorage.setItem('interstitial_last_shown', String(ts));
-    };
-    const getSessionCount = (): number => {
-        const v = safeStorage.getItem('interstitial_session_count');
-        const lastShown = getLastShownAt();
-        // Reset session count if last ad was >30 min ago (new session proxy)
-        if (Date.now() - lastShown > 30 * 60 * 1000) return 0;
-        return v ? parseInt(v, 10) : 0;
-    };
-    const setSessionCount = (n: number) => {
-        safeStorage.setItem('interstitial_session_count', String(n));
-    };
-
 
     /**
      * Pre-load an interstitial so it's available instantly when a trigger fires.
@@ -84,17 +78,17 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                 }
 
                 const { AdMob } = admobRef.current;
-                console.log('[Interstitial] Preparing ad unit:', IS_TESTING ? ADMOB_INTERSTITIAL_TEST_ID : ADMOB_INTERSTITIAL_ID);
+                logger.debug('[Interstitial] Preparing ad unit:', IS_TESTING ? ADMOB_INTERSTITIAL_TEST_ID : ADMOB_INTERSTITIAL_ID);
                 await AdMob.prepareInterstitial({
                     adId: IS_TESTING ? ADMOB_INTERSTITIAL_TEST_ID : ADMOB_INTERSTITIAL_ID,
                     isTesting: IS_TESTING,
                 });
 
-                console.log('[Interstitial] ✅ Ad loaded and ready');
+                logger.debug('[Interstitial] Ad loaded and ready');
                 isAdReadyRef.current = true;
                 return true;
             } catch (err) {
-                console.warn('[Interstitial] ❌ Failed to prepare:', err);
+                logger.warn('[Interstitial] Failed to prepare:', err);
                 isAdReadyRef.current = false;
                 return false;
             } finally {
@@ -108,54 +102,47 @@ export function useInterstitialAdEngine(isPatron: boolean) {
 
     /**
      * Attempt to show an interstitial ad.
-     *
-     * @param trigger - `'nav'` for section/menu navigation, `'loadMore'` for
-     *   marketplace pagination.
-     * @returns `true` if an ad was shown, `false` if any guard blocked it.
-     *
-     * Guards (in order):
-     *   1. Not native → skip
-     *   2. User is patron → skip
-     *   3. Session cap reached → skip
-     *   4. Cooldown not elapsed → skip
-     *   5. loadMore trigger and < 2 presses → skip (only 2nd+ press)
      */
     const maybeShowInterstitial = useCallback(
         async (trigger: 'nav' | 'loadMore'): Promise<boolean> => {
-            // ── Platform guard ──
-            if (!isNative()) return false;
-
-            // ── Patron guard ──
+            // ── Patron / PRO guard ──
             if (isPatron) {
-                console.log('[Interstitial] Blocked: user is patron');
+                logger.debug('[Interstitial] Blocked: user is patron/pro');
                 return false;
             }
 
             // ── Session cap guard ──
             const sc = getSessionCount();
             if (sc >= MAX_PER_SESSION) {
-                console.log('[Interstitial] Blocked: session cap', sc, '>=', MAX_PER_SESSION);
+                logger.debug('[Interstitial] Blocked: session cap', sc, '>=', MAX_PER_SESSION);
                 return false;
             }
 
             // ── Cooldown guard ──
-            // First interstitial: 2 min after login. Subsequent: 4 min.
             const cooldown = sc === 0 ? INITIAL_COOLDOWN_MS : COOLDOWN_MS;
             const lastShown = getLastShownAt();
             const elapsed = Date.now() - lastShown;
             if (elapsed < cooldown) {
-                console.log('[Interstitial] Blocked: cooldown', Math.round(elapsed/1000), 's <', cooldown/1000, 's');
+                logger.debug('[Interstitial] Blocked: cooldown', Math.round(elapsed / 1000), 's <', cooldown / 1000, 's');
                 return false;
             }
 
-            console.log('[Interstitial] Guards passed! trigger=' + trigger, 'elapsed=' + Math.round(elapsed/1000) + 's', 'sessionCount=' + sc);
+            logger.debug('[Interstitial] Guards passed! trigger=' + trigger, 'elapsed=' + Math.round(elapsed / 1000) + 's', 'sessionCount=' + sc);
 
-            // ── Ensure an ad is ready ──
+            // ── Web (Desktop / Mobile Browser): show custom affiliate interstitial ──
+            if (!isNative()) {
+                if (onShowCustomInterstitial) {
+                    return await onShowCustomInterstitial();
+                }
+                return false;
+            }
+
+            // ── Native Android: Ensure an AdMob ad is ready ──
             if (!isAdReadyRef.current) {
-                console.log('[Interstitial] Ad not ready, preparing now...');
+                logger.debug('[Interstitial] Ad not ready, preparing now...');
                 const ready = await prepareAd();
                 if (!ready) {
-                    console.log('[Interstitial] ❌ Ad prepare failed, cannot show');
+                    logger.debug('[Interstitial] Ad prepare failed, cannot show');
                     return false;
                 }
             }
@@ -165,7 +152,9 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                 const { AdMob, InterstitialAdPluginEvents } = admobRef.current;
 
                 return new Promise<boolean>(async (resolve) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
                     let dismissedListener: any;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-const
                     let failedListener: any;
 
                     const cleanup = () => {
@@ -180,7 +169,6 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                             isAdReadyRef.current = false;
                             setLastShownAt(Date.now());
                             setSessionCount(getSessionCount() + 1);
-                            // Pre-load the next ad
                             prepareAd();
                             resolve(true);
                         }
@@ -191,7 +179,6 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                         () => {
                             cleanup();
                             isAdReadyRef.current = false;
-                            // Pre-load a replacement
                             prepareAd();
                             resolve(false);
                         }
@@ -199,7 +186,7 @@ export function useInterstitialAdEngine(isPatron: boolean) {
 
                     try {
                         await AdMob.showInterstitial();
-                    } catch (showErr) {
+                    } catch {
                         cleanup();
                         isAdReadyRef.current = false;
                         prepareAd();
@@ -207,12 +194,12 @@ export function useInterstitialAdEngine(isPatron: boolean) {
                     }
                 });
             } catch (err) {
-                console.warn('[AdMob Interstitial] Failed to show:', err);
+                logger.warn('[AdMob Interstitial] Failed to show:', err);
                 isAdReadyRef.current = false;
                 return false;
             }
         },
-        [isPatron, prepareAd]
+        [isPatron, prepareAd, onShowCustomInterstitial]
     );
 
     return { maybeShowInterstitial, prepareAd };

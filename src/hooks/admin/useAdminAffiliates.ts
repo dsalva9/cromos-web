@@ -1,13 +1,14 @@
 import { useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
-import type { AffiliateLink, ImageConfig } from '@/types/affiliates';
+import type { AffiliateLink, ImageConfig, InterstitialStats } from '@/types/affiliates';
 import { DEFAULT_IMAGE_CONFIG } from '@/types/affiliates';
 
 const supabase = createClient();
 
 interface UseAdminAffiliatesReturn {
   affiliates: AffiliateLink[];
+  interstitialStats: InterstitialStats;
   loading: boolean;
   error: string | null;
   saving: boolean;
@@ -30,6 +31,11 @@ interface UseAdminAffiliatesReturn {
 
 export function useAdminAffiliates(): UseAdminAffiliatesReturn {
   const [affiliates, setAffiliates] = useState<AffiliateLink[]>([]);
+  const [interstitialStats, setInterstitialStats] = useState<InterstitialStats>({
+    impressions: 0,
+    clicks: 0,
+    dismissals: 0,
+  });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +48,22 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
       const { data, error: rpcError } = await (supabase.rpc as any)('admin_list_affiliate_links');
       if (rpcError) throw rpcError;
       setAffiliates((data as AffiliateLink[]) || []);
+
+      // Fetch interstitial event stats (non-fatal)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: statsData } = await (supabase.rpc as any)('admin_get_interstitial_stats');
+        const row = Array.isArray(statsData) ? statsData[0] : statsData;
+        if (row) {
+          setInterstitialStats({
+            impressions: Number(row.impressions) || 0,
+            clicks: Number(row.clicks) || 0,
+            dismissals: Number(row.dismissals) || 0,
+          });
+        }
+      } catch {
+        // Ignore if stats RPC fails
+      }
     } catch (err) {
       logger.error('Error fetching affiliate links:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch affiliate links');
@@ -132,6 +154,7 @@ export function useAdminAffiliates(): UseAdminAffiliatesReturn {
 
   return {
     affiliates,
+    interstitialStats,
     loading,
     error,
     saving,

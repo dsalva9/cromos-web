@@ -155,6 +155,7 @@ textarea,
   --z-nav: 40;
   --z-modal: 50;
   --z-toast: 60;
+  --z-interstitial: 10000;
 }
 
 .dark {
