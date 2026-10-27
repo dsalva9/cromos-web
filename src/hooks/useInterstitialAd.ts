@@ -88,7 +88,7 @@ export function useInterstitialAdEngine(
                 isAdReadyRef.current = true;
                 return true;
             } catch (err) {
-                logger.warn('[Interstitial] Failed to prepare:', err);
+                logger.warnLocal('[Interstitial] Failed to prepare:', err);
                 isAdReadyRef.current = false;
                 return false;
             } finally {
@@ -194,7 +194,7 @@ export function useInterstitialAdEngine(
                     }
                 });
             } catch (err) {
-                logger.warn('[AdMob Interstitial] Failed to show:', err);
+                logger.warnLocal('[AdMob Interstitial] Failed to show:', err);
                 isAdReadyRef.current = false;
                 return false;
             }
