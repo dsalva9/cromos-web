@@ -49,6 +49,8 @@ if (SENTRY_DSN) {
             'Connection to Indexed Database server lost',
             // Chrome extension/port error injected into the page.
             'A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received',
+            // Safari Web Extension error injected into the page when tab closes/navigates mid-message.
+            'Invalid call to runtime.sendMessage()',
             // DuckDuckGo / iOS WKWebView internal script injection postMessage timeout error.
             'WKWebView API client did not respond to this postMessage',
             // Facebook in-app browser native bridge exception
@@ -145,6 +147,14 @@ if (SENTRY_DSN) {
                 return null;
             }
 
+            // Drop browser extension runtime messaging errors (e.g. Safari Web Extensions "Invalid call to runtime.sendMessage(). Tab not found.")
+            if (
+                message.includes('Invalid call to runtime.sendMessage') ||
+                message.includes('runtime.sendMessage()')
+            ) {
+                return null;
+            }
+
             const frames = event.exception?.values?.flatMap(
                 (v) => v.stacktrace?.frames ?? [],
             ) ?? [];
@@ -161,7 +171,11 @@ if (SENTRY_DSN) {
             // Drop errors originating from browser extension injected scripts.
             // These are extension-owned stack frames, not our code.
             const hasInjectedScript = frames.some((f) =>
-                f.filename?.includes('injectedScript'),
+                f.filename?.includes('injectedScript') ||
+                f.filename?.includes('safari-web-extension://') ||
+                f.filename?.includes('safari-extension://') ||
+                f.filename?.includes('chrome-extension://') ||
+                f.filename?.includes('moz-extension://'),
             );
             if (hasInjectedScript) return null;
 
